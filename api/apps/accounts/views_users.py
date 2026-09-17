@@ -156,6 +156,7 @@ def check_creds(request):
         "exists": False,
         "email": "",
         "email_verified": False,
+        "other_role": None,
     }
 
     check_creds_serializer = CheckCredsSerializer(data=data)
@@ -178,6 +179,10 @@ def check_creds(request):
         res_data["exists"] = True
         if user.is_verify_email:
             res_data["email_verified"] = True
+    else:
+        other_user = User.objects.filter(email__iexact=email).first()
+        if other_user:
+            res_data["other_role"] = other_user.role_name
 
     return response_data(data=res_data)
 
@@ -635,7 +640,7 @@ class UserViewSet(
     def get_queryset(self):
         queryset = (
             User.objects.select_related("avatar", "company")
-            .prefetch_related("companymember_set__role")
+            .prefetch_related("company_memberships__role")
             .order_by("-id")
         )
         role_name = self.request.query_params.get("roleName", None)

@@ -334,6 +334,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onSave, is
             onChange={(_, val) => setCurrentTab(val)}
             variant="scrollable"
             scrollButtons="auto"
+            allowScrollButtonsMobile
             sx={{
               '& .MuiTab-root': {
                 fontWeight: 700,

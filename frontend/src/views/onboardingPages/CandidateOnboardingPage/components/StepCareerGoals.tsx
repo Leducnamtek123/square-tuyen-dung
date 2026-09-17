@@ -278,7 +278,7 @@ export default function StepCareerGoals({
             </Stack>
 
             {showMap && (
-              <Box sx={{ mt: 2, borderRadius: '10px', overflow: 'hidden', border: '1px solid #E2E8F0' }}>
+              <Box sx={{ mt: 2, p: 2, borderRadius: '12px', bgcolor: '#ffffff', border: '1px solid #E2E8F0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
                 <LocationPicker
                   value={{
                     address: values.address || '',

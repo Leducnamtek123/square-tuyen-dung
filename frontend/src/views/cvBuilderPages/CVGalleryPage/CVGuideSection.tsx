@@ -54,7 +54,7 @@ export const CVGuideSection: React.FC = () => {
         gap: 5,
       }}
     >
-      {/* ── 1. Main Header & Intro ────────────────────────────────────────── */}
+      {/* -- 1. Main Header & Intro ------------------------------------------ */}
       <Box sx={{ borderBottom: '1px solid #f1f5f9', pb: 4, maxWidth: 900 }}>
         <Chip
           icon={<ArticleOutlinedIcon sx={{ fontSize: '16px !important', color: '#2563eb !important' }} />}
@@ -96,7 +96,7 @@ export const CVGuideSection: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* ── 2. Khái niệm & Tại sao CV quan trọng ──────────────────────────── */}
+      {/* -- 2. Khái niệm & Tại sao CV quan trọng ---------------------------- */}
       <Grid container spacing={3}>
         {/* Definition Box */}
         <Grid size={{ xs: 12, md: 5 }}>
@@ -205,7 +205,7 @@ export const CVGuideSection: React.FC = () => {
         </Grid>
       </Grid>
 
-      {/* ── 3. Sự khác biệt giữa CV và Resume ─────────────────────────────── */}
+      {/* -- 3. Sự khác biệt giữa CV và Resume ------------------------------- */}
       <Stack spacing={2.5}>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -280,7 +280,7 @@ export const CVGuideSection: React.FC = () => {
         </TableContainer>
       </Stack>
 
-      {/* ── 4. Cấu trúc của một CV hoàn chỉnh ─────────────────────────────── */}
+      {/* -- 4. Cấu trúc của một CV hoàn chỉnh ------------------------------- */}
       <Stack spacing={2.5}>
         <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
           <FormatListNumberedOutlinedIcon sx={{ color: '#0284c7' }} />
@@ -302,7 +302,7 @@ export const CVGuideSection: React.FC = () => {
             {
               step: '03',
               title: 'Trình độ học vấn',
-              desc: 'Tên trường, chuyên ngành, thời gian học tập, bằng cấp đạt được (Cử nhân, Kỹ sư, Thạc sĩ).',
+              desc: 'Tên trường, chuyên ngành, thời gian học tập, bằng cấp đạt được: Cử nhân, Kỹ sư, Thạc sĩ.',
             },
             {
               step: '04',
@@ -312,7 +312,7 @@ export const CVGuideSection: React.FC = () => {
             {
               step: '05',
               title: 'Kỹ năng nổi bật',
-              desc: 'Kỹ năng chuyên môn ngành nghề + kỹ năng mềm (giao tiếp, làm việc nhóm, quản lý thời gian).',
+              desc: 'Kỹ năng chuyên môn ngành nghề kết hợp kỹ năng mềm: giao tiếp, làm việc nhóm, quản lý thời gian.',
             },
             {
               step: '06',
@@ -374,7 +374,7 @@ export const CVGuideSection: React.FC = () => {
         </Grid>
       </Stack>
 
-      {/* ── 5. Các lưu ý khi viết CV & Quy trình 8 bước ───────────────────── */}
+      {/* -- 5. Các lưu ý khi viết CV & Quy trình 8 bước --------------------- */}
       <Grid container spacing={4}>
         {/* 10 Golden Rules */}
         <Grid size={{ xs: 12, md: 6 }}>
@@ -389,9 +389,9 @@ export const CVGuideSection: React.FC = () => {
                 'Đảm bảo tính chính xác và trung thực 100% về thông tin kinh nghiệm, học vấn.',
                 'Xác định mục tiêu nghề nghiệp rõ ràng, thể hiện kế hoạch cụ thể cho sự nghiệp.',
                 'Nghiên cứu văn hóa công ty và yêu cầu công việc để tùy chỉnh CV phù hợp.',
-                'Lựa chọn định dạng phù hợp: Chronological (theo thời gian) hoặc Functional (kỹ năng).',
+                'Lựa chọn định dạng phù hợp: Chronological - theo thời gian hoặc Functional - theo kỹ năng.',
                 'Sử dụng ngôn ngữ chuyên nghiệp, trang trọng, tuân thủ đúng ngữ pháp và chính tả.',
-                'Nhấn mạnh điểm nổi bật bằng số liệu cụ thể (ví dụ: "Tăng doanh thu 30% trong 6 tháng").',
+                'Nhấn mạnh điểm nổi bật bằng số liệu cụ thể, ví dụ: "Tăng doanh thu 30% trong 6 tháng".',
                 'Hạn chế sử dụng ngôn ngữ quá thân mật hoặc quá cảm tính.',
                 'Tránh sử dụng từ ngữ chung chung như "năng động", "siêng năng" mà thiếu chứng minh.',
                 'Kiểm tra và chỉnh sửa kỹ lưỡng trước khi gửi đến nhà tuyển dụng.',
@@ -469,7 +469,7 @@ export const CVGuideSection: React.FC = () => {
 
       <Divider sx={{ borderColor: '#f1f5f9' }} />
 
-      {/* ── 6. Phối màu CV theo Phong Thủy Ngũ Hành ─────────────────────── */}
+      {/* -- 6. Phối màu CV theo Phong Thủy Ngũ Hành ----------------------- */}
       <Stack spacing={3}>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -477,7 +477,7 @@ export const CVGuideSection: React.FC = () => {
             <span>Có nên phối màu CV không? & Bí kíp chọn màu CV đẹp mắt, hợp mệnh</span>
           </Typography>
           <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.85rem', mt: 0.5, lineHeight: 1.7, maxWidth: 900 }}>
-            Phối màu CV xin việc mang lại nhiều lợi ích quan trọng: tạo ấn tượng ban đầu mạnh mẽ, phản ánh cá tính riêng, làm nổi bật thông tin quan trọng và mang lại may mắn theo phong thủy Ngũ Hành (Kim, Mộc, Thủy, Hỏa, Thổ):
+            Phối màu CV xin việc mang lại nhiều lợi ích quan trọng: tạo ấn tượng ban đầu mạnh mẽ, phản ánh cá tính riêng, làm nổi bật thông tin quan trọng và mang lại may mắn theo phong thủy Ngũ Hành: Kim, Mộc, Thủy, Hỏa, Thổ:
           </Typography>
         </Box>
 
@@ -517,7 +517,7 @@ export const CVGuideSection: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CloseIcon sx={{ fontSize: 15, color: '#dc2626' }} />
                   <Typography variant="caption" sx={{ color: '#991b1b', fontWeight: 600 }}>
-                    Kỵ: Màu Đỏ, Hồng (thuộc Hỏa)
+                    Kỵ: Màu Đỏ, Hồng - thuộc hành Hỏa
                   </Typography>
                 </Box>
               </Stack>
@@ -637,13 +637,13 @@ export const CVGuideSection: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CheckIcon sx={{ fontSize: 15, color: '#16a34a' }} />
                   <Typography variant="caption" sx={{ color: '#166534', fontWeight: 600 }}>
-                    Hợp: Xanh lá cây (Mộc sinh Hỏa), Đỏ, Tím, Cam
+                    Hợp: Xanh lá cây - Mộc sinh Hỏa, Đỏ, Tím, Cam
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CloseIcon sx={{ fontSize: 15, color: '#dc2626' }} />
                   <Typography variant="caption" sx={{ color: '#991b1b', fontWeight: 600 }}>
-                    Kỵ: Đen, Xám, Xanh biển đậm (Thủy khắc Hỏa)
+                    Kỵ: Đen, Xám, Xanh biển đậm - Thủy khắc Hỏa
                   </Typography>
                 </Box>
               </Stack>
@@ -685,7 +685,7 @@ export const CVGuideSection: React.FC = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <CloseIcon sx={{ fontSize: 15, color: '#dc2626' }} />
                   <Typography variant="caption" sx={{ color: '#991b1b', fontWeight: 600 }}>
-                    Kỵ: Xanh lá cây (Mộc khắc Thổ)
+                    Kỵ: Xanh lá cây - Mộc khắc Thổ
                   </Typography>
                 </Box>
               </Stack>
@@ -725,7 +725,7 @@ export const CVGuideSection: React.FC = () => {
         </Grid>
       </Stack>
 
-      {/* ── 7. Call To Action Footer ──────────────────────────────────────── */}
+      {/* -- 7. Call To Action Footer ---------------------------------------- */}
       <Card
         elevation={0}
         sx={{

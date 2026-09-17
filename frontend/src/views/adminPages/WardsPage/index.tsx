@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
@@ -401,11 +401,6 @@ const WardsPage = () => {
 
   const columns = React.useMemo<ColumnDef<Ward>[]>(
     () => [
-      {
-        accessorKey: 'id',
-        header: 'ID',
-        enableSorting: true,
-      },
       {
         accessorKey: 'name',
         header: t('pages.wards.table.name') as string,

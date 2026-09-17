@@ -36,35 +36,41 @@ const AIAnalysisDrawerHeader = ({ title, subtitle, onClose }: Props) => {
       <Stack direction="row" spacing={2} alignItems="center">
         <Box
           sx={{
-            p: 1,
-            borderRadius: 1.5,
-            bgcolor: pc.primary( 0.1),
+            width: 40,
+            height: 40,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
             color: 'primary.main',
             display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
           <PsychologyIcon sx={{ fontSize: 24 }} />
         </Box>
-        <Box>
+        <Box sx={{ minWidth: 0 }}>
           <Typography
-            variant="h6"
-            sx={{ fontWeight: 900, color: 'text.primary', lineHeight: 1.2, letterSpacing: '-0.5px' }}
+            variant="subtitle1"
+            sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2, letterSpacing: '-0.3px' }}
           >
             {title}
           </Typography>
           {subtitle && (
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+            <Typography variant="caption" noWrap sx={{ color: 'text.secondary', fontWeight: 600, display: 'block' }}>
               {subtitle}
             </Typography>
           )}
         </Box>
       </Stack>
-      <IconButton aria-label="Đóng"
+      <IconButton
+        aria-label="Đóng"
         onClick={onClose}
         size="small"
         sx={{
-          bgcolor: pc.actionDisabled( 0.05),
-          '&:hover': { bgcolor: pc.error( 0.1), color: 'error.main' },
+          color: 'text.secondary',
+          bgcolor: alpha(theme.palette.action.disabled, 0.05),
+          '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.1), color: 'error.main' },
         }}
       >
         <CloseIcon fontSize="small" />

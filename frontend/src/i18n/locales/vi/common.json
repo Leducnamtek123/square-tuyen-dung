@@ -7,6 +7,9 @@
     },
     "userMenu": "Menu người dùng"
   },
+  "home": {
+    "trending": "Xu hướng:"
+  },
   "city": "Tỉnh/Thành phố",
   "career": "Ngành nghề",
   "experience": "Kinh nghiệm",
@@ -47,6 +50,9 @@
     "save": "Lưu",
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
+    "clear": "Xóa bộ lọc",
+    "reset": "Đặt lại",
+    "undo": "Hoàn tác",
     "confirm": "Xác nhận",
     "apply": "Áp dụng",
     "add": "Thêm",
@@ -85,12 +91,13 @@
     "defaultDescription": "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp.",
     "notUpdated": "Chưa cập nhật",
     "jobCount": "{{count}} việc làm",
-    "followers": "{{count}} người theo dõi"
+    "followers": "người theo dõi"
   },
   "nav": {
     "createCv": "Tạo CV",
     "jobs": "Việc làm",
     "companies": "Công ty",
+    "practice": "Phỏng vấn thử",
     "news": "Tin tức",
     "aboutUs": "Về chúng tôi",
     "introduction": "Giới thiệu",
@@ -112,7 +119,7 @@
     "mainNav": "Menu điều hướng",
     "mobileMenu": "Menu chính",
     "switch": {
-      "forEmployers": "Dành cho nhà tuyển dụng",
+      "forEmployers": "Nhà tuyển dụng",
       "postFreeJob": "Đăng tin miễn phí",
       "forJobSeekers": "Dành cho ứng viên",
       "switch": "Chuyển",
@@ -214,7 +221,7 @@
     "servicePricing": "Báo giá dịch vụ",
     "pricingTable": "Bảng giá dịch vụ",
     "employerBlog": "Cẩm nang tuyển dụng",
-    "employerFaq": "Hỏi đáp thường gặp (FAQ)",
+    "employerFaq": "Hỏi đáp thường gặp",
     "warrantyPolicy": "Chính sách bảo hành & Hoàn tiền",
     "employerTerms": "Điều khoản sử dụng cho Nhà tuyển dụng",
     "employerPrivacy": "Chính sách bảo mật thông tin",
@@ -242,7 +249,7 @@
       "title": "Văn bản thành giọng nói",
       "textLabel": "Nội dung",
       "textPlaceholder": "Nhập nội dung để tạo giọng nói...",
-      "voiceLabel": "Giọng đọc (tuỳ chọn)",
+      "voiceLabel": "Giọng đọc",
       "voicePlaceholder": "Ví dụ: Ly",
       "speedLabel": "Tốc độ",
       "generate": "Tạo âm thanh",
@@ -304,7 +311,7 @@
     "Staff / Employee": "Nhân viên",
     "Collaborator": "Cộng tác viên",
     "Office-based": "Tại văn phòng",
-    "Hybrid": "Linh hoạt (Hybrid)",
+    "Hybrid": "Linh hoạt kết hợp",
     "Remote / Work from home": "Làm việc từ xa / Tại nhà",
     "Full-time Permanent": "Toàn thời gian cố định",
     "Full-time Temporary": "Toàn thời gian tạm thời",
@@ -355,6 +362,7 @@
   "feedback": {
     "button": "Đánh giá",
     "title": "Đánh giá của bạn",
+    "subtitle": "Chia sẻ trải nghiệm để nâng cao chất lượng dịch vụ",
     "placeholder": "Chia sẻ đánh giá của bạn...",
     "submit": "Gửi đánh giá",
     "ratingRequired": "Vui lòng chọn mức đánh giá.",
@@ -579,10 +587,10 @@
       "professionalScore": "Điểm chuyên môn",
       "resultLabel": "Kết quả cuối cùng",
       "pending": "Chờ xem xét",
-      "passed": "Chấp nhận (Đạt)",
-      "failed": "Từ chối (Không đạt)",
+      "passed": "Đạt yêu cầu",
+      "failed": "Không đạt",
       "comments": "Nhận xét chi tiết",
-      "proposedSalary": "Lương đề xuất (VNĐ)",
+      "proposedSalary": "Lương đề xuất",
       "submitEvaluation": "Gửi đánh giá cuối cùng",
       "openRecording": "Mở ghi hình",
       "commentsPlaceholder": "Nhập nhận xét hoặc ghi chú phỏng vấn..."
@@ -606,7 +614,7 @@
       "position": "VỊ TRÍ",
       "type": "LOẠI PHỎNG VẤN",
       "schedule": "LỊCH TRÌNH",
-      "aiOverallQuality": "Chất lượng tổng quan (AI)",
+      "aiOverallQuality": "Chất lượng tổng quan AI",
       "softSkills": "Kỹ năng mềm",
       "confidence": "Độ tự tin",
       "clarity": "Độ rõ ràng & Mạch lạc",
@@ -615,7 +623,7 @@
       "questionPerformance": "Đánh giá từng câu hỏi",
       "question": "Câu hỏi"
     },
-    "title": "Chi tiết Phỏng vấn Online"
+    "title": "Chi tiết phỏng vấn trực tuyến"
   },
   "jobPost": {
     "urgentHiring": "Tuyển gấp",
@@ -661,7 +669,7 @@
       "interviewtemplate": "Mẫu phỏng vấn AI"
     },
     "placeholder": {
-      "enterjobtitle": "Nhập tiêu đề C.V",
+      "enterjobtitle": "Nhập tiêu đề công việc (ví dụ: Kỹ sư phần mềm, Nhân viên kinh doanh...)",
       "selectcareer": "Chọn ngành nghề",
       "selectposition": "Chọn cấp bậc",
       "selectrequiredexperience": "Chọn kinh nghiệm",
@@ -914,8 +922,8 @@
       "editTitle": "Chỉnh sửa banner",
       "form": {
         "description": "Mô tả banner",
-        "buttonText": "Chữ trên nút (Button Text)",
-        "buttonLink": "Liên kết đích (URL)",
+        "buttonText": "Chữ trên nút",
+        "buttonLink": "Liên kết đích",
         "platform": "Nền tảng hiển thị",
         "bannerType": "Loại banner",
         "descLocation": "Vị trí mô tả",
@@ -966,7 +974,7 @@
       "form": {
         "title": "Tiêu đề việc làm quan tâm",
         "salary": "Mức lương mong muốn",
-        "frequency": "Tần suất nhận thông báo (ngày)",
+        "frequency": "Tần suất nhận thông báo",
         "position": "Cấp bậc",
         "experience": "Kinh nghiệm",
         "careerId": "Ngành nghề",
@@ -1226,7 +1234,7 @@
       "readFailed": "Không thể đọc nội dung file ảnh."
     },
     "portals": {
-      "admin": "Trang quản trị (Admin)",
+      "admin": "Trang quản trị",
       "employer": "Kênh nhà tuyển dụng"
     },
     "threadGroups": {
@@ -1485,6 +1493,8 @@
     "emptyContent": "Danh sách bài viết sẽ sớm được cập nhật.",
     "sectionTitle": "Tin tức & Thông tin",
     "sectionSubtitle": "Cập nhật những thông tin, tin tức tuyển dụng và thị trường lao động mới nhất.",
+    "handbookTitle": "Tin tức & Thông tin",
+    "handbookSubtitle": "Cập nhật những thông tin, tin tức tuyển dụng và thị trường lao động mới nhất.",
     "justUpdated": "Mới cập nhật",
     "defaultCategory": "CẨM NANG",
     "byAuthor": "Bởi {{author}} • {{time}}",
@@ -1540,26 +1550,26 @@
   },
   "editor": {
     "toolbar": {
-      "undo": "Hoàn tác (Ctrl+Z)",
-      "redo": "Làm lại (Ctrl+Y)",
+      "undo": "Hoàn tác",
+      "redo": "Làm lại",
       "templates": "Mẫu bài viết",
       "aiAssistant": "Trợ lý AI",
       "clearFormat": "Xóa định dạng",
       "heading": "Tiêu đề",
-      "normalText": "Văn bản thường (Normal text)",
-      "heading1": "Tiêu đề 1 (H1)",
-      "heading2": "Tiêu đề 2 (H2)",
-      "heading3": "Tiêu đề 3 (H3)",
-      "heading4": "Tiêu đề 4 (H4)",
+      "normalText": "Văn bản thường",
+      "heading1": "Tiêu đề 1",
+      "heading2": "Tiêu đề 2",
+      "heading3": "Tiêu đề 3",
+      "heading4": "Tiêu đề 4",
       "fontSize": "Cỡ chữ",
-      "fontSmall": "Nhỏ (13px)",
-      "fontNormal": "Chuẩn (15px)",
-      "fontMedium": "Vừa (18px)",
-      "fontLarge": "Lớn (22px)",
-      "fontXLarge": "Rất lớn (28px)",
-      "bold": "In đậm (Ctrl+B)",
-      "italic": "In nghiêng (Ctrl+I)",
-      "underline": "Gạch chân (Ctrl+U)",
+      "fontSmall": "Cỡ nhỏ",
+      "fontNormal": "Cỡ chuẩn",
+      "fontMedium": "Cỡ vừa",
+      "fontLarge": "Cỡ lớn",
+      "fontXLarge": "Cỡ rất lớn",
+      "bold": "In đậm",
+      "italic": "In nghiêng",
+      "underline": "Gạch chân",
       "strike": "Gạch ngang",
       "code": "Mã nội dòng",
       "textColor": "Màu chữ",
@@ -1570,15 +1580,16 @@
       "alignJustify": "Căn đều hai bên",
       "bulletList": "Danh sách gạch đầu dòng",
       "orderedList": "Danh sách đánh số",
-      "taskList": "Danh sách việc cần làm (Task list)",
+      "taskList": "Danh sách việc cần làm",
       "blockquote": "Trích dẫn",
-      "codeBlock": "Khối mã (Code block)",
-      "callout": "Khối ghi chú nổi bật (Callout box)",
+      "codeBlock": "Khối mã nguồn",
+      "callout": "Khối ghi chú nổi bật",
       "table": "Chèn bảng dữ liệu",
-      "link": "Chèn / Sửa liên kết (Ctrl+K)",
+      "link": "Chèn hoặc sửa liên kết",
       "horizontalRule": "Đường kẻ phân cách",
       "livePreview": "Xem trước bài viết",
-      "uploadImage": "Tải lên hình ảnh"
+      "uploadImage": "Tải lên hình ảnh",
+      "moreTools": "Thêm công cụ..."
     },
     "colors": {
       "default": "Mặc định",
@@ -1608,7 +1619,7 @@
       "wordsUnit": "từ"
     },
     "callout": {
-      "modalTitle": "Chèn Khối Ghi Chú Nổi Bật (Callout Box)",
+      "modalTitle": "Chèn Khối Ghi Chú Nổi Bật",
       "selectType": "Chọn loại khối ghi chú:",
       "customTitle": "Tiêu đề tùy chỉnh:",
       "content": "Nội dung ghi chú:",
@@ -1618,19 +1629,19 @@
       "insert": "Chèn Vào Bài Viết",
       "types": {
         "info": {
-          "label": "Thông tin bổ sung (Info)",
+          "label": "Thông tin bổ sung",
           "defaultTitle": "Lưu ý quan trọng:"
         },
         "tip": {
-          "label": "Mẹo & Bí quyết (Tip)",
+          "label": "Mẹo & Bí quyết",
           "defaultTitle": "Bí quyết hữu ích:"
         },
         "warning": {
-          "label": "Cảnh báo / Lưu ý (Warning)",
+          "label": "Cảnh báo & Lưu ý",
           "defaultTitle": "Lưu ý cần biết:"
         },
         "success": {
-          "label": "Điểm nổi bật / Thành tựu (Success)",
+          "label": "Điểm nổi bật",
           "defaultTitle": "Cam kết chất lượng:"
         }
       }
@@ -1639,24 +1650,24 @@
       "modalTitle": "Chèn Bảng Dữ Liệu",
       "gridSize": "Kích thước:",
       "sizeReadout": "{{rows}} hàng x {{cols}} cột",
-      "headerRow": "Có hàng tiêu đề nổi bật (Header row)",
+      "headerRow": "Có hàng tiêu đề nổi bật",
       "cancel": "Hủy",
       "insertButton": "Chèn Bảng ({{rows}}x{{cols}})",
       "dataCell": "Ô dữ liệu",
       "headerCell": "Ô tiêu đề"
     },
     "link": {
-      "modalTitle": "Chèn Liên Kết (Hyperlink)",
-      "urlLabel": "Địa chỉ liên kết (URL)",
+      "modalTitle": "Chèn Liên Kết",
+      "urlLabel": "Địa chỉ liên kết",
       "urlPlaceholder": "https://example.com",
       "textLabel": "Văn bản hiển thị",
-      "textPlaceholder": "Nhập chữ hiển thị (nếu có)...",
-      "openNewTab": "Mở trong tab mới (target=\"_blank\")",
+      "textPlaceholder": "Nhập chữ hiển thị...",
+      "openNewTab": "Mở trong tab mới",
       "cancel": "Hủy",
       "insert": "Chèn Liên Kết"
     },
     "preview": {
-      "modalTitle": "Xem Trước Bài Viết (Live Preview)",
+      "modalTitle": "Xem Trước Bài Viết",
       "subtitle": "Giao diện thực tế người xem sẽ nhìn thấy sau khi xuất bản",
       "empty": "Chưa có nội dung để hiển thị",
       "close": "Đóng"
@@ -1668,7 +1679,7 @@
       "allCategory": "Tất cả mẫu",
       "categories": {
         "company": "Giới thiệu Công ty",
-        "job": "Mô tả Tuyển dụng (JD)",
+        "job": "Mô tả tuyển dụng",
         "policy": "Chính sách & Phúc lợi",
         "interview": "Quy trình & Hướng dẫn",
         "article": "Bài viết",
@@ -1687,7 +1698,7 @@
       "selectToPreview": "Chọn mẫu bên trái để xem trước"
     },
     "ai": {
-      "modalTitle": "Trợ Lý Soạn Thảo AI (AI Writing Assistant)",
+      "modalTitle": "Trợ Lý Soạn Thảo AI",
       "subtitle": "Tối ưu hóa, mở rộng và hoàn thiện nội dung tuyển dụng chuyên nghiệp",
       "tones": {
         "label": "Phong cách diễn đạt:",
@@ -1747,7 +1758,7 @@
         "jd1": "Mô tả vị trí lập trình viên",
         "jd2": "Mô tả vị trí nhân viên kinh doanh",
         "jd3": "Mô tả vị trí chuyên viên tuyển dụng",
-        "mail1": "Thư mời nhận việc (Offer letter)",
+        "mail1": "Thư mời nhận việc",
         "mail2": "Thư mời phỏng vấn",
         "mail3": "Thư cảm ơn ứng viên",
         "mail4": "Thư từ chối ứng viên lịch sự",
@@ -1780,7 +1791,7 @@
     "uploadingImage": "Đang tải ảnh lên..."
   },
   "export": {
-    "title": "Xuất dữ liệu (Export)",
+    "title": "Xuất dữ liệu",
     "subtitle": "Cấu hình phạm vi, xem trước và tải xuống file dữ liệu",
     "fileName": "Tên file xuất",
     "fileNamePlaceholder": "Nhập tên file...",
@@ -1797,7 +1808,7 @@
     "selectAll": "Chọn tất cả",
     "deselectAll": "Bỏ chọn tất cả",
     "rows": "dòng",
-    "previewTitle": "Xem trước dữ liệu (Preview)",
+    "previewTitle": "Xem trước dữ liệu",
     "previewFirst10": "Hiển thị 10 dòng đầu",
     "totalRecords": "Tổng số: {{count}} bản ghi",
     "noColumnsSelected": "Chưa chọn cột nào để xem trước.",

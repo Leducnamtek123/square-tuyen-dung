@@ -345,4 +345,4 @@ const CandidateRecommendedJobsCard = () => {
   );
 };
 
-export default CandidateRecommendedJobsCard;
+export default React.memo(CandidateRecommendedJobsCard);

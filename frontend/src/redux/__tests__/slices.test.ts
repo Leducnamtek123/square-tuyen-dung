@@ -23,7 +23,7 @@ import profileReducer, { reloadResume } from '../profileSlice';
 import type { RootState } from '../store';
 import type { User } from '@/types/models';
 
-// ─── userSlice tests ────────────────────────────────────────────
+// --- userSlice tests --------------------------------------------
 describe('userSlice', () => {
   it('should have correct initial state', () => {
     const state = userReducer(undefined, { type: '@@INIT' });
@@ -126,7 +126,7 @@ describe('userSlice', () => {
   });
 });
 
-// ─── authSlice tests ────────────────────────────────────────────
+// --- authSlice tests --------------------------------------------
 describe('authSlice', () => {
   it('should have correct initial state', () => {
     const state = authReducer(undefined, { type: '@@INIT' });
@@ -162,7 +162,7 @@ describe('authSlice', () => {
   });
 });
 
-// ─── filterSlice tests ──────────────────────────────────────────
+// --- filterSlice tests ------------------------------------------
 describe('filterSlice', () => {
   const initialJobPostFilter = {
     kw: '', careerId: '', cityId: '', districtId: '', wardId: '',
@@ -232,7 +232,7 @@ describe('filterSlice', () => {
   });
 });
 
-// ─── profileSlice tests ─────────────────────────────────────────
+// --- profileSlice tests -----------------------------------------
 describe('profileSlice', () => {
   it('should have correct initial state', () => {
     const state = profileReducer(undefined, { type: '@@INIT' });
@@ -248,7 +248,7 @@ describe('profileSlice', () => {
   });
 });
 
-// ─── Store integration test ─────────────────────────────────────
+// --- Store integration test -------------------------------------
 describe('Redux store integration', () => {
   let store: ReturnType<typeof configureStore>;
 

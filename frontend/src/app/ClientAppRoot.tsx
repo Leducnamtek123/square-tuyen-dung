@@ -16,6 +16,7 @@ import { isAdminPortalPath } from "../configs/portalRouting";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import tokenService from "../services/tokenService";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { ProductTourProvider } from "../components/Features/ProductTour";
 import MaintenanceModeScreen from "../components/Common/MaintenanceModeScreen";
 import {
   MAINTENANCE_MODE_CODE,
@@ -86,10 +87,14 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     pathname === jobSeekerInterviewPrefix ||
     pathname.startsWith(`${jobSeekerInterviewPrefix}/`);
   const isInterviewPage =
-    pathname.startsWith(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW}`) ||
-    pathname.startsWith(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM}`) ||
+    isJobSeekerInterviewRoute ||
+    pathname.startsWith('/interview') ||
+    pathname.startsWith('/phong-van') ||
     pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`) ||
-    pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', '')}`);
+    pathname.startsWith('/employer/interviews') ||
+    pathname.startsWith('/nha-tuyen-dung/phong-van') ||
+    pathname.startsWith('/nha-tuyen-dung/interviews') ||
+    pathname.startsWith('/nha-tuyen-dung/danh-sach-phong-van');
   
   const canShowChatBot = !isAdminPortal && !isEmployerPortal && !isChatPage && !isInterviewPage;
   const isMaintenanceMode =
@@ -194,9 +199,11 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
   return (
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
+        <ProductTourProvider>
           {children}
           <Toaster richColors position="top-right" />
           {canShowChatBot && <ChatBot />}
+        </ProductTourProvider>
       </GoogleOAuthProvider>
       <ConfirmDialogRoot />
       <ScrollToTop />

@@ -29,7 +29,7 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 
 const INTERVAL_MS = 5000;
 
-/* ────────────── styled components ────────────── */
+/* -------------- styled components -------------- */
 const Card = styled(Box)(() => ({
   display: 'flex',
   width: '100%',
@@ -91,7 +91,7 @@ const Dot = styled('button')<{ active: boolean }>(({ active }) => ({
   padding: 0,
 }));
 
-/* ────────────── component ────────────── */
+/* -------------- component -------------- */
 const AdminLogin: React.FC = () => {
   const { t } = useTranslation(['auth', 'admin']);
   TabTitle(t('auth:login.adminTitle'));
@@ -101,7 +101,7 @@ const AdminLogin: React.FC = () => {
   const [isAuthenticating, setIsAuthenticating] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  /* ── slider data ── */
+  /* -- slider data -- */
   const SLIDES = [
     {
       image: '/images/admin-login/slide-1.png',
@@ -120,7 +120,7 @@ const AdminLogin: React.FC = () => {
     },
   ];
 
-  /* ── slider state ── */
+  /* -- slider state -- */
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -143,7 +143,7 @@ const AdminLogin: React.FC = () => {
     resetTimer();
   };
 
-  /* ── auth logic ── */
+  /* -- auth logic -- */
   const handleLogin: React.ComponentProps<typeof AdminLoginForm>['onLogin'] = (data) => {
     const getAccessToken = async (email: string, password: string, roleName: string) => {
       try {
@@ -217,7 +217,7 @@ const AdminLogin: React.FC = () => {
   return (
     <>
       <Card>
-        {/* ─── LEFT: Form ─── */}
+        {/* --- LEFT: Form --- */}
         <LeftPanel>
           <Box sx={{ mb: 1 }}>
             <Image
@@ -267,7 +267,7 @@ const AdminLogin: React.FC = () => {
           </Typography>
         </LeftPanel>
 
-        {/* ─── RIGHT: Image slides (no animation) ─── */}
+        {/* --- RIGHT: Image slides (no animation) --- */}
         <RightPanel>
           {SLIDES.map((slide, idx) => (
             <SlideImage

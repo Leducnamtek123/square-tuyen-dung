@@ -59,6 +59,8 @@ const buildInitialValues = (editData: Partial<JobPostFormValues> | null): JobPos
     benefitsEnjoyed: createEditorStateFromHTMLString(''),
     isUrgent: false,
     interviewTemplate: null,
+    autoInterviewEnabled: true,
+    minScreeningScore: 70,
     location: { city: '', district: '', address: '', lat: '', lng: '' },
   } as JobPostFormValues;
 

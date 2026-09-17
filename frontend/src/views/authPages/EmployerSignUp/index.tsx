@@ -15,7 +15,6 @@ import { getUserInfo } from '@/redux/userSlice';
 import authService from '@/services/authService';
 import tokenService from '@/services/tokenService';
 import EmployerSignUpForm, { EmployerSignUpFormData } from '@/views/components/auths/EmployerSignUpForm';
-import AuthShowcasePanel from '@/views/components/auths/AuthShowcasePanel';
 import { useAppDispatch } from '@/hooks/useAppStore';
 import type { RoleName, AuthProvider } from '@/types/auth';
 import type { AxiosError } from 'axios';
@@ -23,14 +22,20 @@ import type { EmployerRegisterData } from '@/types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 import SecurityIcon from '@mui/icons-material/Security';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import EmployerSignUpShowcase from '@/views/components/auths/EmployerSignUpShowcase';
 
 const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
 const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   background: '#FFFFFF',
-  borderRadius: '28px',
-  boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
-  border: '1px solid #E2E8F0',
+  borderRadius: 0,
+  boxShadow: 'none',
+  border: 'none',
+  [theme.breakpoints.up('sm')]: {
+    borderRadius: '28px',
+    boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
+    border: '1px solid #E2E8F0',
+  },
   transition: 'all 0.3s ease',
   width: '100%',
   maxWidth: '1080px',
@@ -257,11 +262,11 @@ const EmployerSignUp = () => {
               width: '100%',
             }}
           >
-            {/* Left Column: Sign Up Form */}
+            {/* Left Column: Registration Form */}
             <Grid
               size={{ xs: 12, md: 6 }}
               sx={{
-                p: { xs: 3, sm: 4, md: 4.5 },
+                p: { xs: 3, sm: 4, md: 5 },
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -351,7 +356,7 @@ const EmployerSignUp = () => {
                       mb: 0.75,
                     }}
                   >
-                    {t('signup.heading')}
+                    {t('signup.employerTitle', { defaultValue: 'Đăng ký tài khoản Tuyển dụng' })}
                   </Typography>
 
                   <Typography
@@ -376,24 +381,24 @@ const EmployerSignUp = () => {
               </Box>
 
               {/* Card Bottom / Legal Disclaimer & Links */}
-              <Box sx={{ mt: 'auto', pt: 2.5 }}>
+              <Box sx={{ mt: 'auto', pt: 3 }}>
                 <Typography
                   variant="caption"
                   sx={{
                     display: 'block',
                     textAlign: 'center',
                     color: '#64748B',
-                    fontSize: '12.5px',
+                    fontSize: '12px',
                     lineHeight: 1.55,
                     mb: 2,
                   }}
                 >
                   Bằng việc đăng ký tài khoản, quý doanh nghiệp đồng ý tuân thủ các{' '}
-                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '12px', color: '#2563EB' }}>
                     Điều khoản dịch vụ
                   </StyledLink>{' '}
                   và{' '}
-                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '12px', color: '#2563EB' }}>
                     Chính sách bảo mật
                   </StyledLink>{' '}
                   của InfoHR.
@@ -445,7 +450,7 @@ const EmployerSignUp = () => {
                 position: 'relative',
               }}
             >
-              <AuthShowcasePanel variant="employer" />
+              <EmployerSignUpShowcase />
             </Grid>
           </Grid>
         </UnifiedAuthCard>

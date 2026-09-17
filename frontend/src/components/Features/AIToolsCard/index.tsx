@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, Card, Divider, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, Chip, Divider, Stack, TextField, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import aiService from '@/services/aiService';
 import type { AxiosError } from 'axios';
@@ -158,13 +158,31 @@ const AIToolsCard = () => {
           minRows={2}
         />
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <TextField
-            label={t('aiTools.tts.voiceLabel')}
-            placeholder={t('aiTools.tts.voicePlaceholder')}
-            value={state.ttsVoice}
-            onChange={(e) => dispatch({ type: 'set_tts_voice', payload: e.target.value })}
-            fullWidth
-          />
+          <Box sx={{ flex: 1 }}>
+            <TextField
+              label={t('aiTools.tts.voiceLabel')}
+              placeholder="Trúc Ly"
+              value={state.ttsVoice}
+              onChange={(e) => dispatch({ type: 'set_tts_voice', payload: e.target.value })}
+              fullWidth
+            />
+            <Stack direction="row" spacing={1} sx={{ mt: 1 }} alignItems="center">
+              <Typography variant="caption" color="text.secondary">
+                Gợi ý giọng đọc:
+              </Typography>
+              {['Trúc Ly', 'Mai Anh', 'Thanh Bình'].map((voice) => (
+                <Chip
+                  key={voice}
+                  label={voice}
+                  size="small"
+                  variant={state.ttsVoice === voice ? 'filled' : 'outlined'}
+                  color={state.ttsVoice === voice ? 'primary' : 'default'}
+                  onClick={() => dispatch({ type: 'set_tts_voice', payload: voice })}
+                  sx={{ cursor: 'pointer' }}
+                />
+              ))}
+            </Stack>
+          </Box>
           <TextField
             label={t('aiTools.tts.speedLabel')}
             value={state.ttsSpeed}

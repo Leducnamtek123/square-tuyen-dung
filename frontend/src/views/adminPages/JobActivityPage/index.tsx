@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo, useReducer } from 'react';
 import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
@@ -142,9 +142,10 @@ const JobActivityPage = () => {
 
     const columns = useMemo<ColumnDef<JobPostActivity>[]>(() => [
         {
-            accessorKey: 'id',
-            header: 'ID',
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             accessorKey: 'fullName',

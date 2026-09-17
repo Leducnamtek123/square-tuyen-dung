@@ -56,6 +56,31 @@ audit_result*.txt
 build_err*.txt
 expect_output*.txt
 expect_cli_output*.txt
+temp_prompt.txt
+temp_*.txt
+prompt_*.txt
+*.mp3
+*.wav
+
+# AI Assistant & Tooling
+.superpowers/
+.agent/
+
+# Audit reports & screenshots
+docs/audit_reports/deep_screens_audit/
+docs/audit_reports/ntd_audit/
+docs/audit_reports/real_user_audit/
+docs/audit_reports/*.json
+docs/audit_reports/**/*.png
+*_findings.json
+deep_findings_report.txt
+audit_output.md
+
+# Test results & coverage
+playwright-report/
+test-results/
+coverage/
+.nyc_output/
 
 # Local isolated worktrees
 .worktrees/

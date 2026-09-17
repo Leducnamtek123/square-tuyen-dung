@@ -135,18 +135,37 @@ export function ConfirmDialogRoot() {
     showCancelButton = true,
     confirmButtonText = 'Đồng ý',
     cancelButtonText = 'Hủy',
+    input,
     onConfirm,
     onCancel,
   } = useConfirmDialogState();
+
+  const [inputValue, setInputValue] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (open) {
+      setInputValue(input?.defaultValue || '');
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [open, input]);
 
   const iconConfig = ICON_CONFIG[icon] || ICON_CONFIG.info;
   const IconComponent = iconConfig.icon;
   const isDanger = icon === 'error' || icon === 'warning';
 
   const handleConfirm = () => {
+    if (input?.required && !inputValue.trim()) {
+      inputRef.current?.focus();
+      return;
+    }
     confirmDialogStore.close();
     if (onConfirm) {
-      onConfirm();
+      onConfirm(inputValue);
     }
   };
 
@@ -184,13 +203,31 @@ export function ConfirmDialogRoot() {
               </AlertDialogDescription>
             )}
           </AlertDialogHeader>
+          {input && (
+            <div className="w-full mt-3.5">
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleConfirm();
+                  }
+                }}
+                placeholder={input.placeholder || ''}
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder:text-slate-400 shadow-sm"
+              />
+            </div>
+          )}
         </div>
 
         <AlertDialogFooter className="mt-4 gap-2.5 sm:gap-3">
           {showCancelButton && (
             <AlertDialogCancel
               onClick={handleCancel}
-              className="h-10 rounded-xl px-5 text-sm font-semibold border-slate-200 bg-white hover:bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-all duration-150"
+              className="h-10 rounded-xl px-5 text-sm font-semibold border border-slate-200 !bg-white hover:!bg-slate-50 !text-slate-700 shadow-xs transition-all duration-150 cursor-pointer"
             >
               {cancelButtonText}
             </AlertDialogCancel>
@@ -198,10 +235,10 @@ export function ConfirmDialogRoot() {
           <AlertDialogAction
             variant={isDanger ? 'destructive' : 'default'}
             onClick={handleConfirm}
-            className={`h-10 rounded-xl px-5 text-sm font-bold text-white transition-all duration-150 ${
+            className={`h-10 rounded-xl px-5 text-sm font-bold transition-all duration-150 cursor-pointer ${
               isDanger
-                ? 'bg-red-600 hover:bg-red-700 shadow-md shadow-red-600/20'
-                : 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-600/25'
+                ? 'bg-red-600 hover:bg-red-700 !bg-red-600 hover:!bg-red-700 !text-white shadow-md shadow-red-600/20'
+                : 'bg-blue-600 hover:bg-blue-700 !bg-blue-600 hover:!bg-blue-700 !text-white shadow-md shadow-blue-600/25'
             }`}
           >
             {confirmButtonText}

@@ -12,6 +12,9 @@ from django.utils.html import strip_tags
 from pydantic import BaseModel, Field, ValidationError
 
 from integrations.ai.client import post_chat_completion_httpx
+from apps.operations.services import OperationTracker
+from apps.operations.models import AsyncOperation
+from decimal import Decimal
 from .livekit_service import LiveKitService
 from .models import InterviewSession
 from .services import broadcast_interview_event
@@ -71,8 +74,21 @@ def _extract_json_object(raw_content: str) -> str:
 def _mark_evaluation_unavailable(session: InterviewSession, reason: str):
     old_status = session.status
     session.status = "completed"
+    session.ai_overall_score = 0
+    session.ai_technical_score = 0
+    session.ai_communication_score = 0
     session.ai_summary = reason
-    session.save(update_fields=["status", "ai_summary", "update_at"])
+    session.ai_strengths = []
+    session.ai_weaknesses = ["Phiên phỏng vấn kết thúc sớm khi chưa ghi nhận câu trả lời từ ứng viên."]
+    session.ai_detailed_feedback = {
+        "soft_skills": {"confidence": 0, "clarity": 0, "tone": "chưa ghi nhận"},
+        "cultural_fit": "Chưa đủ dữ liệu đánh giá do phiên phỏng vấn kết thúc sớm.",
+        "question_performance": [],
+    }
+    session.save(update_fields=[
+        "status", "ai_overall_score", "ai_technical_score", "ai_communication_score",
+        "ai_summary", "ai_strengths", "ai_weaknesses", "ai_detailed_feedback", "update_at"
+    ])
 
     if old_status == "processing":
         broadcast_interview_event(session.id, "status_changed", {
@@ -93,6 +109,10 @@ def end_interview_session(session_id, reason="max_duration"):
         session = InterviewSession.objects.get(id=session_id)
 
         if session.status in ("completed", "cancelled"):
+            return
+
+        if (session.session_metadata or {}).get("persistent"):
+            logger.info("Skip auto-ending persistent session %s.", session_id)
             return
 
         now = tz.now()
@@ -122,7 +142,7 @@ def end_interview_session(session_id, reason="max_duration"):
 
         chain(
             evaluate_interview_session.s(session.id),
-            send_evaluation_report.s(),
+            send_interview_report_notification.s(),
         ).delay()
 
     except InterviewSession.DoesNotExist:
@@ -146,6 +166,13 @@ def finalize_disconnected_session(session_id):
         session = InterviewSession.objects.get(id=session_id)
     except InterviewSession.DoesNotExist:
         logger.warning("Interview session %s not found when finalizing disconnect.", session_id)
+        return
+
+    if (session.session_metadata or {}).get("persistent"):
+        logger.info(
+            "Skip finalizing disconnect for persistent session %s.",
+            session_id,
+        )
         return
 
     if session.status != "interrupted":
@@ -281,17 +308,88 @@ def send_interview_report_notification(session_id):
              retry_backoff=True, retry_kwargs={'max_retries': 3})
 def evaluate_interview_session(self, session_id):
     """Call LLM to evaluate interview transcript and persist validated structured output."""
+    tracker = None
     try:
         session = InterviewSession.objects.prefetch_related("transcripts").get(id=session_id)
+        company = getattr(session.job_post, "company", None) if getattr(session, "job_post", None) else None
+        user = getattr(session, "candidate", None)
+        user_id = getattr(user, "id", None) if user else None
+        company_id = getattr(company, "id", None) if company else None
+
+        create_kwargs = {
+            "type": "interview.evaluate",
+            "title": f"Đánh giá phỏng vấn AI #{session.id}",
+            "steps": [
+                {"key": "sync_recording", "label": "Đồng bộ dữ liệu phòng phỏng vấn"},
+                {"key": "transcribe_align", "label": "Tổng hợp hội thoại & phiên âm"},
+                {"key": "ai_scoring", "label": "AI đánh giá năng lực & chuyên môn"},
+                {"key": "apply_weights", "label": "Áp dụng thang điểm & trọng số"},
+                {"key": "publish_report", "label": "Hoàn tất báo cáo & công bố kết quả"},
+            ],
+            "metadata": {"session_id": session.id, "job_post_id": getattr(session, "job_post_id", None)},
+        }
+        try:
+            tracker = OperationTracker.create(
+                **create_kwargs,
+                company_id=company_id,
+                user_id=user_id,
+            )
+        except TypeError:
+            tracker = OperationTracker.create(
+                **create_kwargs,
+                company=company,
+                user=user,
+            )
+
+        meta = session.session_metadata or {}
+        if isinstance(meta, dict):
+            meta["operation_id"] = tracker.operation.id
+            session.session_metadata = meta
+            session.save(update_fields=["session_metadata", "update_at"])
+
+        if tracker:
+            tracker.start_step("sync_recording", detail="Đang đồng bộ dữ liệu phiên phỏng vấn...")
+            tracker.complete_step("sync_recording", detail="Đồng bộ dữ liệu phiên phỏng vấn thành công.")
+
+        if tracker:
+            tracker.start_step("transcribe_align", detail="Đang tổng hợp nội dung hội thoại...")
+
         transcripts = session.transcripts.all().order_by("create_at")
 
         if not transcripts:
             logger.warning("Session %s has no transcripts to evaluate.", session_id)
+            if tracker:
+                tracker.fail("Chưa có đủ dữ liệu hội thoại từ ứng viên.", code="INSUFFICIENT_DATA")
             _mark_evaluation_unavailable(
                 session,
-                "AI evaluation could not run because this interview has no transcript.",
+                "Chưa có dữ liệu hội thoại để thực hiện đánh giá cho buổi phỏng vấn này.",
             )
             return None
+
+        # Check if candidate actually spoke in the interview
+        candidate_transcripts = [
+            t for t in transcripts if t.speaker_role in ("candidate", "jobseeker", "user")
+        ]
+        total_candidate_words = sum(len(t.content.strip().split()) for t in candidate_transcripts)
+
+        if not candidate_transcripts or total_candidate_words < 5:
+            logger.warning(
+                "Session %s has insufficient candidate speech to evaluate (transcripts=%s, words=%s).",
+                session_id, len(candidate_transcripts), total_candidate_words
+            )
+            if tracker:
+                tracker.fail("Chưa có đủ dữ liệu hội thoại từ ứng viên.", code="INSUFFICIENT_DATA")
+            _mark_evaluation_unavailable(
+                session,
+                "Phiên phỏng vấn kết thúc sớm khi chưa ghi nhận câu trả lời phỏng vấn từ ứng viên.",
+            )
+            return None
+
+        if tracker:
+            tracker.complete_step(
+                "transcribe_align",
+                detail=f"Tổng hợp {len(candidate_transcripts)} câu trả lời ({total_candidate_words} từ).",
+            )
 
         history_text = ""
         for transcript in transcripts:
@@ -299,18 +397,24 @@ def evaluate_interview_session(self, session_id):
             history_text += f"{role}: {transcript.content}\n"
 
         prompt = f"""
-Bạn là một chuyên gia tuyển dụng chuyên nghiệp. Hãy phân tích nội dung buổi phỏng vấn sau đây và đưa ra đánh giá khách quan.
+Bạn là một chuyên gia tuyển dụng chuyên nghiệp. Hãy phân tích nội dung buổi phỏng vấn sau đây và đưa ra đánh giá khách quan, trung thực dựa HOÀN TOÀN vào những gì ứng viên thực tế đã trả lời.
 
 NỘI DUNG BUỔI PHỎNG VẤN:
 {history_text}
+
+QUY TẮC ĐÁNH GIÁ VÀ CHẤM ĐIỂM BẮT BUỘC:
+1. Chỉ chấm điểm và đánh giá dựa trên những gì ứng viên THỰC TẾ ĐÃ TRẢ LỜI. Tuyệt đối KHÔNG tự suy diễn, KHÔNG khen ngợi những kỹ năng không xuất hiện trong hội thoại.
+2. Nếu ứng viên trả lời rất ngắn gọn, sơ sài, không đúng trọng tâm hoặc chỉ nói không biết, điểm số từng phần và tổng quát phải từ 1 đến 4 điểm.
+3. Chỉ đưa vào danh sách question_performance những câu hỏi mà ứng viên thực sự đã có câu trả lời.
+4. Điểm số (1-10) phải phản ánh đúng năng lực thể hiện thực tế.
 
 Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
 - overall_score: điểm tổng quát (1-10)
 - technical_score: điểm kiến thức chuyên môn (1-10)
 - communication_score: điểm giao tiếp (1-10)
-- summary: tóm tắt ngắn gọn (dưới 100 từ)
-- strengths: danh sách 3-5 điểm mạnh (list string)
-- weaknesses: danh sách 2-3 điểm cần cải thiện (list string)
+- summary: tóm tắt ngắn gọn nhận xét thực tế (dưới 100 từ)
+- strengths: danh sách điểm mạnh thực tế (list string, nếu ứng viên chưa thể hiện được thì trả về [])
+- weaknesses: danh sách điểm cần cải thiện (list string)
 - detailed_feedback: object gồm:
   - question_performance: list object {{question: string, feedback: string, score: 1-10}}
   - soft_skills: {{confidence: 1-10, clarity: 1-10, tone: string}}
@@ -337,6 +441,12 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
             "response_format": {"type": "json_object"},
         }
 
+        if tracker:
+            tracker.start_step(
+                "ai_scoring",
+                detail="Mô hình AI đang phân tích năng lực và dẫn chứng câu trả lời...",
+            )
+
         logger.info("Starting AI evaluation for session %s using %s", session_id, model_alias)
 
         response_json, llm_candidate = post_chat_completion_httpx(
@@ -355,9 +465,61 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
         raw_json = _extract_json_object(content)
         validated = InterviewEvaluationSchema.model_validate_json(raw_json)
 
-        session.ai_overall_score = validated.overall_score
+        if tracker:
+            tracker.complete_step(
+                "ai_scoring",
+                detail=f"AI hoàn thành đánh giá chuyên môn (Kỹ thuật: {validated.technical_score}, Giao tiếp: {validated.communication_score}).",
+            )
+
         session.ai_technical_score = validated.technical_score
         session.ai_communication_score = validated.communication_score
+        session.ai_overall_score = validated.overall_score
+
+        if tracker:
+            tracker.start_step("apply_weights", detail="Đang áp dụng trọng số đánh giá doanh nghiệp...")
+
+        try:
+            company = getattr(session.job_post, "company", None)
+            if company and hasattr(company, "get_evaluation_weights"):
+                weights = company.get_evaluation_weights()
+                tech = float(validated.technical_score or 0)
+                comm = float(validated.communication_score or 0)
+                overall = float(validated.overall_score or 75)
+                soft_skills = validated.detailed_feedback.soft_skills
+                confidence = float(getattr(soft_skills, "confidence", 7.0) or 7.0) * 10
+                clarity = float(getattr(soft_skills, "clarity", 7.0) or 7.0) * 10
+
+                total_w = (
+                    weights.get("technical", 30) +
+                    weights.get("communication", 20) +
+                    weights.get("situational", 20) +
+                    weights.get("culture_fit", 20) +
+                    weights.get("attitude", 10)
+                ) or 100
+
+                weighted = (
+                    tech * weights.get("technical", 30) +
+                    comm * weights.get("communication", 20) +
+                    clarity * weights.get("situational", 20) +
+                    confidence * weights.get("culture_fit", 20) +
+                    overall * weights.get("attitude", 10)
+                ) / total_w
+                session.ai_overall_score = round(Decimal(str(weighted)), 1)
+        except Exception as w_exc:
+            logger.warning("Error applying company weights to evaluation score: %s", w_exc)
+
+        if tracker:
+            tracker.complete_step(
+                "apply_weights",
+                detail=f"Điểm số tổng quan sau trọng số: {session.ai_overall_score}/10.",
+            )
+
+        if tracker:
+            tracker.start_step(
+                "publish_report",
+                detail="Đang lưu trữ báo cáo và phát sự kiện hoàn tất...",
+            )
+
         session.ai_summary = validated.summary
         session.ai_strengths = validated.strengths
         session.ai_weaknesses = validated.weaknesses
@@ -374,6 +536,20 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
             "duration": session.duration,
         })
 
+        if tracker:
+            tracker.complete_step(
+                "publish_report",
+                detail="Hoàn tất báo cáo & công bố kết quả.",
+            )
+            tracker.finish(
+                result={
+                    "overallScore": float(session.ai_overall_score or 0),
+                    "technicalScore": float(session.ai_technical_score or 0),
+                    "communicationScore": float(session.ai_communication_score or 0),
+                    "summary": session.ai_summary,
+                }
+            )
+
         logger.info(
             "AI evaluation for session %s completed successfully. Score=%s",
             session_id,
@@ -386,12 +562,20 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
         return None
     except ValidationError as e:
         logger.error("AI output schema validation failed for session %s: %s", session_id, e)
+        if tracker:
+            tracker.fail(str(e)[:500], code="EVALUATION_FAILED")
     except ValueError as e:
         logger.error("Could not extract JSON payload for session %s: %s", session_id, e)
+        if tracker:
+            tracker.fail(str(e)[:500], code="EVALUATION_FAILED")
     except json.JSONDecodeError:
         logger.error("Failed to decode JSON from AI response for session %s", session_id)
+        if tracker:
+            tracker.fail("Failed to decode JSON from AI response", code="EVALUATION_FAILED")
     except Exception as e:
         logger.error("Unexpected error in evaluate_interview_session(%s): %s", session_id, e)
+        if tracker:
+            tracker.fail(str(e)[:500], code="EVALUATION_FAILED")
 
     # If we caught an error (other than DoesNotExist), revert to completed so frontend doesn't hang
     try:
@@ -453,4 +637,117 @@ def auto_schedule_screening_interview(activity_id: int):
         logger.info(f"Auto-scheduled screening AI interview for candidate {candidate.id} on job {job_post.id}")
     except Exception as e:
         logger.error(f"Failed to auto-schedule screening interview: {e}")
+
+
+@shared_task
+def start_room_recording_task(room_name: str) -> None:
+    """Start LiveKit room composite egress asynchronously via Celery worker."""
+    try:
+        LiveKitService.start_recording(room_name)
+    except Exception as exc:
+        logger.warning("start_room_recording_task failed for room %s: %s", room_name, exc)
+
+
+def synthesize_and_cache_audio(model: str, voice: str, speed: float, text: str) -> bool:
+    """Helper to synthesize audio and write to the shared TTS cache directory."""
+    import os
+    import shutil
+    import httpx
+    from .tts_cache import get_tts_cache_file_path, sanitize_tts_text
+
+    cleaned_text = sanitize_tts_text(text)
+    if not cleaned_text:
+        return False
+
+    cache_path = get_tts_cache_file_path(model, voice, speed, cleaned_text)
+    if os.path.exists(cache_path) and os.path.getsize(cache_path) > 100:
+        logger.info("TTS Cache already pre-warmed for: %s", cleaned_text[:30])
+        return True
+
+    base_url = (
+        getattr(settings, "TTS_BASE_URL", None)
+        or config("TTS_BASE_URL", default="")
+        or config("AI_TTS_BASE_URL", default="https://api.nodelee.tech:4433/v1")
+    ).rstrip("/")
+    api_key = (
+        getattr(settings, "TTS_API_KEY", None)
+        or config("TTS_API_KEY", default="")
+        or config("AI_TTS_API_KEY", default="")
+    )
+
+    url = f"{base_url}/audio/speech"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": model,
+        "input": cleaned_text,
+        "voice": voice,
+        "response_format": "mp3",
+        "speed": speed,
+    }
+
+    try:
+        with httpx.Client(timeout=30.0, verify=False) as client:
+            resp = client.post(url, json=payload, headers=headers)
+            if resp.status_code == 200 and len(resp.content) > 100:
+                tmp_dir = os.path.dirname(cache_path)
+                os.makedirs(tmp_dir, exist_ok=True)
+                tmp_file = f"{cache_path}.tmp.{os.getpid()}"
+                with open(tmp_file, "wb") as f:
+                    f.write(resp.content)
+                shutil.move(tmp_file, cache_path)
+                try:
+                    os.chmod(cache_path, 0o666)
+                except Exception:
+                    pass
+                logger.info("TTS Pre-warmed audio written to %s (%d bytes)", cache_path, len(resp.content))
+                return True
+            else:
+                logger.warning("TTS Pre-warm failed for %s: HTTP %s (%s)", cleaned_text[:30], resp.status_code, resp.text[:100])
+    except Exception as exc:
+        logger.warning("TTS Pre-warm exception for %s: %s", cleaned_text[:30], exc)
+    return False
+
+
+@shared_task
+def prewarm_interview_tts_task(session_id: int) -> None:
+    """Pre-synthesize opening greeting and first question audio into the shared disk cache."""
+    from apps.interviews.models import InterviewSession
+    from .tts_cache import format_opening_greeting
+
+    try:
+        session = InterviewSession.objects.select_related(
+            "candidate", "job_post", "voice_profile"
+        ).prefetch_related("questions").get(id=session_id)
+    except InterviewSession.DoesNotExist:
+        logger.warning("prewarm_interview_tts_task: session %s does not exist", session_id)
+        return
+
+    candidate_name = getattr(session.candidate, "full_name", "") or getattr(session.candidate, "username", "") or ""
+    job_title = session.job_post.job_name if session.job_post else (session.session_metadata or {}).get("position_title", "")
+    language = session.interview_language or "vi"
+    has_cv = bool(getattr(session.candidate, "cv_file", None))
+    voice = getattr(session.voice_profile, "voice_id", None) or config("AI_TTS_DEFAULT_VOICE", default="Trúc Ly")
+    model = config("AI_TTS_MODEL", default="tts-vi")
+    speed = 1.0
+
+    # 1. Opening greeting
+    greeting = format_opening_greeting(candidate_name, job_title, language, has_cv)
+    synthesize_and_cache_audio(model, voice, speed, greeting)
+
+    # 2. First question (if any)
+    first_question = session.questions.order_by("sort_order", "create_at", "id").first()
+    q_text = (getattr(first_question, "text", "") or getattr(first_question, "content", "") or "").strip()
+    if q_text:
+        if language == "vi":
+            first_q_prompt_1 = f"Hi bạn, mình bắt đầu nhẹ nhé. {q_text}"
+            first_q_prompt_2 = f"Ok, mình bắt đầu nhé. {q_text}"
+            synthesize_and_cache_audio(model, voice, speed, first_q_prompt_1)
+            synthesize_and_cache_audio(model, voice, speed, first_q_prompt_2)
+        elif language == "en":
+            first_q_prompt = f"Let us begin with our first question. {q_text}"
+            synthesize_and_cache_audio(model, voice, speed, first_q_prompt)
+
 

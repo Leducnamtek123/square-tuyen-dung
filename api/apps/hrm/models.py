@@ -1,7 +1,88 @@
+from decimal import Decimal
 from django.db import models
 from shared.models import CommonBaseModel
 from apps.accounts.models import User
 from apps.profiles.models import Company, JobSeekerProfile
+
+
+class WorkLocation(CommonBaseModel):
+    LOCATION_TYPE_CHOICES = (
+        ('HEADQUARTERS', 'Trụ sở chính'),
+        ('BRANCH', 'Chi nhánh'),
+        ('FACTORY', 'Nhà xưởng / Nhà máy'),
+        ('WAREHOUSE', 'Kho hàng'),
+        ('RETAIL', 'Điểm bán lẻ / Showroom'),
+        ('OTHER', 'Khác'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="work_locations")
+    name = models.CharField(max_length=255, verbose_name="Tên trụ sở hoặc chi nhánh")
+    code = models.CharField(max_length=50, blank=True, null=True, verbose_name="Mã chi nhánh")
+    location_type = models.CharField(max_length=20, choices=LOCATION_TYPE_CHOICES, default='BRANCH', verbose_name="Phân loại địa điểm")
+    address = models.CharField(max_length=500, blank=True, null=True, verbose_name="Địa chỉ")
+    city = models.CharField(max_length=100, blank=True, null=True, verbose_name="Tỉnh / Thành phố")
+    latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True, verbose_name="Vĩ độ")
+    longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True, verbose_name="Kinh độ")
+    radius_meters = models.PositiveIntegerField(default=200, verbose_name="Bán kính chấm công cho phép (mét)")
+    allowed_ip_ranges = models.TextField(blank=True, null=True, verbose_name="Dải IP mạng cho phép chấm công")
+    timezone = models.CharField(max_length=50, default="Asia/Ho_Chi_Minh", verbose_name="Múi giờ")
+    is_active = models.BooleanField(default=True, verbose_name="Đang hoạt động")
+
+    class Meta:
+        ordering = ['name']
+        unique_together = ('company', 'code')
+
+    def __str__(self):
+        return f"{self.name} ({self.code})" if self.code else self.name
+
+
+class BiometricDevice(CommonBaseModel):
+    PROTOCOL_CHOICES = (
+        ('ZKTECO_PULL', 'ZKTeco Kéo dữ liệu (TCP 4370)'),
+        ('ZKTECO_PUSH', 'ZKTeco Đẩy tự động (ADMS / Cổng 4200)'),
+        ('HIKVISION', 'Hikvision ISUP / ISAPI'),
+        ('CAMERA_AI', 'Camera AI nhận diện khuôn mặt'),
+        ('OTHER', 'Khác'),
+    )
+    DIRECTION_CHOICES = (
+        ('BOTH', 'Cả vào và ra'),
+        ('IN', 'Chỉ quẹt vào'),
+        ('OUT', 'Chỉ quẹt ra'),
+    )
+    STATUS_CHOICES = (
+        ('ONLINE', 'Đang kết nối'),
+        ('OFFLINE', 'Mất kết nối'),
+        ('SYNCING', 'Đang đồng bộ'),
+        ('ERROR', 'Lỗi kết nối'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="biometric_devices")
+    location = models.ForeignKey(WorkLocation, on_delete=models.CASCADE, related_name="devices", verbose_name="Trụ sở hoặc chi nhánh")
+    name = models.CharField(max_length=255, verbose_name="Tên máy chấm công")
+    device_code = models.CharField(max_length=50, blank=True, null=True, verbose_name="Mã thiết bị")
+    protocol = models.CharField(max_length=30, choices=PROTOCOL_CHOICES, default='ZKTECO_PULL', verbose_name="Giao thức kết nối")
+    ip_or_domain = models.CharField(max_length=255, verbose_name="Địa chỉ IP hoặc tên miền")
+    device_port = models.PositiveIntegerField(default=4370, verbose_name="Cổng thiết bị phần cứng")
+    service_port = models.PositiveIntegerField(default=4200, verbose_name="Cổng dịch vụ máy chủ")
+    comm_key = models.CharField(max_length=50, default="0", blank=True, verbose_name="Mật mã kết nối (Comm Key)")
+    direction = models.CharField(max_length=10, choices=DIRECTION_CHOICES, default='BOTH', verbose_name="Hướng quẹt")
+    serial_number = models.CharField(max_length=100, blank=True, null=True, verbose_name="Số sê-ri máy")
+    model_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Dòng máy / Hãng")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OFFLINE', verbose_name="Trạng thái kết nối")
+    last_ping = models.DateTimeField(null=True, blank=True, verbose_name="Lần kiểm tra gần nhất")
+    last_sync_time = models.DateTimeField(null=True, blank=True, verbose_name="Lần đồng bộ gần nhất")
+    last_error_message = models.TextField(null=True, blank=True, verbose_name="Thông điệp lỗi gần nhất")
+    total_punches_synced = models.PositiveIntegerField(default=0, verbose_name="Tổng số lượt quẹt đã đồng bộ")
+    auto_sync_interval = models.PositiveIntegerField(default=15, verbose_name="Chu kỳ quét tự động (phút)")
+    is_active = models.BooleanField(default=True, verbose_name="Kích hoạt")
+
+    class Meta:
+        ordering = ['location', 'name']
+        unique_together = ('company', 'device_code')
+
+    def __str__(self):
+        loc_name = self.location.name if self.location else "Chưa gán chi nhánh"
+        return f"{self.name} - {loc_name} ({self.ip_or_domain}:{self.device_port})"
 
 
 class Department(CommonBaseModel):
@@ -74,6 +155,7 @@ class Employee(CommonBaseModel):
     address = models.TextField(blank=True, null=True)
     
     department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="employees")
+    work_location = models.ForeignKey(WorkLocation, on_delete=models.SET_NULL, null=True, blank=True, related_name="employees", verbose_name="Trụ sở hoặc chi nhánh")
     designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, null=True, blank=True, related_name="employees")
     reports_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name="subordinates")
     
@@ -89,6 +171,7 @@ class Employee(CommonBaseModel):
     bank_account_holder = models.CharField(max_length=150, blank=True, null=True)
     tax_id = models.CharField(max_length=100, blank=True, null=True)
     social_insurance_id = models.CharField(max_length=100, blank=True, null=True)
+    dependents_count = models.PositiveSmallIntegerField(default=0, verbose_name="Số người phụ thuộc")
 
     class Meta:
         ordering = ['-create_at']
@@ -194,6 +277,78 @@ class EmployeeLeaveBalance(CommonBaseModel):
         return f"{self.employee.full_name} - {self.leave_type.name} ({self.year}): Còn {self.remaining_days} ngày"
 
 
+class WorkShift(CommonBaseModel):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="work_shifts")
+    code = models.CharField(max_length=50, verbose_name="Mã ca")
+    name = models.CharField(max_length=100, verbose_name="Tên ca")
+    start_time = models.TimeField(verbose_name="Giờ bắt đầu")
+    end_time = models.TimeField(verbose_name="Giờ kết thúc")
+    break_start = models.TimeField(null=True, blank=True, verbose_name="Nghỉ trưa từ")
+    break_end = models.TimeField(null=True, blank=True, verbose_name="Nghỉ trưa đến")
+    working_hours = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal("8.00"), verbose_name="Số giờ công")
+    work_factor = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal("1.00"), verbose_name="Hệ số công")
+    is_overnight = models.BooleanField(default=False, verbose_name="Ca qua đêm")
+    grace_period_late_minutes = models.PositiveIntegerField(default=5, verbose_name="Dung sai đi muộn (phút)")
+    grace_period_early_minutes = models.PositiveIntegerField(default=5, verbose_name="Dung sai về sớm (phút)")
+    is_active = models.BooleanField(default=True, verbose_name="Kích hoạt")
+
+    class Meta:
+        unique_together = ('company', 'code')
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.code})"
+
+
+class ShiftAssignment(CommonBaseModel):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="shift_assignments")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="shift_assignments")
+    shift = models.ForeignKey(WorkShift, on_delete=models.CASCADE, related_name="assignments")
+    date = models.DateField(db_index=True, verbose_name="Ngày làm việc")
+    is_off_day = models.BooleanField(default=False, verbose_name="Ngày nghỉ")
+    note = models.CharField(max_length=255, blank=True, null=True, verbose_name="Ghi chú")
+
+    class Meta:
+        unique_together = ('employee', 'date')
+        ordering = ['date', 'employee']
+
+    def __str__(self):
+        return f"{self.employee.full_name} - {self.date}: {self.shift.code}"
+
+
+class BiometricPunchLog(CommonBaseModel):
+    PUNCH_CHOICES = (
+        ('CHECK_IN', 'Vào'),
+        ('CHECK_OUT', 'Ra'),
+        ('AUTO', 'Tự động'),
+    )
+    SOURCE_CHOICES = (
+        ('ZKTECO', 'Máy ZKTeco'),
+        ('EXCEL_IMPORT', 'Nhập file Excel'),
+        ('WEB_APP', 'Web App'),
+        ('MANUAL', 'Thủ công'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="punch_logs")
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="punch_logs")
+    device = models.ForeignKey(BiometricDevice, on_delete=models.SET_NULL, null=True, blank=True, related_name="punch_logs", verbose_name="Thiết bị chấm công")
+    location = models.ForeignKey(WorkLocation, on_delete=models.SET_NULL, null=True, blank=True, related_name="punch_logs", verbose_name="Trụ sở hoặc chi nhánh")
+    biometric_id = models.CharField(max_length=50, verbose_name="Mã máy chấm công")
+    punch_time = models.DateTimeField(db_index=True, verbose_name="Thời gian quẹt")
+    device_name = models.CharField(max_length=100, blank=True, null=True, verbose_name="Tên máy chấm công")
+    device_ip = models.CharField(max_length=50, blank=True, null=True, verbose_name="IP máy chấm công")
+    punch_type = models.CharField(max_length=20, choices=PUNCH_CHOICES, default='AUTO', verbose_name="Loại quẹt")
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='ZKTECO', verbose_name="Nguồn dữ liệu")
+    is_duplicate = models.BooleanField(default=False, db_index=True, verbose_name="Cờ quẹt trùng lặp")
+
+    class Meta:
+        ordering = ['-punch_time']
+
+    def __str__(self):
+        emp_name = self.employee.full_name if self.employee else self.biometric_id
+        return f"{emp_name} - {self.punch_time.strftime('%Y-%m-%d %H:%M:%S')} ({self.punch_type})"
+
+
 class AttendanceRecord(CommonBaseModel):
     STATUS_CHOICES = (
         ('PRESENT', 'Có mặt'),
@@ -204,16 +359,94 @@ class AttendanceRecord(CommonBaseModel):
     )
 
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="attendances")
+    shift = models.ForeignKey(WorkShift, on_delete=models.SET_NULL, null=True, blank=True, related_name="attendance_records")
     date = models.DateField(db_index=True)
     check_in = models.TimeField(null=True, blank=True)
     check_out = models.TimeField(null=True, blank=True)
-    working_hours = models.DecimalField(max_digits=4, decimal_places=2, default=0.0)
+    scheduled_in = models.TimeField(null=True, blank=True)
+    scheduled_out = models.TimeField(null=True, blank=True)
+    late_minutes = models.PositiveIntegerField(default=0)
+    early_minutes = models.PositiveIntegerField(default=0)
+    working_hours = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal("0.00"))
+    effective_work_hours = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal("0.00"))
+    overtime_hours = models.DecimalField(max_digits=4, decimal_places=2, default=Decimal("0.00"))
+    status_code = models.CharField(max_length=20, default='X', blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PRESENT')
+    is_manually_adjusted = models.BooleanField(default=False)
+    adjustment_reason = models.TextField(blank=True, null=True)
+    is_locked = models.BooleanField(default=False)
     notes = models.TextField(blank=True, null=True)
 
     class Meta:
         unique_together = ('employee', 'date')
         ordering = ['-date']
+
+
+class AttendanceRequest(CommonBaseModel):
+    REQUEST_TYPE_CHOICES = (
+        ('LEAVE', 'Đơn xin nghỉ'),
+        ('REGULARISATION', 'Đề nghị cập nhật công'),
+        ('BUSINESS_TRIP', 'Đề nghị công tác'),
+        ('OVERTIME', 'Đơn làm thêm giờ'),
+        ('LATE_EARLY', 'Đơn đi muộn về sớm'),
+    )
+    STATUS_CHOICES = (
+        ('PENDING_STAGE_1', 'Chờ Quản lý duyệt'),
+        ('APPROVED_STAGE_1', 'Quản lý đã duyệt - Chờ HR duyệt'),
+        ('APPROVED', 'Đã phê duyệt'),
+        ('REJECTED', 'Từ chối'),
+        ('CANCELLED', 'Hủy đơn'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="attendance_requests")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="attendance_requests")
+    request_type = models.CharField(max_length=30, choices=REQUEST_TYPE_CHOICES, db_index=True, verbose_name="Loại đơn")
+    leave_type = models.ForeignKey(LeaveType, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Loại phép")
+    start_date = models.DateField(verbose_name="Từ ngày")
+    end_date = models.DateField(verbose_name="Đến ngày")
+    start_time = models.TimeField(null=True, blank=True, verbose_name="Từ giờ")
+    end_time = models.TimeField(null=True, blank=True, verbose_name="Đến giờ")
+    duration_hours = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name="Số giờ")
+    reason = models.TextField(blank=True, null=True, verbose_name="Lý do")
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='PENDING_STAGE_1', db_index=True, verbose_name="Trạng thái")
+    manager_reviewer = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_requests_stage1", verbose_name="Quản lý duyệt")
+    manager_approved_at = models.DateTimeField(null=True, blank=True, verbose_name="Thời gian quản lý duyệt")
+    hr_reviewer = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_requests_stage2", verbose_name="HR duyệt")
+    hr_approved_at = models.DateTimeField(null=True, blank=True, verbose_name="Thời gian HR duyệt")
+    rejection_reason = models.TextField(blank=True, null=True, verbose_name="Lý do từ chối")
+
+    class Meta:
+        ordering = ['-create_at']
+
+    def __str__(self):
+        return f"{self.employee.full_name} - {self.get_request_type_display()} ({self.start_date}): {self.status}"
+
+
+class MonthlyAttendanceSummary(CommonBaseModel):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="monthly_attendance_summaries")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="monthly_attendance_summaries")
+    month = models.PositiveSmallIntegerField(verbose_name="Tháng")
+    year = models.PositiveIntegerField(verbose_name="Năm")
+    standard_work_days = models.DecimalField(max_digits=4, decimal_places=1, default=Decimal("22.0"), verbose_name="Công chuẩn")
+    actual_work_days = models.DecimalField(max_digits=4, decimal_places=1, default=Decimal("0.0"), verbose_name="Công thực tế")
+    paid_leave_days = models.DecimalField(max_digits=4, decimal_places=1, default=Decimal("0.0"), verbose_name="Nghỉ phép hưởng lương")
+    unpaid_leave_days = models.DecimalField(max_digits=4, decimal_places=1, default=Decimal("0.0"), verbose_name="Nghỉ không lương")
+    overtime_hours_weekday = models.DecimalField(max_digits=5, decimal_places=1, default=Decimal("0.0"), verbose_name="Giờ OT ngày thường")
+    overtime_hours_weekend = models.DecimalField(max_digits=5, decimal_places=1, default=Decimal("0.0"), verbose_name="Giờ OT cuối tuần")
+    overtime_hours_holiday = models.DecimalField(max_digits=5, decimal_places=1, default=Decimal("0.0"), verbose_name="Giờ OT lễ tết")
+    late_occurrences = models.PositiveSmallIntegerField(default=0, verbose_name="Số lần đi muộn")
+    early_occurrences = models.PositiveSmallIntegerField(default=0, verbose_name="Số lần về sớm")
+    is_locked = models.BooleanField(default=False, verbose_name="Đã khóa")
+    locked_by = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="locked_summaries")
+    locked_at = models.DateTimeField(null=True, blank=True)
+    pushed_to_payroll_at = models.DateTimeField(null=True, blank=True, verbose_name="Thời gian chuyển tính lương")
+
+    class Meta:
+        unique_together = ('employee', 'month', 'year')
+        ordering = ['-year', '-month', 'employee']
+
+    def __str__(self):
+        return f"Summary {self.month}/{self.year} - {self.employee.full_name}: {self.actual_work_days}/{self.standard_work_days} công"
 
 
 class MonthlyPayrollRecord(CommonBaseModel):
@@ -273,4 +506,73 @@ class MonthlyPayrollRecord(CommonBaseModel):
 
     def __str__(self):
         return f"Payroll {self.month}/{self.year} - {self.employee.full_name}: Net {self.net_salary:,.0f} VND"
+
+
+class EmployeeCareerHistory(CommonBaseModel):
+    EVENT_TYPE_CHOICES = (
+        ('ONBOARDING', 'Tiếp nhận / Tuyển dụng mới'),
+        ('HIRED', 'Tuyển dụng mới'),
+        ('PROMOTION', 'Bổ nhiệm / Thăng chức'),
+        ('TRANSFER', 'Điều chuyển phòng ban'),
+        ('SALARY_ADJUSTMENT', 'Điều chỉnh lương'),
+        ('SALARY_INCREASE', 'Điều chỉnh lương'),
+        ('ROLE_CHANGE', 'Thay đổi vị trí / Chức danh'),
+        ('DEMOTION', 'Miễn nhiệm / Giáng chức'),
+        ('REWARD', 'Khen thưởng'),
+        ('DISCIPLINE', 'Kỷ luật'),
+        ('RESIGNATION', 'Thôi việc / Nghỉ việc'),
+        ('TERMINATION', 'Chấm dứt hợp đồng'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="career_histories")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="career_histories")
+    effective_date = models.DateField(db_index=True, verbose_name="Ngày hiệu lực")
+    event_type = models.CharField(max_length=30, choices=EVENT_TYPE_CHOICES, default='TRANSFER', verbose_name="Loại biến động")
+    old_department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    new_department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    old_designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    new_designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    old_salary = models.DecimalField(max_digits=12, decimal_places=0, null=True, blank=True, verbose_name="Mức lương cũ")
+    new_salary = models.DecimalField(max_digits=12, decimal_places=0, null=True, blank=True, verbose_name="Mức lương mới")
+    decision_number = models.CharField(max_length=100, blank=True, null=True, verbose_name="Số quyết định")
+    attachment = models.URLField(max_length=500, blank=True, null=True, verbose_name="Văn bản quyết định đính kèm")
+    note = models.TextField(blank=True, null=True, verbose_name="Ghi chú diễn giải")
+
+    class Meta:
+        ordering = ['-effective_date', '-create_at']
+
+    def __str__(self):
+        return f"{self.employee.full_name} - {self.get_event_type_display()} ({self.effective_date})"
+
+
+class EmployeeDocument(CommonBaseModel):
+    DOCUMENT_TYPE_CHOICES = (
+        ('IDENTITY_CARD', 'CCCD / Hộ chiếu'),
+        ('CCCD', 'CCCD / CMND / Hộ chiếu'),
+        ('LABOR_CONTRACT', 'Hợp đồng lao động bản scan'),
+        ('DEGREE_CERTIFICATE', 'Bằng cấp / Chứng chỉ chuyên môn'),
+        ('DEGREE', 'Bằng cấp / Chứng chỉ'),
+        ('HEALTH_CERTIFICATE', 'Giấy khám sức khỏe định kỳ'),
+        ('HEALTH_CERT', 'Giấy khám sức khỏe'),
+        ('TAX_DOCUMENT', 'Mã số thuế / Giảm trừ gia cảnh'),
+        ('DECISION', 'Quyết định bổ nhiệm / khen thưởng / kỷ luật'),
+        ('RESUME', 'Sơ yếu lý lịch'),
+        ('OTHER', 'Tài liệu khác'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="employee_documents")
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="documents")
+    document_type = models.CharField(max_length=30, choices=DOCUMENT_TYPE_CHOICES, default='OTHER', verbose_name="Phân loại tài liệu")
+    name = models.CharField(max_length=255, verbose_name="Tên tài liệu")
+    file_url = models.URLField(max_length=500, verbose_name="Đường dẫn lưu trữ văn bản")
+    issue_date = models.DateField(null=True, blank=True, verbose_name="Ngày cấp")
+    expiry_date = models.DateField(null=True, blank=True, verbose_name="Ngày hết hạn hiệu lực")
+    note = models.TextField(blank=True, null=True, verbose_name="Ghi chú")
+
+    class Meta:
+        ordering = ['-create_at']
+
+    def __str__(self):
+        return f"{self.employee.full_name} - {self.name} ({self.get_document_type_display()})"
+
 

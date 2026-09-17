@@ -260,7 +260,7 @@ export default function DashboardPage() {
       <Grid container spacing={{ xs: 1.5, sm: 2.5 }} sx={{ mb: 3.5 }}>
         <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2.4 }}>
           <LiveMetricCard
-            title={t('dashboard.noUserData')}
+            title={t('dashboard.totalUsers', 'Tổng người dùng')}
             value={totalUsers}
             subtitle={`${t('dashboard.last30Days')}: +${n(stats?.newUsers30d)}`}
             deltaPercent={14}
@@ -306,7 +306,7 @@ export default function DashboardPage() {
             loading={isLoading}
           />
         </Grid>
-        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2.4 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }}>
           <LiveMetricCard
             title={t('dashboard.interviews')}
             value={totalInterviews}

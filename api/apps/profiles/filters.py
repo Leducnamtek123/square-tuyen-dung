@@ -136,9 +136,13 @@ class CompanyFilter(django_filters.FilterSet):
 
     excludeSlug = django_filters.CharFilter(method="exclude_slug")
 
+    employeeSize = django_filters.NumberFilter(field_name='employee_size')
+
+    fieldOperation = django_filters.CharFilter(field_name='field_operation', lookup_expr='icontains')
+
     class Meta:
         model = Company
-        fields = ['kw', 'cityId', 'excludeSlug', 'cityIds']
+        fields = ['kw', 'cityId', 'excludeSlug', 'cityIds', 'employeeSize', 'fieldOperation']
 
     class NumberInFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
         pass

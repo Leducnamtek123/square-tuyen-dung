@@ -30,9 +30,14 @@ const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
 const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   background: '#FFFFFF',
-  borderRadius: '28px',
-  boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
-  border: '1px solid #E2E8F0',
+  borderRadius: 0,
+  boxShadow: 'none',
+  border: 'none',
+  [theme.breakpoints.up('sm')]: {
+    borderRadius: '28px',
+    boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
+    border: '1px solid #E2E8F0',
+  },
   transition: 'all 0.3s ease',
   width: '100%',
   maxWidth: '1080px',
@@ -301,13 +306,14 @@ const EmployerLogin = () => {
     <>
       <Container
         maxWidth="lg"
+        disableGutters
         sx={{
-          py: { xs: 2, sm: 4, md: 5 },
-          px: { xs: 1, sm: 2, md: 3 },
+          py: { xs: 0, sm: 4, md: 5 },
+          px: { xs: 0, sm: 2, md: 3 },
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: 'calc(100vh - 120px)',
+          minHeight: { xs: 'auto', sm: 'calc(100vh - 120px)' },
         }}
       >
         <UnifiedAuthCard>
@@ -323,7 +329,7 @@ const EmployerLogin = () => {
             <Grid
               size={{ xs: 12, md: 6 }}
               sx={{
-                p: { xs: 3, sm: 4, md: 4.5 },
+                p: { xs: 2.25, sm: 4, md: 4.5 },
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',

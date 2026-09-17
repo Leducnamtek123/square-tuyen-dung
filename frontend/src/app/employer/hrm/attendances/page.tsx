@@ -1,6 +1,12 @@
 import React from 'react';
-import AttendanceListPage from '@/views/hrmPages/AttendanceListPage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import AttendanceOverviewPage from '@/views/hrmPages/AttendancePages/AttendanceOverviewPage';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.hrm.attendances');
+}
 
 export default function EmployerHrmAttendancePage() {
-  return <AttendanceListPage />;
+  return <AttendanceOverviewPage />;
 }

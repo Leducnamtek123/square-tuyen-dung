@@ -73,7 +73,7 @@ const OnlineProfilePage = () => {
     };
 
     return (
-        <Box sx={{ py: 2, px: { xs: 2, sm: 3 } }}>
+        <Box sx={{ width: '100%' }}>
             {/* Mobile Section Quick Jump Bar */}
             <Box
                 sx={{

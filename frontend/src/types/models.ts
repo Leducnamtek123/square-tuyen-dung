@@ -25,6 +25,7 @@ export interface User {
   workspaces?: Workspace[];
   canAccessEmployerPortal?: boolean;
   isActive?: boolean;
+  dateJoined?: string;
   /** Job seeker profile object returned by backend (when roleName === 'JOB_SEEKER') */
   jobSeekerProfile?: { id: number | string } | null;
   /** Flat job seeker profile ID (alternative backend serialization) */
@@ -80,6 +81,7 @@ export interface Company {
     district?: string;
     address?: string;
   };
+  createAt?: string;
 }
 
 export interface CompanyImage {
@@ -120,6 +122,7 @@ export interface CompanyVerification {
   taxCode?: string;
   businessLicense?: string;
   representative?: string;
+  representativeName?: string;
   phone?: string;
   email?: string;
   website?: string;
@@ -137,11 +140,14 @@ export interface CompanyVerification {
 export interface TrustReport {
   id: number;
   targetType: 'job' | 'company';
+  reportType?: string;
   reason: string;
   message?: string;
   status: 'open' | 'reviewing' | 'resolved' | 'rejected';
   company?: number | null;
   jobPost?: number | null;
+  targetId?: number | null;
+  createdAt?: string;
   targetTitle?: string;
   reporterDict?: User;
   createAt?: string;
@@ -199,6 +205,9 @@ export interface JobPost {
   appliedNumber?: number;
   aiRecommendedCount?: number;
   aiRecommendedAvatars?: Array<{ name: string; initial: string; avatarUrl?: string | null }>;
+  interviewTemplate?: number | null;
+  autoInterviewEnabled?: boolean;
+  minScreeningScore?: number;
 }
 
 export interface JobPostActivity {
@@ -375,6 +384,7 @@ export interface JobSeekerProfile {
   permanentAddress?: string | null;
   location?: Location | null;
   userDict?: UserDict;
+  user?: number | string | null;
   isJobSeeking?: boolean;
   isSeekingJob?: boolean;
 }
@@ -474,19 +484,164 @@ export interface Location {
 
 /* Interview */
 
+export interface QuestionStep {
+  step: number;
+  title: string;
+  detail?: string;
+  guidance?: string;
+}
+
+export interface QuestionAnswerStructure {
+  start?: string;
+  steps: QuestionStep[];
+  end?: string;
+  time_guidance?: string;
+}
+
+export interface QuestionImportantTip {
+  priority?: 'HIGH' | 'MEDIUM' | 'LOW';
+  text?: string;
+  type?: 'do' | 'dont' | string;
+  content?: string;
+}
+
 export interface Question {
   id: number;
-  text: string;
-  difficulty?: string;
+  title?: string;
+  text?: string;
+  question_text?: string;
+  questionText?: string;
+  sort_order?: number;
+  sortOrder?: number;
+  seniority?: string;
+  difficulty?: string | number;
+  difficulty_display?: string;
   career?: number | null;
+  career_name?: string;
+  careerName?: string;
   category?: string;
+  category_display?: string;
+  categoryDisplay?: string;
   company?: number | null;
   canWrite?: boolean;
   questionType?: string;
+  default_duration_seconds?: number;
+  defaultDurationSeconds?: number;
+  answer_structure?: QuestionAnswerStructure | null;
+  answerStructure?: QuestionAnswerStructure | null;
+  interviewer_intent?: string;
+  interviewerIntent?: string;
+  important_tips?: QuestionImportantTip[] | null;
+  importantTips?: QuestionImportantTip[] | null;
+  follow_up_questions?: string[] | null;
+  followUpQuestions?: string[] | null;
   // Fallbacks for raw API response or transformer mapped fields
   content?: string;
-  questionText?: string;
   type?: string;
+  is_public?: boolean;
+  isPublic?: boolean;
+}
+
+export interface QuestionBankItem extends Question {
+  create_at?: string;
+  createAt?: string;
+}
+
+export interface CompanyQuestionSet {
+  id: number;
+  name: string;
+  description?: string;
+  company_id?: number | null;
+  companyId?: number | null;
+  company_name?: string;
+  companyName?: string;
+  company_logo?: string | null;
+  companyLogo?: string | null;
+  career_id?: number | null;
+  careerId?: number | null;
+  career_name?: string | null;
+  careerName?: string | null;
+  seniority?: string;
+  questions_count?: number;
+  questionsCount?: number;
+  total_duration_minutes?: number;
+  totalDurationMinutes?: number;
+  category_tags?: string[];
+  categoryTags?: string[];
+  questions?: QuestionBankItem[];
+}
+
+export interface SalaryBenchmarkItem {
+  id: number;
+  job_title?: string;
+  jobTitle?: string;
+  position_title?: string;
+  positionTitle?: string;
+  category?: string;
+  career?: number | null;
+  career_name?: string;
+  careerName?: string;
+  seniority?: string;
+  experience_level?: string;
+  experienceLevel?: string;
+  experience_level_display?: string;
+  experienceLevelDisplay?: string;
+  min_salary?: number | string;
+  minSalary?: number | string;
+  salary_min?: number | string;
+  salaryMin?: number | string;
+  median_salary?: number | string;
+  medianSalary?: number | string;
+  salary_avg?: number | string | null;
+  salaryAvg?: number | string | null;
+  max_salary?: number | string;
+  maxSalary?: number | string;
+  salary_max?: number | string;
+  salaryMax?: number | string;
+  currency?: string;
+  year?: number;
+  sample_size?: number;
+  sampleSize?: number;
+  sample_count?: number;
+  sampleCount?: number;
+  is_hot?: boolean;
+  isHot?: boolean;
+  source_notes?: string;
+  sourceNotes?: string;
+  create_at?: string;
+  createAt?: string;
+}
+
+export interface CreateMockSessionPayload {
+  job_title?: string;
+  position_title?: string;
+  category?: string;
+  career_id?: number | null;
+  seniority?: string;
+  experience_level?: string;
+  question_count?: number;
+  question_group_id?: number | string | null;
+  question_ids?: number[];
+  voice_profile_id?: number | string | null;
+  job_post_id?: number | string | null;
+  session_metadata?: Record<string, unknown>;
+}
+
+export interface MockSessionResponse extends InterviewSession {
+  questions?: Question[];
+  livekit_token?: string;
+  livekitToken?: string;
+  invite_token?: string;
+  interview_url?: string;
+}
+
+export interface InterviewEvaluationRubric {
+  criteria?: Array<{
+    name: string;
+    weight: number;
+    description?: string;
+  }>;
+  [key: string]: unknown;
 }
 
 export interface QuestionGroup {
@@ -495,13 +650,40 @@ export interface QuestionGroup {
   description?: string;
   author?: UserDict;
   company?: number;
-  evaluation_rubric?: any;
+  evaluation_rubric?: InterviewEvaluationRubric | null;
   questions?: Question[];
   questionIds?: number[];
   question_ids?: number[]; // Raw API payload field
   canWrite?: boolean;
+  is_public?: boolean;
+  isPublic?: boolean;
   createAt?: string;
   updateAt?: string;
+}
+
+export interface InterviewSessionMetadata {
+  position_title?: string;
+  job_title?: string;
+  category?: string;
+  career_id?: number | null;
+  total_questions?: number;
+  current_question_index?: number;
+  [key: string]: unknown;
+}
+
+export interface QuestionHintsDetailResponse {
+  id: number;
+  text: string;
+  question_text?: string;
+  category?: string;
+  category_display?: string;
+  difficulty?: number | string;
+  difficulty_display?: string;
+  default_duration_seconds?: number;
+  answer_structure?: QuestionAnswerStructure | null;
+  interviewer_intent?: string;
+  important_tips?: QuestionImportantTip[] | null;
+  follow_up_questions?: string[] | null;
 }
 
 export interface InterviewSession {
@@ -509,6 +691,7 @@ export interface InterviewSession {
   roomName: string;
   inviteToken?: string;
   status: string;
+  isLive?: boolean;
   type: string;
   interview_type?: string;
   scheduledAt?: string | null;
@@ -525,6 +708,10 @@ export interface InterviewSession {
   candidateEmail?: string | null;
   candidate_email?: string | null;
   companyName?: string | null;
+  companyLogo?: string | null;
+  company_logo?: string | null;
+  questionsCount?: number;
+  questions_count?: number;
   createdById?: number | null;
   createdBy?: User | number | null;
   aiOverallScore?: number | null;
@@ -539,8 +726,8 @@ export interface InterviewSession {
   ai_strengths?: string[] | string | null;
   aiWeaknesses?: string[] | string | null;
   ai_weaknesses?: string[] | string | null;
-  aiDetailedFeedback?: InterviewAiDetailedFeedback;
-  ai_detailed_feedback?: InterviewAiDetailedFeedback;
+  aiDetailedFeedback?: InterviewAiDetailedFeedback | null;
+  ai_detailed_feedback?: InterviewAiDetailedFeedback | null;
   recordingUrl?: string | null;
   recording_url?: string | null;
   evaluations?: InterviewEvaluation[];
@@ -552,6 +739,20 @@ export interface InterviewSession {
   voice_profile?: number | null;
   voiceProfileName?: string | null;
   voice_profile_name?: string | null;
+  sessionType?: 'official' | 'mock' | string;
+  session_type?: 'official' | 'mock' | string;
+  timeLimitPerQuestion?: number;
+  time_limit_per_question?: number;
+  sessionMetadata?: InterviewSessionMetadata | null;
+  session_metadata?: InterviewSessionMetadata | null;
+  livekitToken?: string;
+  livekit_token?: string;
+  interview_url?: string;
+  interviewUrl?: string;
+  interviewLanguage?: 'vi' | 'en' | 'ja' | 'ko' | string;
+  interview_language?: 'vi' | 'en' | 'ja' | 'ko' | string;
+  interviewLanguageDisplay?: string;
+  interview_language_display?: string;
 }
 
 export interface InterviewTranscript {
@@ -562,7 +763,7 @@ export interface InterviewTranscript {
   createAt?: string | null;
 }
 
-interface InterviewAiDetailedFeedback {
+export interface InterviewAiDetailedFeedback {
   technical?: string;
   communication?: string;
   attitude?: string;

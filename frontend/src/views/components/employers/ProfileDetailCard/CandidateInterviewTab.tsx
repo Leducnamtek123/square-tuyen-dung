@@ -21,6 +21,7 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import Link from 'next/link';
 import dayjs from '@/configs/dayjs-config';
 
@@ -68,6 +69,39 @@ const getStatusBadge = (status: string) => {
         color: '#64748B',
         bgcolor: '#F1F5F9',
         borderColor: '#E2E8F0',
+      };
+  }
+};
+
+const getLanguageBadge = (lang?: string) => {
+  switch (lang) {
+    case 'en':
+      return {
+        label: 'Tiếng Anh - FDI',
+        color: '#0369A1',
+        bgcolor: '#E0F2FE',
+        borderColor: '#BAE6FD',
+      };
+    case 'ja':
+      return {
+        label: 'Tiếng Nhật - FDI',
+        color: '#B91C1C',
+        bgcolor: '#FEE2E2',
+        borderColor: '#FECACA',
+      };
+    case 'ko':
+      return {
+        label: 'Tiếng Hàn - FDI',
+        color: '#4338CA',
+        bgcolor: '#E0E7FF',
+        borderColor: '#C7D2FE',
+      };
+    default:
+      return {
+        label: 'Tiếng Việt',
+        color: '#15803D',
+        bgcolor: '#DCFCE7',
+        borderColor: '#BBF7D0',
       };
   }
 };
@@ -209,6 +243,7 @@ export const CandidateInterviewTab: React.FC<CandidateInterviewTabProps> = ({ pr
           <Stack spacing={2} sx={{ mb: 1 }}>
             {sessions.map((session, index) => {
               const badge = getStatusBadge(session.status);
+              const langBadge = getLanguageBadge(session.interview_language || session.interviewLanguage);
               const isAi = session.type === 'mixed' || session.type === 'behavioral';
               const formattedDate = session.scheduledAt
                 ? dayjs(session.scheduledAt).format('DD/MM/YYYY HH:mm')
@@ -256,12 +291,25 @@ export const CandidateInterviewTab: React.FC<CandidateInterviewTabProps> = ({ pr
                       <Box sx={{ minWidth: 0 }}>
                         <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 0.5 }}>
                           <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '0.95rem' }}>
-                            {session.jobName ? `Phỏng vấn vị trí: ${session.jobName}` : `Buổi phỏng vấn #${session.id}`}
+                            {session.jobName ? `Phỏng vấn vị trí: ${session.jobName}` : 'Buổi phỏng vấn ứng viên'}
                           </Typography>
                           <Chip
-                            label={isAi ? 'AI Voice Bot' : 'Trực tiếp (Live)'}
+                            label={isAi ? 'AI Voice Bot' : 'Trực tiếp - Live'}
                             size="small"
                             sx={{ height: 22, fontSize: '0.7rem', fontWeight: 700, bgcolor: 'action.hover' }}
+                          />
+                          <Chip
+                            label={langBadge.label}
+                            size="small"
+                            sx={{
+                              height: 22,
+                              fontSize: '0.7rem',
+                              fontWeight: 750,
+                              bgcolor: langBadge.bgcolor,
+                              color: langBadge.color,
+                              border: '1px solid',
+                              borderColor: langBadge.borderColor,
+                            }}
                           />
                         </Stack>
 
@@ -303,9 +351,36 @@ export const CandidateInterviewTab: React.FC<CandidateInterviewTabProps> = ({ pr
                         }}
                       />
 
+                      {session.status === 'completed' && (
+                        <Button
+                          component="a"
+                          href={`/api/interview/web/sessions/${session.id}/export-pdf/`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          size="small"
+                          variant="outlined"
+                          startIcon={<PictureAsPdfOutlinedIcon sx={{ fontSize: 15 }} />}
+                          sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            fontSize: '0.75rem',
+                            color: '#1d4ed8',
+                            borderColor: '#bfdbfe',
+                            bgcolor: '#eff6ff',
+                            '&:hover': {
+                              bgcolor: '#dbeafe',
+                              borderColor: '#93c5fd',
+                            },
+                          }}
+                        >
+                          Xuất báo cáo PDF
+                        </Button>
+                      )}
+
                       <Button
                         component={Link}
-                        href={`/employer/interviews`}
+                        href={session.id ? `/employer/interviews/${session.id}` : `/employer/interviews`}
                         size="small"
                         variant="outlined"
                         endIcon={<OpenInNewIcon sx={{ fontSize: 15 }} />}
@@ -344,7 +419,7 @@ export const CandidateInterviewTab: React.FC<CandidateInterviewTabProps> = ({ pr
               Chưa có biên bản phỏng vấn nào cho ứng viên này
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, mb: 2.5, maxWidth: 520, mx: 'auto', fontSize: '0.8125rem', lineHeight: 1.6 }}>
-              Bạn có thể xếp lịch phỏng vấn AI tự động hoặc phỏng vấn trực tiếp để đánh giá chuyên môn, bảng điểm và bản gỡ băng (transcript) sẽ tự động lưu trữ tại đây.
+              Nhà tuyển dụng có thể xếp lịch phỏng vấn AI tự động hoặc phỏng vấn trực tiếp để đánh giá chuyên môn, bảng điểm và bản gỡ băng transcript sẽ tự động lưu trữ tại đây.
             </Typography>
 
             <Button

@@ -8,6 +8,7 @@ import { Box, Button, Stack, Typography, Paper } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import SavedResumeTable from '../SavedResumeTable';
 import { useSavedResumes, useToggleSaveResume } from '../hooks/useEmployerQueries';
@@ -17,6 +18,7 @@ import toastMessages from '@/utils/toastMessages';
 import { confirmModal } from '@/utils/sweetalert2Modal';
 import type { OnChangeFn, PaginationState, SortingState, RowSelectionState } from '@tanstack/react-table';
 import { ExportModal, type ExportColumn, type ExportScope } from '@/components/Common/ExportModal';
+import { ImportModal } from '@/components/Common/ImportModal';
 import { useConfig } from '@/hooks/useConfig';
 import {
   useGlobalFilter,
@@ -116,6 +118,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   );
 
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
 
   const savedResumeExportColumns: ExportColumn[] = useMemo(
     () => [
@@ -233,6 +236,21 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
             </Box>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<UploadFileOutlinedIcon />}
+                onClick={() => setImportModalOpen(true)}
+                sx={{
+                  px: 3,
+                  py: 1,
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  borderRadius: '8px',
+                }}
+              >
+                Nhập Excel/CSV
+              </Button>
+              <Button
                 variant="contained"
                 color="primary"
                 startIcon={<FileDownloadOutlinedIcon />}
@@ -292,6 +310,14 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
           filtered: count,
           selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
         }}
+      />
+
+      {/* Import Modal */}
+      <ImportModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        entity="candidate"
+        title="Nhập hồ sơ ứng viên (Candidate Import)"
       />
     </Box>
   );

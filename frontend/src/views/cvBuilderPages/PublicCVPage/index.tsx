@@ -29,6 +29,7 @@ import { CVTemplateRenderer } from '../templates/CVTemplateRenderer';
 import { printCVToPDF } from '../CVEditorPage/utils/pdfExport';
 import { TabTitle } from '@/utils/generalFunction';
 import toastMessages from '@/utils/toastMessages';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 export const PublicCVPage: React.FC = () => {
   const params = useParams();
@@ -145,7 +146,7 @@ export const PublicCVPage: React.FC = () => {
     },
     personalInfo: {
       fullName: cvRecord.candidateName || cvRecord.candidate_name || '',
-      title: '',
+      title: cvDataVal.personalInfo?.title || cvRecord.title || '',
       email: '',
       phoneNumber: '',
       address: '',
@@ -161,9 +162,14 @@ export const PublicCVPage: React.FC = () => {
     ...cvDataVal,
   };
 
+  if (!cvData.personalInfo.title && cvRecord.title) {
+    cvData.personalInfo.title = cvRecord.title;
+  }
+
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#e2e8f0', display: 'flex', flexDirection: 'column' }}>
-      {/* ── Top Recruiter Action Bar ─────────────────────────────────────── */}
+      {/* -- Top Recruiter Action Bar --------------------------------------- */}
       <Paper
         elevation={0}
         className="no-print"
@@ -343,6 +349,29 @@ export const PublicCVPage: React.FC = () => {
             Chia sẻ
           </Button>
 
+          {Boolean(cvRecord.pdfUrl || cvRecord.pdf_url) && (
+            <Button
+              size="small"
+              variant="outlined"
+              component="a"
+              href={getSafeExternalOpenUrl(String(cvRecord.pdfUrl || cvRecord.pdf_url))}
+              target="_blank"
+              rel="noopener noreferrer"
+              startIcon={<PictureAsPdfOutlinedIcon sx={{ fontSize: 16 }} />}
+              sx={{
+                borderRadius: '8px',
+                borderColor: '#2563eb',
+                color: '#2563eb',
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                textTransform: 'none',
+                '&:hover': { bgcolor: '#eff6ff', borderColor: '#1d4ed8' },
+              }}
+            >
+              Tải CV gốc
+            </Button>
+          )}
+
           <Button
             size="small"
             variant="contained"
@@ -363,10 +392,11 @@ export const PublicCVPage: React.FC = () => {
           >
             Tải PDF A4
           </Button>
+
         </Stack>
       </Paper>
 
-      {/* ── Main CV Sheet Render Area with Responsive Scaling ────────────── */}
+      {/* -- Main CV Sheet Render Area with Responsive Scaling -------------- */}
       <Box
         ref={previewContainerRef}
         sx={{
@@ -407,7 +437,7 @@ export const PublicCVPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ── Footer ─────────────────────────────────────────────────────── */}
+      {/* -- Footer ------------------------------------------------------- */}
       <Box className="no-print" sx={{ py: 2, textAlign: 'center', bgcolor: '#ffffff', borderTop: '1px solid #cbd5e1' }}>
         <Typography variant="caption" sx={{ color: '#64748b' }}>
           Được tạo và bảo đảm bởi <strong>InfoHR Tuyển Dụng</strong> • Nền tảng tuyển dụng thông minh hàng đầu Việt Nam

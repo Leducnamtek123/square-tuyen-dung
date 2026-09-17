@@ -11,6 +11,8 @@ type IdType = string | number;
 type CompanyListParams = {
   kw?: string;
   cityId?: string | number;
+  employeeSize?: string | number;
+  fieldOperation?: string;
   page?: number;
   pageSize?: number;
   ordering?: string;

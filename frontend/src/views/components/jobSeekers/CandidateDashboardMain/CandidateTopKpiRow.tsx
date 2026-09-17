@@ -64,7 +64,7 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
       subtext: t('jobSeeker:candidateDashboard.kpi.followingSubtext', { defaultValue: 'Quan tâm đến bạn' }),
       icon: <FavoriteBorderIcon sx={{ color: '#ea580c' }} />,
       bgColor: '#fff7ed',
-      path: '/companies',
+      path: '/my-company?tab=2',
     },
   ];
 
@@ -171,4 +171,4 @@ const CandidateTopKpiRow = ({ stats }: CandidateTopKpiRowProps) => {
   );
 };
 
-export default CandidateTopKpiRow;
+export default React.memo(CandidateTopKpiRow);

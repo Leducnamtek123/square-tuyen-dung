@@ -367,8 +367,8 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
           <CloseIcon fontSize="small" />
         </IconButton>
 
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: 460 }}>
-          {/* ── Left Column: Form Content ── */}
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: { xs: 'auto', md: 460 } }}>
+          {/* -- Left Column: Form Content -- */}
           <Box
             sx={{
               flex: { xs: '1 1 auto', md: '0 0 55%' },
@@ -434,7 +434,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                       InputProps={{
                         startAdornment: (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mr: 1.25, color: '#64748b' }}>
-                            <PhoneIphoneIcon sx={{ fontSize: 20, color: '#4f46e5' }} />
+                            <PhoneIphoneIcon sx={{ fontSize: 20, color: '#2563eb' }} />
                             <Typography sx={{ fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>
                               +84
                             </Typography>
@@ -454,7 +454,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                             borderColor: '#cbd5e1',
                           },
                           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#4f46e5',
+                            borderColor: '#2563eb',
                             borderWidth: '2px',
                           },
                         },
@@ -470,15 +470,15 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                     sx={{
                       py: 1.5,
                       borderRadius: '14px',
-                      backgroundColor: '#5b21b6',
+                      backgroundColor: '#2563eb',
                       fontSize: '1rem',
                       fontWeight: 700,
                       textTransform: 'none',
-                      boxShadow: '0 10px 20px -5px rgba(91, 33, 182, 0.35)',
+                      boxShadow: '0 10px 20px -5px rgba(37, 99, 235, 0.35)',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        backgroundColor: '#4c1d95',
-                        boxShadow: '0 12px 24px -5px rgba(91, 33, 182, 0.45)',
+                        backgroundColor: '#1d4ed8',
+                        boxShadow: '0 12px 24px -5px rgba(37, 99, 235, 0.45)',
                         transform: 'translateY(-1px)',
                       },
                     }}
@@ -580,12 +580,12 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                           fontWeight: 800,
                           textAlign: 'center',
                           borderRadius: '12px',
-                          border: digit ? '2px solid #5b21b6' : '1.5px solid #cbd5e1',
-                          backgroundColor: digit ? '#f5f3ff' : '#f8fafc',
+                          border: digit ? '2px solid #2563eb' : '1.5px solid #cbd5e1',
+                          backgroundColor: digit ? '#eff6ff' : '#f8fafc',
                           color: '#0f172a',
                           outline: 'none',
                           transition: 'all 0.15s ease',
-                          boxShadow: digit ? '0 2px 8px rgba(91, 33, 182, 0.15)' : 'none',
+                          boxShadow: digit ? '0 2px 8px rgba(37, 99, 235, 0.15)' : 'none',
                         }}
                       />
                     ))}
@@ -611,7 +611,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                           disabled={isSendingOtp}
                           sx={{
                             fontWeight: 700,
-                            color: '#5b21b6',
+                            color: '#2563eb',
                             textTransform: 'none',
                             p: 0,
                             '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' },
@@ -631,14 +631,14 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                     sx={{
                       py: 1.5,
                       borderRadius: '14px',
-                      backgroundColor: '#5b21b6',
+                      backgroundColor: '#2563eb',
                       fontSize: '1rem',
                       fontWeight: 700,
                       textTransform: 'none',
-                      boxShadow: '0 10px 20px -5px rgba(91, 33, 182, 0.35)',
+                      boxShadow: '0 10px 20px -5px rgba(37, 99, 235, 0.35)',
                       '&:hover': {
-                        backgroundColor: '#4c1d95',
-                        boxShadow: '0 12px 24px -5px rgba(91, 33, 182, 0.45)',
+                        backgroundColor: '#1d4ed8',
+                        boxShadow: '0 12px 24px -5px rgba(37, 99, 235, 0.45)',
                       },
                     }}
                   >
@@ -687,12 +687,12 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
             )}
           </Box>
 
-          {/* ── Right Column: Graphic Illustration ── */}
+          {/* -- Right Column: Graphic Illustration -- */}
           <Box
             sx={{
               display: { xs: 'none', md: 'flex' },
               flex: '0 0 45%',
-              background: 'linear-gradient(145deg, #eef2ff 0%, #e0e7ff 50%, #f5f3ff 100%)',
+              background: 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%)',
               alignItems: 'center',
               justifyContent: 'center',
               p: 4,
@@ -707,7 +707,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                 width: 220,
                 height: 220,
                 borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0) 70%)',
+                background: 'radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0) 70%)',
                 top: '10%',
                 right: '-10%',
               }}
@@ -718,7 +718,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                 width: 200,
                 height: 200,
                 borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, rgba(168, 85, 247, 0) 70%)',
+                background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0) 70%)',
                 bottom: '10%',
                 left: '-10%',
               }}
@@ -731,7 +731,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                 <ellipse cx="160" cy="280" rx="110" ry="18" fill="#cbd5e1" opacity="0.45" />
 
                 {/* Smartphone Frame */}
-                <rect x="85" y="35" width="150" height="230" rx="28" fill="#ffffff" stroke="#6366f1" strokeWidth="4" />
+                <rect x="85" y="35" width="150" height="230" rx="28" fill="#ffffff" stroke="#2563eb" strokeWidth="4" />
                 <rect x="95" y="55" width="130" height="190" rx="16" fill="#f8fafc" />
 
                 {/* Phone Speaker & Camera */}
@@ -739,22 +739,22 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                 <circle cx="128" cy="46" r="3" fill="#cbd5e1" />
 
                 {/* User Profile Avatar Card on Screen */}
-                <circle cx="160" cy="95" r="24" fill="#e0e7ff" />
-                <path d="M146 110 C146 102, 174 102, 174 110" fill="#6366f1" />
-                <circle cx="160" cy="90" r="10" fill="#6366f1" />
+                <circle cx="160" cy="95" r="24" fill="#dbeafe" />
+                <path d="M146 110 C146 102, 174 102, 174 110" fill="#2563eb" />
+                <circle cx="160" cy="90" r="10" fill="#2563eb" />
 
                 {/* Simulated Text Lines on Phone Screen */}
                 <rect x="120" y="128" width="80" height="6" rx="3" fill="#cbd5e1" />
                 <rect x="135" y="140" width="50" height="5" rx="2.5" fill="#e2e8f0" />
 
                 {/* 4 OTP Input Dots */}
-                <circle cx="125" cy="165" r="5" fill="#6366f1" />
-                <circle cx="148" cy="165" r="5" fill="#6366f1" />
-                <circle cx="172" cy="165" r="5" fill="#6366f1" />
+                <circle cx="125" cy="165" r="5" fill="#2563eb" />
+                <circle cx="148" cy="165" r="5" fill="#2563eb" />
+                <circle cx="172" cy="165" r="5" fill="#2563eb" />
                 <circle cx="195" cy="165" r="5" fill="#cbd5e1" />
 
                 {/* Button on Phone */}
-                <rect x="115" y="190" width="90" height="18" rx="9" fill="#f43f5e" opacity="0.8" />
+                <rect x="115" y="190" width="90" height="18" rx="9" fill="#2563eb" opacity="0.9" />
 
                 {/* Security Shield Overlay */}
                 <g transform="translate(45, 140)">
@@ -763,7 +763,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                     fill="url(#shieldGrad)"
                     stroke="#ffffff"
                     strokeWidth="3"
-                    filter="drop-shadow(0 8px 16px rgba(59, 130, 246, 0.35))"
+                    filter="drop-shadow(0 8px 16px rgba(37, 99, 235, 0.35))"
                   />
                   {/* Shield Checkmark */}
                   <path
@@ -791,7 +791,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
                 <defs>
                   <linearGradient id="shieldGrad" x1="10" y1="10" x2="60" y2="70" gradientUnits="userSpaceOnUse">
                     <stop stopColor="#3b82f6" />
-                    <stop offset="1" stopColor="#6366f1" />
+                    <stop offset="1" stopColor="#1d4ed8" />
                   </linearGradient>
                 </defs>
               </svg>

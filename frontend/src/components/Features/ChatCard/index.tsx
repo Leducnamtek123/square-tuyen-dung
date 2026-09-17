@@ -3,7 +3,7 @@ import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
 import { Badge, IconButton } from "@mui/material";
-import ForumIcon from '@mui/icons-material/Forum';
+import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import {
   collection,
   onSnapshot,
@@ -70,7 +70,7 @@ const ChatCard = (_props: ChatCardProps) => {
       color="inherit"
     >
       <Badge badgeContent={count} color="error">
-        <ForumIcon />
+        <ChatBubbleOutlineRoundedIcon />
       </Badge>
     </IconButton>
   );

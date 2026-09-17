@@ -47,7 +47,7 @@ const VoiceAiInterviewRedirectPage = () => {
         elevation={0}
       >
         <Stack spacing={2}>
-          <Typography variant="h5" sx={{ fontWeight: 800 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: '#ffffff' }}>
             {t('redirectTitle')}
           </Typography>
           <Typography sx={{ color: '#cbd5e1' }}>

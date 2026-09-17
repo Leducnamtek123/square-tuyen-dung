@@ -85,10 +85,16 @@ const JobSeekerSignUp = () => {
                 updateVerifyEmail({
                   isAllowVerifyEmail: true,
                   email: data?.email,
-                  roleName: ROLES_NAME.JOB_SEEKER as RoleName,
+                  roleName: roleName,
                 })
               );
               push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+              return;
+            }
+            if ((resData as any)?.otherRole === ROLES_NAME.EMPLOYER || (resData as any)?.other_role === ROLES_NAME.EMPLOYER) {
+              setServerErrors({
+                email: ['Email này đã được đăng ký cho tài khoản Nhà tuyển dụng. Vui lòng đăng nhập tại Cổng Doanh nghiệp.']
+              });
               return;
             }
           } catch {

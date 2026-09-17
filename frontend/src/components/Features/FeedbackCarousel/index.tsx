@@ -19,18 +19,28 @@ const styles = {
     paddingBottom: '32px',
   },
   '.swiper-pagination-bullet': {
-    width: 10,
-    height: 10,
+    width: 8,
+    height: 8,
     opacity: 0.35,
     backgroundColor: '#64748b',
     transition: 'all 0.25s ease',
   },
   '.swiper-pagination-bullet-active': {
-    width: 24,
-    borderRadius: '6px',
+    width: 18,
+    borderRadius: '5px',
     opacity: 1,
     backgroundColor: '#2563eb',
   },
+};
+
+const cleanFeedbackText = (text?: string): string => {
+  if (!text) return '';
+  return text
+    .replace(/nền tảng tuyển dụng Square/gi, 'nền tảng tuyển dụng InfoHR')
+    .replace(/Square Tuyển Dụng/gi, 'InfoHR Tuyển Dụng')
+    .replace(/Square Studio/gi, 'InfoHR Tech')
+    .replace(/Công ty Square/gi, 'Công ty InfoHR')
+    .replace(/\bSquare\b/gi, 'InfoHR');
 };
 
 interface EnrichedFeedbackItem {
@@ -51,7 +61,7 @@ const DEFAULT_EMPLOYER_FEEDBACKS: EnrichedFeedbackItem[] = [
     id: 'emp-1',
     fullName: 'Nguyễn Đình Thơ',
     roleTitle: 'Head of Talent Acquisition',
-    companyName: 'Square Studio',
+    companyName: 'InfoHR Tech',
     userType: 'employer',
     rating: 5,
     content:
@@ -62,13 +72,13 @@ const DEFAULT_EMPLOYER_FEEDBACKS: EnrichedFeedbackItem[] = [
   },
   {
     id: 'emp-2',
-    fullName: 'Minh Thuận',
+    fullName: 'Minh Thuấn',
     roleTitle: 'Giám đốc Nhân sự',
     companyName: 'Vinhomes Central',
     userType: 'employer',
     rating: 5,
     content:
-      'Square Tuyển Dụng mang lại nguồn ứng viên chất lượng đúng chuyên ngành Xây dựng & Bất động sản, tỷ lệ nhận việc đạt hơn 85%.',
+      'InfoHR mang lại nguồn ứng viên chất lượng đúng chuyên ngành Xây dựng & Bất động sản, tỷ lệ nhận việc đạt hơn 85%.',
     impactTag: 'Đã tuyển 25+ chuyên viên BĐS',
     verified: true,
     avatarUrl: '/images/testimonials/avatar-1.jpg',
@@ -119,7 +129,7 @@ const DEFAULT_CANDIDATE_FEEDBACKS: EnrichedFeedbackItem[] = [
     id: 'cand-2',
     fullName: 'Lê Ngọc Mai',
     roleTitle: 'Kiến trúc sư cảnh quan',
-    companyName: 'Square Studio',
+    companyName: 'InfoHR Design',
     userType: 'candidate',
     rating: 5,
     content:
@@ -181,12 +191,12 @@ const FeedbackCarousel = () => {
       return {
         id: item.id,
         avatarUrl: item?.userDict?.avatarUrl || fallbackItem.avatarUrl,
-        fullName: item?.userDict?.fullName || fallbackItem.fullName,
+        fullName: cleanFeedbackText(item?.userDict?.fullName || fallbackItem.fullName),
         roleTitle: fallbackItem.roleTitle,
-        companyName: fallbackItem.companyName,
+        companyName: cleanFeedbackText(fallbackItem.companyName),
         userType: fallbackItem.userType,
         rating: item.rating || fallbackItem.rating,
-        content: item.content || fallbackItem.content,
+        content: cleanFeedbackText(item.content || fallbackItem.content),
         impactTag: fallbackItem.impactTag,
         verified: true,
       };
@@ -218,7 +228,12 @@ const FeedbackCarousel = () => {
         spacing={1}
         sx={{
           mb: 3.5,
-          flexWrap: 'wrap',
+          flexWrap: { xs: 'nowrap', sm: 'wrap' },
+          overflowX: { xs: 'auto', sm: 'visible' },
+          maxWidth: '100%',
+          py: 0.5,
+          scrollbarWidth: 'none',
+          '&::-webkit-scrollbar': { display: 'none' },
           gap: { xs: 1, sm: 1.25 },
         }}
       >
@@ -227,6 +242,8 @@ const FeedbackCarousel = () => {
           onClick={() => setSelectedTab('all')}
           size="small"
           sx={{
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
             borderRadius: '9999px',
             textTransform: 'none',
             fontWeight: 600,
@@ -265,6 +282,8 @@ const FeedbackCarousel = () => {
           onClick={() => setSelectedTab('employer')}
           size="small"
           sx={{
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
             borderRadius: '9999px',
             textTransform: 'none',
             fontWeight: 600,
@@ -295,7 +314,12 @@ const FeedbackCarousel = () => {
                 }),
           }}
         >
-          {t('home.feedbackEmployers')}
+          <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+            Doanh nghiệp
+          </Box>
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            {t('home.feedbackEmployers')}
+          </Box>
         </Button>
 
         <Button
@@ -303,6 +327,8 @@ const FeedbackCarousel = () => {
           onClick={() => setSelectedTab('candidate')}
           size="small"
           sx={{
+            flexShrink: 0,
+            whiteSpace: 'nowrap',
             borderRadius: '9999px',
             textTransform: 'none',
             fontWeight: 600,
@@ -333,7 +359,12 @@ const FeedbackCarousel = () => {
                 }),
           }}
         >
-          {t('home.feedbackCandidates')}
+          <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+            Ứng viên
+          </Box>
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            {t('home.feedbackCandidates')}
+          </Box>
         </Button>
       </Stack>
 

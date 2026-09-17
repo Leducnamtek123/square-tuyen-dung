@@ -39,17 +39,32 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
       </ListItem>
 
       <ListItem disablePadding>
-        <MenuItem icon={SmartToyOutlinedIcon} text={t('employer:sidebar.agentAssistants')} to={routePath(ROUTES.EMPLOYER.AGENT_ASSISTANTS)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.AGENT_ASSISTANTS) }} />
+        <MenuItem
+          icon={SmartToyOutlinedIcon}
+          text={t('employer:sidebar.agentAssistants')}
+          tooltip="Trợ lý AI AILA hỗ trợ tìm kiếm và sơ tuyển ứng viên"
+          to={routePath(ROUTES.EMPLOYER.AGENT_ASSISTANTS)}
+          isCollapsed={isCollapsed}
+          state={{ selected: isSelected(ROUTES.EMPLOYER.AGENT_ASSISTANTS) }}
+        />
       </ListItem>
 
       <ListItem disablePadding>
-        <MenuItem icon={ListAltOutlinedIcon} text={t('employer:sidebar.jobPostList')} to={routePath(ROUTES.EMPLOYER.JOB_POST)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.JOB_POST) }} />
+        <MenuItem
+          icon={ListAltOutlinedIcon}
+          text={t('employer:sidebar.jobPostList')}
+          tooltip="Quản lý tin tuyển dụng và thiết lập phỏng vấn tự động"
+          to={routePath(ROUTES.EMPLOYER.JOB_POST)}
+          isCollapsed={isCollapsed}
+          state={{ selected: isSelected(ROUTES.EMPLOYER.JOB_POST) }}
+        />
       </ListItem>
 
       <ListItem disablePadding>
         <MenuItem
           icon={PeopleAltOutlinedIcon}
           text={t('employer:sidebar.candidateManagement')}
+          tooltip="Quản lý toàn diện hồ sơ ứng viên và nguồn tuyển dụng"
           kind="group"
           isCollapsed={isCollapsed}
           state={{ expanded: expandedItems.candidates }}
@@ -75,6 +90,7 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
         <MenuItem
           icon={VideoCameraFrontOutlinedIcon}
           text={t('employer:sidebar.onlineInterviews')}
+          tooltip="Hệ thống phỏng vấn trực tuyến AI và ngân hàng câu hỏi"
           kind="group"
           isCollapsed={isCollapsed}
           state={{ expanded: expandedItems.interviews }}
@@ -84,6 +100,7 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
             { text: t('employer:sidebar.interviewLive'), to: routePath(ROUTES.EMPLOYER.INTERVIEW_LIVE), badgeContent: liveInterviewCount, isSelected: isSelected(ROUTES.EMPLOYER.INTERVIEW_LIVE) },
             { text: t('employer:sidebar.questionBank'), to: routePath(ROUTES.EMPLOYER.QUESTION_BANK), isSelected: isSelected(ROUTES.EMPLOYER.QUESTION_BANK) },
             { text: t('employer:sidebar.questionSets'), to: routePath(ROUTES.EMPLOYER.QUESTION_GROUPS), isSelected: isSelected(ROUTES.EMPLOYER.QUESTION_GROUPS) },
+            { text: t('employer:sidebar.aiSettings'), to: routePath(ROUTES.EMPLOYER.AI_SETTINGS), isSelected: isSelected(ROUTES.EMPLOYER.AI_SETTINGS) },
           ]}
         />
       </ListItem>
@@ -94,6 +111,7 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
             <MenuItem text={t('employer:sidebar.interviewLive')} to={routePath(ROUTES.EMPLOYER.INTERVIEW_LIVE)} kind="child" badgeContent={liveInterviewCount} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.INTERVIEW_LIVE) }} />
             <MenuItem text={t('employer:sidebar.questionBank')} to={routePath(ROUTES.EMPLOYER.QUESTION_BANK)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.QUESTION_BANK) }} />
             <MenuItem text={t('employer:sidebar.questionSets')} to={routePath(ROUTES.EMPLOYER.QUESTION_GROUPS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.QUESTION_GROUPS) }} />
+            <MenuItem text={t('employer:sidebar.aiSettings')} to={routePath(ROUTES.EMPLOYER.AI_SETTINGS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.AI_SETTINGS) }} />
           </List>
         </Collapse>
       )}

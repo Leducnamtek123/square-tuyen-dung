@@ -89,7 +89,7 @@ const JobSeekerLogin = () => {
       setIsFullScreenLoading(true);
       try {
         const resData = await authService.checkCreds(data.email, ROLES_NAME.JOB_SEEKER as RoleName);
-        const { exists, email: resEmail, emailVerified } = resData;
+        const { exists, email: resEmail, emailVerified, otherRole, other_role } = resData;
 
         if (exists === true && emailVerified === false) {
           dispatch(
@@ -104,6 +104,13 @@ const JobSeekerLogin = () => {
         }
 
         if (exists === false) {
+          const detectedOtherRole = otherRole || other_role;
+          if (detectedOtherRole === ROLES_NAME.EMPLOYER) {
+            setErrorMessage(
+              'Email này đã được đăng ký cho tài khoản Nhà tuyển dụng. Vui lòng đăng nhập tại Cổng Doanh nghiệp.'
+            );
+            return;
+          }
           setErrorMessage(t('messages.noCandidateAccount'));
           return;
         }

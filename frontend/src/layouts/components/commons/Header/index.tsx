@@ -121,6 +121,7 @@ const Header = (_props: HeaderProps) => {
     [HOST_NAME.PROJECT]: [
       { id: '1', label: t('nav.jobs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language), isHighlight: true },
       { id: '2', label: t('nav.companies'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language) },
+      { id: 'practice', label: t('nav.practice', 'Phỏng vấn thử'), path: localizeRoutePath('/practice', i18n.language), isHot: true },
       { id: 'cv', label: t('nav.createCv', 'Tạo CV'), path: localizeRoutePath('/tao-cv', i18n.language) },
       {
         id: '3',
@@ -226,12 +227,17 @@ const Header = (_props: HeaderProps) => {
       <AppBar
         position="sticky"
         id="common-header"
+        className="no-print"
         sx={{
+          top: 0,
+          zIndex: (theme) => theme.zIndex.appBar || 1100,
           boxShadow: '0 2px 18px rgba(15, 23, 42, 0.08)',
-          background: 'rgba(255, 255, 255, 0.92)',
+          background: 'rgba(255, 255, 255, 0.95)',
           color: '#1f2937',
-          backdropFilter: 'blur(14px)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           borderBottom: '1px solid rgba(226, 232, 240, 0.9)',
+          transition: 'box-shadow 0.2s ease, background-color 0.2s ease',
         }}
       >
 
@@ -243,12 +249,11 @@ const Header = (_props: HeaderProps) => {
               minHeight: { xs: 56, sm: 64 },
               px: { xs: 0.75, sm: 1.5, md: 2 },
               gap: { xs: 0.5, sm: 1 },
-              overflow: 'hidden',
               justifyContent: 'space-between',
             }}
           >
 
-            {/* ── Mobile: Hamburger icon TRƯỚC logo (chuẩn MUI) ── */}
+            {/* Mobile: Hamburger icon TRƯỚC logo - chuẩn MUI */}
             <IconButton
               color="inherit"
               aria-label={t('actions.openDrawer')}
@@ -266,7 +271,7 @@ const Header = (_props: HeaderProps) => {
               <MenuIcon />
             </IconButton>
 
-            {/* ── Logo ── */}
+            {/* -- Logo -- */}
             <Box
               component={Link}
               href="/"
@@ -305,17 +310,17 @@ const Header = (_props: HeaderProps) => {
               }}
             />
 
-            {/* ── Desktop: nav links (flex grow) ── */}
+            {/* -- Desktop: nav links (flex grow) -- */}
             <HeaderNavLinks
               pages={pages[currentPortalHost] || []}
               activePathname={pathname}
               onClose={handleCloseNavMenu}
             />
 
-            {/* ── Mobile: spacer để đẩy icons sang phải ── */}
+            {/* -- Mobile: spacer để đẩy icons sang phải -- */}
             <Box sx={{ flexGrow: 1, minWidth: { xs: 4, sm: 8 }, display: { xs: "flex", md: "none" } }} />
 
-            {/* ── Right side: icons + auth ── */}
+            {/* -- Right side: icons + auth -- */}
             <Stack
               direction="row"
               alignItems="center"
@@ -365,7 +370,7 @@ const Header = (_props: HeaderProps) => {
                   <Divider
                     orientation="vertical"
                     flexItem
-                    sx={{ mx: 0.5, height: 24, alignSelf: 'center', borderColor: "rgba(255, 255, 255, 0.3)" }}
+                    sx={{ mx: 0.5, height: 24, alignSelf: 'center', borderColor: 'rgba(226, 232, 240, 0.9)' }}
                   />
                   <AccountSwitchMenu />
                 </>

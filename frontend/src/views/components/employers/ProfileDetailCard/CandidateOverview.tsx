@@ -6,20 +6,27 @@ import PersonalInformation from './PersonalInformation';
 import GeneralInformation from './GeneralInformation';
 import CareerObjective from './CareerObjective';
 import AttachedDocumentRow from './AttachedDocumentRow';
+import CandidateSemanticMatchCard from './CandidateSemanticMatchCard';
 import type { ResumeDetailResponse } from '@/types/models';
 
 interface CandidateOverviewProps {
   profileDetail: ResumeDetailResponse;
   onOpenDocumentTab?: () => void;
+  onScheduleInterview?: () => void;
 }
 
 export const CandidateOverview: React.FC<CandidateOverviewProps> = ({
   profileDetail,
   onOpenDocumentTab,
+  onScheduleInterview,
 }) => {
   return (
     <Stack spacing={3}>
       <PersonalInformation profileDetail={profileDetail} />
+      <CandidateSemanticMatchCard
+        profileDetail={profileDetail}
+        onScheduleInterview={onScheduleInterview}
+      />
       <GeneralInformation profileDetail={profileDetail} />
       <CareerObjective profileDetail={profileDetail} />
       <AttachedDocumentRow profileDetail={profileDetail} onOpenViewer={onOpenDocumentTab} />

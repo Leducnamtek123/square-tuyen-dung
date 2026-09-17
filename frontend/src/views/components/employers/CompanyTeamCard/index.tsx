@@ -506,7 +506,7 @@ const CompanyTeamCard = () => {
               {members.map((member) => (
                 <TableRow key={member.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                   <TableCell sx={{ fontWeight: 800, color: '#0f172a' }}>
-                    {member.userDict?.fullName || member.userDict?.email || `#${member.userId || member.userDict?.id || member.id}`}
+                    {member.userDict?.fullName || member.userDict?.email || 'Thành viên'}
                   </TableCell>
                   <TableCell>
                     <Chip

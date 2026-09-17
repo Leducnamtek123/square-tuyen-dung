@@ -36,6 +36,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation, Trans } from 'react-i18next';
 import DataTable from '@/components/Common/DataTable';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import TechnicalDetails from '@/components/Common/TechnicalDetails';
 import adminManagementService from '@/services/adminManagementService';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
 import { formatRoute, downloadPdf } from '@/utils/funcUtils';
@@ -376,11 +377,6 @@ const ProfileDetailPage = ({ id }: { id?: string } = {}) => {
                   variant={profile.isActive === false ? 'outlined' : 'filled'}
                   size="small"
                 />
-                <Chip
-                  label={`${t('pages.profileDetail.labels.profileId')}: ${profile.id}`}
-                  size="small"
-                  variant="outlined"
-                />
               </Stack>
               <Typography variant="h4" sx={{ fontWeight: 1000, overflowWrap: 'anywhere' }}>
                 {candidateName}
@@ -486,6 +482,16 @@ const ProfileDetailPage = ({ id }: { id?: string } = {}) => {
             </Typography>
           )}
         </SectionCard>
+
+        {profile && (
+          <TechnicalDetails
+            data={{
+              'ID Hồ sơ': profile.id,
+              'User ID': profile.user,
+              'Ngày cập nhật': profile.updateAt,
+            }}
+          />
+        )}
       </Stack>
 
         <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>

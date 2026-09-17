@@ -92,8 +92,8 @@
   },
   "sidebar": {
     "systemOverview": "Tổng quan",
-    "agentAssistants": "AILA",
-    "systemAndUsers": "Người dùng & HT",
+    "agentAssistants": "Trợ lý AI AILA",
+    "systemAndUsers": "Hệ thống & Người dùng",
     "usersAndPermissions": "Phân quyền",
     "systemConfiguration": "Cấu hình hệ thống",
     "auditLogs": "Nhật ký hệ thống",
@@ -114,18 +114,18 @@
     "questionBank": "Ngân hàng câu hỏi",
     "interviewQuestionSets": "Bộ câu hỏi",
     "interviewSchedule": "Lịch phỏng vấn",
-    "interviewLive": "Phỏng vấn Live",
+    "interviewLive": "Phỏng vấn trực tiếp",
     "jobNotifications": "Thông báo việc làm",
     "contentManagement": "Quản lý nội dung",
     "bannersManagement": "Quản lý Banner",
     "bannerTypes": "Loại banner",
-    "feedbacksManagement": "Quản lý đánh giá người dùng",
-    "contactMessages": "Báo lỗi & tin nhắn liên hệ",
+    "feedbacksManagement": "Đánh giá người dùng",
+    "contactMessages": "Báo lỗi & liên hệ",
     "articlesManagement": "Tin tức & Blog",
     "chatWithEmployers": "Kết nối với nhà tuyển dụng",
     "voiceProfiles": "Hồ sơ giọng nói AI",
-    "interviewPreview": "Xem trước giao diện phỏng vấn",
-    "squareHrmAdmin": "Mở HRM",
+    "interviewPreview": "Xem trước phòng PV",
+    "squareHrmAdmin": "Quản trị nhân sự",
     "aiAgents": "Trợ lý AI",
     "articles": "Bài viết",
     "banners": "Banner quảng cáo",
@@ -165,7 +165,7 @@
       "addConfirmTitle": "Thêm ngành nghề mới",
       "editConfirmTitle": "Sửa ngành nghề",
       "careerNameLabel": "Tên ngành nghề",
-      "iconLabel": "Biểu tượng (App)",
+      "iconLabel": "Biểu tượng ứng dụng",
       "keyCareerLabel": "Ngành nghề trọng điểm",
       "keyCareerBadge": "Trọng điểm",
       "uploadIconBtn": "Tải ảnh đại diện",
@@ -680,7 +680,7 @@
         "completedMessage": "Đã nhập thành công các hồ sơ CV.",
         "failedMessage": "Có lỗi xảy ra trong quá trình nhập hồ sơ.",
         "processingMessage": "Hệ thống đang tiến hành xử lý hồ sơ nền...",
-        "sourceUrlLabel": "Đường dẫn nguồn ứng viên (URL)"
+        "sourceUrlLabel": "Đường dẫn nguồn ứng viên"
       },
       "bulkSelect": {
         "selectedCount": "Đã chọn {{count}} hồ sơ",
@@ -1057,7 +1057,7 @@
       "editTitle": "Chỉnh sửa thông báo",
       "labelTitle": "Tiêu đề",
       "labelContent": "Nội dung",
-      "labelRecipient": "ID người nhận (Để trống nếu gửi toàn hệ thống)",
+      "labelRecipient": "ID người nhận",
       "cancelBtn": "Hủy",
       "confirmBtn": "Xác nhận",
       "sendingBtn": "Đang gửi...",
@@ -1084,9 +1084,9 @@
         "imageUrl": "URL Ảnh",
         "content": "Nội dung",
         "salary": "Mức lương kỳ vọng",
-        "frequency": "Tần suất thông báo (ngày)",
+        "frequency": "Tần suất thông báo",
         "position": "Vị trí / Tên công việc",
-        "experience": "Kinh nghiệm (năm)",
+        "experience": "Kinh nghiệm",
         "careerId": "Lĩnh vực / Ngành nghề",
         "cityId": "Tỉnh / Thành phố",
         "isActive": "Đang hoạt động"
@@ -1186,31 +1186,31 @@
         "desc": "Gửi thông báo hệ thống qua email cho quản trị viên"
       },
       "interviewAi": {
-        "pacingTitle": "Cấu Hình Nhịp Độ Phỏng Vấn AI (Voice AI Pacing)",
-        "pacingDescription": "Tùy chỉnh tốc độ đọc câu hỏi phỏng vấn (TTS) và khoảng nghỉ nhận diện câu trả lời của ứng viên.",
+        "pacingTitle": "Cấu Hình Nhịp Độ Phỏng Vấn AI",
+        "pacingDescription": "Tùy chỉnh tốc độ đọc câu hỏi phỏng vấn và khoảng nghỉ nhận diện câu trả lời của ứng viên.",
         "preset": {
           "label": "Preset nhịp độ phỏng vấn",
           "helper": "Chọn nhanh bộ tham số tối ưu hóa trải nghiệm phỏng vấn giọng nói.",
           "options": {
-            "balanced": "Cân bằng (Mặc định - Khuyên dùng)",
+            "balanced": "Cân bằng tiêu chuẩn",
             "natural": "Tự nhiên, chậm rãi",
             "snappy": "Nhanh nhạy, phản hồi gấp",
             "custom": "Tùy chỉnh thủ công"
           }
         },
         "questionGap": {
-          "label": "Khoảng nghỉ chuyển câu (Gap Seconds)",
-          "helper": "Thời gian chờ giữa 2 câu hỏi (giây)"
+          "label": "Khoảng nghỉ chuyển câu",
+          "helper": "Thời gian chờ giữa 2 câu hỏi tính bằng giây"
         },
         "silenceThreshold": {
-          "label": "Ngưỡng nhận diện im lặng (Silence Seconds)",
+          "label": "Ngưỡng nhận diện im lặng",
           "helper": "Thời gian im lặng để AI nhận diện ứng viên đã nói xong"
         },
-        "ttsTitle": "Tốc Độ Đọc Giọng Nói AI (TTS)",
+        "ttsTitle": "Tốc Độ Đọc Giọng Nói AI",
         "ttsDescription": "Điều chỉnh tốc độ phát âm thanh của trợ lý phỏng vấn ảo.",
         "ttsSpeed": {
-          "label": "Tốc độ đọc câu hỏi (TTS Speed)",
-          "helper": "Tốc độ chuẩn: 0.92 (Từ 0.5 đến 2.0)"
+          "label": "Tốc độ đọc câu hỏi",
+          "helper": "Tốc độ chuẩn: 0.92, thang đo từ 0.5 đến 2.0"
         }
       },
       "apiTitle": "API & Dịch vụ bên ngoài",
@@ -1328,7 +1328,7 @@
         },
         "typeOptions": {
           "home": "Trang chủ",
-          "mainJobRight": "Việc làm chính (phải)"
+          "mainJobRight": "Việc làm chính bên phải"
         },
         "descLocationOptions": {
           "topLeft": "Trên trái",
@@ -1375,7 +1375,12 @@
       "categories": {
         "all": "Tất cả",
         "news": "Tin tức",
-        "blog": "Blog tuyển dụng"
+        "blog": "Blog tuyển dụng",
+        "cam-nang": "Cẩm nang nghề nghiệp",
+        "thu-tuc-lao-dong": "Thủ tục & Quyền lợi",
+        "thue-tncn": "Thuế & TNCN",
+        "bi-quyet-cv": "Bí quyết viết CV",
+        "xu-huong": "Báo cáo & Xu hướng"
       },
       "statuses": {
         "all": "Tất cả",
@@ -1615,8 +1620,8 @@
         "grantError": "Không thể cấp quyền dùng giọng."
       },
       "types": {
-        "preset": "Giọng mẫu hệ thống (Preset)",
-        "cloned": "Giọng nhân bản AI (Cloned)"
+        "preset": "Giọng mẫu hệ thống",
+        "cloned": "Giọng nhân bản AI"
       }
     },
     "bannerTypes": {
@@ -1641,7 +1646,7 @@
         "deleteError": "Không thể xóa loại banner"
       },
       "table": {
-        "id": "ID",
+        "id": "STT",
         "code": "Mã",
         "name": "Tên",
         "value": "Giá trị",
@@ -1937,7 +1942,7 @@
     }
   },
   "confirmDialog": {
-    "reasonLabel": "Lý do thực hiện (Bắt buộc)",
+    "reasonLabel": "Lý do thực hiện",
     "reasonPlaceholder": "Nhập lý do chi tiết để ghi vào nhật ký kiểm toán...",
     "reasonRequired": "Vui lòng nhập lý do để tiếp tục"
   },

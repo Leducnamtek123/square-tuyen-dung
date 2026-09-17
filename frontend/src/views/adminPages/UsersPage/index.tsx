@@ -11,7 +11,10 @@ import UserTable from './components/UserTable';
 import UserFilters from './components/UserFilters';
 import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
 import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
+import TechnicalDetails from '@/components/Common/TechnicalDetails';
 import AdminStatusBadge from '@/components/Common/AdminStatusBadge';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import { ExportModal } from '@/components/Common/ExportModal';
 import { User as UserModel } from '@/types/models';
 import type { RoleName } from '@/types/auth';
 import dayjs from '@/configs/dayjs-config';
@@ -37,6 +40,7 @@ const UsersPage = () => {
     const [deleteTarget, setDeleteTarget] = useState<UserModel | null>(null);
     const [inspectingUser, setInspectingUser] = useState<UserModel | null>(null);
     const [bulkDisableOpen, setBulkDisableOpen] = useState(false);
+    const [exportModalOpen, setExportModalOpen] = useState(false);
     
     const currentUserId = useAppSelector((state) => state.user?.currentUser?.id);
     const resolvedPageSize = pageSize === -1 ? PAGINATION.ADMIN_MAX_PAGE_SIZE : pageSize;
@@ -125,13 +129,31 @@ const UsersPage = () => {
     return (
         <Box sx={{ width: '100%', pb: 6 }}>
             {/* Header Section */}
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.5rem', sm: '1.875rem' }, lineHeight: 1.2 }}>
-                    {t('pages.users.title')}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>
-                    Quản lý tài khoản, phân quyền vai trò và kiểm soát trạng thái hoạt động của người dùng toàn hệ thống.
-                </Typography>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+                <Box>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.5rem', sm: '1.875rem' }, lineHeight: 1.2 }}>
+                        {t('pages.users.title')}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>
+                        Quản lý tài khoản, phân quyền vai trò và kiểm soát trạng thái hoạt động của người dùng toàn hệ thống.
+                    </Typography>
+                </Box>
+                <Button
+                    variant="outlined"
+                    startIcon={<FileDownloadOutlinedIcon />}
+                    onClick={() => setExportModalOpen(true)}
+                    sx={{
+                        borderRadius: 2,
+                        textTransform: 'none',
+                        fontWeight: 700,
+                        color: '#0f172a',
+                        borderColor: '#cbd5e1',
+                        bgcolor: '#ffffff',
+                        '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+                    }}
+                >
+                    Xuất danh sách người dùng
+                </Button>
             </Box>
 
             <Paper
@@ -228,7 +250,7 @@ const UsersPage = () => {
                 open={Boolean(inspectingUser)}
                 onClose={() => setInspectingUser(null)}
                 title={inspectingUser?.fullName || inspectingUser?.email || 'Chi tiết người dùng'}
-                subtitle={`Mã người dùng: #${inspectingUser?.id}`}
+                subtitle={inspectingUser?.email || inspectingUser?.phoneNumber || undefined}
                 footerAction={
                     inspectingUser && (
                         <Stack direction="row" spacing={1}>
@@ -302,9 +324,33 @@ const UsersPage = () => {
                                 </Stack>
                             </Box>
                         </Box>
+
+                        {inspectingUser && (
+                            <TechnicalDetails
+                                data={{
+                                    'ID Người dùng': inspectingUser.id,
+                                    'Vai trò': inspectingUser.roleName,
+                                    'Ngày tham gia': inspectingUser.dateJoined,
+                                }}
+                            />
+                        )}
                     </Stack>
                 )}
             </AdminDetailDrawer>
+
+            {/* Export Modal */}
+            <ExportModal
+                open={exportModalOpen}
+                onClose={() => setExportModalOpen(false)}
+                defaultFileName="DanhSachNguoiDung"
+                columns={[]}
+                entity="user"
+                totalRecords={{
+                    all: totalUsers,
+                    filtered: totalUsers,
+                    selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
+                }}
+            />
         </Box>
     );
 };

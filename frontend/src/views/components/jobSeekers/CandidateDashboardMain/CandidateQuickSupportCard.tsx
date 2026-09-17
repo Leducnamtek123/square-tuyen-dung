@@ -10,11 +10,15 @@ import {
 } from '@mui/material';
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
+import { useTranslation } from 'react-i18next';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 const CandidateQuickSupportCard = () => {
+  const { i18n } = useTranslation();
+  const contactPath = localizeRoutePath('/contact', i18n.language);
   return (
     <>
-      {/* ── Mobile Compact Helper (< 900px) ── */}
+      {/* -- Mobile Compact Helper (< 900px) -- */}
       <Card
         elevation={0}
         sx={{
@@ -64,7 +68,7 @@ const CandidateQuickSupportCard = () => {
 
           <Button
             component={Link}
-            href="/contact"
+            href={contactPath}
             variant="outlined"
             size="small"
             startIcon={<ChatOutlinedIcon sx={{ fontSize: '15px !important', color: '#2563eb' }} />}
@@ -96,7 +100,7 @@ const CandidateQuickSupportCard = () => {
         </Box>
       </Card>
 
-      {/* ── Desktop Full Card (>= 900px) ── */}
+      {/* -- Desktop Full Card (>= 900px) -- */}
       <Card
         elevation={0}
         sx={{
@@ -119,7 +123,7 @@ const CandidateQuickSupportCard = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
           <Button
             component={Link}
-            href="/contact"
+            href={contactPath}
             variant="outlined"
             size="small"
             startIcon={<ChatOutlinedIcon sx={{ color: '#2563eb' }} />}

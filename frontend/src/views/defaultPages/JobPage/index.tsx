@@ -98,7 +98,7 @@ const JobPage = () => {
 
                   {/* Start: SuggestedJobPostCard */}
 
-                  <SuggestedJobPostCard fullWidth={true} />
+                  <SuggestedJobPostCard fullWidth={true} pageSize={5} />
 
                   {/* End: SuggestedJobPostCard */}
                 </>

@@ -27,6 +27,7 @@ import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import type { ChipProps } from '@mui/material';
 import commonService from '@/services/commonService';
 import toastMessages from '@/utils/toastMessages';
@@ -48,6 +49,8 @@ interface Props {
   onChange: (field: keyof VerificationLegalProfile) => (event: React.ChangeEvent<HTMLInputElement>) => void;
   onLicenseFileUploaded?: (fileUrl: string) => void;
   onSubmit: (event: React.SyntheticEvent) => void;
+  onCancel?: () => void;
+  isPreviouslyVerified?: boolean;
   statusLabel: string;
   statusColor?: ChipProps['color'];
   errors?: Partial<Record<keyof VerificationLegalProfile, string>>;
@@ -79,6 +82,8 @@ const VerificationLegalProfileForm = ({
   onChange,
   onLicenseFileUploaded,
   onSubmit,
+  onCancel,
+  isPreviouslyVerified,
   statusLabel,
   statusColor = 'info',
   errors,
@@ -205,6 +210,32 @@ const VerificationLegalProfileForm = ({
         </Box>
         <Chip label={statusLabel} color={statusColor} sx={{ fontWeight: 800, borderRadius: 2 }} />
       </Stack>
+
+      {isPreviouslyVerified && (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            borderRadius: 2.5,
+            border: '1px solid #fed7aa',
+            bgcolor: '#fff7ed',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 1.5,
+          }}
+        >
+          <WarningAmberOutlinedIcon sx={{ color: '#ea580c', fontSize: 22, mt: 0.25, flexShrink: 0 }} />
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#9a3412', mb: 0.5 }}>
+              Lưu ý xác thực lại doanh nghiệp
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#c2410c', fontWeight: 500, fontSize: '0.875rem' }}>
+              Doanh nghiệp của bạn hiện đã được xác minh. Khi bạn lưu thay đổi thông tin pháp lý, hồ sơ sẽ chuyển về trạng thái <strong>Chờ duyệt</strong> và ban quản trị InfoHR sẽ xác minh lại.
+            </Typography>
+          </Box>
+        </Paper>
+      )}
 
       <Box component="form" onSubmit={onSubmit}>
         <Grid container spacing={{ xs: 2, md: 2.5 }}>
@@ -368,12 +399,36 @@ const VerificationLegalProfileForm = ({
           </Grid>
         </Grid>
 
-        <Box sx={{ mt: 3.5, display: 'flex', justifyContent: 'flex-end' }}>
+        <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 3.5 }}>
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outlined"
+              disabled={loading}
+              onClick={onCancel}
+              sx={{
+                borderRadius: 2.5,
+                px: 3.5,
+                minHeight: 44,
+                fontWeight: 700,
+                fontSize: '0.9375rem',
+                textTransform: 'none',
+                borderColor: '#cbd5e1',
+                color: '#475569',
+                '&:hover': {
+                  bgcolor: '#f8fafc',
+                  borderColor: '#94a3b8',
+                },
+              }}
+            >
+              Hủy
+            </Button>
+          )}
           <Button
             type="submit"
             variant="contained"
             disabled={loading}
-            startIcon={<SaveOutlinedIcon />}
+            startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <SaveOutlinedIcon />}
             sx={{
               borderRadius: 2.5,
               px: 4,
@@ -391,7 +446,7 @@ const VerificationLegalProfileForm = ({
           >
             {loading ? 'Đang lưu...' : t('verification.step2.saveBtn')}
           </Button>
-        </Box>
+        </Stack>
       </Box>
     </Card>
   );

@@ -10,11 +10,13 @@ import {
   Stack,
   TextField,
   Typography,
+  alpha,
   useTheme,
 } from '@mui/material';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
@@ -26,6 +28,7 @@ import { SectionCard } from './SectionCard';
 import type { AIAnalysisData } from './types';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
+import { OperationTimeline, adaptResumeAnalysisOperation } from '@/components/operation';
 
 type Props = {
   data: AIAnalysisData | null;
@@ -116,88 +119,107 @@ const AIAnalysisDrawerStatePanels = ({
   };
 
   if (isProcessing) {
+    const operation = adaptResumeAnalysisOperation(data, scanProgress);
+    return (
+      <Box sx={{ mb: 2.5 }}>
+        <OperationTimeline operation={operation} onRetry={onAnalyze} />
+      </Box>
+    );
+  }
+
+  if (isFailed) {
+    const isMissingResume = data?.aiAnalysisSummary?.includes('Không tìm thấy') ||
+                            data?.aiAnalysisSummary?.includes('Khong tim thay') ||
+                            data?.aiAnalysisSummary?.includes('chưa có') ||
+                            data?.aiAnalysisSummary?.includes('không đọc được');
+
     return (
       <Paper
         elevation={0}
         sx={{
           p: 3,
-          mb: 2,
+          mb: 2.5,
           border: '1px solid',
-          borderColor: pc.info( 0.3),
+          borderColor: alpha(theme.palette.error.main, 0.24),
           borderRadius: 3,
-          background: `linear-gradient(135deg, #0369a1 0%, rgba(3, 105, 161, 0.8) 100%)`,
-          boxShadow: (muiTheme) => muiTheme.customShadows?.info,
+          bgcolor: alpha(theme.palette.error.main, 0.025),
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
-          <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            {t('appliedResume.ai.scanning')}
-          </Typography>
-          <Chip
-            size="small"
-            label={`${scanProgress}%`}
+        <Stack direction="row" spacing={2} alignItems="flex-start">
+          <Box
             sx={{
-              color: 'info.dark',
-              bgcolor: 'info.light',
-              fontWeight: 1000,
-              boxShadow: '0 0 10px rgba(0,0,0,0.2)',
+              width: 44,
+              height: 44,
+              borderRadius: '50%',
+              bgcolor: alpha(theme.palette.error.main, 0.1),
+              color: 'error.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
             }}
-          />
-        </Stack>
-        <LinearProgress
-          variant="determinate"
-          value={scanProgress}
-          sx={{
-            height: 10,
-            borderRadius: 5,
-            bgcolor: 'rgba(186, 230, 253, 0.2)',
-            '& .MuiLinearProgress-bar': {
-              borderRadius: 5,
-              background: `linear-gradient(90deg, ${theme.palette.info.light} 0%, white 100%)`,
-            },
-          }}
-        />
-        <Typography variant="caption" sx={{ color: 'white', mt: 1.5, display: 'block', fontWeight: 600, opacity: 0.9 }}>
-          {t('appliedResume.ai.scanProgress')}
-        </Typography>
-      </Paper>
-    );
-  }
+          >
+            <ErrorOutlineIcon sx={{ fontSize: 24 }} />
+          </Box>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 0.75 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.3 }}>
+                {t('appliedResume.ai.failedTitle')}
+              </Typography>
+              <Chip
+                size="small"
+                label={isMissingResume ? "Cần bổ sung hồ sơ" : "Lỗi xử lý"}
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '0.72rem',
+                  bgcolor: alpha(theme.palette.error.main, 0.1),
+                  color: 'error.main',
+                  borderRadius: 1.5,
+                }}
+              />
+            </Stack>
 
-  if (isFailed) {
-    return (
-      <Paper
-        elevation={0}
-        sx={{
-          p: 4,
-          mb: 2,
-          border: '1px solid',
-          borderColor: pc.error( 0.2),
-          borderRadius: 3,
-          bgcolor: pc.error( 0.04),
-          textAlign: 'center',
-        }}
-      >
-        <CancelIcon sx={{ fontSize: 48, color: 'error.main', mb: 2, opacity: 0.8 }} />
-        <Typography variant="h6" sx={{ fontWeight: 900, color: 'error.dark' }}>
-          {t('appliedResume.ai.failedTitle')}
-        </Typography>
-        {data?.aiAnalysisSummary && (
-          <Typography variant="body2" sx={{ color: 'error.main', mt: 1, fontWeight: 600 }}>
-            {data.aiAnalysisSummary}
-          </Typography>
-        )}
-        <Button
-          variant="contained"
-          color="error"
-          size="medium"
-          startIcon={<RefreshIcon />}
-          onClick={onAnalyze}
-          disabled={analyzing}
-          sx={{ mt: 3, textTransform: 'none', fontWeight: 900, boxShadow: (muiTheme) => muiTheme.customShadows?.error }}
-        >
-          {t('appliedResume.ai.retry')}
-        </Button>
+            <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6, fontWeight: 500 }}>
+              {data?.aiAnalysisSummary || t('appliedResume.ai.failed')}
+            </Typography>
+
+            {isMissingResume && (
+              <Box
+                sx={{
+                  mt: 2,
+                  p: 1.75,
+                  borderRadius: 2,
+                  bgcolor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: pc.divider(0.8),
+                }}
+              >
+                <Stack direction="row" spacing={1} alignItems="flex-start">
+                  <Box sx={{ color: 'info.main', display: 'flex', mt: 0.25 }}>
+                    <AutoFixHighIcon sx={{ fontSize: 18 }} />
+                  </Box>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, lineHeight: 1.6 }}>
+                    Gợi ý dành cho Nhà tuyển dụng: Hồ sơ ứng viên cần có tệp CV hoặc thông tin chi tiết để AI tiến hành đối chiếu năng lực. Nhà tuyển dụng có thể tải lên tệp CV trực tiếp hoặc liên hệ ứng viên để hoàn thiện thông tin.
+                  </Typography>
+                </Stack>
+              </Box>
+            )}
+
+            <Stack direction="row" spacing={1.5} sx={{ mt: 2.5 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                startIcon={<RefreshIcon />}
+                onClick={onAnalyze}
+                disabled={analyzing}
+                sx={{ textTransform: 'none', fontWeight: 700, px: 2.5, py: 0.8 }}
+              >
+                {t('appliedResume.ai.retry')}
+              </Button>
+            </Stack>
+          </Box>
+        </Stack>
       </Paper>
     );
   }
@@ -207,54 +229,73 @@ const AIAnalysisDrawerStatePanels = ({
       <Paper
         elevation={0}
         sx={{
-          p: 5,
-          mb: 2,
-          border: '2px dashed',
-          borderColor: pc.primary( 0.3),
-          borderRadius: 4,
+          p: 3.5,
+          mb: 2.5,
+          border: '1px solid',
+          borderColor: alpha(theme.palette.primary.main, 0.2),
+          borderRadius: 3,
+          bgcolor: alpha(theme.palette.primary.main, 0.02),
           textAlign: 'center',
-          background: `linear-gradient(135deg, ${pc.primary( 0.02)} 0%, ${pc.primary( 0.05)} 100%)`,
-          transition: 'all 0.3s ease',
+          transition: 'all 0.2s ease',
           '&:hover': {
             borderColor: 'primary.main',
-            bgcolor: pc.primary( 0.06),
+            bgcolor: alpha(theme.palette.primary.main, 0.035),
           },
         }}
       >
         <Box
           sx={{
-            p: 2,
+            width: 56,
+            height: 56,
             borderRadius: '50%',
-            bgcolor: pc.primary( 0.1),
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            color: 'primary.main',
             display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             mb: 2,
           }}
         >
-          <AutoFixHighIcon sx={{ fontSize: 48, color: 'primary.main' }} />
+          <PsychologyIcon sx={{ fontSize: 32 }} />
         </Box>
-        <Typography variant="h5" sx={{ fontWeight: 1000, color: 'text.primary', mb: 1, letterSpacing: '-0.5px' }}>
+        <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', mb: 1, letterSpacing: '-0.3px' }}>
           {t('appliedResume.ai.idleTitle')}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block', mb: 4, fontWeight: 600, px: 2 }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block', mb: 3, fontWeight: 500, px: 2, lineHeight: 1.6 }}>
           {t('appliedResume.ai.idleHint')}
         </Typography>
+
+        <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 3, flexWrap: 'wrap', gap: 1 }}>
+          <Chip
+            size="small"
+            label="Đối chiếu kỹ năng JD"
+            sx={{ fontWeight: 600, fontSize: '0.75rem', bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.dark' }}
+          />
+          <Chip
+            size="small"
+            label="Chấm điểm năng lực"
+            sx={{ fontWeight: 600, fontSize: '0.75rem', bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.dark' }}
+          />
+          <Chip
+            size="small"
+            label="Đánh giá chi tiết"
+            sx={{ fontWeight: 600, fontSize: '0.75rem', bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.dark' }}
+          />
+        </Stack>
+
         <Button
           variant="contained"
-          size="large"
+          color="primary"
+          size="medium"
           startIcon={<AutoFixHighIcon />}
           onClick={onAnalyze}
           disabled={analyzing}
           sx={{
             textTransform: 'none',
-            px: 4,
-            py: 1.5,
-            
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-            color: 'white',
-            fontWeight: 900,
-            fontSize: '1rem',
-            boxShadow: (muiTheme) => muiTheme.customShadows?.primary,
-            '&:hover': { transform: 'translateY(-2px)', boxShadow: (muiTheme) => muiTheme.customShadows?.z12 },
+            px: 3.5,
+            py: 1.1,
+            fontWeight: 700,
+            fontSize: '0.92rem',
           }}
         >
           {t('appliedResume.ai.startScan')}
@@ -268,13 +309,12 @@ const AIAnalysisDrawerStatePanels = ({
       <Paper
         elevation={0}
         sx={{
-          p: 2.5,
+          p: 2.25,
           mb: 2,
           border: '1px solid',
-          borderColor: pc.success( 0.2),
+          borderColor: alpha(theme.palette.success.main, 0.24),
           borderRadius: 3,
-          background: `linear-gradient(135deg, ${pc.success( 0.04)} 0%, ${pc.success( 0.08)} 100%)`,
-          boxShadow: (muiTheme) => muiTheme.customShadows?.success,
+          bgcolor: alpha(theme.palette.success.main, 0.04),
         }}
       >
         <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ flexWrap: 'wrap', rowGap: 1.5 }}>

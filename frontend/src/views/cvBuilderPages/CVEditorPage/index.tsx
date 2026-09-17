@@ -38,6 +38,7 @@ import toastMessages from '@/utils/toastMessages';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTranslation } from 'react-i18next';
 import useRequireAuth from '@/hooks/useRequireAuth';
+import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
 
 export const CVEditorPage: React.FC = () => {
   const router = useRouter();
@@ -51,6 +52,9 @@ export const CVEditorPage: React.FC = () => {
   const initialColorParam = searchParams.get('color') || undefined;
 
   TabTitle(t('cvBuilder.pageTitle', 'Trình Tạo & Trang Trí CV Trực Tuyến | InfoHR Tuyển Dụng'));
+
+  // Auto-start CV builder tour on first visit
+  useTourAutoStart('cv_builder', 1000);
 
   const [activeCVId, setActiveCVId] = useState<number | null>(cvIdParam ? Number(cvIdParam) : null);
   const activeCVIdRef = useRef<number | null>(activeCVId);
@@ -571,7 +575,7 @@ export const CVEditorPage: React.FC = () => {
 
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f1f5f9', overflow: 'hidden' }}>
-      {/* ── Top Navbar (Material UI AppBar standard) ──────────────────────── */}
+      {/* -- Top Navbar (Material UI AppBar standard) ------------------------ */}
       <Paper
         elevation={0}
         className="no-print"
@@ -579,7 +583,7 @@ export const CVEditorPage: React.FC = () => {
           height: 64,
           bgcolor: '#ffffff',
           borderBottom: '1px solid #e2e8f0',
-          px: { xs: 2, sm: 3 },
+          px: { xs: 1.25, sm: 3 },
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -588,7 +592,7 @@ export const CVEditorPage: React.FC = () => {
         }}
       >
         {/* Left: Back & Title input */}
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack direction="row" spacing={{ xs: 1, sm: 1.5 }} alignItems="center" sx={{ minWidth: 0 }}>
           <IconButton
             onClick={() => router.push(localizeRoutePath('/danh-sach-mau-cv', i18n.language))}
             size="small"
@@ -597,6 +601,7 @@ export const CVEditorPage: React.FC = () => {
               borderRadius: '10px',
               border: '1px solid #e2e8f0',
               p: 0.75,
+              flexShrink: 0,
               '&:hover': { bgcolor: '#f1f5f9', color: '#0f172a' },
             }}
             title={t('cvBuilder.backToGallery', 'Quay lại danh sách mẫu')}
@@ -606,35 +611,48 @@ export const CVEditorPage: React.FC = () => {
 
           <Box sx={{ display: { xs: 'none', sm: 'block' }, width: '1px', height: 24, bgcolor: '#e2e8f0' }} />
 
-          <Box sx={{ maxWidth: { xs: 180, sm: 280, md: 380 } }}>
+          <Box sx={{ maxWidth: { xs: 90, sm: 280, md: 380 }, minWidth: 0, overflow: 'hidden' }}>
             <Typography component="h1" sx={{ position: 'absolute', width: '1px', height: '1px', p: 0, m: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>
               {cvData.title || 'Tạo CV Trực Tuyến & Studio Thiết Kế CV'}
             </Typography>
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={0.5} alignItems="center">
               <input
                 type="text"
                 value={cvData.title}
                 onChange={(e) => handleDataChange({ ...cvData, title: e.target.value })}
                 style={{
                   fontWeight: 800,
-                  fontSize: '0.925rem',
+                  fontSize: '0.825rem',
                   fontFamily: 'Inter, sans-serif',
                   color: '#0f172a',
                   background: 'transparent',
                   border: '1px solid transparent',
                   borderRadius: '6px',
-                  padding: '2px 6px',
+                  padding: '2px 4px',
                   outline: 'none',
                   maxWidth: '100%',
                   textOverflow: 'ellipsis',
                 }}
                 title={t('cvBuilder.renameHint', 'Bấm để đổi tên CV')}
               />
-              <EditOutlinedIcon sx={{ fontSize: 14, color: '#94a3b8', pointerEvents: 'none', flexShrink: 0 }} />
+              <EditOutlinedIcon sx={{ fontSize: 13, color: '#94a3b8', pointerEvents: 'none', flexShrink: 0 }} />
+
+              {/* Mobile Auto-Save Indicator Dot */}
+              <Box sx={{ display: { xs: 'inline-flex', sm: 'none' }, ml: 0.5 }}>
+                {saveStatus === 'saving' ? (
+                  <Tooltip title={t('cvBuilder.saveStatus.saving', 'Đang tự động lưu...')}>
+                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#d97706' }} />
+                  </Tooltip>
+                ) : saveStatus === 'saved' ? (
+                  <Tooltip title={lastSavedAt ? t('cvBuilder.saveStatus.savedAt', { time: lastSavedAt, defaultValue: `Đã lưu lúc ${lastSavedAt}` }) : t('cvBuilder.saveStatus.saved', 'Đã lưu')}>
+                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#16a34a' }} />
+                  </Tooltip>
+                ) : null}
+              </Box>
             </Stack>
 
             {/* Auto-Save & Status Badge & Guest Badge */}
-            <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 0.75 }}>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ px: 0.75, display: { xs: 'none', sm: 'flex' } }}>
               {saveStatus === 'saving' ? (
                 <Typography variant="caption" sx={{ color: '#d97706', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5, fontSize: '0.7rem', fontFamily: 'Inter, sans-serif' }}>
                   <CloudSyncOutlinedIcon sx={{ fontSize: 13 }} />
@@ -670,18 +688,20 @@ export const CVEditorPage: React.FC = () => {
         </Stack>
 
         {/* Center: Mobile Toggle Tabs (Editor / Preview) */}
-        <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'flex', md: 'none' }, bgcolor: '#f1f5f9', p: 0.5, borderRadius: '10px' }}>
+        <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'flex', md: 'none' }, bgcolor: '#f1f5f9', p: 0.5, borderRadius: '10px', flexShrink: 0 }}>
           <Button
             size="small"
             variant={mobileView === 'editor' ? 'contained' : 'text'}
             onClick={() => setMobileView('editor')}
             sx={{
               py: 0.5,
-              px: 1.5,
-              fontSize: '0.75rem',
+              px: { xs: 0.75, sm: 1.5 },
+              fontSize: '0.7rem',
               fontWeight: 700,
               textTransform: 'none',
               borderRadius: '8px',
+              whiteSpace: 'nowrap',
+              minWidth: 'auto',
               ...(mobileView === 'editor' ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } : { color: '#64748b' }),
             }}
           >
@@ -693,11 +713,13 @@ export const CVEditorPage: React.FC = () => {
             onClick={() => setMobileView('preview')}
             sx={{
               py: 0.5,
-              px: 1.5,
-              fontSize: '0.75rem',
+              px: { xs: 0.75, sm: 1.5 },
+              fontSize: '0.7rem',
               fontWeight: 700,
               textTransform: 'none',
               borderRadius: '8px',
+              whiteSpace: 'nowrap',
+              minWidth: 'auto',
               ...(mobileView === 'preview' ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } : { color: '#64748b' }),
             }}
           >
@@ -706,7 +728,11 @@ export const CVEditorPage: React.FC = () => {
         </Stack>
 
         {/* Right: Actions (Share, Word, JSON, Save, PDF) */}
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
+          <Box sx={{ display: { xs: 'none', md: 'inline-flex' } }}>
+            <ProductTourTrigger tourKey="cv_builder" variant="chip" label="Hướng dẫn tạo CV" />
+          </Box>
+
           {cvSlug && (
             <Button
               size="small"
@@ -749,7 +775,7 @@ export const CVEditorPage: React.FC = () => {
               '&:hover': { borderColor: '#cbd5e1', bgcolor: '#f8fafc' },
             }}
           >
-            {t('cvBuilder.actions.exportWord', 'Xuất Word (.doc)')}
+            {t('cvBuilder.actions.exportWord', 'Xuất Word - Định dạng DOC')}
           </Button>
 
           {/* Backup JSON */}
@@ -799,9 +825,9 @@ export const CVEditorPage: React.FC = () => {
 
           {/* Primary Download PDF Button */}
           <Button
+            data-tour="cv-export"
             size="small"
             variant="contained"
-            startIcon={<PictureAsPdfOutlinedIcon sx={{ fontSize: 16 }} />}
             onClick={handleDownloadPDF}
             sx={{
               bgcolor: '#2563eb',
@@ -810,21 +836,27 @@ export const CVEditorPage: React.FC = () => {
               fontSize: '0.8rem',
               borderRadius: '10px',
               textTransform: 'none',
-              px: 2.5,
+              px: { xs: 1.25, sm: 2.5 },
               py: 0.85,
+              whiteSpace: 'nowrap',
+              minWidth: { xs: 40, sm: 'auto' },
               boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
               '&:hover': { bgcolor: '#1d4ed8' },
             }}
           >
-            {t('cvBuilder.actions.downloadPdf', 'Tải PDF A4')}
+            <PictureAsPdfOutlinedIcon sx={{ fontSize: 18, mr: { xs: 0, sm: 0.75 } }} />
+            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+              {t('cvBuilder.actions.downloadPdf', 'Tải PDF A4')}
+            </Box>
           </Button>
         </Stack>
       </Paper>
 
-      {/* ── Main Studio Body ─────────────────────────────────────────────── */}
+      {/* -- Main Studio Body ----------------------------------------------- */}
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {/* Left Side: Form Controls Sidebar (460px fixed) */}
         <Box
+          data-tour="cv-ai-assist"
           className="no-print"
           sx={{
             width: { xs: '100%', md: 450, lg: 480 },
@@ -845,6 +877,7 @@ export const CVEditorPage: React.FC = () => {
 
         {/* Right Side: Live A4 Visual Canvas */}
         <Box
+          data-tour="cv-templates"
           sx={{
             flex: 1,
             height: '100%',
@@ -861,7 +894,7 @@ export const CVEditorPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* ── Template Switcher Dialog ─────────────────────────────────────── */}
+      {/* -- Template Switcher Dialog --------------------------------------- */}
       <TemplateSwitcherModal
         open={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
@@ -870,7 +903,7 @@ export const CVEditorPage: React.FC = () => {
         onSelectTemplate={handleSelectTemplate}
       />
 
-      {/* ── Auth Required Modal for Guest Actions ───────────────────────── */}
+      {/* -- Auth Required Modal for Guest Actions ------------------------- */}
       {AuthModal}
     </Box>
   );

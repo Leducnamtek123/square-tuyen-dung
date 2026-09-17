@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Badge, Box, Button, CircularProgress, IconButton, Menu, Stack, Typography } from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { useTranslation } from 'react-i18next';
 import { ROLES_NAME, ROUTES } from '@/configs/constants';
@@ -69,7 +69,7 @@ const NotificationCard: React.FC = () => {
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <IconButton size="large" aria-label={t('notification.openMenu')} color="inherit" onClick={openNotificationsMenu}>
           <Badge badgeContent={unreadCount} color="error">
-            <NotificationsIcon />
+            <NotificationsNoneOutlinedIcon />
           </Badge>
         </IconButton>
       </Box>

@@ -27,6 +27,10 @@ import {
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EventAvailableOutlinedIcon from '@mui/icons-material/EventAvailableOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import { ExportModal } from '@/components/Common/ExportModal';
+import { ImportModal } from '@/components/Common/ImportModal';
 
 import {
   useHrmTimesheet,
@@ -129,6 +133,8 @@ export default function AttendanceListPage() {
   const { quickCheckin } = useHrmMutations();
 
   const [openCheckinModal, setOpenCheckinModal] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [checkinForm, setCheckinForm] = useState<{
     employee_id: number | null;
     date: string;
@@ -170,6 +176,40 @@ export default function AttendanceListPage() {
           </Typography>
         </Box>
         <Stack direction="row" spacing={1.5}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<UploadFileOutlinedIcon sx={{ fontSize: 16 }} />}
+            onClick={() => setImportModalOpen(true)}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 700,
+              color: '#0284c7',
+              borderColor: '#bae6fd',
+              bgcolor: '#f0f9ff',
+              '&:hover': { bgcolor: '#e0f2fe', borderColor: '#7dd3fc' },
+            }}
+          >
+            Nhập máy chấm công
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<FileDownloadOutlinedIcon sx={{ fontSize: 16 }} />}
+            onClick={() => setExportModalOpen(true)}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 700,
+              color: '#0f172a',
+              borderColor: '#cbd5e1',
+              bgcolor: '#ffffff',
+              '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+            }}
+          >
+            Xuất bảng chấm công
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -500,6 +540,31 @@ export default function AttendanceListPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName="BangChamCong"
+        columns={[]}
+        entity="attendance_punch"
+        totalRecords={{
+          all: timesheetData?.employees?.length || 0,
+          filtered: timesheetData?.employees?.length || 0,
+          selected: 0,
+        }}
+      />
+
+      {/* Import Modal */}
+      <ImportModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        entity="attendance_punch"
+        title="Nhập dữ liệu máy chấm công (Biometric Punch Logs)"
+        onSuccess={() => {
+          refetch();
+        }}
+      />
     </Box>
   );
 }

@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from '@/configs/dayjs-config';
+import 'dayjs/locale/vi';
+import 'dayjs/locale/en';
 
 interface Props {
   date: string | number | Date;

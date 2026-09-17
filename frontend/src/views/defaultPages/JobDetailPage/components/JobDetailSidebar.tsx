@@ -45,7 +45,7 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
 
   return (
     <Stack spacing={3}>
-      {/* ── 1. Company Info Card ──────────────────────────────────────── */}
+      {/* -- 1. Company Info Card ---------------------------------------- */}
       <Card
         variant="outlined"
         sx={{
@@ -121,7 +121,7 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
         </CardContent>
       </Card>
 
-      {/* ── 2. Similar Jobs Section (Without filter bar) ────────────────── */}
+      {/* -- 2. Similar Jobs Section (Without filter bar) ------------------ */}
       <Card
         variant="outlined"
         sx={{

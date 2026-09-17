@@ -37,25 +37,59 @@ const SidebarHeader = (_props: SidebarHeaderProps) => {
   };
 
   return (
-    <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Box>
+    <Box sx={{ width: '100%' }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{
+          pb: 1.75,
+          minHeight: 40,
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <MuiImageCustom
-            width={120}
+            width={116}
             src={IMAGES.getTextLogo('dark')}
-            sx={{ mr: 1, mb: 1 }}
+            sx={{ display: 'block' }}
           />
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <LanguageSwitcher />
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <LanguageSwitcher size="small" />
           <Chip
-            icon={!isEmployer ? <HomeIcon /> : <GridViewIcon />}
+            icon={!isEmployer ? <HomeIcon sx={{ fontSize: '18px !important' }} /> : <GridViewIcon sx={{ fontSize: '18px !important' }} />}
             label={!isEmployer ? t('sidebarHeader.backToHome') : t('sidebarHeader.backToAdmin')}
             onClick={handleRedirect}
+            clickable
+            sx={{
+              height: 36,
+              borderRadius: '10px',
+              fontWeight: 600,
+              fontSize: '0.8125rem',
+              bgcolor: '#f8fafc',
+              color: '#334155',
+              border: '1px solid #e2e8f0',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              '& .MuiChip-label': {
+                px: 1.25,
+              },
+              '&:hover': {
+                bgcolor: '#f1f5f9',
+                color: '#0f172a',
+                borderColor: '#cbd5e1',
+              },
+              '&:focus-visible': {
+                outline: '2px solid #2563eb',
+                outlineOffset: '2px',
+              },
+              '&:active': {
+                transform: 'scale(0.98)',
+              },
+            }}
           />
-        </Box>
+        </Stack>
       </Stack>
-      <Divider />
+      <Divider sx={{ borderColor: '#e2e8f0' }} />
     </Box>
   );
 };

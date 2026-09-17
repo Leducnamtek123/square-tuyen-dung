@@ -189,19 +189,41 @@ const DataTable = <TData,>({
 
     return (
         <Box sx={{ width: '100%', overflow: 'hidden' }}>
+            {/* Mobile Swipe Cue Banner */}
+            <Box
+                sx={{
+                    display: { xs: 'flex', md: 'none' },
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    px: 1.5,
+                    py: 0.75,
+                    bgcolor: '#F1F5F9',
+                    borderRadius: 1,
+                    mb: 1,
+                    color: '#64748B',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                }}
+            >
+                <span>⇄ Vuốt ngang để xem đủ các cột & thao tác</span>
+            </Box>
             <TableContainer
                 component={variant === 'flat' ? Box : Paper}
                 sx={{
                     maxHeight: maxHeight || undefined,
                     overflowX: 'auto',
                     WebkitOverflowScrolling: 'touch',
+                    scrollbarWidth: 'thin',
+                    '&::-webkit-scrollbar': { height: 6, width: 6 },
+                    '&::-webkit-scrollbar-thumb': { bgcolor: '#CBD5E1', borderRadius: 3 },
+                    '&::-webkit-scrollbar-track': { bgcolor: '#F1F5F9' },
                     width: '100%',
                     ...(variant === 'flat'
                         ? { borderRadius: 0, boxShadow: 'none', border: 'none' }
                         : { borderRadius: 2, boxShadow: 'none', border: '1px solid', borderColor: 'divider' })
                 }}
             >
-                <Table sx={{ minWidth: 650 }} stickyHeader={stickyHeader}>
+                <Table sx={{ minWidth: { xs: 720, md: 650 } }} stickyHeader={stickyHeader}>
                     <TableHead sx={{ bgcolor: 'grey.50' }}>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>

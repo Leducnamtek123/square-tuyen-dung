@@ -45,12 +45,12 @@ const PRESET_COLORS = [
 ];
 
 const FONTS: { id: string; label: string }[] = [
-  { id: 'Inter', label: 'Inter (Hiện đại & Sắc nét)' },
-  { id: 'Roboto', label: 'Roboto (Chuẩn quốc tế)' },
-  { id: 'Plus Jakarta Sans', label: 'Plus Jakarta (Chuyên nghiệp)' },
-  { id: 'Geist', label: 'Geist (Tối giản Công nghệ)' },
-  { id: 'Outfit', label: 'Outfit (Tròn trịa & Tinh tế)' },
-  { id: 'Playfair Display', label: 'Playfair Display (Cổ điển)' },
+  { id: 'Inter', label: 'Inter - Hiện đại & Sắc nét' },
+  { id: 'Roboto', label: 'Roboto - Chuẩn quốc tế' },
+  { id: 'Plus Jakarta Sans', label: 'Plus Jakarta - Chuyên nghiệp' },
+  { id: 'Geist', label: 'Geist - Tối giản Công nghệ' },
+  { id: 'Outfit', label: 'Outfit - Tròn trịa & Tinh tế' },
+  { id: 'Playfair Display', label: 'Playfair Display - Cổ điển' },
 ];
 
 export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
@@ -67,7 +67,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* ── 1. Switch Template ─────────────────────────────────────────── */}
+      {/* -- 1. Switch Template ------------------------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -133,7 +133,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         </Grid>
       </Paper>
 
-      {/* ── 2. Color Palette ───────────────────────────────────────────── */}
+      {/* -- 2. Color Palette --------------------------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -186,7 +186,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         </Stack>
       </Paper>
 
-      {/* ── 3. Typography & Sizing ─────────────────────────────────────── */}
+      {/* -- 3. Typography & Sizing --------------------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -238,7 +238,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                 Cỡ chữ:
               </Typography>
               <Typography variant="caption" sx={{ fontWeight: 600, color: '#2563eb', fontSize: '0.725rem' }}>
-                {theme.fontSize === 'small' ? 'Thu nhỏ' : theme.fontSize === 'large' ? 'Phóng to' : 'Vừa (Chuẩn)'}
+                {theme.fontSize === 'small' ? 'Thu nhỏ' : theme.fontSize === 'large' ? 'Phóng to' : 'Vừa - Chuẩn'}
               </Typography>
             </Stack>
             <Stack
@@ -302,7 +302,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                 Giãn cách:
               </Typography>
               <Typography variant="caption" sx={{ fontWeight: 600, color: '#2563eb', fontSize: '0.725rem' }}>
-                {theme.spacing === 'compact' ? 'Gọn (Tiết kiệm)' : theme.spacing === 'relaxed' ? 'Rộng (Thoáng)' : 'Chuẩn (Cân đối)'}
+                {theme.spacing === 'compact' ? 'Gọn - Tiết kiệm' : theme.spacing === 'relaxed' ? 'Rộng - Thoáng' : 'Chuẩn - Cân đối'}
               </Typography>
             </Stack>
             <Stack
@@ -361,7 +361,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         </Stack>
       </Paper>
 
-      {/* ── 4. Avatar Customization ────────────────────────────────────── */}
+      {/* -- 4. Avatar Customization -------------------------------------- */}
       <Paper
         elevation={0}
         sx={{

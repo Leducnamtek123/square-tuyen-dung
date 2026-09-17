@@ -37,7 +37,7 @@ export default function LiveMetricCard({
       elevation={0}
       onClick={onClick}
       sx={{
-        p: 2.5,
+        p: { xs: 1.5, sm: 2.5 },
         borderRadius: 3,
         border: '1px solid #E2E8F0',
         bgcolor: '#FFFFFF',
@@ -53,16 +53,28 @@ export default function LiveMetricCard({
           : undefined,
       }}
     >
-      <Stack direction="row" spacing={2} alignItems="flex-start" justifyContent="space-between">
-        <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.8125rem' }}>
+      <Stack direction="row" spacing={{ xs: 1, sm: 2 }} alignItems="flex-start" justifyContent="space-between">
+        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#64748B',
+              fontWeight: 600,
+              fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+              lineHeight: 1.3,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {title}
           </Typography>
 
           {loading ? (
             <Skeleton variant="text" width={100} height={40} sx={{ mt: 0.5 }} />
           ) : (
-            <Typography variant="h4" sx={{ fontWeight: 700, color: '#0F172A', mt: 0.5, fontSize: '1.75rem' }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: '#0F172A', mt: 0.5, fontSize: { xs: '1.25rem', sm: '1.75rem' } }}>
               {typeof value === 'number' ? value.toLocaleString('vi-VN') : value}
             </Typography>
           )}
@@ -74,7 +86,7 @@ export default function LiveMetricCard({
           )}
 
           {deltaPercent !== undefined && !loading && (
-            <Stack direction="row" spacing={0.75} alignItems="center" sx={{ mt: 1 }}>
+            <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap" sx={{ mt: 1 }}>
               <Box
                 sx={{
                   display: 'inline-flex',
@@ -87,6 +99,7 @@ export default function LiveMetricCard({
                   color: isPositiveDelta ? '#16A34A' : '#DC2626',
                   fontSize: '0.75rem',
                   fontWeight: 700,
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {isPositiveDelta ? (
@@ -96,7 +109,7 @@ export default function LiveMetricCard({
                 )}
                 {isPositiveDelta ? `+${deltaPercent}%` : `${deltaPercent}%`}
               </Box>
-              <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem' }}>
+              <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
                 so với {deltaPeriod}
               </Typography>
             </Stack>

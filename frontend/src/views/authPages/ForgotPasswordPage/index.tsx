@@ -33,9 +33,16 @@ const ForgotPasswordPage = () => {
 
   return (
 
-    <Container maxWidth="sm" sx={{ mt: 6 }}>
+    <Container maxWidth="sm" disableGutters sx={{ mt: { xs: 0, sm: 6 }, px: { xs: 0, sm: 2 } }}>
 
-      <Card sx={{ p: 4 }}>
+      <Card
+        sx={{
+          p: { xs: 2.5, sm: 4 },
+          borderRadius: { xs: 0, sm: '28px' },
+          border: { xs: 'none', sm: '1px solid #E2E8F0' },
+          boxShadow: { xs: 'none', sm: '0 25px 60px -15px rgba(15, 23, 42, 0.12)' },
+        }}
+      >
 
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
 

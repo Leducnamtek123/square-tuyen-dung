@@ -16,6 +16,8 @@ export interface CheckCredsResponse {
   exists: boolean;
   email: string;
   emailVerified: boolean;
+  otherRole?: RoleName | null;
+  other_role?: RoleName | null;
 }
 
 /** Response from auth/email-exists/ */
@@ -39,6 +41,7 @@ export interface BotConfig {
 /** Form data for Employer registration */
 export interface EmployerSignUpFormData {
   fullName: string;
+  phone?: string;
   email: string;
   password: string;
   confirmPassword: string;

@@ -73,28 +73,20 @@ export const CVGalleryPage: React.FC = () => {
 
   return (
     <Box sx={{ width: '100%', pb: 6, display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* ── Top Hero Banner (Matching Candidate Dashboard style) ──────────── */}
+      {/* -- Top Hero Banner (Matching Candidate Dashboard style) ------------ */}
       <Card
         elevation={0}
         sx={{
           borderRadius: '20px',
-          background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 55%, #1d4ed8 100%)',
+          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.82) 45%, rgba(15, 23, 42, 0.42) 100%), url(/images/banners/banner-cv-gallery.jpg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center right',
           color: '#ffffff',
           p: { xs: 3, sm: 4 },
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 8px 30px rgba(37, 99, 235, 0.2)',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: -60,
-            right: -60,
-            width: 280,
-            height: 280,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)',
-            pointerEvents: 'none',
-          },
+          boxShadow: '0 12px 35px -5px rgba(15, 23, 42, 0.35)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
         }}
       >
         <Stack spacing={2} sx={{ position: 'relative', zIndex: 1, maxWidth: 820 }}>
@@ -184,7 +176,7 @@ export const CVGalleryPage: React.FC = () => {
         </Stack>
       </Card>
 
-      {/* ── Topic Filter Bar (Lọc theo chủ đề: Match Vieclam24h UI) ──────── */}
+      {/* -- Topic Filter Bar (Lọc theo chủ đề: Match Vieclam24h UI) -------- */}
       <Card
         elevation={0}
         sx={{
@@ -270,7 +262,7 @@ export const CVGalleryPage: React.FC = () => {
         </Stack>
       </Card>
 
-      {/* ── Templates Grid or Loading / Empty States ─────────────────────── */}
+      {/* -- Templates Grid or Loading / Empty States ----------------------- */}
       <Box id="cv-template-grid">
         {isLoading ? (
           <Grid container spacing={3}>
@@ -370,7 +362,7 @@ export const CVGalleryPage: React.FC = () => {
         )}
       </Box>
 
-      {/* ── Comprehensive CV Writing Guide & Knowledge Section ──────────── */}
+      {/* -- Comprehensive CV Writing Guide & Knowledge Section ------------ */}
       <CVGuideSection />
 
       {/* Interactive Template Preview Modal */}

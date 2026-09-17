@@ -6,6 +6,7 @@ from shared.helpers import utils, helper
 
 from shared.configs import variable_response as var_res
 from shared.audit import AuditLogViewSetMixin, record_audit_log
+from shared.authentication import SafeOAuth2Authentication
 
 from django.db.models import Count, Q
 from django.http import HttpResponse
@@ -595,6 +596,7 @@ def health_check(request):
     return Response(response_data, status=status_code)
 
 @api_view(["GET"])
+@authentication_classes([SafeOAuth2Authentication])
 @permission_classes([AllowAny])
 @throttle_classes([])
 def presign_url(request):
@@ -627,7 +629,10 @@ def presign_url(request):
         if isinstance(target, str) and (target.startswith("http://") or target.startswith("https://")):
             parsed = urlparse(target)
             # Extract object path from public URL (e.g. https://s3.domain.com/bucket/path)
-            if base_url and target.startswith(f"{base_url}/"):
+            clean_path = parsed.path.lstrip("/")
+            if bucket and clean_path.startswith(f"{bucket}/"):
+                object_path = clean_path[len(bucket) + 1:]
+            elif base_url and target.startswith(f"{base_url}/"):
                 object_path = target[len(base_url) + 1:]
                 if object_path.startswith(f"{bucket}/"):
                     object_path = object_path[len(bucket) + 1:]
@@ -639,6 +644,8 @@ def presign_url(request):
                     object_path = parsed.path.lstrip("/")
                     if object_path.startswith(f"{bucket}/"):
                         object_path = object_path[len(bucket) + 1:]
+                else:
+                    object_path = clean_path
         else:
             # Plain public_id
             object_path = str(target).lstrip("/") if target else None
@@ -753,11 +760,70 @@ def _public_presign_prefixes():
 
 
 def _is_public_presign_path(object_path: str) -> bool:
-    return _path_has_prefix(object_path, _public_presign_prefixes())
+    if not object_path:
+        return False
+
+    # Check if object is private first
+    if _is_private_presign_path(object_path):
+        return False
+
+    # 1. Match configured directory prefixes
+    if _path_has_prefix(object_path, _public_presign_prefixes()):
+        return True
+
+    # 2. Check if path contains public asset segments
+    # Handles e.g. goldlotustravel/logo/..., vismarttech/cover/..., company/gallery/...
+    normalized_path = f"/{object_path.lstrip('/')}"
+    public_segments = (
+        "/logo/",
+        "/cover/",
+        "/gallery/",
+        "/cover_image/",
+        "/company_image/",
+        "/career_image/",
+        "/banners/",
+        "/articles/",
+        "/avatar/",
+        "/avatars/",
+        "/system/",
+        "/icons/",
+        "/about_us/",
+    )
+    for seg in public_segments:
+        if seg in normalized_path:
+            return True
+
+    # 3. Check File model if exists in DB
+    try:
+        from apps.files.models import File
+
+        file_obj = File.objects.filter(public_id=object_path).first()
+        if file_obj:
+            public_file_types = {
+                File.AVATAR_TYPE,
+                File.LOGO_TYPE,
+                File.COVER_IMAGE_TYPE,
+                File.COMPANY_IMAGE_TYPE,
+                File.CAREER_IMAGE_TYPE,
+                File.WEB_BANNER_TYPE,
+                File.MOBILE_BANNER_TYPE,
+                File.SYSTEM_TYPE,
+            }
+            if file_obj.file_type in public_file_types:
+                return True
+    except Exception:
+        pass
+
+    # 4. Standard public images (not in private folders)
+    image_extensions = (".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif", ".ico")
+    if any(object_path.lower().endswith(ext) for ext in image_extensions):
+        return True
+
+    return False
 
 
 def _is_private_presign_path(object_path: str) -> bool:
-    return _path_has_prefix(object_path, ("cv/", "interviews/", "chat_attachments/"))
+    return _path_has_prefix(object_path, ("cv/", "interviews/", "chat_attachments/", "business_license/"))
 
 
 def _user_can_presign_resume_file(user, file_obj) -> bool:

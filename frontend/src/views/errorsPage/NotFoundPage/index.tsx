@@ -77,100 +77,127 @@ const NotFoundPage = () => {
   // Context-aware helpful destinations
   const destinations: DestinationItem[] = useMemo(() => {
     if (isEmployer) {
+      const cTitle = t('employerCandidatesTitle', { defaultValue: 'Tìm kiếm ứng viên' });
+      const cDesc = t('employerCandidatesDesc', { defaultValue: 'Khám phá hàng ngàn hồ sơ ứng viên tài năng' });
+      const jTitle = t('employerJobPostsTitle', { defaultValue: 'Quản lý tin tuyển dụng' });
+      const jDesc = t('employerJobPostsDesc', { defaultValue: 'Đăng tin mới và theo dõi tiến độ tuyển dụng' });
+      const aTitle = t('employerAppliedTitle', { defaultValue: 'Hồ sơ ứng tuyển mới' });
+      const aDesc = t('employerAppliedDesc', { defaultValue: 'Xem danh sách và đánh giá ứng viên nộp CV' });
+      const dTitle = t('employerDashboardTitle', { defaultValue: 'Bảng điều khiển NTD' });
+      const dDesc = t('employerDashboardDesc', { defaultValue: 'Tổng quan báo cáo & hiệu suất tuyển dụng' });
+
       return [
         {
-          title: t('employerCandidatesTitle', { defaultValue: 'Tìm kiếm ứng viên' }),
-          desc: t('employerCandidatesDesc', { defaultValue: 'Khám phá hàng ngàn hồ sơ ứng viên tài năng' }),
+          title: cTitle,
+          desc: cDesc,
           icon: <PeopleOutlineRoundedIcon sx={{ fontSize: 20 }} />,
           path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language),
-          ariaLabel: 'Chuyển đến trang tìm kiếm ứng viên cho nhà tuyển dụng',
+          ariaLabel: `${cTitle} - ${cDesc}`,
         },
         {
-          title: t('employerJobPostsTitle', { defaultValue: 'Quản lý tin tuyển dụng' }),
-          desc: t('employerJobPostsDesc', { defaultValue: 'Đăng tin mới và theo dõi tiến độ tuyển dụng' }),
+          title: jTitle,
+          desc: jDesc,
           icon: <PostAddOutlinedIcon sx={{ fontSize: 20 }} />,
           path: localizeRoutePath(`/${ROUTES.EMPLOYER.JOB_POST}`, i18n.language),
-          ariaLabel: 'Chuyển đến trang quản lý tin đăng tuyển dụng',
+          ariaLabel: `${jTitle} - ${jDesc}`,
         },
         {
-          title: t('employerAppliedTitle', { defaultValue: 'Hồ sơ ứng tuyển mới' }),
-          desc: t('employerAppliedDesc', { defaultValue: 'Xem danh sách và đánh giá ứng viên nộp CV' }),
+          title: aTitle,
+          desc: aDesc,
           icon: <AssignmentTurnedInOutlinedIcon sx={{ fontSize: 20 }} />,
           path: localizeRoutePath(`/${ROUTES.EMPLOYER.APPLIED_PROFILE}`, i18n.language),
-          ariaLabel: 'Chuyển đến trang xem hồ sơ ứng viên nộp CV',
+          ariaLabel: `${aTitle} - ${aDesc}`,
         },
         {
-          title: t('employerDashboardTitle', { defaultValue: 'Bảng điều khiển NTD' }),
-          desc: t('employerDashboardDesc', { defaultValue: 'Tổng quan báo cáo & hiệu suất tuyển dụng' }),
+          title: dTitle,
+          desc: dDesc,
           icon: <DashboardOutlinedIcon sx={{ fontSize: 20 }} />,
           path: localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, i18n.language),
-          ariaLabel: 'Chuyển đến bảng điều khiển nhà tuyển dụng',
+          ariaLabel: `${dTitle} - ${dDesc}`,
         },
       ];
     }
 
     if (isAdmin) {
+      const dTitle = t('adminDashboardTitle', { defaultValue: 'Bảng điều khiển Quản trị' });
+      const dDesc = t('adminDashboardDesc', { defaultValue: 'Tổng quan chỉ số hệ thống, dữ liệu người dùng & việc làm' });
+      const jTitle = t('adminJobsTitle', { defaultValue: 'Quản lý tin tuyển dụng' });
+      const jDesc = t('adminJobsDesc', { defaultValue: 'Duyệt bài đăng, kiểm duyệt nội dung tin tuyển dụng' });
+      const pTitle = t('adminProfilesTitle', { defaultValue: 'Quản lý ứng viên & CV' });
+      const pDesc = t('adminProfilesDesc', { defaultValue: 'Tra cứu thông tin tài khoản ứng viên và hồ sơ CV' });
+      const uTitle = t('adminUsersTitle', { defaultValue: 'Quản lý người dùng' });
+      const uDesc = t('adminUsersDesc', { defaultValue: 'Phân quyền tài khoản doanh nghiệp & ứng viên' });
+
       return [
         {
-          title: 'Bảng điều khiển Quản trị',
-          desc: 'Tổng quan chỉ số hệ thống, dữ liệu người dùng & việc làm',
+          title: dTitle,
+          desc: dDesc,
           icon: <DashboardOutlinedIcon sx={{ fontSize: 20 }} />,
           path: '/admin/dashboard',
-          ariaLabel: 'Chuyển đến bảng điều khiển quản trị viên',
+          ariaLabel: `${dTitle} - ${dDesc}`,
         },
         {
-          title: 'Quản lý tin tuyển dụng',
-          desc: 'Duyệt bài đăng, kiểm duyệt nội dung tin tuyển dụng',
+          title: jTitle,
+          desc: jDesc,
           icon: <WorkOutlineRoundedIcon sx={{ fontSize: 20 }} />,
           path: '/admin/jobs',
-          ariaLabel: 'Chuyển đến trang quản lý tin tuyển dụng quản trị',
+          ariaLabel: `${jTitle} - ${jDesc}`,
         },
         {
-          title: 'Quản lý ứng viên & CV',
-          desc: 'Tra cứu thông tin tài khoản ứng viên và hồ sơ CV',
+          title: pTitle,
+          desc: pDesc,
           icon: <DescriptionOutlinedIcon sx={{ fontSize: 20 }} />,
           path: '/admin/profiles',
-          ariaLabel: 'Chuyển đến trang quản lý hồ sơ ứng viên quản trị',
+          ariaLabel: `${pTitle} - ${pDesc}`,
         },
         {
-          title: 'Quản lý người dùng',
-          desc: 'Phân quyền tài khoản doanh nghiệp & ứng viên',
+          title: uTitle,
+          desc: uDesc,
           icon: <PeopleOutlineRoundedIcon sx={{ fontSize: 20 }} />,
           path: '/admin/users',
-          ariaLabel: 'Chuyển đến trang quản trị tài khoản người dùng',
+          ariaLabel: `${uTitle} - ${uDesc}`,
         },
       ];
     }
 
     // Default: Job Seeker & Public Portal
+    const fTitle = t('findJobsTitle', { defaultValue: 'Tìm việc làm hot' });
+    const fDesc = t('findJobsDesc', { defaultValue: 'Khám phá hàng ngàn việc làm lương cao mới nhất' });
+    const cTitle = t('cvBuilderTitle', { defaultValue: 'Mẫu CV chuẩn ATS' });
+    const cDesc = t('cvBuilderDesc', { defaultValue: 'Thiết kế CV chuyên nghiệp, chuẩn hóa ATS miễn phí' });
+    const tcTitle = t('topCompaniesTitle', { defaultValue: 'Top Công ty hàng đầu' });
+    const tcDesc = t('topCompaniesDesc', { defaultValue: 'Khám phá văn hóa & môi trường làm việc lý tưởng' });
+    const nTitle = t('notificationsTitle', { defaultValue: 'Thông báo & Tin mới' });
+    const nDesc = t('notificationsDesc', { defaultValue: 'Xem gợi ý việc làm và cập nhật cơ hội mới nhất' });
+
     return [
       {
-        title: t('findJobsTitle', { defaultValue: 'Tìm việc làm hot' }),
-        desc: t('findJobsDesc', { defaultValue: 'Khám phá hàng ngàn việc làm lương cao mới nhất' }),
+        title: fTitle,
+        desc: fDesc,
         icon: <WorkOutlineRoundedIcon sx={{ fontSize: 20 }} />,
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language),
-        ariaLabel: 'Chuyển đến trang tìm kiếm việc làm',
+        ariaLabel: `${fTitle} - ${fDesc}`,
       },
       {
-        title: t('cvBuilderTitle', { defaultValue: 'Mẫu CV chuẩn ATS' }),
-        desc: t('cvBuilderDesc', { defaultValue: 'Thiết kế CV chuyên nghiệp, chuẩn hóa ATS miễn phí' }),
+        title: cTitle,
+        desc: cDesc,
         icon: <DescriptionOutlinedIcon sx={{ fontSize: 20 }} />,
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.CV_TEMPLATES}`, i18n.language),
-        ariaLabel: 'Chuyển đến trang danh sách mẫu CV',
+        ariaLabel: `${cTitle} - ${cDesc}`,
       },
       {
-        title: t('topCompaniesTitle', { defaultValue: 'Top Công ty hàng đầu' }),
-        desc: t('topCompaniesDesc', { defaultValue: 'Khám phá văn hóa & môi trường làm việc lý tưởng' }),
+        title: tcTitle,
+        desc: tcDesc,
         icon: <BusinessOutlinedIcon sx={{ fontSize: 20 }} />,
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language),
-        ariaLabel: 'Chuyển đến trang danh sách công ty hàng đầu',
+        ariaLabel: `${tcTitle} - ${tcDesc}`,
       },
       {
-        title: t('notificationsTitle', { defaultValue: 'Thông báo & Tin mới' }),
-        desc: t('notificationsDesc', { defaultValue: 'Xem gợi ý việc làm và cập nhật cơ hội mới nhất' }),
+        title: nTitle,
+        desc: nDesc,
         icon: <NotificationsActiveOutlinedIcon sx={{ fontSize: 20 }} />,
         path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NOTIFICATION}`, i18n.language),
-        ariaLabel: 'Chuyển đến trang thông báo việc làm',
+        ariaLabel: `${nTitle} - ${nDesc}`,
       },
     ];
   }, [isEmployer, isAdmin, t, i18n.language]);
@@ -410,7 +437,13 @@ const NotFoundPage = () => {
               size="large"
               startIcon={<HomeRoundedIcon sx={{ fontSize: 20 }} />}
               onClick={() => router.push(homePath)}
-              aria-label={isEmployer ? 'Về trang chủ nhà tuyển dụng' : 'Về trang chủ InfoHR'}
+              aria-label={
+                isEmployer
+                  ? t('backEmployerHome', { defaultValue: 'Về trang chủ NTD' })
+                  : isAdmin
+                  ? t('backAdminHome', { defaultValue: 'Về trang Quản trị' })
+                  : t('backHome', { defaultValue: 'Về trang chủ' })
+              }
               sx={{
                 borderRadius: '12px',
                 backgroundColor: '#2563eb',
@@ -441,7 +474,7 @@ const NotFoundPage = () => {
               {isEmployer
                 ? t('backEmployerHome', { defaultValue: 'Về trang chủ NTD' })
                 : isAdmin
-                ? 'Về trang Quản trị'
+                ? t('backAdminHome', { defaultValue: 'Về trang Quản trị' })
                 : t('backHome', { defaultValue: 'Về trang chủ' })}
             </Button>
             <Button
@@ -449,7 +482,7 @@ const NotFoundPage = () => {
               size="large"
               startIcon={<ArrowBackRoundedIcon sx={{ fontSize: 20 }} />}
               onClick={() => router.back()}
-              aria-label="Quay lại trang trước đó"
+              aria-label={t('goBack', { defaultValue: 'Quay lại trang trước' })}
               sx={{
                 borderRadius: '12px',
                 borderColor: '#cbd5e1',

@@ -16,24 +16,24 @@
   "workflowLead": "Giải pháp số hóa toàn diện giúp doanh nghiệp tự động hóa từ khâu đăng tin, sàng lọc đến phỏng vấn và tiếp nhận nhân sự.",
   "steps": {
     "step1Title": "1. Tìm kiếm & Sàng lọc Thông minh",
-    "step1Desc": "Tự động phân tích hồ sơ CV, chấm điểm độ phù hợp (Match Score) và gợi ý top ứng viên tiềm năng nhất.",
-    "step2Title": "2. Phỏng vấn Video & Voice AI Đa ngôn ngữ",
+    "step1Desc": "Tự động phân tích CV, chấm điểm độ phù hợp và gợi ý các ứng viên tiềm năng nhất.",
+    "step2Title": "2. Phỏng vấn Video & Giọng nói AI Đa ngôn ngữ",
     "step2Desc": "AI phỏng vấn trực tiếp bằng giọng nói tự nhiên, phân tích ngữ điệu, biểu cảm và chuyển ngữ real-time.",
-    "step3Title": "3. Đánh giá Năng lực & Skill Gap Analysis",
+    "step3Title": "3. Đánh giá Năng lực & Phân tích Kỹ năng",
     "step3Desc": "Xuất báo cáo chi tiết về điểm mạnh, điểm yếu và khoảng trống kỹ năng so với yêu cầu công việc.",
-    "step4Title": "4. Quyết định Tuyển dụng & Collaborative Hiring",
+    "step4Title": "4. Quyết định Tuyển dụng & Đánh giá Chung",
     "step4Desc": "Hội đồng tuyển dụng dễ dàng đánh giá chung, trao đổi nhận xét và đồng bộ dữ liệu với hệ thống HRM."
   },
   "featuresHeading": "Các Tính Năng Đột Phá Thuộc Nền Tảng AILA",
-  "aiVoiceTitle": "Trợ lý Phỏng vấn Giọng nói AI (Voice AI)",
+  "aiVoiceTitle": "Trợ lý Phỏng vấn Giọng nói AI",
   "aiVoiceDesc1": "Tự động thực hiện các cuộc phỏng vấn sơ loại bằng giọng nói AI mượt mà, hỗ trợ cả Tiếng Việt và Tiếng Anh.",
   "aiVoiceDesc2": "Tự động ghi âm, nhận diện giọng nói và chuyển đổi thành văn bản transcript để hội đồng tuyển dụng xem lại bất kỳ lúc nào.",
   "aiVoiceDesc3": "Giảm thiểu 90% thời gian gọi điện sơ tuyển thủ công của chuyên viên HR.",
   "aiMatchTitle": "Thuật Toán Match Score & Phân Tích Kỹ Năng",
-  "aiMatchDesc1": "AI tự động đối soát hồ sơ ứng viên với yêu cầu công việc (Job Description) để chấm điểm phần trăm phù hợp.",
-  "aiMatchDesc2": "Phân tích khoảng trống kỹ năng (Skill Gap), đưa ra gợi ý câu hỏi phỏng vấn đào sâu cho từng ứng viên.",
+  "aiMatchDesc1": "AI tự động đối soát hồ sơ ứng viên với yêu cầu công việc để chấm điểm phần trăm phù hợp.",
+  "aiMatchDesc2": "Phân tích khoảng trống kỹ năng, đưa ra gợi ý câu hỏi phỏng vấn đào sâu cho từng ứng viên.",
   "aiMatchDesc3": "Giúp doanh nghiệp ra quyết định tuyển dụng dựa trên dữ liệu khách quan, tránh định kiến cá nhân.",
-  "aiPipelineTitle": "Quản Lý Đường Ống Tuyển Dụng (Candidate CRM)",
+  "aiPipelineTitle": "Quản Lý Đường Ống Tuyển Dụng",
   "aiPipelineDesc1": "Quy trình Kanban trực quan từ Sơ tuyển, Phỏng vấn AI Live đến Ký hợp đồng & Onboarding.",
   "aiPipelineDesc2": "Tự động gửi thông báo, lịch hẹn phỏng vấn và kết quả đến email/sĐT của ứng viên tức thì.",
   "aiPipelineDesc3": "Kết nối liền mạch với Hệ sinh thái Quản lý Nhân sự InfoHR HRM.",
@@ -66,5 +66,45 @@
     "desc1": "Smart notification system helps you closely follow the status of your application profile.",
     "desc2": "Receive interview appointments directly from employers and respond right on the platform.",
     "desc3": "Ensure seamless communication between businesses and candidates throughout the selection process."
+  },
+  "aboutUsPage": {
+    "tabTitle": "Về chúng tôi - Hệ sinh thái Tuyển dụng & Quản trị Nhân sự {{appName}}",
+    "heroBadge": "HỆ SINH THÁI TUYỂN DỤNG & QUẢN TRỊ NHÂN SỰ INFOHR",
+    "industries": {
+      "construction": "Xây dựng",
+      "realEstate": "Bất động sản",
+      "architecture": "Kiến trúc / Thiết kế nội thất",
+      "mep": "Kỹ thuật & Cơ điện (MEP)"
+    },
+    "stats": {
+      "candidates": "Ứng viên tài năng kết nối",
+      "candidatesDesc": "Hồ sơ chuyên môn cao",
+      "companies": "Doanh nghiệp đồng hành",
+      "companiesDesc": "Tập đoàn & đối tác uy tín",
+      "satisfaction": "Độ hài lòng tuyển dụng",
+      "satisfactionDesc": "Đánh giá tích cực từ đối tác",
+      "aiOperating": "Vận hành & Phỏng vấn AI",
+      "aiOperatingDesc": "Không giới hạn thời gian"
+    },
+    "coreValues": {
+      "aiTechTitle": "Tiên Phong Công Nghệ AI",
+      "aiTechDesc": "Ứng dụng mô hình Voice AI và thuật toán phân tích năng lực khách quan, xóa bỏ rào cản thời gian và định kiến tuyển dụng.",
+      "speedCostTitle": "Tối Ưu Tốc Độ & Chi Phí",
+      "speedCostDesc": "Cắt giảm đến 80% thời gian sơ loại hồ sơ và sàng lọc ứng viên, tối ưu hóa ngân sách nhân sự cho mọi quy mô doanh nghiệp.",
+      "fourIndustriesTitle": "Chuyên Sâu 4 Khối Ngành",
+      "fourIndustriesDesc": "Thấu hiểu đặc thù tiêu chuẩn nghề nghiệp của Xây dựng, Bất động sản, Thiết kế kiến trúc và Kỹ thuật Cơ điện.",
+      "securityTitle": "Bảo Mật Chuẩn Doanh Nghiệp",
+      "securityDesc": "Hệ thống bảo vệ dữ liệu hồ sơ và thông tin nhân sự tuân thủ nghiêm ngặt các tiêu chuẩn mã hóa an toàn thông tin."
+    },
+    "steps": {
+      "step1Title": "Đăng Tin & Thu Hút Ứng Viên",
+      "step1Desc": "Doanh nghiệp đăng tin tuyển dụng thông minh, tối ưu SEO việc làm và tiếp cận hàng ngàn ứng viên đúng chuyên môn.",
+      "step2Title": "AI Sàng Lọc & Phỏng Vấn Voice",
+      "step2Desc": "AILA AI tự động phân tích CV, tính toán Match Score và thực hiện phỏng vấn sơ tuyển bằng giọng nói tự nhiên 24/7.",
+      "step3Title": "Đánh Giá Năng Lực Chuẩn STAR",
+      "step3Desc": "Hội đồng tuyển dụng nhận báo cáo phân tích kỹ năng, khoảng trống năng lực và video/transcript phỏng vấn để ra quyết định.",
+      "step4Title": "Tiếp Nhận & Quản Trị HRM",
+      "step4Desc": "Đồng bộ hồ sơ trúng tuyển vào hệ thống InfoHR HRM: ký hợp đồng số, cập nhật sơ đồ tổ chức và quản lý nhân sự liền mạch."
+    }
   }
 }

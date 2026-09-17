@@ -21,6 +21,8 @@ from integrations.ai.client import (
     post_chat_completion_httpx,
     post_ollama_native_chat_httpx,
 )
+from apps.operations.services import OperationTracker
+from apps.operations.models import AsyncOperation
 from .ai_scoring_service import _fallback_scoring
 
 logger = logging.getLogger(__name__)
@@ -877,6 +879,7 @@ def analyze_resume_ai(self, activity_id):
     """
     temp_file = None
     slot_key = None
+    tracker = None
 
     try:
         max_slots = config("AI_RESUME_ANALYSIS_MAX_CONCURRENCY", default=4, cast=int)
@@ -921,18 +924,93 @@ def analyze_resume_ai(self, activity_id):
             .get(id=activity_id)
         )
 
+        try:
+            company = getattr(activity.job_post, "company", None)
+            company_id = getattr(company, "id", None) if company else None
+            user = getattr(activity.job_post, "user", None)
+            user_id = getattr(user, "id", None) if user else None
+
+            create_kwargs = {
+                "type": "candidate.ai_scan",
+                "title": f"AI phân tích ứng viên #{activity.id}",
+                "steps": [
+                    {"key": "extract_text", "label": "Đọc & trích xuất tệp hồ sơ/CV"},
+                    {"key": "criteria_match", "label": "Đối soát tiêu chí & yêu cầu công việc"},
+                    {"key": "llm_evaluation", "label": "Phân tích chuyên sâu với AI"},
+                    {"key": "scoring_finalize", "label": "Tổng hợp dẫn chứng & tính điểm"},
+                ],
+                "metadata": {"activity_id": activity.id, "job_post_id": activity.job_post_id},
+                "company_id": company_id,
+                "user_id": user_id,
+            }
+            try:
+                tracker = OperationTracker.create(**create_kwargs)
+            except TypeError:
+                tracker = OperationTracker.create(
+                    type="candidate.ai_scan",
+                    title=f"AI phân tích ứng viên #{activity.id}",
+                    steps=create_kwargs["steps"],
+                    metadata=create_kwargs["metadata"],
+                )
+
+            evidence = activity.ai_analysis_evidence or {}
+            if isinstance(evidence, dict):
+                evidence["operation_id"] = tracker.operation.id
+                activity.ai_analysis_evidence = evidence
+                activity.save(update_fields=['ai_analysis_evidence', 'update_at'])
+        except Exception as tr_err:
+            logger.warning("Could not initialize OperationTracker: %s", tr_err)
+
         resume = activity.resume
         manual_profile = activity.manual_candidate_profile
         if not resume and not manual_profile:
+            if activity.user:
+                from apps.profiles.models import Resume
+                candidate_resume = Resume.objects.filter(user=activity.user).order_by('-create_at').first()
+                if candidate_resume:
+                    activity.resume = candidate_resume
+                    activity.save(update_fields=['resume', 'update_at'])
+                    resume = candidate_resume
+
+        resume_text = ""
+        if not resume and not manual_profile:
+            try:
+                from apps.interviews.models import InterviewSession
+                session = (
+                    InterviewSession.objects
+                    .filter(candidate=activity.user, job_post=activity.job_post)
+                    .order_by('-create_at')
+                    .first()
+                ) if activity.user and activity.job_post else None
+
+                if session and session.transcripts.exists():
+                    tx_snippets = [
+                        f"{t.speaker_role}: {t.content}"
+                        for t in session.transcripts.order_by('created_at')[:10]
+                    ]
+                    resume_text = (
+                        f"Candidate Name: {activity.full_name or (activity.user.full_name if activity.user else '')}\n"
+                        f"Candidate Email: {activity.email or (activity.user.email if activity.user else '')}\n"
+                        f"Interview Session Summary: {session.ai_summary or ''}\n"
+                        f"Interview Q&A:\n" + "\n".join(tx_snippets)
+                    )
+            except Exception as sess_err:
+                logger.warning("Could not build interview transcript text: %s", sess_err)
+
+        if not resume and not manual_profile and not resume_text:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Khong tim thay ho so ung vien de phan tich."
+            activity.ai_analysis_summary = "Không tìm thấy tệp CV hoặc thông tin hồ sơ ứng viên để thực hiện phân tích."
             activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
+            if tracker:
+                tracker.fail(activity.ai_analysis_summary, code="NO_RESUME_FOUND")
             return
 
         activity.ai_analysis_status = 'processing'
         activity.ai_analysis_progress = 5
         activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
+        if tracker:
+            tracker.start_step("extract_text", detail="Đang đọc và trích xuất nội dung CV...")
 
         file_obj = resume.file if resume else manual_profile.file
         file_format = file_obj.format.lower() if file_obj and file_obj.format else 'pdf'
@@ -1020,9 +1098,15 @@ def analyze_resume_ai(self, activity_id):
         if not resume_text or len(resume_text.strip()) < 50:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Khong the doc duoc noi dung CV hoac ho so truc tuyen."
+            activity.ai_analysis_summary = "Không thể đọc được nội dung tệp CV hoặc thông tin hồ sơ trực tuyến của ứng viên."
             activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
+            if tracker:
+                tracker.fail(activity.ai_analysis_summary, code="NO_RESUME_FOUND")
             return
+
+        if tracker:
+            tracker.complete_step("extract_text", detail="Trích xuất văn bản CV hoàn tất.")
+            tracker.start_step("criteria_match", detail="Đang thiết lập tiêu chí và đối soát yêu cầu...")
 
         # Compact prompt to reduce token use and improve throughput
         max_resume_chars = config("AI_RESUME_PROMPT_MAX_CV_CHARS", default=2600, cast=int)
@@ -1131,6 +1215,10 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_progress = 70
         activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
+        if tracker:
+            tracker.complete_step("criteria_match", detail="Chuẩn bị tiêu chí đối soát hoàn tất.")
+            tracker.start_step("llm_evaluation", detail="Mô hình AI đang phân tích năng lực và dẫn chứng...")
+
         try:
             response_json, llm_candidate = post_chat_completion_httpx(
                 payload,
@@ -1192,6 +1280,11 @@ def analyze_resume_ai(self, activity_id):
                     raise ValueError("Model response does not contain valid JSON.")
 
             result = _normalize_analysis_result(result)
+
+        if tracker:
+            tracker.complete_step("llm_evaluation", detail="Mô hình AI đã hoàn tất phân tích.")
+            tracker.start_step("scoring_finalize", detail="Đang chuẩn hóa điểm và tổng hợp kết quả...")
+
         identity_warnings = _merge_identity_warnings(
             result.get("identity_warnings"),
             _build_identity_warnings(
@@ -1224,6 +1317,7 @@ def analyze_resume_ai(self, activity_id):
             "criteria_results": result.get("criteria_results", []),
             "evidence": result.get("evidence", []),
             "identity_warnings": result.get("identity_warnings", []),
+            "operation_id": tracker.operation.id if tracker else (evidence.get("operation_id") if isinstance(evidence, dict) else None),
         }
         activity.ai_analysis_model = analysis_model
         activity.ai_analysis_source = analysis_source
@@ -1237,6 +1331,10 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_status = 'completed'
         activity.ai_analysis_progress = 100
         activity.save()
+
+        if tracker:
+            tracker.complete_step("scoring_finalize", detail="Tổng hợp dẫn chứng và tính điểm hoàn tất.")
+            tracker.finish(result={"score": activity.ai_analysis_score, "summary": activity.ai_analysis_summary})
 
         logger.info("AI Analysis completed for Activity %s. Score: %s", activity_id, activity.ai_analysis_score)
 
@@ -1263,13 +1361,17 @@ def analyze_resume_ai(self, activity_id):
             logger.error("Error evaluating screening interview gatekeeper for activity %s: %s", activity_id, gate_exc)
 
     except (httpx.TimeoutException, httpx.ConnectError) as exc:
+        if tracker:
+            try:
+                tracker.fail(str(exc)[:500], code="AI_SCAN_FAILED")
+            except Exception:
+                pass
         max_r = 3  # matches retry_kwargs['max_retries']
         if (self.request.retries or 0) >= max_r:
             try:
                 act = JobPostActivity.objects.get(id=activity_id)
-                act.ai_analysis_status = 'failed'
-                act.ai_analysis_progress = 0
-                act.ai_analysis_summary = f"LLM khong phan hoi sau nhieu lan thu: {str(exc)[:300]}"
+                err_text = str(exc)[:300]
+                act.ai_analysis_summary = f"Mô hình AI không phản hồi sau nhiều lần thử: {err_text}"
                 act.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             except Exception:
                 logger.error("Failed to update activity %s after final retry", activity_id)
@@ -1277,6 +1379,32 @@ def analyze_resume_ai(self, activity_id):
 
     except Exception as e:
         logger.error("Error in analyze_resume_ai for activity %s: %s", activity_id, e)
+        if tracker:
+            try:
+                tracker.fail(str(e)[:500], code="AI_SCAN_FAILED")
+            except Exception:
+                pass
+        else:
+            try:
+                op = AsyncOperation.objects.filter(type="candidate.ai_scan", metadata__activity_id=activity_id).first()
+                if op:
+                    t = OperationTracker(op)
+                    t.fail(str(e)[:500], code="AI_SCAN_FAILED")
+                else:
+                    t = OperationTracker.create(
+                        type="candidate.ai_scan",
+                        title=f"AI phân tích ứng viên #{activity_id}",
+                        steps=[
+                            {"key": "extract_text", "label": "Đọc & trích xuất tệp hồ sơ/CV"},
+                            {"key": "criteria_match", "label": "Đối soát tiêu chí & yêu cầu công việc"},
+                            {"key": "llm_evaluation", "label": "Phân tích chuyên sâu với AI"},
+                            {"key": "scoring_finalize", "label": "Tổng hợp dẫn chứng & tính điểm"},
+                        ],
+                        metadata={"activity_id": activity_id},
+                    )
+                    t.fail(str(e)[:500], code="AI_SCAN_FAILED")
+            except Exception:
+                pass
         try:
             activity = JobPostActivity.objects.get(id=activity_id)
             activity.ai_analysis_status = 'failed'

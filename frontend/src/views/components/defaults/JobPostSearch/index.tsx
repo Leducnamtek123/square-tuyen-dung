@@ -303,23 +303,26 @@ const JobPostSearch = () => {
               xl: 4,
             }}
           >
-            <Stack
-              spacing={1.5}
-              direction={{
-                xs: 'column',
-                sm: 'row',
-                md: 'row',
-                lg: 'row',
-                xl: 'row',
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 1.25,
+                gridTemplateColumns: {
+                  xs: 'repeat(2, 1fr)',
+                  sm: 'repeat(3, auto)',
+                },
+                justifyContent: { sm: 'flex-end', lg: 'center' },
               }}
-              justifyContent={{ sm: 'flex-end', lg: 'center' }}
             >
               <Button
                 variant="contained"
                 startIcon={<SearchIcon />}
+                type="submit"
                 sx={{
+                  gridColumn: { xs: 'span 2', sm: 'auto' },
                   whiteSpace: 'nowrap',
-                  width: { xs: '100%', sm: 'auto' },
+                  width: '100%',
+                  minHeight: 44,
                   justifyContent: 'center',
                   borderRadius: '10px',
                   backgroundColor: '#2563eb',
@@ -334,22 +337,24 @@ const JobPostSearch = () => {
                     boxShadow: '0 4px 14px -2px rgba(37,99,235,0.4)',
                   },
                 }}
-                type="submit"
               >
                 {t('jobSearch.searchButton')}
               </Button>
               <Button
                 variant="outlined"
                 sx={{
+                  gridColumn: { xs: 'span 1', sm: 'auto' },
                   whiteSpace: 'nowrap',
-                  width: { xs: '100%', sm: 'auto' },
+                  width: '100%',
+                  minHeight: 44,
                   justifyContent: 'center',
                   borderRadius: '10px',
                   borderColor: '#cbd5e1',
                   color: '#334155',
                   fontWeight: 700,
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
                   textTransform: 'none',
-                  px: 2,
+                  px: 1.5,
                   py: 1,
                   '&:hover': {
                     borderColor: '#2563eb',
@@ -365,16 +370,19 @@ const JobPostSearch = () => {
               <Button
                 variant="outlined"
                 sx={{
+                  gridColumn: { xs: 'span 1', sm: 'auto' },
                   whiteSpace: 'nowrap',
-                  width: { xs: '100%', sm: 'auto' },
+                  width: '100%',
+                  minHeight: 44,
                   justifyContent: 'center',
                   borderRadius: '10px',
                   borderColor: activeAdvancedFilterCount > 0 ? '#2563eb' : '#cbd5e1',
                   backgroundColor: activeAdvancedFilterCount > 0 ? '#eff6ff' : '#ffffff',
                   color: activeAdvancedFilterCount > 0 ? '#2563eb' : '#0f172a',
                   fontWeight: 700,
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
                   textTransform: 'none',
-                  px: 2,
+                  px: 1.5,
                   py: 1,
                   boxShadow: 'none',
                   '&:hover': {
@@ -406,12 +414,12 @@ const JobPostSearch = () => {
                   </Box>
                 )}
               </Button>
-            </Stack>
+            </Box>
           </Grid>
         </Grid>
       </Card>
 
-      {/* ── Active Filters Chips Bar ────────────────────────────────────────── */}
+      {/* -- Active Filters Chips Bar ------------------------------------------ */}
       {activeAdvancedFilterCount > 0 && (
         <Box
           sx={{
@@ -535,7 +543,7 @@ const JobPostSearch = () => {
         </Box>
       )}
 
-      {/* ── Advanced Filters Drawer ────────────────────────────────────────── */}
+      {/* -- Advanced Filters Drawer ------------------------------------------ */}
       <JobPostSearchAdvancedFilters
         open={showAdvanceFilter}
         t={t}

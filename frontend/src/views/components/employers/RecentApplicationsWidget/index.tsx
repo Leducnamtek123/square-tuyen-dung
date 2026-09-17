@@ -151,8 +151,10 @@ export default function RecentApplicationsWidget() {
                 key={app.id}
                 sx={{
                   display: 'flex',
-                  alignItems: 'center',
+                  flexDirection: { xs: 'column', sm: 'row' },
+                  alignItems: { xs: 'stretch', sm: 'center' },
                   justifyContent: 'space-between',
+                  gap: { xs: 1, sm: 1.5 },
                   p: 1.25,
                   borderRadius: '12px',
                   bgcolor: '#F8FAFC',
@@ -165,51 +167,92 @@ export default function RecentApplicationsWidget() {
                   },
                 }}
               >
-                {/* Left: Avatar & Candidate Info */}
-                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
-                  <Avatar
+                {/* Top / Left: Avatar & Candidate Info + View button on mobile */}
+                <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ minWidth: 0, width: '100%' }}>
+                  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0, flexGrow: 1 }}>
+                    <Avatar
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        bgcolor: '#2563EB',
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                        color: '#FFFFFF',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {candidateName.charAt(0).toUpperCase()}
+                    </Avatar>
+
+                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                      <Typography
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.875rem',
+                          color: '#0F172A',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {candidateName}
+                      </Typography>
+
+                      <Typography
+                        sx={{
+                          fontSize: '0.78rem',
+                          color: '#64748B',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {jobTitle}
+                      </Typography>
+                    </Box>
+                  </Stack>
+
+                  {/* Mobile only View button */}
+                  <Button
+                    component={Link}
+                    href={appliedProfilesHref}
+                    size="small"
+                    variant="outlined"
                     sx={{
-                      width: 40,
-                      height: 40,
-                      bgcolor: '#2563EB',
-                      fontSize: '0.9rem',
-                      fontWeight: 700,
-                      color: '#FFFFFF',
+                      display: { xs: 'inline-flex', sm: 'none' },
+                      textTransform: 'none',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: '8px',
+                      borderColor: '#E2E8F0',
+                      color: '#334155',
+                      minWidth: 'auto',
+                      px: 1.2,
+                      py: 0.3,
+                      flexShrink: 0,
+                      '&:hover': {
+                        bgcolor: '#EFF6FF',
+                        borderColor: '#93C5FD',
+                        color: '#2563EB',
+                      },
                     }}
                   >
-                    {candidateName.charAt(0).toUpperCase()}
-                  </Avatar>
-
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '0.875rem',
-                        color: '#0F172A',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {candidateName}
-                    </Typography>
-
-                    <Typography
-                      sx={{
-                        fontSize: '0.78rem',
-                        color: '#64748B',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {jobTitle}
-                    </Typography>
-                  </Box>
+                    Xem
+                  </Button>
                 </Stack>
 
-                {/* Right: AI Score & Time */}
-                <Stack direction="row" spacing={1.25} alignItems="center" sx={{ flexShrink: 0 }}>
+                {/* Bottom / Right: AI Score & Time & Desktop View Button */}
+                <Stack
+                  direction="row"
+                  spacing={1.25}
+                  alignItems="center"
+                  justifyContent={{ xs: 'flex-start', sm: 'flex-end' }}
+                  sx={{
+                    flexShrink: 0,
+                    pl: { xs: 6.5, sm: 0 },
+                    width: { xs: '100%', sm: 'auto' },
+                  }}
+                >
                   {typeof aiScore === 'number' && aiScore > 0 ? (
                     <Chip
                       icon={<AutoAwesomeIcon sx={{ fontSize: '13px !important', color: '#059669 !important' }} />}
@@ -242,6 +285,7 @@ export default function RecentApplicationsWidget() {
                     size="small"
                     variant="outlined"
                     sx={{
+                      display: { xs: 'none', sm: 'inline-flex' },
                       textTransform: 'none',
                       fontSize: '0.75rem',
                       fontWeight: 600,

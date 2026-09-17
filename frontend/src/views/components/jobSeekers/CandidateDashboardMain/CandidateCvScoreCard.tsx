@@ -123,4 +123,4 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
   );
 };
 
-export default CandidateCvScoreCard;
+export default React.memo(CandidateCvScoreCard);

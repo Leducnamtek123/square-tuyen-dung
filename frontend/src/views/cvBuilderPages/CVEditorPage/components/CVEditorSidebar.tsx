@@ -86,7 +86,7 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
 
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', bgcolor: '#ffffff', borderRight: '1px solid #e2e8f0' }}>
-      {/* ── Top Header & 1-Click Sync Button ──────────────────────────────── */}
+      {/* -- Top Header & 1-Click Sync Button -------------------------------- */}
       <Box sx={{ p: 2, borderBottom: '1px solid #e2e8f0', bgcolor: '#f8fafc', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.875rem' }}>
@@ -161,7 +161,7 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
         </Stack>
       </Box>
 
-      {/* ── Tab Content Forms Scrollable Container ─────────────────────── */}
+      {/* -- Tab Content Forms Scrollable Container ----------------------- */}
       <Box sx={{ flex: 1, overflowY: 'auto', p: { xs: 2, sm: 2.5 } }}>
         {activeTab === 'content' && (
           <UnifiedCVForm

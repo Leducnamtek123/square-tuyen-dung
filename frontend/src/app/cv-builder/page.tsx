@@ -1,15 +1,10 @@
 import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { buildSeoMetadata } from '@/utils/serverI18n';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import { CVEditorPage } from '@/views/cvBuilderPages/CVEditorPage';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildSeoMetadata({
-    title: 'Tạo & Trang Trí CV Trực Tuyến',
-    description:
-      'Trình tạo và trang trí CV trực tuyến thông minh, đồng bộ 1 chạm từ hồ sơ cá nhân, xuất PDF chuẩn in ấn A4 nhanh chóng.',
-    path: '/tao-cv',
-  });
+  return buildPageMetadata('cv-builder');
 }
 
 export default function Page() {

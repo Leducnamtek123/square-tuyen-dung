@@ -24,7 +24,9 @@ export interface ExportModalProps {
   title?: string;
   defaultFileName?: string;
   columns: ExportColumn[];
-  fetchData: (scope: ExportScope) => Promise<Record<string, any>[]>;
+  fetchData?: (scope: ExportScope) => Promise<Record<string, any>[]>;
+  entity?: string;
+  filters?: Record<string, any>;
   totalRecords?: ScopeCount;
   onExportSuccess?: (fileName: string, format: ExportFormat, recordCount: number) => void;
 }

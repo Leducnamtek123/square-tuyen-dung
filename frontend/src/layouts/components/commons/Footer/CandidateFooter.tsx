@@ -42,6 +42,7 @@ export const CandidateFooter: React.FC = () => {
   return (
     <Box
       component="footer"
+      className="no-print"
       sx={{
         width: '100%',
         mt: 'auto',
@@ -49,7 +50,7 @@ export const CandidateFooter: React.FC = () => {
         borderTop: '1px solid #e2e8f0',
       }}
     >
-      {/* ── Main Candidate Footer (Clean White Theme) ── */}
+      {/* -- Main Candidate Footer (Clean White Theme) -- */}
       <Box sx={{ py: { xs: 5, md: 6 } }}>
         <Container maxWidth="xl">
           <Grid container spacing={{ xs: 4, md: 5 }}>
@@ -160,7 +161,7 @@ export const CandidateFooter: React.FC = () => {
 
           <Divider sx={{ mt: 5, mb: 3, borderColor: '#e2e8f0' }} />
 
-          {/* ── Bottom Bar with Trust Badges ── */}
+          {/* -- Bottom Bar with Trust Badges -- */}
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             alignItems="center"

@@ -358,7 +358,7 @@ export default function HomePage() {
     () => {
       const mm = gsap.matchMedia();
 
-      // ── Desktop Breakpoint (≥769px) ─────────────────────────────────
+      // -- Desktop Breakpoint (≥769px) ---------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
         // 1. Urgent jobs section entrance
         gsap.fromTo(
@@ -458,7 +458,7 @@ export default function HomePage() {
         );
       });
 
-      // ── Mobile Breakpoint (≤768px) ──────────────────────────────────
+      // -- Mobile Breakpoint (≤768px) ----------------------------------
       // Subtle movements (y: 12-16px), earlier trigger (top 92%) and faster durations to eliminate lag
       mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
         gsap.fromTo(
@@ -554,7 +554,7 @@ export default function HomePage() {
         );
       });
 
-      // ── Reduced Motion ───────────────────────────────────────────────
+      // -- Reduced Motion -----------------------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
         gsap.set(
           '.gsap-urgent-jobs, .gsap-top-companies, .gsap-path-header, .gsap-entry-card, .gsap-feedback-section, .gsap-handbook-section',
@@ -658,15 +658,15 @@ export default function HomePage() {
         </Box>
       )}
 
-      {/* ── Key Careers Section (Tabbed Pills & Smart Fallback) ──────── */}
+      {/* -- Key Careers Section (Tabbed Pills & Smart Fallback) -------- */}
       <CareerJobPostTabs />
 
-      {/* ── Top Career Carousel (Industries) ────────────────────────────── */}
+      {/* -- Top Career Carousel (Industries) ------------------------------ */}
       <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
         <CareerCarousel />
       </Box>
 
-      {/* ── Explore Banner ──────────────────────────────────────────────── */}
+      {/* -- Explore Banner ------------------------------------------------ */}
       <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
         <Box
           component={Link}
@@ -840,7 +840,7 @@ export default function HomePage() {
         </Box>
       </Box>
 
-      {/* ── User Feedback Carousel ──────────────────────────────────────── */}
+      {/* -- User Feedback Carousel ---------------------------------------- */}
       <Box className="gsap-feedback-section" sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
         <Stack spacing={1} sx={{ mb: 3 }}>
           <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
@@ -855,7 +855,7 @@ export default function HomePage() {
         </LazyLoadSection>
       </Box>
 
-      {/* ── Cẩm nang nghề nghiệp (Articles / Handbook Section) ────────────── */}
+      {/* -- Cẩm nang nghề nghiệp (Articles / Handbook Section) -------------- */}
       <Box className="gsap-handbook-section" sx={{ mt: { xs: 4, sm: 6, md: 10 }, mb: { xs: 4, md: 8 } }}>
         <LazyLoadSection minHeight="400px" rootMargin="300px">
           <CareerHandbookSection />

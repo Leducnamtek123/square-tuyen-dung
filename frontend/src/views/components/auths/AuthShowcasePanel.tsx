@@ -8,20 +8,20 @@ interface AuthShowcasePanelProps {
   variant: 'employer' | 'candidate';
 }
 
-const BannerContainer = styled(Box)(({ theme }) => ({
+const BannerContainer = styled(Box)(() => ({
   position: 'relative',
   width: '100%',
   height: '100%',
-  minHeight: '560px',
+  minHeight: '600px',
   overflow: 'hidden',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: '#F8FAFC',
+  backgroundColor: '#0F172A',
   transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
   '&:hover': {
     '& .banner-image': {
-      transform: 'scale(1.025)',
+      transform: 'scale(1.02)',
     },
   },
 }));
@@ -30,7 +30,7 @@ const ImageWrapper = styled(Box)({
   position: 'relative',
   width: '100%',
   height: '100%',
-  minHeight: '560px',
+  minHeight: '600px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

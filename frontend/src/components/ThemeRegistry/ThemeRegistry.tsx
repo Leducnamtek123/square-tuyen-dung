@@ -242,6 +242,21 @@ const theme = createTheme(baseTheme, {
         }),
       },
     },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          '&:first-of-type': {
+            paddingTop: 20,
+          },
+          '.MuiDialogTitle-root + &': {
+            paddingTop: '20px !important',
+          },
+          '.MuiDialogTitle-root + &.MuiDialogContent-dividers': {
+            paddingTop: '16px !important',
+          },
+        },
+      },
+    },
   },
 });
 

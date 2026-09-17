@@ -50,7 +50,7 @@ const MetricCard = ({
     <Paper
       elevation={0}
       sx={{
-        p: 2.5,
+        p: { xs: 1.5, sm: 2.5 },
         borderRadius: 3,
         border: '1px solid #E2E8F0',
         bgcolor: '#FFFFFF',
@@ -68,20 +68,24 @@ const MetricCard = ({
         },
       }}
     >
-      <Stack spacing={1.5}>
+      <Stack spacing={{ xs: 1, sm: 1.5 }}>
         {/* Card Header: Title & Icon */}
-        <Stack direction="row" spacing={1.5} alignItems="flex-start" justifyContent="space-between">
+        <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="space-between">
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 600,
                 color: '#64748B',
-                fontSize: '0.8125rem',
+                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
                 lineHeight: 1.3,
-                whiteSpace: 'nowrap',
+                whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                display: { xs: '-webkit-box', sm: 'block' },
+                WebkitLineClamp: { xs: 2, sm: 1 },
+                WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                minHeight: { xs: '2.5em', sm: 'auto' },
               }}
             >
               {title}
@@ -94,8 +98,8 @@ const MetricCard = ({
                 variant="h4"
                 sx={{
                   color: '#0F172A',
-                  fontSize: { xs: '1.55rem', sm: '1.75rem' },
-                  fontWeight: 700,
+                  fontSize: { xs: '1.25rem', sm: '1.75rem' },
+                  fontWeight: 800,
                   mt: 0.5,
                   lineHeight: 1.1,
                   display: 'flex',
@@ -103,9 +107,11 @@ const MetricCard = ({
                   gap: 0.5,
                 }}
               >
-                {typeof value === 'number' ? value.toLocaleString('vi-VN') : value ?? 0}
+                {typeof value === 'number'
+                  ? (Number.isFinite(value) ? value.toLocaleString('vi-VN') : 0)
+                  : ((value === 'NaN' || value === 'undefined') ? 0 : (value ?? 0))}
                 {suffix && (
-                  <Typography component="span" sx={{ fontSize: '1rem', fontWeight: 600, color: '#64748B' }}>
+                  <Typography component="span" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' }, fontWeight: 600, color: '#64748B' }}>
                     {suffix}
                   </Typography>
                 )}
@@ -118,12 +124,15 @@ const MetricCard = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 44,
-              height: 44,
-              borderRadius: 2.5,
+              width: { xs: 34, sm: 44 },
+              height: { xs: 34, sm: 44 },
+              borderRadius: 2,
               bgcolor: iconBgColor,
               color: iconColor,
               flexShrink: 0,
+              '& svg': {
+                fontSize: { xs: 18, sm: 22 },
+              },
             }}
           >
             {icon}
@@ -204,13 +213,15 @@ const EmployerQuantityStatistics = () => {
   const totalInterviews = data?.totalInterviews ?? 0;
   const completedInterviews = data?.totalInterviewsCompleted ?? 0;
   const inProgressInterviews = data?.totalInterviewsInProgress ?? 0;
-  const conversionRate = data?.conversionRate ?? 0;
-  const avgAiScore = data?.avgAiOverallScore ? Number(data.avgAiOverallScore).toFixed(1) : '8.5';
+  const rawConversionRate = Number(data?.conversionRate);
+  const conversionRate = Number.isFinite(rawConversionRate) ? rawConversionRate : 0;
+  const rawAiScore = Number(data?.avgAiOverallScore);
+  const avgAiScore = Number.isFinite(rawAiScore) && rawAiScore > 0 ? rawAiScore.toFixed(1) : '8.5';
 
   return (
     <Grid container spacing={{ xs: 1.5, sm: 2.5 }}>
       {/* Metric 1: Total Applications */}
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 6, sm: 6, lg: 3 }}>
         <MetricCard
           title={t('statItem.title.totalapplications')}
           value={totalApply}
@@ -225,7 +236,7 @@ const EmployerQuantityStatistics = () => {
       </Grid>
 
       {/* Metric 2: Job Posts */}
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 6, sm: 6, lg: 3 }}>
         <MetricCard
           title={t('statItem.title.totaljobposts')}
           value={totalJobPost}
@@ -241,7 +252,7 @@ const EmployerQuantityStatistics = () => {
       </Grid>
 
       {/* Metric 3: Interviews */}
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 6, sm: 6, lg: 3 }}>
         <MetricCard
           title={t('statItem.title.totalinterviews')}
           value={totalInterviews}
@@ -257,7 +268,7 @@ const EmployerQuantityStatistics = () => {
       </Grid>
 
       {/* Metric 4: AI Matching & Conversion */}
-      <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+      <Grid size={{ xs: 6, sm: 6, lg: 3 }}>
         <MetricCard
           title={t('statItem.title.conversionrate')}
           value={conversionRate}

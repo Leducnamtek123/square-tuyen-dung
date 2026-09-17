@@ -104,21 +104,30 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
           </Box>
         )}
 
-        {/* Advanced Filter Drawer Trigger Button */}
-        <Box sx={{ width: { xs: '100%', sm: 'auto' }, flexShrink: 0 }}>
+        {/* Buttons Group: Filter Drawer Trigger & Primary Search */}
+        <Stack
+          direction="row"
+          spacing={1.25}
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+            flexShrink: 0,
+          }}
+        >
+          {/* Advanced Filter Drawer Trigger Button */}
           <Button
             variant={activeFilterCount > 0 ? 'contained' : 'outlined'}
             color={activeFilterCount > 0 ? 'primary' : 'inherit'}
             startIcon={<FilterAltIcon sx={{ fontSize: 18 }} />}
             onClick={onOpenFilterDrawer}
-            fullWidth
             sx={{
+              flex: { xs: 1, sm: 'none' },
               height: 42,
               borderRadius: '8px',
               fontWeight: 700,
               fontSize: '0.875rem',
               textTransform: 'none',
               px: 2,
+              whiteSpace: 'nowrap',
               borderColor: activeFilterCount > 0 ? 'primary.main' : '#CBD5E1',
               bgcolor: activeFilterCount > 0 ? undefined : '#F8FAFC',
               color: activeFilterCount > 0 ? '#FFFFFF' : '#334155',
@@ -130,23 +139,23 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
           >
             {t('filters.filterButton', 'Bộ lọc')} {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
           </Button>
-        </Box>
 
-        {/* Primary Search Button */}
-        <Box sx={{ width: { xs: '100%', sm: 'auto', md: 130 }, flexShrink: 0 }}>
+          {/* Primary Search Button */}
           <Button
             variant="contained"
             color="primary"
             startIcon={<SearchIcon />}
             type="submit"
-            fullWidth
             sx={{
+              flex: { xs: 1, sm: 'none' },
+              minWidth: { sm: 120 },
               height: 42,
               borderRadius: '8px',
               fontWeight: 700,
               fontSize: '0.875rem',
               textTransform: 'none',
               px: 2.5,
+              whiteSpace: 'nowrap',
               boxShadow: 'none',
               '&:hover': {
                 boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
@@ -155,7 +164,7 @@ export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
           >
             {t('common.search.button', 'Tìm kiếm')}
           </Button>
-        </Box>
+        </Stack>
 
         {/* Extra Actions Slot (e.g. View switches, Create button, Export) */}
         {extraActions && (

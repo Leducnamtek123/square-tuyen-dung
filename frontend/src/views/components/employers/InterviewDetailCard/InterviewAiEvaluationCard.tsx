@@ -9,6 +9,7 @@ import { InterviewSession } from '@/types/models';
 import pc from '@/utils/muiColors';
 import InterviewDetailSectionHeader from './InterviewDetailSectionHeader';
 import { interviewDetailCardSx, interviewDetailPanelSx } from './sectionStyles';
+import CompetencyRadarChart, { RadarDimension } from '@/views/interviewPages/components/CompetencyRadarChart';
 
 interface InterviewAiEvaluationCardProps {
   session: InterviewSession;
@@ -75,6 +76,21 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
   const isProcessing = effectiveStatus === 'processing' || session.status === 'processing';
   const canTriggerAi = effectiveStatus === 'completed' || session.status === 'completed';
   const rating = getRatingBadge(numOverallScore);
+
+  const score100 = numOverallScore <= 10 ? Math.round(numOverallScore * 10) : Math.round(numOverallScore);
+  const techScore100 = technicalScore <= 10 ? Math.round(technicalScore * 10) : Math.round(technicalScore);
+  const commScore100 = communicationScore <= 10 ? Math.round(communicationScore * 10) : Math.round(communicationScore);
+  const softSkills = (session.aiDetailedFeedback as any)?.soft_skills;
+  const confidenceScore = softSkills?.confidence != null ? Math.round(Number(softSkills.confidence) * 10) : Math.round(score100 * 0.95);
+  const clarityScore = softSkills?.clarity != null ? Math.round(Number(softSkills.clarity) * 10) : commScore100;
+  const relevanceScore = Math.round((techScore100 + score100) / 2);
+
+  const radarDimensions: RadarDimension[] = [
+    { key: 'content', label: 'Nội dung', value: techScore100 },
+    { key: 'clarity', label: 'Rõ ràng', value: clarityScore },
+    { key: 'relevance', label: 'Liên quan', value: relevanceScore },
+    { key: 'confidence', label: 'Tự tin', value: confidenceScore },
+  ];
 
   return (
     <Paper elevation={0} sx={interviewDetailCardSx}>
@@ -166,6 +182,32 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
               color="#6366f1"
             />
           </Stack>
+
+          {/* Competency Radar Overview */}
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              bgcolor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ width: '100%', mb: 1 }}>
+              <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Tổng quan năng lực (Radar)
+              </Typography>
+              <Chip
+                label="0 - 100"
+                size="small"
+                sx={{ height: 20, fontSize: '0.6875rem', fontWeight: 700 }}
+              />
+            </Stack>
+            <CompetencyRadarChart dimensions={radarDimensions} size={250} accentColor="#4f46e5" />
+          </Box>
 
           {/* Executive Summary */}
           <Box

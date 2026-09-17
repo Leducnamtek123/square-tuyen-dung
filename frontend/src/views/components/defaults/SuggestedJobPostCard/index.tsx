@@ -14,8 +14,8 @@ interface SuggestedJobPostCardProps {
   fullWidth?: boolean;
 }
 
-const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 12, fullWidth = false }) => {
-
+const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize, fullWidth = false }) => {
+  const effectivePageSize = pageSize ?? (fullWidth ? 5 : 12);
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
   const [page, setPage] = React.useState(1);
@@ -42,18 +42,26 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
   }, [fullWidth]);
 
   const { data, isLoading } = useSuggestedJobPosts(
-    { pageSize, page },
+    { pageSize: effectivePageSize, page },
     isJobSeeker
   );
 
   const jobPosts = isJobSeeker ? (data?.results || []) : [];
   const count = isJobSeeker ? (data?.count || 0) : 0;
   const showLoading = isJobSeeker && isLoading;
+  const totalPages = Math.ceil(count / effectivePageSize);
 
-  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  React.useEffect(() => {
+    if (totalPages > 0 && page > totalPages) {
+      setPage(1);
+    }
+  }, [totalPages, page]);
 
+  const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
-
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   };
 
   return (
@@ -66,7 +74,7 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
           <Grid container spacing={2}>
 
-            {Array.from(Array(pageSize).keys()).map((item) => (
+            {Array.from(Array(effectivePageSize).keys()).map((item) => (
 
               <Grid key={item} size={col}>
 
@@ -128,21 +136,53 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
             </Grid>
 
-            <Stack sx={{mt: 4}}>
+            <Stack sx={{ mt: 3, alignItems: "center" }}>
 
-              {Math.ceil(count / pageSize) > 1 && (
+              {totalPages > 1 && (
 
                 <Pagination
 
                   color="primary"
 
-                  size="medium"
+                  size="small"
 
-                  variant="text"
+                  shape="rounded"
 
-                  sx={{ margin: "0 auto" }}
+                  variant="outlined"
 
-                  count={Math.ceil(count / pageSize)}
+                  sx={{
+
+                    margin: "0 auto",
+
+                    "& .MuiPaginationItem-root": {
+
+                      fontWeight: 600,
+
+                      borderRadius: "8px",
+
+                      borderColor: "divider",
+
+                      "&.Mui-selected": {
+
+                        backgroundColor: "primary.main",
+
+                        color: "#fff",
+
+                        borderColor: "primary.main",
+
+                        "&:hover": {
+
+                          backgroundColor: "primary.dark",
+
+                        },
+
+                      },
+
+                    },
+
+                  }}
+
+                  count={totalPages}
 
                   page={page}
 

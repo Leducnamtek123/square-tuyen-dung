@@ -1,5 +1,5 @@
-﻿import React from 'react';
-import { TextField, MenuItem, Box, Typography, alpha, useTheme } from '@mui/material';
+import React from 'react';
+import { TextField, MenuItem, Box, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { confirmModal, errorModal } from '@/utils/sweetalert2Modal';
 import { tConfig } from '@/utils/tConfig';
@@ -9,7 +9,7 @@ import {
   canTransitionApplicationStatus,
   getAllowedApplicationStatusTargets,
 } from '../applicationStatusTransitions';
-import { getAppliedStatusTone } from './applicationStatusPresentation';
+import { getAppliedStatusConfig } from './applicationStatusPresentation';
 
 interface AppliedStatusComponentProps {
   options: SelectOption[];
@@ -26,7 +26,6 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
 }) => {
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
-  const theme = useTheme();
   const applyStatus = defaultStatus;
 
   const canChooseStatus = (statusId: number) => {
@@ -59,20 +58,10 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
     );
   };
 
-  const getStatusColor = () => {
-    const tone = getAppliedStatusTone(applyStatus);
-    if (tone === 'success') return theme.palette.success;
-    if (tone === 'error') return theme.palette.error;
-    if (tone === 'primary') return theme.palette.primary;
-    if (tone === 'warning') return theme.palette.warning;
-    if (tone === 'info') return theme.palette.info;
-    return { main: theme.palette.text.secondary, light: theme.palette.divider };
-  };
-
-  const statusColor = getStatusColor();
+  const statusCfg = getAppliedStatusConfig(applyStatus);
 
   return (
-    <Box sx={{ minWidth: 140 }}>
+    <Box sx={{ minWidth: 155 }}>
         <TextField
             id={`status-select-${id}`}
             size="small"
@@ -81,29 +70,57 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
             value={applyStatus}
             onChange={handleChangeValue}
             disabled={getAllowedApplicationStatusTargets(applyStatus).length === 0}
+            SelectProps={{
+              renderValue: (val) => {
+                const currentCfg = getAppliedStatusConfig(Number(val));
+                return (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: currentCfg.dot, flexShrink: 0 }} />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: '0.72rem',
+                        letterSpacing: '0.3px',
+                        textTransform: 'uppercase',
+                        color: currentCfg.text,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {tConfig(allConfig?.applicationStatusDict?.[Number(val)]) || '---'}
+                    </Typography>
+                  </Box>
+                );
+              },
+            }}
             sx={{
                 '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    fontSize: '0.75rem',
-                    fontWeight: 900,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    backgroundColor: alpha(statusColor.main, 0.08),
-                    color: statusColor.main,
+                    borderRadius: '8px',
+                    backgroundColor: statusCfg.bg,
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+                    transition: 'all 0.15s ease',
                     '& fieldset': {
-                        borderColor: alpha(statusColor.main, 0.2),
+                        borderColor: statusCfg.border,
                         borderWidth: '1px'
                     },
+                    '&:hover': {
+                        backgroundColor: statusCfg.hoverBg,
+                    },
                     '&:hover fieldset': {
-                        borderColor: statusColor.main,
+                        borderColor: statusCfg.dot,
                     },
                     '&.Mui-focused fieldset': {
-                        borderColor: statusColor.main,
+                        borderColor: statusCfg.dot,
+                        borderWidth: '1.5px',
+                    },
+                    '& .MuiSvgIcon-root': {
+                        color: statusCfg.text,
+                        fontSize: '18px',
                     }
                 },
                 '& .MuiSelect-select': {
-                    py: 0.75,
-                    px: 1.5,
+                    py: 0.65,
+                    px: 1.25,
                     display: 'flex',
                     alignItems: 'center'
                 }
@@ -111,11 +128,15 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
         >
             {options.map((option) => {
               const optionId = Number(option.id);
+              const itemCfg = getAppliedStatusConfig(optionId);
               return (
                 <MenuItem key={option.id as string | number} value={option.id as string | number} disabled={!canChooseStatus(optionId)}>
-                    <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.8125rem' }}>
-                        {tConfig(option.name as string)}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: itemCfg.dot, flexShrink: 0 }} />
+                      <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.8125rem', color: itemCfg.text }}>
+                          {tConfig(option.name as string)}
+                      </Typography>
+                    </Box>
                 </MenuItem>
               );
             })}

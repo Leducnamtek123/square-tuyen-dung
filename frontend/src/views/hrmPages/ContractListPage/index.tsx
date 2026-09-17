@@ -405,7 +405,7 @@ export default function ContractListPage() {
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ fontWeight: 700, color: '#0f172a' }}>
-                        {c.employeeName || c.employee_name || `#${c.employee}`}
+                        {c.employeeName || c.employee_name || 'Nhân sự'}
                       </TableCell>
                       <TableCell>{renderContractTypeChip(c.contractType || c.contract_type)}</TableCell>
                       <TableCell sx={{ fontWeight: 800, color: '#16a34a', fontFamily: 'var(--font-mono)', fontSize: '0.875rem' }}>
@@ -598,7 +598,7 @@ export default function ContractListPage() {
             <Stack spacing={2}>
               <Box sx={{ p: 2, bgcolor: '#f0fdf4', borderRadius: 2, border: '1px solid #bbf7d0' }}>
                 <Typography variant="body2" sx={{ fontWeight: 700, color: '#166534' }}>
-                  Gia hạn cho nhân sự: {renewingContract.employee_name || `#${renewingContract.employee}`}
+                  Gia hạn cho nhân sự: {renewingContract.employee_name || 'Nhân sự'}
                 </Typography>
                 <Typography variant="caption" sx={{ color: '#15803d', display: 'block', mt: 0.5 }}>
                   Hợp đồng cũ ({renewingContract.contract_number}) sẽ được chuyển sang trạng thái <b>EXPIRED</b> và hợp đồng mới sẽ có hiệu lực.

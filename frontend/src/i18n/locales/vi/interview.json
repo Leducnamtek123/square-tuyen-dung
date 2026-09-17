@@ -10,12 +10,18 @@
   "processingTitle": "Đang xử lý kết quả phỏng vấn",
   "processingBody": "Buổi phỏng vấn đã kết thúc. Hệ thống đang tổng hợp transcript và chấm điểm, bạn có thể quay lại sau ít phút.",
   "startInterview": "Bắt đầu phỏng vấn",
+  "activeRoomTitle": "Phòng phỏng vấn trực tuyến",
   "preflight": {
     "title": "Kiểm tra thiết bị",
     "subtitle": "Hãy đảm bảo microphone của bạn hoạt động trước khi bắt đầu buổi phỏng vấn AI.",
     "mic_ready": "Microphone sẵn sàng",
     "join": "Tham gia phỏng vấn",
     "mic_denied": "Quyền truy cập microphone bị từ chối. Vui lòng cho phép truy cập microphone để tiếp tục."
+  },
+  "recordingBadge": {
+    "tooltip": "Cuộc họp đang được tự động ghi hình để phục vụ đánh giá năng lực chuyên môn & đối soát",
+    "ariaLabel": "Cuộc họp đang được ghi hình",
+    "recording": "Đang ghi hình"
   },
   "transcriptTitle": "Bản ghi âm",
   "noMessages": "Chưa có tin nhắn nào.",
@@ -112,7 +118,7 @@
   "errors": {
     "missingInvite": "Thiếu mã mời phỏng vấn.",
     "missingSessionId": "Thiếu ID phiên phỏng vấn.",
-    "tokenMissing": "Không thể lấy token để tham gia phỏng vấn.",
+    "tokenMissing": "Không thể kết nối vào phòng phỏng vấn.",
     "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ.",
     "sessionNotReadyForJoin": "Không thể vào phòng lúc này vì phiên đang ở trạng thái {{status}}.",
     "endSessionFailed": "Không thể cập nhật trạng thái kết thúc. Phiên đã được ngắt khỏi phòng.",
@@ -152,12 +158,32 @@
       },
       "deleteTitle": "Xóa câu hỏi",
       "noData": "Chưa có câu hỏi nào",
-      "hint": "Tạo câu hỏi để sử dụng trong phỏng vấn"
+      "hint": "Tạo câu hỏi để sử dụng trong phỏng vấn",
+      "categoryLabel": "Phân loại câu hỏi",
+      "difficultyLabel": "Mức độ đánh giá",
+      "durationLabel": "Thời lượng dự kiến",
+      "categories": {
+        "technical": "Chuyên môn",
+        "situational": "Tình huống",
+        "culture": "Văn hóa & Động lực",
+        "general": "Tổng quát"
+      },
+      "difficulties": {
+        "easy": "Cơ bản",
+        "medium": "Tiêu chuẩn",
+        "hard": "Nâng cao"
+      }
     }
   },
   "interviewListCard": {
-    "title": "Danh sách Phỏng vấn Online",
+    "title": "Danh sách phỏng vấn trực tuyến",
     "scheduleInterview": "Lên lịch phỏng vấn",
+    "interviewer": "Người phỏng vấn",
+    "autoInterviewBanner": {
+      "title": "Tự động hóa phỏng vấn AI",
+      "description": "Hệ thống hỗ trợ tự động xếp lịch và gửi email phỏng vấn AI ngay khi ứng viên nộp hồ sơ đạt yêu cầu.",
+      "action": "Thiết lập tại Tin tuyển dụng"
+    },
     "noInterviews": "Chưa có buổi phỏng vấn nào được tạo.",
     "deleteInterview": "Xóa buổi phỏng vấn",
     "editInterview": "Sửa buổi phỏng vấn",
@@ -225,7 +251,8 @@
   "interviewCreateCard": {
     "messages": {
       "updateSuccess": "Cập nhật phỏng vấn thành công",
-      "scheduleSuccess": "Lên lịch phỏng vấn thành công"
+      "scheduleSuccess": "Lên lịch phỏng vấn thành công",
+      "testRoomCreated": "Đã khởi tạo phòng phỏng vấn thử nghiệm thành công! Đang mở phòng..."
     },
     "title": {
       "editOnlineInterview": "Chỉnh sửa phỏng vấn trực tuyến",
@@ -243,14 +270,19 @@
       "autoDefaultVoice": "Tự động/giọng mặc định",
       "defaultVoiceSuffix": "mặc định",
       "questions": "Câu hỏi",
-      "selectquestiongroupoptional": "Chọn nhóm câu hỏi (Tùy chọn)",
+      "selectquestiongroupoptional": "Chọn nhóm câu hỏi",
       "selectinterviewquestions": "Chọn câu hỏi phỏng vấn",
       "selectquestions": "Chọn câu hỏi"
     },
     "validation": {
       "selectJobPost": "Vui lòng chọn tin tuyển dụng",
       "selectCandidate": "Vui lòng chọn ứng viên",
-      "selectScheduleTime": "Vui lòng chọn thời gian phỏng vấn"
+      "selectScheduleTime": "Vui lòng chọn thời gian phỏng vấn",
+      "selectAtLeastOneQuestionForTest": "Vui lòng chọn ít nhất một câu hỏi hoặc nhóm câu hỏi để thử nghiệm."
+    },
+    "actions": {
+      "testInterviewWithAI": "Thử nghiệm với AI",
+      "testing": "Đang khởi tạo..."
     },
     "helperText": {
       "selectaquestiongrouptoautomaticallyfillthequestions below": "Chọn nhóm câu hỏi để tự động điền câu hỏi",
@@ -265,6 +297,7 @@
   },
   "interviewDetail": {
     "title": "Chi tiết phỏng vấn",
+    "forceEndTitle": "Kết thúc phỏng vấn",
     "subtitle": {
       "info": "Thông tin Phỏng vấn",
       "aiEvaluation": "Kết quả đánh giá AI",
@@ -345,18 +378,18 @@
       "overallScore": "Điểm tổng quan",
       "resultLabel": "Kết quả cuối cùng",
       "comments": "Nhận xét chi tiết",
-      "proposedSalary": "Lương đề xuất (VNĐ)",
+      "proposedSalary": "Lương đề xuất",
       "submitEvaluation": "Gửi đánh giá cuối cùng",
       "evalSuccess": "Gửi đánh giá thành công!",
-      "passed": "Chấp nhận (Đạt)",
-      "failed": "Từ chối (Không đạt)",
+      "passed": "Đạt yêu cầu",
+      "failed": "Không đạt",
       "pending": "Chờ xem xét",
       "joinAsHrLoading": "Đang kết nối..."
     }
   },
   "liveRoom": {
     "participants": {
-      "aiInterviewer": "AI Phỏng vấn",
+      "aiInterviewer": "AILA AI",
       "employer": "Nhà tuyển dụng",
       "you": "Bạn",
       "candidate": "Ứng viên",
@@ -364,10 +397,12 @@
       "observer": "Quan sát viên"
     },
     "chips": {
-      "ai": "AI",
+      "ai": "AILA",
       "you": "BẠN",
       "employer": "NTD",
-      "live": "TRỰC TIẾP"
+      "live": "TRỰC TIẾP",
+      "screenSharing": "ĐANG CHIA SẺ MÀN HÌNH",
+      "yourScreenSharing": "MÀN HÌNH CỦA BẠN ĐANG CHIA SẺ"
     },
     "chat": {
       "title": "Hội thoại",
@@ -398,6 +433,22 @@
       "employerObserving": "Nhà tuyển dụng đang quan sát phiên phỏng vấn này",
       "live": "TRỰC TIẾP",
       "waiting": "CHỜ"
+    },
+    "competencyOverview": {
+      "title": "Tổng quan năng lực",
+      "subtitle": "Tổng điểm: 0-100",
+      "radarTitle": "Biểu đồ năng lực Radar",
+      "axes": {
+        "content": "Nội dung",
+        "clarity": "Rõ ràng",
+        "relevance": "Liên quan",
+        "confidence": "Tự tin"
+      },
+      "retryQuestion": "Thử lại câu này",
+      "retryAll": "Thử lại toàn bộ",
+      "shareResult": "Chia sẻ kết quả",
+      "backToList": "Về danh sách",
+      "continue": "Tiếp tục"
     }
   }
 }

@@ -28,4 +28,23 @@ describe('ConfirmDialogRoot formatting and design-taste tests', () => {
     expect(rootSource).toContain('bg-blue-600 hover:bg-blue-700');
     expect(rootSource).toContain('bg-red-600 hover:bg-red-700');
   });
+
+  it('ensures alert-dialog opens as a clean centered popup without sliding from the top-left corner', () => {
+    const alertDialogSource = readFileSync(join(__dirname, '../../../ui/alert-dialog.tsx'), 'utf8');
+    expect(alertDialogSource).toContain('fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2');
+    expect(alertDialogSource).toContain('z-[2000]');
+    expect(alertDialogSource).toContain('flex flex-col');
+    expect(alertDialogSource).toContain('zoom-in-95');
+    expect(alertDialogSource).not.toContain('slide-in-from-left');
+    expect(alertDialogSource).not.toContain('slide-in-from-top');
+    expect(alertDialogSource).not.toContain('slide-out-to-left');
+    expect(alertDialogSource).not.toContain('slide-out-to-top');
+  });
+
+  it('supports prompt input rendering with Enter key handling and autofocus', () => {
+    expect(rootSource).toContain('input &&');
+    expect(rootSource).toContain('handleConfirm();');
+    expect(rootSource).toContain('inputRef');
+  });
 });
+

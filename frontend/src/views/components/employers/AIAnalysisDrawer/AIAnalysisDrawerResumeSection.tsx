@@ -64,13 +64,13 @@ const AIAnalysisDrawerResumeSection = ({
       <Box
         sx={{
           border: '1px solid',
-          borderColor: pc.info( 0.2),
-          borderRadius: 3,
+          borderColor: pc.divider(0.8),
+          borderRadius: 2.5,
           overflow: 'hidden',
           height: { xs: 420, sm: 560 },
           bgcolor: '#fff',
           position: 'relative',
-          boxShadow: (muiTheme) => muiTheme.customShadows?.z8,
+          boxShadow: (muiTheme) => muiTheme.customShadows?.z1,
         }}
       >
         <Pdf
@@ -80,11 +80,11 @@ const AIAnalysisDrawerResumeSection = ({
             height: '100%',
             border: 0,
             borderRadius: 0,
-            opacity: isProcessing ? 0.72 : 1,
+            opacity: isProcessing ? 0.75 : 1,
             transition: 'opacity 0.3s ease',
           }}
           toolbarSx={{
-            bgcolor: '#1f3f83',
+            bgcolor: '#1e293b',
             px: 1.25,
             py: 0.75,
             '& .MuiIconButton-root': { color: '#fff', p: 0.75 },
@@ -96,11 +96,6 @@ const AIAnalysisDrawerResumeSection = ({
             bgcolor: '#f8fafc',
           }}
         />
-
-        <Box sx={{ position: 'absolute', top: 12, left: 12, width: 24, height: 24, borderTop: `2px solid ${pc.info( 0.5)}`, borderLeft: `2px solid ${pc.info( 0.5)}`, pointerEvents: 'none' }} />
-        <Box sx={{ position: 'absolute', top: 12, right: 12, width: 24, height: 24, borderTop: `2px solid ${pc.info( 0.5)}`, borderRight: `2px solid ${pc.info( 0.5)}`, pointerEvents: 'none' }} />
-        <Box sx={{ position: 'absolute', bottom: 12, left: 12, width: 24, height: 24, borderBottom: `2px solid ${pc.info( 0.5)}`, borderLeft: `2px solid ${pc.info( 0.5)}`, pointerEvents: 'none' }} />
-        <Box sx={{ position: 'absolute', bottom: 12, right: 12, width: 24, height: 24, borderBottom: `2px solid ${pc.info( 0.5)}`, borderRight: `2px solid ${pc.info( 0.5)}`, pointerEvents: 'none' }} />
 
         {isProcessing && (
           <Box

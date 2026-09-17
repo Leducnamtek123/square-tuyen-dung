@@ -19,8 +19,10 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DownloadIcon from '@mui/icons-material/Download';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import EventIcon from '@mui/icons-material/Event';
 import type { ColumnDef, PaginationState, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 
+import { getAppliedResumeJobPostId } from '../appliedResumeUtils';
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
@@ -41,6 +43,7 @@ interface AppliedResumeTableProps {
   handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
   handleDelete: (id: string | number) => void;
   onCreateEmployee?: (activity: JobPostActivity) => void;
+  onQuickScheduleInterview?: (activity: JobPostActivity) => void;
   onAnalysisStateChange?: (id: string | number, nextState: Partial<JobPostActivity>) => void;
   blindMode?: boolean;
   rowCount: number;
@@ -65,6 +68,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     handleChangeApplicationStatus, 
     handleDelete,
     onCreateEmployee,
+    onQuickScheduleInterview,
     onAnalysisStateChange,
     blindMode = false,
     rowCount,
@@ -111,9 +115,10 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             const publicCvHref = resumeSlug ? `/cv/${resumeSlug}` : undefined;
             const hasCvTarget = Boolean(safeCvFileUrl || publicCvHref);
 
-            const displayTitle = isAnonymized
+            const rawDisplayTitle = isAnonymized
               ? (isManualCandidate ? 'Hồ sơ thủ công ẩn danh' : 'Hồ sơ ứng viên ẩn danh')
               : (resumeTitle || '---');
+            const displayTitle = rawDisplayTitle.replace(/^[-•*–—\s]+/, '').trim() || '---';
 
             return (
               <>
@@ -152,7 +157,20 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                       </IconButton>
                     </Tooltip>
                   )}
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 600,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 1,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: 260,
+                    }}
+                    title={displayTitle}
+                  >
                     {displayTitle}
                   </Typography>
                 </Box>
@@ -218,7 +236,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       header: t('appliedResume.table.actions'),
       meta: { align: 'right' },
       cell: (info) => (
-        <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
+        <Stack direction="row" spacing={0.75} justifyContent="flex-end" alignItems="center">
           {(() => {
             const isAnonymized = blindMode || String(info.row.original.fullName ?? '').startsWith('Candidate #');
             const detailSlug = info.row.original.resumeSlug || info.row.original.resume?.slug || '';
@@ -229,7 +247,6 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
               <Tooltip title={isAnonymized ? t('appliedResume.table.tooltips.blindDisabled', { defaultValue: 'Hồ sơ đang ở chế độ ẩn danh' }) : t('appliedResume.table.tooltips.view')} arrow>
                 <span>
                   <IconButton aria-label="Xem chi tiết"
-                    color="primary"
                     size="small"
                     disabled={isAnonymized || !detailSlug}
                     onClick={() => {
@@ -237,11 +254,76 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                       push(detailHref);
                     }}
                     sx={{ 
-                      bgcolor: pc.primary( 0.06),
-                      '&:hover': { bgcolor: pc.primary( 0.12) }
+                      width: 32,
+                      height: 32,
+                      bgcolor: '#EFF6FF',
+                      color: '#2563EB',
+                      border: '1px solid #BFDBFE',
+                      transition: 'all 0.15s ease',
+                      '&:hover': { 
+                        bgcolor: '#DBEAFE',
+                        borderColor: '#2563EB',
+                        transform: 'translateY(-1px)',
+                      },
+                      '&.Mui-disabled': {
+                        bgcolor: '#F1F5F9',
+                        borderColor: '#E2E8F0',
+                        color: '#94A3B8',
+                      },
                     }}
                   >
-                    <RemoveRedEyeIcon fontSize="small" />
+                    <RemoveRedEyeIcon sx={{ fontSize: 17 }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            );
+          })()}
+
+          {(() => {
+            const item = info.row.original;
+            const jobPostId = getAppliedResumeJobPostId(item);
+            const canScheduleInterview = !blindMode && Boolean(item.userId) && Boolean(jobPostId);
+            const scheduleHref = canScheduleInterview
+              ? localizeRoutePath(
+                  `/${ROUTES.EMPLOYER.INTERVIEW_CREATE}?candidate=${item.userId}&jobPost=${jobPostId}`,
+                  i18n.language
+                )
+              : undefined;
+
+            return (
+              <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview', { defaultValue: 'Lên lịch phỏng vấn' })} arrow>
+                <span>
+                  <IconButton
+                    aria-label={t('appliedResume.table.tooltips.scheduleInterview', { defaultValue: 'Lên lịch phỏng vấn' })}
+                    size="small"
+                    disabled={!canScheduleInterview}
+                    onClick={() => {
+                      if (onQuickScheduleInterview) {
+                        onQuickScheduleInterview(item);
+                      } else if (scheduleHref) {
+                        push(scheduleHref);
+                      }
+                    }}
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      color: '#7C3AED',
+                      bgcolor: '#F5F3FF',
+                      border: '1px solid #DDD6FE',
+                      transition: 'all 0.15s ease',
+                      '&:hover': { 
+                        bgcolor: '#EDE9FE',
+                        borderColor: '#7C3AED',
+                        transform: 'translateY(-1px)',
+                      },
+                      '&.Mui-disabled': {
+                        bgcolor: '#F1F5F9',
+                        borderColor: '#E2E8F0',
+                        color: '#94A3B8',
+                      },
+                    }}
+                  >
+                    <EventIcon sx={{ fontSize: 17 }} />
                   </IconButton>
                 </span>
               </Tooltip>
@@ -263,58 +345,79 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
 
           {!blindMode && info.row.original.hrmEmployeeId ? (
             <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>
-              <IconButton aria-label="Thao tác"
+              <IconButton aria-label="Mở hồ sơ nhân viên HRM"
                 size="small"
-                color="primary"
                 onClick={() => {
                   if (info.row.original.hrmEmployeeUrl) {
                     openExternalUrlSafely(info.row.original.hrmEmployeeUrl);
                   }
                 }}
                 sx={{
-                  bgcolor: pc.primary(0.06),
-                  
-                  '&:hover': { bgcolor: pc.primary(0.12) }
+                  width: 32,
+                  height: 32,
+                  bgcolor: '#ECFDF5',
+                  color: '#059669',
+                  border: '1px solid #A7F3D0',
+                  transition: 'all 0.15s ease',
+                  '&:hover': { 
+                    bgcolor: '#D1FAE5',
+                    borderColor: '#059669',
+                    transform: 'translateY(-1px)',
+                  }
                 }}
               >
-                <PersonAddAltIcon fontSize="small" />
+                <PersonAddAltIcon sx={{ fontSize: 17 }} />
               </IconButton>
             </Tooltip>
           ) : (!blindMode && [4, 5].includes(Number(info.row.original.status)) && onCreateEmployee && (
             <Tooltip title={t('employees.hrm.convert.action')} arrow>
-              <IconButton aria-label="Thao tác"
+              <IconButton aria-label="Tiếp nhận nhân sự vào HRM"
                 size="small"
-                color="success"
                 onClick={() => onCreateEmployee(info.row.original)}
                 sx={{
-                  bgcolor: pc.success(0.06),
-                  
-                  '&:hover': { bgcolor: pc.success(0.12) }
+                  width: 32,
+                  height: 32,
+                  bgcolor: '#ECFDF5',
+                  color: '#059669',
+                  border: '1px solid #A7F3D0',
+                  transition: 'all 0.15s ease',
+                  '&:hover': { 
+                    bgcolor: '#D1FAE5',
+                    borderColor: '#059669',
+                    transform: 'translateY(-1px)',
+                  }
                 }}
               >
-                <PersonAddAltIcon fontSize="small" />
+                <PersonAddAltIcon sx={{ fontSize: 17 }} />
               </IconButton>
             </Tooltip>
           ))}
 
           <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
-            <IconButton aria-label="Thao tác"
+            <IconButton aria-label="Xóa hồ sơ"
               size="small"
-              color="error"
               onClick={() => handleDelete(info.row.original.id)}
               sx={{ 
-                bgcolor: pc.error( 0.06),
-                
-                '&:hover': { bgcolor: pc.error( 0.12) }
+                width: 32,
+                height: 32,
+                bgcolor: '#FFF1F2',
+                color: '#DC2626',
+                border: '1px solid #FECDD3',
+                transition: 'all 0.15s ease',
+                '&:hover': { 
+                  bgcolor: '#FFE4E6',
+                  borderColor: '#DC2626',
+                  transform: 'translateY(-1px)',
+                }
               }}
             >
-              <DeleteIcon fontSize="small" />
+              <DeleteIcon sx={{ fontSize: 17 }} />
             </IconButton>
           </Tooltip>
         </Stack>
       ),
     },
-  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, push, blindMode, i18n.language]);
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, onQuickScheduleInterview, push, blindMode, i18n.language]);
 
   return (
     <>

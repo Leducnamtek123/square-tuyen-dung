@@ -184,4 +184,4 @@ const CandidateActivityChartCard: React.FC<CandidateActivityChartCardProps> = ({
   );
 };
 
-export default CandidateActivityChartCard;
+export default React.memo(CandidateActivityChartCard);

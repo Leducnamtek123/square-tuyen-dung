@@ -33,6 +33,8 @@ body, html {
   -webkit-text-size-adjust: 100%;
 }
 
+
+
 /* Safe Area Utility Classes for Notch & Home Indicator */
 .pb-safe {
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
@@ -210,12 +212,12 @@ body, html {
 @custom-variant dark (&:is(.dark *));
 
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
   font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -617,6 +619,22 @@ h1, h2, h3, h4, h5, .display-text {
   border: 1px solid rgba(255, 255, 255, 0.8) !important;
 }
 
+@media (max-width: 600px) {
+  .MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
+    margin: 16px !important;
+    max-width: calc(100% - 32px) !important;
+    height: auto !important;
+    max-height: calc(100dvh - 32px) !important;
+    border-radius: 18px !important;
+  }
+  .MuiDialogActions-root {
+    gap: 8px !important;
+  }
+  .MuiDialogActions-root > :not(:first-of-type) {
+    margin-left: 0 !important;
+  }
+}
+
 .dark .MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
   background-color: #0f172a !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -655,16 +673,37 @@ h1, h2, h3, h4, h5, .display-text {
     overflow: visible !important;
   }
 
-  /* Hide interactive web UI */
+  /* Hide interactive web UI and website structural chrome */
   header,
+  footer,
   nav,
   aside,
-  button,
+  [role="navigation"],
+  [role="contentinfo"],
+  #common-header,
+  #common-footer,
   .no-print,
+  .no-print-area,
+  button,
   .toaster,
   [data-sonner-toaster],
   .swal2-container,
-  .no-print-area {
+  .MuiAppBar-root,
+  .MuiDrawer-root,
+  .MuiBackdrop-root,
+  .MuiSpeedDial-root,
+  .floating-chat,
+  #chat-widget-root,
+  [data-tour] {
+    display: none !important;
+  }
+
+  /* When CV is printed, hide any layout sibling that does not contain the CV */
+  body.cv-printing-active > *:not(:has(#cv-print-area)):not(#cv-print-area) {
+    display: none !important;
+  }
+
+  *:has(#cv-print-area) > *:not(:has(#cv-print-area)):not(#cv-print-area) {
     display: none !important;
   }
 
@@ -686,7 +725,10 @@ h1, h2, h3, h4, h5, .display-text {
     print-color-adjust: exact !important;
   }
 
-  /* Cancel all zoom/transform scaling on parents of #cv-print-area */
+  /* Cancel all zoom/transform scaling and overflow clipping on all ancestors of #cv-print-area */
+  :has(#cv-print-area),
+  main:has(#cv-print-area),
+  div:has(#cv-print-area),
   div:has(> #cv-print-area),
   div:has(> div > #cv-print-area) {
     transform: none !important;
@@ -701,6 +743,15 @@ h1, h2, h3, h4, h5, .display-text {
     background: transparent !important;
     overflow: visible !important;
     display: block !important;
+  }
+
+  /* Reset Material UI Container padding when printing CV */
+  .MuiContainer-root:has(#cv-print-area) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    max-width: none !important;
   }
 
   /* Prevent awkward page break splits */
@@ -766,6 +817,86 @@ h1, h2, h3, h4, h5, .display-text {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
   }
+}
+
+/* ==========================================================================
+   LEAFLET MAP ATTRIBUTION & SERVICE BADGE REMOVAL & UI/UX REFINEMENT
+   ========================================================================== */
+.leaflet-control-attribution,
+.leaflet-control-attribution *,
+.leaflet-attribution-flag,
+.leaflet-bottom.leaflet-right .leaflet-control-attribution {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+/* Prevent Tailwind's global img reset from distorting Leaflet tiles and markers */
+.leaflet-container img,
+.leaflet-container .leaflet-tile,
+.leaflet-container .leaflet-marker-icon,
+.leaflet-container .leaflet-marker-shadow {
+  max-width: none !important;
+  max-height: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Crisp rendering for modern raster map tiles */
+.leaflet-tile {
+  filter: saturate(1.05) contrast(1.02);
+}
+
+/* Clean, modern styling for Leaflet zoom control */
+.leaflet-bar {
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.leaflet-bar a {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  transition: all 0.15s ease !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: #f8fafc !important;
+  color: #2563eb !important;
+}
+
+/* ==========================================================================
+   LIVEKIT ROOM CONTAINER FULL HEIGHT STRETCH
+   ========================================================================== */
+.lk-room-container {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* ==========================================================================
+   MUI DIALOG & FORM HEADER COLLAPSE PREVENTION
+   ========================================================================== */
+.MuiDialogTitle-root + .MuiDialogContent-root:not(.p-0):not([data-no-padding='true']) {
+  padding-top: 20px !important;
+}
+
+.MuiDialogTitle-root + .MuiDialogContent-root.MuiDialogContent-dividers {
+  padding-top: 16px !important;
 }
 
 

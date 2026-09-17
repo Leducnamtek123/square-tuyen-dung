@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo, useReducer } from 'react';
 import {
@@ -213,7 +213,6 @@ const DistrictsPage = () => {
   };
 
   const columns = useMemo<ColumnDef<District>[]>(() => [
-    { accessorKey: 'id', header: 'ID', enableSorting: true },
     {
       accessorKey: 'name',
       header: t('pages.districts.table.name') as string,

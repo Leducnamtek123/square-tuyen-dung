@@ -126,6 +126,7 @@ class EmploymentContractSerializer(serializers.ModelSerializer):
 
 class EmployeeSerializer(serializers.ModelSerializer):
     department_name = serializers.CharField(source='department.name', read_only=True)
+    work_location_name = serializers.CharField(source='work_location.name', read_only=True)
     designation_title = serializers.CharField(source='designation.title', read_only=True)
     reports_to_name = serializers.CharField(source='reports_to.full_name', read_only=True)
     contracts = EmploymentContractSerializer(many=True, read_only=True)
@@ -136,10 +137,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'id', 'company', 'user', 'candidate_profile', 'onboarded_from_activity',
             'employee_code', 'first_name', 'last_name', 'full_name', 'email', 'phone', 'avatar',
             'gender', 'date_of_birth', 'address', 'department', 'department_name',
+            'work_location', 'work_location_name',
             'designation', 'designation_title', 'reports_to', 'reports_to_name',
             'status', 'employment_type', 'join_date', 'probation_end_date',
             'resign_date', 'bank_name', 'bank_account_number', 'bank_account_holder',
-            'tax_id', 'social_insurance_id', 'contracts', 'create_at', 'update_at'
+            'tax_id', 'social_insurance_id', 'dependents_count', 'contracts', 'create_at', 'update_at'
         ]
         read_only_fields = ['company', 'create_at', 'update_at']
 
@@ -152,6 +154,9 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'fullName': 'full_name',
             'dateOfBirth': 'date_of_birth',
             'reportsTo': 'reports_to',
+            'workLocation': 'work_location',
+            'workLocationId': 'work_location',
+            'work_location_id': 'work_location',
             'employmentType': 'employment_type',
             'joinDate': 'join_date',
             'probationEndDate': 'probation_end_date',
@@ -161,6 +166,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'bankAccountHolder': 'bank_account_holder',
             'taxId': 'tax_id',
             'socialInsuranceId': 'social_insurance_id',
+            'dependentsCount': 'dependents_count',
             'candidateProfile': 'candidate_profile',
             'onboardedFromActivity': 'onboarded_from_activity',
         }
@@ -468,4 +474,388 @@ class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
             if camel in payload and snake not in payload:
                 payload[snake] = payload.get(camel)
         return super().to_internal_value(payload)
+
+
+class WorkShiftSerializer(serializers.ModelSerializer):
+    class Meta:
+        from .models import WorkShift
+        model = WorkShift
+        fields = [
+            'id', 'company', 'code', 'name', 'start_time', 'end_time',
+            'break_start', 'break_end', 'working_hours', 'work_factor',
+            'grace_period_late_minutes', 'grace_period_early_minutes',
+            'is_overnight', 'is_active', 'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'startTime': 'start_time',
+            'endTime': 'end_time',
+            'breakStart': 'break_start',
+            'breakEnd': 'break_end',
+            'workingHours': 'working_hours',
+            'workFactor': 'work_factor',
+            'gracePeriodLateMinutes': 'grace_period_late_minutes',
+            'gracePeriodEarlyMinutes': 'grace_period_early_minutes',
+            'isOvernight': 'is_overnight',
+            'isNightShift': 'is_overnight',
+            'isActive': 'is_active',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class ShiftAssignmentSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    shift_code = serializers.CharField(source='shift.code', read_only=True)
+    shift_name = serializers.CharField(source='shift.name', read_only=True)
+
+    class Meta:
+        from .models import ShiftAssignment
+        model = ShiftAssignment
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'shift', 'shift_code', 'shift_name', 'date', 'is_off_day', 'note',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'shiftId': 'shift',
+            'isOffDay': 'is_off_day',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class ShiftAssignmentBatchSerializer(serializers.Serializer):
+    employee_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        allow_empty=False
+    )
+    shift_id = serializers.IntegerField(required=False, allow_null=True)
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    applicable_days_of_week = serializers.ListField(
+        child=serializers.IntegerField(min_value=0, max_value=6),
+        required=False,
+        default=[0, 1, 2, 3, 4, 5, 6]
+    )
+    is_off_day = serializers.BooleanField(default=False)
+    note = serializers.CharField(required=False, allow_blank=True, default='')
+
+    def validate(self, data):
+        if data['start_date'] > data['end_date']:
+            raise serializers.ValidationError("start_date phải trước hoặc bằng end_date.")
+        if not data.get('is_off_day') and not data.get('shift_id'):
+            raise serializers.ValidationError("Vui lòng chọn ca làm việc nếu không phải ngày nghỉ.")
+        return data
+
+
+class AttendanceRequestSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    leave_type_name = serializers.CharField(source='leave_type.name', read_only=True)
+    manager_reviewer_name = serializers.CharField(source='manager_reviewer.full_name', read_only=True)
+    hr_reviewer_name = serializers.CharField(source='hr_reviewer.full_name', read_only=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
+    request_type_label = serializers.CharField(source='get_request_type_display', read_only=True)
+
+    class Meta:
+        from .models import AttendanceRequest
+        model = AttendanceRequest
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'request_type', 'request_type_label', 'leave_type', 'leave_type_name',
+            'start_date', 'end_date', 'start_time', 'end_time', 'duration_hours',
+            'reason', 'status', 'status_label',
+            'manager_reviewer', 'manager_reviewer_name', 'manager_approved_at',
+            'hr_reviewer', 'hr_reviewer_name', 'hr_approved_at',
+            'rejection_reason', 'create_at', 'update_at'
+        ]
+        read_only_fields = [
+            'id', 'company', 'status', 'status_label',
+            'manager_reviewer', 'manager_approved_at',
+            'hr_reviewer', 'hr_approved_at', 'rejection_reason',
+            'create_at', 'update_at'
+        ]
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'employee_id': 'employee',
+            'requestType': 'request_type',
+            'leaveTypeId': 'leave_type',
+            'leave_type_id': 'leave_type',
+            'startDate': 'start_date',
+            'endDate': 'end_date',
+            'startTime': 'start_time',
+            'endTime': 'end_time',
+            'durationHours': 'duration_hours',
+            'rejectionReason': 'rejection_reason',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class WorkLocationSerializer(serializers.ModelSerializer):
+    location_type_label = serializers.CharField(source='get_location_type_display', read_only=True)
+    device_count = serializers.IntegerField(source='devices.count', read_only=True)
+    employee_count = serializers.IntegerField(source='employees.count', read_only=True)
+
+    class Meta:
+        from .models import WorkLocation
+        model = WorkLocation
+        fields = [
+            'id', 'company', 'name', 'code', 'location_type', 'location_type_label',
+            'address', 'city', 'latitude', 'longitude', 'radius_meters',
+            'allowed_ip_ranges', 'timezone', 'is_active', 'device_count', 'employee_count',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'locationType': 'location_type',
+            'radiusMeters': 'radius_meters',
+            'allowedIpRanges': 'allowed_ip_ranges',
+            'isActive': 'is_active',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class BiometricDeviceSerializer(serializers.ModelSerializer):
+    location_name = serializers.CharField(source='location.name', read_only=True)
+    location_code = serializers.CharField(source='location.code', read_only=True)
+    protocol_label = serializers.CharField(source='get_protocol_display', read_only=True)
+    direction_label = serializers.CharField(source='get_direction_display', read_only=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
+
+    class Meta:
+        from .models import BiometricDevice
+        model = BiometricDevice
+        fields = [
+            'id', 'company', 'location', 'location_name', 'location_code',
+            'name', 'device_code', 'protocol', 'protocol_label',
+            'ip_or_domain', 'device_port', 'service_port', 'comm_key',
+            'direction', 'direction_label', 'serial_number', 'model_name',
+            'status', 'status_label', 'last_ping', 'last_sync_time',
+            'last_error_message', 'total_punches_synced', 'auto_sync_interval',
+            'is_active', 'create_at', 'update_at'
+        ]
+        read_only_fields = [
+            'id', 'company', 'last_ping', 'last_sync_time',
+            'last_error_message', 'total_punches_synced', 'create_at', 'update_at'
+        ]
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'locationId': 'location',
+            'location_id': 'location',
+            'deviceCode': 'device_code',
+            'ipOrDomain': 'ip_or_domain',
+            'devicePort': 'device_port',
+            'servicePort': 'service_port',
+            'commKey': 'comm_key',
+            'serialNumber': 'serial_number',
+            'modelName': 'model_name',
+            'autoSyncInterval': 'auto_sync_interval',
+            'isActive': 'is_active',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class BiometricPunchLogSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    device_title = serializers.CharField(source='device.name', read_only=True)
+    location_name = serializers.CharField(source='location.name', read_only=True)
+    punch_type_label = serializers.CharField(source='get_punch_type_display', read_only=True)
+    source_label = serializers.CharField(source='get_source_display', read_only=True)
+
+    class Meta:
+        from .models import BiometricPunchLog
+        model = BiometricPunchLog
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'device', 'device_title', 'location', 'location_name',
+            'biometric_id', 'punch_time', 'device_name', 'device_ip',
+            'punch_type', 'punch_type_label', 'source', 'source_label',
+            'is_duplicate', 'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'employee_id': 'employee',
+            'deviceId': 'device',
+            'device_id': 'device',
+            'locationId': 'location',
+            'location_id': 'location',
+            'biometricId': 'biometric_id',
+            'punchTime': 'punch_time',
+            'deviceName': 'device_name',
+            'deviceIp': 'device_ip',
+            'punchType': 'punch_type',
+            'isDuplicate': 'is_duplicate',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class MonthlyAttendanceSummarySerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    locked_by_name = serializers.CharField(source='locked_by.full_name', read_only=True)
+
+    class Meta:
+        from .models import MonthlyAttendanceSummary
+        model = MonthlyAttendanceSummary
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'month', 'year', 'standard_work_days', 'actual_work_days',
+            'paid_leave_days', 'unpaid_leave_days',
+            'overtime_hours_weekday', 'overtime_hours_weekend', 'overtime_hours_holiday',
+            'late_occurrences', 'early_occurrences',
+            'is_locked', 'locked_by', 'locked_by_name', 'locked_at',
+            'pushed_to_payroll_at', 'create_at', 'update_at'
+        ]
+        read_only_fields = [
+            'id', 'company', 'is_locked', 'locked_by', 'locked_at',
+            'pushed_to_payroll_at', 'create_at', 'update_at'
+        ]
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'standardWorkDays': 'standard_work_days',
+            'actualWorkDays': 'actual_work_days',
+            'paidLeaveDays': 'paid_leave_days',
+            'unpaidLeaveDays': 'unpaid_leave_days',
+            'overtimeHoursWeekday': 'overtime_hours_weekday',
+            'overtimeHoursWeekend': 'overtime_hours_weekend',
+            'overtimeHoursHoliday': 'overtime_hours_holiday',
+            'lateOccurrences': 'late_occurrences',
+            'earlyOccurrences': 'early_occurrences',
+            'isLocked': 'is_locked',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class EmployeeCareerHistorySerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    event_type_label = serializers.CharField(source='get_event_type_display', read_only=True)
+    old_department_name = serializers.CharField(source='old_department.name', read_only=True)
+    new_department_name = serializers.CharField(source='new_department.name', read_only=True)
+    old_designation_title = serializers.CharField(source='old_designation.title', read_only=True)
+    new_designation_title = serializers.CharField(source='new_designation.title', read_only=True)
+
+    class Meta:
+        from .models import EmployeeCareerHistory
+        model = EmployeeCareerHistory
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code',
+            'effective_date', 'event_type', 'event_type_label',
+            'old_department', 'old_department_name',
+            'new_department', 'new_department_name',
+            'old_designation', 'old_designation_title',
+            'new_designation', 'new_designation_title',
+            'old_salary', 'new_salary',
+            'decision_number', 'attachment', 'note',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'effectiveDate': 'effective_date',
+            'eventType': 'event_type',
+            'oldDepartmentId': 'old_department',
+            'old_department_id': 'old_department',
+            'newDepartmentId': 'new_department',
+            'new_department_id': 'new_department',
+            'oldDesignationId': 'old_designation',
+            'old_designation_id': 'old_designation',
+            'newDesignationId': 'new_designation',
+            'new_designation_id': 'new_designation',
+            'oldSalary': 'old_salary',
+            'newSalary': 'new_salary',
+            'decisionNumber': 'decision_number',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+class EmployeeDocumentSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    document_type_label = serializers.CharField(source='get_document_type_display', read_only=True)
+
+    class Meta:
+        from .models import EmployeeDocument
+        model = EmployeeDocument
+        fields = [
+            'id', 'company', 'employee', 'employee_name', 'employee_code',
+            'document_type', 'document_type_label',
+            'name', 'file_url', 'issue_date', 'expiry_date', 'note',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at']
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, 'copy') else dict(data)
+        mappings = {
+            'employeeId': 'employee',
+            'documentType': 'document_type',
+            'fileUrl': 'file_url',
+            'issueDate': 'issue_date',
+            'expiryDate': 'expiry_date',
+        }
+        for camel, snake in mappings.items():
+            if camel in payload and snake not in payload:
+                payload[snake] = payload.get(camel)
+        return super().to_internal_value(payload)
+
+
+
+
+
 

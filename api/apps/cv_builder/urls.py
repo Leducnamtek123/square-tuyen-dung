@@ -13,6 +13,6 @@ router.register(r"candidate-cvs", CandidateCVViewSet, basename="candidate-cv")
 router.register(r"suggestions", CVSuggestionViewSet, basename="cv-suggestion")
 
 urlpatterns = [
-    path("public/<slug:slug>/", PublicCVView.as_view(), name="public-cv-detail"),
+    path("public/<str:slug>/", PublicCVView.as_view(), name="public-cv-detail"),
     path("", include(router.urls)),
 ]

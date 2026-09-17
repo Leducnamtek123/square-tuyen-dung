@@ -147,9 +147,37 @@ export default function AdminDataGrid<T>({
         loading={loading}
       />
 
+      {/* Mobile Swipe Cue Banner */}
+      <Box
+        sx={{
+          display: { xs: 'flex', md: 'none' },
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 2,
+          py: 0.75,
+          bgcolor: '#F1F5F9',
+          borderBottom: '1px solid #E2E8F0',
+          color: '#64748B',
+          fontSize: '0.75rem',
+          fontWeight: 600,
+        }}
+      >
+        <span>⇄ Vuốt ngang để xem đủ các cột & thao tác</span>
+      </Box>
+
       {/* Main Table */}
-      <TableContainer sx={{ maxHeight: 680, overflowX: 'auto' }}>
-        <Table stickyHeader size={dense ? 'small' : 'medium'}>
+      <TableContainer
+        sx={{
+          maxHeight: 680,
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'thin',
+          '&::-webkit-scrollbar': { height: 6, width: 6 },
+          '&::-webkit-scrollbar-thumb': { bgcolor: '#CBD5E1', borderRadius: 3 },
+          '&::-webkit-scrollbar-track': { bgcolor: '#F1F5F9' },
+        }}
+      >
+        <Table stickyHeader size={dense ? 'small' : 'medium'} sx={{ minWidth: { xs: 720, md: '100%' } }}>
           <TableHead>
             <TableRow sx={{ bgcolor: '#F8FAFC' }}>
               {selectable && (

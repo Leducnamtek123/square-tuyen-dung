@@ -4,6 +4,7 @@ import InterviewDetailPage from './InterviewDetailPage';
 import InterviewLivePage from './InterviewLivePage';
 import QuestionBankPage from './QuestionBankPage';
 import QuestionGroupsPage from './QuestionGroupsPage';
+import EmployerAiSettingsPage from './EmployerAiSettingsPage';
 
 export {
     InterviewListPage,
@@ -12,4 +13,5 @@ export {
     InterviewLivePage,
     QuestionBankPage,
     QuestionGroupsPage,
+    EmployerAiSettingsPage,
 };

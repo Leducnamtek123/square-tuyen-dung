@@ -141,10 +141,13 @@ const FeedbackCard = ({
                 sx={{
                   color: '#64748b',
                   fontSize: '0.775rem',
-                  display: 'block',
+                  display: '-webkit-box',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  WebkitLineClamp: { xs: 2, sm: 1 },
+                  WebkitBoxOrient: 'vertical',
+                  whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                  lineHeight: 1.25,
                 }}
               >
                 {displayRole}
@@ -166,7 +169,7 @@ const FeedbackCard = ({
                   fontWeight: 600,
                   fontSize: '0.75rem',
                   height: 26,
-                  maxWidth: 150,
+                  maxWidth: { xs: 115, sm: 155 },
                   '& .MuiChip-label': {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',

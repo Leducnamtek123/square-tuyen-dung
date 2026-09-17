@@ -73,9 +73,10 @@ const ResumesPage = () => {
 
     const columns = useMemo<ColumnDef<Resume>[]>(() => [
         {
-            accessorKey: 'id',
-            header: 'ID',
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             accessorKey: 'title',

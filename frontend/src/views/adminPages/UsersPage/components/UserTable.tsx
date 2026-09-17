@@ -67,9 +67,10 @@ const UserTable = ({
 
     const columns = useMemo<ColumnDef<UserModel>[]>(() => [
         {
-            accessorKey: 'id',
-            header: t('pages.users.table.id') as string,
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             accessorKey: 'fullName',
@@ -122,11 +123,22 @@ const UserTable = ({
             accessorKey: 'isVerifyEmail',
             header: t('pages.users.table.verification') as string,
             cell: (info) => info.getValue() ? (
-                <Tooltip title={t('pages.users.table.verified')}>
-                    <CheckCircleIcon color="success" sx={{ fontSize: '1.25rem' }} />
-                </Tooltip>
+                <Chip
+                    icon={<CheckCircleIcon sx={{ fontSize: '0.95rem !important' }} />}
+                    label={t('pages.users.table.verified')}
+                    size="small"
+                    color="success"
+                    variant="outlined"
+                    sx={{ fontWeight: 600, fontSize: '0.75rem' }}
+                />
             ) : (
-                <Typography variant="caption" color="error">{t('pages.users.table.unverified')}</Typography>
+                <Chip
+                    label={t('pages.users.table.unverified')}
+                    size="small"
+                    color="error"
+                    variant="outlined"
+                    sx={{ fontWeight: 600, fontSize: '0.75rem' }}
+                />
             ),
         },
         {

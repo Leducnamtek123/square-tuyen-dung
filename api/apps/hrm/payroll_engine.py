@@ -76,8 +76,12 @@ def calculate_vietnam_payroll(
     allow = Decimal(str(allowance))
     bon = Decimal(str(bonus))
 
-    # 1. Tính lương thực tế theo ngày công
-    actual_days = max(0, min(standard_working_days, working_days_actual - unpaid_leave_days))
+    # 1. Tính lương thực tế theo ngày công (tránh trừ trùng ngày nghỉ không lương)
+    if working_days_actual >= standard_working_days and unpaid_leave_days > 0:
+        actual_days = max(0, min(standard_working_days, standard_working_days - unpaid_leave_days))
+    else:
+        actual_days = max(0, min(standard_working_days, working_days_actual))
+
     prorated_salary = (gross / Decimal(standard_working_days) * Decimal(actual_days)).quantize(
         Decimal("1"), rounding=ROUND_HALF_UP
     ) if standard_working_days > 0 else gross

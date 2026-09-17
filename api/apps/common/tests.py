@@ -141,6 +141,40 @@ def test_presign_allows_public_asset_path(monkeypatch):
 
 
 @pytest.mark.django_db
+def test_presign_allows_company_scoped_paths(monkeypatch):
+    class FakePresignClient:
+        def presigned_get_object(self, bucket, object_path, expires):
+            return f"https://s3.infohr.vn/{bucket}/{object_path}?X-Amz-Signature=test"
+
+    monkeypatch.setattr(
+        "apps.common.views.CloudinaryService._get_presign_client",
+        lambda: FakePresignClient(),
+    )
+
+    # 1. Company-scoped logo URL from s3.infohr.vn
+    resp1 = APIClient().get(
+        "/api/v1/common/presign/",
+        {"url": "https://s3.infohr.vn/square/goldlotustravel/logo/brand_logo.png"},
+    )
+    assert resp1.status_code == 200
+    assert "goldlotustravel/logo/brand_logo.png" in resp1.json()["data"]["url"]
+
+    # 2. Company-scoped cover URL from s3.infohr.vn
+    resp2 = APIClient().get(
+        "/api/v1/common/presign/",
+        {"url": "https://s3.infohr.vn/square/vismarttech/cover/hero.png"},
+    )
+    assert resp2.status_code == 200
+    assert "vismarttech/cover/hero.png" in resp2.json()["data"]["url"]
+
+
+@pytest.mark.django_db
+def test_presign_rejects_business_license_for_anonymous():
+    resp = APIClient().get("/api/v1/common/presign/", {"publicId": "business_license/cert.pdf"})
+    assert resp.status_code == 403
+
+
+@pytest.mark.django_db
 def test_presign_allows_resume_owner_for_cv_file(monkeypatch, job_seeker_user, resume):
     class FakePresignClient:
         def presigned_get_object(self, bucket, object_path, expires):

@@ -263,8 +263,9 @@ const FeedbacksPage = () => {
   const columns = useMemo<ColumnDef<Feedback>[]>(() => [
     {
       accessorKey: 'id',
-      header: t('pages.feedbacks.table.id') as string,
-      enableSorting: true,
+      header: 'STT',
+      cell: (info) => info.row.index + 1,
+      size: 60,
     },
     {
       accessorKey: 'userDict.fullName',
@@ -315,7 +316,7 @@ const FeedbacksPage = () => {
             startIcon={<ImageIcon fontSize="small" />}
             onClick={() => setEvidencePreview({
               url: evidenceImageUrl,
-              title: feedback.userDict?.fullName || `#${feedback.id}`,
+              title: feedback.userDict?.fullName || 'Người dùng',
             })}
             sx={{ textTransform: 'none' }}
           >
@@ -507,7 +508,7 @@ const FeedbacksPage = () => {
         open={openDelete}
         title={t('pages.feedbacks.deleteTitle')}
         message={t('pages.feedbacks.deleteConfirm', {
-          name: current?.userDict?.fullName || `#${current?.id}`,
+          name: current?.userDict?.fullName || 'Người dùng',
         })}
         variant="danger"
         loading={isMutating}

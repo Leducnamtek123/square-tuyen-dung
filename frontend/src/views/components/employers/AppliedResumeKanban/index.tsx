@@ -71,6 +71,7 @@ interface AppliedResumeKanbanProps {
   ) => void;
   handleDelete: (id: string | number) => void;
   onCreateEmployee?: (activity: JobPostActivity) => void;
+  onQuickScheduleInterview?: (activity: JobPostActivity) => void;
   onAnalysisStateChange?: (id: string | number, nextState: Partial<JobPostActivity>) => void;
   onAddCandidate?: () => void;
   blindMode?: boolean;
@@ -89,44 +90,51 @@ const getStatusStyle = (statusId: string) => {
     case '1': // Chờ xác nhận
       return {
         badgeBg: '#FEF3C7',
-        textColor: '#D97706',
+        textColor: '#B45309',
         borderColor: '#FDE68A',
         icon: <AccessTimeIcon sx={{ fontSize: 28, color: '#D97706' }} />,
       };
     case '2': // Đã liên hệ
       return {
-        badgeBg: '#D1FAE5',
-        textColor: '#059669',
-        borderColor: '#A7F3D0',
-        icon: <PhoneInTalkIcon sx={{ fontSize: 28, color: '#059669' }} />,
+        badgeBg: '#F3E8FF',
+        textColor: '#6B21A8',
+        borderColor: '#E9D5FF',
+        icon: <PhoneInTalkIcon sx={{ fontSize: 28, color: '#9333EA' }} />,
       };
     case '3': // Đã làm bài test
       return {
-        badgeBg: '#DBEAFE',
-        textColor: '#2563EB',
-        borderColor: '#BFDBFE',
-        icon: <AssignmentOutlinedIcon sx={{ fontSize: 28, color: '#2563EB' }} />,
+        badgeBg: '#E0F2FE',
+        textColor: '#0369A1',
+        borderColor: '#BAE6FD',
+        icon: <AssignmentOutlinedIcon sx={{ fontSize: 28, color: '#0284C7' }} />,
       };
-    case '4': // Đã phòng vấn
+    case '4': // Đã phỏng vấn
       return {
-        badgeBg: '#F3E8FF',
-        textColor: '#7C3AED',
-        borderColor: '#E9D5FF',
-        icon: <PeopleAltOutlinedIcon sx={{ fontSize: 28, color: '#7C3AED' }} />,
+        badgeBg: '#DBEAFE',
+        textColor: '#1D4ED8',
+        borderColor: '#BFDBFE',
+        icon: <PeopleAltOutlinedIcon sx={{ fontSize: 28, color: '#2563EB' }} />,
       };
-    case '5': // Đã tuyển dụng
+    case '5': // Đã tuyển dụng (Hired - Success)
+      return {
+        badgeBg: '#DCFCE7',
+        textColor: '#15803D',
+        borderColor: '#86EFAC',
+        icon: <WorkOutlineIcon sx={{ fontSize: 28, color: '#15803D' }} />,
+      };
+    case '6': // Không phù hợp / Từ chối
       return {
         badgeBg: '#FEE2E2',
-        textColor: '#DC2626',
+        textColor: '#B91C1C',
         borderColor: '#FECACA',
-        icon: <WorkOutlineIcon sx={{ fontSize: 28, color: '#DC2626' }} />,
+        icon: <AssignmentOutlinedIcon sx={{ fontSize: 28, color: '#DC2626' }} />,
       };
     default:
       return {
         badgeBg: '#F1F5F9',
-        textColor: '#475467',
+        textColor: '#475569',
         borderColor: '#E2E8F0',
-        icon: <AssignmentOutlinedIcon sx={{ fontSize: 28, color: '#475467' }} />,
+        icon: <AssignmentOutlinedIcon sx={{ fontSize: 28, color: '#475569' }} />,
       };
   }
 };
@@ -137,6 +145,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
   handleChangeApplicationStatus,
   handleDelete,
   onCreateEmployee,
+  onQuickScheduleInterview,
   onAnalysisStateChange,
   onAddCandidate,
   blindMode = false,
@@ -199,6 +208,9 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
           t('appliedResume.status.errorTitle', 'Cập nhật thất bại'),
           t('appliedResume.status.rollbackMsg', 'Không thể cập nhật trạng thái ứng viên. Đã khôi phục vị trí ban đầu.')
         );
+      } else if (Number(nextStatusId) === 4 && onQuickScheduleInterview) {
+        const candidate = (localRows || []).find((item) => String(item.id) === String(candidateId));
+        if (candidate) onQuickScheduleInterview(candidate);
       }
     });
   };
@@ -283,6 +295,9 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
           t('appliedResume.status.errorTitle', 'Cập nhật thất bại'),
           t('appliedResume.status.rollbackMsg', 'Không thể cập nhật trạng thái ứng viên. Đã khôi phục vị trí ban đầu.')
         );
+      } else if (Number(nextStatusId) === 4 && onQuickScheduleInterview) {
+        const candidate = (localRows || []).find((item) => String(item.id) === String(candidateId));
+        if (candidate) onQuickScheduleInterview(candidate);
       }
     });
   };
@@ -630,12 +645,15 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                                             arrow
                                           >
                                             <span>
-                                              <IconButton aria-label="Xem chi tiết"
+                                              <IconButton aria-label="Lên lịch phỏng vấn"
                                                 size="small"
                                                 disabled={!canScheduleInterview}
                                                 onClick={() => {
-                                                  if (!scheduleHref) return;
-                                                  push(scheduleHref);
+                                                  if (onQuickScheduleInterview) {
+                                                    onQuickScheduleInterview(item);
+                                                  } else if (scheduleHref) {
+                                                    push(scheduleHref);
+                                                  }
                                                 }}
                                                 sx={{
                                                   color: '#2563EB',

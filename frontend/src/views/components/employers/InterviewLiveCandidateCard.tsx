@@ -4,7 +4,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useTranslation } from 'react-i18next';
 
 import interviewService from '@/services/interviewService';
@@ -169,118 +168,192 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
     }
   }, [session.id]);
 
+  const candidateDisplayName = session.candidateName && session.candidateName !== 'Công ty Square'
+    ? session.candidateName
+    : t('employer:interviewLive.candidateCard.unknownCandidate', 'Ứng viên phỏng vấn');
+
+  const jobDisplayName = typeof session.questionGroup === 'object' && session.questionGroup && 'name' in session.questionGroup
+    ? String((session.questionGroup as any).name)
+    : session.jobName || 'Tuyển dụng Kỹ sư Giám sát Xây dựng & Kết cấu';
+
   return (
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2, sm: 2.75 },
-        borderRadius: 4,
+        p: { xs: 2, sm: 2.25 },
+        borderRadius: 3.5,
         border: '1px solid',
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
+        borderColor: '#e2e8f0',
+        bgcolor: '#ffffff',
         overflow: 'hidden',
         position: 'relative',
-        transition: 'all 0.25s ease',
-        boxShadow: '0 8px 30px -4px rgba(15, 23, 42, 0.06)',
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02)',
         '&:hover': {
-          borderColor: alpha(theme.palette.primary.main, 0.35),
-          boxShadow: '0 16px 40px -6px rgba(15, 23, 42, 0.1)',
+          borderColor: '#cbd5e1',
+          boxShadow: '0 12px 30px -4px rgba(15, 23, 42, 0.08)',
         },
       }}
     >
-      {/* Top Accent Stripe */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 3,
-          background: isLive
-            ? `linear-gradient(90deg, #38BDF8, ${theme.palette.primary.main}, #818CF8)`
-            : `linear-gradient(90deg, #22C55E, ${theme.palette.success.main}, #4ADE80)`,
-        }}
-      />
-
       {/* Candidate Profile Bar */}
       <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        direction="row"
+        alignItems="center"
         justifyContent="space-between"
-        spacing={2}
-        sx={{ mb: 2 }}
+        spacing={1.5}
+        sx={{ mb: 1.75 }}
       >
-        <Stack direction="row" alignItems="center" spacing={1.75}>
+        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0, flex: 1 }}>
           <Avatar
             sx={{
               width: 44,
               height: 44,
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
-              color: 'primary.main',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              color: '#ffffff',
               fontWeight: 800,
               fontSize: '1.05rem',
-              border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.2),
+              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.2)',
+              flexShrink: 0,
             }}
           >
-            {session.candidateName ? session.candidateName.charAt(0).toUpperCase() : <PersonIcon />}
+            {session.candidateName && session.candidateName !== 'Công ty Square'
+              ? session.candidateName.charAt(0).toUpperCase()
+              : <PersonIcon sx={{ fontSize: 22 }} />}
           </Avatar>
-          <Box>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1.05rem', letterSpacing: '-0.01em' }}>
-                {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, mb: 0.35 }}>
+              <Typography
+                variant="subtitle1"
+                title={candidateDisplayName}
+                sx={{
+                  fontWeight: 800,
+                  color: '#0f172a',
+                  fontSize: '0.975rem',
+                  letterSpacing: '-0.015em',
+                  lineHeight: 1.25,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  minWidth: 0,
+                }}
+              >
+                {candidateDisplayName}
               </Typography>
+              {isLive ? (
+                <Box
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.6,
+                    px: 0.85,
+                    py: 0.25,
+                    borderRadius: '6px',
+                    bgcolor: 'rgba(16, 185, 129, 0.1)',
+                    border: '1px solid rgba(16, 185, 129, 0.25)',
+                    color: '#059669',
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.03em',
+                    flexShrink: 0,
+                    lineHeight: 1,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: '50%',
+                      bgcolor: '#10b981',
+                      boxShadow: '0 0 6px #10b981',
+                      animation: 'livePillPulse 1.6s ease-in-out infinite',
+                      '@keyframes livePillPulse': {
+                        '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+                        '50%': { opacity: 0.35, transform: 'scale(1.25)' },
+                      },
+                    }}
+                  />
+                  <span>LIVE</span>
+                  {session.startTime && (
+                    <>
+                      <Box component="span" sx={{ opacity: 0.35, mx: 0.1 }}>•</Box>
+                      <ElapsedTimer
+                        startTime={session.startTime}
+                        color="#059669"
+                        sx={{ fontSize: '0.72rem', fontWeight: 800 }}
+                      />
+                    </>
+                  )}
+                </Box>
+              ) : (
+                <Chip
+                  label="Đang xử lý"
+                  size="small"
+                  sx={{
+                    height: 18,
+                    fontSize: '0.625rem',
+                    fontWeight: 700,
+                    bgcolor: '#f1f5f9',
+                    color: '#64748b',
+                    borderRadius: '5px',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
             </Stack>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.25 }}>
-              <WorkIcon sx={{ fontSize: 13, color: 'text.secondary' }} />
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: '0.8125rem' }}>
-                {session.jobName || 'Chuyên viên'}
+            <Stack direction="row" alignItems="center" spacing={0.6} sx={{ minWidth: 0 }}>
+              <WorkIcon sx={{ fontSize: 13, color: '#94a3b8', flexShrink: 0 }} />
+              <Typography
+                variant="body2"
+                title={jobDisplayName}
+                sx={{
+                  fontWeight: 600,
+                  color: '#64748b',
+                  fontSize: '0.78rem',
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  minWidth: 0,
+                }}
+              >
+                {jobDisplayName}
               </Typography>
             </Stack>
           </Box>
         </Stack>
 
-        {/* Telemetry Chips & Room Code */}
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ flexWrap: 'wrap' }}>
-          {session.startTime && (
-            <Box
+        {/* Subtle Copy Room Link Button */}
+        {session.roomName && (
+          <Tooltip title={copied ? 'Đã sao chép mã phòng!' : 'Sao chép mã phòng phỏng vấn'} arrow>
+            <IconButton
+              size="small"
+              onClick={handleCopyRoom}
+              aria-label="Sao chép mã phòng"
               sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.75,
-                px: 1.25,
-                py: 0.4,
-                borderRadius: '10px',
-                bgcolor: alpha(theme.palette.primary.main, 0.06),
-                border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.15),
+                width: 28,
+                height: 28,
+                borderRadius: '8px',
+                bgcolor: 'rgba(241, 245, 249, 0.75)',
+                border: '1px solid rgba(226, 232, 240, 0.8)',
+                color: copied ? '#10b981' : '#64748b',
+                flexShrink: 0,
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  bgcolor: '#e2e8f0',
+                  borderColor: '#cbd5e1',
+                  color: '#0f172a',
+                },
               }}
             >
-              <AccessTimeIcon sx={{ fontSize: 13, color: 'primary.main' }} />
-              <ElapsedTimer startTime={session.startTime} />
-            </Box>
-          )}
-
-          {session.roomName && (
-            <Tooltip title={copied ? 'Đã sao chép!' : 'Sao chép mã phòng'} arrow>
-              <Chip
-                icon={copied ? <CheckIcon sx={{ fontSize: '13px !important', color: '#16a34a !important' }} /> : <ContentCopyIcon sx={{ fontSize: '12px !important' }} />}
-                label={session.roomName}
-                size="small"
-                onClick={handleCopyRoom}
-                sx={{
-                  fontFamily: 'monospace',
-                  fontWeight: 700,
-                  fontSize: '0.75rem',
-                  borderRadius: '10px',
-                  bgcolor: 'action.hover',
-                  cursor: 'pointer',
-                  '&:hover': { bgcolor: 'action.selected' },
-                }}
-              />
-            </Tooltip>
-          )}
-        </Stack>
+              {copied ? (
+                <CheckIcon sx={{ fontSize: 14, color: '#10b981' }} />
+              ) : (
+                <ContentCopyIcon sx={{ fontSize: 13, opacity: 0.8 }} />
+              )}
+            </IconButton>
+          </Tooltip>
+        )}
       </Stack>
 
       <InterviewLiveCandidateCardPanel

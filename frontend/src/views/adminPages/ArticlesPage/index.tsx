@@ -145,7 +145,21 @@ const AdminArticlesPage = () => {
     return <AdminStatusBadge status="draft" label={label} />;
   };
 
-  const getCategoryLabel = (articleCategory: ArticleCategory) => t(`pages.articles.categories.${articleCategory}`);
+  const getCategoryLabel = (articleCategory: ArticleCategory) => {
+    const key = `pages.articles.categories.${articleCategory}`;
+    const translated = t(key);
+    if (translated && translated !== key) return translated;
+    const fallbackMap: Record<string, string> = {
+      'xu-huong': 'Xu hướng',
+      'bi-quyet-cv': 'Bí quyết CV',
+      'cam-nang': 'Cẩm nang',
+      'thu-tuc-lao-dong': 'Thủ tục',
+      'thue-tncn': 'Thuế TNCN',
+      'news': 'Tin tức',
+      'blog': 'Blog tuyển dụng',
+    };
+    return fallbackMap[articleCategory] || articleCategory;
+  };
 
   const columns: ColumnDef<Article>[] = [
     {

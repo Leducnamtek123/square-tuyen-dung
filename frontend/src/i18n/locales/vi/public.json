@@ -193,7 +193,16 @@
     "searchPlaceholder": "Nhập tên công ty hoặc lĩnh vực cần tìm kiếm",
     "allCities": "Tất cả tỉnh thành",
     "searchButton": "Tìm kiếm",
-    "resetFiltersAria": "Đặt lại bộ lọc tìm công ty"
+    "resetFiltersAria": "Đặt lại bộ lọc tìm công ty",
+    "openFiltersAria": "Mở bộ lọc tìm công ty",
+    "filterDrawerTitle": "Bộ lọc nâng cao",
+    "filterLocation": "Địa điểm / Tỉnh thành",
+    "filterEmployeeSize": "Quy mô nhân sự",
+    "allEmployeeSizes": "Tất cả quy mô nhân sự",
+    "applyFilters": "Áp dụng",
+    "resetFilters": "Xóa bộ lọc",
+    "activeFilters": "Đang lọc",
+    "clearAll": "Xóa tất cả"
   },
   "jobsByCategoryPage": {
     "careerTitle": "Việc làm theo ngành nghề",
@@ -278,7 +287,7 @@
   "company": {
     "following": "Đang theo dõi",
     "follow": "Theo dõi",
-    "followers": "{{count}} người theo dõi",
+    "followers": "người theo dõi",
     "openingJobs": "việc làm đang tuyển",
     "notUpdated": "Chưa cập nhật",
     "jobCount": "{{count}} việc làm"
@@ -504,5 +513,30 @@
     "candidateBadge": "Ứng viên"
   },
   "featuredCompanies": "Công ty nổi bật",
-  "openPositions": "{{count}} vị trí đang tuyển"
+  "openPositions": "{{count}} vị trí đang tuyển",
+  "salary": {
+    "allCategories": "Tất cả ngành nghề",
+    "seniorities": {
+      "all": "Tất cả cấp bậc",
+      "junior": "Junior / Mới bắt đầu (0 - 2 năm)",
+      "mid": "Trung cấp / Mid-level (2 - 4 năm)",
+      "senior": "Senior / Quản lý (> 4 năm)"
+    },
+    "metrics": {
+      "surveyedRoles": "Vị trí khảo sát",
+      "standardRanges": "{{count}} dải lương chuẩn",
+      "zeroRanges": "0 dải lương",
+      "medianSalary": "Mức lương trung vị (P50)",
+      "perMonth": "{{val}} / tháng",
+      "highestSalary": "Mốc trần cao nhất",
+      "upTo": "Lên đến {{val}}"
+    },
+    "cta": {
+      "eyebrow": "Bước tiếp theo để đạt mức lương kỳ vọng",
+      "title": "Tự Tin Chinh Phục Buổi Phỏng Vấn Với AI Interviewer",
+      "desc": "Trải nghiệm phòng phỏng vấn trực tuyến với AI, bộ đếm ngược từng câu hỏi, cấu trúc câu trả lời chi tiết và mẹo phỏng vấn hoàn toàn miễn phí.",
+      "button": "Vào phòng phỏng vấn thử ngay"
+    },
+    "errorFetch": "Không thể tải dữ liệu mức lương. Vui lòng thử lại!"
+  }
 }

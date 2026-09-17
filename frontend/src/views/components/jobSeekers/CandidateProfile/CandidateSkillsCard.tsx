@@ -407,7 +407,7 @@ const CandidateSkillsCard: React.FC<CandidateSkillsCardProps> = ({
         </Box>
       )}
 
-      {/* ── Modern Skills Management Modal ────────────────────────────────────── */}
+      {/* -- Modern Skills Management Modal -------------------------------------- */}
       <Dialog
         open={openModal}
         onClose={handleCloseModal}

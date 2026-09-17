@@ -169,11 +169,14 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           <JobDetailInfoItem
             title={t("jobDetail.salary")}
-            value={formatLocalizedSalaryRange(
-              jobPostDetail?.salaryMin,
-              jobPostDetail?.salaryMax,
-              i18n.language
-            )}
+            value={(() => {
+              const salary = formatLocalizedSalaryRange(
+                jobPostDetail?.salaryMin,
+                jobPostDetail?.salaryMax,
+                i18n.language
+              );
+              return salary && salary !== '---' ? `${salary} VNĐ` : (salary || '---');
+            })()}
           />
           <JobDetailInfoItem
             title={t("jobDetail.experience")}

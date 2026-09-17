@@ -282,8 +282,10 @@ class LiveKitService:
                         s3=s3_upload
                     )
                 )
-                await lkapi.egress.start_room_composite_egress(req)
+                await asyncio.wait_for(lkapi.egress.start_room_composite_egress(req), timeout=2.5)
                 logger.info("Started egress recording for room %s at %s", room_name, filepath)
+            except asyncio.TimeoutError:
+                logger.info("LiveKit egress start timed out after 2.5s for room %s (egress service busy or deferred)", room_name)
             finally:
                 await lkapi.aclose()
         

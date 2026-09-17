@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import { CandidateCVListPage } from '@/views/cvBuilderPages';
 
-export const metadata: Metadata = {
-  title: 'Quản Lý CV Đã Lưu | Square Tuyển Dụng',
-  description: 'Quản lý các bản CV ứng tuyển trực tuyến, đặt CV chính, nhân bản và tải file PDF A4 chuẩn chuyên nghiệp.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('my-cvs');
+}
 
 export default function Page() {
   return <CandidateCVListPage />;

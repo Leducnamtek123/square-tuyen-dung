@@ -96,28 +96,20 @@ const InterviewsPage = () => {
 
   const columns = useMemo<ColumnDef<InterviewSession>[]>(() => [
     {
-      accessorKey: 'id',
-      header: 'ID',
-      enableSorting: true,
-    },
-    {
-      accessorKey: 'roomName',
-      header: t('pages.interviews.table.room') as string,
-      cell: (info) => (
-        <Typography variant="body2" fontWeight={600}>
-          {info.getValue() as string}
-        </Typography>
-      ),
-    },
-    {
-      accessorKey: 'jobName',
-      header: t('pages.interviews.table.jobPost') as string,
-      cell: (info) => info.getValue() as string || '-',
+      id: 'index',
+      header: 'STT',
+      cell: (info) => info.row.index + 1,
+      size: 60,
     },
     {
       accessorKey: 'candidateName',
       header: t('pages.interviews.table.candidate') as string,
-      cell: (info) => info.getValue() as string || '-',
+      cell: (info) => (info.getValue() as string) || '-',
+    },
+    {
+      accessorKey: 'jobName',
+      header: t('pages.interviews.table.jobPost') as string,
+      cell: (info) => (info.getValue() as string) || '-',
     },
     {
       accessorKey: 'status',
@@ -140,7 +132,7 @@ const InterviewsPage = () => {
       accessorFn: (row) => row.scheduledAt,
       header: t('pages.interviews.table.scheduledAt') as string,
       enableSorting: true,
-      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '-',
+      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '-'),
     },
     {
       id: 'actions',

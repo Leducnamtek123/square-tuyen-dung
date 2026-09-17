@@ -9,6 +9,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import InputBaseSearchHomeCustom from '@/components/Common/Controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '@/components/Common/Controls/SingleSelectSearchCustom';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +31,30 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 
 type HomeSearchProps = {
   variant?: 'default' | 'hero';
+};
+
+const getTrendingPillMeta = (item: { title: string; cityId?: number | string; careerId?: number | string }) => {
+  const raw = (item.title || '').trim();
+  let label = raw.replace(/^(việc làm|tuyển dụng)\s+/i, '').trim();
+
+  if (/^thành phố\s+hà nội$/i.test(label) || /^hà nội$/i.test(label)) {
+    label = 'Hà Nội';
+  } else if (/^thành phố\s+hồ chí minh$/i.test(label) || /^hồ chí minh$/i.test(label) || /^tp\.?\s*hcm$/i.test(label)) {
+    label = 'TP. Hồ Chí Minh';
+  } else if (/^thành phố\s+đà nẵng$/i.test(label) || /^đà nẵng$/i.test(label)) {
+    label = 'Đà Nẵng';
+  } else {
+    label = label.replace(/^thành phố\s+/i, '').trim();
+  }
+
+  const isCity = Boolean(item.cityId) || ['Hà Nội', 'TP. Hồ Chí Minh', 'Đà Nẵng'].includes(label);
+  const isCareer = Boolean(item.careerId);
+
+  return {
+    label,
+    isCity,
+    isCareer,
+  };
 };
 
 const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
@@ -247,43 +272,126 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
         </Grid>
       </Box>
 
-      {/* ── Popular Keywords Pills ────────────────── */}
+      {/* -- Popular Keywords Pills ------------------ */}
       {isHero && popularKeywords.length > 0 && (
-        <Stack
-          direction="row"
-          spacing={1}
-          alignItems="center"
-          flexWrap="wrap"
-          sx={{ mt: 2, gap: 1, px: 0.5 }}
+        <Box
+          sx={{
+            mt: { xs: 1.5, md: 2 },
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.25,
+            width: '100%',
+            overflow: 'hidden',
+          }}
         >
-          {popularKeywords.map((item) => (
-            <Chip
-              key={item.id}
-              icon={<TrendingUpIcon sx={{ fontSize: '15px !important', color: '#e11d48' }} />}
-              label={item.title}
-              clickable
-              onClick={() => handlePillClick(item)}
-              sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.90)',
-                backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255, 255, 255, 0.6)',
-                fontWeight: 600,
-                fontSize: '0.85rem',
-                color: '#0f172a',
-                py: 0.5,
-                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.06)',
-                transition: 'all 0.25s ease',
-                '&:hover': {
-                  backgroundColor: '#ffffff',
-                  color: '#e11d48',
-                  borderColor: '#e11d48',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 6px 16px rgba(225, 29, 72, 0.18)',
-                },
-              }}
-            />
-          ))}
-        </Stack>
+          {/* Trend Indicator Badge */}
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flexShrink: 0,
+              px: { xs: 1.25, sm: 1.5 },
+              py: { xs: 0.6, sm: 0.75 },
+              borderRadius: '9999px',
+              bgcolor: 'rgba(225, 29, 72, 0.15)',
+              border: '1px solid rgba(225, 29, 72, 0.35)',
+              backdropFilter: 'blur(10px)',
+              color: '#ffffff',
+              fontWeight: 700,
+              fontSize: { xs: '0.78rem', sm: '0.82rem' },
+              lineHeight: 1,
+              userSelect: 'none',
+              boxShadow: '0 2px 8px rgba(225, 29, 72, 0.2)',
+            }}
+          >
+            <LocalFireDepartmentIcon sx={{ fontSize: 16, color: '#f43f5e' }} />
+            <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+              {t('common:home.trending', { defaultValue: 'Xu hướng:' })}
+            </Box>
+          </Box>
+
+          {/* Scrolling Chips Container with Right Edge Fade on Mobile */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 1,
+              overflowX: 'auto',
+              flexWrap: { xs: 'nowrap', md: 'wrap' },
+              py: 0.5,
+              px: 0.25,
+              width: '100%',
+              maskImage: {
+                xs: 'linear-gradient(to right, black calc(100% - 36px), transparent 100%)',
+                md: 'none',
+              },
+              WebkitMaskImage: {
+                xs: 'linear-gradient(to right, black calc(100% - 36px), transparent 100%)',
+                md: 'none',
+              },
+              '&::-webkit-scrollbar': { display: 'none' },
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch',
+            }}
+          >
+            {popularKeywords.map((item) => {
+              const meta = getTrendingPillMeta(item);
+              let icon = <TrendingUpIcon sx={{ fontSize: '15px !important', color: '#e11d48' }} />;
+              if (meta.isCity) {
+                icon = <LocationOnIcon sx={{ fontSize: '15px !important', color: '#2563eb' }} />;
+              } else if (meta.isCareer) {
+                icon = <WorkOutlineIcon sx={{ fontSize: '15px !important', color: '#059669' }} />;
+              }
+
+              return (
+                <Chip
+                  key={item.id}
+                  icon={icon}
+                  label={meta.label}
+                  clickable
+                  onClick={() => handlePillClick(item)}
+                  sx={{
+                    flexShrink: 0,
+                    minHeight: { xs: 38, sm: 40 },
+                    height: { xs: 38, sm: 40 },
+                    borderRadius: '9999px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.94)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255, 255, 255, 0.85)',
+                    fontWeight: 600,
+                    fontSize: { xs: '0.82rem', sm: '0.86rem' },
+                    color: '#0f172a',
+                    px: { xs: 0.5, sm: 0.75 },
+                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.08)',
+                    transition: 'all 0.2s ease',
+                    '&:active': {
+                      transform: 'scale(0.96)',
+                    },
+                    '&:hover': {
+                      backgroundColor: '#ffffff',
+                      color: '#e11d48',
+                      borderColor: '#e11d48',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 18px rgba(225, 29, 72, 0.20)',
+                    },
+                    '& .MuiChip-label': {
+                      px: { xs: 0.75, sm: 1 },
+                      whiteSpace: 'nowrap',
+                    },
+                    '& .MuiChip-icon': {
+                      ml: { xs: 0.75, sm: 1 },
+                      mr: -0.25,
+                    },
+                  }}
+                />
+              );
+            })}
+          </Box>
+        </Box>
       )}
     </Box>
   );

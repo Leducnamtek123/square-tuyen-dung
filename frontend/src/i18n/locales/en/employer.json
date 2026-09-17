@@ -320,7 +320,38 @@
       "toast": "Please verify your employer profile before posting a job."
     },
     "popupTitle": "Job Post",
-    "manageSubtitle": "Manage your job postings"
+    "manageSubtitle": "Manage your job postings",
+    "editor": {
+      "createTitle": "Create New Job Post",
+      "editTitle": "Edit Job Post",
+      "createSubtitle": "Fill in position details, compensation, and AI interview parameters to attract qualified candidates quickly.",
+      "editSubtitle": "Update recruitment information, requirements, and adjust AI screening score thresholds.",
+      "backToList": "Back to List",
+      "confirmCancelTitle": "Discard changes?",
+      "confirmCancelMessage": "You have unsaved changes. Leaving this page will discard them. Are you sure you want to exit?",
+      "confirmCancelButton": "Leave page",
+      "continueEditingButton": "Keep editing",
+      "saveButton": "Publish Job Post",
+      "updateButton": "Save Changes",
+      "cancelButton": "Cancel",
+      "progressTitle": "Form Completion Progress",
+      "progressSubtitle": "A more detailed post attracts more high-caliber applicants",
+      "sectionBasic": "Basic Information",
+      "sectionSalary": "Salary & Deadline",
+      "sectionAi": "AI Interview Settings",
+      "sectionContent": "Description & Benefits",
+      "sectionLocation": "Workplace Location",
+      "sectionContact": "Contact Details",
+      "tipsTitle": "Tips for an effective job post",
+      "tip1Title": "Clear job responsibilities",
+      "tip1Desc": "List 5-7 core responsibilities and clearly outline key technologies or required skills.",
+      "tip2Title": "Transparent salary range",
+      "tip2Desc": "Posts with specific salary ranges receive up to 40% more qualified applications.",
+      "tip3Title": "Automated AI interview pipeline",
+      "tip3Desc": "Enabling auto-screening shortens response time and improves candidate experience.",
+      "policyTitle": "Job posting policy",
+      "policyDesc": "Job postings are reviewed within 2 business hours to ensure transparency and protect candidate rights."
+    }
   },
   "sendEmailComponent": {
     "label": {
@@ -466,7 +497,7 @@
     "label": {
       "selectjobpost": "Select job post",
       "selectcandidate": "Select candidate",
-      "selectquestiongroupoptional": "Select Question Group (Optional)",
+      "selectquestiongroupoptional": "Select Question Group",
       "selectinterviewquestions": "Select Interview Questions"
     },
     "helperText": {
@@ -561,11 +592,11 @@
       "resultLabel": "Final Result",
       "commentsPlaceholder": "Add HR notes and final assessment...",
       "comments": "Detailed Comments",
-      "proposedSalary": "Proposed Salary (VND)",
+      "proposedSalary": "Proposed Salary",
       "submitEvaluation": "Submit Final Evaluation",
       "evalSuccess": "Evaluation submitted successfully!",
-      "passed": "Accepted (Pass)",
-      "failed": "Rejected (Fail)",
+      "passed": "Qualified",
+      "failed": "Unqualified",
       "pending": "Pending Review"
     }
   },
@@ -618,7 +649,9 @@
       "contactpersonphoneexceededallowedlength": "Contact person phone exceeded allowed length.",
       "contactpersonemailisrequired": "Contact person email is required.",
       "invalidemail": "Invalid email.",
-      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length."
+      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length.",
+      "invalidminscore": "Invalid minimum score.",
+      "minscoreoutofrange": "Minimum score must be between 0 and 100."
     },
     "warning": "When you update the post, it will be pending approval!",
     "title": {
@@ -647,7 +680,14 @@
       "contactpersonphone": "Contact Person Phone",
       "contactpersonemail": "Contact Person Email",
       "urgent": "Urgent",
-      "contactinformation": "Contact Information"
+      "contactinformation": "Contact Information",
+      "autointerview": "Auto AI Interview for Qualified Candidates",
+      "autointerviewdesc": "Automatically send an AI interview invitation as soon as the candidate's CV score meets the threshold.",
+      "minscreeningscore": "Minimum CV score for auto-invitation",
+      "aiPipelineHelp": "Parallel Mode: Candidates scoring at or above this threshold will automatically receive an AI interview invitation email. Candidates below threshold or when auto-interview is turned off will be queued in pending status for manual review."
+    },
+    "tooltip": {
+      "minscreeningscore": "Score scale from 0 to 100 points."
     },
     "placeholder": {
       "enterjobtitle": "Enter job title",
@@ -662,6 +702,7 @@
       "entermaximumsalary": "Enter maximum salary",
       "selectacademiclevel": "Select academic level",
       "selectinterviewtemplate": "Select an interview template for automated preliminary assessment...",
+      "enterminscreeningscore": "Enter score between 0 and 100 (default: 70)",
       "selectcityprovince": "Select city/province",
       "selectCityFirst": "Please select City / Province first",
       "selectdistrict": "Select district",
@@ -680,6 +721,8 @@
     },
     "section": {
       "basicInfo": "Basic Information",
+      "aiPipeline": "AI Interview & Automation Pipeline",
+      "content": "Job Details & Benefits",
       "location": "Work Location",
       "contact": "Contact Information"
     }
@@ -782,6 +825,7 @@
     "table": {
       "groupName": "Question Group Name",
       "numberOfQuestions": "Number of Questions",
+      "status": "Status",
       "description": "Description",
       "na": "N/A",
       "noData": "No data"
@@ -812,12 +856,17 @@
       "updateError": "Error occurred while updating question set",
       "deleteSuccess": "Deleted question group successfully",
       "deleteError": "Error occurred while deleting question set",
-      "createSuccess": "Question group created successfully"
+      "createSuccess": "Question group created successfully",
+      "testRoomCreated": "Mock interview room created successfully!",
+      "emptyGroupWarning": "This question group does not have any questions to test."
     },
     "title": "Question Groups",
     "actions": {
       "addGroup": "Add Group",
-      "createNewQuestion": "Create New Question"
+      "createNewQuestion": "Create New Question",
+      "testWithAI": "Test with AI",
+      "testGroupTooltip": "Practice / Test interview with this question group",
+      "testInDialog": "Test question group"
     },
     "noData": "No question groups yet"
   },
@@ -851,7 +900,7 @@
   },
   "sidebar": {
     "dashboard": "Dashboard",
-    "agentAssistants": "AI Assistant (AILA)",
+    "agentAssistants": "AI Assistant AILA",
     "jobPostList": "Job Post List",
     "candidateManagement": "Candidate Management",
     "appliedApplications": "Applied Applications",
@@ -863,6 +912,7 @@
     "interviewHistory": "Video Library",
     "questionBank": "Question Bank",
     "questionSets": "Question Sets",
+    "aiSettings": "AI Interview Settings",
     "notifications": "Notifications",
     "accountManagement": "Account Management",
     "companyInfo": "Company Info",
@@ -919,6 +969,9 @@
     },
     "updating": "Updating...",
     "activeNow": "Active Now",
+    "searchPlaceholder": "Search by candidate name, position...",
+    "noSearchMatch": "No matching live interviews found",
+    "noSearchMatchHint": "Try searching with a different keyword or clear filter",
     "noData": {
       "title": "No live sessions yet",
       "subtitle": "When a candidate turns on camera or mic, their realtime card will appear here."
@@ -956,7 +1009,7 @@
       "screenShare": "Screen share",
       "liveAudioNoVideo": "Live audio - No video",
       "waitingForMediaTracks": "Waiting for audio/video tracks...",
-      "waitingSignal": "Waiting for signal",
+      "waitingSignal": "Waiting for signal...",
       "waitingSignalHint": "When the candidate turns on camera or mic, the preview will appear here",
       "tokenError": "Unable to fetch observer token.",
       "unknownCandidate": "Unknown candidate",
@@ -971,16 +1024,16 @@
       "time": "Time",
       "endSession": "End session",
       "noConnectionDetails": "No connection details available for fullscreen.",
-      "joinPresence": "Join as Present",
+      "joinPresence": "Join Room",
       "joinPresenceLoading": "Connecting...",
-      "joinPresenceTooltip": "Join the room as Employer â€” candidate will see you",
+      "joinPresenceTooltip": "Join the room as Employer — candidate will see you",
       "presenceTitle": "Present in Room",
       "presenceSubtitle": "You are joining as Employer. The candidate can see your presence.",
       "presenceExit": "Leave room"
     }
   },
   "verification": {
-    "title": "Employer Verification",
+    "title": "Business Verification",
     "step1": {
       "title": "Step 1: Update Company Profile",
       "description": "Complete company information before submitting verification documents. Admin will review this content before granting posting rights.",
@@ -1001,10 +1054,10 @@
       "statusPending": "Status: Pending Approval"
     },
     "status": {
-      "pending": "Pending review",
-      "reviewing": "Reviewing",
-      "approved": "Approved",
-      "rejected": "Rejected"
+      "pending": "Incomplete",
+      "reviewing": "Under Review",
+      "approved": "Verified",
+      "rejected": "Needs Update"
     },
     "messages": {
       "infoRecorded": "Information recorded.",
@@ -1013,8 +1066,8 @@
       "saveFailed": "Could not save the verification profile. Please try again."
     },
     "summary": {
-      "companyProfile": "Company profile",
-      "legalProfile": "Legal profile",
+      "companyProfile": "Company Profile",
+      "legalProfile": "Legal Documents",
       "progress": "Completion progress",
       "canPost": "Your company has been verified and can post jobs.",
       "cannotPost": "Please complete the legal profile and wait for admin verification before posting jobs."
@@ -1320,6 +1373,7 @@
   "blog": {
     "title": "Recruitment Blog",
     "subtitle": "Share hiring experience and recruitment tips from your company",
+    "deleteTitle": "Confirm delete article",
     "newPost": "Write new post",
     "reviewNotice": "Posts are sent to Admin for review before appearing on the website. Review usually takes up to 24 hours.",
     "filter": {
@@ -1843,5 +1897,50 @@
       "uploadFailed": "Failed to upload file. Please try again."
     }
   },
-  "candidate": "Candidate"
+  "candidateDetail": {
+    "messages": {
+      "noEmail": "Candidate has not updated email address"
+    }
+  },
+  "candidate": "Candidate",
+  "introduce": {
+    "tabTitle": "Overview & Recruitment Solutions - {{appName}}",
+    "badge": "SMART RECRUITMENT SOLUTIONS FOR BUSINESSES",
+    "industries": {
+      "construction": "Construction",
+      "realEstate": "Real Estate",
+      "architecture": "Architecture & Interior Design",
+      "mep": "Engineering & MEP Systems"
+    },
+    "stats": {
+      "screeningTime": "Reduction in Pre-screening Time",
+      "screeningTimeDesc": "Automated CV screening & AI interviews",
+      "hiringSuccess": "Boost in Hiring Success Rate",
+      "hiringSuccessDesc": "Precise candidate-job skill matching",
+      "matchAccuracy": "AI Match Score Accuracy",
+      "matchAccuracyDesc": "Standardized evaluation metrics",
+      "trustedCompanies": "Trusted Partner Businesses",
+      "trustedCompaniesDesc": "Leading corporations & partners"
+    },
+    "valueProps": {
+      "poolTitle": "Talent Pool for 4 Key Industries",
+      "poolDesc": "Deep talent pool in Construction, Real Estate, Architecture/Interior Design, and MEP with verified credentials.",
+      "aiMatchingTitle": "AI Skill Matching & Automated Interviews",
+      "aiMatchingDesc": "AILA AI analyzes CVs, calculates Match Scores, and conducts natural Voice AI interviews 24/7 without subjective bias.",
+      "pipelineTitle": "Candidate Pipeline CRM",
+      "pipelineDesc": "Track candidate lifecycles from application and interview scheduling to final onboarding on a single visual dashboard.",
+      "guaranteeTitle": "Dedicated Support & Hiring Warranty",
+      "guaranteeDesc": "24/7 consultation team, job posting optimization, and dedicated support ensuring corporate hiring success."
+    },
+    "steps": {
+      "step1Title": "Company Profile Setup & Verification",
+      "step1Desc": "Quick employer registration and instant verification with a trusted verified company badge.",
+      "step2Title": "Smart Job Posting",
+      "step2Desc": "Publish SEO-optimized job openings fast with AI-assisted professional Job Description recommendations.",
+      "step3Title": "Automated AI Screening & Interviews",
+      "step3Desc": "Automated candidate sorting, AI Match Scoring, and instant round-the-clock interview scheduling.",
+      "step4Title": "Offer Acceptance & Workforce Management",
+      "step4Desc": "Approve final candidates, issue digital contracts, and streamline new hire onboarding seamlessly."
+    }
+  }
 }

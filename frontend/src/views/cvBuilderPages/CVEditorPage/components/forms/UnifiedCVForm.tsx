@@ -121,7 +121,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
     }
   };
 
-  // ── Experiences Handlers ──────────────────────────────────────────
+  // -- Experiences Handlers ------------------------------------------
   const handleAddExperience = () => {
     const newItem: CVExperienceItem = {
       id: `exp-${crypto.randomUUID()}`,
@@ -149,7 +149,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
     });
   };
 
-  // ── Educations Handlers ───────────────────────────────────────────
+  // -- Educations Handlers -------------------------------------------
   const handleAddEducation = () => {
     const newItem: CVEducationItem = {
       id: `edu-${crypto.randomUUID()}`,
@@ -178,7 +178,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
     });
   };
 
-  // ── Skills Handlers ───────────────────────────────────────────────
+  // -- Skills Handlers -----------------------------------------------
   const [newSkillName, setNewSkillName] = useState('');
 
   const handleAddSkill = (nameToAdd?: string) => {
@@ -209,7 +209,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
     });
   };
 
-  // ── Languages Handlers (Vieclam24h 5-Star Style) ───────────────────
+  // -- Languages Handlers (Vieclam24h 5-Star Style) -------------------
   const handleAddLanguage = (name = 'Tiếng Anh') => {
     const newItem: CVLanguageItem = {
       id: `lang-${crypto.randomUUID()}`,
@@ -252,7 +252,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
     }
   };
 
-  // ── Certificates Handlers ─────────────────────────────────────────
+  // -- Certificates Handlers -----------------------------------------
   const handleAddCertificate = () => {
     const newItem: CVCertificateItem = {
       id: `cert-${crypto.randomUUID()}`,
@@ -277,7 +277,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
     });
   };
 
-  // ── Projects Handlers ─────────────────────────────────────────────
+  // -- Projects Handlers ---------------------------------------------
   const handleAddProject = () => {
     const newItem: CVProjectItem = {
       id: `proj-${crypto.randomUUID()}`,
@@ -304,7 +304,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3.5 }}>
-      {/* ── Section 1: Thông tin cơ bản ──────────────────────────────── */}
+      {/* -- Section 1: Thông tin cơ bản -------------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -455,7 +455,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
             }}
           >
-            {showExtraPersonalInfo ? 'Ẩn bớt liên kết bổ sung' : 'Thông tin bổ sung (Website, LinkedIn, GitHub) >'}
+            {showExtraPersonalInfo ? 'Ẩn bớt liên kết bổ sung' : 'Thông tin bổ sung - Website, LinkedIn, GitHub >'}
           </Button>
 
           <Collapse in={showExtraPersonalInfo}>
@@ -492,7 +492,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
         </Stack>
       </Paper>
 
-      {/* ── Section 2: Mục tiêu nghề nghiệp ─────────────────────────── */}
+      {/* -- Section 2: Mục tiêu nghề nghiệp --------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -551,7 +551,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
         </Stack>
       </Paper>
 
-      {/* ── Section 3: Kinh nghiệm làm việc ─────────────────────────── */}
+      {/* -- Section 3: Kinh nghiệm làm việc --------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -583,7 +583,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm kinh nghiệm làm việc
+            Thêm kinh nghiệm làm việc
           </Button>
         </Stack>
 
@@ -641,7 +641,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
 
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
                   <TextField
-                    label="Bắt đầu (MM/YYYY)"
+                    label="Bắt đầu: Tháng / Năm"
                     value={exp.startDate}
                     onChange={(e) => handleUpdateExperience(exp.id, 'startDate', e.target.value)}
                     placeholder="03/2022"
@@ -665,7 +665,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
                   label="Mô tả công việc & Thành tích chính"
                   value={exp.description}
                   onChange={(e) => handleUpdateExperience(exp.id, 'description', e.target.value)}
-                  placeholder="• Nhiệm vụ và các dự án phụ trách&#10;• Thành quả số liệu nổi bật (tăng trưởng %, doanh số, giảm chi phí...)"
+                  placeholder="• Nhiệm vụ và các dự án phụ trách&#10;• Thành quả số liệu nổi bật: tăng trưởng doanh số, tỷ lệ chuyển đổi, giảm chi phí..."
                   size="small"
                   fullWidth
                 />
@@ -675,7 +675,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
         )}
       </Paper>
 
-      {/* ── Section 4: Học vấn & Trình độ ────────────────────────────── */}
+      {/* -- Section 4: Học vấn & Trình độ ------------------------------ */}
       <Paper
         elevation={0}
         sx={{
@@ -707,7 +707,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm học vấn
+            Thêm học vấn
           </Button>
         </Stack>
 
@@ -795,7 +795,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
         )}
       </Paper>
 
-      {/* ── Section 5: Kỹ năng chuyên môn ───────────────────────────── */}
+      {/* -- Section 5: Kỹ năng chuyên môn ----------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -819,7 +819,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           <TextField
             size="small"
             fullWidth
-            placeholder="Nhập kỹ năng mới (VD: React, Figma, SEO, Bán hàng, Excel...)"
+            placeholder="Nhập kỹ năng mới, ví dụ: React, Figma, SEO, Bán hàng, Excel..."
             value={newSkillName}
             onChange={(e) => setNewSkillName(e.target.value)}
             onKeyDown={(e) => {
@@ -907,7 +907,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
         </Stack>
       </Paper>
 
-      {/* ── Section 6: Ngoại ngữ (Vieclam24h Star Rating Style) ─────── */}
+      {/* -- Section 6: Ngoại ngữ (Vieclam24h Star Rating Style) ------- */}
       <Paper
         elevation={0}
         sx={{
@@ -939,7 +939,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm ngoại ngữ
+            Thêm ngoại ngữ
           </Button>
         </Stack>
 
@@ -1023,7 +1023,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
         )}
       </Paper>
 
-      {/* ── Section 7: Chứng chỉ & Giải thưởng ───────────────────────── */}
+      {/* -- Section 7: Chứng chỉ & Giải thưởng ------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -1055,7 +1055,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm chứng chỉ
+            Thêm chứng chỉ
           </Button>
         </Stack>
 
@@ -1118,7 +1118,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
         )}
       </Paper>
 
-      {/* ── Section 8: Dự án tiêu biểu ──────────────────────────────── */}
+      {/* -- Section 8: Dự án tiêu biểu -------------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -1150,7 +1150,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm dự án
+            Thêm dự án
           </Button>
         </Stack>
 

@@ -58,7 +58,8 @@ export function useCandidateOnboarding() {
         const res = await authService.getOnboardingStatus();
         if (!isMounted) return;
 
-        if (res.isOnboarded) {
+        const isPreview = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === '1';
+        if (res.isOnboarded && !isPreview) {
           router.replace('/jobs');
           return;
         }

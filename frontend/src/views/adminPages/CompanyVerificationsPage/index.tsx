@@ -22,6 +22,7 @@ import AdminDataGrid, { ColumnDef, FilterDef } from '@/components/Common/AdminDa
 import AdminStatusBadge from '@/components/Common/AdminStatusBadge';
 import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
 import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
+import TechnicalDetails from '@/components/Common/TechnicalDetails';
 
 import adminManagementService from '@/services/adminManagementService';
 import toastMessages from '@/utils/toastMessages';
@@ -142,7 +143,7 @@ export default function CompanyVerificationsPage() {
                 '&:hover': { color: '#2563EB', textDecoration: 'underline' },
               }}
             >
-              {row.companyName || (row.companyId ? `Công ty #${row.companyId}` : 'Doanh nghiệp')}
+              {row.companyName || 'Doanh nghiệp'}
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748B' }}>
               Mã số thuế: {row.taxCode || 'Chưa cung cấp'}
@@ -313,7 +314,7 @@ export default function CompanyVerificationsPage() {
         open={Boolean(inspectingVerification)}
         onClose={() => setInspectingVerification(null)}
         title={inspectingVerification?.companyName || 'Hồ sơ xác thực doanh nghiệp'}
-        subtitle={`Mã xác thực: #${inspectingVerification?.id}`}
+        subtitle={inspectingVerification?.taxCode ? `MST: ${inspectingVerification.taxCode}` : (inspectingVerification?.representativeName || undefined)}
         footerAction={
           inspectingVerification && (
             <Stack direction="row" spacing={1}>
@@ -429,6 +430,16 @@ export default function CompanyVerificationsPage() {
                   </Typography>
                 </Box>
               </Box>
+            )}
+
+            {inspectingVerification && (
+              <TechnicalDetails
+                data={{
+                  'ID Xác thực': inspectingVerification.id,
+                  'ID Doanh nghiệp': inspectingVerification.companyId,
+                  'Ngày gửi': inspectingVerification.createAt ? dayjs(inspectingVerification.createAt).format('DD/MM/YYYY HH:mm:ss') : undefined,
+                }}
+              />
             )}
           </Stack>
         )}

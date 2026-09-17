@@ -306,7 +306,8 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
                           </Typography>
 
                           <Stack direction="row" spacing={1}>
-                            <IconButton aria-label="Quay lại"
+                            <IconButton
+                              aria-label={t('common:actions.edit')}
                               size="small"
                               sx={{
                                 color: 'secondary.main',
@@ -321,7 +322,8 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
                               <ModeEditOutlineOutlinedIcon fontSize="small" />
                             </IconButton>
 
-                            <IconButton aria-label="Quay lại"
+                            <IconButton
+                              aria-label={t('common:actions.delete')}
                               size="small"
                               sx={{
                                 color: 'error.main',

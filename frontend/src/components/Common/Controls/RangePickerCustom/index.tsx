@@ -93,7 +93,7 @@ const RangePickerCustom: React.FC<Props> = ({
 
   return (
     <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap sx={{ mb: '20px' }}>
-      {/* ── 1. Single Unified Date Range Trigger Control ──────────────── */}
+      {/* -- 1. Single Unified Date Range Trigger Control ---------------- */}
       <Box
         onClick={handleOpenPopover}
         sx={{
@@ -133,7 +133,7 @@ const RangePickerCustom: React.FC<Props> = ({
         <CalendarMonthOutlinedIcon sx={{ fontSize: 16, color: '#667085', ml: 'auto', flexShrink: 0 }} />
       </Box>
 
-      {/* ── 2. Calendar Popover ────────────────────────────────────────── */}
+      {/* -- 2. Calendar Popover ------------------------------------------ */}
       <Popover
         open={openPopover}
         anchorEl={anchorEl}
@@ -246,7 +246,7 @@ const RangePickerCustom: React.FC<Props> = ({
         </Stack>
       </Popover>
 
-      {/* ── 3. Quick Filter Preset Group (30 ngày & 90 ngày) ──────────── */}
+      {/* -- 3. Quick Filter Preset Group (30 ngày & 90 ngày) ------------ */}
       <Box
         onClick={() => handlePresetSelect(30)}
         sx={{
@@ -301,7 +301,7 @@ const RangePickerCustom: React.FC<Props> = ({
         {t('common.dateRange.days90', '90 ngày')}
       </Box>
 
-      {/* ── 4. Apply Button (#0F1B3D) ─────────────────────────────────── */}
+      {/* -- 4. Apply Button (#0F1B3D) ----------------------------------- */}
       <Button
         disableElevation
         variant="contained"

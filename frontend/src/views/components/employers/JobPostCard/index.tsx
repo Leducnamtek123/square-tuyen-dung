@@ -1,27 +1,20 @@
 'use client';
-import React, { useMemo, useCallback, useReducer } from 'react';
+import React, { useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import dayjs from '@/configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 import { Alert, Box, Button, Stack, Typography, Paper, type Theme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
-import {
-  convertEditorStateToHTMLString,
-  createEditorStateFromHTMLString,
-} from '@/utils/editorUtils';
 import toastMessages from '@/utils/toastMessages';
-import errorHandling from '@/utils/errorHandling';
 import { confirmModal } from '@/utils/sweetalert2Modal';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
-import FormPopup from '@/components/Common/Controls/FormPopup';
-import JobPostForm from '../JobPostForm';
-import type { JobPostFormValues } from '../JobPostForm/JobPostSchema';
 import jobService from '@/services/jobService';
 import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '@/hooks';
 import { useCompanyProfile, useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
-import type { JobPostInput } from '@/services/jobService';
 import type { RowSelectionState } from '@tanstack/react-table';
 import { useConfig } from '@/hooks/useConfig';
 import { useForm } from 'react-hook-form';
@@ -33,59 +26,13 @@ import {
   useGlobalFilter,
 } from '@/components/Common/Filters';
 import { ExportModal, type ExportColumn, type ExportScope } from '@/components/Common/ExportModal';
+import { ImportModal } from '@/components/Common/ImportModal';
 import { ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import AiCandidateRecommendationModal from '../AiCandidateRecommendationModal';
 
-type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number; slug?: string };
-
-const getSelectId = (
-  value: number | string | { id?: number | string | null } | null | undefined,
-) => (value && typeof value === 'object' ? value.id ?? '' : value ?? '');
-
-const toNullableNumber = (value: number | string | null | undefined) => (
-  value === undefined || value === null || value === '' ? null : Number(value)
-);
-
-type JobPostCardState = {
-  openPopup: boolean;
-  editData: JobPostEditData | null;
-  serverErrors: Record<string, string[]> | null;
-  isProcessing: boolean;
-};
-
-type JobPostCardAction =
-  | { type: 'openAdd' }
-  | { type: 'openEdit'; value: JobPostEditData }
-  | { type: 'closePopup' }
-  | { type: 'setErrors'; value: Record<string, string[]> | null }
-  | { type: 'setProcessing'; value: boolean };
-
-const initialState: JobPostCardState = {
-  openPopup: false,
-  editData: null,
-  serverErrors: null,
-  isProcessing: false,
-};
-
-function reducer(state: JobPostCardState, action: JobPostCardAction): JobPostCardState {
-  switch (action.type) {
-    case 'openAdd':
-      return { ...state, openPopup: true, editData: null, serverErrors: null };
-    case 'openEdit':
-      return { ...state, openPopup: true, editData: action.value };
-    case 'closePopup':
-      return { ...state, openPopup: false };
-    case 'setErrors':
-      return { ...state, serverErrors: action.value };
-    case 'setProcessing':
-      return { ...state, isProcessing: action.value };
-    default:
-      return state;
-  }
-}
-
 const JobPostCard = () => {
+  const router = useRouter();
   const { t, i18n } = useTranslation('employer');
   const { allConfig } = useConfig();
   const verificationHref = localizeRoutePath(`/${ROUTES.EMPLOYER.VERIFICATION}`, i18n.language);
@@ -105,7 +52,6 @@ const JobPostCard = () => {
     initialPageSize: 10
   });
 
-  const [state, dispatch] = React.useReducer(reducer, initialState);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   const filter = useGlobalFilter({
@@ -145,95 +91,22 @@ const JobPostCard = () => {
     status: filter.appliedValues.statusId === '' ? undefined : filter.appliedValues.statusId,
   });
 
-  const { addJobPost, updateJobPost, deleteJobPost, isMutating } = useJobPostMutations();
+  const { deleteJobPost, isMutating } = useJobPostMutations();
   const { data: companyProfile } = useCompanyProfile();
   const isCompanyVerified = Boolean(companyProfile?.isVerified);
   const isCreateBlocked = Boolean(companyProfile) && !isCompanyVerified;
 
-  const handleShowUpdate = useCallback(async (slugOrId: string | number) => {
-    dispatch({ type: 'setProcessing', value: true });
-    try {
-      const resData = await jobService.getEmployerJobPostDetailById(slugOrId);
-      const data: JobPostEditData = {
-        ...resData,
-        career: getSelectId(resData.career),
-        position: resData.position ?? '',
-        experience: resData.experience ?? '',
-        typeOfWorkplace: resData.typeOfWorkplace ?? '',
-        jobType: resData.jobType ?? '',
-        academicLevel: resData.academicLevel ?? '',
-        genderRequired: resData.genderRequired ?? '',
-        jobDescription: createEditorStateFromHTMLString(resData.jobDescription || ''),
-        jobRequirement: createEditorStateFromHTMLString(resData.jobRequirement || ''),
-        benefitsEnjoyed: createEditorStateFromHTMLString(resData.benefitsEnjoyed || ''),
-        location: {
-          city: getSelectId(resData.location?.city),
-          district: getSelectId(resData.location?.district),
-          address: resData.location?.address || '',
-          lat: resData.location?.lat ?? '',
-          lng: resData.location?.lng ?? '',
-        },
-      };
-      dispatch({ type: 'openEdit', value: data });
-    } catch (error) {
-      errorHandling(error);
-    } finally {
-      dispatch({ type: 'setProcessing', value: false });
-    }
-  }, []);
+  const createJobPostHref = localizeRoutePath(`/${ROUTES.EMPLOYER.JOB_POST_CREATE}`, i18n.language);
+
+  const handleShowUpdate = useCallback((slugOrId: string | number) => {
+    const editRoute = localizeRoutePath(`/${ROUTES.EMPLOYER.JOB_POST}/${slugOrId}/edit`, i18n.language);
+    router.push(editRoute);
+  }, [router, i18n.language]);
 
   const handleShowAdd = useCallback(() => {
     if (isCreateBlocked) return;
-    dispatch({ type: 'openAdd' });
-  }, [isCreateBlocked]);
-
-  const handleAddOrUpdate = async (formData: JobPostFormValues) => {
-    dispatch({ type: 'setErrors', value: null });
-    const editLookup = state.editData?.slug ?? state.editData?.id;
-    const payload: JobPostInput = {
-      jobName: formData.jobName || '',
-      deadline: formData.deadline ? (typeof formData.deadline === 'string' ? formData.deadline : (formData.deadline as any).toISOString()) : '',
-      quantity: Number(formData.quantity),
-      salaryMin: Number(formData.salaryMin),
-      salaryMax: Number(formData.salaryMax),
-      isHot: formData.isHot,
-      isUrgent: formData.isUrgent,
-      career: Number(formData.career),
-      position: Number(formData.position),
-      experience: Number(formData.experience),
-      academicLevel: Number(formData.academicLevel),
-      jobType: Number(formData.jobType),
-      interviewTemplate: formData.interviewTemplate ? Number(formData.interviewTemplate) : null,
-      typeOfWorkplace: Number(formData.typeOfWorkplace),
-      genderRequired: formData.genderRequired,
-      jobDescription: convertEditorStateToHTMLString(formData.jobDescription as ReturnType<typeof createEditorStateFromHTMLString>),
-      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement as ReturnType<typeof createEditorStateFromHTMLString>),
-      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed as ReturnType<typeof createEditorStateFromHTMLString>),
-      contactPersonName: formData.contactPersonName,
-      contactPersonPhone: formData.contactPersonPhone,
-      contactPersonEmail: formData.contactPersonEmail,
-      location: {
-        city: Number(formData.location.city),
-        district: Number(formData.location.district),
-        address: formData.location.address,
-        lat: toNullableNumber(formData.location.lat),
-        lng: toNullableNumber(formData.location.lng),
-      },
-    };
-
-    try {
-      if (editLookup != null) {
-        await updateJobPost({ id: editLookup, data: payload });
-        toastMessages.success(t('jobPost.messages.updateSuccess'));
-      } else {
-        await addJobPost(payload);
-        toastMessages.success(t('jobPost.messages.addSuccess'));
-      }
-      dispatch({ type: 'closePopup' });
-    } catch (error) {
-      errorHandling(error, (errs) => dispatch({ type: 'setErrors', value: errs as Record<string, string[]> }));
-    }
-  };
+    router.push(createJobPostHref);
+  }, [isCreateBlocked, router, createJobPostHref]);
 
   const handleDelete = useCallback((slugOrId: string | number) => {
     confirmModal(
@@ -252,6 +125,7 @@ const JobPostCard = () => {
   }, [deleteJobPost, t]);
 
   const [exportModalOpen, setExportModalOpen] = React.useState(false);
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
 
   const jobPostExportColumns: ExportColumn[] = React.useMemo(() => [
     {
@@ -363,18 +237,42 @@ const JobPostCard = () => {
               </Typography>
             </Box>
           </Box>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
+          <Stack direction="row" spacing={1.25} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            <Button 
+              variant="outlined" 
+              color="inherit" 
+              startIcon={<UploadFileOutlinedIcon />} 
+              onClick={() => setImportModalOpen(true)} 
+              sx={{ 
+                flex: { xs: 1, sm: 'none' },
+                px: { xs: 1.5, sm: 2.5 }, 
+                py: 1, 
+                fontWeight: 800, 
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                border: '1px solid #E2E8F0',
+                bgcolor: '#FFFFFF',
+                color: '#334155',
+                '&:hover': {
+                  bgcolor: '#F8FAFC',
+                  borderColor: '#CBD5E1',
+                },
+              }}
+            >
+              Nhập Excel/CSV
+            </Button>
             <Button 
               variant="outlined" 
               color="inherit" 
               startIcon={<FileDownloadOutlinedIcon />} 
               onClick={() => setExportModalOpen(true)} 
               sx={{ 
-                width: { xs: '100%', sm: 'auto' },
-                px: 3, 
+                flex: { xs: 1, sm: 'none' },
+                px: { xs: 1.5, sm: 3 }, 
                 py: 1, 
                 fontWeight: 800, 
                 textTransform: 'none',
+                whiteSpace: 'nowrap',
                 border: '1px solid #E2E8F0',
                 bgcolor: '#FFFFFF',
                 color: '#334155',
@@ -393,9 +291,10 @@ const JobPostCard = () => {
               onClick={handleShowAdd} 
               disabled={isCreateBlocked}
               sx={{ 
-                width: { xs: '100%', sm: 'auto' },
-                px: 4, 
+                flex: { xs: 1.25, sm: 'none' },
+                px: { xs: 2, sm: 4 }, 
                 py: 1.25, 
+                whiteSpace: 'nowrap',
                 boxShadow: (theme: Theme) => theme.customShadows?.primary, 
                 fontWeight: 900,
                 textTransform: 'none'
@@ -493,20 +392,13 @@ const JobPostCard = () => {
           jobPost={selectedAiJob}
         />
 
-        <FormPopup
-          title={t('jobPost.popupTitle')}
-          openPopup={state.openPopup}
-          setOpenPopup={(open) => dispatch({ type: open ? 'openAdd' : 'closePopup' })}
-        >
-          <JobPostForm handleAddOrUpdate={handleAddOrUpdate} editData={state.editData} serverErrors={state.serverErrors} />
-        </FormPopup>
-
         <ExportModal
           open={exportModalOpen}
           onClose={() => setExportModalOpen(false)}
           defaultFileName="DanhSachTinTuyenDung"
           columns={jobPostExportColumns}
           fetchData={handleFetchJobPostsExportData}
+          entity="job_post"
           totalRecords={{
             all: data?.count || 0,
             filtered: data?.count || 0,
@@ -514,7 +406,17 @@ const JobPostCard = () => {
           }}
         />
 
-        {(state.isProcessing || isMutating) && <BackdropLoading />}
+        <ImportModal
+          open={importModalOpen}
+          onClose={() => setImportModalOpen(false)}
+          entity="job_post"
+          title="Nhập tin tuyển dụng (Job Post Import)"
+          onSuccess={() => {
+            router.refresh();
+          }}
+        />
+
+        {isMutating && <BackdropLoading />}
       </Paper>
     </Box>
   );

@@ -119,7 +119,7 @@ export const INITIAL_CV_SAMPLE_DATA: CVData = {
     website: 'quynhmy.portfolio.me',
     linkedin: 'linkedin.com/in/quynhmy-nguyen',
     github: '',
-    bio: 'Chuyên viên Marketing với hơn 4 năm kinh nghiệm trong việc xây dựng chiến dịch Performance & Brand Awareness cho các doanh nghiệp TMĐT và Công nghệ. Có tư duy phân tích số liệu nhạy bén, quản trị ngân sách hiệu quả và luôn hướng tới việc nâng cao tỉ lệ chuyển đổi (ROI).',
+    bio: 'Chuyên viên Marketing với hơn 4 năm kinh nghiệm trong việc xây dựng chiến dịch Performance & Brand Awareness cho các doanh nghiệp TMĐT và Công nghệ. Có tư duy phân tích số liệu nhạy bén, quản trị ngân sách hiệu quả và luôn hướng tới việc nâng cao tỉ lệ hoàn vốn đầu tư ROI.',
   },
   experiences: [
     {
@@ -130,7 +130,7 @@ export const INITIAL_CV_SAMPLE_DATA: CVData = {
       endDate: 'Hiện tại',
       isCurrent: true,
       description:
-        '• Hoạch định và thực thi các chiến dịch Digital Marketing đa kênh (Google Ads, Meta Ads, TikTok), quản lý ngân sách 200M+/tháng.\n• Tăng trưởng lượng truy cập tự nhiên (Organic Traffic) lên 45% và tỉ lệ chuyển đổi khách hàng tiềm năng tăng 28% sau 6 tháng.\n• Phối hợp chặt chẽ cùng đội ngũ Design và Content để sản xuất các ấn phẩm truyền thông chất lượng cao.',
+        '• Hoạch định và thực thi các chiến dịch Digital Marketing đa kênh trên Google Ads, Meta Ads, TikTok, quản lý ngân sách 200M+/tháng.\n• Tăng trưởng lượng truy cập tự nhiên Organic Traffic lên 45% và tỉ lệ chuyển đổi khách hàng tiềm năng tăng 28% sau 6 tháng.\n• Phối hợp chặt chẽ cùng đội ngũ Design và Content để sản xuất các ấn phẩm truyền thông chất lượng cao.',
     },
     {
       id: 'exp-2',
@@ -140,13 +140,13 @@ export const INITIAL_CV_SAMPLE_DATA: CVData = {
       endDate: '02/2022',
       isCurrent: false,
       description:
-        '• Xây dựng và quản lý các kênh Social Media đạt mốc 150K followers với chỉ số tương tác (ER) đạt trung bình 6.8%.\n• Lập kế hoạch Email Marketing tự động hóa qua HubSpot, nâng tỷ lệ mở mail (Open Rate) đạt 32%.\n• Theo dõi và phân tích báo cáo hiệu suất hàng tuần bằng Google Analytics và Looker Studio.',
+        '• Xây dựng và quản lý các kênh Social Media đạt mốc 150K followers với chỉ số tương tác ER đạt trung bình 6.8%.\n• Lập kế hoạch Email Marketing tự động hóa qua HubSpot, nâng tỷ lệ mở thư điện tử Open Rate đạt 32%.\n• Theo dõi và phân tích báo cáo hiệu suất hàng tuần bằng Google Analytics và Looker Studio.',
     },
   ],
   educations: [
     {
       id: 'edu-1',
-      school: 'Đại học Kinh Tế TP. Hồ Chí Minh (UEH)',
+      school: 'Đại học Kinh Tế TP. Hồ Chí Minh - UEH',
       major: 'Quản trị Marketing',
       degree: 'Cử nhân Giỏi',
       startDate: '2016',
@@ -156,9 +156,9 @@ export const INITIAL_CV_SAMPLE_DATA: CVData = {
     },
   ],
   skills: [
-    { id: 'sk-1', name: 'Digital Advertising (Meta/Google)', level: 5 },
+    { id: 'sk-1', name: 'Digital Advertising: Meta, Google', level: 5 },
     { id: 'sk-2', name: 'Content & Copywriting', level: 5 },
-    { id: 'sk-3', name: 'Data Analysis (GA4, Looker Studio)', level: 4 },
+    { id: 'sk-3', name: 'Data Analysis: GA4, Looker Studio', level: 4 },
     { id: 'sk-4', name: 'SEO & Performance Optimization', level: 4 },
     { id: 'sk-5', name: 'Kỹ năng thuyết trình & Đàm phán', level: 5 },
     { id: 'sk-6', name: 'Làm việc nhóm & Quản lý dự án', level: 4 },
@@ -176,7 +176,7 @@ export const INITIAL_CV_SAMPLE_DATA: CVData = {
     },
     {
       id: 'cert-2',
-      name: 'Inbound Marketing Certified',
+      name: 'HubSpot Inbound Marketing Certified',
       organization: 'HubSpot Academy',
       issueDate: '2022',
     },
@@ -184,19 +184,16 @@ export const INITIAL_CV_SAMPLE_DATA: CVData = {
   projects: [
     {
       id: 'proj-1',
-      name: 'Chiến dịch Ra mắt Ứng dụng SuperApp 2023',
-      role: 'Lead Project Marketing',
+      name: 'Rebranding & Omni-channel Launch Campaign',
+      role: 'Project Lead',
       startDate: '01/2023',
       endDate: '06/2023',
-      technologies: 'Omnichannel, Influencer Marketing, PR',
-      description:
-        'Chiến dịch thu hút 100.000 lượt tải app trong 30 ngày đầu tiên, lọt top 3 ứng dụng phổ biến trên App Store & Google Play.',
+      description: 'Tái định vị thương hiệu hệ thống chuỗi bán lẻ, tiếp cận 1.2M khách hàng mục tiêu.',
     },
   ],
 };
 
-// Rich template-specific sample datasets with diverse authentic headshot portraits
-export const TEMPLATE_SAMPLE_DATA_MAP: Record<string, Partial<CVData>> = {
+export const SAMPLE_CV_DATA_BY_TEMPLATE: Record<string, Partial<CVData>> = {
   'modern-navy': {
     personalInfo: {
       fullName: 'NGUYỄN TRÚC QUỲNH MY',
@@ -215,7 +212,7 @@ export const TEMPLATE_SAMPLE_DATA_MAP: Record<string, Partial<CVData>> = {
   'minimal-clean': {
     personalInfo: {
       fullName: 'TRẦN HOÀNG NAM',
-      title: 'Chuyên viên Tài chính & Kiểm toán',
+      title: 'Chuyên viên Phân tích Tài chính',
       email: 'hoangnam.tran@example.com',
       phoneNumber: '0938 123 456',
       address: 'Cầu Giấy, Hà Nội',
@@ -230,7 +227,7 @@ export const TEMPLATE_SAMPLE_DATA_MAP: Record<string, Partial<CVData>> = {
   'executive-emerald': {
     personalInfo: {
       fullName: 'LÊ ĐỨC MINH',
-      title: 'Giám đốc Vận hành & Dự án (COO)',
+      title: 'Giám đốc Vận hành & Dự án - COO',
       email: 'ducminh.le@example.com',
       phoneNumber: '0903 888 999',
       address: 'Quận 7, TP. Hồ Chí Minh',
@@ -270,7 +267,7 @@ export const TEMPLATE_SAMPLE_DATA_MAP: Record<string, Partial<CVData>> = {
       website: 'minhtuan.tech',
       linkedin: 'linkedin.com/in/minhtuan-se',
       github: 'github.com/minhtuan-dev',
-      bio: 'Kỹ sư phần mềm 6+ năm kinh nghiệm xây dựng hệ thống phân tán microservices (Golang, Node.js, React/Next.js) phục vụ hơn 2 triệu người dùng thực tế. Đam mê mã nguồn mở và kiến trúc đám mây AWS.',
+      bio: 'Kỹ sư phần mềm 6+ năm kinh nghiệm xây dựng hệ thống phân tán microservices gồm Golang, Node.js, React/Next.js phục vụ hơn 2 triệu người dùng thực tế. Đam mê mã nguồn mở và kiến trúc đám mây AWS.',
     },
   },
   'classic-serif': {
@@ -300,7 +297,7 @@ export const TEMPLATE_SAMPLE_DATA_MAP: Record<string, Partial<CVData>> = {
       avatarUrl: '/images/cv-avatars/avatar-nordic.jpg',
       website: 'quochuy.io',
       linkedin: 'linkedin.com/in/quochuy-pm',
-      bio: 'Product Manager dẫn dắt phát triển sản phẩm B2B SaaS từ giai đoạn MVP đến khi đạt 50.000 người dùng trả phí. Định hướng theo dữ liệu (Data-driven) và phương pháp Agile/Scrum linh hoạt.',
+      bio: 'Product Manager dẫn dắt phát triển sản phẩm B2B SaaS từ giai đoạn MVP đến khi đạt 50.000 người dùng trả phí. Định hướng theo dữ liệu Data-driven và phương pháp Agile/Scrum linh hoạt.',
     },
   },
   'corporate-compact': {
@@ -358,8 +355,10 @@ export function createEmptyCVData(templateCode: string, primaryColor?: string): 
   };
 }
 
+export const TEMPLATE_SAMPLE_DATA_MAP = SAMPLE_CV_DATA_BY_TEMPLATE;
+
 export function getSampleDataForTemplate(templateCode: string): CVData {
-  const specificSample = TEMPLATE_SAMPLE_DATA_MAP[templateCode] || {};
+  const specificSample = SAMPLE_CV_DATA_BY_TEMPLATE[templateCode] || {};
   return {
     ...INITIAL_CV_SAMPLE_DATA,
     templateId: templateCode,

@@ -103,14 +103,58 @@ const isValidLatLng = (lat: unknown, lng: unknown): boolean => {
 function MapAutoResize() {
   const map = useMap();
   useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        map.invalidateSize();
-      } catch (err) {
-        console.warn('Map invalidateSize error:', err);
+    const timers = [
+      setTimeout(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      }, 50),
+      setTimeout(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      }, 250),
+      setTimeout(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      }, 600),
+      setTimeout(() => {
+        try {
+          map.invalidateSize();
+        } catch {
+          // ignore
+        }
+      }, 1200),
+    ];
+
+    let ro: ResizeObserver | null = null;
+    try {
+      const container = map.getContainer();
+      if (container && typeof ResizeObserver !== 'undefined') {
+        ro = new ResizeObserver(() => {
+          try {
+            map.invalidateSize();
+          } catch {
+            // ignore
+          }
+        });
+        ro.observe(container);
       }
-    }, 200);
-    return () => clearTimeout(timer);
+    } catch {
+      // ignore
+    }
+
+    return () => {
+      timers.forEach(clearTimeout);
+      ro?.disconnect();
+    };
   }, [map]);
   return null;
 }
@@ -362,7 +406,7 @@ export default function LocationPickerContent({
           setGpsError('Không thể xác định vị trí hiện tại của thiết bị. Vui lòng kiểm tra lại kết nối GPS hoặc thử lại sau.');
         } else if (err.code === 3) {
           // TIMEOUT
-          setGpsError('Yêu cầu định vị đã hết thời gian chờ (timeout). Vui lòng thử lại.');
+          setGpsError('Yêu cầu định vị đã quá thời gian chờ. Vui lòng thử lại.');
         } else {
           setGpsError('Không thể lấy vị trí thiết bị. Vui lòng cho phép quyền truy cập vị trí trên trình duyệt.');
         }
@@ -381,7 +425,7 @@ export default function LocationPickerContent({
 
       {/* Control Bar: Search & GPS Button */}
       {(showSearch || showGps) && (
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 1.5 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
           {showSearch && (
             <Autocomplete
               fullWidth
@@ -425,7 +469,12 @@ export default function LocationPickerContent({
                   sx={{
                     bgcolor: 'background.paper',
                     borderRadius: 1.5,
-                    '& .MuiOutlinedInput-root': { borderRadius: 1.5 },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 1.5,
+                      height: 44,
+                      minHeight: 44,
+                      boxSizing: 'border-box',
+                    },
                   }}
                 />
               )}
@@ -456,7 +505,9 @@ export default function LocationPickerContent({
                 sx={{
                   whiteSpace: 'nowrap',
                   borderRadius: 1.5,
-                  height: 40,
+                  height: 44,
+                  minHeight: 44,
+                  boxSizing: 'border-box',
                   px: 2,
                   textTransform: 'none',
                   fontWeight: 600,
@@ -492,11 +543,14 @@ export default function LocationPickerContent({
           center={position}
           zoom={15}
           scrollWheelZoom={false}
+          attributionControl={false}
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            attribution=""
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            subdomains={['a', 'b', 'c']}
+            maxZoom={19}
           />
           <MapAutoResize />
           <MapRecenter center={position} />

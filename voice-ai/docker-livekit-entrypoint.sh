@@ -11,7 +11,7 @@ bind_addresses:
 rtc:
   use_external_ip: true
   port_range_start: 50000
-  port_range_end: 50010
+  port_range_end: 50100
 keys:
   ${LIVEKIT_API_KEY}: ${LIVEKIT_API_SECRET}
 logging:

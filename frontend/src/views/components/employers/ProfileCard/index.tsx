@@ -26,7 +26,7 @@ import MasterCandidateItem from './components/MasterCandidateItem';
 import CandidateDetailPreviewPanel from './components/CandidateDetailPreviewPanel';
 import { useProfileCardState } from './hooks/useProfileCardState';
 
-/* ─── ProfileCard Master-Detail View ────────────────────────────────────────── */
+/* --- ProfileCard Master-Detail View ------------------------------------------ */
 const ProfileCardContent: React.FC = () => {
   const {
     t,
@@ -77,12 +77,14 @@ const ProfileCardContent: React.FC = () => {
           {/* Segmented Mode Switcher */}
           <Box
             sx={{
-              display: 'inline-flex',
+              display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
               p: '4px',
               borderRadius: '12px',
               bgcolor: '#F1F5F9',
               border: '1px solid #E2E8F0',
               gap: '4px',
+              width: { xs: '100%', sm: 'auto' },
             }}
           >
             {/* Standard Search Button */}
@@ -99,12 +101,15 @@ const ProfileCardContent: React.FC = () => {
                 />
               }
               sx={{
-                px: 2.25,
+                px: { xs: 1.5, sm: 2.25 },
                 py: 1,
+                width: { xs: '100%', sm: 'auto' },
+                justifyContent: 'center',
                 borderRadius: '9px',
                 textTransform: 'none',
                 fontWeight: activeTab === 'all' ? 800 : 600,
-                fontSize: '0.875rem',
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                whiteSpace: 'nowrap',
                 color: activeTab === 'all' ? '#0F172A' : '#64748B',
                 bgcolor: activeTab === 'all' ? '#FFFFFF' : 'transparent',
                 boxShadow: activeTab === 'all' ? '0 2px 8px rgba(15, 23, 42, 0.08)' : 'none',
@@ -134,12 +139,15 @@ const ProfileCardContent: React.FC = () => {
                 />
               }
               sx={{
-                px: 2.25,
+                px: { xs: 1.5, sm: 2.25 },
                 py: 1,
+                width: { xs: '100%', sm: 'auto' },
+                justifyContent: 'center',
                 borderRadius: '9px',
                 textTransform: 'none',
                 fontWeight: activeTab === 'ai' ? 800 : 600,
-                fontSize: '0.875rem',
+                fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                whiteSpace: 'nowrap',
                 color: activeTab === 'ai' ? '#1E3A8A' : '#475569',
                 bgcolor: activeTab === 'ai' ? '#FFFFFF' : 'transparent',
                 boxShadow: activeTab === 'ai' ? '0 2px 10px rgba(37, 99, 235, 0.12)' : 'none',
@@ -151,7 +159,7 @@ const ProfileCardContent: React.FC = () => {
                 },
               }}
             >
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
                 <span>{t('employer:profileCard.tabs.aiSuggestedCandidates', 'Ứng viên AI gợi ý')}</span>
                 <Chip
                   label="AI MATCH PRO"
@@ -298,87 +306,89 @@ const ProfileCardContent: React.FC = () => {
             </Typography>
           </Paper>
         ) : (
-          <Grid container spacing={2.5} alignItems="flex-start">
+          <Grid container spacing={2.5} alignItems="stretch">
             {/* LEFT COLUMN: Master Candidate List (~360px - 400px) */}
-            <Grid item xs={12} lg={4.5} xl={4}>
-              <Stack spacing={1.5}>
-                {/* Result count & Sort dropdown bar */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    pb: 0.5,
-                    px: 0.5,
-                  }}
-                >
-                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.95rem' }}>
-                      Kết quả:{' '}
-                      <Box component="span" sx={{ color: 'primary.main', fontWeight: 900 }}>
-                        {count} ứng viên
-                      </Box>
-                    </Typography>
-                    <Tooltip title="Dùng phím mũi tên ↑/↓ để chuyển ứng viên, phím S để lưu/bỏ lưu, Enter để xem chi tiết" arrow>
-                      <Chip
-                        label="↑/↓ duyệt nhanh"
-                        size="small"
+            <Grid item xs={12} lg={4.5} xl={4} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Stack spacing={1.5} sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <Box>
+                  {/* Result count & Sort dropdown bar */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      pb: 0.5,
+                      px: 0.5,
+                    }}
+                  >
+                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.95rem' }}>
+                        Kết quả:{' '}
+                        <Box component="span" sx={{ color: 'primary.main', fontWeight: 900 }}>
+                          {count} ứng viên
+                        </Box>
+                      </Typography>
+                      <Tooltip title="Dùng phím mũi tên ↑/↓ để chuyển ứng viên, phím S để lưu/bỏ lưu, Enter để xem chi tiết" arrow>
+                        <Chip
+                          label="↑/↓ duyệt nhanh"
+                          size="small"
+                          sx={{
+                            height: 20,
+                            fontSize: '0.675rem',
+                            fontWeight: 700,
+                            bgcolor: '#F1F5F9',
+                            color: '#475569',
+                            border: '1px solid #E2E8F0',
+                            cursor: 'help',
+                            display: { xs: 'none', sm: 'inline-flex' },
+                          }}
+                        />
+                      </Tooltip>
+                    </Stack>
+
+                    {/* Sort Selection */}
+                    <FormControl size="small" variant="standard" sx={{ minWidth: 140 }}>
+                      <Select
+                        value={sortOption}
+                        onChange={(e) => handleSortChange(e.target.value)}
+                        disableUnderline
                         sx={{
-                          height: 20,
-                          fontSize: '0.675rem',
+                          fontSize: '0.8125rem',
                           fontWeight: 700,
-                          bgcolor: '#F1F5F9',
-                          color: '#475569',
-                          border: '1px solid #E2E8F0',
-                          cursor: 'help',
-                          display: { xs: 'none', sm: 'inline-flex' },
+                          color: 'primary.main',
+                          '& .MuiSelect-select': {
+                            py: 0.5,
+                            pr: '24px !important',
+                          },
                         }}
+                      >
+                        <MenuItem value="suitable" sx={{ fontSize: '0.8125rem', fontWeight: 600 }}>
+                          {t('employer:profileCard.sort.mostSuitable', 'Phù hợp nhất')}
+                        </MenuItem>
+                        <MenuItem value="newest" sx={{ fontSize: '0.8125rem', fontWeight: 600 }}>
+                          {t('employer:profileCard.sort.newest', 'Mới nhất')}
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+
+                  {/* Candidate List */}
+                  <Stack spacing={1.25}>
+                    {resumes.map((resume) => (
+                      <MasterCandidateItem
+                        key={resume.id}
+                        resume={resume}
+                        isSelected={selectedSlug === resume.slug}
+                        onSelect={() => setSelectedSlug(resume.slug)}
+                        onSave={handleSave}
                       />
-                    </Tooltip>
+                    ))}
                   </Stack>
-
-                  {/* Sort Selection */}
-                  <FormControl size="small" variant="standard" sx={{ minWidth: 140 }}>
-                    <Select
-                      value={sortOption}
-                      onChange={(e) => handleSortChange(e.target.value)}
-                      disableUnderline
-                      sx={{
-                        fontSize: '0.8125rem',
-                        fontWeight: 700,
-                        color: 'primary.main',
-                        '& .MuiSelect-select': {
-                          py: 0.5,
-                          pr: '24px !important',
-                        },
-                      }}
-                    >
-                      <MenuItem value="suitable" sx={{ fontSize: '0.8125rem', fontWeight: 600 }}>
-                        {t('employer:profileCard.sort.mostSuitable', 'Phù hợp nhất')}
-                      </MenuItem>
-                      <MenuItem value="newest" sx={{ fontSize: '0.8125rem', fontWeight: 600 }}>
-                        {t('employer:profileCard.sort.newest', 'Mới nhất')}
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
                 </Box>
-
-                {/* Candidate List */}
-                <Stack spacing={1.25}>
-                  {resumes.map((resume) => (
-                    <MasterCandidateItem
-                      key={resume.id}
-                      resume={resume}
-                      isSelected={selectedSlug === resume.slug}
-                      onSelect={() => setSelectedSlug(resume.slug)}
-                      onSave={handleSave}
-                    />
-                  ))}
-                </Stack>
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', mt: 'auto', pt: 2 }}>
                     <Pagination
                       color="primary"
                       shape="rounded"
@@ -404,7 +414,7 @@ const ProfileCardContent: React.FC = () => {
             </Grid>
 
             {/* RIGHT COLUMN: Candidate Detail Preview Panel */}
-            <Grid item xs={12} lg={7.5} xl={8}>
+            <Grid item xs={12} lg={7.5} xl={8} sx={{ display: 'flex', flexDirection: 'column' }}>
               <CandidateDetailPreviewPanel
                 resumeSlug={selectedSlug || selectedResume?.slug}
                 initialResume={selectedResume}

@@ -144,7 +144,7 @@ export const ExportModal: React.FC<ExportModalProps> = (props) => {
       </DialogTitle>
 
       {/* Modal Content */}
-      <DialogContent sx={{ p: isMobile ? 2 : 3, backgroundColor: '#FFFFFF' }}>
+      <DialogContent sx={{ p: isMobile ? 2 : 3, pt: isMobile ? '20px !important' : '24px !important', backgroundColor: '#FFFFFF' }}>
         {status === 'config' && (
           <Grid container spacing={3}>
             {/* Left Column - Options */}

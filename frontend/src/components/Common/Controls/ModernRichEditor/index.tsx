@@ -13,6 +13,7 @@ import {
   MenuItem,
   Paper,
   Popover,
+  Snackbar,
   Tooltip,
   Typography,
   useTheme,
@@ -24,6 +25,9 @@ import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
 import StrikethroughSIcon from '@mui/icons-material/StrikethroughS';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import FormatColorTextIcon from '@mui/icons-material/FormatColorText';
 import FormatColorFillIcon from '@mui/icons-material/FormatColorFill';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -39,6 +43,11 @@ import TableChartIcon from '@mui/icons-material/TableChart';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
+import SpellcheckIcon from '@mui/icons-material/Spellcheck';
+import ShortTextIcon from '@mui/icons-material/ShortText';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import TuneIcon from '@mui/icons-material/Tune';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useTranslation } from 'react-i18next';
 
 import commonService from '@/services/commonService';
@@ -46,7 +55,7 @@ import {
   createEditorStateFromHTMLString,
   convertEditorStateToHTMLString,
 } from '@/utils/editorUtils';
-import { AIContentType } from './aiAssistantEngine';
+import { AIContentType, AIActionType, generateWithAI } from './aiAssistantEngine';
 import AIAssistantModal from './AIAssistantModal';
 import TemplatesModal from './TemplatesModal';
 import PreviewModal from './PreviewModal';
@@ -77,6 +86,7 @@ export interface ModernRichEditorProps {
   showRequired?: boolean;
   contextType?: AIContentType;
   disabled?: boolean;
+  jobTitle?: string;
 }
 
 export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
@@ -88,6 +98,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
   showRequired = false,
   contextType = 'general',
   disabled = false,
+  jobTitle,
 }) => {
   const { t } = useTranslation('common');
   const theme = useTheme();
@@ -144,6 +155,11 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
   const [headingAnchor, setHeadingAnchor] = useState<null | HTMLElement>(null);
   const [colorAnchor, setColorAnchor] = useState<null | HTMLElement>(null);
   const [highlightAnchor, setHighlightAnchor] = useState<null | HTMLElement>(null);
+  const [aiMenuAnchor, setAiMenuAnchor] = useState<null | HTMLElement>(null);
+  const [moreToolsAnchor, setMoreToolsAnchor] = useState<null | HTMLElement>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuccessSnackbar, setAiSuccessSnackbar] = useState<string | null>(null);
+  const lastContentBeforeAIRef = useRef<string>('');
 
   // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -232,6 +248,104 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
     if (typeof DraftEditorState?.redo === 'function') {
       const nextState = DraftEditorState.redo(editorStateRef.current as any);
       if (nextState) handleEditorStateChange(nextState);
+    }
+  };
+
+  const applyAlignment = async (alignment: 'left' | 'justify' | 'center' | 'right') => {
+    try {
+      const { Modifier, EditorState }: any = await loadDraftJs();
+      const { Map } = await import('immutable');
+      const currentContent = (editorStateRef.current as any).getCurrentContent();
+      const selection = (editorStateRef.current as any).getSelection();
+      const contentWithData = Modifier.setBlockData(
+        currentContent,
+        selection,
+        Map({ 'text-align': alignment })
+      );
+      const nextState = EditorState.push(editorStateRef.current, contentWithData, 'change-block-data');
+      handleEditorStateChange(nextState);
+    } catch (err) {
+      console.error('Error applying alignment:', err);
+    }
+  };
+
+  const customBlockStyleFn = (contentBlock: any) => {
+    try {
+      const align = contentBlock?.getData?.()?.get?.('text-align');
+      if (align === 'justify') return 'editor-align-justify';
+      if (align === 'center') return 'editor-align-center';
+      if (align === 'right') return 'editor-align-right';
+      return 'editor-align-left';
+    } catch {
+      return '';
+    }
+  };
+
+  // Active state indicators
+  const currentInlineStyle = useMemo(() => {
+    try {
+      return (editorState as any)?.getCurrentInlineStyle?.() || null;
+    } catch {
+      return null;
+    }
+  }, [editorState]);
+
+  const isBold = currentInlineStyle ? currentInlineStyle.has('BOLD') : false;
+  const isItalic = currentInlineStyle ? currentInlineStyle.has('ITALIC') : false;
+  const isUnderline = currentInlineStyle ? currentInlineStyle.has('UNDERLINE') : false;
+
+  const currentBlockType = useMemo(() => {
+    try {
+      const selection = (editorState as any)?.getSelection?.();
+      if (!selection) return 'unstyled';
+      const content = (editorState as any)?.getCurrentContent?.();
+      return content?.getBlockForKey(selection.getStartKey())?.getType() || 'unstyled';
+    } catch {
+      return 'unstyled';
+    }
+  }, [editorState]);
+
+  const isBulletList = currentBlockType === 'unordered-list-item';
+  const isNumberedList = currentBlockType === 'ordered-list-item';
+
+  const currentAlignment = useMemo(() => {
+    try {
+      const selection = (editorState as any)?.getSelection?.();
+      if (!selection) return 'left';
+      const content = (editorState as any)?.getCurrentContent?.();
+      const block = content?.getBlockForKey(selection.getStartKey());
+      return block?.getData()?.get('text-align') || 'left';
+    } catch {
+      return 'left';
+    }
+  }, [editorState]);
+
+  const handleQuickAI = async (action: AIActionType) => {
+    setAiMenuAnchor(null);
+    const currentHtml = convertEditorStateToHTMLString(editorStateRef.current);
+    lastContentBeforeAIRef.current = currentHtml;
+    setAiLoading(true);
+
+    try {
+      const generated = await generateWithAI({
+        action,
+        contentType: contextType,
+        currentContent: currentHtml,
+        jobTitle,
+        tone: 'professional',
+        length: 'medium',
+      });
+
+      if (generated) {
+        applyHTMLContent(generated, 'replace');
+        setAiSuccessSnackbar('✨ Đã tối ưu hóa nội dung thành công với AI!');
+      }
+    } catch (err) {
+      console.error('Quick AI error:', err);
+    } finally {
+      if (isMountedRef.current) {
+        setAiLoading(false);
+      }
     }
   };
 
@@ -366,8 +480,18 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
     >
       {/* Optional Title */}
       {title && (
-        <Typography variant="subtitle2" fontWeight={600} gutterBottom sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          {title} {showRequired && <span style={{ color: '#ef4444' }}>*</span>}
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 700,
+            mb: 1,
+            color: 'text.primary',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+        >
+          {title} {showRequired && <Box component="span" sx={{ color: 'error.main' }}>*</Box>}
         </Typography>
       )}
 
@@ -375,33 +499,35 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
-          border: '1.5px solid',
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+          borderRadius: 2.5,
+          border: '1px solid',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#CBD5E1',
           bgcolor: 'background.paper',
           overflow: 'hidden',
-          transition: 'all 0.2s ease',
+          transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
           display: 'flex',
           flexDirection: 'column',
           flex: isFullscreen ? 1 : undefined,
           boxShadow: isDark
             ? '0 4px 20px rgba(0, 0, 0, 0.4)'
-            : '0 2px 12px rgba(0, 0, 0, 0.04)',
+            : '0 1px 3px rgba(0, 0, 0, 0.04)',
+          '&:hover': {
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.25)' : '#94A3B8',
+          },
           '&:focus-within': {
             borderColor: 'primary.main',
-            boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.15)',
+            boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.15)',
           },
         }}
       >
         {/* Modern Top Header Toolbar */}
         <Box
           sx={{
-            p: 1,
+            py: 0.75,
             px: 1.5,
-            bgcolor: isDark ? 'rgba(15, 23, 42, 0.8)' : 'rgba(248, 250, 252, 0.9)',
-            backdropFilter: 'blur(8px)',
+            bgcolor: isDark ? '#0F172A' : '#FAFAFC',
             borderBottom: '1px solid',
-            borderColor: 'divider',
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -409,318 +535,455 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
             gap: 1,
           }}
         >
-          {/* Left Group: AI Sparkle Button + Smart Templates Hub */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-            {/* AI Assistant Button */}
-            <Button
-              size="small"
-              onClick={() => setOpenAIModal(true)}
-              startIcon={<AutoAwesomeIcon sx={{ fontSize: '1.1rem !important' }} />}
-              sx={{
-                background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-                color: '#fff',
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                textTransform: 'none',
-                borderRadius: 2,
-                px: 1.8,
-                py: 0.6,
-                boxShadow: '0 3px 10px rgba(99, 102, 241, 0.35)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #9333ea 100%)',
-                  boxShadow: '0 4px 14px rgba(99, 102, 241, 0.45)',
-                },
-              }}
-            >
-              {t('editor.toolbar.aiAssistant', 'Trợ Lý AI')}
-            </Button>
+          {/* Left Side: Standard formatting buttons matching user's sample image */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+            {/* Bold */}
+            <Tooltip title={t('editor.toolbar.bold', 'In đậm (Ctrl+B)')}>
+              <IconButton
+                size="small"
+                onClick={() => applyInlineStyle('BOLD')}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  fontWeight: 800,
+                  fontSize: '1rem',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  color: isBold ? '#4F46E5' : '#334155',
+                  bgcolor: isBold ? '#EEF2FF' : 'transparent',
+                  '&:hover': { bgcolor: isBold ? '#E0E7FF' : 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                B
+              </IconButton>
+            </Tooltip>
 
-            {/* Smart Templates Button */}
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setOpenTemplatesModal(true)}
-              startIcon={<MenuBookIcon sx={{ fontSize: '1rem !important' }} />}
-              sx={{
-                borderRadius: 2,
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: '0.82rem',
-                borderColor: 'divider',
-                color: 'text.primary',
-                bgcolor: 'background.paper',
-                '&:hover': {
-                  borderColor: 'primary.main',
-                  bgcolor: 'rgba(99, 102, 241, 0.05)',
-                },
-              }}
-            >
-              {t('editor.toolbar.templates', 'Mẫu Nội Dung')}
-            </Button>
+            {/* Italic */}
+            <Tooltip title={t('editor.toolbar.italic', 'In nghiêng (Ctrl+I)')}>
+              <IconButton
+                size="small"
+                onClick={() => applyInlineStyle('ITALIC')}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  fontWeight: 600,
+                  fontStyle: 'italic',
+                  fontSize: '1.05rem',
+                  fontFamily: 'Georgia, serif',
+                  color: isItalic ? '#4F46E5' : '#334155',
+                  bgcolor: isItalic ? '#EEF2FF' : 'transparent',
+                  '&:hover': { bgcolor: isItalic ? '#E0E7FF' : 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                I
+              </IconButton>
+            </Tooltip>
 
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 22 }} />
+            {/* Underline */}
+            <Tooltip title={t('editor.toolbar.underline', 'Gạch chân (Ctrl+U)')}>
+              <IconButton
+                size="small"
+                onClick={() => applyInlineStyle('UNDERLINE')}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  fontWeight: 600,
+                  textDecoration: 'underline',
+                  fontSize: '1rem',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  color: isUnderline ? '#4F46E5' : '#334155',
+                  bgcolor: isUnderline ? '#EEF2FF' : 'transparent',
+                  '&:hover': { bgcolor: isUnderline ? '#E0E7FF' : 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                U
+              </IconButton>
+            </Tooltip>
 
-            {/* Headings Dropdown */}
-            <Button
-              size="small"
-              onClick={(e) => setHeadingAnchor(e.currentTarget)}
-              endIcon={<KeyboardArrowDownIcon />}
-              sx={{
-                textTransform: 'none',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                color: 'text.primary',
-                minWidth: 100,
-                justifyContent: 'space-between',
-                px: 1,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1.5,
-                bgcolor: 'background.paper',
-              }}
-            >
-              {t('editor.toolbar.heading', 'Định dạng')}
-            </Button>
-            <Menu anchorEl={headingAnchor} open={Boolean(headingAnchor)} onClose={() => setHeadingAnchor(null)}>
-              <MenuItem onClick={() => applyBlockType('unstyled')}>
-                <Typography variant="body2">{t('editor.toolbar.normalText', 'Đoạn văn thường (Normal)')}</Typography>
-              </MenuItem>
-              <MenuItem onClick={() => applyBlockType('header-one')}>
-                <Typography variant="subtitle1" fontWeight={700}>
-                  {t('editor.toolbar.heading1', 'Tiêu đề 1 (H1)')}
-                </Typography>
-              </MenuItem>
-              <MenuItem onClick={() => applyBlockType('header-two')}>
-                <Typography variant="subtitle2" fontWeight={700}>
-                  {t('editor.toolbar.heading2', 'Tiêu đề 2 (H2)')}
-                </Typography>
-              </MenuItem>
-              <MenuItem onClick={() => applyBlockType('header-three')}>
-                <Typography variant="body2" fontWeight={700} color="primary.main">
-                  {t('editor.toolbar.heading3', 'Tiêu đề 3 (H3)')}
-                </Typography>
-              </MenuItem>
-              <MenuItem onClick={() => applyBlockType('header-four')}>
-                <Typography variant="body2" fontWeight={700}>
-                  {t('editor.toolbar.heading4', 'Tiêu đề 4 (H4)')}
-                </Typography>
-              </MenuItem>
-              <Divider />
-              <MenuItem onClick={() => applyBlockType('blockquote')}>
-                <Typography variant="body2" fontStyle="italic">
-                  {t('editor.toolbar.blockquote', 'Khối trích dẫn (Quote)')}
-                </Typography>
-              </MenuItem>
-              <MenuItem onClick={() => applyBlockType('code-block')}>
-                <Typography variant="body2" fontFamily="monospace">
-                  {t('editor.toolbar.codeBlock', 'Khối mã nguồn (Code)')}
-                </Typography>
-              </MenuItem>
-            </Menu>
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 20, my: 'auto' }} />
 
-            {/* Inline Styles Group */}
-            <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.bold', 'In đậm (Ctrl+B)')}>
-                <IconButton size="small" onClick={() => applyInlineStyle('BOLD')}>
-                  <FormatBoldIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.italic', 'In nghiêng (Ctrl+I)')}>
-                <IconButton size="small" onClick={() => applyInlineStyle('ITALIC')}>
-                  <FormatItalicIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.underline', 'Gạch chân (Ctrl+U)')}>
-                <IconButton size="small" onClick={() => applyInlineStyle('UNDERLINE')}>
-                  <FormatUnderlinedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.strike', 'Gạch ngang')}>
-                <IconButton size="small" onClick={() => applyInlineStyle('STRIKETHROUGH')}>
-                  <StrikethroughSIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.code', 'Mã inline')}>
-                <IconButton size="small" onClick={() => applyInlineStyle('CODE')}>
-                  <CodeIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </ButtonGroup>
+            {/* Bullet List */}
+            <Tooltip title={t('editor.toolbar.bulletList', 'Danh sách gạch đầu dòng')}>
+              <IconButton
+                size="small"
+                onClick={() => applyBlockType('unordered-list-item')}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  color: isBulletList ? '#4F46E5' : '#334155',
+                  bgcolor: isBulletList ? '#EEF2FF' : 'transparent',
+                  '&:hover': { bgcolor: isBulletList ? '#E0E7FF' : 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                <FormatListBulletedIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
 
-            {/* Color & Highlight Dropdown */}
-            <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.textColor', 'Màu chữ')}>
-                <IconButton size="small" onClick={(e) => setColorAnchor(e.currentTarget)}>
-                  <FormatColorTextIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.highlightColor', 'Màu nền highlight')}>
-                <IconButton size="small" onClick={(e) => setHighlightAnchor(e.currentTarget)}>
-                  <FormatColorFillIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </ButtonGroup>
+            {/* Numbered List */}
+            <Tooltip title={t('editor.toolbar.orderedList', 'Danh sách số')}>
+              <IconButton
+                size="small"
+                onClick={() => applyBlockType('ordered-list-item')}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  color: isNumberedList ? '#4F46E5' : '#334155',
+                  bgcolor: isNumberedList ? '#EEF2FF' : 'transparent',
+                  '&:hover': { bgcolor: isNumberedList ? '#E0E7FF' : 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                <FormatListNumberedIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
 
-            <Popover
-              open={Boolean(colorAnchor)}
-              anchorEl={colorAnchor}
-              onClose={() => setColorAnchor(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-              <Box sx={{ p: 1.5, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}>
-                {TEXT_COLORS.map((item) => (
-                  <Tooltip key={item.color} title={item.label}>
-                    <Box
-                      onClick={() => {
-                        applyHTMLContent(`<span style="color: ${item.color};">${t('editor.sampleText', 'Văn bản màu')}</span>`, 'append');
-                        setColorAnchor(null);
-                      }}
-                      sx={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: '50%',
-                        bgcolor: item.color,
-                        cursor: 'pointer',
-                        border: '2px solid #fff',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-                        '&:hover': { transform: 'scale(1.15)' },
-                      }}
-                    />
-                  </Tooltip>
-                ))}
-              </Box>
-            </Popover>
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 20, my: 'auto' }} />
 
-            <Popover
-              open={Boolean(highlightAnchor)}
-              anchorEl={highlightAnchor}
-              onClose={() => setHighlightAnchor(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-              <Box sx={{ p: 1.5, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1 }}>
-                {BG_HIGHLIGHTS.map((item) => (
-                  <Tooltip key={item.label} title={item.label}>
-                    <Box
-                      onClick={() => {
-                        applyHTMLContent(`<mark style="background-color: ${item.color}; padding: 2px 4px; border-radius: 3px;">${t('editor.sampleHighlight', 'Văn bản highlight')}</mark>`, 'append');
-                        setHighlightAnchor(null);
-                      }}
-                      sx={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 1,
-                        bgcolor: item.color === 'transparent' ? '#f1f5f9' : item.color,
-                        cursor: 'pointer',
-                        border: '1px solid #cbd5e1',
-                        '&:hover': { transform: 'scale(1.15)' },
-                      }}
-                    />
-                  </Tooltip>
-                ))}
-              </Box>
-            </Popover>
+            {/* Align Left */}
+            <Tooltip title={t('editor.toolbar.alignLeft', 'Căn lề trái')}>
+              <IconButton
+                size="small"
+                onClick={() => applyAlignment('left')}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  color: currentAlignment === 'left' ? '#4F46E5' : '#334155',
+                  bgcolor: currentAlignment === 'left' ? '#EEF2FF' : 'transparent',
+                  '&:hover': { bgcolor: currentAlignment === 'left' ? '#E0E7FF' : 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                <FormatAlignLeftIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
 
-            {/* Lists & Alignment */}
-            <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.bulletList', 'Danh sách chấm tròn')}>
-                <IconButton size="small" onClick={() => applyBlockType('unordered-list-item')}>
-                  <FormatListBulletedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.orderedList', 'Danh sách số thứ tự')}>
-                <IconButton size="small" onClick={() => applyBlockType('ordered-list-item')}>
-                  <FormatListNumberedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </ButtonGroup>
+            {/* Align Justify */}
+            <Tooltip title={t('editor.toolbar.alignJustify', 'Căn đều hai bên')}>
+              <IconButton
+                size="small"
+                onClick={() => applyAlignment('justify')}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  color: currentAlignment === 'justify' ? '#4F46E5' : '#334155',
+                  bgcolor: currentAlignment === 'justify' ? '#EEF2FF' : 'transparent',
+                  '&:hover': { bgcolor: currentAlignment === 'justify' ? '#E0E7FF' : 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                <FormatAlignJustifyIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
 
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 22 }} />
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 20, my: 'auto' }} />
 
-            {/* Insert Controls: Image, Link, Table, Callout, Divider */}
-            <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.uploadImage', 'Tải ảnh lên (Upload ảnh / Kéo thả)')}>
-                <IconButton size="small" onClick={() => fileInputRef.current?.click()}>
-                  <ImageIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.link', 'Chèn liên kết (Link)')}>
-                <IconButton size="small" onClick={() => setOpenLinkModal(true)}>
-                  <LinkIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.table', 'Chèn bảng dữ liệu')}>
-                <IconButton size="small" onClick={() => setOpenTableModal(true)}>
-                  <TableChartIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.callout', 'Chèn khối ghi chú (Callout box)')}>
-                <IconButton size="small" onClick={() => setOpenCalloutModal(true)}>
-                  <LightbulbOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.horizontalRule', 'Chèn đường phân cách ngang')}>
-                <IconButton size="small" onClick={handleInsertDivider}>
-                  <HorizontalRuleIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </ButtonGroup>
+            {/* Undo */}
+            <Tooltip title={t('editor.toolbar.undo', 'Hoàn tác (Ctrl+Z)')}>
+              <IconButton
+                size="small"
+                onClick={handleUndo}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  color: '#475569',
+                  '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                <UndoIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
 
-            {/* Hidden image file input */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileInputChange}
-            />
+            {/* Redo */}
+            <Tooltip title={t('editor.toolbar.redo', 'Làm lại (Ctrl+Y)')}>
+              <IconButton
+                size="small"
+                onClick={handleRedo}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  color: '#475569',
+                  '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                <RedoIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
+
+            {/* More options button (Heading, Image, Link, Table) */}
+            <Tooltip title={t('editor.toolbar.moreTools', 'Thêm công cụ...')}>
+              <IconButton
+                size="small"
+                onClick={(e) => setMoreToolsAnchor(e.currentTarget)}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  color: '#64748B',
+                  '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' },
+                }}
+              >
+                <MoreHorizIcon sx={{ fontSize: 20 }} />
+              </IconButton>
+            </Tooltip>
           </Box>
 
-          {/* Right Group: Undo/Redo, Preview, Fullscreen */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-            <ButtonGroup size="small" variant="outlined" sx={{ bgcolor: 'background.paper', borderRadius: 1.5 }}>
-              <Tooltip title={t('editor.toolbar.undo', 'Hoàn tác (Undo)')}>
-                <IconButton size="small" onClick={handleUndo}>
-                  <UndoIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('editor.toolbar.redo', 'Làm lại (Redo)')}>
-                <IconButton size="small" onClick={handleRedo}>
-                  <RedoIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </ButtonGroup>
-
-            <Tooltip title={t('editor.toolbar.livePreview', 'Xem trước bản in / hiển thị thực tế')}>
-              <IconButton
-                size="small"
-                onClick={() => setOpenPreviewModal(true)}
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1.5,
-                  bgcolor: 'background.paper',
-                }}
-              >
-                <VisibilityOutlinedIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title={isFullscreen ? t('actions.zoomOut', 'Thu nhỏ') : t('actions.zoomIn', 'Toàn màn hình')}>
-              <IconButton
-                size="small"
-                onClick={() => setIsFullscreen(!isFullscreen)}
-                sx={{
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1.5,
-                  bgcolor: 'background.paper',
-                }}
-              >
-                {isFullscreen ? <FullscreenExitIcon fontSize="small" /> : <FullscreenIcon fontSize="small" />}
-              </IconButton>
-            </Tooltip>
+          {/* Right Side: ✨ Sửa với AI Button & Quick Actions Menu */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 'auto' }}>
+            <Button
+              size="small"
+              onClick={(e) => setAiMenuAnchor(e.currentTarget)}
+              disabled={aiLoading}
+              startIcon={
+                aiLoading ? (
+                  <CircularProgress size={16} sx={{ color: '#4F46E5' }} />
+                ) : (
+                  <AutoAwesomeIcon sx={{ fontSize: '1.15rem !important', color: '#4F46E5' }} />
+                )
+              }
+              sx={{
+                color: '#4F46E5',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                textTransform: 'none',
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 1.5,
+                bgcolor: 'transparent',
+                border: '1px solid transparent',
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  bgcolor: 'rgba(79, 70, 229, 0.08)',
+                  borderColor: 'rgba(79, 70, 229, 0.2)',
+                },
+              }}
+            >
+              {aiLoading ? 'Đang viết với AI...' : 'Sửa với AI'}
+            </Button>
           </Box>
         </Box>
+
+        {/* Quick AI Actions Menu */}
+        <Menu
+          anchorEl={aiMenuAnchor}
+          open={Boolean(aiMenuAnchor)}
+          onClose={() => setAiMenuAnchor(null)}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          PaperProps={{
+            elevation: 4,
+            sx: {
+              mt: 1,
+              minWidth: 320,
+              maxWidth: 380,
+              borderRadius: 2.5,
+              border: '1px solid #E2E8F0',
+              p: 0.75,
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+            },
+          }}
+        >
+          <Box sx={{ px: 1.5, py: 1, mb: 0.5, bgcolor: '#F8FAFC', borderRadius: 1.5 }}>
+            <Typography variant="caption" sx={{ fontWeight: 700, color: '#4F46E5', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+              ✨ TRỢ LÝ AI TUYỂN DỤNG
+            </Typography>
+            <Typography variant="body2" sx={{ fontSize: '0.78rem', color: '#64748B', mt: 0.25 }}>
+              {jobTitle ? `Tối ưu cho vị trí: "${jobTitle}"` : 'Tối ưu hóa nội dung thông minh với 1 chạm'}
+            </Typography>
+          </Box>
+
+          <MenuItem onClick={() => handleQuickAI('improve')} sx={{ borderRadius: 1.5, py: 1, gap: 1.5 }}>
+            <AutoAwesomeIcon sx={{ color: '#4F46E5', fontSize: 20 }} />
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
+                Viết lại chuyên nghiệp hơn
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B' }}>
+                Nâng cấp câu từ, mượt mà chuẩn văn phong doanh nghiệp
+              </Typography>
+            </Box>
+          </MenuItem>
+
+          <MenuItem onClick={() => handleQuickAI('fix_spelling')} sx={{ borderRadius: 1.5, py: 1, gap: 1.5 }}>
+            <SpellcheckIcon sx={{ color: '#059669', fontSize: 20 }} />
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
+                Sửa lỗi chính tả & câu từ
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B' }}>
+                Khắc phục lỗi gõ tiếng Việt, dấu câu, ngắt đoạn
+              </Typography>
+            </Box>
+          </MenuItem>
+
+          <MenuItem onClick={() => handleQuickAI('format_bullets')} sx={{ borderRadius: 1.5, py: 1, gap: 1.5 }}>
+            <FormatListBulletedIcon sx={{ color: '#2563EB', fontSize: 20 }} />
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
+                Định dạng danh sách gạch đầu dòng
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B' }}>
+                Tự động cấu trúc bullet points & in đậm từ khóa chính
+              </Typography>
+            </Box>
+          </MenuItem>
+
+          <MenuItem onClick={() => handleQuickAI('expand')} sx={{ borderRadius: 1.5, py: 1, gap: 1.5 }}>
+            <AddCircleOutlineIcon sx={{ color: '#7C3AED', fontSize: 20 }} />
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
+                Mở rộng & bổ sung chi tiết
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B' }}>
+                Bổ sung tiêu chuẩn thị trường & quy định chi tiết
+              </Typography>
+            </Box>
+          </MenuItem>
+
+          <MenuItem onClick={() => handleQuickAI('shorten')} sx={{ borderRadius: 1.5, py: 1, gap: 1.5 }}>
+            <ShortTextIcon sx={{ color: '#D97706', fontSize: 20 }} />
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
+                Rút gọn súc tích
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B' }}>
+                Tóm tắt các ý cốt lõi, ngắn gọn và cuốn hút
+              </Typography>
+            </Box>
+          </MenuItem>
+
+          <MenuItem onClick={() => handleQuickAI('generate')} sx={{ borderRadius: 1.5, py: 1, gap: 1.5 }}>
+            <LightbulbOutlinedIcon sx={{ color: '#EA580C', fontSize: 20 }} />
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
+                Tạo mới nội dung chuẩn theo vị trí
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B' }}>
+                {jobTitle ? `Tự động sinh nội dung hoàn chỉnh cho "${jobTitle}"` : 'Tạo mẫu nội dung chuẩn ngành đầy đủ'}
+              </Typography>
+            </Box>
+          </MenuItem>
+
+          <Divider sx={{ my: 0.75 }} />
+
+          <MenuItem
+            onClick={() => {
+              setAiMenuAnchor(null);
+              setOpenAIModal(true);
+            }}
+            sx={{ borderRadius: 1.5, py: 1, gap: 1.5 }}
+          >
+            <TuneIcon sx={{ color: '#475569', fontSize: 20 }} />
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: '#1E293B' }}>
+                Trợ lý AI nâng cao...
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B' }}>
+                Tùy chỉnh câu lệnh prompt, giọng điệu & độ dài
+              </Typography>
+            </Box>
+          </MenuItem>
+        </Menu>
+
+        {/* More Tools Menu */}
+        <Menu
+          anchorEl={moreToolsAnchor}
+          open={Boolean(moreToolsAnchor)}
+          onClose={() => setMoreToolsAnchor(null)}
+          PaperProps={{
+            elevation: 3,
+            sx: { borderRadius: 2, minWidth: 220, p: 0.5 },
+          }}
+        >
+          <MenuItem onClick={(e) => { setMoreToolsAnchor(null); setHeadingAnchor(e.currentTarget); }}>
+            <KeyboardArrowDownIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2">{t('editor.toolbar.heading', 'Định dạng Tiêu đề (H1 - H4)')}</Typography>
+          </MenuItem>
+          <MenuItem onClick={() => { setMoreToolsAnchor(null); fileInputRef.current?.click(); }}>
+            <ImageIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2">{t('editor.toolbar.uploadImage', 'Tải ảnh lên')}</Typography>
+          </MenuItem>
+          <MenuItem onClick={() => { setMoreToolsAnchor(null); setOpenLinkModal(true); }}>
+            <LinkIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2">{t('editor.toolbar.link', 'Chèn liên kết')}</Typography>
+          </MenuItem>
+          <MenuItem onClick={() => { setMoreToolsAnchor(null); setOpenTableModal(true); }}>
+            <TableChartIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2">{t('editor.toolbar.table', 'Chèn bảng dữ liệu')}</Typography>
+          </MenuItem>
+          <MenuItem onClick={() => { setMoreToolsAnchor(null); setOpenCalloutModal(true); }}>
+            <LightbulbOutlinedIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2">{t('editor.toolbar.callout', 'Chèn ghi chú nổi bật')}</Typography>
+          </MenuItem>
+          <MenuItem onClick={() => { setMoreToolsAnchor(null); handleInsertDivider(); }}>
+            <HorizontalRuleIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2">{t('editor.toolbar.horizontalRule', 'Đường phân cách')}</Typography>
+          </MenuItem>
+          <MenuItem onClick={() => { setMoreToolsAnchor(null); setOpenTemplatesModal(true); }}>
+            <MenuBookIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2">{t('editor.toolbar.templates', 'Mẫu nội dung có sẵn')}</Typography>
+          </MenuItem>
+          <Divider sx={{ my: 0.5 }} />
+          <MenuItem onClick={() => { setMoreToolsAnchor(null); setOpenPreviewModal(true); }}>
+            <VisibilityOutlinedIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />
+            <Typography variant="body2">{t('editor.toolbar.livePreview', 'Xem trước hiển thị')}</Typography>
+          </MenuItem>
+          <MenuItem onClick={() => { setMoreToolsAnchor(null); setIsFullscreen(!isFullscreen); }}>
+            {isFullscreen ? <FullscreenExitIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} /> : <FullscreenIcon fontSize="small" sx={{ mr: 1, color: 'text.secondary' }} />}
+            <Typography variant="body2">{isFullscreen ? 'Thu nhỏ cửa sổ' : 'Toàn màn hình'}</Typography>
+          </MenuItem>
+        </Menu>
+
+        {/* Headings Menu */}
+        <Menu anchorEl={headingAnchor} open={Boolean(headingAnchor)} onClose={() => setHeadingAnchor(null)}>
+          <MenuItem onClick={() => applyBlockType('unstyled')}>
+            <Typography variant="body2">{t('editor.toolbar.normalText', 'Đoạn văn thường (Normal)')}</Typography>
+          </MenuItem>
+          <MenuItem onClick={() => applyBlockType('header-one')}>
+            <Typography variant="subtitle1" fontWeight={700}>
+              {t('editor.toolbar.heading1', 'Tiêu đề 1 (H1)')}
+            </Typography>
+          </MenuItem>
+          <MenuItem onClick={() => applyBlockType('header-two')}>
+            <Typography variant="subtitle2" fontWeight={700}>
+              {t('editor.toolbar.heading2', 'Tiêu đề 2 (H2)')}
+            </Typography>
+          </MenuItem>
+          <MenuItem onClick={() => applyBlockType('header-three')}>
+            <Typography variant="body2" fontWeight={700} color="primary.main">
+              {t('editor.toolbar.heading3', 'Tiêu đề 3 (H3)')}
+            </Typography>
+          </MenuItem>
+          <MenuItem onClick={() => applyBlockType('header-four')}>
+            <Typography variant="body2" fontWeight={700}>
+              {t('editor.toolbar.heading4', 'Tiêu đề 4 (H4)')}
+            </Typography>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={() => applyBlockType('blockquote')}>
+            <Typography variant="body2" fontStyle="italic">
+              {t('editor.toolbar.blockquote', 'Khối trích dẫn (Quote)')}
+            </Typography>
+          </MenuItem>
+          <MenuItem onClick={() => applyBlockType('code-block')}>
+            <Typography variant="body2" fontFamily="monospace">
+              {t('editor.toolbar.codeBlock', 'Khối mã nguồn (Code)')}
+            </Typography>
+          </MenuItem>
+        </Menu>
+
+        {/* Hidden image file input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileInputChange}
+        />
 
         {/* Editor Content Area */}
         <Box
@@ -745,13 +1008,19 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
             '& .public-DraftEditor-content': {
               minHeight: isFullscreen ? 'calc(100vh - 220px)' : minHeight,
             },
+            '& .editor-align-justify': { textAlign: 'justify !important' },
+            '& .editor-align-center': { textAlign: 'center !important' },
+            '& .editor-align-right': { textAlign: 'right !important' },
+            '& .editor-align-left': { textAlign: 'left !important' },
             '& h1': { fontSize: '1.6rem', fontWeight: 800, mt: 2, mb: 1, color: 'text.primary' },
             '& h2': { fontSize: '1.3rem', fontWeight: 700, mt: 2, mb: 1, color: 'text.primary' },
             '& h3': { fontSize: '1.1rem', fontWeight: 700, mt: 1.5, mb: 0.8, color: 'primary.main' },
             '& h4': { fontSize: '0.98rem', fontWeight: 700, mt: 1.2, mb: 0.6, color: 'text.primary' },
             '& p': { mb: 1.2, lineHeight: 1.7 },
-            '& ul, & ol': { pl: 3, mb: 1.2 },
-            '& li': { mb: 0.5, lineHeight: 1.6 },
+            '& ul': { pl: 3, mb: 1.2, listStyleType: 'disc !important' },
+            '& ol': { pl: 3, mb: 1.2, listStyleType: 'decimal !important' },
+            '& li': { mb: 0.6, lineHeight: 1.6 },
+            '& li strong': { fontWeight: 700, color: 'text.primary' },
             '& blockquote': {
               borderLeft: '4px solid',
               borderColor: 'primary.main',
@@ -775,6 +1044,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
             onEditorStateChange={handleEditorStateChange}
             placeholder={defaultPlaceholder}
             readOnly={disabled}
+            blockStyleFn={customBlockStyleFn}
             handlePastedFiles={(files: Blob[]) => {
               const img = files.find((f) => f.type.startsWith('image/'));
               if (img instanceof File) {
@@ -904,6 +1174,29 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
         open={openCalloutModal}
         onClose={() => setOpenCalloutModal(false)}
         onInsertCallout={handleInsertCallout}
+      />
+
+      {/* AI Success Feedback Toast */}
+      <Snackbar
+        open={Boolean(aiSuccessSnackbar)}
+        autoHideDuration={6000}
+        onClose={() => setAiSuccessSnackbar(null)}
+        message={aiSuccessSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        action={
+          <Button
+            size="small"
+            onClick={() => {
+              if (lastContentBeforeAIRef.current !== undefined) {
+                applyHTMLContent(lastContentBeforeAIRef.current, 'replace');
+                setAiSuccessSnackbar(null);
+              }
+            }}
+            sx={{ fontWeight: 700, color: '#818CF8', textTransform: 'none' }}
+          >
+            {t('actions.undo', 'Hoàn tác')}
+          </Button>
+        }
       />
     </Box>
   );

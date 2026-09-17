@@ -18,6 +18,8 @@ export interface JobPostFilter {
 export interface CompanyFilter {
   kw: string;
   cityId: string;
+  employeeSize?: string;
+  fieldOperation?: string;
   page: number;
   pageSize: number;
 }
@@ -71,6 +73,8 @@ const buildJobPostFilter = (
 const initialCompanyFilter: CompanyFilter = {
   kw: '',
   cityId: '',
+  employeeSize: '',
+  fieldOperation: '',
   page: 1,
   pageSize: 12,
 };

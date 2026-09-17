@@ -1,6 +1,14 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
-import type { InterviewSession, InterviewEvaluation } from '../types/models';
+import type {
+  InterviewSession,
+  InterviewEvaluation,
+  QuestionBankItem,
+  CompanyQuestionSet,
+  QuestionHintsDetailResponse,
+  CreateMockSessionPayload,
+  MockSessionResponse,
+} from '../types/models';
 import type { PaginatedResponse } from '../types/api';
 import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
 
@@ -11,7 +19,7 @@ type UpdateSessionStatusOptions = {
   inviteToken?: string;
 };
 
-/* ── Request DTOs ─────────────────────────────────────────────────────── */
+/* -- Request DTOs ------------------------------------------------------- */
 
 export interface GetSessionsParams {
   page?: number;
@@ -27,6 +35,8 @@ export interface ScheduleSessionInput {
   job_post?: number;
   scheduled_at?: string;
   type?: 'technical' | 'behavioral' | 'mixed';
+  interview_language?: 'vi' | 'en' | 'ja' | 'ko' | string;
+  interviewLanguage?: 'vi' | 'en' | 'ja' | 'ko' | string;
   question_ids?: number[];
   question_group?: number;
   voice_profile?: number | null;
@@ -43,7 +53,7 @@ export interface SubmitEvaluationInput {
   proposed_salary?: number;
 }
 
-/* ── Response Types ───────────────────────────────────────────────────── */
+/* -- Response Types ----------------------------------------------------- */
 
 interface LiveKitTokenResponse {
   token: string;
@@ -79,6 +89,15 @@ interface TriggerAiEvaluationResponse {
   detail?: string;
 }
 
+export interface WarmupSessionResponse {
+  success: boolean;
+  tts?: string;
+  stt?: string;
+  duration_ms?: number;
+  session_status?: string;
+  detail?: string;
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -99,7 +118,7 @@ const normalizeTriggerAiEvaluationResponse = (raw: unknown): TriggerAiEvaluation
   return detail ? { status, detail } : { status };
 };
 
-/* ── Service ──────────────────────────────────────────────────────────── */
+/* -- Service ------------------------------------------------------------ */
 
 const interviewService = {
   getSessions: (params: GetSessionsParams = {}): Promise<PaginatedResponse<InterviewSession>> => {
@@ -169,6 +188,16 @@ const interviewService = {
       .then(unwrapDataResponse<LiveKitTokenResponse>);
   },
 
+  warmupSession: (
+    identifier: IdType,
+    options: { inviteToken?: string } = {}
+  ): Promise<WarmupSessionResponse> => {
+    const url = `interview/web/sessions/${identifier}/warmup/`;
+    const payload = options.inviteToken ? { invite_token: options.inviteToken } : {};
+    return (httpRequest.post(url, payload) as Promise<unknown>)
+      .then(unwrapDataResponse<WarmupSessionResponse>);
+  },
+
   triggerAiEvaluation: (id: IdType): Promise<TriggerAiEvaluationResponse> => {
     const url = `interview/web/sessions/${id}/evaluate-ai/`;
     return Promise.resolve(httpRequest.post(url)).then(normalizeTriggerAiEvaluationResponse);
@@ -205,10 +234,31 @@ const interviewService = {
       .then(unwrapDataResponse<SessionMetrics>);
   },
 
+  getCompanyQuestionSets: (params?: { search?: string; career_id?: number; seniority?: string }): Promise<CompanyQuestionSet[]> => {
+    const url = 'interview/web/question-groups/public/';
+    return (httpRequest.get(url, { params }) as Promise<unknown>).then(unwrapDataResponse<CompanyQuestionSet[]>);
+  },
+
+  getQuestionBank: (params?: { search?: string; career_id?: number; difficulty?: number; category?: string; seniority?: string }): Promise<PaginatedResponse<QuestionBankItem>> => {
+    const url = 'interview/web/questions/bank/';
+    return httpRequest.get(url, { params }).then((data) => normalizePaginatedResponse<QuestionBankItem>(data));
+  },
+
+  getQuestionHints: (questionId: IdType): Promise<QuestionHintsDetailResponse> => {
+    const url = `interview/web/questions/${questionId}/hints/`;
+    return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<QuestionHintsDetailResponse>);
+  },
+
+  createMockSession: (data: CreateMockSessionPayload): Promise<MockSessionResponse> => {
+    const url = 'interview/web/sessions/create-mock/';
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<MockSessionResponse>);
+  },
+
   getSSEUrl: (sessionId: IdType): string => {
     const base = (process.env.NEXT_PUBLIC_API_BASE || '/api').replace(/\/$/, '');
     return `${base}/interview/web/sessions/${sessionId}/stream/`;
   },
 };
 
+export { interviewService };
 export default interviewService;

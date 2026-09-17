@@ -17,6 +17,7 @@ export interface SubMenuItemData {
 interface MenuItemProps {
   icon?: React.ElementType;
   text: string;
+  tooltip?: string;
   to?: string;
   external?: boolean;
   onClick?: () => void;
@@ -80,7 +81,7 @@ const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementT
   },
 }));
 
-const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'item', badgeContent, isCollapsed = false, subItems, state }: MenuItemProps) => {
+const MenuItem = ({ icon: Icon, text, tooltip, to, external = false, onClick, kind = 'item', badgeContent, isCollapsed = false, subItems, state }: MenuItemProps) => {
   const pathname = usePathname();
   const isChild = kind === 'child';
   const hasChildren = kind === 'group';
@@ -119,7 +120,7 @@ const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'ite
       onClick={handleClick}
       selected={isSelected}
       sx={{
-        pl: isCollapsed ? 0 : (isChild ? 3.5 : 1.75),
+        pl: isCollapsed ? 0 : (isChild ? 2.5 : 1.75),
         justifyContent: isCollapsed ? 'center' : 'flex-start',
         minHeight: 42,
         px: isCollapsed ? 0 : undefined,
@@ -139,8 +140,8 @@ const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'ite
             borderRadius: '50%',
             backgroundColor: isSelected ? '#2563eb' : '#cbd5e1',
             boxShadow: isSelected ? '0 0 0 3px rgba(37, 99, 235, 0.18)' : 'none',
-            mr: isCollapsed ? 0 : 2,
-            ml: isCollapsed ? 0 : 0.5,
+            mr: isCollapsed ? 0 : 1.25,
+            ml: isCollapsed ? 0 : 0.25,
             transition: 'all 0.15s ease-in-out',
             flexShrink: 0,
           }}
@@ -200,7 +201,7 @@ const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'ite
   return (
     <>
       {isCollapsed ? (
-        <Tooltip title={text} placement="right" arrow slotProps={{ tooltip: { sx: { bgcolor: '#0f172a', fontSize: '0.8rem', py: 0.75, px: 1.5, fontWeight: 500 } } }}>
+        <Tooltip title={tooltip || text} placement="right" arrow slotProps={{ tooltip: { sx: { bgcolor: '#0f172a', fontSize: '0.8rem', py: 0.75, px: 1.5, fontWeight: 500 } } }}>
           <Box sx={{ width: '100%' }}>
             {itemContent}
           </Box>

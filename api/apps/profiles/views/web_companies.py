@@ -158,6 +158,11 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
     renderer_classes = [renderers.MyJSONRenderer]
 
+    def get_permissions(self):
+        if self.action in ["evaluation_weights_config"]:
+            return [perms_sys.IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
     @action(methods=["put"], detail=False,
 
             url_path="company-image-url", url_name="company-image-url")
@@ -203,6 +208,96 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
         company_cover_image_url_serializer.save()
         return var_res.response_data(status=status.HTTP_200_OK, data=company_cover_image_url_serializer.data)
+
+    @action(methods=["get", "put", "post"], detail=False, url_path="evaluation-weights", url_name="evaluation-weights")
+    def evaluation_weights_config(self, request):
+        user = request.user
+        company = getattr(user, "active_company", None)
+        if not company and hasattr(user, "get_active_company"):
+            company = user.get_active_company()
+        if not company and hasattr(user, "company"):
+            company = getattr(user, "company", None)
+
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "Nhà tuyển dụng chưa được liên kết với hồ sơ công ty hợp lệ."}
+            )
+
+        if request.method == "GET":
+            return var_res.response_data(
+                status=status.HTTP_200_OK,
+                data={
+                    "companyId": company.id,
+                    "companyName": company.company_name,
+                    "evaluationWeights": company.get_evaluation_weights(),
+                    "standardWeights": {
+                        "technical": 30,
+                        "communication": 20,
+                        "situational": 20,
+                        "culture_fit": 20,
+                        "attitude": 10,
+                    },
+                    "criteriaLabels": {
+                        "technical": "Chuyên môn kỹ thuật",
+                        "communication": "Khả năng giao tiếp",
+                        "situational": "Xử lý tình huống",
+                        "culture_fit": "Phù hợp văn hóa",
+                        "attitude": "Thái độ và cam kết",
+                    }
+                }
+            )
+
+        weights_data = (
+            request.data.get("evaluationWeights")
+            if isinstance(request.data.get("evaluationWeights"), dict)
+            else request.data.get("evaluation_weights")
+            if isinstance(request.data.get("evaluation_weights"), dict)
+            else request.data
+        )
+        if not isinstance(weights_data, dict):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "Dữ liệu cấu hình trọng số không hợp lệ."}
+            )
+
+        try:
+            tech = int(weights_data.get("technical", 30))
+            comm = int(weights_data.get("communication", 20))
+            sit = int(weights_data.get("situational", 20))
+            cult = int(weights_data.get("culture_fit", 20))
+            att = int(weights_data.get("attitude", 10))
+        except (ValueError, TypeError):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "Trọng số các tiêu chí phải là các số nguyên dương."}
+            )
+
+        total = tech + comm + sit + cult + att
+        if total != 100:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": f"Tổng các trọng số phải đạt đúng một trăm phần trăm, hiện tại là {total} phần trăm."}
+            )
+
+        new_weights = {
+            "technical": tech,
+            "communication": comm,
+            "situational": sit,
+            "culture_fit": cult,
+            "attitude": att,
+        }
+        company.evaluation_weights = new_weights
+        company.save(update_fields=["evaluation_weights"])
+
+        return var_res.response_data(
+            status=status.HTTP_200_OK,
+            data={
+                "message": "Cập nhật trọng số đánh giá văn hóa công ty thành công.",
+                "companyId": company.id,
+                "evaluationWeights": company.get_evaluation_weights(),
+            }
+        )
 
 
 class CompanyViewSet(viewsets.ViewSet,

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo, useReducer, useState } from 'react';
 import {
@@ -214,7 +214,12 @@ const BannerTypesPage = () => {
   };
 
   const columns = useMemo<ColumnDef<BannerType>[]>(() => [
-    { accessorKey: 'id', header: t('pages.bannerTypes.table.id'), enableSorting: true },
+    {
+      id: 'index',
+      header: t('pages.bannerTypes.table.id'),
+      cell: (info) => info.row.index + 1,
+      size: 60,
+    },
     { accessorKey: 'code', header: t('pages.bannerTypes.table.code'), enableSorting: true },
     { accessorKey: 'name', header: t('pages.bannerTypes.table.name'), enableSorting: true },
     { accessorKey: 'value', header: t('pages.bannerTypes.table.value'), enableSorting: true },

@@ -51,7 +51,7 @@ export const AICvScoreTab: React.FC<AICvScoreTabProps> = ({ data, candidateCvId,
 
         const res = await cvBuilderService.reviewCvWithAI(targetId);
         setReviewResult(res);
-        toastMessages.success(`AI đã chấm điểm thành công: ${res.score}/100 điểm (${res.grade})`);
+        toastMessages.success(`AI đã chấm điểm thành công: ${res.score}/100 điểm - Xếp loại: ${res.grade}`);
       } else {
         try {
           const created = await cvBuilderService.createCandidateCV({
@@ -64,7 +64,7 @@ export const AICvScoreTab: React.FC<AICvScoreTabProps> = ({ data, candidateCvId,
           if (created?.id) {
             const res = await cvBuilderService.reviewCvWithAI(created.id);
             setReviewResult(res);
-            toastMessages.success(`AI đã chấm điểm thành công: ${res.score}/100 điểm (${res.grade})`);
+            toastMessages.success(`AI đã chấm điểm thành công: ${res.score}/100 điểm - Xếp loại: ${res.grade}`);
             return;
           }
         } catch (createErr) {
@@ -86,7 +86,7 @@ export const AICvScoreTab: React.FC<AICvScoreTabProps> = ({ data, candidateCvId,
 
         setReviewResult({
           score: Math.min(score, 100),
-          grade: score >= 85 ? 'Xuất sắc (Chuẩn ATS)' : score >= 70 ? 'Tốt (Khá hoàn thiện)' : 'Cần cải thiện',
+          grade: score >= 85 ? 'Xuất sắc - Chuẩn ATS' : score >= 70 ? 'Tốt - Khá hoàn thiện' : 'Cần cải thiện',
           badge_color: score >= 85 ? 'emerald' : score >= 70 ? 'blue' : 'amber',
           summary_feedback:
             'Hồ sơ của bạn đã có các thành phần cơ bản. Hãy lưu lại CV lên hệ thống để AI quét sâu toàn diện hơn.',
@@ -105,7 +105,7 @@ export const AICvScoreTab: React.FC<AICvScoreTabProps> = ({ data, candidateCvId,
             {
               category: 'Kinh nghiệm',
               priority: 'high',
-              title: 'Thêm số liệu định lượng (%, KPI)',
+              title: 'Thêm số liệu định lượng về phần trăm và chỉ số KPI',
               detail: 'Bổ sung các con số cụ thể vào mô tả công việc để tăng tỷ lệ phản hồi từ NTD.',
               example: '• Tăng trưởng doanh thu 30%, tối ưu hóa quy trình giúp tiết kiệm 15 giờ/tuần.',
             },
@@ -129,7 +129,7 @@ export const AICvScoreTab: React.FC<AICvScoreTabProps> = ({ data, candidateCvId,
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-      {/* ── Banner ──────────────────────────────────────────────────────── */}
+      {/* -- Banner -------------------------------------------------------- */}
       <Paper
         elevation={0}
         sx={{
@@ -178,7 +178,7 @@ export const AICvScoreTab: React.FC<AICvScoreTabProps> = ({ data, candidateCvId,
         </Button>
       </Paper>
 
-      {/* ── Empty State ─────────────────────────────────────────────────── */}
+      {/* -- Empty State --------------------------------------------------- */}
       {!reviewResult && !isAnalyzing && (
         <Paper
           elevation={0}
@@ -200,7 +200,7 @@ export const AICvScoreTab: React.FC<AICvScoreTabProps> = ({ data, candidateCvId,
         </Paper>
       )}
 
-      {/* ── Review Result ───────────────────────────────────────────────── */}
+      {/* -- Review Result ------------------------------------------------- */}
       {reviewResult && (
         <Stack spacing={2.5}>
           {/* Main Score Overview Card */}

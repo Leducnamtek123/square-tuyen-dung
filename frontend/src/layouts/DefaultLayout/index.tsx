@@ -1,25 +1,37 @@
 'use client';
 
-import * as React from 'react';
+import { usePathname } from 'next/navigation';
 import { Box, Container } from "@mui/material";
 import Header from '../components/commons/Header';
 import Footer from '../components/commons/Footer';
 
+const AUTH_PATHS = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/employer/login',
+  '/employer/register',
+  '/employer/forgot-password',
+  '/employer/reset-password',
+];
+
 const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
+  const pathname = usePathname() || '';
+  const isAuthPage = AUTH_PATHS.some((p) => pathname === p || pathname.endsWith(p));
 
   return (
-
-    <Box>
-
+    <Box sx={{ backgroundColor: isAuthPage ? { xs: '#FFFFFF', sm: 'inherit' } : 'inherit' }}>
       <Header />
 
       <Container
         component="main"
         maxWidth="xl"
+        disableGutters={isAuthPage}
         sx={{
-          paddingLeft: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
-          paddingRight: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
-          pb: { xs: 8, md: 4 },
+          paddingLeft: isAuthPage ? { xs: 0, sm: 4, md: 6, lg: 8, xl: 8 } : { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
+          paddingRight: isAuthPage ? { xs: 0, sm: 4, md: 6, lg: 8, xl: 8 } : { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
+          pb: isAuthPage ? { xs: 3, md: 4 } : { xs: 8, md: 4 },
         }}
       >
         {children}
@@ -27,9 +39,7 @@ const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
 
       <Footer />
     </Box>
-
   );
-
 };
 
 export default DefaultLayout;

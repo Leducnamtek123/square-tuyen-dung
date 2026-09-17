@@ -155,13 +155,13 @@ export default function JobsPage() {
   const columns: ColumnDef<JobPost>[] = useMemo(
     () => [
       {
-        id: 'id',
+        id: 'index',
         accessorKey: 'id',
-        header: 'Mã tin',
-        width: 80,
-        cell: (row) => (
+        header: 'STT',
+        width: 70,
+        cell: (info: any, index: number) => (
           <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748B' }}>
-            #{row.id}
+            {info?.row?.index !== undefined ? info.row.index + 1 : index + 1}
           </Typography>
         ),
       },

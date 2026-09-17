@@ -233,7 +233,7 @@ const ArticleDetailPage = () => {
         {t('news.article.backToList', { ns: 'public' })}
       </Button>
 
-      {/* ── Top Featured Image (Unobscured & Standalone) ────────────────── */}
+      {/* -- Top Featured Image (Unobscured & Standalone) ------------------ */}
       <Box
         sx={{
           width: '100%',
@@ -263,7 +263,7 @@ const ArticleDetailPage = () => {
         />
       </Box>
 
-      {/* ── Standalone Article Title & Metadata Section (Below Image) ──── */}
+      {/* -- Standalone Article Title & Metadata Section (Below Image) ---- */}
       <Card
         elevation={0}
         sx={{
@@ -339,7 +339,7 @@ const ArticleDetailPage = () => {
         </Stack>
       </Card>
 
-      {/* ── Main Article Content Grid ──────────────────────────────────── */}
+      {/* -- Main Article Content Grid ------------------------------------ */}
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, lg: 8 }}>
           <Card

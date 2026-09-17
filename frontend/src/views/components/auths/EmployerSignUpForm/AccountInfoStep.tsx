@@ -16,21 +16,24 @@ interface AccountInfoStepProps {
 const inputStyle = {
   '& .MuiOutlinedInput-root': {
     borderRadius: '12px',
-    backgroundColor: '#F8FAFC',
-    transition: 'all 0.2s ease',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #E2E8F0',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
     '&:hover': {
-      backgroundColor: '#F1F5F9',
-    },
-    '&.Mui-focused': {
+      borderColor: '#94A3B8',
       backgroundColor: '#FFFFFF',
     },
-    '& input:-webkit-autofill': {
-      WebkitBoxShadow: '0 0 0 1000px #F8FAFC inset !important',
-      WebkitTextFillColor: '#0F172A !important',
-      borderRadius: 'inherit',
+    '&.Mui-focused': {
+      borderColor: '#2563EB',
+      backgroundColor: '#FFFFFF',
+      boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.12)',
     },
-    '&.Mui-focused input:-webkit-autofill': {
+    '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active': {
       WebkitBoxShadow: '0 0 0 1000px #FFFFFF inset !important',
+      WebkitTextFillColor: '#0F172A !important',
+      caretColor: '#0F172A',
+      transition: 'background-color 5000s ease-in-out 0s',
+      borderRadius: 'inherit',
     },
   },
 };
@@ -46,6 +49,14 @@ const AccountInfoStep: React.FC<AccountInfoStepProps> = ({ control, t, show }) =
         control={control}
         title={t('form.fullName')}
         placeholder={t('form.fullNamePlaceholder')}
+        showRequired={true}
+        sx={inputStyle}
+      />
+      <TextFieldCustom
+        name="phone"
+        control={control}
+        title={t('form.phone')}
+        placeholder={t('form.phonePlaceholder')}
         showRequired={true}
         sx={inputStyle}
       />

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo, useReducer } from 'react';
 import { Box, Typography, Paper, Button, Tooltip, IconButton, Stack } from "@mui/material";
@@ -172,9 +172,10 @@ const JobNotificationsPage = () => {
 
     const columns = useMemo<ColumnDef<JobPostNotification>[]>(() => [
         {
-            accessorKey: 'id',
-            header: t('common:id') as string,
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             accessorKey: 'jobName',

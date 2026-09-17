@@ -37,7 +37,7 @@ const INDUSTRY_OPTIONS = [
   { value: 'Construction', label: 'Xây dựng & Quản lý dự án' },
   { value: 'RealEstate', label: 'Bất động sản & Phát triển kinh doanh' },
   { value: 'Architecture', label: 'Kiến trúc & Thiết kế nội thất' },
-  { value: 'Engineering', label: 'Kỹ thuật & Cơ điện công trình (M&E)' },
+  { value: 'Engineering', label: 'Kỹ thuật & Cơ điện công trình - M&E' },
   { value: 'Sales', label: 'Kinh doanh & B2B Sales' },
   { value: 'Marketing', label: 'Marketing & Truyền thông' },
   { value: 'Finance', label: 'Tài chính & Kế toán' },
@@ -91,29 +91,29 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({ onApplyBio }) =>
       let genSkills = ['Kỹ năng giao tiếp', 'Tư duy chiến lược', 'Giải quyết vấn đề', 'Quản lý thời gian', 'Làm việc nhóm'];
 
       if (isDev) {
-        genBio = `Lập trình viên ${role} với ${expYears} kinh nghiệm phát triển các hệ thống web quy mô lớn, kiến trúc vi dịch vụ và tối ưu trải nghiệm người dùng (UX/UI). Am hiểu quy trình CI/CD, viết mã nguồn sạch (Clean Code), tư duy logic vững chắc và khả năng thích ứng công nghệ mới nhanh chóng.`;
+        genBio = `Lập trình viên ${role} với ${expYears} kinh nghiệm phát triển các hệ thống web quy mô lớn, kiến trúc vi dịch vụ và tối ưu trải nghiệm người dùng UX/UI. Am hiểu quy trình CI/CD, viết mã nguồn sạch Clean Code, tư duy logic vững chắc và khả năng thích ứng công nghệ mới nhanh chóng.`;
         genBullets = [
           `• Thiết kế và phát triển các module frontend/backend hiệu năng cao, tối ưu điểm Core Web Vitals từ 65 lên 95/100.`,
           `• Tái cấu trúc mã nguồn và chuẩn hóa Design System, giảm 40% thời gian phát triển tính năng mới của toàn đội ngũ.`,
-          `• Xây dựng và duy trì luồng kiểm thử tự động (Unit Test / E2E Test) đạt tỷ lệ bao phủ hơn 85%, hạn chế tối đa lỗi phát sinh.`,
+          `• Xây dựng và duy trì luồng kiểm thử tự động Unit Test và E2E Test đạt tỷ lệ bao phủ hơn 85%, hạn chế tối đa lỗi phát sinh.`,
         ];
         genSkills = ['React/Next.js', 'TypeScript', 'Node.js/Python', 'RESTful API/GraphQL', 'Git & CI/CD', 'Agile/Scrum'];
       } else if (isMarketing) {
-        genBio = `Chuyên viên ${role} với ${expYears} kinh nghiệm thực chiến trong việc lập chiến lược Marketing đa kênh, tối ưu phễu chuyển đổi và xây dựng thương hiệu. Sở hữu tư duy phân tích số liệu (Data-Driven), nhạy bén với xu hướng thị trường và năng lực tối ưu ngân sách quảng cáo hiệu quả.`;
+        genBio = `Chuyên viên ${role} với ${expYears} kinh nghiệm thực chiến trong việc lập chiến lược Marketing đa kênh, tối ưu phễu chuyển đổi và xây dựng thương hiệu. Sở hữu tư duy phân tích số liệu Data-Driven, nhạy bén với xu hướng thị trường và năng lực tối ưu ngân sách quảng cáo hiệu quả.`;
         genBullets = [
-          `• Lên kế hoạch và thực thi chiến dịch Performance Marketing đa kênh (Google Ads, Meta, TikTok), tăng trưởng doanh thu 45%.`,
-          `• Tối ưu phễu chuyển đổi (Conversion Rate Optimization), giảm chỉ số CPA 28% và tăng lượng khách hàng tiềm năng chất lượng.`,
-          `• Quản trị hệ thống Content & SEO, thúc đẩy lưu lượng truy cập tự nhiên (Organic Traffic) tăng 120.000 lượt xem/tháng.`,
+          `• Lên kế hoạch và thực thi chiến dịch Performance Marketing đa kênh: Google Ads, Meta, TikTok, tăng trưởng doanh thu 45%.`,
+          `• Tối ưu phễu chuyển đổi Conversion Rate Optimization, giảm chỉ số CPA 28% và tăng lượng khách hàng tiềm năng chất lượng.`,
+          `• Quản trị hệ thống Content & SEO, thúc đẩy lưu lượng truy cập tự nhiên Organic Traffic tăng 120.000 lượt xem/tháng.`,
         ];
-        genSkills = ['Digital Marketing', 'SEO & SEM', 'Google Analytics / GA4', 'Content Strategy', 'Conversion Rate (CRO)', 'Meta Ads'];
+        genSkills = ['Digital Marketing', 'SEO & SEM', 'Google Analytics / GA4', 'Content Strategy', 'Conversion Rate CRO', 'Meta Ads'];
       } else if (isSales) {
         genBio = `Chuyên viên ${role} với ${expYears} kinh nghiệm phát triển thị trường, đàm phán hợp đồng B2B và duy trì mối quan hệ khách hàng chiến lược. Kỹ năng giao tiếp thuyết phục, định hướng mục tiêu doanh số rõ ràng và khả năng xử lý tình huống linh hoạt.`;
         genBullets = [
           `• Mở rộng danh mục khách hàng mới, vượt chỉ tiêu doanh số năm liên tục đạt 130% - 150% KPI được giao.`,
           `• Đàm phán và chốt thành công 25+ hợp đồng doanh nghiệp lớn với giá trị hợp đồng trung bình tăng 35%.`,
-          `• Xây dựng quy trình chăm sóc khách hàng sau bán hàng, tăng tỷ lệ gia hạn dịch vụ (Retention Rate) lên 88%.`,
+          `• Xây dựng quy trình chăm sóc khách hàng sau bán hàng, tăng tỷ lệ gia hạn dịch vụ Retention Rate lên 88%.`,
         ];
-        genSkills = ['B2B Sales', 'Kỹ năng đàm phán', 'CRM (HubSpot/Salesforce)', 'Chăm sóc khách hàng', 'Thuyết trình & Pitching'];
+        genSkills = ['B2B Sales', 'Kỹ năng đàm phán', 'CRM: HubSpot, Salesforce', 'Chăm sóc khách hàng', 'Thuyết trình & Pitching'];
       } else if (isConstruction) {
         genBio = `${role} với ${expYears} kinh nghiệm tham gia giám sát, thiết kế và quản lý các công trình dân dụng & công nghiệp. Thành thạo phần mềm chuyên ngành, nắm vững quy chuẩn xây dựng Việt Nam và quốc tế, đảm bảo an toàn lao động và tiến độ chất lượng.`;
         genBullets = [
@@ -121,7 +121,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({ onApplyBio }) =>
           `• Rà soát hồ sơ thiết kế kỹ thuật, phát hiện và xử lý kịp thời các xung đột kết cấu giúp tiết kiệm 8% chi phí vật tư.`,
           `• Phối hợp chặt chẽ với Chủ đầu tư và Tư vấn giám sát, thực hiện nghiêm ngặt quy trình ATLĐ & VSMT.`,
         ];
-        genSkills = ['AutoCAD / Revit', 'BIM / SketchUp', 'Đọc bản vẽ kỹ thuật', 'Giám sát công trình', 'An toàn lao động (HSE)'];
+        genSkills = ['AutoCAD / Revit', 'BIM / SketchUp', 'Đọc bản vẽ kỹ thuật', 'Giám sát công trình', 'An toàn lao động HSE'];
       }
 
       setGeneratedAI({
@@ -143,7 +143,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({ onApplyBio }) =>
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-      {/* ── AI Generator Interactive Box ──────────────────────────────────── */}
+      {/* -- AI Generator Interactive Box ------------------------------------ */}
       <Paper
         elevation={0}
         sx={{
@@ -191,7 +191,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({ onApplyBio }) =>
             <MenuItem value="Chưa có kinh nghiệm">Mới tốt nghiệp / Fresher</MenuItem>
             <MenuItem value="1-2 năm">1 - 2 năm</MenuItem>
             <MenuItem value="3-5 năm">3 - 5 năm</MenuItem>
-            <MenuItem value="Trên 5 năm">Trên 5 năm (Senior/Lead)</MenuItem>
+            <MenuItem value="Trên 5 năm">Trên 5 năm - Cấp độ Senior hoặc Lead</MenuItem>
           </TextField>
         </Box>
 
@@ -345,7 +345,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({ onApplyBio }) =>
         <Chip label="Thư viện gợi ý mẫu theo ngành" size="small" sx={{ fontSize: '0.725rem', fontWeight: 600, color: '#64748b' }} />
       </Divider>
 
-      {/* ── Filter & Search Toolbar ─────────────────────────────────────────── */}
+      {/* -- Filter & Search Toolbar ------------------------------------------- */}
       <Stack direction="row" spacing={1.5}>
         <TextField
           select
@@ -378,7 +378,7 @@ export const AIAssistantTab: React.FC<AIAssistantTabProps> = ({ onApplyBio }) =>
         />
       </Stack>
 
-      {/* ── Suggestions List ────────────────────────────────────────────── */}
+      {/* -- Suggestions List ---------------------------------------------- */}
       <Stack spacing={2}>
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>

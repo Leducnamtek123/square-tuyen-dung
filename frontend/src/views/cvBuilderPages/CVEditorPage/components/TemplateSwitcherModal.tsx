@@ -107,7 +107,7 @@ export const TemplateSwitcherModal: React.FC<TemplateSwitcherModalProps> = ({
         },
       }}
     >
-      {/* ── Dialog Header ────────────────────────────────────────────── */}
+      {/* -- Dialog Header ---------------------------------------------- */}
       <DialogTitle
         sx={{
           px: 3.5,
@@ -158,8 +158,8 @@ export const TemplateSwitcherModal: React.FC<TemplateSwitcherModalProps> = ({
         </IconButton>
       </DialogTitle>
 
-      {/* ── Dialog Content ───────────────────────────────────────────── */}
-      <DialogContent sx={{ p: { xs: 2, sm: 3.5 }, bgcolor: '#f8fafc' }}>
+      {/* -- Dialog Content --------------------------------------------- */}
+      <DialogContent sx={{ p: { xs: 2, sm: 3.5 }, pt: { xs: '20px !important', sm: '24px !important' }, bgcolor: '#f8fafc' }}>
         {/* Category Filters Carousel */}
         <Stack
           direction="row"
@@ -409,7 +409,7 @@ export const TemplateSwitcherModal: React.FC<TemplateSwitcherModalProps> = ({
         </Grid>
       </DialogContent>
 
-      {/* ── Dialog Actions ───────────────────────────────────────────── */}
+      {/* -- Dialog Actions --------------------------------------------- */}
       <DialogActions
         sx={{
           px: 3.5,
@@ -421,7 +421,7 @@ export const TemplateSwitcherModal: React.FC<TemplateSwitcherModalProps> = ({
       >
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.85rem' }}>
-            {t('cvBuilder.templateModal.selectedLabel', 'Mẫu đang chọn:')} <strong style={{ color: '#0f172a' }}>{currentMeta.name} ({currentMeta.vietnameseName})</strong>
+            {t('cvBuilder.templateModal.selectedLabel', 'Mẫu đang chọn:')} <strong style={{ color: '#0f172a' }}>{currentMeta.name} - {currentMeta.vietnameseName}</strong>
           </Typography>
           <Box
             sx={{

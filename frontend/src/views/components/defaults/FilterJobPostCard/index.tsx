@@ -27,7 +27,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
@@ -132,7 +132,6 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         const res = await jobService.saveJobPost(slug || String(id)) as { isSaved?: boolean };
         const saved = res?.isSaved ?? willSave;
         setFavorites((prev) => ({ ...prev, [id]: saved }));
-        toastMessages.success(saved ? 'Đã lưu tin tuyển dụng' : 'Đã bỏ lưu tin tuyển dụng');
       } catch {
         setFavorites((prev) => ({ ...prev, [id]: currentStatus }));
       }
@@ -349,7 +348,15 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
     placeholderData: keepPreviousData,
   });
 
-  const jobPosts = data?.results || [];
+  const rawJobPosts = data?.results || [];
+  // For compact/similar jobs card, filter out expired jobs so candidates don't get dead suggestions
+  const jobPosts = React.useMemo(() => {
+    if (!compact) return rawJobPosts;
+    return rawJobPosts.filter((job) => {
+      if (!job.deadline) return true;
+      return dayjs(job.deadline).diff(dayjs(), 'day') >= 0;
+    });
+  }, [rawJobPosts, compact]);
   const totalCount = data?.count || jobPosts.length || 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const isFallbackActive = Boolean(data?.isFallback);
@@ -359,10 +366,10 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
     if (min && max) {
       const minTr = Math.round(min / 1000000);
       const maxTr = Math.round(max / 1000000);
-      return `${minTr} - ${maxTr} triệu`;
+      return `${minTr} - ${maxTr} triệu VNĐ`;
     }
-    if (min) return `Từ ${Math.round(min / 1000000)} triệu`;
-    if (max) return `Đến ${Math.round(max / 1000000)} triệu`;
+    if (min) return `Từ ${Math.round(min / 1000000)} triệu VNĐ`;
+    if (max) return `Đến ${Math.round(max / 1000000)} triệu VNĐ`;
     return 'Thoả thuận';
   };
 
@@ -383,7 +390,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
 
   return (
     <Box id="filter-job-post-card" sx={{ width: '100%' }}>
-      {/* ── Section Header Row ───────────────────────────────────────── */}
+      {/* -- Section Header Row ----------------------------------------- */}
       {!hideHeader && (
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2.5 }}>
           <Stack direction="row" spacing={1} alignItems="center">
@@ -402,7 +409,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         </Stack>
       )}
 
-      {/* ── Filter Bar (Filter Mode dropdown + Scrollable Sub-item Pills) ───── */}
+      {/* -- Filter Bar (Filter Mode dropdown + Scrollable Sub-item Pills) ----- */}
       {!hideFilterBar && (
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
@@ -490,6 +497,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
               size="small"
               onClick={handleScrollLeft}
               sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#ffffff',
                 width: 32,
@@ -509,6 +517,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                 gap: 1,
                 overflowX: 'auto',
                 scrollBehavior: 'smooth',
+                WebkitOverflowScrolling: 'touch',
                 py: 0.5,
                 flex: 1,
                 minWidth: 0,
@@ -552,6 +561,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
               size="small"
               onClick={handleScrollRight}
               sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#ffffff',
                 width: 32,
@@ -566,7 +576,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         </Stack>
       )}
 
-      {/* ── Cards Grid (3 Columns or 1 Column in compact mode) ─────── */}
+      {/* -- Cards Grid (3 Columns or 1 Column in compact mode) ------- */}
       {isLoading && !data ? (
         <Grid container spacing={2.5}>
           {Array.from(Array(compact ? 6 : 9).keys()).map((i) => (
@@ -737,8 +747,8 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                           {companyNameStr}
                         </Typography>
                         <Stack direction="row" spacing={0.5} alignItems="center">
-                          <AttachMoneyIcon sx={{ fontSize: 16, color: '#2563eb' }} />
-                          <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: '#2563eb', fontFamily: 'var(--font-mono)', letterSpacing: '-0.01em' }}>
+                          <PaymentsOutlinedIcon sx={{ fontSize: 16, color: '#2563eb' }} />
+                          <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: '#2563eb', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
                             {salaryDisplay}
                           </Typography>
                         </Stack>
@@ -772,7 +782,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
             })}
           </Grid>
 
-          {/* ── Bottom Circular Pagination ──────────────────────────────────── */}
+          {/* -- Bottom Circular Pagination ------------------------------------ */}
           <Stack direction="row" spacing={2} justifyContent="center" alignItems="center" sx={{ mt: 4 }}>
             <IconButton
               aria-label="Trang trước"

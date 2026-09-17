@@ -9,6 +9,8 @@ export const exportCVToDocx = (data: CVData, fileName?: string, language: CVLang
   const { personalInfo, experiences, educations, skills, languages, certificates, projects, title } = data;
   const labels = getCVLabels(language);
   const safeName = (fileName || personalInfo.fullName || title || 'Curriculum-Vitae').replace(/[/\\?%*:|"<>]/g, '-');
+  const defaultFullName = language === 'vi' ? 'HỌ VÀ TÊN' : 'FULL NAME';
+  const defaultJobTitle = language === 'vi' ? 'VỊ TRÍ CHUYÊN MÔN' : 'PROFESSIONAL TITLE';
 
   const content = `
 <!DOCTYPE html>
@@ -90,8 +92,8 @@ export const exportCVToDocx = (data: CVData, fileName?: string, language: CVLang
 </head>
 <body>
   <!-- Header -->
-  <h1>${personalInfo.fullName || (language === 'vi' ? 'HỌ VÀ TÊN' : 'FULL NAME')}</h1>
-  <div class="subtitle">${personalInfo.title || (language === 'vi' ? 'VỊ TRÍ CHUYÊN MÔN' : 'PROFESSIONAL TITLE')}</div>
+  <h1>${personalInfo.fullName || defaultFullName}</h1>
+  <div class="subtitle">${personalInfo.title || defaultJobTitle}</div>
   <div class="contact-info">
     ${personalInfo.phoneNumber ? `<span>${labels.phone}: <b>${personalInfo.phoneNumber}</b></span> &nbsp;|&nbsp; ` : ''}
     ${personalInfo.email ? `<span>${labels.email}: <b>${personalInfo.email}</b></span> &nbsp;|&nbsp; ` : ''}

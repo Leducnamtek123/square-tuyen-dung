@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
+import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
 import dayjs from '@/configs/dayjs-config';
 import interviewService from '@/services/interviewService';
 import jobService from '@/services/jobService';
@@ -46,6 +48,7 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
 
   const [selectedJobPost, setSelectedJobPost] = useState<number | ''>('');
   const [interviewType, setInterviewType] = useState<'mixed' | 'technical' | 'behavioral'>('mixed');
+  const [interviewLanguage, setInterviewLanguage] = useState<'vi' | 'en' | 'ja' | 'ko'>('vi');
   const [selectedQuestionGroup, setSelectedQuestionGroup] = useState<number | ''>('');
   const [scheduledAt, setScheduledAt] = useState(
     dayjs().add(1, 'day').hour(9).minute(0).format('YYYY-MM-DDTHH:mm')
@@ -111,6 +114,8 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
         candidate: candidateId ? Number(candidateId) : undefined,
         job_post: Number(selectedJobPost),
         type: interviewType,
+        interview_language: interviewLanguage,
+        interviewLanguage: interviewLanguage,
         scheduled_at: dayjs(scheduledAt).toISOString(),
         question_group: selectedQuestionGroup ? Number(selectedQuestionGroup) : undefined,
         notes: notes.trim() || undefined,
@@ -123,10 +128,14 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
         onScheduled();
       }
     } catch (err: any) {
-      console.error('Failed to schedule interview:', err);
+      const resData = err?.response?.data;
       const detail =
-        err?.response?.data?.errors?.detail?.[0] ||
-        err?.response?.data?.message ||
+        resData?.error?.details?.scheduled_at?.[0] ||
+        resData?.error?.details?.detail?.[0] ||
+        resData?.errors?.scheduled_at?.[0] ||
+        resData?.errors?.detail?.[0] ||
+        resData?.error?.message ||
+        resData?.message ||
         'Không thể tạo lịch phỏng vấn. Vui lòng thử lại sau.';
       setErrorMessage(detail);
       toastMessages.error(detail);
@@ -213,7 +222,39 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
               )}
             </TextField>
 
-            {/* 2. Hình thức phỏng vấn */}
+            {/* 2. Ngôn ngữ phỏng vấn - FDI */}
+            <TextField
+              select
+              label="Ngôn ngữ phỏng vấn *"
+              size="small"
+              fullWidth
+              value={interviewLanguage}
+              onChange={(e) => setInterviewLanguage(e.target.value as any)}
+              helperText="Hệ thống AI Voice AILA sẽ sử dụng ngôn ngữ và bộ phát âm này trong suốt buổi phỏng vấn"
+            >
+              <MenuItem value="vi">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span>🇻🇳 Tiếng Việt - Tiêu chuẩn mặc định</span>
+                </Box>
+              </MenuItem>
+              <MenuItem value="en">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span>🇬🇧 Tiếng Anh - Khối doanh nghiệp FDI</span>
+                </Box>
+              </MenuItem>
+              <MenuItem value="ja">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span>🇯🇵 Tiếng Nhật - Khối doanh nghiệp FDI</span>
+                </Box>
+              </MenuItem>
+              <MenuItem value="ko">
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <span>🇰🇷 Tiếng Hàn - Khối doanh nghiệp FDI</span>
+                </Box>
+              </MenuItem>
+            </TextField>
+
+            {/* 3. Hình thức phỏng vấn */}
             <TextField
               select
               label="Hình thức phỏng vấn *"
@@ -223,20 +264,29 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
               onChange={(e) => setInterviewType(e.target.value as any)}
             >
               <MenuItem value="mixed">
-                🤖 Phỏng vấn AI Voice Bot (Hỗn hợp: Chuyên môn & Kỹ năng mềm)
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <SmartToyOutlinedIcon sx={{ fontSize: 18, color: '#7c3aed' }} />
+                  <span>Phỏng vấn AI Voice Bot - Hỗn hợp: Chuyên môn và Kỹ năng mềm</span>
+                </Box>
               </MenuItem>
               <MenuItem value="technical">
-                💼 Phỏng vấn Chuyên môn Kỹ thuật (Technical Focus)
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <WorkOutlineOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} />
+                  <span>Phỏng vấn Chuyên môn Kỹ thuật - Technical Focus</span>
+                </Box>
               </MenuItem>
               <MenuItem value="behavioral">
-                💬 Phỏng vấn Hành vi & Tính cách (Behavioral Focus)
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ChatBubbleOutlineOutlinedIcon sx={{ fontSize: 18, color: '#059669' }} />
+                  <span>Phỏng vấn Hành vi và Tính cách - Behavioral Focus</span>
+                </Box>
               </MenuItem>
             </TextField>
 
-            {/* 3. Bộ câu hỏi */}
+            {/* 4. Bộ câu hỏi */}
             <TextField
               select
-              label="Bộ câu hỏi phỏng vấn (Tùy chọn)"
+              label="Bộ câu hỏi phỏng vấn - Tùy chọn"
               size="small"
               fullWidth
               value={selectedQuestionGroup}
@@ -253,7 +303,7 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
               ))}
             </TextField>
 
-            {/* 4. Thời gian phỏng vấn */}
+            {/* 5. Thời gian phỏng vấn */}
             <TextField
               label="Thời gian bắt đầu phỏng vấn *"
               type="datetime-local"
@@ -264,14 +314,14 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
               InputLabelProps={{ shrink: true }}
             />
 
-            {/* 5. Ghi chú */}
+            {/* 6. Ghi chú */}
             <TextField
               label="Ghi chú nội bộ cho buổi phỏng vấn"
               size="small"
               fullWidth
               multiline
               rows={3}
-              placeholder="VD: Chú trọng kiểm tra kinh nghiệm giám sát công trình và tiếng Anh giao tiếp..."
+              placeholder="Ví dụ: Chú trọng kiểm tra kinh nghiệm giám sát công trình và tiếng Anh giao tiếp..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />

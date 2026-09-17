@@ -29,6 +29,7 @@ interface PageItem {
   path: string;
   label: string;
   requireAuth?: boolean;
+  isHot?: boolean;
   children?: {
     id: string;
     path: string;
@@ -119,7 +120,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
           maxWidth: 320,
           boxShadow: (theme) => theme.customShadows?.card || '0 8px 32px rgba(0,0,0,0.15)',
           border: 'none',
-          borderRadius: '0 16px 16px 0',
+          borderRadius: 0,
           overflow: 'hidden',
         },
       }}
@@ -225,7 +226,48 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                       }}
                     >
                       <ListItemText
-                        primary={page.label}
+                        primary={
+                          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+                            <span>{page.label}</span>
+                            {page.isHot && (
+                              <Box
+                                component="span"
+                                sx={{
+                                  bgcolor: '#ef4444',
+                                  color: '#ffffff',
+                                  fontSize: '0.625rem',
+                                  fontWeight: 900,
+                                  letterSpacing: '0.04em',
+                                  lineHeight: 1,
+                                  px: 0.75,
+                                  py: 0.35,
+                                  borderRadius: '5px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.45)',
+                                  animation: 'hotBadgePulse 1.8s infinite ease-in-out',
+                                  '@keyframes hotBadgePulse': {
+                                    '0%': {
+                                      transform: 'scale(1)',
+                                      boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.65)',
+                                    },
+                                    '50%': {
+                                      transform: 'scale(1.08)',
+                                      boxShadow: '0 0 0 5px rgba(239, 68, 68, 0)',
+                                    },
+                                    '100%': {
+                                      transform: 'scale(1)',
+                                      boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)',
+                                    },
+                                  },
+                                }}
+                              >
+                                HOT
+                              </Box>
+                            )}
+                          </Box>
+                        }
                         slotProps={{
                           primary: {
                             fontSize: '0.9rem',
@@ -252,15 +294,18 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                   {hasSubItems && (
                     <Collapse in={isSubOpen} timeout="auto" unmountOnExit>
                       <List disablePadding sx={{ pl: 2, pr: 1, mb: 1, minWidth: 0 }}>
-                        {page.children?.map((child) => (
-                          <ListItem
-                            key={child.id}
-                            component={Link}
-                            href={child.path}
-                            disablePadding
-                            onClick={() => handleDrawerToggle()}
-                            sx={{ mb: 0.5, minWidth: 0 }}
-                          >
+                        {page.children?.map((child) => {
+                          const isExternal = child.path?.startsWith('http://') || child.path?.startsWith('https://');
+                          return (
+                            <ListItem
+                              key={child.id}
+                              component={isExternal ? 'a' : Link}
+                              href={child.path}
+                              {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                              disablePadding
+                              onClick={() => handleDrawerToggle()}
+                              sx={{ mb: 0.5, minWidth: 0 }}
+                            >
                             <ListItemButton
                               sx={{
                                 minHeight: 44,
@@ -299,7 +344,8 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                               />
                             </ListItemButton>
                           </ListItem>
-                        ))}
+                            );
+                          })}
                       </List>
                     </Collapse>
                   )}

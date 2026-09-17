@@ -118,7 +118,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
         keepMounted: true,
       }}
     >
-      {/* ── Sticky Header ────────────────────────────────────────── */}
+      {/* -- Sticky Header ------------------------------------------ */}
       <Box
         sx={{
           p: { xs: 2, sm: 2.5 },
@@ -226,10 +226,11 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
         </Stack>
       </Box>
 
-      {/* ── Scrollable Body ──────────────────────────────────────── */}
+      {/* -- Scrollable Body ---------------------------------------- */}
       <Box
         sx={{
           p: { xs: 2, sm: 2.5 },
+          pb: { xs: 6, sm: 4 },
           flexGrow: 1,
           overflowY: 'auto',
           display: 'flex',
@@ -352,7 +353,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
         </FilterSection>
       </Box>
 
-      {/* ── Sticky Footer Actions ────────────────────────────────── */}
+      {/* -- Sticky Footer Actions ---------------------------------- */}
       <Box
         sx={{
           p: { xs: 2, sm: 2.5 },
@@ -370,6 +371,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
           fullWidth
           variant="outlined"
           onClick={onReset}
+          aria-label={t('jobSearch.resetFiltersAria')}
           startIcon={<RestartAltRoundedIcon />}
           sx={{
             py: 1.2,
@@ -379,13 +381,14 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
             fontWeight: 700,
             textTransform: 'none',
             fontSize: '0.875rem',
+            whiteSpace: 'nowrap',
             '&:hover': {
               borderColor: '#94a3b8',
               backgroundColor: '#f8fafc',
             },
           }}
         >
-          {t('jobSearch.resetFiltersAria', { defaultValue: 'Đặt lại' })}
+          {t('common:actions.reset', { defaultValue: 'Đặt lại' })}
         </Button>
         <Button
           fullWidth

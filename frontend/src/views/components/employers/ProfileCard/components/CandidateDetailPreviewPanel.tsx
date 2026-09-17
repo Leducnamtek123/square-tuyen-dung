@@ -23,10 +23,18 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LockIcon from '@mui/icons-material/Lock';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import SendIcon from '@mui/icons-material/Send';
+import { InviteCandidateToJobModal } from './InviteCandidateToJobModal';
 
 import { useResumeDetail } from '@/views/components/employers/hooks/useEmployerQueries';
 import type { Resume } from '@/types/models';
 import { formatLocalizedSalaryRange } from '@/utils/customData';
+
+const formatCleanSalary = (min?: number | null, max?: number | null, lang?: string): string => {
+  const raw = formatLocalizedSalaryRange(min, max, lang);
+  if (!raw || raw === '---') return 'Thỏa thuận';
+  return raw.replace(/\s*-\s*\?$/, ' trở lên').replace(/^\?\s*-\s*/, 'Đến ');
+};
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
@@ -48,6 +56,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
   const { t, i18n } = useTranslation(['employer', 'common']);
   const { allConfig } = useConfig();
 
+  const [isInviteModalOpen, setIsInviteModalOpen] = React.useState(false);
   const { data: fetchedDetail } = useResumeDetail(resumeSlug);
   const resume = fetchedDetail || initialResume;
 
@@ -61,6 +70,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
           borderRadius: '12px',
           border: '1px solid #E2E8F0',
           bgcolor: '#FFFFFF',
+          height: '100%',
           minHeight: 450,
           display: 'flex',
           flexDirection: 'column',
@@ -88,15 +98,31 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
     user?.phone ||
     (resume as any).phone ||
     (resume as any).contactPhone;
-  const email =
+  const rawEmail =
     (resume as any).user?.email ||
     (resume as any).userDict?.email ||
     user?.email ||
     profileObj?.email ||
     (resume as any).email ||
     (resume as any).contactEmail;
+  const isInternalProxyEmail = (val?: string) =>
+    !val || val.includes('.private.nhanlucsieuviet.com') || val.includes('@imported.infohr.vn');
+  const email = isInternalProxyEmail(rawEmail) ? '' : rawEmail;
+
   const fullName = user?.fullName || resume.title || 'Ứng viên';
-  const age = (resume as any).jobSeekerProfileDict?.old;
+
+  const rawAge = (resume as any).jobSeekerProfileDict?.old || (resume as any).jobSeekerProfile?.old;
+  const birthday = (resume as any).jobSeekerProfile?.birthday || (resume as any).jobSeekerProfileDict?.birthday;
+  const calculateAge = (bday: string | Date | undefined) => {
+    if (!bday) return null;
+    const bDate = new Date(bday);
+    const birthYear = bDate.getFullYear();
+    if (isNaN(birthYear) || birthYear <= 1970) return null;
+    const currentYear = new Date().getFullYear();
+    return currentYear - birthYear;
+  };
+  const calculatedAge = birthday ? calculateAge(birthday) : null;
+  const age = calculatedAge || (rawAge && rawAge < 55 ? rawAge : null);
   const profileDetailHref = localizeRoutePath(
     `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, resume.slug)}`,
     i18n.language
@@ -173,10 +199,9 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
         bgcolor: '#FFFFFF',
         overflow: 'hidden',
         boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-        position: 'sticky',
-        top: '80px',
-        alignSelf: 'start',
-        maxHeight: 'calc(100dvh - 100px)',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         overflowY: 'auto',
         '&::-webkit-scrollbar': { width: '5px' },
         '&::-webkit-scrollbar-thumb': { bgcolor: '#CBD5E1', borderRadius: '4px' },
@@ -185,23 +210,23 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
       {/* 1. Header Action Bar */}
       <Box
         sx={{
-          p: 2.5,
+          p: { xs: 2, sm: 2.5 },
           borderBottom: '1px solid #E2E8F0',
           bgcolor: '#FAFCFF',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: { xs: 'flex-start', sm: 'center' },
           justifyContent: 'space-between',
-          flexWrap: 'wrap',
+          flexDirection: { xs: 'column', sm: 'row' },
           gap: 1.5,
         }}
       >
-        <Box sx={{ minWidth: 0, flex: 1 }}>
+        <Box sx={{ width: { xs: '100%', sm: 'auto' }, flex: { sm: 1 } }}>
           <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '1.125rem' }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.05rem', sm: '1.125rem' } }}>
               {fullName}
               {age && String(age) !== '---' && (
                 <Box component="span" sx={{ fontWeight: 500, color: '#64748B', ml: 0.75, fontSize: '0.9rem' }}>
-                  ({age} tuổi)
+                  · {age} tuổi
                 </Box>
               )}
             </Typography>
@@ -218,7 +243,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
         </Box>
 
         {/* Action Buttons */}
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
           <Button
             variant={resume.isSaved ? 'contained' : 'outlined'}
             color={resume.isSaved ? 'primary' : 'inherit'}
@@ -231,6 +256,8 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
               fontSize: '0.8125rem',
               textTransform: 'none',
               px: 2,
+              flex: { xs: 1, sm: 'none' },
+              whiteSpace: 'nowrap',
               borderColor: resume.isSaved ? 'primary.main' : '#CBD5E1',
               bgcolor: resume.isSaved ? 'primary.main' : '#FFFFFF',
               color: resume.isSaved ? '#FFFFFF' : '#334155',
@@ -240,6 +267,32 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
             }}
           >
             {resume.isSaved ? 'Đã lưu' : 'Lưu hồ sơ'}
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<SendIcon sx={{ fontSize: 16 }} />}
+            onClick={() => setIsInviteModalOpen(true)}
+            sx={{
+              height: 38,
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.8125rem',
+              textTransform: 'none',
+              px: 2,
+              flex: { xs: 1, sm: 'none' },
+              whiteSpace: 'nowrap',
+              borderColor: '#2563EB',
+              color: '#2563EB',
+              bgcolor: 'rgba(37, 99, 235, 0.04)',
+              '&:hover': {
+                bgcolor: 'rgba(37, 99, 235, 0.1)',
+                borderColor: '#1D4ED8',
+              },
+            }}
+          >
+            Mời ứng tuyển
           </Button>
 
           <Button
@@ -254,6 +307,8 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
               fontSize: '0.8125rem',
               textTransform: 'none',
               px: 2.25,
+              flex: { xs: 1.5, sm: 'none' },
+              whiteSpace: 'nowrap',
               boxShadow: 'none',
               '&:hover': {
                 boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
@@ -266,7 +321,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
       </Box>
 
       {/* 2. Main Profile Overview Body */}
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: { xs: 2, sm: 3 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
         {/* AI Match Insights Card */}
         {matchScore > 0 && (
           <Box
@@ -408,7 +463,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                     sx={{ fontWeight: 700, color: '#2563EB', fontSize: '0.8rem', mt: 0.25 }}
                     noWrap
                   >
-                    {formatLocalizedSalaryRange(resume.salaryMin, resume.salaryMax, i18n.language)}
+                    {formatCleanSalary(resume.salaryMin, resume.salaryMax, i18n.language)}
                   </Typography>
                 </Paper>
               </Grid>
@@ -536,7 +591,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
               Mức lương mong muốn
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 700, color: '#2563EB', fontSize: '0.875rem' }}>
-              {formatLocalizedSalaryRange(resume.salaryMin, resume.salaryMax, i18n.language)}
+              {formatCleanSalary(resume.salaryMin, resume.salaryMax, i18n.language)}
             </Typography>
           </Grid>
 
@@ -613,7 +668,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
 
         {/* PDF CV Preview Section */}
         {resume.fileUrl ? (
-          <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid #E2E8F0' }}>
+          <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid #E2E8F0', flex: 1, display: 'flex', flexDirection: 'column' }}>
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <PictureAsPdfIcon sx={{ color: '#EF4444', fontSize: 20 }} />
@@ -621,7 +676,7 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
                   variant="subtitle2"
                   sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.875rem' }}
                 >
-                  File Hồ sơ đính kèm (CV PDF)
+                  Tệp hồ sơ đính kèm định dạng PDF
                 </Typography>
               </Stack>
               <Button
@@ -641,7 +696,8 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
             <Box
               sx={{
                 width: '100%',
-                height: 480,
+                flex: 1,
+                minHeight: { xs: 450, lg: 520 },
                 borderRadius: '8px',
                 border: '1px solid #CBD5E1',
                 overflow: 'hidden',
@@ -659,6 +715,14 @@ export const CandidateDetailPreviewPanel: React.FC<DetailPreviewProps> = ({
           </Box>
         ) : null}
       </Box>
+
+      <InviteCandidateToJobModal
+        open={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        resume={resume}
+        candidateName={fullName}
+        candidateTitle={resume.title}
+      />
     </Paper>
   );
 };
