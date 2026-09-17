@@ -34,6 +34,8 @@ api_v1_patterns = [
     path("interview/", include("apps.interviews.urls")),
     path("agent-assistants/", include("apps.agent_assistants.urls")),
     path("native-hrm/", include("apps.hrm.urls")),
+    path("exchange/", include("apps.exchange.urls")),
+    path("operations/", include("apps.operations.urls")),
     path("admin/web/system-settings/", views.SystemSettingsAPIView.as_view()),
     path("ai/tts/", ai_views.tts),
     path("ai/transcribe/", ai_views.transcribe),
