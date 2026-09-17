@@ -19,34 +19,15 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
   const isProcessing = row.aiAnalysisStatus === 'processing';
   const isFailed = row.aiAnalysisStatus === 'failed';
 
-  const getScoreStyle = (score: number) => {
-    if (score >= 75) {
-      return {
-        bg: '#ECFDF5',
-        border: '#A7F3D0',
-        text: '#047857',
-        hoverBg: '#D1FAE5',
-      };
-    }
-    if (score >= 40) {
-      return {
-        bg: '#FFFBEB',
-        border: '#FDE68A',
-        text: '#B45309',
-        hoverBg: '#FEF3C7',
-      };
-    }
-    return {
-      bg: '#FFF1F2',
-      border: '#FECDD3',
-      text: '#BE123C',
-      hoverBg: '#FFE4E6',
-    };
+  const getScoreColor = (score: number) => {
+    if (score >= 70) return theme.palette.success;
+    if (score >= 40) return theme.palette.warning;
+    return theme.palette.error;
   };
 
   if (isCompleted) {
     const score = (row.aiAnalysisEffectiveScore ?? row.aiAnalysisScore ?? 0) as number;
-    const scoreStyle = getScoreStyle(score);
+    const color = getScoreColor(score);
     return (
       <Tooltip
         title={t('appliedResume.ai.viewAnalysis')}
@@ -54,26 +35,22 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
         placement="top"
       >
         <Chip
-          icon={<PsychologyIcon sx={{ fontSize: '1.05rem !important', color: `${scoreStyle.text} !important` }} />}
+          icon={<PsychologyIcon sx={{ fontSize: '1rem !important' }} />}
           label={`${score}/100`}
           onClick={onOpenDrawer}
           sx={{ 
-            fontWeight: 800, 
-            fontSize: '0.8125rem',
+            fontWeight: 900, 
             cursor: 'pointer',
-            borderRadius: '8px',
-            px: 0.75,
-            bgcolor: scoreStyle.bg,
-            color: scoreStyle.text,
+            borderRadius: 1.5,
+            px: 0.5,
+            bgcolor: alpha(color.main, 0.08),
+            color: color.main,
             border: '1px solid',
-            borderColor: scoreStyle.border,
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
-            transition: 'all 0.15s ease',
-            '& .MuiChip-icon': { ml: 0.25 },
+            borderColor: alpha(color.main, 0.1),
+            '& .MuiChip-icon': { color: 'inherit', ml: 0.5 },
             '&:hover': {
-              bgcolor: scoreStyle.hoverBg,
-              borderColor: scoreStyle.text,
-              transform: 'translateY(-1px)',
+                bgcolor: alpha(color.main, 0.15),
+                borderColor: color.main
             }
           }}
         />

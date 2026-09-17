@@ -123,3 +123,48 @@ def test_analyze_resume_ai_handles_failure(monkeypatch, job_post):
 
     assert op is not None, "AsyncOperation should be created even if scan fails"
     assert op.status == OperationStatus.FAILED
+
+
+@pytest.mark.django_db
+def test_analyze_resume_ai_handles_exception(monkeypatch, employer_user, job_post):
+    profile = EmployerCandidateProfile.objects.create(
+        company=job_post.company,
+        created_by=employer_user,
+        full_name="Exception Candidate",
+        title="Python Engineer",
+        description="Experienced Python developer.",
+    )
+    activity = JobPostActivity.objects.create(
+        job_post=job_post,
+        manual_candidate_profile=profile,
+        full_name=profile.full_name,
+        status=var_sys.ApplicationStatus.INTERVIEWED,
+    )
+
+    def fake_acquire_slot(*args, **kwargs):
+        return "slot:test:123"
+
+    def fake_release_slot(*args, **kwargs):
+        return True
+
+    def fail_post_chat_completion_httpx(*args, **kwargs):
+        raise RuntimeError("LLM Service Disconnected")
+
+    monkeypatch.setattr("apps.jobs.tasks._acquire_analysis_slot", fake_acquire_slot)
+    monkeypatch.setattr("apps.jobs.tasks._release_analysis_slot", fake_release_slot)
+    monkeypatch.setattr("apps.jobs.tasks.post_chat_completion_httpx", fail_post_chat_completion_httpx)
+
+    analyze_resume_ai.run(activity.id)
+
+    activity.refresh_from_db()
+    assert activity.ai_analysis_status == "failed"
+
+    op = AsyncOperation.objects.filter(
+        type="candidate.ai_scan",
+        metadata__activity_id=activity.id,
+    ).first()
+
+    assert op is not None
+    assert op.status == OperationStatus.FAILED
+    assert "LLM Service Disconnected" in str(op.error)
+
