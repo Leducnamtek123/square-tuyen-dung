@@ -44,6 +44,11 @@ import { ROUTES } from '@/configs/routeConfig';
 import { formatRoute } from '@/utils/funcUtils';
 import adminManagementService, { Vieclam24hSourceOccupation } from '@/services/adminManagementService';
 import type { Vieclam24hImportJob } from '@/services/adminManagementService';
+import {
+    OperationTimeline,
+    adaptVieclam24hImportOperation,
+    useOperationContext,
+} from '@/components/operation';
 import { useProfiles } from './hooks/useProfiles';
 
 const IMPORT_JOB_STORAGE_KEY = 'admin-profiles-vieclam24h-import-job-id';
@@ -92,6 +97,7 @@ const ProfilesPage = () => {
     const { t } = useTranslation('admin');
     const { allConfig } = useConfig();
     const queryClient = useQueryClient();
+    const { registerOperation } = useOperationContext();
 
     const {
         page,
@@ -156,6 +162,10 @@ const ProfilesPage = () => {
     });
     const [importJobId, setImportJobId] = useState<number | null>(() => readPersistedImportJobId());
     const [importJob, setImportJob] = useState<Vieclam24hImportJob | null>(null);
+    const importOperation = useMemo(
+        () => adaptVieclam24hImportOperation(importJob),
+        [importJob]
+    );
 
     const queryParams = useMemo(
         () => ({
@@ -400,6 +410,10 @@ const ProfilesPage = () => {
             const job = await importCandidates(importForm);
             setImportJobId(job.id);
             setImportJob(job);
+            const op = adaptVieclam24hImportOperation(job);
+            if (op) {
+                registerOperation(op.id, op);
+            }
             setOpenImportDialog(true);
         } catch (error) {
             console.error(error);
@@ -409,7 +423,11 @@ const ProfilesPage = () => {
     useEffect(() => {
         if (!importJobQuery.data) return;
         setImportJob(importJobQuery.data);
-    }, [importJobQuery.data]);
+        const op = adaptVieclam24hImportOperation(importJobQuery.data);
+        if (op) {
+            registerOperation(op.id, op);
+        }
+    }, [importJobQuery.data, registerOperation]);
 
     useEffect(() => {
         if (!importJob) return;
@@ -465,47 +483,10 @@ const ProfilesPage = () => {
                 </Button>
             </Stack>
 
-            {importJob && (
-                <Paper
-                    sx={{
-                        p: 2,
-                        mb: 3,
-                        borderRadius: '12px',
-                        border: '1px solid',
-                        borderColor: importJob.status === 'failed' ? 'error.light' : 'primary.light',
-                        bgcolor: importJob.status === 'failed' ? 'error.50' : 'primary.50',
-                    }}
-                    elevation={0}
-                >
-                    <Stack spacing={1.25}>
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2} flexWrap="wrap">
-                            <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                                    {importJob.status === 'completed'
-                                        ? t('pages.profiles.import.completedTitle', { defaultValue: 'Đã xong' })
-                                        : importJob.status === 'failed'
-                                            ? t('pages.profiles.import.failedTitle', { defaultValue: 'Đã lỗi' })
-                                            : t('pages.profiles.import.processingTitle', { defaultValue: 'Đang xử lý' })}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {importJob.status === 'completed'
-                                        ? t('pages.profiles.import.completedMessage', {
-                                              defaultValue: `Đã tạo ${importJob.createdCount} mới, cập nhật ${importJob.updatedCount}, bỏ qua ${importJob.skippedCount}.`,
-                                          })
-                                        : importJob.status === 'failed'
-                                            ? importJob.errorMessage || t('pages.profiles.import.failedMessage', { defaultValue: 'Tác vụ lấy ứng viên đã gặp lỗi.' })
-                                            : t('pages.profiles.import.processingMessage', {
-                                                  defaultValue: 'Hệ thống đang lấy và chuẩn hóa dữ liệu ứng viên trong nền.',
-                                              })}
-                                </Typography>
-                            </Box>
-                            <Typography variant="caption" sx={{ fontWeight: 800, color: importJob.status === 'failed' ? 'error.main' : 'primary.main' }}>
-                                {importJob.progress}%
-                            </Typography>
-                        </Stack>
-                        <LinearProgress variant="determinate" value={importJob.progress} sx={{ height: 8, borderRadius: 999 }} />
-                    </Stack>
-                </Paper>
+            {importOperation && (
+                <Box sx={{ mb: 3 }}>
+                    <OperationTimeline operation={importOperation} />
+                </Box>
             )}
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
@@ -831,46 +812,10 @@ const ProfilesPage = () => {
                                 />
                             )}
                         />
-                        {importJob && (
-                            <Paper
-                                variant="outlined"
-                                sx={{
-                                    p: 2,
-                                    borderRadius: 2,
-                                    bgcolor: importJob.status === 'failed' ? 'error.50' : 'primary.50',
-                                }}
-                            >
-                                <Stack spacing={1.25}>
-                                    <Stack direction="row" justifyContent="space-between" alignItems="center" gap={2}>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                                            {importJob.status === 'completed'
-                                                ? t('pages.profiles.import.completedTitle', { defaultValue: 'Đã xong' })
-                                                : importJob.status === 'failed'
-                                                    ? t('pages.profiles.import.failedTitle', { defaultValue: 'Đã lỗi' })
-                                                    : t('pages.profiles.import.processingTitle', { defaultValue: 'Đang xử lý' })}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: importJob.status === 'failed' ? 'error.main' : 'primary.main' }}>
-                                            {importJob.progress}%
-                                        </Typography>
-                                    </Stack>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={importJob.progress}
-                                        sx={{ height: 8, borderRadius: 999 }}
-                                    />
-                                    <Typography variant="body2" color="text.secondary">
-                                        {importJob.status === 'failed'
-                                            ? importJob.errorMessage || t('pages.profiles.import.failedMessage', { defaultValue: 'Tác vụ lấy ứng viên đã gặp lỗi.' })
-                                            : importJob.status === 'completed'
-                                                ? t('pages.profiles.import.completedMessage', {
-                                                      defaultValue: `Đã tạo ${importJob.createdCount} mới, cập nhật ${importJob.updatedCount}, bỏ qua ${importJob.skippedCount}.`,
-                                                  })
-                                                : t('pages.profiles.import.processingMessage', {
-                                                      defaultValue: 'Hệ thống đang lấy và chuẩn hóa dữ liệu ứng viên trong nền.',
-                                                  })}
-                                    </Typography>
-                                </Stack>
-                            </Paper>
+                        {importOperation && (
+                            <Box sx={{ mt: 1 }}>
+                                <OperationTimeline operation={importOperation} />
+                            </Box>
                         )}
                     </Stack>
                 </DialogContent>
