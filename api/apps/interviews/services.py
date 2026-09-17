@@ -526,7 +526,9 @@ def run_status_side_effects(
     if new_status == "completed":
         queue_ai_evaluation(session)
 
-    if new_status == "in_progress" and not was_started:
+    is_persistent = bool((session.session_metadata or {}).get("persistent"))
+
+    if new_status == "in_progress" and not was_started and not is_persistent:
         from .tasks import end_interview_session, start_room_recording_task
 
         timeout = int(max_duration_seconds or getattr(settings, "INTERVIEW_MAX_DURATION_SECONDS", 1800))
@@ -536,7 +538,7 @@ def run_status_side_effects(
         except Exception as exc:
             logger.warning("Failed to dispatch start_room_recording_task: %s", exc)
 
-    if new_status == "interrupted":
+    if new_status == "interrupted" and not is_persistent:
         from .tasks import finalize_disconnected_session
 
         grace_seconds = int(getattr(settings, "INTERVIEW_DISCONNECT_GRACE_SECONDS", 300))

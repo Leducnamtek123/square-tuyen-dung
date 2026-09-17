@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import SummaryTimesheetPage from '@/views/hrmPages/AttendancePages/SummaryTimesheetPage';
 
-export const metadata: Metadata = {
-  title: 'Bảng chấm công tổng hợp | InfoHR Quản lý nhân sự',
-  description: 'Bảng tổng hợp công tháng, khóa công và chuyển tính lương tự động sang phân hệ Bảng lương',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.hrm.attendances.monthly-summary');
+}
 
 export default function EmployerAttendanceMonthlySummaryPage() {
   return <SummaryTimesheetPage />;

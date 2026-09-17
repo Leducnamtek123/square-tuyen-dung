@@ -130,6 +130,7 @@ const TopCompanyCarousel = () => {
             overflowX: 'auto',
             scrollBehavior: 'smooth',
             py: 0.5,
+            px: 0.5,
             flex: 1,
             '&::-webkit-scrollbar': { display: 'none' },
             msOverflowStyle: 'none',

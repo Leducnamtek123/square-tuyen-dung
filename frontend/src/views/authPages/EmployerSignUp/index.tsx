@@ -22,17 +22,23 @@ import type { EmployerRegisterData } from '@/types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 import SecurityIcon from '@mui/icons-material/Security';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import EmployerSignUpShowcase from '@/views/components/auths/EmployerSignUpShowcase';
 
 const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
 const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   background: '#FFFFFF',
-  borderRadius: '28px',
-  boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
-  border: '1px solid #E2E8F0',
+  borderRadius: 0,
+  boxShadow: 'none',
+  border: 'none',
+  [theme.breakpoints.up('sm')]: {
+    borderRadius: '28px',
+    boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
+    border: '1px solid #E2E8F0',
+  },
   transition: 'all 0.3s ease',
   width: '100%',
-  maxWidth: '780px',
+  maxWidth: '1080px',
   margin: '0 auto',
   overflow: 'hidden',
 }));
@@ -256,11 +262,11 @@ const EmployerSignUp = () => {
               width: '100%',
             }}
           >
-            {/* Full-width Registration Form */}
+            {/* Left Column: Registration Form */}
             <Grid
-              size={{ xs: 12 }}
+              size={{ xs: 12, md: 6 }}
               sx={{
-                p: { xs: 3, sm: 5, md: 6 },
+                p: { xs: 3, sm: 4, md: 5 },
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -350,7 +356,7 @@ const EmployerSignUp = () => {
                       mb: 0.75,
                     }}
                   >
-                    {t('signup.heading')}
+                    {t('signup.employerTitle', { defaultValue: 'Đăng ký tài khoản Tuyển dụng' })}
                   </Typography>
 
                   <Typography
@@ -382,17 +388,17 @@ const EmployerSignUp = () => {
                     display: 'block',
                     textAlign: 'center',
                     color: '#64748B',
-                    fontSize: '12.5px',
+                    fontSize: '12px',
                     lineHeight: 1.55,
                     mb: 2,
                   }}
                 >
                   Bằng việc đăng ký tài khoản, quý doanh nghiệp đồng ý tuân thủ các{' '}
-                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '12px', color: '#2563EB' }}>
                     Điều khoản dịch vụ
                   </StyledLink>{' '}
                   và{' '}
-                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '12px', color: '#2563EB' }}>
                     Chính sách bảo mật
                   </StyledLink>{' '}
                   của InfoHR.
@@ -434,6 +440,17 @@ const EmployerSignUp = () => {
                   <span>Bảo mật thông tin doanh nghiệp theo tiêu chuẩn SSL 256-bit</span>
                 </Box>
               </Box>
+            </Grid>
+
+            {/* Right Column: Showcase Panel (Desktop only) */}
+            <Grid
+              size={{ xs: 12, md: 6 }}
+              sx={{
+                display: { xs: 'none', md: 'flex' },
+                position: 'relative',
+              }}
+            >
+              <EmployerSignUpShowcase />
             </Grid>
           </Grid>
         </UnifiedAuthCard>

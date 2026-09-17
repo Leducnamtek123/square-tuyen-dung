@@ -1,14 +1,10 @@
 import type { Metadata } from 'next';
-import { buildSeoMetadata } from '@/utils/serverI18n';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import DefaultLayout from '@/layouts/DefaultLayout';
 import JobsByCityPage from '@/views/defaultPages/JobsByCityPage';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildSeoMetadata({
-    title: 'Việc làm mới nhất theo tỉnh thành',
-    description: 'Tìm kiếm cơ hội việc làm tại Hà Nội, TP. Hồ Chí Minh, Đà Nẵng, Bình Dương, Hải Phòng và tất cả các tỉnh thành trên cả nước.',
-    path: '/viec-lam-theo-tinh-thanh',
-  });
+  return buildPageMetadata('jobs-by-city');
 }
 
 export default function Page() {

@@ -631,6 +631,56 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     def get_questions_count(self, obj):
         return resolve_session_questions_count(obj)
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        scheduled_at = attrs.get("scheduled_at")
+        if scheduled_at:
+            session_type = attrs.get("session_type", getattr(self.instance, "session_type", "official"))
+            validate_interview_slot_capacity(scheduled_at, instance=self.instance, session_type=session_type)
+        return attrs
+
+
+SLOT_CAPACITY_FULL_MESSAGE = (
+    "Khung giờ này đã đạt giới hạn số lượng ứng viên phỏng vấn đồng thời "
+    "(nhằm đảm bảo đường truyền video và chất lượng tương tác giọng nói AI mượt mà nhất cho ứng viên của bạn). "
+    "Quý công ty vui lòng chọn khung giờ khác hoặc dời lịch lệch tối thiểu 30 phút."
+)
+
+
+def validate_interview_slot_capacity(scheduled_at, instance=None, session_type="official"):
+    """
+    Slot Capacity Guard: ensures the number of concurrent interviews within a 30-minute window
+    does not exceed MAX_CONCURRENT_INTERVIEWS_PER_SLOT (default: 30) to preserve network and GPU quality.
+    """
+    if not scheduled_at or session_type == "mock":
+        return
+
+    from django.conf import settings
+    from datetime import timedelta
+
+    slot_limit = getattr(settings, "MAX_CONCURRENT_INTERVIEWS_PER_SLOT", 30)
+    window_minutes = getattr(settings, "SLOT_WINDOW_MINUTES", 15)
+    start_window = scheduled_at - timedelta(minutes=window_minutes)
+    end_window = scheduled_at + timedelta(minutes=window_minutes)
+
+    qs = InterviewSession.objects.filter(
+        scheduled_at__gte=start_window,
+        scheduled_at__lte=end_window,
+    ).exclude(
+        status__in=["completed", "cancelled"]
+    ).exclude(
+        session_type="mock"
+    )
+
+    if instance and getattr(instance, "pk", None):
+        qs = qs.exclude(pk=instance.pk)
+
+    if qs.count() >= slot_limit:
+        raise serializers.ValidationError({
+            "scheduled_at": SLOT_CAPACITY_FULL_MESSAGE,
+            "detail": SLOT_CAPACITY_FULL_MESSAGE,
+        })
+
 
 class InterviewSessionCreateSerializer(serializers.ModelSerializer):
     """Serializer tạo mới interview."""
@@ -679,6 +729,11 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
         return candidate
 
     def validate(self, attrs):
+        scheduled_at = attrs.get("scheduled_at")
+        if scheduled_at:
+            session_type = attrs.get("session_type", "official")
+            validate_interview_slot_capacity(scheduled_at, instance=self.instance, session_type=session_type)
+
         job_post = attrs.get("job_post")
         question_group = attrs.get("question_group")
         question_ids = attrs.get("question_ids") or []
@@ -721,6 +776,13 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
             session.questions.set(question_ids)
         elif session.question_group:
             session.questions.set(session.question_group.questions.all())
+
+        try:
+            from .tasks import prewarm_interview_tts_task
+            prewarm_interview_tts_task.delay(session.id)
+        except Exception as exc:
+            logger.warning("Failed to queue prewarm_interview_tts_task for session %s: %s", session.id, exc)
+
         return session
 
 class InterviewContextSerializer(serializers.Serializer):

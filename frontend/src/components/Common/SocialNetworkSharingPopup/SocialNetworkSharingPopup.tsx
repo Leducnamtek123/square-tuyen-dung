@@ -71,7 +71,8 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
       slotProps={{
         paper: {
           sx: {
-            width: '380px',
+            width: { xs: '100%', sm: '380px' },
+            maxWidth: '100%',
             borderRadius: '20px',
             boxShadow: '0 25px 60px -12px rgba(0, 0, 0, 0.25)',
             overflow: 'hidden',

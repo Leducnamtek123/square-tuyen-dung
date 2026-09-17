@@ -175,6 +175,8 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
     };
   });
 
+  const isDashboardActive = menuItems.find((item) => item.key === 'dashboard')?.active ?? false;
+
   return (
     <>
       {/* -- Mobile Layout (< 900px) -- */}
@@ -270,11 +272,13 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
           </Box>
         </Box>
 
-        {/* Compact Profile Completeness Banner Card */}
-        <CandidateCompletenessBannerCard completenessPercent={completenessPercent} />
-
-        {/* Compact Quick Support Card */}
-        <CandidateQuickSupportCard />
+        {/* Compact Profile Completeness Banner Card & Quick Support Card - only shown on mobile Dashboard */}
+        {isDashboardActive && (
+          <>
+            <CandidateCompletenessBannerCard completenessPercent={completenessPercent} />
+            <CandidateQuickSupportCard />
+          </>
+        )}
       </Box>
 
       {/* -- Desktop Layout: Sticky panel for screens >= 900px -- */}

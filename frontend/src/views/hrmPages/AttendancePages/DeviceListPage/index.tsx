@@ -47,6 +47,7 @@ import {
 } from '../../hooks/useHrmQueries';
 import { NativeBiometricDevice, NativeWorkLocation } from '@/services/hrmService';
 import { TabTitle } from '@/utils/generalFunction';
+import { confirmModal } from '@/utils/sweetalert2Modal';
 import pc from '@/utils/muiColors';
 
 const inputSx = {
@@ -223,9 +224,14 @@ export default function DeviceListPage() {
   };
 
   const handleDeleteDevice = (id: number) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa thiết bị chấm công này khỏi danh mục theo dõi?')) {
-      deleteBiometricDevice.mutate(id);
-    }
+    confirmModal(
+      () => {
+        deleteBiometricDevice.mutate(id);
+      },
+      'Xóa thiết bị chấm công',
+      'Bạn có chắc chắn muốn xóa thiết bị chấm công này khỏi danh mục theo dõi?',
+      'warning'
+    );
   };
 
   const handleTestConnection = (id: number) => {

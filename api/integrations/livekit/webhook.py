@@ -132,6 +132,9 @@ def _handle_livekit_event(payload: Any) -> None:
             logger.info("LiveKit webhook: session %s marked in_progress", session.id)
     elif event in {"room_finished", "room_ended", "room_stopped", "room_disconnected"}:
         if session.status not in {"completed", "cancelled", "processing"}:
+            if (session.session_metadata or {}).get("persistent"):
+                logger.info("LiveKit webhook: skipping interruption for persistent session %s", session.id)
+                return
             update_interview_status(session, "interrupted")
             logger.info("LiveKit webhook: session %s marked interrupted", session.id)
 

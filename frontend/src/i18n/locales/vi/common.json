@@ -7,6 +7,9 @@
     },
     "userMenu": "Menu người dùng"
   },
+  "home": {
+    "trending": "Xu hướng:"
+  },
   "city": "Tỉnh/Thành phố",
   "career": "Ngành nghề",
   "experience": "Kinh nghiệm",
@@ -47,6 +50,9 @@
     "save": "Lưu",
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
+    "clear": "Xóa bộ lọc",
+    "reset": "Đặt lại",
+    "undo": "Hoàn tác",
     "confirm": "Xác nhận",
     "apply": "Áp dụng",
     "add": "Thêm",
@@ -113,7 +119,7 @@
     "mainNav": "Menu điều hướng",
     "mobileMenu": "Menu chính",
     "switch": {
-      "forEmployers": "Dành cho nhà tuyển dụng",
+      "forEmployers": "Nhà tuyển dụng",
       "postFreeJob": "Đăng tin miễn phí",
       "forJobSeekers": "Dành cho ứng viên",
       "switch": "Chuyển",
@@ -356,6 +362,7 @@
   "feedback": {
     "button": "Đánh giá",
     "title": "Đánh giá của bạn",
+    "subtitle": "Chia sẻ trải nghiệm để nâng cao chất lượng dịch vụ",
     "placeholder": "Chia sẻ đánh giá của bạn...",
     "submit": "Gửi đánh giá",
     "ratingRequired": "Vui lòng chọn mức đánh giá.",
@@ -662,7 +669,7 @@
       "interviewtemplate": "Mẫu phỏng vấn AI"
     },
     "placeholder": {
-      "enterjobtitle": "Nhập tiêu đề C.V",
+      "enterjobtitle": "Nhập tiêu đề công việc (ví dụ: Kỹ sư phần mềm, Nhân viên kinh doanh...)",
       "selectcareer": "Chọn ngành nghề",
       "selectposition": "Chọn cấp bậc",
       "selectrequiredexperience": "Chọn kinh nghiệm",
@@ -1486,6 +1493,8 @@
     "emptyContent": "Danh sách bài viết sẽ sớm được cập nhật.",
     "sectionTitle": "Tin tức & Thông tin",
     "sectionSubtitle": "Cập nhật những thông tin, tin tức tuyển dụng và thị trường lao động mới nhất.",
+    "handbookTitle": "Tin tức & Thông tin",
+    "handbookSubtitle": "Cập nhật những thông tin, tin tức tuyển dụng và thị trường lao động mới nhất.",
     "justUpdated": "Mới cập nhật",
     "defaultCategory": "CẨM NANG",
     "byAuthor": "Bởi {{author}} • {{time}}",
@@ -1579,7 +1588,8 @@
       "link": "Chèn hoặc sửa liên kết",
       "horizontalRule": "Đường kẻ phân cách",
       "livePreview": "Xem trước bài viết",
-      "uploadImage": "Tải lên hình ảnh"
+      "uploadImage": "Tải lên hình ảnh",
+      "moreTools": "Thêm công cụ..."
     },
     "colors": {
       "default": "Mặc định",

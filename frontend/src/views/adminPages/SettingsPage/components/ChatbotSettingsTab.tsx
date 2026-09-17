@@ -104,7 +104,13 @@ export const ChatbotSettingsTab: React.FC<ChatbotSettingsTabProps> = ({ formData
 
               {/* Sub-tabs for Employer vs Job Seeker */}
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={activeTab} onChange={(_, val) => setActiveTab(val)}>
+                <Tabs
+                  value={activeTab}
+                  onChange={(_, val) => setActiveTab(val)}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  allowScrollButtonsMobile
+                >
                   <Tab
                     icon={<BusinessIcon fontSize="small" />}
                     iconPosition="start"

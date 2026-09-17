@@ -112,7 +112,7 @@ def _perform_interview_warmup(session: InterviewSession) -> dict:
                 session.id,
                 session.room_name,
             )
-            resp = requests.post(tts_url, json=tts_payload, headers=tts_headers, timeout=(10, 25))
+            resp = requests.post(tts_url, json=tts_payload, headers=tts_headers, timeout=(10, 25), verify=False)
             if resp.status_code == 200 and len(resp.content) > 100:
                 tts_status = "ready"
                 break
@@ -133,7 +133,7 @@ def _perform_interview_warmup(session: InterviewSession) -> dict:
         stt_headers["Authorization"] = f"Bearer {stt_api_key}"
 
     try:
-        resp_stt = requests.get(f"{stt_base_url}/models", headers=stt_headers, timeout=(5, 10))
+        resp_stt = requests.get(f"{stt_base_url}/models", headers=stt_headers, timeout=(5, 10), verify=False)
         if resp_stt.status_code < 500:
             stt_status = "ready"
         else:

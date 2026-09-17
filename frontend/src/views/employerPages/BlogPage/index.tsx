@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import contentService, { Article, ArticleStatus } from '@/services/contentService';
 import DataTable from '@/components/Common/DataTable';
 import toastMessages from '@/utils/toastMessages';
+import { confirmModal } from '@/utils/sweetalert2Modal';
 import dayjs from '@/configs/dayjs-config';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
@@ -120,15 +121,21 @@ const EmployerBlogListPage = () => {
 
   useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
-  const handleDelete = async (id: number, title: string) => {
-    if (!window.confirm(t('blog.messages.deleteConfirm', { title }))) return;
-    try {
-      await contentService.employerDeleteBlog(id);
-      toastMessages.success(t('blog.messages.deleteSuccess'));
-      fetchArticles();
-    } catch {
-      toastMessages.error(t('blog.messages.deleteError'));
-    }
+  const handleDelete = (id: number, title: string) => {
+    confirmModal(
+      async () => {
+        try {
+          await contentService.employerDeleteBlog(id);
+          toastMessages.success(t('blog.messages.deleteSuccess'));
+          fetchArticles();
+        } catch {
+          toastMessages.error(t('blog.messages.deleteError'));
+        }
+      },
+      t('blog.deleteTitle', { defaultValue: 'Xác nhận xóa bài viết' }),
+      t('blog.messages.deleteConfirm', { title }),
+      'warning'
+    );
   };
 
   const getStatusLabel = (status: ArticleStatus) => t(`blog.statuses.${status}`);

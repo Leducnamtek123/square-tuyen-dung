@@ -63,6 +63,10 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutlineOutlined';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import { ExportModal } from '@/components/Common/ExportModal';
+import { ImportModal } from '@/components/Common/ImportModal';
 
 import {
   useHrmEmployees,
@@ -176,6 +180,9 @@ export default function EmployeeListPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [deptFilter, setDeptFilter] = useState<number | 'ALL'>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   const [selectedEmp, setSelectedEmp] = useState<NativeEmployee | null>(null);
   const [detailTab, setDetailTab] = useState<number>(0);
@@ -474,6 +481,40 @@ export default function EmployeeListPage() {
               }}
             >
               Làm mới
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<UploadFileOutlinedIcon sx={{ fontSize: 16 }} />}
+              onClick={() => setImportModalOpen(true)}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                color: '#2563eb',
+                borderColor: '#bfdbfe',
+                bgcolor: '#eff6ff',
+                '&:hover': { bgcolor: '#dbeafe', borderColor: '#93c5fd' },
+              }}
+            >
+              Nhập Excel/CSV
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<FileDownloadOutlinedIcon sx={{ fontSize: 16 }} />}
+              onClick={() => setExportModalOpen(true)}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                color: '#0f172a',
+                borderColor: '#cbd5e1',
+                bgcolor: '#ffffff',
+                '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+              }}
+            >
+              Xuất dữ liệu
             </Button>
             <Button
               variant="outlined"
@@ -1702,6 +1743,31 @@ export default function EmployeeListPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName="DanhSachNhanVien"
+        columns={[]}
+        entity="employee"
+        totalRecords={{
+          all: employees.length,
+          filtered: employees.length,
+          selected: 0,
+        }}
+      />
+
+      {/* Import Modal */}
+      <ImportModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        entity="employee"
+        title="Nhập danh sách nhân sự (HRM Employee Import)"
+        onSuccess={() => {
+          refetch();
+        }}
+      />
     </Box>
   );
 }

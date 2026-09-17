@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, Box, Button, Stack, Typography, Paper, type Theme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import toastMessages from '@/utils/toastMessages';
 import { confirmModal } from '@/utils/sweetalert2Modal';
@@ -25,6 +26,7 @@ import {
   useGlobalFilter,
 } from '@/components/Common/Filters';
 import { ExportModal, type ExportColumn, type ExportScope } from '@/components/Common/ExportModal';
+import { ImportModal } from '@/components/Common/ImportModal';
 import { ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import AiCandidateRecommendationModal from '../AiCandidateRecommendationModal';
@@ -123,6 +125,7 @@ const JobPostCard = () => {
   }, [deleteJobPost, t]);
 
   const [exportModalOpen, setExportModalOpen] = React.useState(false);
+  const [importModalOpen, setImportModalOpen] = React.useState(false);
 
   const jobPostExportColumns: ExportColumn[] = React.useMemo(() => [
     {
@@ -234,18 +237,42 @@ const JobPostCard = () => {
               </Typography>
             </Box>
           </Box>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
+          <Stack direction="row" spacing={1.25} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
+            <Button 
+              variant="outlined" 
+              color="inherit" 
+              startIcon={<UploadFileOutlinedIcon />} 
+              onClick={() => setImportModalOpen(true)} 
+              sx={{ 
+                flex: { xs: 1, sm: 'none' },
+                px: { xs: 1.5, sm: 2.5 }, 
+                py: 1, 
+                fontWeight: 800, 
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+                border: '1px solid #E2E8F0',
+                bgcolor: '#FFFFFF',
+                color: '#334155',
+                '&:hover': {
+                  bgcolor: '#F8FAFC',
+                  borderColor: '#CBD5E1',
+                },
+              }}
+            >
+              Nhập Excel/CSV
+            </Button>
             <Button 
               variant="outlined" 
               color="inherit" 
               startIcon={<FileDownloadOutlinedIcon />} 
               onClick={() => setExportModalOpen(true)} 
               sx={{ 
-                width: { xs: '100%', sm: 'auto' },
-                px: 3, 
+                flex: { xs: 1, sm: 'none' },
+                px: { xs: 1.5, sm: 3 }, 
                 py: 1, 
                 fontWeight: 800, 
                 textTransform: 'none',
+                whiteSpace: 'nowrap',
                 border: '1px solid #E2E8F0',
                 bgcolor: '#FFFFFF',
                 color: '#334155',
@@ -264,9 +291,10 @@ const JobPostCard = () => {
               onClick={handleShowAdd} 
               disabled={isCreateBlocked}
               sx={{ 
-                width: { xs: '100%', sm: 'auto' },
-                px: 4, 
+                flex: { xs: 1.25, sm: 'none' },
+                px: { xs: 2, sm: 4 }, 
                 py: 1.25, 
+                whiteSpace: 'nowrap',
                 boxShadow: (theme: Theme) => theme.customShadows?.primary, 
                 fontWeight: 900,
                 textTransform: 'none'
@@ -370,10 +398,21 @@ const JobPostCard = () => {
           defaultFileName="DanhSachTinTuyenDung"
           columns={jobPostExportColumns}
           fetchData={handleFetchJobPostsExportData}
+          entity="job_post"
           totalRecords={{
             all: data?.count || 0,
             filtered: data?.count || 0,
             selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
+          }}
+        />
+
+        <ImportModal
+          open={importModalOpen}
+          onClose={() => setImportModalOpen(false)}
+          entity="job_post"
+          title="Nhập tin tuyển dụng (Job Post Import)"
+          onSuccess={() => {
+            router.refresh();
           }}
         />
 

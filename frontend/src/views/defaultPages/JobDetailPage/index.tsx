@@ -302,11 +302,11 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
                 onOpenSharePopup={(open) => dispatch({ type: 'open-share-popup', value: open })}
                 onOpenReport={handleOpenReport}
               />
-              <JobSalaryInsightCard slug={slug as string} />
               <JobDetailDescriptionCard
                 jobPostDetail={state.jobPostDetail}
                 allConfig={allConfig}
               />
+              <JobSalaryInsightCard slug={slug as string} />
               <JobDetailContactCard jobPostDetail={state.jobPostDetail as JobPost & { companyDict?: Company; location?: Location & { lat?: number; lng?: number; } }} />
             </div>
             <div>

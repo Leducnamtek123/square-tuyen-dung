@@ -27,6 +27,7 @@ import { useInterviewDetail, useInterviewMutations } from '../hooks/useEmployerQ
 import { useInterviewSSE } from '@/views/employerPages/InterviewPages/hooks/useInterviewSSE';
 import interviewService from '@/services/interviewService';
 import toastMessages from '@/utils/toastMessages';
+import { confirmModal } from '@/utils/sweetalert2Modal';
 import errorHandling from '@/utils/errorHandling';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import { useTourAutoStart } from '@/components/Features/ProductTour';
@@ -303,16 +304,22 @@ const InterviewDetailCard = () => {
     await ensureObserverConnection(true);
   };
 
-  const handleForceEndInterview = async () => {
+  const handleForceEndInterview = () => {
     if (!session?.roomName) return;
-    if (!window.confirm(t('interview:interviewDetail.messages.confirmForceEnd'))) return;
-    try {
-      await interviewService.updateSessionStatus(session.roomName, 'completed');
-      toastMessages.success(t('interview:interviewDetail.messages.forceEndSuccess'));
-      queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
-    } catch (e) {
-      errorHandling(e as AxiosError<{ errors?: ApiError }>);
-    }
+    confirmModal(
+      async () => {
+        try {
+          await interviewService.updateSessionStatus(session.roomName, 'completed');
+          toastMessages.success(t('interview:interviewDetail.messages.forceEndSuccess'));
+          queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
+        } catch (e) {
+          errorHandling(e as AxiosError<{ errors?: ApiError }>);
+        }
+      },
+      t('interview:interviewDetail.forceEndTitle', { defaultValue: 'Kết thúc phỏng vấn' }),
+      t('interview:interviewDetail.messages.confirmForceEnd'),
+      'warning'
+    );
   };
 
   const handleJoinAsHR = React.useCallback(async () => {

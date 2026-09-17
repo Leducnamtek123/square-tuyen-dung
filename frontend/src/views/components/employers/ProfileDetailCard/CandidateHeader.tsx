@@ -30,6 +30,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
 import toastMessages from '@/utils/toastMessages';
+import { promptModal } from '@/utils/sweetalert2Modal';
 import type { ResumeDetailResponse } from '@/types/models';
 import { useToggleSaveResumeOptimistic } from '../hooks/useEmployerQueries';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
@@ -89,8 +90,14 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
     setAnchorEl(null);
   };
 
-  const handleAddTag = () => {
-    const newTag = prompt('Nhập tên tag mới cho ứng viên:');
+  const handleAddTag = async () => {
+    const newTag = await promptModal(
+      'Thêm tag ứng viên',
+      'Nhập tên tag mới cho ứng viên:',
+      'VD: Tiềm năng, Phỏng vấn tốt, Kinh nghiệm...',
+      '',
+      'question'
+    );
     if (newTag && newTag.trim()) {
       const updated = [...tags, newTag.trim()];
       setTags(updated);

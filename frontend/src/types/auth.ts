@@ -41,6 +41,7 @@ export interface BotConfig {
 /** Form data for Employer registration */
 export interface EmployerSignUpFormData {
   fullName: string;
+  phone?: string;
   email: string;
   password: string;
   confirmPassword: string;

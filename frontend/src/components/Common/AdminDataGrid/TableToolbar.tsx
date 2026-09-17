@@ -210,7 +210,14 @@ export default function TableToolbar<T>({
         }}
       >
         {/* Left side: Search & Filter dropdowns */}
-        <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" sx={{ flexGrow: 1 }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.5}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          useFlexGap
+          flexWrap="wrap"
+          sx={{ flexGrow: 1, width: { xs: '100%', sm: 'auto' } }}
+        >
           {onSearchChange && (
             <TextField
               size="small"
@@ -246,7 +253,12 @@ export default function TableToolbar<T>({
             <FormControl
               key={filter.id}
               size="small"
-              sx={{ minWidth: 140, bgcolor: '#FFFFFF', borderRadius: 2 }}
+              sx={{
+                width: { xs: '100%', sm: 'auto' },
+                minWidth: { xs: '100%', sm: 140 },
+                bgcolor: '#FFFFFF',
+                borderRadius: 2,
+              }}
             >
               <InputLabel id={`filter-label-${filter.id}`} sx={{ fontSize: '0.875rem' }}>
                 {filter.label}

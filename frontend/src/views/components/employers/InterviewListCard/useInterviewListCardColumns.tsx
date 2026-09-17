@@ -44,12 +44,12 @@ const getStatusColor = (status: string): StatusColor => {
  * from theme.palette[color].main, which alpha() cannot process → MUI error #9.
  */
 const STATUS_BG_COLORS: Record<StatusColor, { bg: string; border: string; text: string }> = {
-  success:  { bg: 'rgba(5, 150, 105, 0.08)',   border: 'rgba(5, 150, 105, 0.15)',   text: '#047857' },
-  primary:  { bg: 'rgba(26, 64, 125, 0.08)',   border: 'rgba(26, 64, 125, 0.15)',   text: '#1a407d' },
-  info:     { bg: 'rgba(42, 169, 225, 0.08)',  border: 'rgba(42, 169, 225, 0.15)',  text: '#2aa9e1' },
-  error:    { bg: 'rgba(220, 38, 38, 0.08)',   border: 'rgba(220, 38, 38, 0.15)',   text: '#dc2626' },
-  warning:  { bg: 'rgba(245, 158, 11, 0.08)',  border: 'rgba(245, 158, 11, 0.15)',  text: '#d97706' },
-  default:  { bg: 'rgba(0, 0, 0, 0.06)',       border: 'rgba(0, 0, 0, 0.10)',       text: '#64748b' },
+  success:  { bg: '#ECFDF5', border: '#A7F3D0', text: '#047857' },
+  primary:  { bg: '#EFF6FF', border: '#BFDBFE', text: '#1D4ED8' },
+  info:     { bg: '#F0F9FF', border: '#BAE6FD', text: '#0284C7' },
+  error:    { bg: '#FEF2F2', border: '#FECDD3', text: '#DC2626' },
+  warning:  { bg: '#FFFBEB', border: '#FDE68A', text: '#B45309' },
+  default:  { bg: '#F1F5F9', border: '#CBD5E1', text: '#475569' },
 };
 
 export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseInterviewListCardColumnsArgs) => {
@@ -162,70 +162,90 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
           );
 
           return (
-            <Stack direction="row" spacing={1} justifyContent="flex-end">
+            <Stack direction="row" spacing={0.75} justifyContent="flex-end">
               <Tooltip title={t('common:view')} arrow>
-                <IconButton aria-label="Xem chi tiết"
+                <IconButton
+                  aria-label="Xem chi tiết"
                   component={Link}
                   href={detailHref}
-                  color="primary"
                   size="small"
                   sx={{
-                    bgcolor: 'rgba(26, 64, 125, 0.06)',
-                    
-                    '&:hover': { bgcolor: 'rgba(26, 64, 125, 0.12)' },
+                    color: '#2563EB',
+                    bgcolor: '#EFF6FF',
+                    border: '1px solid #BFDBFE',
+                    borderRadius: '8px',
+                    width: 32,
+                    height: 32,
+                    transition: 'all 0.2s ease',
+                    '&:hover': { bgcolor: '#DBEAFE', transform: 'scale(1.05)' },
                   }}
                 >
-                  <VisibilityIcon fontSize="small" />
+                  <VisibilityIcon sx={{ fontSize: 16 }} />
                 </IconButton>
               </Tooltip>
 
               {canEdit && (
                 <Tooltip title={t('interview:interviewListCard.editInterview')} arrow>
-                  <IconButton aria-label="Chỉnh sửa"
+                  <IconButton
+                    aria-label="Chỉnh sửa"
                     component={Link}
                     href={editHref}
-                    color="info"
                     size="small"
                     sx={{
-                      bgcolor: 'rgba(42, 169, 225, 0.06)',
-                      
-                      '&:hover': { bgcolor: 'rgba(42, 169, 225, 0.12)' },
+                      color: '#0284C7',
+                      bgcolor: '#F0F9FF',
+                      border: '1px solid #BAE6FD',
+                      borderRadius: '8px',
+                      width: 32,
+                      height: 32,
+                      transition: 'all 0.2s ease',
+                      '&:hover': { bgcolor: '#E0F2FE', transform: 'scale(1.05)' },
                     }}
                   >
-                    <EditIcon fontSize="small" />
+                    <EditIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
               )}
 
               {canCancel && (
                 <Tooltip title={t('interview:interviewListCard.cancelInterview')} arrow>
-                  <IconButton aria-label="Thao tác"
+                  <IconButton
+                    aria-label="Hủy phỏng vấn"
                     onClick={() => onCancel(session.roomName)}
-                    color="warning"
                     size="small"
                     sx={{
-                      bgcolor: 'rgba(245, 158, 11, 0.06)',
-                      
-                      '&:hover': { bgcolor: 'rgba(245, 158, 11, 0.12)' },
+                      color: '#D97706',
+                      bgcolor: '#FFFBEB',
+                      border: '1px solid #FDE68A',
+                      borderRadius: '8px',
+                      width: 32,
+                      height: 32,
+                      transition: 'all 0.2s ease',
+                      '&:hover': { bgcolor: '#FEF3C7', transform: 'scale(1.05)' },
                     }}
                   >
-                    <BlockIcon fontSize="small" />
+                    <BlockIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
               )}
 
               <Tooltip title={t('interview:interviewListCard.deleteInterview')} arrow>
-                <IconButton aria-label="Thao tác"
+                <IconButton
+                  aria-label="Xóa phỏng vấn"
                   onClick={() => onDelete(session.id)}
-                  color="error"
                   size="small"
                   sx={{
-                    bgcolor: 'rgba(220, 38, 38, 0.06)',
-                    
-                    '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.12)' },
+                    color: '#DC2626',
+                    bgcolor: '#FEF2F2',
+                    border: '1px solid #FECDD3',
+                    borderRadius: '8px',
+                    width: 32,
+                    height: 32,
+                    transition: 'all 0.2s ease',
+                    '&:hover': { bgcolor: '#FEE2E2', transform: 'scale(1.05)' },
                   }}
                 >
-                  <DeleteIcon fontSize="small" />
+                  <DeleteIcon sx={{ fontSize: 16 }} />
                 </IconButton>
               </Tooltip>
             </Stack>

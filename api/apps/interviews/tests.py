@@ -237,6 +237,25 @@ class LiveKitWebhookTests(TestCase):
             "http://localhost:9000/square/interviews/demo/recording.mp4",
         )
 
+    def test_handle_livekit_event_updates_recording_url_for_both_mock_and_official(self):
+        mock_session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            status="completed",
+            session_type="mock",
+        )
+        official_session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            status="completed",
+            session_type="official",
+        )
+        _handle_livekit_event(_FakeWebhookEvent(mock_session.room_name, "http://localhost:9000/square/interviews/mock/recording.mp4"))
+        _handle_livekit_event(_FakeWebhookEvent(official_session.room_name, "http://localhost:9000/square/interviews/official/recording.mp4"))
+
+        mock_session.refresh_from_db()
+        official_session.refresh_from_db()
+        self.assertEqual(mock_session.recording_url, "http://localhost:9000/square/interviews/mock/recording.mp4")
+        self.assertEqual(official_session.recording_url, "http://localhost:9000/square/interviews/official/recording.mp4")
+
     @override_settings(LIVEKIT_API_KEY="devkey", LIVEKIT_API_SECRET="secret", LIVEKIT_WEBHOOK_STRICT=True)
     @patch("livekit.api.TokenVerifier")
     @patch("livekit.api.WebhookReceiver")
@@ -1516,3 +1535,112 @@ class ModelAutoFieldTests(TestCase):
     def test_default_type_is_mixed(self):
         session = InterviewSession.objects.create(candidate=self.candidate)
         self.assertEqual(session.type, "mixed")
+
+
+class InterviewSlotCapacityTests(TestCase):
+    def setUp(self):
+        self.candidate = User.objects.create_user(
+            email="candidate_slot@example.com",
+            full_name="Candidate Slot",
+            password="password123",
+            role_name=var_sys.JOB_SEEKER,
+        )
+        self.employer = User.objects.create_user(
+            email="employer_slot@example.com",
+            full_name="Employer Slot",
+            password="password123",
+            role_name=var_sys.EMPLOYER,
+        )
+
+    def test_slot_capacity_guard_rejects_when_limit_reached(self):
+        from .serializers import SLOT_CAPACITY_FULL_MESSAGE
+        target_time = timezone.now() + timedelta(days=3)
+
+        with self.settings(MAX_CONCURRENT_INTERVIEWS_PER_SLOT=2, SLOT_WINDOW_MINUTES=15):
+            # Create 2 sessions within the slot window
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time,
+                status="scheduled",
+                session_type="official",
+            )
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time + timedelta(minutes=5),
+                status="scheduled",
+                session_type="official",
+            )
+
+            # 3rd session in same slot should fail
+            serializer = InterviewSessionCreateSerializer(data={
+                "candidate": self.candidate.id,
+                "scheduled_at": (target_time + timedelta(minutes=2)).isoformat(),
+                "type": "mixed",
+            })
+            self.assertFalse(serializer.is_valid())
+            self.assertIn("scheduled_at", serializer.errors)
+            self.assertIn(SLOT_CAPACITY_FULL_MESSAGE, str(serializer.errors["scheduled_at"]))
+
+    def test_slot_capacity_guard_allows_different_slot(self):
+        target_time = timezone.now() + timedelta(days=3)
+
+        with self.settings(MAX_CONCURRENT_INTERVIEWS_PER_SLOT=2, SLOT_WINDOW_MINUTES=15):
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time,
+                status="scheduled",
+                session_type="official",
+            )
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time + timedelta(minutes=5),
+                status="scheduled",
+                session_type="official",
+            )
+
+            # Session 45 minutes later should succeed
+            serializer = InterviewSessionCreateSerializer(data={
+                "candidate": self.candidate.id,
+                "scheduled_at": (target_time + timedelta(minutes=45)).isoformat(),
+                "type": "mixed",
+            })
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_slot_capacity_ignores_completed_and_cancelled_sessions(self):
+        target_time = timezone.now() + timedelta(days=3)
+
+        with self.settings(MAX_CONCURRENT_INTERVIEWS_PER_SLOT=1, SLOT_WINDOW_MINUTES=15):
+            # Create completed and cancelled sessions
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time,
+                status="completed",
+                session_type="official",
+            )
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time,
+                status="cancelled",
+                session_type="official",
+            )
+
+            # New scheduled session should succeed because finished sessions are excluded
+            serializer = InterviewSessionCreateSerializer(data={
+                "candidate": self.candidate.id,
+                "scheduled_at": target_time.isoformat(),
+                "type": "mixed",
+            })
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_tts_cache_key_deterministic(self):
+        from .tts_cache import compute_tts_cache_key
+        key1 = compute_tts_cache_key("tts-vi", "Trúc Ly", 1.0, "Chào bạn, mình là trợ lý AI.")
+        key2 = compute_tts_cache_key("tts-vi", "Trúc Ly", 1.0, "   Chào bạn, mình là trợ lý AI.   ")
+        self.assertEqual(key1, key2)
+

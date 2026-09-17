@@ -1426,7 +1426,12 @@
       "categories": {
         "all": "All",
         "news": "News",
-        "blog": "Recruitment blog"
+        "blog": "Recruitment blog",
+        "cam-nang": "Career Handbook",
+        "thu-tuc-lao-dong": "Labor Regulations",
+        "thue-tncn": "Personal Income Tax",
+        "bi-quyet-cv": "CV & Interview Tips",
+        "xu-huong": "Hiring Trends"
       },
       "statuses": {
         "all": "All",

@@ -135,7 +135,8 @@ export default function AdminCommandPalette({ open, onClose }: AdminCommandPalet
           bgcolor: '#FFFFFF',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
           overflow: 'hidden',
-          top: '-15%',
+          top: { xs: 0, sm: '-15%' },
+          m: { xs: 2, sm: 'auto' },
         },
       }}
     >

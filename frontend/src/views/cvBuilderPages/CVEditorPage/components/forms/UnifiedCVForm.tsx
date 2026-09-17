@@ -583,7 +583,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm kinh nghiệm làm việc
+            Thêm kinh nghiệm làm việc
           </Button>
         </Stack>
 
@@ -707,7 +707,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm học vấn
+            Thêm học vấn
           </Button>
         </Stack>
 
@@ -939,7 +939,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm ngoại ngữ
+            Thêm ngoại ngữ
           </Button>
         </Stack>
 
@@ -1055,7 +1055,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm chứng chỉ
+            Thêm chứng chỉ
           </Button>
         </Stack>
 
@@ -1150,7 +1150,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            + Thêm dự án
+            Thêm dự án
           </Button>
         </Stack>
 

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { usePathname } from 'next/navigation';
 import { Box } from "@mui/material";
 
 import Header from '../components/employers/Header';
@@ -13,14 +14,19 @@ interface AdminLayoutProps {
   children?: React.ReactNode;
 }
 
-const EXPANDED_WIDTH = 240;
+const EXPANDED_WIDTH = 260;
 const COLLAPSED_WIDTH = 64;
 
 const AdminLayout = (props: AdminLayoutProps) => {
   const { windowGetter, children } = props;
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState<boolean>(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {

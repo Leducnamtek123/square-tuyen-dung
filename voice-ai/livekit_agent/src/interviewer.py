@@ -778,6 +778,9 @@ class Interviewer(Agent):
 
     @property
     def _safe_session(self) -> Any | None:
+        override = getattr(self, "_session_override", None)
+        if override is not None:
+            return override
         try:
             return self.session
         except RuntimeError:
@@ -800,21 +803,39 @@ class Interviewer(Agent):
         *,
         speaker_name: str | None = None,
     ) -> str | None:
-        if self._completed or self._employer_takeover_active:
+        if self._completed:
             return None
 
-        response = self.build_employer_instruction_response(instruction)
-        if not response:
+        clean_text = (instruction or "").strip()
+        if not clean_text:
             return None
 
-        self._pending_employer_followups.append(response)
         logger.info(
-            "Queued employer follow-up for room %s from %s: queue_size=%s",
+            "Handling employer instruction for room %s from %s: '%s' (takeover_active=%s)",
             self._room_name,
             speaker_name or "employer",
-            len(self._pending_employer_followups),
+            clean_text[:60],
+            self._employer_takeover_active,
         )
-        return None
+
+        session = self._safe_session
+        if session is not None:
+            try:
+                await session.interrupt(force=True)
+            except Exception as exc:
+                logger.warning("Failed to interrupt session on employer instruction: %s", exc)
+            try:
+                await session.say(clean_text, allow_interruptions=False)
+            except Exception as exc:
+                logger.error("Failed to speak employer instruction: %s", exc)
+
+        try:
+            await self.record_transcript("ai_agent", clean_text)
+        except Exception as exc:
+            logger.warning("Failed to record employer instruction transcript: %s", exc)
+
+        self._last_asked_question_text = clean_text
+        return clean_text
 
     async def on_enter(self) -> None:
         """Called when the agent joins the session."""

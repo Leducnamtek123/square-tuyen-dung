@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
-import { buildSeoMetadata } from '@/utils/serverI18n';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import { CVEditorPage } from '@/views/cvBuilderPages/CVEditorPage';
 
 export async function generateMetadata({
@@ -9,12 +9,12 @@ export async function generateMetadata({
   params: Promise<{ templateId: string }>;
 }): Promise<Metadata> {
   const resolved = await params;
-  return buildSeoMetadata({
-    title: `Tạo CV Trực Tuyến - Mẫu ${resolved.templateId}`,
-    description:
-      'Trình tạo và trang trí CV trực tuyến thông minh, đồng bộ 1 chạm từ hồ sơ cá nhân, xuất PDF chuẩn in ấn A4 nhanh chóng.',
-    path: `/tao-cv/${resolved.templateId}`,
-  });
+  const baseMeta = await buildPageMetadata('cv-builder');
+  const baseTitle = typeof baseMeta.title === 'string' ? baseMeta.title : 'CV Builder';
+  return {
+    ...baseMeta,
+    title: `${baseTitle} - ${resolved.templateId}`,
+  };
 }
 
 export default function Page() {

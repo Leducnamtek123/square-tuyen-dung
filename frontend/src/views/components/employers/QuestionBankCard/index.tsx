@@ -35,12 +35,17 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import PublicIcon from '@mui/icons-material/Public';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toastMessages from '@/utils/toastMessages';
 import { confirmModal } from '@/utils/sweetalert2Modal';
 import errorHandling from '@/utils/errorHandling';
 import DataTable from '@/components/Common/DataTable';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { ExportModal } from '@/components/Common/ExportModal';
+import { ImportModal } from '@/components/Common/ImportModal';
 import { useDataTable } from '@/hooks';
 import { useEmployerQuestions, useQuestionMutations } from '../hooks/useEmployerQueries';
 import type { Question } from '@/types/models';
@@ -219,6 +224,8 @@ const getQuestionMeta = (input: string | QuestionMetaInput) => {
     }
   }
 
+  const difficultyColor = difficultyLevel === 1 ? '#16a34a' : difficultyLevel === 3 ? '#d97706' : '#0284c7';
+
   return {
     category: categoryLabel,
     categoryKey,
@@ -228,6 +235,7 @@ const getQuestionMeta = (input: string | QuestionMetaInput) => {
     borderColor: alpha(color, 0.25),
     difficulty: difficultyLabel,
     difficultyLevel,
+    difficultyColor,
     duration: durationLabel,
     durationSeconds,
   };
@@ -284,6 +292,9 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
     const [isEdit, setIsEdit] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [importModalOpen, setImportModalOpen] = useState(false);
+    const [exportModalOpen, setExportModalOpen] = useState(false);
+    const queryClient = useQueryClient();
 
     // Data Fetching Hook
     const { data: questionData, isLoading } = useEmployerQuestions({
@@ -591,13 +602,14 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                         <Chip
                             label={meta.difficulty}
                             size="small"
-                            variant="outlined"
                             sx={{
                                 height: 22,
-                                fontSize: '0.65rem',
+                                fontSize: '0.6875rem',
                                 fontWeight: 700,
-                                borderColor: alpha(theme.palette.text.secondary, 0.2),
-                                color: 'text.secondary',
+                                bgcolor: alpha(meta.difficultyColor, 0.08),
+                                color: meta.difficultyColor,
+                                border: '1px solid',
+                                borderColor: alpha(meta.difficultyColor, 0.25),
                                 borderRadius: '6px',
                             }}
                         />
@@ -655,14 +667,19 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                                 }
                                 sx={{
                                     cursor: isSystem ? 'not-allowed' : 'pointer',
-                                    opacity: isSystem ? 0.65 : 1,
                                     fontWeight: 700,
                                     fontSize: '0.75rem',
-                                    color: isPublic ? '#047857' : '#475569',
+                                    color: isPublic ? '#047857' : '#334155',
                                     bgcolor: isPublic ? '#d1fae5' : '#f1f5f9',
                                     border: '1px solid',
                                     borderColor: isPublic ? '#a7f3d0' : '#cbd5e1',
                                     transition: 'all 0.2s ease',
+                                    '&.Mui-disabled': {
+                                        opacity: 0.85,
+                                        color: isPublic ? '#047857' : '#334155',
+                                        bgcolor: isPublic ? '#d1fae5' : '#f1f5f9',
+                                        borderColor: isPublic ? '#a7f3d0' : '#cbd5e1',
+                                    },
                                     '&:hover': isSystem
                                         ? undefined
                                         : {
@@ -950,15 +967,33 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                         </Typography>
                     </Box>
 
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        startIcon={<AddIcon />}
-                        onClick={() => handleOpen()}
-                        sx={{ px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}
-                    >
-                        {t('interview:employer.questionBank.add')}
-                    </Button>
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Button
+                            variant="outlined"
+                            startIcon={<UploadFileOutlinedIcon />}
+                            onClick={() => setImportModalOpen(true)}
+                            sx={{ px: 2, py: 1, fontWeight: 700, textTransform: 'none', borderRadius: 2 }}
+                        >
+                            Nhập câu hỏi (Excel/CSV)
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            startIcon={<FileDownloadOutlinedIcon />}
+                            onClick={() => setExportModalOpen(true)}
+                            sx={{ px: 2, py: 1, fontWeight: 700, textTransform: 'none', borderRadius: 2 }}
+                        >
+                            Xuất kho câu hỏi
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            startIcon={<AddIcon />}
+                            onClick={() => handleOpen()}
+                            sx={{ px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}
+                        >
+                            {t('interview:employer.questionBank.add')}
+                        </Button>
+                    </Stack>
                 </Stack>
 
                 {/* Filter and Search Bar */}
@@ -1324,6 +1359,31 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                 </Dialog>
 
                 {isMutating && <BackdropLoading />}
+
+                {/* Export Modal */}
+                <ExportModal
+                    open={exportModalOpen}
+                    onClose={() => setExportModalOpen(false)}
+                    defaultFileName="NganHangCauHoiPhongVan"
+                    columns={[]}
+                    entity="question_bank"
+                    totalRecords={{
+                        all: count || 0,
+                        filtered: count || 0,
+                        selected: 0,
+                    }}
+                />
+
+                {/* Import Modal */}
+                <ImportModal
+                    open={importModalOpen}
+                    onClose={() => setImportModalOpen(false)}
+                    entity="question_bank"
+                    title="Nhập ngân hàng câu hỏi (Question Bank Import)"
+                    onSuccess={() => {
+                        queryClient.invalidateQueries({ queryKey: ['employerQuestions'] });
+                    }}
+                />
             </Paper>
         </Stack>
     );

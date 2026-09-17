@@ -108,23 +108,25 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                 </Box>
               )}
             </Box>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 1.25, sm: 2.5 }}
+            <Box
               sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: { xs: 1.5, sm: 2.5 },
                 justifyContent: { xs: 'center', md: 'flex-start' },
-                alignItems: { xs: 'center', md: 'flex-start' },
+                alignItems: "center",
                 "& .MuiTypography-root": {
                   color: "#475569",
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
                   fontSize: { xs: '0.85rem', sm: '0.925rem' },
+                  whiteSpace: "nowrap",
                   "& svg": { color: "#2563eb", fontSize: "1.1rem" },
                 },
               }}
             >
-              <Typography variant="subtitle1">
+              <Typography variant="subtitle1" sx={{ whiteSpace: "normal !important", maxWidth: { xs: "100%", md: "420px" } }}>
                 <FontAwesomeIcon icon={faBriefcase} />
                 {companyDetail.fieldOperation}
               </Typography>
@@ -140,7 +142,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
                 <FontAwesomeIcon icon={faCalendarDays} />
                 {t("companyDetail.since", { year: dayjs(companyDetail?.since).format("YYYY") })}
               </Typography>
-            </Stack>
+            </Box>
           </Box>
           <Box sx={{ pt: 1, display: { xs: 'none', md: 'block' } }}>
             <QRCodeBox value={(typeof window !== 'undefined' ? window.location.href : '') || "-"} size={80} label={t("companyDetail.shareWithQr")} />

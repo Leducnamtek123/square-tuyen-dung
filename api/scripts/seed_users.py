@@ -65,7 +65,7 @@ emp_user, _ = User.objects.get_or_create(
         "is_verify_email": True,
     },
 )
-emp_user.set_password("Password123!")
+emp_user.set_password("Squaretuyendung@2026")
 emp_user.save()
 emp_user.has_company = True
 emp_user.is_onboarded = True

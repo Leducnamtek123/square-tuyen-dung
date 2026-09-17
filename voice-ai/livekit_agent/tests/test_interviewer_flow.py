@@ -392,9 +392,22 @@ def test_employer_takeover_pauses_scripted_replies_until_released() -> None:
     asyncio.run(run())
 
 
-def test_employer_instruction_is_queued_until_before_candidate_qna() -> None:
+def test_employer_instruction_speaks_immediately_and_records_transcript() -> None:
+    class DummySession:
+        def __init__(self):
+            self.interrupted = False
+            self.spoken = []
+
+        async def interrupt(self, force=True):
+            self.interrupted = True
+
+        async def say(self, text, allow_interruptions=False):
+            self.spoken.append((text, allow_interruptions))
+
     async def run() -> None:
         agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
+        session = DummySession()
+        agent._session_override = session
         recorded = []
 
         async def fake_record_transcript(
@@ -404,45 +417,67 @@ def test_employer_instruction_is_queued_until_before_candidate_qna() -> None:
 
         agent.record_transcript = fake_record_transcript
 
-        queued = await agent.handle_employer_instruction(
+        result = await agent.handle_employer_instruction(
             "Hoi sau hon ve kinh nghiem Revit"
         )
-        first = await agent.llm_node(
-            DummyChatContext(DummyUserMessage("u1", "Xin chao")), [], None
-        )
-        follow_up = await agent.llm_node(
-            DummyChatContext(
-                DummyUserMessage(
-                    "u2",
-                    "Toi co hon nam nam kinh nghiem giam sat cong trinh dan dung",
-                )
-            ),
-            [],
-            None,
-        )
-        qna_prompt = await agent.llm_node(
-            DummyChatContext(
-                DummyUserMessage(
-                    "u3",
-                    "Toi da dung Revit de phoi hop ban ve ket cau va kien truc trong nhieu du an",
-                )
-            ),
-            [],
-            None,
+
+        assert result == "Hoi sau hon ve kinh nghiem Revit"
+        assert session.interrupted is True
+        assert session.spoken == [("Hoi sau hon ve kinh nghiem Revit", False)]
+        assert recorded == [
+            ("ai_agent", "Hoi sau hon ve kinh nghiem Revit", None),
+        ]
+        assert agent._last_asked_question_text == "Hoi sau hon ve kinh nghiem Revit"
+
+    asyncio.run(run())
+
+
+def test_employer_instruction_speaks_during_takeover() -> None:
+    class DummySession:
+        def __init__(self):
+            self.interrupted = False
+            self.spoken = []
+
+        async def interrupt(self, force=True):
+            self.interrupted = True
+
+        async def say(self, text, allow_interruptions=False):
+            self.spoken.append((text, allow_interruptions))
+
+    async def run() -> None:
+        agent = Interviewer(context={"questions": [{"text": "Cau hoi 1"}]})
+        session = DummySession()
+        agent._session_override = session
+        recorded = []
+
+        async def fake_record_transcript(
+            speaker_role, content, speech_duration_ms=None
+        ):
+            recorded.append((speaker_role, content, speech_duration_ms))
+
+        agent.record_transcript = fake_record_transcript
+
+        # Employer activates takeover
+        agent.pause_for_employer_takeover("HR User")
+        assert agent.employer_takeover_active is True
+
+        # Employer sends instruction - should NOT be dropped despite takeover
+        result = await agent.handle_employer_instruction(
+            "Ban da tung su dung Docker va Kubernetes chua?"
         )
 
-        assert queued is None
+        assert result == "Ban da tung su dung Docker va Kubernetes chua?"
+        assert session.interrupted is True
+        assert session.spoken == [("Ban da tung su dung Docker va Kubernetes chua?", False)]
         assert recorded == [
-            ("ai_agent", first, None),
-            ("ai_agent", follow_up, None),
-            ("ai_agent", qna_prompt, None),
+            ("ai_agent", "Ban da tung su dung Docker va Kubernetes chua?", None),
         ]
-        assert "Cau hoi 1" in first
-        assert "Revit" in follow_up
-        normalized_qna = _strip_accents(qna_prompt).lower()
-        assert "cau hoi" in normalized_qna
-        assert "cong ty" in normalized_qna
-        assert agent.completed is False
+
+        # Completed session should drop instruction
+        agent._completed = True
+        completed_result = await agent.handle_employer_instruction("Cau hoi sau khi ket thuc")
+        assert completed_result is None
+        assert len(session.spoken) == 1
 
     asyncio.run(run())
 

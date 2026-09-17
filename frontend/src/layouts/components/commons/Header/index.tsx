@@ -249,7 +249,6 @@ const Header = (_props: HeaderProps) => {
               minHeight: { xs: 56, sm: 64 },
               px: { xs: 0.75, sm: 1.5, md: 2 },
               gap: { xs: 0.5, sm: 1 },
-              overflow: 'hidden',
               justifyContent: 'space-between',
             }}
           >

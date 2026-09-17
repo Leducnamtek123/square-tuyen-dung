@@ -648,3 +648,106 @@ def start_room_recording_task(room_name: str) -> None:
         logger.warning("start_room_recording_task failed for room %s: %s", room_name, exc)
 
 
+def synthesize_and_cache_audio(model: str, voice: str, speed: float, text: str) -> bool:
+    """Helper to synthesize audio and write to the shared TTS cache directory."""
+    import os
+    import shutil
+    import httpx
+    from .tts_cache import get_tts_cache_file_path, sanitize_tts_text
+
+    cleaned_text = sanitize_tts_text(text)
+    if not cleaned_text:
+        return False
+
+    cache_path = get_tts_cache_file_path(model, voice, speed, cleaned_text)
+    if os.path.exists(cache_path) and os.path.getsize(cache_path) > 100:
+        logger.info("TTS Cache already pre-warmed for: %s", cleaned_text[:30])
+        return True
+
+    base_url = (
+        getattr(settings, "TTS_BASE_URL", None)
+        or config("TTS_BASE_URL", default="")
+        or config("AI_TTS_BASE_URL", default="https://api.nodelee.tech:4433/v1")
+    ).rstrip("/")
+    api_key = (
+        getattr(settings, "TTS_API_KEY", None)
+        or config("TTS_API_KEY", default="")
+        or config("AI_TTS_API_KEY", default="")
+    )
+
+    url = f"{base_url}/audio/speech"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": model,
+        "input": cleaned_text,
+        "voice": voice,
+        "response_format": "mp3",
+        "speed": speed,
+    }
+
+    try:
+        with httpx.Client(timeout=30.0, verify=False) as client:
+            resp = client.post(url, json=payload, headers=headers)
+            if resp.status_code == 200 and len(resp.content) > 100:
+                tmp_dir = os.path.dirname(cache_path)
+                os.makedirs(tmp_dir, exist_ok=True)
+                tmp_file = f"{cache_path}.tmp.{os.getpid()}"
+                with open(tmp_file, "wb") as f:
+                    f.write(resp.content)
+                shutil.move(tmp_file, cache_path)
+                try:
+                    os.chmod(cache_path, 0o666)
+                except Exception:
+                    pass
+                logger.info("TTS Pre-warmed audio written to %s (%d bytes)", cache_path, len(resp.content))
+                return True
+            else:
+                logger.warning("TTS Pre-warm failed for %s: HTTP %s (%s)", cleaned_text[:30], resp.status_code, resp.text[:100])
+    except Exception as exc:
+        logger.warning("TTS Pre-warm exception for %s: %s", cleaned_text[:30], exc)
+    return False
+
+
+@shared_task
+def prewarm_interview_tts_task(session_id: int) -> None:
+    """Pre-synthesize opening greeting and first question audio into the shared disk cache."""
+    from apps.interviews.models import InterviewSession
+    from .tts_cache import format_opening_greeting
+
+    try:
+        session = InterviewSession.objects.select_related(
+            "candidate", "job_post", "voice_profile"
+        ).prefetch_related("questions").get(id=session_id)
+    except InterviewSession.DoesNotExist:
+        logger.warning("prewarm_interview_tts_task: session %s does not exist", session_id)
+        return
+
+    candidate_name = getattr(session.candidate, "full_name", "") or getattr(session.candidate, "username", "") or ""
+    job_title = session.job_post.job_name if session.job_post else (session.session_metadata or {}).get("position_title", "")
+    language = session.interview_language or "vi"
+    has_cv = bool(getattr(session.candidate, "cv_file", None))
+    voice = getattr(session.voice_profile, "voice_id", None) or config("AI_TTS_DEFAULT_VOICE", default="Trúc Ly")
+    model = config("AI_TTS_MODEL", default="tts-vi")
+    speed = 1.0
+
+    # 1. Opening greeting
+    greeting = format_opening_greeting(candidate_name, job_title, language, has_cv)
+    synthesize_and_cache_audio(model, voice, speed, greeting)
+
+    # 2. First question (if any)
+    first_question = session.questions.order_by("sort_order", "create_at", "id").first()
+    q_text = (getattr(first_question, "text", "") or getattr(first_question, "content", "") or "").strip()
+    if q_text:
+        if language == "vi":
+            first_q_prompt_1 = f"Hi bạn, mình bắt đầu nhẹ nhé. {q_text}"
+            first_q_prompt_2 = f"Ok, mình bắt đầu nhé. {q_text}"
+            synthesize_and_cache_audio(model, voice, speed, first_q_prompt_1)
+            synthesize_and_cache_audio(model, voice, speed, first_q_prompt_2)
+        elif language == "en":
+            first_q_prompt = f"Let us begin with our first question. {q_text}"
+            synthesize_and_cache_audio(model, voice, speed, first_q_prompt)
+
+

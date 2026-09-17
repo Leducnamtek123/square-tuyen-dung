@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import BiometricLogsPage from '@/views/hrmPages/AttendancePages/BiometricLogsPage';
 
-export const metadata: Metadata = {
-  title: 'Dữ liệu máy chấm công | InfoHR Quản lý nhân sự',
-  description: 'Dữ liệu log quẹt thẻ từ máy chấm công ZKTeco và Import Excel',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.hrm.attendances.biometric-logs');
+}
 
 export default function EmployerAttendanceBiometricLogsPage() {
   return <BiometricLogsPage />;

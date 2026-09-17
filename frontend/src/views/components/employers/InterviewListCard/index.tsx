@@ -15,6 +15,8 @@ import { confirmModal } from '@/utils/sweetalert2Modal';
 import { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
 import { useInterviewListCardColumns } from './useInterviewListCardColumns';
 import { localizeRoutePath } from '@/configs/routeLocalization';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import { ExportModal } from '@/components/Common/ExportModal';
 
 interface InterviewListCardProps {
   title?: string;
@@ -37,6 +39,8 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
     initialSorting: [{ id: 'scheduledAt', desc: true }],
     initialPageSize: 10,
   });
+
+  const [exportModalOpen, setExportModalOpen] = React.useState(false);
 
   const queryParams = useMemo(
     () => ({
@@ -124,28 +128,44 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             {t('interview:interviewListCard.description', { count })}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          component={Link}
-          href={createHref}
-          sx={{
-            px: 3.5,
-            py: 1.25,
-            boxShadow: (theme) => theme.customShadows?.primary,
-            fontWeight: 800,
-            textTransform: 'none',
-            fontSize: '0.9rem',
-          }}
-        >
-          {t('interview:interviewListCard.scheduleInterview')}
-        </Button>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Button
+            variant="outlined"
+            startIcon={<FileDownloadOutlinedIcon />}
+            onClick={() => setExportModalOpen(true)}
+            sx={{
+              px: 2.5,
+              py: 1.25,
+              fontWeight: 700,
+              textTransform: 'none',
+              borderRadius: 2,
+            }}
+          >
+            Xuất lịch phỏng vấn
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            component={Link}
+            href={createHref}
+            sx={{
+              px: 3.5,
+              py: 1.25,
+              boxShadow: (theme) => theme.customShadows?.primary,
+              fontWeight: 800,
+              textTransform: 'none',
+              fontSize: '0.9rem',
+            }}
+          >
+            {t('interview:interviewListCard.scheduleInterview')}
+          </Button>
+        </Stack>
       </Stack>
 
       <Alert
         severity="info"
-        icon={<AutoAwesomeIcon sx={{ color: '#2563eb' }} />}
+        icon={<AutoAwesomeIcon sx={{ color: '#2563eb', mt: { xs: 0.25, sm: 0 } }} />}
         action={
           <Button
             component={Link}
@@ -153,7 +173,15 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             size="small"
             color="primary"
             variant="outlined"
-            sx={{ fontWeight: 700, textTransform: 'none', borderRadius: '8px', px: 2, whiteSpace: 'nowrap' }}
+            sx={{
+              fontWeight: 700,
+              textTransform: 'none',
+              borderRadius: '8px',
+              px: 2,
+              py: 0.75,
+              whiteSpace: 'nowrap',
+              width: { xs: '100%', sm: 'auto' },
+            }}
           >
             {t('interview:interviewListCard.autoInterviewBanner.action')}
           </Button>
@@ -163,19 +191,35 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
           borderRadius: '12px',
           bgcolor: 'rgba(37, 99, 235, 0.05)',
           border: '1px solid rgba(37, 99, 235, 0.15)',
-          alignItems: 'center',
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 1.5, sm: 0 },
+          '& .MuiAlert-icon': {
+            mr: { xs: 1.5, sm: 2 },
+            p: 0,
+          },
           '& .MuiAlert-message': {
             display: 'flex',
             flexDirection: { xs: 'column', sm: 'row' },
             alignItems: { xs: 'flex-start', sm: 'center' },
-            gap: 1,
+            gap: { xs: 0.5, sm: 1 },
+            p: 0,
+            width: '100%',
+          },
+          '& .MuiAlert-action': {
+            m: 0,
+            p: 0,
+            pt: { xs: 1, sm: 0 },
+            width: { xs: '100%', sm: 'auto' },
+            display: 'flex',
+            justifyContent: { xs: 'stretch', sm: 'flex-end' },
           },
         }}
       >
-        <Typography variant="body2" component="span" sx={{ color: '#1e3a8a', fontWeight: 700 }}>
+        <Typography variant="body2" component="span" sx={{ color: '#1e3a8a', fontWeight: 700, lineHeight: 1.5 }}>
           {t('interview:interviewListCard.autoInterviewBanner.title')}:
         </Typography>
-        <Typography variant="body2" component="span" sx={{ color: '#334155' }}>
+        <Typography variant="body2" component="span" sx={{ color: '#334155', lineHeight: 1.5 }}>
           {t('interview:interviewListCard.autoInterviewBanner.description')}
         </Typography>
       </Alert>
@@ -196,6 +240,20 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
       />
 
       {isMutating && <BackdropLoading />}
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName="DanhSachLichPhongVan"
+        columns={[]}
+        entity="interview"
+        totalRecords={{
+          all: count || 0,
+          filtered: count || 0,
+          selected: 0,
+        }}
+      />
     </Paper>
   );
 };

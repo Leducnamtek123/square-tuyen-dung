@@ -1,11 +1,11 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import DeviceListPage from '@/views/hrmPages/AttendancePages/DeviceListPage';
 
-export const metadata: Metadata = {
-  title: 'Quản lý Thiết bị Chấm công | InfoHR Quản lý nhân sự',
-  description: 'Quản lý danh mục thiết bị máy chấm công, giám sát trạng thái kết nối mạng và đồng bộ dữ liệu theo chi nhánh',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.hrm.attendances.devices');
+}
 
 export default function EmployerAttendanceDevicesPage() {
   return <DeviceListPage />;

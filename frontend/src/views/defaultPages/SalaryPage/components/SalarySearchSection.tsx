@@ -173,7 +173,7 @@ export const SalarySearchSection: React.FC<SalarySearchSectionProps> = ({
               size="small"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Nhập chức danh: Kỹ sư xây dựng, Kiến trúc sư, Frontend Developer, Sales B2B..."
+              placeholder="Kỹ sư xây dựng, Kiến trúc sư, Frontend, Sales B2B..."
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -236,6 +236,7 @@ export const SalarySearchSection: React.FC<SalarySearchSectionProps> = ({
               }}
               variant="scrollable"
               scrollButtons="auto"
+              allowScrollButtonsMobile
               sx={{
                 minHeight: 40,
                 '& .MuiTabs-indicator': {

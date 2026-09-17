@@ -2,6 +2,12 @@ import { useSyncExternalStore } from 'react';
 
 export type ModalIconType = 'success' | 'error' | 'warning' | 'info' | 'question' | 'logout';
 
+export interface ConfirmDialogInputOptions {
+  placeholder?: string;
+  defaultValue?: string;
+  required?: boolean;
+}
+
 export interface ConfirmDialogOptions {
   title?: string;
   text?: string;
@@ -9,7 +15,8 @@ export interface ConfirmDialogOptions {
   showCancelButton?: boolean;
   confirmButtonText?: string;
   cancelButtonText?: string;
-  onConfirm?: () => void;
+  input?: ConfirmDialogInputOptions;
+  onConfirm?: (inputValue?: string) => void;
   onCancel?: () => void;
 }
 
@@ -25,6 +32,7 @@ const defaultState: ConfirmDialogState = {
   showCancelButton: true,
   confirmButtonText: 'Đồng ý',
   cancelButtonText: 'Hủy',
+  input: undefined,
 };
 
 let currentState: ConfirmDialogState = { ...defaultState };

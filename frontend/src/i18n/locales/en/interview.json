@@ -297,6 +297,7 @@
   },
   "interviewDetail": {
     "title": "Interview Details",
+    "forceEndTitle": "End interview",
     "subtitle": {
       "info": "Interview Information",
       "aiEvaluation": "AI Evaluation Result",

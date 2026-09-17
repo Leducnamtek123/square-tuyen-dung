@@ -152,16 +152,73 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
             )
         ],
     )
-    taxCode = serializers.CharField(
-        source="tax_code",
+class CompanyRegisterLocationSerializer(serializers.ModelSerializer):
+    address = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
+    lat = serializers.FloatField(required=False, allow_null=True)
+    lng = serializers.FloatField(required=False, allow_null=True)
+
+    def validate(self, attrs):
+        city = attrs.get("city")
+        district = attrs.get("district")
+        if not city:
+            raise serializers.ValidationError({"city": ["City is required."]})
+        if not district:
+            from apps.locations.models import District
+            default_district = District.objects.filter(city_id=city.id).first()
+            if default_district:
+                attrs["district"] = default_district
+            else:
+                raise serializers.ValidationError({"district": ["District is required."]})
+        if not attrs.get("address"):
+            attrs["address"] = city.name if hasattr(city, 'name') else "Trụ sở chính"
+        return attrs
+
+    class Meta:
+        model = Location
+        fields = ('city', 'district', 'ward', 'address', 'lat', 'lng')
+
+class CompanyRegisterSerializer(serializers.ModelSerializer):
+    companyName = serializers.CharField(
+        source='company_name',
         required=True,
-        max_length=30,
+        max_length=255,
         validators=[
             UniqueValidator(
                 Company.objects.all(),
-                message=ERROR_MESSAGES['COMPANY_TAX_CODE_EXISTS'],
+                lookup='iexact',
+                message=ERROR_MESSAGES['COMPANY_NAME_EXISTS'],
             )
         ],
+    )
+    companyEmail = serializers.EmailField(
+        source='company_email',
+        required=True,
+        max_length=100,
+        validators=[
+            UniqueValidator(
+                Company.objects.all(),
+                lookup='iexact',
+                message=ERROR_MESSAGES['COMPANY_EMAIL_EXISTS'],
+            )
+        ],
+    )
+    companyPhone = serializers.CharField(
+        source='company_phone',
+        required=True,
+        max_length=15,
+        validators=[
+            UniqueValidator(
+                Company.objects.all(),
+                message=ERROR_MESSAGES['COMPANY_PHONE_EXISTS'],
+            )
+        ],
+    )
+    taxCode = serializers.CharField(
+        source="tax_code",
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=30,
     )
     fieldOperation = serializers.CharField(source="field_operation", required=False,
                                            max_length=255,
@@ -171,12 +228,17 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
                                   input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
                                                  var_sys.DATE_TIME_FORMAT["Ymd"]],
                                   allow_null=True)
-    employeeSize = serializers.ChoiceField(source="employee_size", required=True, choices=var_sys.EMPLOYEE_SIZE_CHOICES)
+    employeeSize = serializers.ChoiceField(
+        source="employee_size",
+        required=False,
+        default=2,
+        choices=var_sys.EMPLOYEE_SIZE_CHOICES,
+    )
     websiteUrl = serializers.URLField(source="website_url", required=False, max_length=300,
                                       allow_blank=True,
                                       allow_null=True)
     description = serializers.CharField(required=False)
-    location = LocationSerializer()
+    location = CompanyRegisterLocationSerializer()
 
     class Meta:
         model = Company
@@ -191,6 +253,13 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
         errors = {}
         company_phone = attrs.get("company_phone")
         since = attrs.get("since")
+        tax_code = attrs.get("tax_code")
+
+        if not tax_code:
+            import time, uuid
+            attrs["tax_code"] = f"DRAFT_{int(time.time())}_{uuid.uuid4().hex[:6]}"
+        elif Company.objects.filter(tax_code=tax_code).exists():
+            errors["taxCode"] = [ERROR_MESSAGES['COMPANY_TAX_CODE_EXISTS']]
 
         if company_phone and not PHONE_PATTERN.fullmatch(str(company_phone).strip()):
             errors["companyPhone"] = ["Invalid phone number."]

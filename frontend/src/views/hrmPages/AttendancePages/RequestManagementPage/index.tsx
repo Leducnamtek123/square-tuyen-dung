@@ -59,6 +59,7 @@ import {
   NativeAttendanceRequest,
 } from '@/services/hrmService';
 import { TabTitle } from '@/utils/generalFunction';
+import toastMessages from '@/utils/toastMessages';
 import pc from '@/utils/muiColors';
 
 const inputSx = {
@@ -169,7 +170,7 @@ export default function RequestManagementPage() {
   const handleSubmitCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!createForm.employee) {
-      alert('Vui lòng chọn nhân viên.');
+      toastMessages.error('Vui lòng chọn nhân viên.');
       return;
     }
 

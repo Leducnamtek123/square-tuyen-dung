@@ -1,12 +1,12 @@
 import React, { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import RequestManagementPage from '@/views/hrmPages/AttendancePages/RequestManagementPage';
 import { CircularProgress, Box } from '@mui/material';
 
-export const metadata: Metadata = {
-  title: 'Trung tâm quản lý đơn từ | InfoHR Quản lý nhân sự',
-  description: 'Quản lý và phê duyệt 2 cấp cho các loại đơn từ chấm công, nghỉ phép, OT, công tác',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.hrm.attendances.requests');
+}
 
 export default function EmployerAttendanceRequestsPage() {
   return (

@@ -97,8 +97,8 @@ const JobPostLarge = ({
           <Box
             sx={{
               position: 'relative',
-              width: { xs: 64, sm: 84, md: 100 },
-              height: { xs: 64, sm: 84, md: 100 },
+              width: { xs: 52, sm: 84, md: 100 },
+              height: { xs: 52, sm: 84, md: 100 },
               flexShrink: 0,
             }}
           >
@@ -111,7 +111,7 @@ const JobPostLarge = ({
                 width: '100%',
                 height: '100%',
                 border: 1,
-                borderRadius: 2.5,
+                borderRadius: { xs: 2, sm: 2.5 },
                 borderColor: theme.palette.grey[200],
                 p: { xs: 0.5, sm: 1 },
                 backgroundColor: theme.palette.common.white,
@@ -155,16 +155,29 @@ const JobPostLarge = ({
               {isHot && <HotBadge theme={theme} />}
             </Stack>
 
-            <JobPostLargeInfoChips
-              theme={theme}
-              salaryMin={salaryMin}
-              salaryMax={salaryMax}
-              salaryLanguage={i18n.language}
-              cityLabel={cityLabel}
-              deadline={deadline}
-            />
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <JobPostLargeInfoChips
+                theme={theme}
+                salaryMin={salaryMin}
+                salaryMax={salaryMax}
+                salaryLanguage={i18n.language}
+                cityLabel={cityLabel}
+                deadline={deadline}
+              />
+            </Box>
           </Stack>
         </Stack>
+
+        <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+          <JobPostLargeInfoChips
+            theme={theme}
+            salaryMin={salaryMin}
+            salaryMax={salaryMax}
+            salaryLanguage={i18n.language}
+            cityLabel={cityLabel}
+            deadline={deadline}
+          />
+        </Box>
       </Stack>
 
       <Box sx={{ my: 0.75 }}>

@@ -58,4 +58,35 @@ const errorModal = (title = '', text = ''): Promise<SweetAlertResult> => {
   });
 };
 
-export { confirmModal, errorModal };
+const promptModal = (
+  title = '',
+  text = '',
+  placeholder = '',
+  defaultValue = '',
+  icon: ModalIconType = 'question',
+  confirmButtonText = 'Đồng ý',
+  cancelButtonText = 'Hủy'
+): Promise<string | null> => {
+  return new Promise((resolve) => {
+    confirmDialogStore.show({
+      title,
+      text,
+      icon,
+      showCancelButton: true,
+      confirmButtonText,
+      cancelButtonText,
+      input: {
+        placeholder,
+        defaultValue,
+      },
+      onConfirm: (val) => {
+        resolve(val ?? '');
+      },
+      onCancel: () => {
+        resolve(null);
+      },
+    });
+  });
+};
+
+export { confirmModal, errorModal, promptModal };

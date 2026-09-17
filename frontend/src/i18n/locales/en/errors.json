@@ -34,5 +34,14 @@
   "employerAppliedTitle": "Recent Applications",
   "employerAppliedDesc": "Review and evaluate applicants' CVs",
   "employerDashboardTitle": "Employer Dashboard",
-  "employerDashboardDesc": "Overview of recruitment metrics and performance"
+  "employerDashboardDesc": "Overview of recruitment metrics and performance",
+  "backAdminHome": "Back to Admin Portal",
+  "adminDashboardTitle": "Admin Dashboard",
+  "adminDashboardDesc": "System metrics, user and job posting overview",
+  "adminJobsTitle": "Job Posts Management",
+  "adminJobsDesc": "Review, approve and moderate job posts",
+  "adminProfilesTitle": "Candidate Profiles & CVs",
+  "adminProfilesDesc": "Lookup candidate account details and CV profiles",
+  "adminUsersTitle": "User Management",
+  "adminUsersDesc": "Manage roles and accounts for employers and seekers"
 }

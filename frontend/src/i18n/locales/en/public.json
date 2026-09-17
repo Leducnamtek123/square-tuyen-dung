@@ -513,5 +513,30 @@
     "candidateBadge": "Candidate"
   },
   "featuredCompanies": "Featured Companies",
-  "openPositions": "{{count}} open positions"
+  "openPositions": "{{count}} open positions",
+  "salary": {
+    "allCategories": "All Industries",
+    "seniorities": {
+      "all": "All Seniority Levels",
+      "junior": "Junior / Entry-level (0 - 2 years)",
+      "mid": "Mid-level (2 - 4 years)",
+      "senior": "Senior / Manager (> 4 years)"
+    },
+    "metrics": {
+      "surveyedRoles": "Surveyed Roles",
+      "standardRanges": "{{count}} benchmark roles",
+      "zeroRanges": "0 benchmark roles",
+      "medianSalary": "Median Salary (P50)",
+      "perMonth": "{{val}} / month",
+      "highestSalary": "Highest Ceiling (Max)",
+      "upTo": "Up to {{val}}"
+    },
+    "cta": {
+      "eyebrow": "Next step toward your target compensation",
+      "title": "Confidently Ace Your Interviews with AI Interviewer",
+      "desc": "Experience online practice interviews with AI, question timers, structured STAR responses, and comprehensive feedback for free.",
+      "button": "Start Practice Interview Now"
+    },
+    "errorFetch": "Failed to load salary benchmarks. Please try again!"
+  }
 }

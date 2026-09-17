@@ -4,7 +4,7 @@ import { type Theme } from '@mui/material/styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
-import TimeAgo from '@/components/Common/TimeAgo';
+import dayjs from '@/configs/dayjs-config';
 
 type JobPostLargeFooterProps = {
   theme: Theme;
@@ -12,7 +12,22 @@ type JobPostLargeFooterProps = {
 };
 
 export const JobPostLargeFooter = ({ theme, deadline }: JobPostLargeFooterProps) => {
-  const { t } = useTranslation(['public', 'common']);
+  const { i18n } = useTranslation(['public', 'common']);
+  const isEn = i18n.language && i18n.language.startsWith('en');
+
+  const daysLeftText = React.useMemo(() => {
+    if (!deadline) return isEn ? '30 days left' : 'Còn 30 ngày';
+    const diffDays = dayjs(deadline).diff(dayjs(), 'day');
+    if (diffDays > 0) {
+      return isEn ? `${diffDays} days left` : `Còn ${diffDays} ngày`;
+    }
+    const diffHours = dayjs(deadline).diff(dayjs(), 'hour');
+    if (diffHours > 0) {
+      return isEn ? `${diffHours} hours left` : `Còn ${diffHours} giờ`;
+    }
+    return isEn ? 'Expired' : 'Hết hạn';
+  }, [deadline, isEn]);
+
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Box
@@ -36,7 +51,7 @@ export const JobPostLargeFooter = ({ theme, deadline }: JobPostLargeFooterProps)
           }}
           variant="body2"
         >
-          {t('public:jobPost.timeLeft', { defaultValue: 'Còn' })} <TimeAgo date={deadline} type="fromNow" />
+          {daysLeftText}
         </Typography>
       </Box>
     </Box>

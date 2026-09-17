@@ -366,6 +366,7 @@ export default function AuditLogsPage() {
         defaultFileName="AuditLogs"
         columns={auditLogExportColumns}
         fetchData={handleFetchAuditLogExportData}
+        entity="audit_log"
         totalRecords={{
           all: data?.count || 0,
           filtered: data?.count || 0,

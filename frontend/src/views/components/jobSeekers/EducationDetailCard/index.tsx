@@ -307,7 +307,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           <Stack direction="row" spacing={1}>
                             <IconButton
-                              aria-label={t('education.edit', { defaultValue: 'Chỉnh sửa học vấn' })}
+                              aria-label={t('common:actions.edit')}
                               size="small"
                               sx={{
                                 color: 'secondary.main',
@@ -323,7 +323,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
                             </IconButton>
 
                             <IconButton
-                              aria-label={t('education.delete', { defaultValue: 'Xóa học vấn' })}
+                              aria-label={t('common:actions.delete')}
                               size="small"
                               sx={{
                                 color: 'error.main',

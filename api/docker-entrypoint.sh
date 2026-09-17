@@ -36,4 +36,7 @@ else
   echo "SYNC_OAUTH_CLIENT disabled. Skipping OAuth client sync."
 fi
 
+mkdir -p "${TTS_CACHE_DIR:-/tmp/tts_cache}" 2>/dev/null || true
+chmod 777 "${TTS_CACHE_DIR:-/tmp/tts_cache}" 2>/dev/null || true
+
 exec "$@"

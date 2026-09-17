@@ -34,5 +34,14 @@
   "employerAppliedTitle": "Hồ sơ ứng tuyển mới",
   "employerAppliedDesc": "Xem danh sách và đánh giá ứng viên nộp CV",
   "employerDashboardTitle": "Bảng điều khiển NTD",
-  "employerDashboardDesc": "Tổng quan báo cáo & hiệu suất tuyển dụng"
+  "employerDashboardDesc": "Tổng quan báo cáo & hiệu suất tuyển dụng",
+  "backAdminHome": "Về trang Quản trị",
+  "adminDashboardTitle": "Bảng điều khiển Quản trị",
+  "adminDashboardDesc": "Tổng quan chỉ số hệ thống, dữ liệu người dùng & việc làm",
+  "adminJobsTitle": "Quản lý tin tuyển dụng",
+  "adminJobsDesc": "Duyệt bài đăng, kiểm duyệt nội dung tin tuyển dụng",
+  "adminProfilesTitle": "Quản lý ứng viên & CV",
+  "adminProfilesDesc": "Tra cứu thông tin tài khoản ứng viên và hồ sơ CV",
+  "adminUsersTitle": "Quản lý người dùng",
+  "adminUsersDesc": "Phân quyền tài khoản doanh nghiệp & ứng viên"
 }

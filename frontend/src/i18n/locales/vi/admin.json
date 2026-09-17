@@ -119,12 +119,12 @@
     "contentManagement": "Quản lý nội dung",
     "bannersManagement": "Quản lý Banner",
     "bannerTypes": "Loại banner",
-    "feedbacksManagement": "Quản lý đánh giá người dùng",
-    "contactMessages": "Báo lỗi & tin nhắn liên hệ",
+    "feedbacksManagement": "Đánh giá người dùng",
+    "contactMessages": "Báo lỗi & liên hệ",
     "articlesManagement": "Tin tức & Blog",
     "chatWithEmployers": "Kết nối với nhà tuyển dụng",
     "voiceProfiles": "Hồ sơ giọng nói AI",
-    "interviewPreview": "Xem trước giao diện phỏng vấn",
+    "interviewPreview": "Xem trước phòng PV",
     "squareHrmAdmin": "Quản trị nhân sự",
     "aiAgents": "Trợ lý AI",
     "articles": "Bài viết",
@@ -1375,7 +1375,12 @@
       "categories": {
         "all": "Tất cả",
         "news": "Tin tức",
-        "blog": "Blog tuyển dụng"
+        "blog": "Blog tuyển dụng",
+        "cam-nang": "Cẩm nang nghề nghiệp",
+        "thu-tuc-lao-dong": "Thủ tục & Quyền lợi",
+        "thue-tncn": "Thuế & TNCN",
+        "bi-quyet-cv": "Bí quyết viết CV",
+        "xu-huong": "Báo cáo & Xu hướng"
       },
       "statuses": {
         "all": "Tất cả",

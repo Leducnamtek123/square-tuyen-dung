@@ -22,8 +22,8 @@ type JobPostLargeInfoChipsProps = {
 const chipSx = (theme: Theme, colorKey: 'primary' | 'info' | 'success') => ({
   backgroundColor: theme.palette[colorKey].background,
   borderRadius: 1.5,
-  px: 1.5,
-  py: 0.75,
+  px: { xs: 1.25, sm: 1.5 },
+  py: { xs: 0.5, sm: 0.75 },
   display: 'flex',
   alignItems: 'center',
   gap: 0.75,
@@ -31,7 +31,7 @@ const chipSx = (theme: Theme, colorKey: 'primary' | 'info' | 'success') => ({
 
 const labelSx = (theme: Theme, colorKey: 'primary' | 'info' | 'success') => ({
   fontWeight: 600,
-  fontSize: 13,
+  fontSize: { xs: 12, sm: 13 },
   color: theme.palette[colorKey].main,
 });
 
@@ -42,17 +42,21 @@ export const JobPostLargeInfoChips = ({
   salaryLanguage,
   cityLabel,
   deadline,
-}: JobPostLargeInfoChipsProps) => (
-  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-    <Box sx={chipSx(theme, 'primary')}>
-      <FontAwesomeIcon
-        icon={faCircleDollarToSlot}
-        style={{ fontSize: '16px', color: theme.palette.primary.main }}
-      />
-      <Typography sx={{ ...labelSx(theme, 'primary'), fontFamily: 'var(--font-mono)', letterSpacing: '-0.01em' }}>
-        {formatLocalizedSalaryRange(salaryMin, salaryMax, salaryLanguage)}
-      </Typography>
-    </Box>
+}: JobPostLargeInfoChipsProps) => {
+  const salaryText = formatLocalizedSalaryRange(salaryMin, salaryMax, salaryLanguage);
+  const displaySalary = salaryText && salaryText !== '---' ? `${salaryText} VNĐ` : 'Thoả thuận';
+
+  return (
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+      <Box sx={chipSx(theme, 'primary')}>
+        <FontAwesomeIcon
+          icon={faCircleDollarToSlot}
+          style={{ fontSize: '16px', color: theme.palette.primary.main }}
+        />
+        <Typography sx={{ ...labelSx(theme, 'primary'), fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
+          {displaySalary}
+        </Typography>
+      </Box>
 
     <Box sx={chipSx(theme, 'info')}>
       <FontAwesomeIcon
@@ -75,3 +79,4 @@ export const JobPostLargeInfoChips = ({
     </Box>
   </Box>
 );
+};

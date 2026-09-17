@@ -13,6 +13,7 @@ from functools import lru_cache
 
 from apps.accounts import permissions as perms_custom
 from apps.files.models import File
+from apps.profiles.models import Resume
 from apps.profiles.serializers import EmployerCandidateProfileSerializer, SendMailToJobSeekerSerializer
 from console.jobs import queue_mail
 from shared import pagination as paginations
@@ -456,6 +457,109 @@ class EmployerJobPostActivityViewSet(
         )
         record_audit_log(request=request, action="create_manual_candidate", instance=job_post_activity)
         return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data)
+
+    @action(methods=["post"], detail=False, url_path="invite-candidate", url_name="invite-candidate")
+    def invite_candidate(self, request):
+        company = request.user.active_company
+        if not company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data if isinstance(request.data, dict) else {}
+        job_post_id = data.get("jobPostId") or data.get("job_post_id") or data.get("jobPost")
+        resume_slug = data.get("resumeSlug") or data.get("resume_slug")
+        resume_id = data.get("resumeId") or data.get("resume_id")
+        note = str(data.get("note", "")).strip()
+
+        if not job_post_id:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"jobPostId": ["Vui lòng chọn tin tuyển dụng."]},
+            )
+
+        try:
+            job_post = JobPost.objects.get(id=job_post_id, company=company)
+        except (JobPost.DoesNotExist, TypeError, ValueError):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"jobPostId": ["Tin tuyển dụng không tồn tại hoặc không thuộc công ty của bạn."]},
+            )
+
+        resume = None
+        if resume_slug:
+            resume = Resume.objects.filter(slug=resume_slug).select_related("user", "job_seeker_profile").first()
+        elif resume_id:
+            resume = Resume.objects.filter(id=resume_id).select_related("user", "job_seeker_profile").first()
+
+        if not resume:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"resume": ["Không tìm thấy thông tin hồ sơ ứng viên."]},
+            )
+
+        candidate_user = resume.user
+        if not candidate_user:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"resume": ["Hồ sơ này không liên kết với tài khoản ứng viên hợp lệ."]},
+            )
+
+        existing = JobPostActivity.objects.filter(
+            job_post=job_post,
+            user=candidate_user,
+            is_deleted=False,
+        ).first()
+
+        if existing:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Ứng viên này đã có trong danh sách ứng tuyển của tin này."]},
+            )
+
+        phone = candidate_user.phone
+        if not phone and hasattr(resume, "job_seeker_profile") and resume.job_seeker_profile:
+            phone = resume.job_seeker_profile.phone
+
+        job_post_activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=candidate_user,
+            resume=resume,
+            full_name=candidate_user.full_name or resume.title or "Ứng viên",
+            email=candidate_user.email,
+            phone=phone,
+            status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        )
+
+        from django.conf import settings
+        from shared.helpers import helper
+        if getattr(settings, "AI_RESUME_AUTO_ANALYZE", True):
+            try:
+                from apps.jobs.tasks import analyze_resume_ai
+                analyze_resume_ai.delay(job_post_activity.id)
+                job_post_activity.ai_analysis_status = "processing"
+                job_post_activity.ai_analysis_progress = 5
+                job_post_activity.save(update_fields=["ai_analysis_status", "ai_analysis_progress", "update_at"])
+            except Exception as ex:
+                helper.print_log_error("auto analyze resume invited candidate", ex)
+
+        try:
+            from shared.services.notification_service import NotificationService
+            company_name = company.company_name if hasattr(company, "company_name") else "Nhà tuyển dụng"
+            notif_title = f"{company_name} đã mời bạn ứng tuyển!"
+            notif_content = f"Nhà tuyển dụng {company_name} rất ấn tượng với hồ sơ của bạn và gửi lời mời bạn ứng tuyển cho vị trí: {job_post.job_name}."
+            if note:
+                notif_content += f" Lời nhắn: \"{note}\""
+            NotificationService.add_system_notifications(notif_title, notif_content, [candidate_user.id])
+        except Exception as ex:
+            helper.print_log_error("notify invited candidate", ex)
+
+        record_audit_log(request=request, action="invite_candidate", instance=job_post_activity)
+        return var_res.response_data(
+            status=status.HTTP_201_CREATED,
+            data={
+                "id": job_post_activity.id,
+                "message": "Đã gửi lời mời ứng tuyển thành công!",
+            },
+        )
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

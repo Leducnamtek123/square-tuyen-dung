@@ -297,6 +297,7 @@
   },
   "interviewDetail": {
     "title": "Chi tiết phỏng vấn",
+    "forceEndTitle": "Kết thúc phỏng vấn",
     "subtitle": {
       "info": "Thông tin Phỏng vấn",
       "aiEvaluation": "Kết quả đánh giá AI",

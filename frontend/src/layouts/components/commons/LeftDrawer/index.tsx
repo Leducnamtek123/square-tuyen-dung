@@ -120,7 +120,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
           maxWidth: 320,
           boxShadow: (theme) => theme.customShadows?.card || '0 8px 32px rgba(0,0,0,0.15)',
           border: 'none',
-          borderRadius: '0 16px 16px 0',
+          borderRadius: 0,
           overflow: 'hidden',
         },
       }}

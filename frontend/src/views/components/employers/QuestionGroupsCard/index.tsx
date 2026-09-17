@@ -315,14 +315,19 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
                 }
                 sx={{
                   cursor: isSystem ? 'not-allowed' : 'pointer',
-                  opacity: isSystem ? 0.65 : 1,
                   fontWeight: 700,
                   fontSize: '0.75rem',
-                  color: isPublic ? '#047857' : '#475569',
+                  color: isPublic ? '#047857' : '#334155',
                   bgcolor: isPublic ? '#d1fae5' : '#f1f5f9',
                   border: '1px solid',
                   borderColor: isPublic ? '#a7f3d0' : '#cbd5e1',
                   transition: 'all 0.2s ease',
+                  '&.Mui-disabled': {
+                    opacity: 0.85,
+                    color: isPublic ? '#047857' : '#334155',
+                    bgcolor: isPublic ? '#d1fae5' : '#f1f5f9',
+                    borderColor: isPublic ? '#a7f3d0' : '#cbd5e1',
+                  },
                   '&:hover': isSystem
                     ? undefined
                     : {

@@ -221,7 +221,7 @@ def _tts_response_from_body(body: Dict[str, Any]):
     for index, base_url in enumerate(get_service_base_urls("tts")):
         url = f"{base_url}/audio/speech"
         try:
-            upstream = requests.post(url, json=payload, headers=headers, stream=False, timeout=(5, 30))
+            upstream = requests.post(url, json=payload, headers=headers, stream=False, timeout=(5, 30), verify=False)
         except requests.RequestException as e:
             last_error = {"source": "primary" if index == 0 else f"fallback-{index}", "detail": str(e)}
             logger.warning("TTS candidate %s unavailable: %s", base_url, e)

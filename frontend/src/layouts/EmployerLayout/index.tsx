@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { usePathname } from 'next/navigation';
 
 import { Box } from "@mui/material";
 
@@ -14,14 +15,19 @@ interface EmployerLayoutProps {
   children?: React.ReactNode;
 }
 
-const EXPANDED_WIDTH = 240;
+const EXPANDED_WIDTH = 260;
 const COLLAPSED_WIDTH = 64;
 
 function EmployerLayout(props: EmployerLayoutProps) {
   const { windowGetter, children } = props;
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState<boolean>(false);
   const liveInterviewCount = useLiveInterviewCount();
+
+  React.useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {

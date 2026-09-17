@@ -580,7 +580,7 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
         width: '100%',
         bgcolor: '#F8FAFC',
         minHeight: '100vh',
-        pb: 14,
+        pb: { xs: 20, md: 14 },
       }}
     >
       <Container maxWidth="xl" sx={{ pt: 3, pb: 4 }}>
@@ -611,7 +611,7 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
           spacing={2}
           sx={{ mb: 3 }}
         >
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ width: '100%' }}>
             <Button
               variant="outlined"
               color="inherit"
@@ -622,16 +622,23 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
                 bgcolor: '#FFFFFF',
                 borderColor: '#E2E8F0',
                 color: '#334155',
-                px: 2,
-                py: 1,
+                px: { xs: 1.5, sm: 2 },
+                py: { xs: 0.75, sm: 1 },
                 fontWeight: 700,
                 textTransform: 'none',
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
                 '&:hover': { bgcolor: '#F1F5F9', borderColor: '#CBD5E1' },
               }}
             >
-              {t('jobPost.editor.backToList')}
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                {t('jobPost.editor.backToList')}
+              </Box>
+              <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+                Quay lại
+              </Box>
             </Button>
-            <Box>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 variant="h4"
                 sx={{
@@ -639,11 +646,12 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
                   color: 'text.primary',
                   letterSpacing: '-0.5px',
                   lineHeight: 1.2,
+                  fontSize: { xs: '1.25rem', sm: '1.65rem', md: '2rem' },
                 }}
               >
                 {isEdit ? t('jobPost.editor.editTitle') : t('jobPost.editor.createTitle')}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, mt: 0.5 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500, mt: 0.5, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                 {isEdit ? t('jobPost.editor.editSubtitle') : t('jobPost.editor.createSubtitle')}
               </Typography>
             </Box>
@@ -1365,37 +1373,50 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
           </Grid>
         </Grid>
 
-        {/* Sticky Bottom Action Bar */}
+        {/* Sticky/Fixed Bottom Action Bar */}
         <Box
+          data-sticky-bottom="true"
           sx={{
-            position: 'sticky',
-            bottom: 16,
-            zIndex: 100,
+            position: { xs: 'fixed', md: 'sticky' },
+            bottom: { xs: 0, md: 16 },
+            left: { xs: 0, md: 'auto' },
+            right: { xs: 0, md: 'auto' },
+            width: { xs: '100%', md: 'auto' },
+            zIndex: 1000,
             bgcolor: '#FFFFFF',
             border: '1px solid #E2E8F0',
-            boxShadow: '0 4px 24px rgba(15, 23, 42, 0.12)',
-            py: 1.75,
+            borderBottom: { xs: 'none', md: '1px solid #E2E8F0' },
+            borderLeft: { xs: 'none', md: '1px solid #E2E8F0' },
+            borderRight: { xs: 'none', md: '1px solid #E2E8F0' },
+            boxShadow: {
+              xs: '0 -4px 20px rgba(15, 23, 42, 0.08)',
+              md: '0 4px 24px rgba(15, 23, 42, 0.12)',
+            },
+            py: { xs: 1.25, sm: 1.75 },
             px: { xs: 2, sm: 3.5 },
+            pb: { xs: 'calc(12px + env(safe-area-inset-bottom, 0px))', md: 1.75 },
             mt: 4,
-            borderRadius: 3,
+            borderRadius: { xs: '16px 16px 0 0', md: 3 },
           }}
         >
           <Stack
             direction="row"
             justifyContent="space-between"
             alignItems="center"
-            spacing={2}
+            spacing={1.5}
+            sx={{ width: '100%' }}
           >
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flex: { xs: 1, sm: 'none' } }}>
               <Button
                 variant="outlined"
                 color="inherit"
                 onClick={handleBackSafe}
                 disabled={isMutating}
                 sx={{
-                  minWidth: 110,
+                  minWidth: { xs: 80, sm: 110 },
+                  flex: { xs: 1, sm: 'none' },
                   py: 1,
-                  px: 2.5,
+                  px: { xs: 1.5, sm: 2.5 },
                   borderRadius: 2.5,
                   fontWeight: 700,
                   textTransform: 'none',
@@ -1417,7 +1438,7 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
               )}
             </Stack>
 
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flex: { xs: 2, sm: 'none' } }}>
               <LoadingButton
                 type="submit"
                 form="job-post-editor-form"
@@ -1428,12 +1449,13 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
                 startIcon={<SaveIcon />}
                 disabled={isCreateBlocked || isMutating}
                 sx={{
-                  minWidth: 180,
+                  width: { xs: '100%', sm: 'auto' },
+                  minWidth: { xs: 140, sm: 180 },
                   py: 1.25,
-                  px: 3.5,
+                  px: { xs: 2, sm: 3.5 },
                   borderRadius: 2.5,
                   fontWeight: 800,
-                  fontSize: '0.95rem',
+                  fontSize: { xs: '0.875rem', sm: '0.95rem' },
                   textTransform: 'none',
                   boxShadow: '0 4px 14px rgba(37, 99, 235, 0.28)',
                   '&:hover': {

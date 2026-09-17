@@ -7,6 +7,9 @@
     },
     "userMenu": "User Menu"
   },
+  "home": {
+    "trending": "Trending:"
+  },
   "city": "City/Province",
   "career": "Industry",
   "experience": "Experience",
@@ -174,6 +177,9 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
+    "clear": "Clear filter",
+    "reset": "Reset",
+    "undo": "Undo",
     "confirm": "Confirm",
     "apply": "Apply",
     "add": "Add",
@@ -283,6 +289,7 @@
   "feedback": {
     "button": "Review",
     "title": "Your Review",
+    "subtitle": "Share your experience to help us improve service quality",
     "placeholder": "Share your review...",
     "submit": "Submit Review",
     "ratingRequired": "Please select a rating.",
@@ -1486,6 +1493,8 @@
     "emptyContent": "Empty Content",
     "sectionTitle": "News & Insights",
     "sectionSubtitle": "Stay updated with the latest recruitment news and labor market trends.",
+    "handbookTitle": "News & Insights",
+    "handbookSubtitle": "Stay updated with the latest recruitment news and labor market trends.",
     "justUpdated": "Just updated",
     "defaultCategory": "HANDBOOK",
     "byAuthor": "By {{author}} • {{time}}",
@@ -1579,7 +1588,8 @@
       "link": "Insert / Edit link (Ctrl+K)",
       "horizontalRule": "Horizontal divider",
       "livePreview": "Live preview",
-      "uploadImage": "Upload image"
+      "uploadImage": "Upload image",
+      "moreTools": "More tools..."
     },
     "colors": {
       "default": "Default",

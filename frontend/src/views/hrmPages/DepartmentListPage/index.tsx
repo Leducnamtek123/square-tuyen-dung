@@ -32,6 +32,10 @@ import BusinessIcon from '@mui/icons-material/Business';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import { ExportModal } from '@/components/Common/ExportModal';
+import { ImportModal } from '@/components/Common/ImportModal';
 
 import {
   useHrmDepartments,
@@ -84,6 +88,10 @@ export default function DepartmentListPage() {
   const [editingDept, setEditingDept] = useState<NativeDepartment | null>(null);
   const [deptForm, setDeptForm] = useState({ name: '', code: '', description: '', manager: '', parent: '' });
   const [deletingDeptId, setDeletingDeptId] = useState<number | null>(null);
+
+  // Import / Export states
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   // Designation Modal States
   const [openDesigModal, setOpenDesigModal] = useState(false);
@@ -231,6 +239,40 @@ export default function DepartmentListPage() {
               }}
             >
               Làm mới
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<UploadFileOutlinedIcon sx={{ fontSize: 16 }} />}
+              onClick={() => setImportModalOpen(true)}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                color: '#7c3aed',
+                borderColor: '#ddd6fe',
+                bgcolor: '#f5f3ff',
+                '&:hover': { bgcolor: '#ede9fe', borderColor: '#c4b5fd' },
+              }}
+            >
+              Nhập Excel/CSV
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<FileDownloadOutlinedIcon sx={{ fontSize: 16 }} />}
+              onClick={() => setExportModalOpen(true)}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                color: '#0f172a',
+                borderColor: '#cbd5e1',
+                bgcolor: '#ffffff',
+                '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+              }}
+            >
+              Xuất cơ cấu
             </Button>
             <Button
               variant="contained"
@@ -640,6 +682,31 @@ export default function DepartmentListPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName="CoCauPhongBan"
+        columns={[]}
+        entity="department"
+        totalRecords={{
+          all: departments.length,
+          filtered: departments.length,
+          selected: 0,
+        }}
+      />
+
+      {/* Import Modal */}
+      <ImportModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        entity="department"
+        title="Nhập danh sách phòng ban (Department Import)"
+        onSuccess={() => {
+          refetchDepts();
+        }}
+      />
     </Box>
   );
 }

@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
@@ -42,7 +43,9 @@ import { useConfig } from '@/hooks/useConfig';
 import type { JobPostActivity } from '@/types/models';
 import type { OnChangeFn, PaginationState, SortingState, RowSelectionState } from '@tanstack/react-table';
 import { ExportModal, type ExportColumn, type ExportScope } from '@/components/Common/ExportModal';
+import { ImportModal } from '@/components/Common/ImportModal';
 import EmployeeFromApplicationDialog from '../EmployeeFromApplicationDialog';
+import QuickScheduleInterviewModal from './QuickScheduleInterviewModal';
 import ManualCandidateForm, { type ManualCandidateFormValues } from '../ManualCandidateForm';
 import {
   GlobalFilterBar,
@@ -81,9 +84,11 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const [viewMode, setViewMode] = useState<'table' | 'board'>('table');
   const [blindMode, setBlindMode] = useState(false);
   const [employeeSourceActivity, setEmployeeSourceActivity] = useState<JobPostActivity | null>(null);
+  const [quickInterviewCandidate, setQuickInterviewCandidate] = useState<JobPostActivity | null>(null);
   const [manualCandidatePopupOpen, setManualCandidatePopupOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [optimisticAnalysis, setOptimisticAnalysis] = useState<Record<string, Partial<JobPostActivity>>>({});
 
   const {
@@ -338,6 +343,14 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
       await updateStatus({ id, status: value });
       toastMessages.success(t('employer:appliedResume.status.updateSuccess'));
       callback(true);
+
+      // Auto-HRM trigger: When candidate is marked as Hired (status 5), automatically open onboarding dialog
+      if (Number(value) === 5) {
+        const candidate = resumes.find((r) => String(r.id) === String(id));
+        if (candidate && !candidate.hrmEmployeeId) {
+          setEmployeeSourceActivity({ ...candidate, status: 5 });
+        }
+      }
     } catch {
       callback(false);
     }
@@ -415,113 +428,193 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
             </Box>
           </Box>
 
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems="center" width={{ xs: '100%', md: 'auto' }}>
-            {/* View Mode Switch */}
-            <ToggleButtonGroup
-              size="small"
-              value={viewMode}
-              exclusive
-              onChange={(_, next) => {
-                if (next) {
-                  setViewMode(next);
-                  onPaginationChange({ pageIndex: 0, pageSize });
-                }
-              }}
-              sx={{
-                bgcolor: '#F8FAFC',
-                '& .MuiToggleButton-root': {
-                  px: 1.5,
-                  py: 0.75,
-                  fontWeight: 700,
-                  fontSize: '0.8125rem',
-                  textTransform: 'none',
-                  border: '1px solid #E2E8F0',
-                  '&.Mui-selected': {
-                    bgcolor: 'primary.main',
-                    color: '#FFFFFF',
-                    '&:hover': {
-                      bgcolor: 'primary.dark',
-                    },
-                  },
-                },
-              }}
-            >
-              <ToggleButton value="table">
-                <ViewListIcon sx={{ fontSize: 18, mr: 0.5 }} />
-                Bảng
-              </ToggleButton>
-              <ToggleButton value="board">
-                <ViewKanbanIcon sx={{ fontSize: 18, mr: 0.5 }} />
-                Kanban
-              </ToggleButton>
-            </ToggleButtonGroup>
-
-            {/* Blind Mode Toggle */}
-            <Tooltip title="Ẩn thông tin cá nhân (họ tên, ảnh, liên hệ) để đánh giá công bằng">
-              <ToggleButton
-                value="blind"
-                selected={blindMode}
-                onChange={() => setBlindMode((prev) => !prev)}
+          <Stack
+            direction={{ xs: 'column', md: 'row' }}
+            spacing={1.5}
+            alignItems="center"
+            sx={{ width: { xs: '100%', md: 'auto' } }}
+          >
+            {/* View Mode & Blind Mode Group */}
+            <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+              {/* View Mode Switch */}
+              <ToggleButtonGroup
                 size="small"
+                value={viewMode}
+                exclusive
+                onChange={(_, next) => {
+                  if (next) {
+                    setViewMode(next);
+                    onPaginationChange({ pageIndex: 0, pageSize });
+                  }
+                }}
                 sx={{
-                  px: 1.5,
-                  py: 0.75,
-                  fontWeight: 700,
-                  fontSize: '0.8125rem',
-                  textTransform: 'none',
-                  borderRadius: '8px !important',
-                  borderColor: blindMode ? 'warning.main' : '#E2E8F0',
-                  color: blindMode ? 'warning.dark' : '#64748B',
-                  bgcolor: blindMode ? 'warning.light' : '#F8FAFC',
-                  '&:hover': {
-                    bgcolor: blindMode ? 'warning.light' : '#F1F5F9',
+                  flex: { xs: 1, sm: 'none' },
+                  bgcolor: '#F1F5F9',
+                  p: '3px',
+                  borderRadius: '10px',
+                  border: '1px solid #E2E8F0',
+                  '& .MuiToggleButton-root': {
+                    flex: { xs: 1, sm: 'none' },
+                    px: 1.75,
+                    py: 0.6,
+                    fontWeight: 700,
+                    fontSize: '0.8125rem',
+                    textTransform: 'none',
+                    border: 'none',
+                    borderRadius: '8px !important',
+                    color: '#64748B',
+                    transition: 'all 0.15s ease-in-out',
+                    '&.Mui-selected': {
+                      bgcolor: '#FFFFFF',
+                      color: '#2563EB',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)',
+                      fontWeight: 800,
+                      '&:hover': {
+                        bgcolor: '#FFFFFF',
+                      },
+                    },
+                    '&:hover': {
+                      bgcolor: 'rgba(255, 255, 255, 0.5)',
+                      color: '#0F172A',
+                    },
                   },
                 }}
               >
-                <VisibilityOffIcon sx={{ fontSize: 18, mr: 0.5 }} />
-                {t('employer:appliedResume.ai.blindMode')}
-              </ToggleButton>
-            </Tooltip>
+                <ToggleButton value="table">
+                  <ViewListIcon sx={{ fontSize: 18, mr: 0.75 }} />
+                  {t('employer:appliedResume.tableView', 'Bảng')}
+                </ToggleButton>
+                <ToggleButton value="board">
+                  <ViewKanbanIcon sx={{ fontSize: 18, mr: 0.75 }} />
+                  {t('employer:appliedResume.boardView', 'Kanban')}
+                </ToggleButton>
+              </ToggleButtonGroup>
 
-            {/* Export List Button */}
-            <Button
-              variant="outlined"
-              color="inherit"
-              startIcon={<FileDownloadOutlinedIcon />}
-              onClick={() => setExportModalOpen(true)}
-              sx={{
-                px: 2.5,
-                py: 1,
-                fontWeight: 800,
-                textTransform: 'none',
-                border: '1px solid #E2E8F0',
-                bgcolor: '#FFFFFF',
-                color: '#334155',
-                '&:hover': {
-                  bgcolor: '#F8FAFC',
-                  borderColor: '#CBD5E1',
-                },
-              }}
-            >
-              {t('employer:appliedResume.downloadList', 'Tải danh sách')}
-            </Button>
+              {/* Blind Mode Toggle */}
+              <Tooltip title="Ẩn thông tin cá nhân (họ tên, ảnh, liên hệ) để đánh giá công bằng">
+                <ToggleButton
+                  value="blind"
+                  selected={blindMode}
+                  onChange={() => setBlindMode((prev) => !prev)}
+                  size="small"
+                  sx={{
+                    flex: { xs: 1, sm: 'none' },
+                    px: 1.75,
+                    py: 0.75,
+                    fontWeight: 700,
+                    fontSize: '0.8125rem',
+                    textTransform: 'none',
+                    borderRadius: '10px !important',
+                    border: '1px solid',
+                    borderColor: blindMode ? '#F59E0B' : '#E2E8F0',
+                    color: blindMode ? '#B45309' : '#475569',
+                    bgcolor: blindMode ? '#FEF3C7' : '#FFFFFF',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.15s ease',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
+                    '&:hover': {
+                      bgcolor: blindMode ? '#FDE68A' : '#F8FAFC',
+                      borderColor: blindMode ? '#D97706' : '#CBD5E1',
+                    },
+                  }}
+                >
+                  <VisibilityOffIcon sx={{ fontSize: 18, mr: 0.75 }} />
+                  {t('employer:appliedResume.ai.blindMode')}
+                </ToggleButton>
+              </Tooltip>
+            </Stack>
 
-            {/* Add Candidate Button */}
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<PersonAddIcon />}
-              onClick={() => setManualCandidatePopupOpen(true)}
-              sx={{
-                px: 3,
-                py: 1,
-                boxShadow: (theme) => theme.customShadows?.primary,
-                fontWeight: 900,
-                textTransform: 'none',
-              }}
-            >
-              {t('employer:manualCandidate.title', 'Thêm ứng viên')}
-            </Button>
+            {/* Action Buttons Group (Import, Export & Add Candidate) */}
+            <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+              {/* Import List Button */}
+              <Button
+                variant="outlined"
+                color="inherit"
+                startIcon={<UploadFileOutlinedIcon />}
+                onClick={() => setImportModalOpen(true)}
+                sx={{
+                  flex: { xs: 1, sm: 'none' },
+                  px: { xs: 1.5, sm: 2.25 },
+                  py: 0.85,
+                  fontWeight: 700,
+                  fontSize: '0.8125rem',
+                  textTransform: 'none',
+                  whiteSpace: 'nowrap',
+                  borderRadius: '10px',
+                  border: '1px solid #E2E8F0',
+                  bgcolor: '#FFFFFF',
+                  color: '#334155',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    bgcolor: '#F8FAFC',
+                    borderColor: '#CBD5E1',
+                    color: '#0F172A',
+                  },
+                }}
+              >
+                Nhập Excel/CSV
+              </Button>
+
+              {/* Export List Button */}
+              <Button
+                variant="outlined"
+                color="inherit"
+                startIcon={<FileDownloadOutlinedIcon />}
+                onClick={() => setExportModalOpen(true)}
+                sx={{
+                  flex: { xs: 1, sm: 'none' },
+                  px: { xs: 1.5, sm: 2.25 },
+                  py: 0.85,
+                  fontWeight: 700,
+                  fontSize: '0.8125rem',
+                  textTransform: 'none',
+                  whiteSpace: 'nowrap',
+                  borderRadius: '10px',
+                  border: '1px solid #E2E8F0',
+                  bgcolor: '#FFFFFF',
+                  color: '#334155',
+                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    bgcolor: '#F8FAFC',
+                    borderColor: '#CBD5E1',
+                    color: '#0F172A',
+                  },
+                }}
+              >
+                {t('employer:appliedResume.downloadList', 'Tải danh sách')}
+              </Button>
+
+              {/* Add Candidate Button */}
+              <Button
+                variant="contained"
+                startIcon={<PersonAddIcon />}
+                onClick={() => setManualCandidatePopupOpen(true)}
+                sx={{
+                  flex: { xs: 1.25, sm: 'none' },
+                  px: { xs: 1.75, sm: 2.75 },
+                  py: 0.85,
+                  whiteSpace: 'nowrap',
+                  borderRadius: '10px',
+                  bgcolor: '#2563EB',
+                  backgroundImage: 'linear-gradient(180deg, #3B82F6 0%, #2563EB 100%)',
+                  boxShadow: '0 1px 3px rgba(37, 99, 235, 0.3), 0 1px 2px rgba(37, 99, 235, 0.2)',
+                  fontWeight: 800,
+                  fontSize: '0.8125rem',
+                  textTransform: 'none',
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    bgcolor: '#1D4ED8',
+                    backgroundImage: 'linear-gradient(180deg, #2563EB 0%, #1D4ED8 100%)',
+                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
+                    transform: 'translateY(-1px)',
+                  },
+                }}
+              >
+                {t('employer:manualCandidate.title', 'Thêm ứng viên')}
+              </Button>
+            </Stack>
           </Stack>
         </Stack>
 
@@ -568,6 +661,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
             handleChangeApplicationStatus={handleChangeApplicationStatus}
             handleDelete={handleDelete}
             onCreateEmployee={setEmployeeSourceActivity}
+            onQuickScheduleInterview={setQuickInterviewCandidate}
             onAnalysisStateChange={handleAnalysisStateChange}
             blindMode={blindMode}
             enableRowSelection
@@ -581,6 +675,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
             handleChangeApplicationStatus={handleChangeApplicationStatus}
             handleDelete={handleDelete}
             onCreateEmployee={setEmployeeSourceActivity}
+            onQuickScheduleInterview={setQuickInterviewCandidate}
             onAnalysisStateChange={handleAnalysisStateChange}
             onAddCandidate={() => setManualCandidatePopupOpen(true)}
             blindMode={blindMode}
@@ -632,10 +727,22 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
           defaultFileName="DanhSachHoSoUngTuyen"
           columns={appliedResumeExportColumns}
           fetchData={handleFetchAppliedResumeExportData}
+          entity="candidate"
           totalRecords={{
             all: count || 0,
             filtered: count || 0,
             selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
+          }}
+        />
+
+        {/* Import Modal */}
+        <ImportModal
+          open={importModalOpen}
+          onClose={() => setImportModalOpen(false)}
+          entity="candidate"
+          title="Nhập hồ sơ ứng viên (Candidate Import)"
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
           }}
         />
 
@@ -650,6 +757,18 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               await createEmployeeMutation.mutateAsync(payload);
             }}
             t={t}
+          />
+        )}
+
+        {/* Quick Schedule Interview Dialog */}
+        {quickInterviewCandidate && (
+          <QuickScheduleInterviewModal
+            open={Boolean(quickInterviewCandidate)}
+            onClose={() => setQuickInterviewCandidate(null)}
+            candidate={quickInterviewCandidate}
+            onScheduleSuccess={() => {
+              queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
+            }}
           />
         )}
 

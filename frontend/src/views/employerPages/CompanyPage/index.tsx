@@ -34,6 +34,9 @@ const CompanyPage = () => {
                     <TabList
                         onChange={selectCompanyTab}
                         aria-label={t("company.tabs.ariaLabel")}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                        allowScrollButtonsMobile
                         sx={{
                             minHeight: 44,
                             '& .MuiTabs-indicator': {
@@ -47,6 +50,7 @@ const CompanyPage = () => {
                                 fontWeight: 800,
                                 letterSpacing: 0,
                                 textTransform: 'none',
+                                whiteSpace: 'nowrap',
                             },
                         }}
                     >

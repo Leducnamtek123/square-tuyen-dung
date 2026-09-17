@@ -81,11 +81,11 @@ import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 const DEFAULT_HERO_PLACEHOLDERS = [
-  'Tìm kiếm: Kỹ sư phần mềm, React, Java...',
-  'Tìm kiếm: Trưởng phòng nhân sự, HR Manager...',
-  'Tìm kiếm: UI/UX Designer, Figma, Design System...',
-  'Tìm kiếm: Kế toán tổng hợp, Financial Analyst...',
-  'Tìm kiếm: Giám đốc kinh doanh, Sales B2B...',
+  'Kỹ sư phần mềm, React, Java...',
+  'Trưởng phòng nhân sự, HR...',
+  'UI/UX Designer, Figma...',
+  'Kế toán tổng hợp, Tài chính...',
+  'Giám đốc kinh doanh, Sales B2B...',
 ];
 
 function useHeroTypewriter(phrases: string[], enabled: boolean) {

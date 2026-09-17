@@ -206,12 +206,12 @@ const MyInterviewsPage = () => {
         sx={{
           mb: 3,
           p: { xs: 1.5, sm: 2 },
-          borderRadius: '14px',
+          borderRadius: '16px',
           border: '1px solid #e2e8f0',
           backgroundColor: '#ffffff',
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          alignItems: { xs: 'stretch', md: 'center' },
+          flexDirection: { xs: 'column', xl: 'row' },
+          alignItems: { xs: 'stretch', xl: 'center' },
           justifyContent: 'space-between',
           gap: 2,
         }}
@@ -220,8 +220,10 @@ const MyInterviewsPage = () => {
           value={activeTab}
           onChange={(_, val) => setActiveTab(val)}
           variant="scrollable"
-          scrollButtons="auto"
+          scrollButtons={false}
           sx={{
+            flex: 1,
+            minWidth: 0,
             minHeight: 40,
             '& .MuiTabs-indicator': {
               backgroundColor: '#2563eb',
@@ -233,7 +235,7 @@ const MyInterviewsPage = () => {
               fontWeight: 600,
               fontSize: '0.875rem',
               minHeight: 40,
-              px: 2,
+              px: { xs: 1.25, sm: 2 },
               color: '#64748b',
               '&.Mui-selected': {
                 color: '#2563eb',
@@ -270,7 +272,7 @@ const MyInterviewsPage = () => {
             iconPosition="start"
             label={
               <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
-                <span>{t('jobSeeker:myInterviews.tabs.official', { defaultValue: 'Phỏng vấn cùng Nhà tuyển dụng' })}</span>
+                <span>{t('jobSeeker:myInterviews.tabs.official', { defaultValue: 'Phỏng vấn NTD' })}</span>
                 <Box
                   component="span"
                   sx={{
@@ -294,7 +296,7 @@ const MyInterviewsPage = () => {
             iconPosition="start"
             label={
               <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
-                <span>{t('jobSeeker:myInterviews.tabs.mock', { defaultValue: 'Luyện tập cùng AI' })}</span>
+                <span>{t('jobSeeker:myInterviews.tabs.mock', { defaultValue: 'Luyện tập AI' })}</span>
                 <Box
                   component="span"
                   sx={{
@@ -373,7 +375,8 @@ const MyInterviewsPage = () => {
             },
           }}
           sx={{
-            minWidth: { xs: '100%', md: 280 },
+            minWidth: { xs: '100%', sm: 240, lg: 280 },
+            width: { xs: '100%', lg: 'auto' },
             '& .MuiOutlinedInput-root': {
               borderRadius: '10px',
               backgroundColor: '#f8fafc',

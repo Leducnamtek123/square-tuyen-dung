@@ -46,6 +46,7 @@ import {
   useHrmMutations,
 } from '../../hooks/useHrmQueries';
 import { TabTitle } from '@/utils/generalFunction';
+import toastMessages from '@/utils/toastMessages';
 import pc from '@/utils/muiColors';
 
 const inputSx = {
@@ -214,7 +215,7 @@ export default function ShiftMatrixPage() {
   const handleSubmitBatch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (batchForm.employee_ids.length === 0) {
-      alert('Vui lòng chọn ít nhất một nhân viên.');
+      toastMessages.error('Vui lòng chọn ít nhất một nhân viên.');
       return;
     }
 

@@ -407,8 +407,8 @@
     "calendarIcs": "Thêm vào lịch",
     "tabs": {
       "all": "Tất cả",
-      "official": "Phỏng vấn cùng Nhà tuyển dụng",
-      "mock": "Luyện tập cùng AI",
+      "official": "Phỏng vấn NTD",
+      "mock": "Luyện tập AI",
       "scheduled": "Sắp diễn ra",
       "completed": "Đã hoàn thành"
     }

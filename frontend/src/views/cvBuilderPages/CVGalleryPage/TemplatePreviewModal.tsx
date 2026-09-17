@@ -150,43 +150,50 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
       {/* -- Dialog Header (Consistent with project modal header) ----------- */}
       <DialogTitle
         sx={{
-          p: 2.5,
+          p: { xs: 2, sm: 2.5 },
           borderBottom: '1px solid #e2e8f0',
           bgcolor: '#f8fafc',
           display: 'flex',
-          alignItems: 'center',
+          flexDirection: { xs: 'column', sm: 'row' },
+          alignItems: { xs: 'flex-start', sm: 'center' },
           justifyContent: 'space-between',
+          gap: 1.5,
         }}
       >
-        <Box sx={{ pr: 2 }}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '1.1rem' }}>
-              Mẫu CV {displayInfo.displayName}
-            </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
-              ({template.name})
-            </Typography>
-            {template.is_popular && (
-              <Chip
-                size="small"
-                icon={<LocalFireDepartmentOutlinedIcon sx={{ fontSize: '14px !important', color: '#fde047 !important' }} />}
-                label="Phổ biến"
-                sx={{
-                  bgcolor: '#e11d48',
-                  color: '#ffffff',
-                  fontWeight: 800,
-                  fontSize: '0.675rem',
-                  height: 22,
-                }}
-              />
-            )}
+        <Box sx={{ pr: { xs: 0, sm: 2 }, width: { xs: '100%', sm: 'auto' } }}>
+          <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between">
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '1.1rem' }}>
+                Mẫu CV {displayInfo.displayName}
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600 }}>
+                ({template.name})
+              </Typography>
+              {template.is_popular && (
+                <Chip
+                  size="small"
+                  icon={<LocalFireDepartmentOutlinedIcon sx={{ fontSize: '14px !important', color: '#fde047 !important' }} />}
+                  label="Phổ biến"
+                  sx={{
+                    bgcolor: '#e11d48',
+                    color: '#ffffff',
+                    fontWeight: 800,
+                    fontSize: '0.675rem',
+                    height: 22,
+                  }}
+                />
+              )}
+            </Stack>
+            <IconButton onClick={onClose} size="small" sx={{ display: { xs: 'inline-flex', sm: 'none' }, color: '#94a3b8', '&:hover': { color: '#0f172a' } }}>
+              <CloseIcon sx={{ fontSize: 20 }} />
+            </IconButton>
           </Stack>
           <Typography variant="caption" sx={{ color: '#64748b', display: 'block', mt: 0.5 }}>
             {template.description || 'Mẫu CV chuẩn ATS, tối ưu hóa bố cục chuyên nghiệp theo tiêu chuẩn tuyển dụng.'}
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" sx={{ width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'space-between', sm: 'flex-end' }, gap: 1 }}>
           {/* Color Switcher */}
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ bgcolor: '#ffffff', p: 0.75, borderRadius: '12px', border: '1px solid #e2e8f0' }}>
             <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, px: 0.5 }}>
@@ -240,14 +247,14 @@ export const TemplatePreviewModal: React.FC<TemplatePreviewModalProps> = ({
             Dùng mẫu này
           </Button>
 
-          <IconButton onClick={onClose} size="small" sx={{ color: '#94a3b8', '&:hover': { color: '#0f172a' } }}>
+          <IconButton onClick={onClose} size="small" sx={{ display: { xs: 'none', sm: 'inline-flex' }, color: '#94a3b8', '&:hover': { color: '#0f172a' } }}>
             <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Stack>
       </DialogTitle>
 
       {/* -- Dialog Content: Centered High-Fidelity A4 Sheet --------------- */}
-      <DialogContent sx={{ p: 4, pt: '24px !important', bgcolor: '#e2e8f0', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflowY: 'auto' }}>
+      <DialogContent sx={{ p: { xs: 1, sm: 4 }, pt: { xs: '16px !important', sm: '24px !important' }, bgcolor: '#e2e8f0', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', overflow: 'auto' }}>
         <Box
           sx={{
             width: 794,

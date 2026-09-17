@@ -286,7 +286,7 @@ const TopSlide = () => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 1,
-                    px: 1.75,
+                    px: { xs: 1.25, sm: 1.75 },
                     py: 0.5,
                     mb: 1.5,
                     borderRadius: '9999px',
@@ -294,12 +294,14 @@ const TopSlide = () => {
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     backdropFilter: 'blur(12px)',
                     color: '#e0f2fe',
-                    fontSize: '0.8rem',
+                    fontSize: { xs: '0.74rem', sm: '0.8rem' },
                     fontWeight: 600,
                     letterSpacing: '0.02em',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%',
                   }}
                 >
-                  <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#38bdf8', boxShadow: '0 0 8px #38bdf8' }} />
+                  <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#38bdf8', boxShadow: '0 0 8px #38bdf8', flexShrink: 0 }} />
                   Nền tảng Tuyển dụng &amp; Phỏng vấn AI chuẩn xác
                 </Box>
                 <Typography
@@ -323,6 +325,7 @@ const TopSlide = () => {
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       fontWeight: 900,
+                      filter: 'drop-shadow(0 2px 8px rgba(56, 189, 248, 0.45))',
                     }}
                   >
                     InfoHR

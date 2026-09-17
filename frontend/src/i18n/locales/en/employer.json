@@ -1373,6 +1373,7 @@
   "blog": {
     "title": "Recruitment Blog",
     "subtitle": "Share hiring experience and recruitment tips from your company",
+    "deleteTitle": "Confirm delete article",
     "newPost": "Write new post",
     "reviewNotice": "Posts are sent to Admin for review before appearing on the website. Review usually takes up to 24 hours.",
     "filter": {
@@ -1896,5 +1897,50 @@
       "uploadFailed": "Failed to upload file. Please try again."
     }
   },
-  "candidate": "Candidate"
+  "candidateDetail": {
+    "messages": {
+      "noEmail": "Candidate has not updated email address"
+    }
+  },
+  "candidate": "Candidate",
+  "introduce": {
+    "tabTitle": "Overview & Recruitment Solutions - {{appName}}",
+    "badge": "SMART RECRUITMENT SOLUTIONS FOR BUSINESSES",
+    "industries": {
+      "construction": "Construction",
+      "realEstate": "Real Estate",
+      "architecture": "Architecture & Interior Design",
+      "mep": "Engineering & MEP Systems"
+    },
+    "stats": {
+      "screeningTime": "Reduction in Pre-screening Time",
+      "screeningTimeDesc": "Automated CV screening & AI interviews",
+      "hiringSuccess": "Boost in Hiring Success Rate",
+      "hiringSuccessDesc": "Precise candidate-job skill matching",
+      "matchAccuracy": "AI Match Score Accuracy",
+      "matchAccuracyDesc": "Standardized evaluation metrics",
+      "trustedCompanies": "Trusted Partner Businesses",
+      "trustedCompaniesDesc": "Leading corporations & partners"
+    },
+    "valueProps": {
+      "poolTitle": "Talent Pool for 4 Key Industries",
+      "poolDesc": "Deep talent pool in Construction, Real Estate, Architecture/Interior Design, and MEP with verified credentials.",
+      "aiMatchingTitle": "AI Skill Matching & Automated Interviews",
+      "aiMatchingDesc": "AILA AI analyzes CVs, calculates Match Scores, and conducts natural Voice AI interviews 24/7 without subjective bias.",
+      "pipelineTitle": "Candidate Pipeline CRM",
+      "pipelineDesc": "Track candidate lifecycles from application and interview scheduling to final onboarding on a single visual dashboard.",
+      "guaranteeTitle": "Dedicated Support & Hiring Warranty",
+      "guaranteeDesc": "24/7 consultation team, job posting optimization, and dedicated support ensuring corporate hiring success."
+    },
+    "steps": {
+      "step1Title": "Company Profile Setup & Verification",
+      "step1Desc": "Quick employer registration and instant verification with a trusted verified company badge.",
+      "step2Title": "Smart Job Posting",
+      "step2Desc": "Publish SEO-optimized job openings fast with AI-assisted professional Job Description recommendations.",
+      "step3Title": "Automated AI Screening & Interviews",
+      "step3Desc": "Automated candidate sorting, AI Match Scoring, and instant round-the-clock interview scheduling.",
+      "step4Title": "Offer Acceptance & Workforce Management",
+      "step4Desc": "Approve final candidates, issue digital contracts, and streamline new hire onboarding seamlessly."
+    }
+  }
 }

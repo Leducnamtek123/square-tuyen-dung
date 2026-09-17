@@ -86,7 +86,7 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
             height={130}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center gap-1.5">
+          <div className="flex flex-col items-center justify-center gap-1 pb-6">
             <div className={`flex size-14 items-center justify-center rounded-full border text-xl
               ${isSelf ? 'border-cyan-400/30 bg-cyan-500/10 text-zinc-200' : 'border-zinc-500/30 bg-zinc-500/10 text-zinc-200'}`}>
               <FontAwesomeIcon icon={faUser} />

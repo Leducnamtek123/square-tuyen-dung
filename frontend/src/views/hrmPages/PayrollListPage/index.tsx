@@ -37,6 +37,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import MonetizationOnOutlinedIcon from '@mui/icons-material/MonetizationOnOutlined';
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
+import { ExportModal } from '@/components/Common/ExportModal';
 
 import {
   useHrmPayrollList,
@@ -92,6 +93,7 @@ export default function PayrollListPage() {
   const { calculateMonthlyPayroll, approveAllPayroll, markPaidAllPayroll } = useHrmMutations();
 
   const [openCalcModal, setOpenCalcModal] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
   const [calcForm, setCalcForm] = useState({
     month: selectedMonth,
     year: selectedYear,
@@ -160,12 +162,11 @@ export default function PayrollListPage() {
           <Button
             variant="outlined"
             color="primary"
-            startIcon={exporting ? <CircularProgress size={16} /> : <FileDownloadOutlinedIcon />}
-            onClick={handleExportPayroll}
-            disabled={exporting}
+            startIcon={<FileDownloadOutlinedIcon />}
+            onClick={() => setExportModalOpen(true)}
             sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
           >
-            {exporting ? 'Đang xuất...' : 'Xuất CSV'}
+            Xuất Bảng Lương (Excel/CSV)
           </Button>
           <Button
             variant="outlined"
@@ -722,6 +723,20 @@ export default function PayrollListPage() {
           </DialogActions>
         </Dialog>
       )}
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName={`BangLuong_T${selectedMonth}_${selectedYear}`}
+        columns={[]}
+        entity="payroll"
+        totalRecords={{
+          all: payrollRecords.length,
+          filtered: payrollRecords.length,
+          selected: 0,
+        }}
+      />
     </Box>
   );
 }

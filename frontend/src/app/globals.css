@@ -619,6 +619,22 @@ h1, h2, h3, h4, h5, .display-text {
   border: 1px solid rgba(255, 255, 255, 0.8) !important;
 }
 
+@media (max-width: 600px) {
+  .MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
+    margin: 16px !important;
+    max-width: calc(100% - 32px) !important;
+    height: auto !important;
+    max-height: calc(100dvh - 32px) !important;
+    border-radius: 18px !important;
+  }
+  .MuiDialogActions-root {
+    gap: 8px !important;
+  }
+  .MuiDialogActions-root > :not(:first-of-type) {
+    margin-left: 0 !important;
+  }
+}
+
 .dark .MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
   background-color: #0f172a !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;

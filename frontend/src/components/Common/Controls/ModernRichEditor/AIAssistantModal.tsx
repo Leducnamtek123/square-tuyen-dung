@@ -370,8 +370,8 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
         sx: {
           borderRadius: '20px',
           overflow: 'hidden',
-          minHeight: '660px',
-          maxHeight: '92vh',
+          minHeight: { xs: 'auto', md: '660px' },
+          maxHeight: { xs: 'calc(100dvh - 32px)', md: '92vh' },
           display: 'flex',
           flexDirection: 'column',
           border: '1px solid',

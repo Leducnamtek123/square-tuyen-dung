@@ -1,21 +1,18 @@
-﻿import { readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const signUpSource = readFileSync(join(__dirname, '../EmployerSignUp/index.tsx'), 'utf8');
 const loginSource = readFileSync(join(__dirname, '../EmployerLogin/index.tsx'), 'utf8');
 
-describe('Employer Auth Layout Variance (design-taste)', () => {
-  it('keeps the promotional showcase panel on employer login page', () => {
+describe('Employer Auth Layout (design-taste)', () => {
+  it('includes promotional showcase panel on employer login and dedicated B2B showcase on registration', () => {
     expect(loginSource).toContain('AuthShowcasePanel');
     expect(loginSource).toContain('variant="employer"');
+    expect(signUpSource).toContain('EmployerSignUpShowcase');
   });
 
-  it('removes the showcase panel from employer registration page to maximize spaciousness', () => {
-    expect(signUpSource).not.toContain('AuthShowcasePanel');
-  });
-
-  it('uses full-width 12-column container for registration form', () => {
-    expect(signUpSource).toContain('size={{ xs: 12 }}');
-    expect(signUpSource).toContain("maxWidth: '780px'");
+  it('uses balanced 2-column layout with 1080px max-width', () => {
+    expect(signUpSource).toContain('size={{ xs: 12, md: 6 }}');
+    expect(signUpSource).toContain("maxWidth: '1080px'");
   });
 });

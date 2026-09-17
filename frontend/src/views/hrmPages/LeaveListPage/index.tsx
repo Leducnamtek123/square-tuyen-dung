@@ -35,6 +35,8 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import { ExportModal } from '@/components/Common/ExportModal';
 import dayjs from 'dayjs';
 
 import { useHrmLeaves, useHrmEmployees, useHrmLeaveBalances, useHrmLeaveTypes, useHrmMutations } from '../hooks/useHrmQueries';
@@ -82,6 +84,7 @@ export default function LeaveListPage() {
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [deletingLeaveId, setDeletingLeaveId] = useState<number | null>(null);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [createForm, setCreateForm] = useState({
@@ -217,6 +220,23 @@ export default function LeaveListPage() {
               }}
             >
               Làm mới
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<FileDownloadOutlinedIcon sx={{ fontSize: 16 }} />}
+              onClick={() => setExportModalOpen(true)}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 700,
+                color: '#0f172a',
+                borderColor: '#cbd5e1',
+                bgcolor: '#ffffff',
+                '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+              }}
+            >
+              Xuất danh sách đơn
             </Button>
             <Button
               variant="contained"
@@ -813,6 +833,20 @@ export default function LeaveListPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName="DanhSachDonNghiPhep"
+        columns={[]}
+        entity="leave_request"
+        totalRecords={{
+          all: leaveRequests.length,
+          filtered: leaveRequests.length,
+          selected: 0,
+        }}
+      />
     </Box>
   );
 }

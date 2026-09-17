@@ -135,18 +135,37 @@ export function ConfirmDialogRoot() {
     showCancelButton = true,
     confirmButtonText = 'Đồng ý',
     cancelButtonText = 'Hủy',
+    input,
     onConfirm,
     onCancel,
   } = useConfirmDialogState();
+
+  const [inputValue, setInputValue] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (open) {
+      setInputValue(input?.defaultValue || '');
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [open, input]);
 
   const iconConfig = ICON_CONFIG[icon] || ICON_CONFIG.info;
   const IconComponent = iconConfig.icon;
   const isDanger = icon === 'error' || icon === 'warning';
 
   const handleConfirm = () => {
+    if (input?.required && !inputValue.trim()) {
+      inputRef.current?.focus();
+      return;
+    }
     confirmDialogStore.close();
     if (onConfirm) {
-      onConfirm();
+      onConfirm(inputValue);
     }
   };
 
@@ -184,6 +203,24 @@ export function ConfirmDialogRoot() {
               </AlertDialogDescription>
             )}
           </AlertDialogHeader>
+          {input && (
+            <div className="w-full mt-3.5">
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleConfirm();
+                  }
+                }}
+                placeholder={input.placeholder || ''}
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder:text-slate-400 shadow-sm"
+              />
+            </div>
+          )}
         </div>
 
         <AlertDialogFooter className="mt-4 gap-2.5 sm:gap-3">

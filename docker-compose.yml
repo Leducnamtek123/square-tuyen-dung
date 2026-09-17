@@ -85,6 +85,7 @@ services:
         read_only: true
         bind:
           create_host_path: false
+      - tts-cache:/tmp/tts_cache
     expose:
       - "8000"
     restart: always
@@ -111,7 +112,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -188,13 +189,15 @@ services:
     env_file:
       - .env
     restart: always
+    volumes:
+      - tts-cache:/tmp/tts_cache
     # Needed only when enabling local Docker/host AI fallback.
     # extra_hosts:
     #   - "host.docker.internal:host-gateway"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
     depends_on:
       db:
         condition: service_healthy
@@ -238,6 +241,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
       MYSQL_DATABASE: ${DB_NAME:-square_db}
+    command: --max-connections=500 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
@@ -321,7 +325,7 @@ services:
     ports:
       - "7881:7881/tcp"
       - "7882:7882/udp"
-      - "50000-50010:50000-50010/udp"
+      - "50000-50100:50000-50100/udp"
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:7880/ || exit 1"]
@@ -469,6 +473,7 @@ services:
         condition: service_healthy
     volumes:
       - ./voice-ai/livekit_agent/src:/app/src
+      - tts-cache:/tmp/tts_cache
     restart: always
     networks:
       - app-net
@@ -570,3 +575,4 @@ volumes:
   whisper-data:
   minio-data:
   elasticsearch-data:
+  tts-cache:

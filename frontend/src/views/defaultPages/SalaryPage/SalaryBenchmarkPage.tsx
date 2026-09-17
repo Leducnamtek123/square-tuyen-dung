@@ -16,6 +16,7 @@ import LocalFireDepartmentOutlinedIcon from '@mui/icons-material/LocalFireDepart
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import { salaryService } from '@/services/salaryService';
 import commonService from '@/services/commonService';
 import { SalaryBenchmarkItem } from '@/types/models';
@@ -25,14 +26,16 @@ import { useTourAutoStart } from '@/components/Features/ProductTour';
 
 const DEFAULT_CATEGORIES = ['Tất cả ngành nghề'];
 
-const SENIORITIES = [
-  { value: '', label: 'Tất cả cấp bậc' },
-  { value: 'junior', label: 'Junior / Mới bắt đầu (0 - 2 năm)' },
-  { value: 'mid', label: 'Trung cấp / Mid-level (2 - 4 năm)' },
-  { value: 'senior', label: 'Senior / Quản lý (> 4 năm)' },
-];
-
 export const SalaryBenchmarkPage: React.FC = () => {
+  const { t } = useTranslation('public');
+
+  const seniorities = useMemo(() => [
+    { value: '', label: t('salary.seniorities.all', { defaultValue: 'Tất cả cấp bậc' }) },
+    { value: 'junior', label: t('salary.seniorities.junior', { defaultValue: 'Junior / Mới bắt đầu (0 - 2 năm)' }) },
+    { value: 'mid', label: t('salary.seniorities.mid', { defaultValue: 'Trung cấp / Mid-level (2 - 4 năm)' }) },
+    { value: 'senior', label: t('salary.seniorities.senior', { defaultValue: 'Senior / Quản lý (> 4 năm)' }) },
+  ], [t]);
+
   // Auto-start salary benchmark tour on first visit
   useTourAutoStart('salary_benchmark', 800);
 
@@ -79,7 +82,7 @@ export const SalaryBenchmarkPage: React.FC = () => {
       setBenchmarks(data);
     } catch (err: unknown) {
       console.error('Failed to fetch salary benchmarks:', err);
-      toast.error('Không thể tải dữ liệu mức lương. Vui lòng thử lại!');
+      toast.error(t('salary.errorFetch', { defaultValue: 'Không thể tải dữ liệu mức lương. Vui lòng thử lại!' }));
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +161,7 @@ export const SalaryBenchmarkPage: React.FC = () => {
           selectedSeniority={selectedSeniority}
           onSeniorityChange={setSelectedSeniority}
           categories={categories}
-          seniorities={SENIORITIES}
+          seniorities={seniorities}
           totalCount={filteredBenchmarks.length}
         />
       </Box>
@@ -206,7 +209,7 @@ export const SalaryBenchmarkPage: React.FC = () => {
                   display: 'block',
                 }}
               >
-                Vị trí khảo sát
+                {t('salary.metrics.surveyedRoles', { defaultValue: 'Vị trí khảo sát' })}
               </Typography>
               <Typography
                 variant="subtitle1"
@@ -217,7 +220,12 @@ export const SalaryBenchmarkPage: React.FC = () => {
                   lineHeight: 1.3,
                 }}
               >
-                {marketMetrics.totalCount > 0 ? `${marketMetrics.totalCount} dải lương chuẩn` : '0 dải lương'}
+                {marketMetrics.totalCount > 0
+                  ? t('salary.metrics.standardRanges', {
+                      count: marketMetrics.totalCount,
+                      defaultValue: `${marketMetrics.totalCount} dải lương chuẩn`,
+                    })
+                  : t('salary.metrics.zeroRanges', { defaultValue: '0 dải lương' })}
               </Typography>
             </Box>
           </Card>
@@ -264,7 +272,7 @@ export const SalaryBenchmarkPage: React.FC = () => {
                   display: 'block',
                 }}
               >
-                Mức lương trung vị (P50)
+                {t('salary.metrics.medianSalary', { defaultValue: 'Mức lương trung vị (P50)' })}
               </Typography>
               <Typography
                 variant="subtitle1"
@@ -276,7 +284,10 @@ export const SalaryBenchmarkPage: React.FC = () => {
                 }}
               >
                 {marketMetrics.avgMedianFormatted !== '---'
-                  ? `${marketMetrics.avgMedianFormatted} / tháng`
+                  ? t('salary.metrics.perMonth', {
+                      val: marketMetrics.avgMedianFormatted,
+                      defaultValue: `${marketMetrics.avgMedianFormatted} / tháng`,
+                    })
                   : '---'}
               </Typography>
             </Box>
@@ -324,7 +335,7 @@ export const SalaryBenchmarkPage: React.FC = () => {
                   display: 'block',
                 }}
               >
-                Mốc trần cao nhất
+                {t('salary.metrics.highestSalary', { defaultValue: 'Mốc trần cao nhất' })}
               </Typography>
               <Typography
                 variant="subtitle1"
@@ -336,7 +347,10 @@ export const SalaryBenchmarkPage: React.FC = () => {
                 }}
               >
                 {marketMetrics.maxSalaryFormatted !== '---'
-                  ? `Lên đến ${marketMetrics.maxSalaryFormatted}`
+                  ? t('salary.metrics.upTo', {
+                      val: marketMetrics.maxSalaryFormatted,
+                      defaultValue: `Lên đến ${marketMetrics.maxSalaryFormatted}`,
+                    })
                   : '---'}
               </Typography>
             </Box>
@@ -399,7 +413,7 @@ export const SalaryBenchmarkPage: React.FC = () => {
                 fontSize: '0.75rem',
               }}
             >
-              Bước tiếp theo để đạt mức lương kỳ vọng
+              {t('salary.cta.eyebrow', { defaultValue: 'Bước tiếp theo để đạt mức lương kỳ vọng' })}
             </Typography>
           </Stack>
           <Typography
@@ -412,7 +426,7 @@ export const SalaryBenchmarkPage: React.FC = () => {
               mb: 1,
             }}
           >
-            Tự Tin Chinh Phục Buổi Phỏng Vấn Với AI Interviewer
+            {t('salary.cta.title', { defaultValue: 'Tự Tin Chinh Phục Buổi Phỏng Vấn Với AI Interviewer' })}
           </Typography>
           <Typography
             variant="body2"
@@ -422,7 +436,10 @@ export const SalaryBenchmarkPage: React.FC = () => {
               lineHeight: 1.6,
             }}
           >
-            Trải nghiệm phòng phỏng vấn trực tuyến với AI, bộ đếm ngược từng câu hỏi, cấu trúc câu trả lời chi tiết và mẹo phỏng vấn hoàn toàn miễn phí.
+            {t('salary.cta.desc', {
+              defaultValue:
+                'Trải nghiệm phòng phỏng vấn trực tuyến với AI, bộ đếm ngược từng câu hỏi, cấu trúc câu trả lời chi tiết và mẹo phỏng vấn hoàn toàn miễn phí.',
+            })}
           </Typography>
         </Box>
 
@@ -449,7 +466,7 @@ export const SalaryBenchmarkPage: React.FC = () => {
             },
           }}
         >
-          Vào phòng phỏng vấn thử ngay
+          {t('salary.cta.button', { defaultValue: 'Vào phòng phỏng vấn thử ngay' })}
         </Button>
       </Card>
     </Box>

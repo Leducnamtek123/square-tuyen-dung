@@ -66,5 +66,45 @@
   "aiPipelineTitle": "Candidate Pipeline CRM",
   "aiPipelineDesc1": "Visual Kanban pipeline from Pre-screening and Live AI Interview to Job Offer and Onboarding.",
   "aiPipelineDesc2": "Automated notifications, interview invites, and status updates delivered instantly via email.",
-  "aiPipelineDesc3": "Seamless two-way integration with the InfoHR Human Resource Management ecosystem."
+  "aiPipelineDesc3": "Seamless two-way integration with the InfoHR Human Resource Management ecosystem.",
+  "aboutUsPage": {
+    "tabTitle": "About Us - Recruitment & HRM Ecosystem {{appName}}",
+    "heroBadge": "INFOHR RECRUITMENT & HUMAN RESOURCE ECOSYSTEM",
+    "industries": {
+      "construction": "Construction",
+      "realEstate": "Real Estate",
+      "architecture": "Architecture & Interior Design",
+      "mep": "Engineering & MEP Systems"
+    },
+    "stats": {
+      "candidates": "Connected Talent Profiles",
+      "candidatesDesc": "High-skilled professionals",
+      "companies": "Partner Enterprises",
+      "companiesDesc": "Reputable corporations & firms",
+      "satisfaction": "Recruitment Satisfaction",
+      "satisfactionDesc": "Positive partner feedback",
+      "aiOperating": "AI Interview Operations",
+      "aiOperatingDesc": "24/7 round-the-clock availability"
+    },
+    "coreValues": {
+      "aiTechTitle": "Pioneering AI Technology",
+      "aiTechDesc": "Employing natural Voice AI models and objective competency algorithms, removing time constraints and hiring biases.",
+      "speedCostTitle": "Optimized Speed & Cost",
+      "speedCostDesc": "Reduce candidate pre-screening and review time by up to 80%, optimizing HR budgets for companies of any size.",
+      "fourIndustriesTitle": "Specialized Across 4 Industries",
+      "fourIndustriesDesc": "Deep domain expertise in Construction, Real Estate, Architecture/Interior Design, and MEP Engineering.",
+      "securityTitle": "Enterprise-Grade Security",
+      "securityDesc": "Candidate and corporate HR data is safeguarded with strict modern enterprise-grade security encryption standards."
+    },
+    "steps": {
+      "step1Title": "Post Jobs & Attract Talent",
+      "step1Desc": "Post smart job listings optimized for search engines, reaching thousands of verified specialized candidates.",
+      "step2Title": "AI Screening & Voice Interviews",
+      "step2Desc": "AILA AI analyzes resumes, computes Match Scores, and conducts natural automated voice screening interviews 24/7.",
+      "step3Title": "STAR Competency Assessment",
+      "step3Desc": "Hiring panels receive skill matrices, competency gap analysis, and recorded interview transcripts for confident decision-making.",
+      "step4Title": "Onboarding & HRM Integration",
+      "step4Desc": "Seamlessly sync hired talent into InfoHR HRM: digital employment contracts, org-chart mapping, and unified workforce management."
+    }
+  }
 }

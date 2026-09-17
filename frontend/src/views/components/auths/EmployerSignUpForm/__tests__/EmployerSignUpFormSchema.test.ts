@@ -1,100 +1,79 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { createEmployerSignUpSchema } from '../index';
 
 const t = (key: string, defaultValue?: string) => {
   const translations: Record<string, string> = {
-    'validation.foundedDateInFuture': 'Founded date cannot be in the future.',
-    'validation.employeeSizeInvalid': 'Invalid company size.',
-    'common:validation.invalidUrl': 'Please enter a valid URL.',
+    'validation.requiredFullName': 'Full name is required.',
+    'validation.requiredPhone': 'Contact phone number is required.',
+    'validation.invalidPhone': 'Invalid phone number.',
+    'validation.requiredEmail': 'Email is required.',
+    'validation.invalidEmail': 'Email format is invalid.',
+    'validation.requiredPassword': 'Password is required.',
+    'validation.passwordMin': 'Password must be at least 8 characters.',
+    'validation.passwordRule': 'Password must include uppercase, lowercase, number, special char.',
+    'validation.requiredConfirmPassword': 'Confirm password is required.',
+    'validation.confirmPasswordMatch': 'Passwords do not match.',
+    'validation.requiredCompanyName': 'Company name is required.',
+    'validation.requiredCity': 'City is required.',
   };
 
   return translations[key] || defaultValue || key;
 };
 
-describe('createEmployerSignUpSchema', () => {
-  afterEach(() => {
-    jest.useRealTimers();
+describe('createEmployerSignUpSchema (Single-step lean registration)', () => {
+  it('validates a correct registration payload successfully', async () => {
+    const schema = createEmployerSignUpSchema(t as never);
+    const validData = {
+      fullName: 'Nguyễn Văn Tuyển',
+      phone: '0901234567',
+      email: 'recruiter@techcorp.vn',
+      password: 'Password@123',
+      confirmPassword: 'Password@123',
+      company: {
+        companyName: 'TechCorp Vietnam JSC',
+        location: {
+          city: 1,
+        },
+      },
+    };
+
+    await expect(schema.isValid(validData)).resolves.toBe(true);
   });
 
-  it('rejects future company founded dates', async () => {
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date(2026, 5, 4, 12, 0, 0).getTime());
+  it('rejects invalid phone numbers', async () => {
     const schema = createEmployerSignUpSchema(t as never);
-    const tomorrow = new Date(2026, 5, 5, 0, 0, 0);
 
-    await expect(schema.validateAt('company.since', { company: { since: tomorrow } })).rejects.toThrow(
-      'Founded date cannot be in the future.',
+    await expect(schema.validateAt('phone', { phone: 'abc12345' })).rejects.toThrow(
+      'Invalid phone number.'
     );
   });
 
-  it('rejects employee size outside backend choices', async () => {
-    const schema = createEmployerSignUpSchema(t as never);
-
-    await expect(schema.validateAt('company.employeeSize', { company: { employeeSize: 999 } })).rejects.toThrow(
-      'Invalid company size.',
-    );
-  });
-
-  it('rejects invalid company location relation ids', async () => {
+  it('rejects invalid company location city ids', async () => {
     const schema = createEmployerSignUpSchema(t as never);
 
     await expect(schema.validateAt('company.location.city', { company: { location: { city: 0 } } })).rejects.toThrow(
-      'validation.requiredCity',
+      'City is required.'
     );
     await expect(schema.validateAt('company.location.city', { company: { location: { city: 1.5 } } })).rejects.toThrow(
-      'validation.requiredCity',
-    );
-    await expect(schema.validateAt('company.location.district', { company: { location: { district: 0 } } })).rejects.toThrow(
-      'validation.requiredDistrict',
-    );
-    await expect(schema.validateAt('company.location.district', { company: { location: { district: 1.5 } } })).rejects.toThrow(
-      'validation.requiredDistrict',
+      'City is required.'
     );
   });
 
-  it('normalizes blank coordinates to null and rejects non-numeric coordinates', async () => {
+  it('rejects mismatched confirm password', async () => {
     const schema = createEmployerSignUpSchema(t as never);
 
-    await expect(schema.validateAt('company.location.lat', { company: { location: { lat: '' } } })).resolves.toBeNull();
-    await expect(schema.validateAt('company.location.lng', { company: { location: { lng: '' } } })).resolves.toBeNull();
-    await expect(schema.validateAt('company.location.lat', { company: { location: { lat: 'not-a-number' } } })).rejects.toThrow(
-      'validation.invalidLatitude',
-    );
-    await expect(schema.validateAt('company.location.lng', { company: { location: { lng: 'not-a-number' } } })).rejects.toThrow(
-      'validation.invalidLongitude',
-    );
-  });
-
-  it('rejects invalid company website URLs but allows blank values', async () => {
-    const schema = createEmployerSignUpSchema(t as never);
-
-    await expect(schema.validateAt('company.websiteUrl', { company: { websiteUrl: 'not-a-url' } })).rejects.toThrow(
-      'Please enter a valid URL.',
-    );
-    await expect(schema.validateAt('company.websiteUrl', { company: { websiteUrl: '' } })).resolves.toBeNull();
-  });
-
-  it('keeps the founded date picker aligned with schema validation', () => {
-    const fieldsSource = readFileSync(join(__dirname, '../CompanyInfoStep.tsx'), 'utf8');
-
-    expect(fieldsSource).toContain('name="company.since"');
-    expect(fieldsSource).toContain('maxDate={DATE_OPTIONS.today()}');
-  });
-
-  it('uses auth locale keys for district field labels without wrong ward fallbacks', () => {
-    const fieldsSource = readFileSync(join(__dirname, '../CompanyInfoStep.tsx'), 'utf8');
-    const vi = JSON.parse(readFileSync(join(__dirname, '../../../../../i18n/locales/vi/auth.json'), 'utf8'));
-    const en = JSON.parse(readFileSync(join(__dirname, '../../../../../i18n/locales/en/auth.json'), 'utf8'));
-
-    expect(fieldsSource).toContain("title={t('form.district')}");
-    expect(fieldsSource).toContain("placeholder={t('form.districtPlaceholder')}");
-    expect(fieldsSource).not.toContain('Ward/Commune');
-    expect(fieldsSource).not.toContain('Select ward/commune');
-    expect(vi.form.district).toEqual(expect.any(String));
-    expect(en.form.district).toEqual(expect.any(String));
-    expect(vi.form.districtPlaceholder).toEqual(expect.any(String));
-    expect(en.form.districtPlaceholder).toEqual(expect.any(String));
+    await expect(
+      schema.validate({
+        fullName: 'Nguyễn Văn Tuyển',
+        phone: '0901234567',
+        email: 'recruiter@techcorp.vn',
+        password: 'Password@123',
+        confirmPassword: 'DifferentPassword@123',
+        company: {
+          companyName: 'TechCorp',
+          location: { city: 1 },
+        },
+      })
+    ).rejects.toThrow('Passwords do not match.');
   });
 
   it('does not hard-code English validation fallback messages', () => {

@@ -693,7 +693,7 @@
       "isUrgent": "Tuyển gấp"
     },
     "placeholder": {
-      "enterjobtitle": "Nhập tiêu đề C.V",
+      "enterjobtitle": "Nhập tiêu đề công việc (ví dụ: Kỹ sư phần mềm, Nhân viên kinh doanh...)",
       "selectcareer": "Chọn ngành nghề",
       "selectposition": "Chọn cấp bậc",
       "selectrequiredexperience": "Chọn kinh nghiệm",
@@ -1373,6 +1373,7 @@
   "blog": {
     "title": "Blog tuyển dụng",
     "subtitle": "Chia sẻ kinh nghiệm, tips tuyển dụng của doanh nghiệp bạn",
+    "deleteTitle": "Xác nhận xóa bài viết",
     "newPost": "Viết bài mới",
     "reviewNotice": "Bài viết sẽ được gửi cho Admin duyệt trước khi hiển thị trên website. Thời gian duyệt thường trong 24 giờ.",
     "filter": {
@@ -1896,5 +1897,50 @@
       "uploadFailed": "Tải file lên thất bại. Vui lòng thử lại."
     }
   },
-  "candidate": "Ứng viên"
+  "candidateDetail": {
+    "messages": {
+      "noEmail": "Ứng viên chưa cập nhật địa chỉ email"
+    }
+  },
+  "candidate": "Ứng viên",
+  "introduce": {
+    "tabTitle": "Giới thiệu & Dịch vụ Tuyển dụng - {{appName}}",
+    "badge": "GIẢI PHÁP TUYỂN DỤNG THÔNG MINH CHO DOANH NGHIỆP",
+    "industries": {
+      "construction": "Xây dựng",
+      "realEstate": "Bất động sản",
+      "architecture": "Kiến trúc / Thiết kế nội thất",
+      "mep": "Kỹ thuật & Cơ điện (MEP)"
+    },
+    "stats": {
+      "screeningTime": "Rút ngắn thời gian sơ tuyển",
+      "screeningTimeDesc": "Sàng lọc CV & phỏng vấn AI",
+      "hiringSuccess": "Tăng tỷ lệ tuyển thành công",
+      "hiringSuccessDesc": "So khớp đúng năng lực thực tế",
+      "matchAccuracy": "Độ chính xác AI Match Score",
+      "matchAccuracyDesc": "Chuẩn hóa tiêu chí đánh giá",
+      "trustedCompanies": "Doanh nghiệp tin cậy",
+      "trustedCompaniesDesc": "Tập đoàn & công ty đồng hành"
+    },
+    "valueProps": {
+      "poolTitle": "Kho Ứng Viên 4 Khối Ngành Trọng Điểm",
+      "poolDesc": "Tập trung chuyên sâu dữ liệu ứng viên Xây dựng, Bất động sản, Thiết kế kiến trúc và Kỹ thuật MEP với hồ sơ xác thực chuẩn mực.",
+      "aiMatchingTitle": "AI So Khớp & Phỏng Vấn Tự Động",
+      "aiMatchingDesc": "AILA AI tự động phân tích CV, tính điểm Match Score và thực hiện phỏng vấn sơ loại Voice AI 24/7 loại bỏ hoàn toàn định kiến.",
+      "pipelineTitle": "Quản Lý Đường Ống Tuyển Dụng CRM",
+      "pipelineDesc": "Theo dõi toàn bộ vòng đời hồ sơ ứng viên từ tiếp nhận, xếp lịch phỏng vấn đến tiếp nhận onboarding trên một màn hình trực quan.",
+      "guaranteeTitle": "Đồng Hành & Bảo Hành Tuyển Dụng",
+      "guaranteeDesc": "Đội ngũ chuyên viên tư vấn hỗ trợ 24/7, tối ưu tin đăng việc làm và chính sách đồng hành bảo đảm sự thành công của doanh nghiệp."
+    },
+    "steps": {
+      "step1Title": "Khởi Tạo & Xác Thực Doanh Nghiệp",
+      "step1Desc": "Đăng ký tài khoản nhà tuyển dụng nhanh chóng và nhận huy hiệu Doanh nghiệp uy tín đã xác thực.",
+      "step2Title": "Đăng Tin Tuyển Dụng Thông Minh",
+      "step2Desc": "Tạo tin tuyển dụng chuẩn SEO nhanh chóng với gợi ý JD chuyên nghiệp từ AI.",
+      "step3Title": "AI Sàng Lọc & Phỏng Vấn Tự Động",
+      "step3Desc": "Tự động phân loại hồ sơ, chấm điểm Match Score và xếp lịch phỏng vấn AI tức thì.",
+      "step4Title": "Tiếp Nhận & Tối Ưu Nhân Sự",
+      "step4Desc": "Duyệt ứng viên trúng tuyển, ký hợp đồng và quản lý toàn diện quy trình Onboarding."
+    }
+  }
 }

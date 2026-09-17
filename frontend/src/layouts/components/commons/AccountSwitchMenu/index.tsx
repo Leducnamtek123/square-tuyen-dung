@@ -220,6 +220,7 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
             />
           }
           sx={{
+            flexShrink: 0,
             backgroundColor: '#ffffff',
             color: '#0f172a',
             borderRadius: '10px',

@@ -497,6 +497,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
               size="small"
               onClick={handleScrollLeft}
               sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#ffffff',
                 width: 32,
@@ -516,6 +517,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                 gap: 1,
                 overflowX: 'auto',
                 scrollBehavior: 'smooth',
+                WebkitOverflowScrolling: 'touch',
                 py: 0.5,
                 flex: 1,
                 minWidth: 0,
@@ -559,6 +561,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
               size="small"
               onClick={handleScrollRight}
               sx={{
+                display: { xs: 'none', sm: 'inline-flex' },
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#ffffff',
                 width: 32,
@@ -745,7 +748,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                         </Typography>
                         <Stack direction="row" spacing={0.5} alignItems="center">
                           <PaymentsOutlinedIcon sx={{ fontSize: 16, color: '#2563eb' }} />
-                          <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: '#2563eb', fontFamily: 'var(--font-mono)', letterSpacing: '-0.01em' }}>
+                          <Typography sx={{ fontSize: '0.875rem', fontWeight: 700, color: '#2563eb', fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}>
                             {salaryDisplay}
                           </Typography>
                         </Stack>

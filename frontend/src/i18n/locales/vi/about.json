@@ -66,5 +66,45 @@
     "desc1": "Smart notification system helps you closely follow the status of your application profile.",
     "desc2": "Receive interview appointments directly from employers and respond right on the platform.",
     "desc3": "Ensure seamless communication between businesses and candidates throughout the selection process."
+  },
+  "aboutUsPage": {
+    "tabTitle": "Về chúng tôi - Hệ sinh thái Tuyển dụng & Quản trị Nhân sự {{appName}}",
+    "heroBadge": "HỆ SINH THÁI TUYỂN DỤNG & QUẢN TRỊ NHÂN SỰ INFOHR",
+    "industries": {
+      "construction": "Xây dựng",
+      "realEstate": "Bất động sản",
+      "architecture": "Kiến trúc / Thiết kế nội thất",
+      "mep": "Kỹ thuật & Cơ điện (MEP)"
+    },
+    "stats": {
+      "candidates": "Ứng viên tài năng kết nối",
+      "candidatesDesc": "Hồ sơ chuyên môn cao",
+      "companies": "Doanh nghiệp đồng hành",
+      "companiesDesc": "Tập đoàn & đối tác uy tín",
+      "satisfaction": "Độ hài lòng tuyển dụng",
+      "satisfactionDesc": "Đánh giá tích cực từ đối tác",
+      "aiOperating": "Vận hành & Phỏng vấn AI",
+      "aiOperatingDesc": "Không giới hạn thời gian"
+    },
+    "coreValues": {
+      "aiTechTitle": "Tiên Phong Công Nghệ AI",
+      "aiTechDesc": "Ứng dụng mô hình Voice AI và thuật toán phân tích năng lực khách quan, xóa bỏ rào cản thời gian và định kiến tuyển dụng.",
+      "speedCostTitle": "Tối Ưu Tốc Độ & Chi Phí",
+      "speedCostDesc": "Cắt giảm đến 80% thời gian sơ loại hồ sơ và sàng lọc ứng viên, tối ưu hóa ngân sách nhân sự cho mọi quy mô doanh nghiệp.",
+      "fourIndustriesTitle": "Chuyên Sâu 4 Khối Ngành",
+      "fourIndustriesDesc": "Thấu hiểu đặc thù tiêu chuẩn nghề nghiệp của Xây dựng, Bất động sản, Thiết kế kiến trúc và Kỹ thuật Cơ điện.",
+      "securityTitle": "Bảo Mật Chuẩn Doanh Nghiệp",
+      "securityDesc": "Hệ thống bảo vệ dữ liệu hồ sơ và thông tin nhân sự tuân thủ nghiêm ngặt các tiêu chuẩn mã hóa an toàn thông tin."
+    },
+    "steps": {
+      "step1Title": "Đăng Tin & Thu Hút Ứng Viên",
+      "step1Desc": "Doanh nghiệp đăng tin tuyển dụng thông minh, tối ưu SEO việc làm và tiếp cận hàng ngàn ứng viên đúng chuyên môn.",
+      "step2Title": "AI Sàng Lọc & Phỏng Vấn Voice",
+      "step2Desc": "AILA AI tự động phân tích CV, tính toán Match Score và thực hiện phỏng vấn sơ tuyển bằng giọng nói tự nhiên 24/7.",
+      "step3Title": "Đánh Giá Năng Lực Chuẩn STAR",
+      "step3Desc": "Hội đồng tuyển dụng nhận báo cáo phân tích kỹ năng, khoảng trống năng lực và video/transcript phỏng vấn để ra quyết định.",
+      "step4Title": "Tiếp Nhận & Quản Trị HRM",
+      "step4Desc": "Đồng bộ hồ sơ trúng tuyển vào hệ thống InfoHR HRM: ký hợp đồng số, cập nhật sơ đồ tổ chức và quản lý nhân sự liền mạch."
+    }
   }
 }

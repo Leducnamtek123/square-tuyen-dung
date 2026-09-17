@@ -52,7 +52,7 @@ const JobPostsTable = ({
   maxHeight,
 }: JobPostsTableProps) => {
 
-  const { t } = useTranslation('employer');
+  const { t, i18n } = useTranslation('employer');
   const { allConfig } = useConfig();
 
   const columns = useMemo<ColumnDef<JobPost>[]>(() => [
@@ -274,9 +274,26 @@ const JobPostsTable = ({
       header: t('jobPost.table.status'),
       accessorKey: 'status',
       cell: (info) => {
-        const val = String(info.getValue() ?? '');
-        const label = allConfig?.jobPostStatusDict?.[val] || val.toUpperCase() || '---';
-        const colorKey = ((JOB_POST_STATUS_BG_COLOR as Record<string, string>)[val]) || 'default';
+        const raw = String(info.getValue() ?? '').trim();
+        const lower = raw.toLowerCase();
+        const isEn = Boolean(i18n?.language && i18n.language.startsWith('en'));
+
+        const STATUS_MAP: Record<string, { labelVi: string; labelEn: string; color: string }> = {
+          '1': { labelVi: 'Chờ duyệt', labelEn: 'Pending', color: 'warning' },
+          'pending': { labelVi: 'Chờ duyệt', labelEn: 'Pending', color: 'warning' },
+          '2': { labelVi: 'Bị từ chối', labelEn: 'Rejected', color: 'error' },
+          'rejected': { labelVi: 'Bị từ chối', labelEn: 'Rejected', color: 'error' },
+          '3': { labelVi: 'Đã duyệt', labelEn: 'Approved', color: 'success' },
+          'approved': { labelVi: 'Đã duyệt', labelEn: 'Approved', color: 'success' },
+        };
+
+        const mapped = STATUS_MAP[raw] || STATUS_MAP[lower];
+        const label = mapped
+          ? (isEn ? mapped.labelEn : mapped.labelVi)
+          : (allConfig?.jobPostStatusDict?.[raw] || raw.toUpperCase() || '---');
+        const colorKey = mapped
+          ? mapped.color
+          : (((JOB_POST_STATUS_BG_COLOR as Record<string, string>)[raw]) || 'default');
         const muiColor = colorKey === 'default' ? 'default' : colorKey;
         
         // pc.X() is used here to avoid alpha(theme.palette[dynamic].main) which crashes in MUI v6
@@ -309,31 +326,64 @@ const JobPostsTable = ({
       header: '',
       id: 'actions',
       cell: (info) => (
-        <Stack direction="row" spacing={1} justifyContent="flex-end">
+        <Stack direction="row" spacing={0.75} justifyContent="flex-end">
+          {info.row.original.slug && (
+            <Tooltip title="Xem tin đăng tuyển" arrow>
+              <IconButton
+                aria-label="Xem tin đăng"
+                size="small"
+                onClick={() => window.open(`/jobs/${info.row.original.slug}`, '_blank')}
+                sx={{
+                  color: '#2563EB',
+                  bgcolor: '#EFF6FF',
+                  border: '1px solid #BFDBFE',
+                  borderRadius: '8px',
+                  width: 32,
+                  height: 32,
+                  transition: 'all 0.2s ease',
+                  '&:hover': { bgcolor: '#DBEAFE', transform: 'scale(1.05)' }
+                }}
+              >
+                <LaunchIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Tooltip>
+          )}
           <Tooltip title={t('jobPost.tooltips.update')} arrow>
-            <IconButton aria-label="Thao tác"
+            <IconButton
+              aria-label="Chỉnh sửa tin tuyển dụng"
               size="small"
               onClick={() => handleUpdate(info.row.original.slug || info.row.original.id)}
               sx={{ 
-                color: 'primary.main',
-                bgcolor: pc.primary( 0.08),
-                '&:hover': { bgcolor: pc.primary( 0.16) }
+                color: '#0284C7',
+                bgcolor: '#F0F9FF',
+                border: '1px solid #BAE6FD',
+                borderRadius: '8px',
+                width: 32,
+                height: 32,
+                transition: 'all 0.2s ease',
+                '&:hover': { bgcolor: '#E0F2FE', transform: 'scale(1.05)' }
               }}
             >
-              <EditIcon fontSize="small" />
+              <EditIcon sx={{ fontSize: 16 }} />
             </IconButton>
           </Tooltip>
           <Tooltip title={t('jobPost.tooltips.delete')} arrow>
-            <IconButton aria-label="Thao tác"
+            <IconButton
+              aria-label="Xóa tin tuyển dụng"
               size="small"
               onClick={() => handleDelete(info.row.original.slug || info.row.original.id)}
               sx={{ 
-                color: 'error.main',
-                bgcolor: pc.error( 0.08),
-                '&:hover': { bgcolor: pc.error( 0.16) }
+                color: '#DC2626',
+                bgcolor: '#FEF2F2',
+                border: '1px solid #FECDD3',
+                borderRadius: '8px',
+                width: 32,
+                height: 32,
+                transition: 'all 0.2s ease',
+                '&:hover': { bgcolor: '#FEE2E2', transform: 'scale(1.05)' }
               }}
             >
-              <DeleteIcon fontSize="small" />
+              <DeleteIcon sx={{ fontSize: 16 }} />
             </IconButton>
           </Tooltip>
         </Stack>

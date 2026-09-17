@@ -85,6 +85,20 @@ const JobPost = ({
   const theme = useTheme();
   const { allConfig } = useConfig();
   const { t, i18n } = useTranslation(['public', 'common']);
+  const isEn = Boolean(i18n.language && i18n.language.startsWith('en'));
+
+  const daysLeftText = React.useMemo(() => {
+    if (!deadline) return isEn ? '30 days left' : '30 ngày';
+    const diffDays = dayjs(deadline).diff(dayjs(), 'day');
+    if (diffDays > 0) {
+      return isEn ? `${diffDays} days left` : `${diffDays} ngày`;
+    }
+    const diffHours = dayjs(deadline).diff(dayjs(), 'hour');
+    if (diffHours > 0) {
+      return isEn ? `${diffHours} hours left` : `${diffHours} giờ`;
+    }
+    return isEn ? 'Expired' : 'Hết hạn';
+  }, [deadline, isEn]);
 
   const {
     hoveredJob,
@@ -243,18 +257,20 @@ const JobPost = ({
               }}
             />
           </Box>
-          <Stack flex={1} sx={{ minWidth: 0, pr: (isHot || isUrgent) ? 9.5 : 0 }} spacing={0.4}>
+          <Stack flex={1} sx={{ minWidth: 0, pr: (isHot || isUrgent) ? 7.5 : 0 }} spacing={0.4}>
             <Tooltip followCursor title={jobName}>
               <Typography
                 variant="subtitle2"
-                noWrap
                 sx={{
                   fontSize: '0.925rem',
                   fontWeight: 700,
                   color: '#0f172a',
-                  textOverflow: 'ellipsis',
-                  minWidth: 0,
                   lineHeight: 1.35,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  minHeight: '2.7em',
                 }}
               >
                 {jobName}
@@ -291,7 +307,7 @@ const JobPost = ({
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 13, color: '#94a3b8' }} />}>
             <span style={{ color: '#64748b', fontSize: '0.775rem' }}>
-              {t('jobPost.timeLeft')} <TimeAgo date={deadline} type="fromNow" />
+              {isEn ? daysLeftText : `${t('jobPost.timeLeft')} ${daysLeftText}`}
             </span>
           </MetaItem>
         </Box>
