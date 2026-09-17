@@ -154,6 +154,9 @@ INTERVIEW_AGENT_AUTH_REQUIRED = config(
 )
 INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS = config("INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS", default=300, cast=int)
 INTERVIEW_DISCONNECT_GRACE_SECONDS = config("INTERVIEW_DISCONNECT_GRACE_SECONDS", default=300, cast=int)
+MAX_CONCURRENT_INTERVIEWS_PER_SLOT = config("MAX_CONCURRENT_INTERVIEWS_PER_SLOT", default=30, cast=int)
+SLOT_WINDOW_MINUTES = config("SLOT_WINDOW_MINUTES", default=15, cast=int)
+TTS_CACHE_DIR = config("TTS_CACHE_DIR", default="/tmp/tts_cache")
 API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=_to_bool)
 FRAPPE_HR_BASE_URL = config("FRAPPE_HR_BASE_URL", default="")
 FRAPPE_HR_PUBLIC_URL = config("FRAPPE_HR_PUBLIC_URL", default=FRAPPE_HR_BASE_URL)
@@ -237,6 +240,8 @@ INSTALLED_APPS = [
     'apps.agent_assistants',
     'apps.hrm',
     'apps.cv_builder',
+    'apps.exchange',
+    'apps.operations',
     'corsheaders',
     'django_celery_results',
     'timezone_field',
@@ -257,6 +262,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
 ]
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 ROOT_URLCONF = 'config.urls'
 
