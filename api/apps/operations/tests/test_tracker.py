@@ -1,7 +1,7 @@
 import pytest
 from django.utils import timezone
 from apps.operations.models import AsyncOperation, OperationStatus
-from apps.operations.services import OperationTracker
+from apps.operations.services import OperationTracker, OperationCancelledError
 
 
 @pytest.mark.django_db
@@ -187,3 +187,40 @@ def test_tracker_recalculate_progress_empty_steps():
     )
     tracker._recalculate_progress()
     assert tracker.op.progress == 0
+
+
+@pytest.mark.django_db
+def test_tracker_concurrency_cancellation_detection():
+    tracker = OperationTracker.create(
+        type="test.concurrency",
+        title="Concurrent Cancellation Test",
+        steps=[
+            {"key": "step1", "label": "Step 1"},
+            {"key": "step2", "label": "Step 2"},
+        ],
+    )
+    tracker.start_step("step1", detail="Step 1 running")
+
+    # Simulate background cancellation via API or DB
+    AsyncOperation.objects.filter(id=tracker.op.id).update(status=OperationStatus.CANCELLED)
+
+    # Calling update_step must detect cancellation and raise OperationCancelledError
+    with pytest.raises(OperationCancelledError, match="was cancelled"):
+        tracker.update_step("step1", progress=50)
+
+    # In DB, status must remain CANCELLED (not reverted to running)
+    tracker.op.refresh_from_db()
+    assert tracker.op.status == OperationStatus.CANCELLED
+
+    # Calling complete_step must also raise OperationCancelledError
+    with pytest.raises(OperationCancelledError, match="was cancelled"):
+        tracker.complete_step("step1")
+
+    # Inside a context manager, OperationCancelledError must not overwrite status to FAILED
+    with pytest.raises(OperationCancelledError):
+        with tracker as t:
+            t.start_step("step2")
+
+    tracker.op.refresh_from_db()
+    assert tracker.op.status == OperationStatus.CANCELLED
+    assert tracker.op.status != OperationStatus.FAILED

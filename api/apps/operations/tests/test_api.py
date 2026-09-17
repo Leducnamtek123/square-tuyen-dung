@@ -188,9 +188,44 @@ def test_cancel_operation_unauthorized(client, job_seeker_user, employer_user):
         status=OperationStatus.RUNNING,
     )
 
+    # Non-owner gets 403
     client.force_authenticate(user=employer_user)
     res = client.post(f"/api/v1/operations/{op.id}/cancel/")
     assert res.status_code == 403
 
+    # Unauthenticated gets 401
+    client.force_authenticate(user=None)
+    res = client.post(f"/api/v1/operations/{op.id}/cancel/")
+    assert res.status_code == 401
+
     op.refresh_from_db()
     assert op.status == OperationStatus.RUNNING
+
+
+@pytest.mark.django_db
+def test_cancel_unassigned_operation_requires_admin(client, job_seeker_user, admin_user):
+    op = AsyncOperation.objects.create(
+        type="test.unassigned",
+        title="Unassigned Op",
+        status=OperationStatus.RUNNING,
+    )
+
+    # Anonymous caller gets 401
+    client.force_authenticate(user=None)
+    res = client.post(f"/api/v1/operations/{op.id}/cancel/")
+    assert res.status_code == 401
+
+    # Regular authenticated user gets 403
+    client.force_authenticate(user=job_seeker_user)
+    res = client.post(f"/api/v1/operations/{op.id}/cancel/")
+    assert res.status_code == 403
+
+    # Admin gets 200
+    client.force_authenticate(user=admin_user)
+    res = client.post(f"/api/v1/operations/{op.id}/cancel/")
+    assert res.status_code == 200
+    assert res.data["success"] is True
+    assert res.data["operation"]["status"] == "cancelled"
+
+    op.refresh_from_db()
+    assert op.status == OperationStatus.CANCELLED

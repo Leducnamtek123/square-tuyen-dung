@@ -7,6 +7,11 @@ from .models import AsyncOperation, OperationStatus
 logger = logging.getLogger(__name__)
 
 
+class OperationCancelledError(Exception):
+    """Raised when an operation has been cancelled while execution is in progress."""
+    pass
+
+
 class OperationTracker:
     def __init__(self, operation: AsyncOperation):
         self.op = operation
@@ -62,8 +67,21 @@ class OperationTracker:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
+            if issubclass(exc_type, OperationCancelledError):
+                return False
             self.fail(str(exc_val))
             return False
+
+    def _check_cancellation(self):
+        if self.op.pk:
+            self.op.refresh_from_db(fields=["status"])
+            if self.op.status == OperationStatus.CANCELLED:
+                raise OperationCancelledError(f"Operation '{self.op.id}' was cancelled.")
+
+    def _save(self, update_fields: list[str]):
+        fields = set(update_fields)
+        fields.add("updated_at")
+        self.op.save(update_fields=list(fields))
 
     def _recalculate_progress(self):
         total_steps = len(self.op.steps)
@@ -78,20 +96,22 @@ class OperationTracker:
         overall = int(((completed * 100) + current_prog) / total_steps)
         self.op.progress = min(overall, 99)
 
-    def start_step(self, key: str, detail: str = ""):
+    def start_step(self, key: str, detail: str | None = None):
+        self._check_cancellation()
         now_str = timezone.now().isoformat()
         self.op.current_step_key = key
         for s in self.op.steps:
             if s.get("key") == key:
                 s["status"] = "running"
                 s["startedAt"] = now_str
-                if detail:
+                if detail is not None:
                     s["detail"] = detail
                 break
         self._recalculate_progress()
-        self.op.save()
+        self._save(["current_step_key", "steps", "progress"])
 
     def update_step(self, key: str, progress: int | None = None, detail: str | None = None):
+        self._check_cancellation()
         for s in self.op.steps:
             if s.get("key") == key:
                 if progress is not None:
@@ -100,9 +120,10 @@ class OperationTracker:
                     s["detail"] = detail
                 break
         self._recalculate_progress()
-        self.op.save()
+        self._save(["steps", "progress"])
 
-    def complete_step(self, key: str, result_summary: str = "", detail: str = ""):
+    def complete_step(self, key: str, result_summary: str = "", detail: str | None = None):
+        self._check_cancellation()
         now_str = timezone.now().isoformat()
         for s in self.op.steps:
             if s.get("key") == key:
@@ -111,13 +132,14 @@ class OperationTracker:
                 s["completedAt"] = now_str
                 if result_summary:
                     s["resultSummary"] = result_summary
-                if detail:
+                if detail is not None:
                     s["detail"] = detail
                 break
         self._recalculate_progress()
-        self.op.save()
+        self._save(["steps", "progress"])
 
     def fail_step(self, key: str, error_message: str):
+        self._check_cancellation()
         now_str = timezone.now().isoformat()
         for s in self.op.steps:
             if s.get("key") == key:
@@ -125,16 +147,22 @@ class OperationTracker:
                 s["completedAt"] = now_str
                 s["errorMessage"] = str(error_message)
                 break
+        self._save(["steps"])
         self.fail(error_message)
 
     def finish(self, result: dict[str, Any] | None = None):
+        self._check_cancellation()
         self.op.status = OperationStatus.COMPLETED
         self.op.progress = 100
         self.op.result = result or {}
         self.op.finished_at = timezone.now()
-        self.op.save()
+        self._save(["status", "progress", "result", "finished_at"])
 
     def fail(self, error_message: str, code: str = "OPERATION_FAILED", detail: str = ""):
+        if self.op.pk:
+            self.op.refresh_from_db(fields=["status"])
+            if self.op.status == OperationStatus.CANCELLED:
+                return
         self.op.status = OperationStatus.FAILED
         self.op.error = {
             "code": code,
@@ -142,4 +170,4 @@ class OperationTracker:
             "detail": detail or str(error_message),
         }
         self.op.finished_at = timezone.now()
-        self.op.save()
+        self._save(["status", "error", "finished_at"])

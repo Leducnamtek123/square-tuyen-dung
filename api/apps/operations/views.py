@@ -37,7 +37,52 @@ def _can_access_operation(user, op: AsyncOperation) -> bool:
 
     # Company match
     if op.company_id:
-        active_company = user.get_active_company() if hasattr(user, "get_active_company") else getattr(user, "active_company", None)
+        active_company = (
+            user.get_active_company()
+            if hasattr(user, "get_active_company")
+            else getattr(user, "active_company", None)
+        )
+        if active_company and active_company.id == op.company_id:
+            return True
+        if getattr(user, "company_id", None) == op.company_id:
+            return True
+        try:
+            from apps.profiles.models import CompanyMember
+            if CompanyMember.objects.filter(company_id=op.company_id, user=user, is_active=True).exists():
+                return True
+        except Exception:
+            pass
+
+    return False
+
+
+def _can_cancel_operation(user, op: AsyncOperation) -> bool:
+    if not user or not user.is_authenticated:
+        return False
+
+    is_admin = (
+        getattr(user, "is_staff", False)
+        or getattr(user, "is_superuser", False)
+        or getattr(user, "role_name", None) == "admin"
+    )
+    if is_admin:
+        return True
+
+    # Unassigned operations can only be cancelled by staff/superuser/admin
+    if op.user_id is None and op.company_id is None:
+        return False
+
+    # Owner user check
+    if op.user_id and op.user_id == user.id:
+        return True
+
+    # Company check
+    if op.company_id:
+        active_company = (
+            user.get_active_company()
+            if hasattr(user, "get_active_company")
+            else getattr(user, "active_company", None)
+        )
         if active_company and active_company.id == op.company_id:
             return True
         if getattr(user, "company_id", None) == op.company_id:
@@ -105,16 +150,17 @@ class CancelOperationView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request, id: str):
+        if not request.user or not request.user.is_authenticated:
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
         op = AsyncOperation.objects.filter(id=id).first()
         if not op:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        if not _can_access_operation(request.user, op):
-            if not request.user.is_authenticated:
-                return Response(
-                    {"detail": "Authentication credentials were not provided."},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
+        if not _can_cancel_operation(request.user, op):
             return Response({"detail": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
         if op.status not in [OperationStatus.QUEUED, OperationStatus.RUNNING]:
@@ -129,7 +175,7 @@ class CancelOperationView(views.APIView):
 
         op.status = OperationStatus.CANCELLED
         op.finished_at = timezone.now()
-        op.save()
+        op.save(update_fields=["status", "finished_at", "updated_at"])
 
         # Optional Celery revocation if task ID exists
         if isinstance(op.metadata, dict):
