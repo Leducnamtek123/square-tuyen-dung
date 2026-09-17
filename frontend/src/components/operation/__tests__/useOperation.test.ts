@@ -279,4 +279,39 @@ describe('useOperation hook', () => {
 
     expect(operationService.getOperation).toHaveBeenCalledTimes(2);
   });
+
+  it('resets state when operationId changes', async () => {
+    const mockOp200: OperationPayload = {
+      id: 'op_200',
+      type: 'exchange.import',
+      title: 'Import',
+      status: 'running',
+      progress: 10,
+      steps: [],
+    };
+
+    (operationService.getOperation as jest.Mock)
+      .mockResolvedValueOnce(mockCompletedOp)
+      .mockResolvedValueOnce(mockOp200);
+
+    let currentId: string = 'op_100';
+    const { result, rerender } = renderHook(() =>
+      useOperation({ operationId: currentId, pollingInterval: 60000 })
+    );
+
+    await waitFor(() => {
+      expect(result.current.isCompleted).toBe(true);
+    });
+
+    currentId = 'op_200';
+    rerender();
+
+    // After switching ID, previous completed status is immediately cleared
+    expect(result.current.isCompleted).toBe(false);
+
+    await waitFor(() => {
+      expect(result.current.operation?.id).toBe('op_200');
+    });
+    expect(result.current.isRunning).toBe(true);
+  });
 });

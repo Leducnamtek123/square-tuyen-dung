@@ -18,7 +18,7 @@ describe('operationService', () => {
   });
 
   describe('getOperation', () => {
-    it('calls GET api/v1/operations/${id}/ and unwraps response', async () => {
+    it('calls GET operations/${id}/ and unwraps response', async () => {
       const mockOp = {
         id: 'op_123',
         type: 'candidate.ai_scan',
@@ -31,7 +31,7 @@ describe('operationService', () => {
 
       const result = await operationService.getOperation('op_123');
 
-      expect(httpRequest.get).toHaveBeenCalledWith('api/v1/operations/op_123/');
+      expect(httpRequest.get).toHaveBeenCalledWith('operations/op_123/');
       expect(result).toEqual(mockOp);
     });
 
@@ -48,13 +48,13 @@ describe('operationService', () => {
 
       const result = await operationService.getOperation('op_123');
 
-      expect(httpRequest.get).toHaveBeenCalledWith('api/v1/operations/op_123/');
+      expect(httpRequest.get).toHaveBeenCalledWith('operations/op_123/');
       expect(result).toEqual(mockOp);
     });
   });
 
   describe('getActiveOperations', () => {
-    it('calls GET api/v1/operations/active/ with params and unwraps response', async () => {
+    it('calls GET operations/active/ with params and unwraps response', async () => {
       const mockResponse = {
         results: [
           {
@@ -71,7 +71,7 @@ describe('operationService', () => {
 
       const result = await operationService.getActiveOperations({ type: 'exchange.import' });
 
-      expect(httpRequest.get).toHaveBeenCalledWith('api/v1/operations/active/', {
+      expect(httpRequest.get).toHaveBeenCalledWith('operations/active/', {
         params: { type: 'exchange.import' },
       });
       expect(result).toEqual(mockResponse);
@@ -85,7 +85,7 @@ describe('operationService', () => {
 
       const result = await operationService.getActiveOperations();
 
-      expect(httpRequest.get).toHaveBeenCalledWith('api/v1/operations/active/', {
+      expect(httpRequest.get).toHaveBeenCalledWith('operations/active/', {
         params: undefined,
       });
       expect(result).toEqual(mockResponse);
@@ -93,7 +93,7 @@ describe('operationService', () => {
   });
 
   describe('cancelOperation', () => {
-    it('calls POST api/v1/operations/${id}/cancel/ and unwraps response', async () => {
+    it('calls POST operations/${id}/cancel/ and unwraps response', async () => {
       const mockResponse = {
         success: true,
         operation: {
@@ -109,7 +109,7 @@ describe('operationService', () => {
 
       const result = await operationService.cancelOperation('op_123');
 
-      expect(httpRequest.post).toHaveBeenCalledWith('api/v1/operations/op_123/cancel/');
+      expect(httpRequest.post).toHaveBeenCalledWith('operations/op_123/cancel/');
       expect(result).toEqual(mockResponse);
     });
 
@@ -129,7 +129,7 @@ describe('operationService', () => {
 
       const result = await operationService.cancelOperation('op_123');
 
-      expect(httpRequest.post).toHaveBeenCalledWith('api/v1/operations/op_123/cancel/');
+      expect(httpRequest.post).toHaveBeenCalledWith('operations/op_123/cancel/');
       expect(result).toEqual(mockResponse);
     });
   });

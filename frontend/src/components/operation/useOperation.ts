@@ -74,7 +74,10 @@ export function useOperation(options: UseOperationOptions = {}): UseOperationRet
   // Track terminal callback notifications to prevent redundant invocations
   const notifiedTerminalRef = useRef<{ id: string; status: string } | null>(null);
 
+  // Reset state and notified terminal flag when operationId changes
   useEffect(() => {
+    setOperation(initialData || null);
+    setError(null);
     notifiedTerminalRef.current = null;
   }, [operationId]);
 
@@ -128,14 +131,16 @@ export function useOperation(options: UseOperationOptions = {}): UseOperationRet
     };
   }, [isEnabled, operationId]);
 
-  // Auto-polling when isRunning
+  // Auto-polling when isRunning (chained setTimeout to eliminate request overlap)
   useEffect(() => {
     if (!isEnabled || !operationId || !isRunning) {
       return;
     }
 
     let isMounted = true;
-    const timer = setInterval(async () => {
+    let timerId: ReturnType<typeof setTimeout> | null = null;
+
+    const poll = async () => {
       try {
         const data = await operationService.getOperation(operationId);
         if (isMounted) {
@@ -146,12 +151,20 @@ export function useOperation(options: UseOperationOptions = {}): UseOperationRet
         if (isMounted) {
           setError(toError(err));
         }
+      } finally {
+        if (isMounted) {
+          timerId = setTimeout(poll, pollingInterval);
+        }
       }
-    }, pollingInterval);
+    };
+
+    timerId = setTimeout(poll, pollingInterval);
 
     return () => {
       isMounted = false;
-      clearInterval(timer);
+      if (timerId) {
+        clearTimeout(timerId);
+      }
     };
   }, [isEnabled, operationId, isRunning, pollingInterval]);
 
@@ -178,15 +191,15 @@ export function useOperation(options: UseOperationOptions = {}): UseOperationRet
       const res = await operationService.cancelOperation(operationId);
       if (res?.operation) {
         setOperation(res.operation);
-      } else if (operation) {
-        setOperation({ ...operation, status: 'cancelled' });
+      } else {
+        setOperation((prev) => (prev ? { ...prev, status: 'cancelled' } : null));
       }
       return res;
     } catch (err: unknown) {
       setError(toError(err));
       throw err;
     }
-  }, [operationId, operation]);
+  }, [operationId]);
 
   return {
     operation,

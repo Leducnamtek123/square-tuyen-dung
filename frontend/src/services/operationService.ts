@@ -1,4 +1,5 @@
 import httpRequest from '@/utils/httpRequest';
+import { unwrapDataResponse } from '@/utils/apiResponse';
 import type {
   ActiveOperationsResponse,
   OperationPayload,
@@ -9,26 +10,20 @@ export interface CancelOperationResponse {
   operation: OperationPayload;
 }
 
-const unwrap = <T>(res: any): T => {
-  return (res?.data !== undefined && (res?.id === undefined && res?.results === undefined && res?.success === undefined))
-    ? (res.data as T)
-    : (res as T);
-};
-
 export const operationService = {
   getOperation: async (id: string): Promise<OperationPayload> => {
-    const res = await httpRequest.get(`api/v1/operations/${id}/`);
-    return unwrap<OperationPayload>(res);
+    const res = await httpRequest.get(`operations/${id}/`);
+    return unwrapDataResponse<OperationPayload>(res);
   },
 
   getActiveOperations: async (params?: { type?: string }): Promise<ActiveOperationsResponse> => {
-    const res = await httpRequest.get('api/v1/operations/active/', { params });
-    return unwrap<ActiveOperationsResponse>(res);
+    const res = await httpRequest.get('operations/active/', { params });
+    return unwrapDataResponse<ActiveOperationsResponse>(res);
   },
 
   cancelOperation: async (id: string): Promise<CancelOperationResponse> => {
-    const res = await httpRequest.post(`api/v1/operations/${id}/cancel/`);
-    return unwrap<CancelOperationResponse>(res);
+    const res = await httpRequest.post(`operations/${id}/cancel/`);
+    return unwrapDataResponse<CancelOperationResponse>(res);
   },
 };
 
