@@ -5,3 +5,4 @@ export * from './OperationTimeline';
 export * from './OperationDetailModal';
 export * from './OperationProvider';
 export * from './OperationCenterDock';
+export * from './adapters/resumeAnalysisAdapter';

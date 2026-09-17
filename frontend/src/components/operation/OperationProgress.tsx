@@ -19,6 +19,7 @@ import type { OperationPayload, OperationStatus } from './types';
 export interface OperationProgressProps {
   operation?: OperationPayload | null;
   onOpenDetail?: () => void;
+  onClick?: () => void;
   size?: 'sm' | 'md';
   showPercentage?: boolean;
   showCurrentStep?: boolean;
@@ -37,6 +38,7 @@ const STATUS_COLORS: Record<OperationStatus, string> = {
 export const OperationProgress: React.FC<OperationProgressProps> = ({
   operation,
   onOpenDetail,
+  onClick,
   size = 'md',
   showPercentage = true,
   showCurrentStep = true,
@@ -110,6 +112,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
   return (
     <Box
       className={className}
+      onClick={onClick}
       sx={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -117,6 +120,7 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
         height: isSmall ? 32 : 40,
         px: isSmall ? 1.25 : 1.75,
         borderRadius: 2,
+        cursor: onClick ? 'pointer' : undefined,
         bgcolor:
           theme.palette.mode === 'dark'
             ? 'rgba(255, 255, 255, 0.05)'
@@ -222,7 +226,10 @@ export const OperationProgress: React.FC<OperationProgressProps> = ({
         <Button
           size="small"
           variant="text"
-          onClick={onOpenDetail}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenDetail();
+          }}
           endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: isSmall ? 12 : 14 }} />}
           sx={{
             textTransform: 'none',

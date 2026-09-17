@@ -28,6 +28,7 @@ import { SectionCard } from './SectionCard';
 import type { AIAnalysisData } from './types';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
+import { OperationTimeline, adaptResumeAnalysisOperation } from '@/components/operation';
 
 type Props = {
   data: AIAnalysisData | null;
@@ -118,54 +119,11 @@ const AIAnalysisDrawerStatePanels = ({
   };
 
   if (isProcessing) {
+    const operation = adaptResumeAnalysisOperation(data, scanProgress);
     return (
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2.75,
-          mb: 2.5,
-          border: '1px solid',
-          borderColor: alpha(theme.palette.info.main, 0.28),
-          borderRadius: 3,
-          bgcolor: alpha(theme.palette.info.main, 0.04),
-        }}
-      >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.75 }}>
-          <Stack direction="row" spacing={1.25} alignItems="center">
-            <Box sx={{ color: 'info.main', display: 'flex' }}>
-              <AutoFixHighIcon sx={{ fontSize: 20 }} />
-            </Box>
-            <Typography variant="subtitle2" sx={{ color: 'info.dark', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              {t('appliedResume.ai.scanning')}
-            </Typography>
-          </Stack>
-          <Chip
-            size="small"
-            label={`${scanProgress}%`}
-            sx={{
-              color: 'info.dark',
-              bgcolor: alpha(theme.palette.info.main, 0.12),
-              fontWeight: 800,
-            }}
-          />
-        </Stack>
-        <LinearProgress
-          variant="determinate"
-          value={scanProgress}
-          sx={{
-            height: 8,
-            borderRadius: 4,
-            bgcolor: alpha(theme.palette.info.main, 0.12),
-            '& .MuiLinearProgress-bar': {
-              borderRadius: 4,
-              bgcolor: 'info.main',
-            },
-          }}
-        />
-        <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1.5, display: 'block', fontWeight: 600 }}>
-          {t('appliedResume.ai.scanProgress')}
-        </Typography>
-      </Paper>
+      <Box sx={{ mb: 2.5 }}>
+        <OperationTimeline operation={operation} onRetry={onAnalyze} />
+      </Box>
     );
   }
 

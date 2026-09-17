@@ -25,6 +25,7 @@ import type { OperationPayload, OperationStatus, OperationStep, OperationStepSta
 export interface OperationTimelineProps {
   operation?: OperationPayload | null;
   onRetryStep?: (stepKey: string) => void;
+  onRetry?: () => void;
   onOpenDetail?: () => void;
   expandable?: boolean;
   defaultExpanded?: boolean;
@@ -63,6 +64,7 @@ function formatDuration(startedAt?: string | null, completedAt?: string | null):
 export const OperationTimeline: React.FC<OperationTimelineProps> = ({
   operation,
   onRetryStep,
+  onRetry,
   onOpenDetail,
   expandable = false,
   defaultExpanded = true,
@@ -257,6 +259,24 @@ export const OperationTimeline: React.FC<OperationTimelineProps> = ({
               <Typography variant="caption" color="text.secondary">
                 {finishedAt ? `Thời gian: ${totalDuration}` : `Đang chạy: ${totalDuration}`}
               </Typography>
+            )}
+
+            {onRetry && status === 'failed' && (
+              <Button
+                size="small"
+                variant="outlined"
+                color="error"
+                onClick={onRetry}
+                startIcon={<ReplayRoundedIcon sx={{ fontSize: 14 }} />}
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '0.75rem',
+                  py: 0.25,
+                  px: 1,
+                }}
+              >
+                Thử lại
+              </Button>
             )}
 
             {onOpenDetail && (
