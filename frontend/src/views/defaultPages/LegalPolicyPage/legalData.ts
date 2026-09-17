@@ -210,7 +210,43 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
       {
         id: 'quyen-cua-ban',
         title: '6. Quyền chỉnh sửa và xóa dữ liệu',
-        content: 'Người Dùng có thể tự đăng nhập để kiểm tra, cập nhật hoặc xóa thông tin cá nhân trong trang Quản lý tài khoản, hoặc gửi yêu cầu xóa toàn bộ dữ liệu qua email: support@infohr.vn.',
+        content: 'Người Dùng có thể tự đăng nhập để kiểm tra, cập nhật hoặc xóa thông tin cá nhân trong trang Quản lý tài khoản, hoặc gửi yêu cầu xóa toàn bộ dữ liệu qua email: support@infohr.vn hoặc ceohub.hostmaster@gmail.com.',
+      },
+      {
+        id: 'du-lieu-nguoi-dung-google',
+        title: '7. Thu thập và Xử lý Dữ liệu Người dùng Google (Google User Data & OAuth Policy)',
+        content: 'Nền tảng infohr.vn (InfoHR) hỗ trợ tính năng Đăng nhập bằng Google (Google OAuth 2.0 / Single Sign-On) nhằm mang lại sự tiện lợi và bảo mật tối đa cho người dùng. Dưới đây là các cam kết chi tiết và minh bạch về cách chúng tôi xử lý dữ liệu người dùng nhận từ Google:',
+        subsections: [
+          {
+            id: 'pham-vi-du-lieu-google',
+            title: 'a. Phạm vi dữ liệu Google được truy cập và thu thập (Google Data Accessed)',
+            content: 'Khi bạn chọn "Đăng nhập bằng Google" trên infohr.vn, hệ thống chỉ yêu cầu quyền truy cập vào các thông tin hồ sơ cơ bản (Basic Profile) được cung cấp bởi Google OAuth bao gồm:\n• Google User ID (mã định danh duy nhất của tài khoản Google).\n• Họ và tên (Full Name).\n• Địa chỉ email chính của tài khoản Google (Email Address).\n• Ảnh đại diện tài khoản Google (Profile Picture / Avatar).\n\nLưu ý quan trọng: InfoHR tuyệt đối KHÔNG truy cập, yêu cầu hoặc lưu trữ mật khẩu tài khoản Google của bạn, danh bạ, Google Drive, Gmail hay bất kỳ dữ liệu nhạy cảm nào khác ngoài các thông tin hồ sơ cơ bản nêu trên.',
+          },
+          {
+            id: 'muc-dich-su-dung-google',
+            title: 'b. Mục đích sử dụng dữ liệu Google (Purpose of Use)',
+            content: 'Thông tin nhận từ Google được infohr.vn sử dụng độc quyền cho các mục đích sau:\n• Xác thực danh tính và kích hoạt phiên đăng nhập an toàn.\n• Khởi tạo và thiết lập tài khoản thành viên trên hệ thống InfoHR.\n• Tự động điền thông tin họ tên, email vào hồ sơ tìm việc hoặc hồ sơ nhà tuyển dụng để tiết kiệm thời gian cho bạn.\n• Gửi các thông báo quan trọng về trạng thái ứng tuyển, lịch phỏng vấn, tin tuyển dụng phù hợp và cảnh báo bảo mật tài khoản.',
+          },
+          {
+            id: 'bao-mat-khong-chia-se-google',
+            title: 'c. Lưu trữ, Bảo mật & Cam kết Không Bán Dữ liệu (Storage, Security & No Sale of Data)',
+            content: '• Lưu trữ an toàn: Dữ liệu nhận từ Google được lưu trữ trên các máy chủ đám mây có bảo mật cao, phân quyền kiểm soát truy cập nghiêm ngặt và mã hóa toàn bộ lưu lượng truyền tải bằng SSL/TLS 256-bit.\n• Không bán dữ liệu: InfoHR cam kết KHÔNG bán, cho thuê, trao đổi hoặc chuyển giao dữ liệu người dùng Google cho bất kỳ bên thứ ba, mạng lưới quảng cáo (Ad Networks) hoặc đơn vị môi giới dữ liệu (Data Brokers) nào vì bất kỳ mục đích thương mại nào.\n• Không quảng cáo nhắm mục tiêu: Dữ liệu người dùng Google không bao giờ được sử dụng để phân phát quảng cáo cá nhân hóa hoặc quảng cáo theo dõi hành vi.\n• Giới hạn AI/ML: InfoHR KHÔNG sử dụng dữ liệu người dùng Google để huấn luyện các mô hình trí tuệ nhân tạo (AI/ML) tổng quát khi chưa có sự cho phép cụ thể của bạn.',
+          },
+          {
+            id: 'tuan-thu-chinh-sach-google',
+            title: 'd. Tuân thủ Chính sách Dữ liệu Người dùng Dịch vụ Google API (Google API Services User Data Policy Compliance)',
+            content: 'Việc InfoHR sử dụng và chuyển giao thông tin nhận được từ các API của Google cho bất kỳ ứng dụng nào khác sẽ tuân thủ nghiêm ngặt Chính sách Dữ liệu Người dùng của Dịch vụ Google API (Google API Services User Data Policy), bao gồm các yêu cầu về Sử dụng Có giới hạn (Limited Use requirements).\n\n(English: InfoHR\'s use and transfer of information received from Google APIs to any other app will adhere to Google API Services User Data Policy, including the Limited Use requirements.)',
+            callout: {
+              type: 'info',
+              text: 'Cam kết Limited Use: InfoHR tuân thủ đầy đủ chính sách Sử dụng có giới hạn của Google. Mọi dữ liệu nhận từ Google API chỉ được sử dụng để cung cấp và cải thiện tính năng trực tiếp cho người dùng, không sử dụng cho mục đích trái phép.',
+            },
+          },
+          {
+            id: 'quyen-thu-hoi-xoa-google',
+            title: 'e. Quyền kiểm soát, Hủy liên kết và Yêu cầu Xóa Dữ liệu (Revoke Access & Data Deletion)',
+            content: 'Người dùng có toàn quyền kiểm soát dữ liệu liên kết Google của mình bất cứ lúc nào:\n1. Hủy cấp quyền từ Google: Bạn có thể ngắt kết nối quyền truy cập của ứng dụng infohr.vn với tài khoản Google của bạn bất kỳ lúc nào tại Cài đặt bảo mật Google: https://myaccount.google.com/permissions .\n2. Yêu cầu xóa dữ liệu hoàn toàn trên InfoHR: Bạn có thể tự thực hiện xóa tài khoản tại trang Cài đặt tài khoản (https://infohr.vn/tai-khoan) hoặc gửi yêu cầu xóa tài khoản và dữ liệu cá nhân qua email: support@infohr.vn hoặc ceohub.hostmaster@gmail.com .\n3. Thời hạn xử lý: Ngay khi nhận được yêu cầu hợp lệ, InfoHR sẽ xóa vĩnh viễn dữ liệu người dùng Google khỏi toàn bộ cơ sở dữ liệu hoạt động và hệ thống lưu trữ dự phòng trong vòng tối đa 30 ngày.',
+          },
+        ],
       },
     ],
   },
@@ -321,8 +357,10 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
 // Aliases mapping for flexible slug resolutions
 export const LEGAL_SLUG_ALIASES: Record<string, string> = {
   'dieu-khoan-su-dung': 'thoa-thuan-su-dung',
+  'dieu-khoan-dich-vu': 'thoa-thuan-su-dung',
   'thoa-thuan-su-dung': 'thoa-thuan-su-dung',
   'terms-of-service': 'thoa-thuan-su-dung',
+  'terms-and-conditions': 'thoa-thuan-su-dung',
   'terms': 'thoa-thuan-su-dung',
   'chinh-sach-bao-mat': 'quy-dinh-bao-mat',
   'quy-dinh-bao-mat': 'quy-dinh-bao-mat',

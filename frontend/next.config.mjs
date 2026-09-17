@@ -141,8 +141,12 @@ const nextConfig = {
       { source: '/lien-he', destination: '/contact' },
       { source: '/cau-hoi-thuong-gap', destination: '/faq' },
       { source: '/dieu-khoan-dich-vu', destination: '/terms-of-service' },
+      { source: '/dieu-khoan-su-dung', destination: '/terms-of-service' },
       { source: '/terms-and-conditions', destination: '/terms-of-service' },
+      { source: '/terms', destination: '/terms-of-service' },
       { source: '/chinh-sach-bao-mat', destination: '/privacy-policy' },
+      { source: '/quy-dinh-bao-mat', destination: '/privacy-policy' },
+      { source: '/privacy', destination: '/privacy-policy' },
 
       // ── Legal & Policy HTML Routes (Vieclam24h style) ──
       { source: '/thoa-thuan-su-dung.html', destination: '/legal/thoa-thuan-su-dung' },

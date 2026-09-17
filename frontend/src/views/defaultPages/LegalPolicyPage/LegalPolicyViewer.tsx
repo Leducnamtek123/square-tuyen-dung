@@ -485,12 +485,19 @@ export const LegalPolicyViewer: React.FC<Props> = ({ slug, portal = 'jobseeker' 
               <Stack direction="row" spacing={1} alignItems="center">
                 <MailOutlineIcon sx={{ color: '#64748b', fontSize: 18 }} />
                 <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.875rem' }}>
-                  Email:{' '}
+                  Email hỗ trợ &amp; Nhà phát triển:{' '}
                   <a
                     href="mailto:support@infohr.vn"
                     style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
                   >
                     support@infohr.vn
+                  </a>{' '}
+                  |{' '}
+                  <a
+                    href="mailto:ceohub.hostmaster@gmail.com"
+                    style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+                  >
+                    ceohub.hostmaster@gmail.com
                   </a>
                 </Typography>
               </Stack>
