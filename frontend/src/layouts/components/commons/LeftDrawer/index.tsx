@@ -150,13 +150,8 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
             <Box
               component="img"
               src={IMAGES.getTextLogo('dark')}
-<<<<<<< HEAD
-              alt="Logo"
-              sx={{ width: 32, height: 32, objectFit: 'contain' }}
-=======
               alt="InfoHR"
               sx={{ height: 30, width: 'auto', maxWidth: 130, objectFit: 'contain' }}
->>>>>>> feature/hrm-time-attendance
             />
           </Box>
 
@@ -199,11 +194,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                     className={pathname.startsWith(page.path) ? 'active' : ''}
                     disablePadding
                     onClick={(e: React.MouseEvent<HTMLElement>) => handleItemClick(e, page)}
-<<<<<<< HEAD
-                    sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer' }}
-=======
                     sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer', minWidth: 0 }}
->>>>>>> feature/hrm-time-attendance
                   >
                     <ListItemButton
                       aria-expanded={hasSubItems ? isSubOpen : undefined}
