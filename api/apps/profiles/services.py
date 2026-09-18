@@ -266,3 +266,23 @@ class CompanyService:
             'resumes_saved': ResumeSaved.objects.filter(company=company).count(),
             'resumes_viewed': ResumeViewed.objects.filter(company=company).count(),
         }
+
+    @staticmethod
+    def safe_set_logo(company: Company, logo_file: Optional[Any]) -> None:
+        """Safely set company logo by unlinking from other companies first to prevent MySQL 1062 IntegrityError."""
+        if logo_file:
+            Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+            company.logo = logo_file
+        else:
+            company.logo = None
+        company.save(update_fields=['logo'])
+
+    @staticmethod
+    def safe_set_cover_image(company: Company, cover_file: Optional[Any]) -> None:
+        """Safely set company cover image by unlinking from other companies first to prevent MySQL 1062 IntegrityError."""
+        if cover_file:
+            Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+            company.cover_image = cover_file
+        else:
+            company.cover_image = None
+        company.save(update_fields=['cover_image'])

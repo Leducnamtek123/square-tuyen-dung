@@ -40,7 +40,7 @@ class ProfileView(viewsets.ViewSet):
         user = request.user
 
         profile, _ = JobSeekerProfile.objects.select_related(
-            'location', 'location__city', 'location__district', 'user'
+            'location', 'location__city', 'location__district', 'user', 'cover_image'
         ).get_or_create(user_id=user.id)
 
         profile_serializer = JobSeekerProfileSerializer(profile)

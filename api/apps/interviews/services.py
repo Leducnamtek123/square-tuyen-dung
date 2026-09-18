@@ -28,6 +28,12 @@ class SessionNotJoinableError(ValueError):
 
 
 def get_session_questions(session: InterviewSession) -> Iterable[Question]:
+    if not getattr(session, "pk", None):
+        if session.question_group_id and session.question_group:
+            return session.question_group.questions.all()
+        if session.job_post_id and getattr(session.job_post, "interview_template_id", None):
+            return session.job_post.interview_template.questions.all()
+        return Question.objects.none()
     questions = session.questions.all()
     if questions.exists():
         return questions
@@ -340,10 +346,22 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
         except (ValueError, TypeError):
             pass
 
+    candidate = getattr(session, "candidate", None)
+    candidate_id = getattr(session, "candidate_id", None) or getattr(candidate, "id", None) or "anonymous"
+    candidate_name = (
+        getattr(candidate, "full_name", None)
+        or getattr(candidate, "email", None)
+        or getattr(candidate, "phone_number", None)
+        or getattr(candidate, "phone", None)
+        or getattr(candidate, "username", None)
+        or f"candidate-{candidate_id}"
+    )
+    candidate_email = getattr(candidate, "email", None) or ""
+
     payload = {
-        "participantIdentity": f"candidate-{session.candidate_id}",
-        "candidateName": session.candidate.full_name,
-        "candidateEmail": session.candidate.email,
+        "participantIdentity": f"candidate-{candidate_id}",
+        "candidateName": str(candidate_name).strip() or f"candidate-{candidate_id}",
+        "candidateEmail": candidate_email,
         "jobTitle": session.job_post.job_name if session.job_post else None,
         "jobDescription": job_description or None,
         "jobRequirement": job_requirement or None,
@@ -407,12 +425,22 @@ def create_livekit_participant_token(session: InterviewSession, request) -> Dict
             f"Khong the tham gia buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"
         )
 
-    participant_identity = f"candidate-{session.candidate_id}"
-    participant_name = session.candidate.full_name or session.candidate.email or participant_identity
+    candidate = getattr(session, "candidate", None)
+    candidate_id = getattr(session, "candidate_id", None) or getattr(candidate, "id", None) or "anonymous"
+    participant_identity = f"candidate-{candidate_id}"
+    participant_name = (
+        getattr(candidate, "full_name", None)
+        or getattr(candidate, "email", None)
+        or getattr(candidate, "phone_number", None)
+        or getattr(candidate, "phone", None)
+        or getattr(candidate, "username", None)
+        or participant_identity
+    )
+    participant_name = str(participant_name).strip() or participant_identity
 
     # Reset question_cursor if session is in scheduled/calibration or is mock so entering doesn't start at the end
     if session.status in ("scheduled", "calibration") or getattr(session, "session_type", None) == "mock":
-        if (session.question_cursor or 0) > 0:
+        if (session.question_cursor or 0) > 0 and getattr(session, "pk", None):
             session.question_cursor = 0
             session.save(update_fields=["question_cursor", "update_at"])
 
@@ -633,19 +661,28 @@ def queue_ai_evaluation(session: InterviewSession) -> None:
 def create_observer_livekit_token(session: InterviewSession, request) -> Dict[str, str]:
     """Create a hidden LiveKit token for employer to observe interview silently."""
     allowed_statuses = ("scheduled", "calibration", "in_progress", "interrupted")
-    if session.status not in allowed_statuses:
+    if (session.status or "").lower() not in allowed_statuses:
         raise SessionNotJoinableError(
             f"Khong the quan sat buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"
         )
 
-    user = request.user
-    observer_identity = f"observer-{user.id}"
-    observer_name = f"[Observer] {user.full_name or user.email}"
+    user = getattr(request, "user", None)
+    user_id = getattr(user, "id", None) or "anonymous"
+    observer_identity = f"observer-{user_id}"
+    observer_name = (
+        getattr(user, "full_name", None)
+        or getattr(user, "email", None)
+        or getattr(user, "phone_number", None)
+        or getattr(user, "phone", None)
+        or getattr(user, "username", None)
+        or observer_identity
+    )
+    observer_display = f"[Observer] {str(observer_name).strip() or observer_identity}"
 
     token = LiveKitService.create_observer_token(
         room_name=session.room_name,
         observer_identity=observer_identity,
-        observer_name=observer_name,
+        observer_name=observer_display,
     )
 
     server_url = _build_public_livekit_url(request)
@@ -670,16 +707,27 @@ def create_hr_presence_livekit_token(session: InterviewSession, request) -> Dict
     - can_subscribe = True           → HR nghe/xem được toàn bộ phòng
     """
     allowed_statuses = ("scheduled", "calibration", "in_progress", "interrupted")
-    if session.status not in allowed_statuses:
+    if (session.status or "").lower() not in allowed_statuses:
         raise SessionNotJoinableError(
             f"Khong the tham gia buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"
         )
 
-    user = request.user
-    hr_identity = f"employer-{user.id}"
-    hr_name = user.full_name or user.email or hr_identity
+    user = getattr(request, "user", None)
+    user_id = getattr(user, "id", None) or "anonymous"
+    hr_identity = f"employer-{user_id}"
+    hr_name = (
+        getattr(user, "full_name", None)
+        or getattr(user, "email", None)
+        or getattr(user, "phone_number", None)
+        or getattr(user, "phone", None)
+        or getattr(user, "username", None)
+        or hr_identity
+    )
+    hr_name = str(hr_name).strip() or hr_identity
     company = getattr(user, "active_company", None)
     company_name = getattr(company, "company_name", None) if company else None
+    if not company_name and session.job_post and getattr(session.job_post, "company", None):
+        company_name = getattr(session.job_post.company, "company_name", None)
 
     token = LiveKitService.create_hr_presence_token(
         room_name=session.room_name,

@@ -129,6 +129,14 @@ class CandidateToEmployeeConverter:
                 raise ValidationError({"candidate_profile_id": ["Hồ sơ ứng viên không tồn tại."]})
             user = candidate_profile.user
 
+        # Resolve user from data if not already bound via application or candidate profile
+        if not user:
+            u_id = data.get("user_id") or data.get("userId")
+            if u_id:
+                user = User.objects.filter(id=u_id).first()
+            elif data.get("email"):
+                user = User.objects.filter(email__iexact=data["email"].strip()).first()
+
         # Idempotency Check 2: Does an active Employee already exist for this user in this company?
         if user:
             existing_user_emp = Employee.objects.filter(
@@ -146,6 +154,19 @@ class CandidateToEmployeeConverter:
                     company.id,
                 )
                 return existing_user_emp, False
+
+            # Safe unlinking / verification:
+            # If this User was already linked to an Employee anywhere else in the system (e.g. another company or older record),
+            # safely unlink it to avoid MySQL 1062 IntegrityError on Employee.user OneToOneField.
+            other_employees = Employee.objects.filter(user=user)
+            if other_employees.exists():
+                for old_emp in other_employees:
+                    logger.warning(
+                        "Unlinking User %s from Employee %s (company %s) before assigning to Employee in company %s.",
+                        user.id, old_emp.id, old_emp.company_id, company.id
+                    )
+                    old_emp.user = None
+                    old_emp.save(update_fields=["user", "update_at"])
 
         # Extract names, contact & demographic details
         first_name = data.get("first_name", "").strip()
@@ -317,7 +338,9 @@ def deduplicate_punch_logs(
 
     q_filter = Q(company=company)
     if target_date:
-        q_filter &= Q(punch_time__date=target_date)
+        day_start = timezone.make_aware(datetime.combine(target_date, time.min))
+        day_end = timezone.make_aware(datetime.combine(target_date, time.max))
+        q_filter &= Q(punch_time__range=(day_start, day_end))
 
     all_logs = BiometricPunchLog.objects.filter(q_filter).order_by('punch_time')
 
@@ -335,8 +358,11 @@ def deduplicate_punch_logs(
         for group_key, logs in grouped_logs.items():
             last_valid_time: Optional[datetime] = None
             for p in logs:
+                pt = p.punch_time
+                if timezone.is_naive(pt):
+                    pt = timezone.make_aware(pt)
                 if last_valid_time is not None:
-                    diff_seconds = abs((p.punch_time - last_valid_time).total_seconds())
+                    diff_seconds = abs((pt - last_valid_time).total_seconds())
                     if diff_seconds < window_seconds:
                         # Mark as duplicate
                         if not p.is_duplicate:
@@ -349,7 +375,7 @@ def deduplicate_punch_logs(
                 if p.is_duplicate:
                     p.is_duplicate = False
                     p.save(update_fields=['is_duplicate', 'update_at'])
-                last_valid_time = p.punch_time
+                last_valid_time = pt
 
     logger.info(
         "Company %s punch log deduplication complete: %s duplicates flagged.",
@@ -367,8 +393,13 @@ def mark_if_duplicate_on_punch(punch_log, window_seconds: int = 120) -> bool:
     """
     from apps.hrm.models import BiometricPunchLog
 
-    time_start = punch_log.punch_time - timedelta(seconds=window_seconds)
-    time_end = punch_log.punch_time + timedelta(seconds=window_seconds)
+    punch_time = punch_log.punch_time
+    if timezone.is_naive(punch_time):
+        punch_time = timezone.make_aware(punch_time)
+        punch_log.punch_time = punch_time
+
+    time_start = punch_time - timedelta(seconds=window_seconds)
+    time_end = punch_time + timedelta(seconds=window_seconds)
 
     q_filter = Q(company_id=punch_log.company_id, is_duplicate=False, punch_time__range=(time_start, time_end))
     if punch_log.id:
@@ -419,7 +450,7 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
         shift = assignment.shift if assignment else None
 
         # Build query for valid (non-duplicate) punch logs
-        bio_id = getattr(emp, 'biometric_id', None)
+        bio_id = getattr(emp, 'biometric_id', None) or getattr(emp, 'employee_code', None)
         emp_bio_q = (Q(employee=emp) | Q(biometric_id=bio_id)) if bio_id else Q(employee=emp)
 
         # Handle overnight shift vs standard day shift
@@ -432,7 +463,9 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
             window_end = timezone.make_aware(datetime.combine(next_date, time(12, 0, 0)))
             q_filter = Q(company=company, is_duplicate=False, punch_time__range=(window_start, window_end)) & emp_bio_q
         else:
-            q_filter = Q(company=company, is_duplicate=False, punch_time__date=target_date) & emp_bio_q
+            day_start = timezone.make_aware(datetime.combine(target_date, time.min))
+            day_end = timezone.make_aware(datetime.combine(target_date, time.max))
+            q_filter = Q(company=company, is_duplicate=False, punch_time__range=(day_start, day_end)) & emp_bio_q
 
         punches = BiometricPunchLog.objects.filter(q_filter).order_by('punch_time')
 
@@ -442,9 +475,16 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
         first_punch = punches.first()
         last_punch = punches.last()
 
-        # Handle local timezone time conversion cleanly
-        local_first_dt = timezone.localtime(first_punch.punch_time)
-        local_last_dt = timezone.localtime(last_punch.punch_time)
+        # Handle local timezone time conversion cleanly and safely
+        fp_time = first_punch.punch_time
+        if timezone.is_naive(fp_time):
+            fp_time = timezone.make_aware(fp_time)
+        local_first_dt = timezone.localtime(fp_time)
+
+        lp_time = last_punch.punch_time
+        if timezone.is_naive(lp_time):
+            lp_time = timezone.make_aware(lp_time)
+        local_last_dt = timezone.localtime(lp_time)
 
         check_in_time = local_first_dt.time()
         check_out_time = local_last_dt.time() if punches.count() > 1 else None
@@ -555,6 +595,7 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
                 'late_minutes': late_minutes,
                 'early_minutes': early_minutes,
                 'working_hours': working_hours,
+                'effective_work_hours': working_hours,
                 'status': record_status,
                 'notes': notes_content,
             }
@@ -562,5 +603,3 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
         updated_count += 1
 
     return updated_count
-
-

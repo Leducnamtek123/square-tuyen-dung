@@ -152,6 +152,8 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         method_name="get_cv_image_url", read_only=True)
     fileUrl = serializers.SerializerMethodField(
         method_name="get_cv_file_url", read_only=True)
+    fileDict = serializers.SerializerMethodField(
+        method_name="get_file_dict", read_only=True)
     file = serializers.FileField(required=True, write_only=True)
     user = auth_serializers.UserSerializer(
         fields=["id", "fullName", "email", "avatarUrl"], read_only=True)
@@ -198,6 +200,17 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 for f in ['sourcePlatform', 'sourceUrl', 'sourceAccount', 'sourceRef', 'isImported']:
                     fields.pop(f, None)
         return fields
+
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        if "skills_summary" in validated_data:
+            summary = validated_data.get("skills_summary") or ""
+            instance.advanced_skills.all().delete()
+            for s in summary.split(","):
+                name = s.strip()
+                if name:
+                    AdvancedSkill.objects.create(resume=instance, name=name, level=3)
+        return instance
 
     def validate_file(self, cv_file):
         return validate_pdf_cv_file(cv_file)
@@ -254,6 +267,23 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         cv_file = resume.file
         if cv_file:
             return cv_file.get_full_url()
+        return None
+
+    def get_file_dict(self, resume):
+        cv_file = resume.file
+        if cv_file:
+            name = ""
+            if cv_file.metadata and isinstance(cv_file.metadata, dict):
+                name = cv_file.metadata.get("name") or cv_file.metadata.get("filename") or cv_file.metadata.get("original_name") or ""
+            if not name and cv_file.public_id:
+                name = cv_file.public_id.split("/")[-1]
+            return {
+                "id": cv_file.id,
+                "url": cv_file.get_full_url(),
+                "fileUrl": cv_file.get_full_url(),
+                "name": name,
+                "size": cv_file.metadata.get("size") if (cv_file.metadata and isinstance(cv_file.metadata, dict)) else None,
+            }
         return None
 
     def get_position_data(self, resume):
@@ -374,7 +404,7 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   "position", "experience", "academicLevel",
                   "typeOfWorkplace", "jobType", "isActive",
                   "career", "updateAt", "file",
-                  "imageUrl", "fileUrl", "user", "city", 'isSaved',
+                  "imageUrl", "fileUrl", "fileDict", "user", "city", 'isSaved',
                   "viewEmployerNumber", "lastViewedDate",
                   "userDict", "jobSeekerProfileDict",
                   "type", "positionChooseData", "experienceChooseData", "academicLevelChooseData",

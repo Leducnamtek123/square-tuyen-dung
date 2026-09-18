@@ -37,18 +37,26 @@ class LiveKitService:
         classify participants without guessing from display names.
         """
         attributes = {
-            "role": role,
-            "participant_role": role,
+            "role": str(role),
+            "participant_role": str(role),
         }
         if extra_attributes:
-            attributes.update({key: value for key, value in extra_attributes.items() if value})
+            attributes.update({
+                str(key): str(value)
+                for key, value in extra_attributes.items()
+                if value is not None and str(value).strip() != ""
+            })
 
         metadata = {
-            "role": role,
-            "name": participant_name,
+            "role": str(role),
+            "name": str(participant_name or ""),
         }
         if extra_metadata:
-            metadata.update({key: value for key, value in extra_metadata.items() if value})
+            metadata.update({
+                str(key): value
+                for key, value in extra_metadata.items()
+                if value is not None
+            })
 
         return (
             token_builder
@@ -130,6 +138,8 @@ class LiveKitService:
         """
         Tạo JWT token cho người dùng (hoặc agent) join room LiveKit.
         """
+        participant_identity = str(participant_identity or "anonymous")
+        participant_name = str(participant_name or participant_identity or "Participant")
         token_builder = (api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
             .with_identity(participant_identity)
             .with_name(participant_name)
@@ -202,6 +212,8 @@ class LiveKitService:
         can_publish=False: không thể nói/gửi media.
         can_subscribe=True: có thể nghe audio realtime.
         """
+        observer_identity = str(observer_identity or "anonymous")
+        observer_name = str(observer_name or observer_identity or "[Observer]")
         token_builder = (
             api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
             .with_identity(observer_identity)
@@ -237,6 +249,9 @@ class LiveKitService:
         can_publish_data=True: HR gửi được chat message.
         can_subscribe=True: HR nghe/xem được toàn bộ phòng.
         """
+        hr_identity = str(hr_identity or "anonymous")
+        hr_name = str(hr_name or hr_identity or "HR")
+        clean_company_name = str(company_name).strip() if company_name else None
         token_builder = (
             api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
             .with_identity(hr_identity)
@@ -255,8 +270,8 @@ class LiveKitService:
             token_builder,
             "employer",
             participant_name=hr_name,
-            extra_attributes={"company_name": company_name} if company_name else None,
-            extra_metadata={"company_name": company_name} if company_name else None,
+            extra_attributes={"company_name": clean_company_name} if clean_company_name else None,
+            extra_metadata={"company_name": clean_company_name} if clean_company_name else None,
         )
         return token_builder.to_jwt()
 

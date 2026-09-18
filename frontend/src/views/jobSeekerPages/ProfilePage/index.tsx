@@ -108,7 +108,20 @@ const ProfilePage = () => {
 
   // Direct Avatar & Cover URL from Redux / Backend User
   const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(currentUser?.avatarUrl || undefined);
-  const [coverUrl, setCoverUrl] = React.useState<string | undefined>(undefined);
+  const [coverUrl, setCoverUrl] = React.useState<string | undefined>(
+    currentUser?.coverUrl || currentUser?.jobSeekerProfile?.coverUrl || undefined
+  );
+
+  React.useEffect(() => {
+    if (currentUser?.coverUrl) {
+      setCoverUrl(currentUser.coverUrl);
+    } else if (currentUser?.jobSeekerProfile?.coverUrl) {
+      setCoverUrl(currentUser.jobSeekerProfile.coverUrl);
+    }
+    if (currentUser?.avatarUrl) {
+      setAvatarUrl(currentUser.avatarUrl);
+    }
+  }, [currentUser?.coverUrl, currentUser?.jobSeekerProfile?.coverUrl, currentUser?.avatarUrl]);
 
   // Profile Form State - Clean initial state from real user data
   const [profileData, setProfileData] = React.useState<ProfileFormData>(() => ({
@@ -212,6 +225,14 @@ const ProfilePage = () => {
         if (p) {
           if (p.id) {
             setProfileIdState(String(p.id));
+          }
+          if (p.coverUrl) {
+            setCoverUrl(p.coverUrl);
+          } else if ((p as any).userDict?.coverUrl) {
+            setCoverUrl((p as any).userDict.coverUrl);
+          }
+          if ((p as any).avatarUrl) {
+            setAvatarUrl((p as any).avatarUrl);
           }
           setIsJobSeeking(p.isJobSeeking ?? p.isSeekingJob ?? true);
           setProfileData((prev) => {
@@ -367,7 +388,15 @@ const ProfilePage = () => {
     setCoverUrl(localUrl);
 
     try {
-      await authService.updateUser(({ coverUrl: localUrl } as unknown) as Partial<User>);
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await authService.updateCover(formData);
+      if (res?.coverUrl) {
+        setCoverUrl(res.coverUrl);
+        if (currentUser) {
+          dispatch(setUserInfo({ ...currentUser, coverUrl: res.coverUrl }));
+        }
+      }
       void dispatch(getUserInfo());
       toastMessages.success('Cập nhật ảnh bìa thành công!');
     } catch (err) {
@@ -834,6 +863,10 @@ const ProfilePage = () => {
         candidateName={profileData.fullName}
         candidateEmail={profileData.email}
         candidatePhone={profileData.phoneNumber}
+        candidateCity={profileData.city}
+        candidateExperience={profileData.experience ? t(`common:choices.${profileData.experience}`, { defaultValue: profileData.experience }) : undefined}
+        candidateEducation={profileData.education ? t(`common:choices.${profileData.education}`, { defaultValue: profileData.education }) : undefined}
+        candidateSkills={skillsList}
         avatarUrl={avatarUrl || currentUser?.avatarUrl || undefined}
       />
     </Box>

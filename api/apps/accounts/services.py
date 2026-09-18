@@ -293,6 +293,63 @@ class AvatarService:
 
 
 # ──────────────────────────────────────────────
+#  Cover Image Service
+# ──────────────────────────────────────────────
+
+class CoverImageService:
+    """Handles candidate cover image upload and deletion."""
+
+    @staticmethod
+    def update_cover(user: User, cover_file) -> str:
+        """
+        Upload new cover image and update job_seeker_profile.
+        Returns the new cover image URL.
+        """
+        profile, _ = JobSeekerProfile.objects.get_or_create(user=user)
+        public_id = None
+        if profile.cover_image:
+            path_list = profile.cover_image.public_id.split('/')
+            public_id = path_list[-1] if path_list else None
+
+        cover_upload_result = CloudinaryService.upload_image(
+            cover_file,
+            settings.CLOUDINARY_DIRECTORY["cover_image"],
+            public_id=public_id
+        )
+
+        if not cover_upload_result:
+            raise Exception(ERROR_MESSAGES["CLOUDINARY_UPLOAD_ERROR"])
+
+        with transaction.atomic():
+            profile.cover_image = File.update_or_create_file_with_cloudinary(
+                profile.cover_image,
+                cover_upload_result,
+                File.COVER_IMAGE_TYPE
+            )
+            profile.save(update_fields=['cover_image', 'update_at'])
+
+        return profile.cover_image.get_full_url()
+
+    @staticmethod
+    def delete_cover(user: User) -> str:
+        """
+        Delete candidate cover image from Cloudinary and DB.
+        Returns empty string.
+        """
+        profile = getattr(user, 'job_seeker_profile', None)
+        if not profile or not profile.cover_image:
+            return ""
+
+        with transaction.atomic():
+            CloudinaryService.delete_image(profile.cover_image.public_id)
+            profile.cover_image.delete()
+            profile.cover_image = None
+            profile.save(update_fields=['cover_image', 'update_at'])
+
+        return ""
+
+
+# ──────────────────────────────────────────────
 #  Email Verification Service
 # ──────────────────────────────────────────────
 

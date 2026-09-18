@@ -219,6 +219,19 @@ class JobActivityService:
         job_post = validated_data.get('job_post')
         resume = validated_data.get('resume')
 
+        if isinstance(job_post, (int, str)):
+            job_post = JobPost.objects.filter(id=job_post).first()
+
+        from apps.profiles.models import Resume
+        if isinstance(resume, (int, str)):
+            resume = Resume.objects.filter(id=resume).first()
+
+        if not resume and user and getattr(user, 'is_authenticated', False):
+            resume = (
+                Resume.objects.filter(user=user, is_active=True).order_by('-update_at', '-create_at').first()
+                or Resume.objects.filter(user=user).order_by('-update_at', '-create_at').first()
+            )
+
         logger.info("Apply attempt: user=%s, job=%s, resume=%s", user.email, job_post.id if job_post else None, resume.id if resume else None)
 
         if not job_post:
@@ -253,13 +266,17 @@ class JobActivityService:
             logger.info("Application reused: User %s already applied to job %s", user.email, job_post.id)
             return existing
 
+        phone_val = validated_data.get("phone", "")
+        if not phone_val and resume and getattr(resume, "job_seeker_profile", None):
+            phone_val = getattr(resume.job_seeker_profile, "phone", "") or getattr(user, "phone", "")
+
         # Create the activity in its own atomic block
         activity_payload = {
             "job_post": job_post,
             "resume": resume,
             "full_name": validated_data.get("full_name", validated_data.get("fullName", user.full_name)),
             "email": validated_data.get("email", user.email),
-            "phone": validated_data.get("phone", ""),
+            "phone": phone_val or getattr(user, "phone", ""),
         }
         with transaction.atomic():
             activity, _ = JobPostActivity.objects.get_or_create(

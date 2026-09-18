@@ -61,6 +61,9 @@ class JobPostFilter(django_filters.FilterSet):
     statusId = django_filters.ChoiceFilter(choices=var_sys.JOB_POST_STATUS, field_name="status")
     statusIds = ChoiceInFilter(choices=var_sys.JOB_POST_STATUS, field_name="status", lookup_expr='in')
 
+    isActive = django_filters.BooleanFilter(method="filter_is_active")
+    is_active = django_filters.BooleanFilter(method="filter_is_active")
+
     excludeSlug = django_filters.CharFilter(method="exclude_slug")
 
     companyId = django_filters.NumberFilter(field_name="company")
@@ -71,6 +74,7 @@ class JobPostFilter(django_filters.FilterSet):
             'kw', 'careerId', 'cityId', 'districtId', 'wardId', 'positionId',
             'experienceId', 'typeOfWorkplaceId', 'jobTypeId',
             'genderId', 'salaryMin', 'salaryMax', 'isUrgent', 'statusId', 'excludeSlug', 'companyId',
+            'isActive', 'is_active',
             'careerIds', 'cityIds', 'districtIds', 'wardIds', 'positionIds',
             'experienceIds', 'typeOfWorkplaceIds', 'jobTypeIds', 'genderIds',
             'statusIds'
@@ -102,6 +106,12 @@ class JobPostFilter(django_filters.FilterSet):
 
     def exclude_slug(self, queryset, name, value):
         return queryset.exclude(slug=value)
+
+    def filter_is_active(self, queryset, name, value):
+        from django.utils import timezone
+        if value:
+            return queryset.filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=timezone.localdate())
+        return queryset.exclude(status=var_sys.JobPostStatus.APPROVED, deadline__gte=timezone.localdate())
 
 
 class AliasedOrderingFilter(OrderingFilter):

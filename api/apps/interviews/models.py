@@ -474,7 +474,16 @@ class InterviewSession(CommonBaseModel):
         verbose_name_plural = "Interview Sessions"
 
     def __str__(self):
-        return f"Interview #{self.pk} - {self.candidate.full_name} ({self.get_status_display()})"
+        candidate = getattr(self, "candidate", None)
+        candidate_name = (
+            getattr(candidate, "full_name", None)
+            or getattr(candidate, "email", None)
+            or getattr(candidate, "phone_number", None)
+            or getattr(candidate, "phone", None)
+            or getattr(candidate, "username", None)
+            or f"User #{getattr(self, 'candidate_id', 'unknown')}"
+        )
+        return f"Interview #{self.pk} - {candidate_name} ({self.get_status_display()})"
 
     def save(self, *args, **kwargs):
         from django.core.exceptions import ValidationError

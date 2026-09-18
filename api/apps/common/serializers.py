@@ -194,6 +194,8 @@ def validate_location_hierarchy(attrs, instance=None, require_city=True, require
 
 class ProfileLocationSerializer(serializers.ModelSerializer):
 
+    cityDict = CitySerializer(source="city", read_only=True)
+
     districtDict = ProfileDistrictSerializers(source="district", read_only=True)
 
     wardDict = ProfileWardSerializers(source="ward", read_only=True)
@@ -212,7 +214,7 @@ class ProfileLocationSerializer(serializers.ModelSerializer):
 
         model = Location
 
-        fields = ('city', 'districtDict', 'wardDict', 'address', 'district', 'ward')
+        fields = ('city', 'cityDict', 'districtDict', 'wardDict', 'address', 'district', 'ward')
 
 class LocationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 

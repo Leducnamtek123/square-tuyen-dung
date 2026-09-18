@@ -197,6 +197,28 @@ const authService = {
     return resData;
   },
 
+  updateCover: async (data: FormData): Promise<{ coverUrl: string }> => {
+    const url = 'auth/cover/';
+    const resData = unwrapDataResponse<{ coverUrl: string }>(await httpRequest.put(url, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }));
+    if (resData?.coverUrl) {
+      const signed = await ensurePresignedUrl(resData.coverUrl);
+      if (signed) {
+        resData.coverUrl = signed;
+      }
+    }
+    return resData;
+  },
+
+  deleteCover: async (): Promise<{ coverUrl: string }> => {
+    const url = 'auth/cover/';
+    const resData = unwrapDataResponse<{ coverUrl: string }>(await httpRequest.delete(url));
+    return resData;
+  },
+
   changePassword: (data: ChangePasswordData): Promise<ActionResponse> => {
     const url = 'auth/change-password/';
     return Promise.resolve(httpRequest.put(url, data)).then(normalizeActionResponse);

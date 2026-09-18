@@ -4,6 +4,7 @@ export interface CandidateStep1Values {
   desiredJobTitle: string;
   careerId: number | string;
   cityId: number | string;
+  phone?: string;
   typeOfWorkplace: number;
   address?: string;
   lat?: number | string | null;
@@ -36,6 +37,14 @@ export const createCandidateStep1Schema = (t: (key: any, defaultVal?: any) => an
       .string()
       .trim()
       .required(t('onboarding.validation.desiredJobTitleRequired', 'Vui lòng nhập vị trí công việc mong muốn.')),
+    phone: yup
+      .string()
+      .trim()
+      .optional()
+      .test('is-valid-phone', t('onboarding.validation.phoneInvalid', 'Số điện thoại không hợp lệ.'), (val) => {
+        if (!val) return true;
+        return /^(0|\+84)[3|5|7|8|9][0-9]{8}$/.test(val.replace(/\s+/g, ''));
+      }),
     careerId: yup
       .mixed()
       .required(t('onboarding.validation.careerRequired', 'Vui lòng chọn ngành nghề chính.'))

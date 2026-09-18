@@ -46,6 +46,7 @@ urlpatterns = [
     path('verify-phone/', views.verify_phone_number),
 
     path('avatar/', views.avatar),
+    path('cover/', views.cover_image),
 
     path('user-info/', views.get_user_info),
     path('user-info-basic/', views.get_user_info_basic),

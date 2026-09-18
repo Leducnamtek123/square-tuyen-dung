@@ -25,6 +25,10 @@ def run_full_auto_recruitment_pipeline(job_post_id: int) -> dict[str, int]:
         logger.error("JobPost %s not found for auto recruitment pipeline", job_post_id)
         return {"matched": 0, "screened": 0, "interviewed": 0}
 
+    if job_post.status != var_sys.JobPostStatus.APPROVED:
+        logger.info("JobPost %s is not approved (status=%s), skipping auto recruitment pipeline", job_post_id, job_post.status)
+        return {"matched": 0, "screened": 0, "interviewed": 0}
+
     if not getattr(job_post, "is_auto_sourcing_enabled", True):
         logger.info("Auto sourcing is disabled for JobPost %s", job_post_id)
         return {"matched": 0, "screened": 0, "interviewed": 0}

@@ -2,7 +2,10 @@ import logging
 from django.core.management.base import BaseCommand
 from apps.interviews.models import Question, QuestionGroup
 from apps.accounts.models import User
-from apps.info.models import Company
+try:
+    from apps.profiles.models import Company
+except ImportError:
+    from apps.info.models import Company
 
 logger = logging.getLogger(__name__)
 
@@ -265,7 +268,7 @@ class Command(BaseCommand):
             author = User.objects.filter(is_superuser=True).first()
 
         # Get company
-        company = Company.objects.filter(name__icontains='Square').first()
+        company = Company.objects.filter(company_name__icontains='Square').first()
         if not company:
             company = Company.objects.first()
 
