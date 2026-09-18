@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+!.env.local.example
 infra/fpt-gpu/*.env
 infra/fpt-gpu/*.runtime.env
 !infra/fpt-gpu/*.env.example

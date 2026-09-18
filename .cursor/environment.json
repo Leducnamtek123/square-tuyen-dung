@@ -1,0 +1,6 @@
+{
+  "name": "InfoHR / Square Tuyển Dụng (local Docker)",
+  "user": "ubuntu",
+  "install": "bash scripts/cloud-install.sh",
+  "start": "bash scripts/cloud-start.sh"
+}
