@@ -60,11 +60,34 @@ if ($BackupFile -and (Test-Path $BackupFile)) {
     Write-Host "[restore_db] Restoring '$BackupFile' into database '$DbName'..."
     docker cp $BackupFile "${DbContainer}:/tmp/restore.sql.gz"
     docker exec $DbContainer sh -c "gzip -dc /tmp/restore.sql.gz | MYSQL_PWD='$DbPassword' mysql -u '$DbUser' '$DbName' && rm -f /tmp/restore.sql.gz"
-    Write-Host "[restore_db] Restore complete from $(Split-Path -Leaf $BackupFile)."
+    Write-Host "[restore_db] Database restore complete from $(Split-Path -Leaf $BackupFile)."
 } else {
-    Write-Host "[restore_db] No backup file found in '$BackupDir'. Falling back to seeding sample data..."
+    Write-Host "[restore_db] No DB backup file found in '$BackupDir'. Falling back to seeding sample data..."
     docker compose exec -T backend python manage.py run_seeding --type all
     Write-Host "[restore_db] Sample data seeded via run_seeding."
 }
 
-Write-Host "[restore_db] Done. Sample data (accounts, companies, resumes, jobs, shifts, payroll) is ready."
+# --- Reindex Elasticsearch so public job/company listings reflect the data ---
+Write-Host "[restore_db] Rebuilding the Elasticsearch index (best-effort)..."
+docker compose exec -T backend python manage.py search_index --rebuild -f 2>$null
+if ($LASTEXITCODE -eq 0) { Write-Host "[restore_db] Elasticsearch index rebuilt." }
+else { Write-Host "[restore_db] (skipped ES reindex - backend/elasticsearch not available)" }
+
+# --- Restore MinIO media (logos, avatars, banners, CVs, article images...) ---
+$MinioBackup = if ($env:MINIO_BACKUP) { $env:MINIO_BACKUP } else { Join-Path $BackupDir "minio_media_latest.tar.gz" }
+$MinioBucket = if ($env:MINIO_BUCKET) { $env:MINIO_BUCKET } elseif (Get-EnvValue "MINIO_BUCKET") { Get-EnvValue "MINIO_BUCKET" } else { "square" }
+$ProjectName = if ($env:COMPOSE_PROJECT_NAME) { $env:COMPOSE_PROJECT_NAME } elseif (Get-EnvValue "COMPOSE_PROJECT_NAME") { Get-EnvValue "COMPOSE_PROJECT_NAME" } else { "tuyendung_studio_vn" }
+$MinioVolume = if ($env:MINIO_VOLUME) { $env:MINIO_VOLUME } else { "${ProjectName}_minio-data" }
+
+if (Test-Path $MinioBackup) {
+    Write-Host "[restore_db] Restoring MinIO media from '$MinioBackup' into volume '$MinioVolume'..."
+    $backupsAbs = (Resolve-Path $BackupDir).Path
+    $archiveName = Split-Path -Leaf $MinioBackup
+    docker run --rm -v "${MinioVolume}:/data" -v "${backupsAbs}:/in:ro" alpine sh -c "mkdir -p /data/$MinioBucket && tar -xzf /in/$archiveName -C /data/$MinioBucket"
+    docker compose restart minio 2>$null
+    Write-Host "[restore_db] MinIO media restore complete."
+} else {
+    Write-Host "[restore_db] No MinIO media archive at '$MinioBackup' - skipping media restore."
+}
+
+Write-Host "[restore_db] Done. Database + MinIO media (accounts, companies, resumes, jobs, shifts, payroll, logos, avatars, banners, CVs) are ready."

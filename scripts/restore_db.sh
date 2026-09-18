@@ -68,11 +68,37 @@ if [ -n "${BACKUP_FILE}" ] && [ -f "${BACKUP_FILE}" ]; then
   ${DOCKER} cp "${BACKUP_FILE}" "${DB_CONTAINER}:/tmp/restore.sql.gz"
   ${DOCKER} exec "${DB_CONTAINER}" sh -c \
     "gzip -dc /tmp/restore.sql.gz | MYSQL_PWD='${DB_PASSWORD}' mysql -u '${DB_USER}' '${DB_NAME}' && rm -f /tmp/restore.sql.gz"
-  echo "[restore_db] ✅ Restore complete from $(basename "${BACKUP_FILE}")."
+  echo "[restore_db] ✅ Database restore complete from $(basename "${BACKUP_FILE}")."
 else
-  echo "[restore_db] No backup file found in '${BACKUP_DIR}'. Falling back to seeding sample data..."
+  echo "[restore_db] No DB backup file found in '${BACKUP_DIR}'. Falling back to seeding sample data..."
   ${DOCKER} compose exec -T backend python manage.py run_seeding --type all
   echo "[restore_db] ✅ Sample data seeded via run_seeding."
 fi
 
-echo "[restore_db] Done. Sample data (accounts, companies, resumes, jobs, shifts, payroll) is ready."
+# --- Reindex Elasticsearch so public job/company listings reflect the data ---
+echo "[restore_db] Rebuilding the Elasticsearch index (best-effort)..."
+${DOCKER} compose exec -T backend python manage.py search_index --rebuild -f >/dev/null 2>&1 \
+  && echo "[restore_db] ✅ Elasticsearch index rebuilt." \
+  || echo "[restore_db] (skipped ES reindex — backend/elasticsearch not available)"
+
+# --- Restore MinIO media (logos, avatars, banners, CVs, article images...) ---
+MINIO_BACKUP="${MINIO_BACKUP:-${BACKUP_DIR}/minio_media_latest.tar.gz}"
+MINIO_BUCKET="${MINIO_BUCKET:-square}"
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-$(grep -E '^COMPOSE_PROJECT_NAME=' .env 2>/dev/null | head -1 | cut -d= -f2-)}"
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-tuyendung_studio_vn}"
+MINIO_VOLUME="${MINIO_VOLUME:-${COMPOSE_PROJECT_NAME}_minio-data}"
+
+if [ -f "${MINIO_BACKUP}" ]; then
+  echo "[restore_db] Restoring MinIO media from '${MINIO_BACKUP}' into volume '${MINIO_VOLUME}'..."
+  ${DOCKER} run --rm \
+    -v "${MINIO_VOLUME}:/data" \
+    -v "$(pwd)/${BACKUP_DIR}:/in:ro" \
+    alpine sh -c "mkdir -p /data/${MINIO_BUCKET} && tar -xzf /in/$(basename "${MINIO_BACKUP}") -C /data/${MINIO_BUCKET}"
+  # Restart MinIO so it rescans the drive and serves the restored objects.
+  ${DOCKER} compose restart minio >/dev/null 2>&1 || ${DOCKER} restart tuyendung-studio-minio >/dev/null 2>&1 || true
+  echo "[restore_db] ✅ MinIO media restore complete."
+else
+  echo "[restore_db] No MinIO media archive at '${MINIO_BACKUP}' — skipping media restore."
+fi
+
+echo "[restore_db] Done. Database + MinIO media (accounts, companies, resumes, jobs, shifts, payroll, logos, avatars, banners, CVs) are ready."
