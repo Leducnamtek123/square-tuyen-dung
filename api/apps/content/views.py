@@ -361,6 +361,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if web_image:
             file_record = self._handle_image_upload(web_image, File.WEB_BANNER_TYPE)
             if file_record:
+                Banner.objects.filter(image=file_record).exclude(id=banner.id).update(image=None)
                 banner.image = file_record
                 banner.save()
 
@@ -368,6 +369,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if mobile_image:
             file_record = self._handle_image_upload(mobile_image, File.MOBILE_BANNER_TYPE)
             if file_record:
+                Banner.objects.filter(image_mobile=file_record).exclude(id=banner.id).update(image_mobile=None)
                 banner.image_mobile = file_record
                 banner.save()
 
@@ -388,6 +390,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if web_image:
             file_record = self._handle_image_upload(web_image, File.WEB_BANNER_TYPE, banner.image)
             if file_record:
+                Banner.objects.filter(image=file_record).exclude(id=banner.id).update(image=None)
                 banner.image = file_record
                 banner.save()
 
@@ -395,6 +398,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if mobile_image:
             file_record = self._handle_image_upload(mobile_image, File.MOBILE_BANNER_TYPE, banner.image_mobile)
             if file_record:
+                Banner.objects.filter(image_mobile=file_record).exclude(id=banner.id).update(image_mobile=None)
                 banner.image_mobile = file_record
                 banner.save()
 

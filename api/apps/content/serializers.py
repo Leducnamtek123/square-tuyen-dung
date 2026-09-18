@@ -138,6 +138,10 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             'imageUrl', 'imageMobileUrl', 'create_at', 'update_at',
         )
         read_only_fields = ('id', 'create_at', 'update_at', 'imageUrl', 'imageMobileUrl')
+        extra_kwargs = {
+            'image': {'validators': []},
+            'image_mobile': {'validators': []},
+        }
 
     def to_internal_value(self, data):
         payload = data.copy() if hasattr(data, "copy") else dict(data)
@@ -170,6 +174,24 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 'type': ['Invalid banner type.'],
             })
         return attrs
+
+    def create(self, validated_data):
+        image = validated_data.get('image')
+        image_mobile = validated_data.get('image_mobile')
+        if image:
+            Banner.objects.filter(image=image).update(image=None)
+        if image_mobile:
+            Banner.objects.filter(image_mobile=image_mobile).update(image_mobile=None)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        image = validated_data.get('image')
+        image_mobile = validated_data.get('image_mobile')
+        if image:
+            Banner.objects.filter(image=image).exclude(id=instance.id).update(image=None)
+        if image_mobile:
+            Banner.objects.filter(image_mobile=image_mobile).exclude(id=instance.id).update(image_mobile=None)
+        return super().update(instance, validated_data)
 
     def get_imageUrl(self, banner):
         if banner.image:

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import F, Q
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from .models import CVTemplate, CandidateCV, CVSuggestion
