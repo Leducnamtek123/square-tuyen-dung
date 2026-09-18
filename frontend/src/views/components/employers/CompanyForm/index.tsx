@@ -5,18 +5,18 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Alert, Box, Stack } from "@mui/material";
 
-import errorHandling from '../../../../utils/errorHandling';
-import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
-import commonService from '../../../../services/commonService';
-import useDebounce from '../../../../hooks/useDebounce';
-import goongService from '../../../../services/goongService';
+import errorHandling from '@/utils/errorHandling';
+import { DATE_OPTIONS, REGEX_VALIDATE } from '@/configs/constants';
+import commonService from '@/services/commonService';
+import useDebounce from '@/hooks/useDebounce';
+import goongService from '@/services/goongService';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 import { shouldResetChildLocationValue } from '@/utils/locationForm';
 
 import CompanyFormFields from './CompanyFormFields';
 import { useConfig } from '@/hooks/useConfig';
-import type { SelectOption } from '../../../../types/models';
-import type { PlacePrediction } from '../../../../services/goongService';
+import type { SelectOption } from '@/types/models';
+import type { PlacePrediction } from '@/services/goongService';
 import type { CompanyFormValues } from './types';
 
 interface CompanyFormProps {
@@ -80,6 +80,7 @@ export const createCompanyFormSchema = (t: CompanyFormT) =>
     since: yup
       .date()
       .nullable()
+      .transform((value, originalValue) => (originalValue === '' || originalValue === null || originalValue === undefined ? null : value))
       .max(DATE_OPTIONS.today(), t('companyForm.validation.foundedDateInFuture')),
     companyEmail: yup.string().required(t('companyForm.validation.companyEmailRequired')).email(t('companyForm.validation.companyEmailInvalid')).max(100, t('companyForm.validation.companyEmailMax')),
     companyPhone: yup.string().required(t('companyForm.validation.companyPhoneRequired')).matches(REGEX_VALIDATE.phoneRegExp, t('companyForm.validation.companyPhoneInvalid')).max(15, t('companyForm.validation.companyPhoneMax')),
@@ -153,13 +154,15 @@ const CompanyFormContent = ({
   }, [cityId, setValue]);
 
   useEffect(() => {
+    let isMounted = true;
     const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
-        setLocalLocationOptions([]);
+        if (isMounted) setLocalLocationOptions([]);
         return;
       }
       try {
         const resData = await goongService.getPlaces(input);
+        if (!isMounted) return;
         const predictions = Array.isArray(resData.predictions) ? resData.predictions : [];
         const mappedOptions: PlaceOption[] = predictions.map((prediction: PlacePrediction) => ({
           id: prediction.place_id,
@@ -172,6 +175,9 @@ const CompanyFormContent = ({
       }
     };
     void loadLocation(addressDebounce);
+    return () => {
+      isMounted = false;
+    };
   }, [addressDebounce]);
 
   const handleSelectLocation = async (_e: React.SyntheticEvent, value: string | SelectOption | null) => {
@@ -192,6 +198,14 @@ const CompanyFormContent = ({
 
   const errorText = serverErrors ? Object.values(serverErrors).flat().join(' ') : '';
 
+  const locationValue = useWatch({ control, name: 'location' });
+
+  const handleLocationChange = (val: { address?: string; lat?: number | string | null; lng?: number | string | null }) => {
+    if (val.address) setValue('location.address', val.address, { shouldDirty: true, shouldValidate: true });
+    if (val.lat !== null && val.lat !== undefined) setValue('location.lat', val.lat, { shouldDirty: true });
+    if (val.lng !== null && val.lng !== undefined) setValue('location.lng', val.lng, { shouldDirty: true });
+  };
+
   return (
     <form id="company-form" onSubmit={handleSubmit(handleUpdate)}>
       <Stack spacing={2.5}>
@@ -204,6 +218,8 @@ const CompanyFormContent = ({
             districtOptions={localDistrictOptions}
             locationOptions={localLocationOptions}
             handleSelectLocation={handleSelectLocation}
+            locationValue={locationValue}
+            onLocationChange={handleLocationChange}
           />
         </Box>
       </Stack>

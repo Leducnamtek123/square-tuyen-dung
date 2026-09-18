@@ -1,8 +1,8 @@
 import React from 'react';
 import { Grid2 as Grid, Box, Stack, Button, Typography, Chip } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import ProfileUploadCard from '../../../../components/Common/ProfileUploadCard';
+import NoDataCard from '@/components/Common/NoDataCard';
+import ProfileUploadCard from '@/components/Common/ProfileUploadCard';
 import type { TFunction } from 'i18next';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 

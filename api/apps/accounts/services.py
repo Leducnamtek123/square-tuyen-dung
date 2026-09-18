@@ -9,6 +9,7 @@ import secrets
 
 import pytz
 from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction
 
 from shared.configs import variable_system as var_sys
@@ -106,11 +107,11 @@ class PasswordResetService:
         access_token = secrets.token_urlsafe(32)
 
         if user.role_name == var_sys.JOB_SEEKER:
-            domain = settings.DOMAIN_CLIENT["job_seeker"]
+            domain = settings.DOMAIN_CLIENT["job_seeker"].rstrip("/")
+            reset_password_url = f"{domain}/cap-nhat-mat-khau/{access_token}"
         else:
-            domain = settings.DOMAIN_CLIENT["employer"]
-
-        reset_password_url = f"{domain}cap-nhat-mat-khau/{access_token}"
+            domain = settings.DOMAIN_CLIENT["employer"].rstrip("/")
+            reset_password_url = f"{domain}/nha-tuyen-dung/cap-nhat-mat-khau/{access_token}"
 
         ForgotPasswordToken.objects.create(
             user=user,
@@ -259,7 +260,9 @@ class AvatarService:
             user.save()
 
             if not user.has_company:
-                queue_auth.update_avatar.delay(user.id, user.avatar.get_full_url())
+                user_id = user.id
+                avatar_url = user.avatar.get_full_url()
+                transaction.on_commit(lambda: queue_auth.update_avatar.delay(user_id, avatar_url))
 
         return user.avatar.get_full_url()
 
@@ -282,9 +285,68 @@ class AvatarService:
             user.save()
 
             if not user.has_company:
-                queue_auth.update_avatar.delay(user.id, var_sys.AVATAR_DEFAULT["AVATAR"])
+                user_id = user.id
+                default_avatar = var_sys.AVATAR_DEFAULT["AVATAR"]
+                transaction.on_commit(lambda: queue_auth.update_avatar.delay(user_id, default_avatar))
 
         return var_sys.AVATAR_DEFAULT["AVATAR"]
+
+
+# ──────────────────────────────────────────────
+#  Cover Image Service
+# ──────────────────────────────────────────────
+
+class CoverImageService:
+    """Handles candidate cover image upload and deletion."""
+
+    @staticmethod
+    def update_cover(user: User, cover_file) -> str:
+        """
+        Upload new cover image and update job_seeker_profile.
+        Returns the new cover image URL.
+        """
+        profile, _ = JobSeekerProfile.objects.get_or_create(user=user)
+        public_id = None
+        if profile.cover_image:
+            path_list = profile.cover_image.public_id.split('/')
+            public_id = path_list[-1] if path_list else None
+
+        cover_upload_result = CloudinaryService.upload_image(
+            cover_file,
+            settings.CLOUDINARY_DIRECTORY["cover_image"],
+            public_id=public_id
+        )
+
+        if not cover_upload_result:
+            raise Exception(ERROR_MESSAGES["CLOUDINARY_UPLOAD_ERROR"])
+
+        with transaction.atomic():
+            profile.cover_image = File.update_or_create_file_with_cloudinary(
+                profile.cover_image,
+                cover_upload_result,
+                File.COVER_IMAGE_TYPE
+            )
+            profile.save(update_fields=['cover_image', 'update_at'])
+
+        return profile.cover_image.get_full_url()
+
+    @staticmethod
+    def delete_cover(user: User) -> str:
+        """
+        Delete candidate cover image from Cloudinary and DB.
+        Returns empty string.
+        """
+        profile = getattr(user, 'job_seeker_profile', None)
+        if not profile or not profile.cover_image:
+            return ""
+
+        with transaction.atomic():
+            CloudinaryService.delete_image(profile.cover_image.public_id)
+            profile.cover_image.delete()
+            profile.cover_image = None
+            profile.save(update_fields=['cover_image', 'update_at'])
+
+        return ""
 
 
 # ──────────────────────────────────────────────
@@ -336,6 +398,59 @@ class EmailVerificationService:
             noti_title,
             [user.id],
         )
+
+        return user, None
+
+    @staticmethod
+    def generate_and_store_otp(user: User) -> str:
+        """Generate 6-digit OTP and store in cache for 15 minutes (900s)."""
+        otp = f"{secrets.randbelow(900000) + 100000}"
+        cache_key = f"email_verify_otp:{user.email.strip().lower()}"
+        cache.set(cache_key, otp, timeout=900)
+        return otp
+
+    @staticmethod
+    def verify_email_otp(email: str, otp_code: str) -> tuple:
+        """
+        Verify email by 6-digit OTP.
+        Returns (user, error_key) — error_key is None on success.
+        """
+        normalized_email = email.strip().lower()
+        user = User.objects.filter(email__iexact=normalized_email).first()
+        if not user:
+            return None, "EMAIL_NOT_REGISTERED"
+
+        if user.is_verify_email and user.is_active:
+            return user, None
+
+        cache_key = f"email_verify_otp:{normalized_email}"
+        stored_otp = cache.get(cache_key)
+
+        if not stored_otp:
+            return user, "OTP_EXPIRED"
+
+        if str(stored_otp).strip() != str(otp_code).strip():
+            return user, "INVALID_OTP"
+
+        # Correct OTP! Activate user
+        with transaction.atomic():
+            user.is_active = True
+            user.is_verify_email = True
+            user.save(update_fields=["is_active", "is_verify_email", "update_at"])
+
+            # Invalidate OTP from cache
+            cache.delete(cache_key)
+
+            # Send welcome notification
+            noti_title = SYSTEM_MESSAGES["WELCOME_JOBSEEKER"]
+            if user.role_name == var_sys.EMPLOYER:
+                noti_title = SYSTEM_MESSAGES["WELCOME_EMPLOYER"]
+
+            helper.add_system_notifications(
+                "Chào mừng bạn!",
+                noti_title,
+                [user.id],
+            )
 
         return user, None
 
@@ -398,13 +513,40 @@ class RegistrationService:
     @staticmethod
     def register_job_seeker(validated_data: dict) -> User:
         """
-        Creates a Job Seeker user along with their Profile and default Resume.
+        Creates a Job Seeker user along with their Profile and default Resume,
+        or claims an existing imported profile if the user has no usable password set yet.
         """
         try:
             with transaction.atomic():
-                # Extract data
+                email = validated_data.get("email", "").strip().lower()
+                full_name = validated_data.get("full_name") or validated_data.get("fullName") or ""
+                password = validated_data.get("password")
+
                 validated_data.pop("confirmPassword", None)
                 validated_data.pop("platform", None)
+
+                existing_user = User.objects.filter(email__iexact=email).first()
+
+                if existing_user and not existing_user.has_usable_password():
+                    existing_user.set_password(password)
+                    if full_name:
+                        existing_user.full_name = full_name
+                    existing_user.is_active = False
+                    existing_user.save()
+
+                    job_seeker_profile = JobSeekerProfile.objects.filter(user=existing_user).first()
+                    if not job_seeker_profile:
+                        job_seeker_profile = JobSeekerProfile.objects.create(user=existing_user)
+
+                    resume = Resume.objects.filter(user=existing_user).first()
+                    if not resume:
+                        Resume.objects.create(
+                            job_seeker_profile=job_seeker_profile,
+                            user=existing_user,
+                            type=var_sys.CV_WEBSITE
+                        )
+
+                    return existing_user
 
                 # 1. Create User
                 user = User.objects.create_user_with_role_name(

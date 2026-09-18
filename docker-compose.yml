@@ -71,6 +71,7 @@ services:
   # ---------------------------------------------------------------------------
   backend:
     container_name: tuyendung-studio-backend
+    shm_size: '2gb'
     build:
       context: ./api
       dockerfile: ${BACKEND_DOCKERFILE:-Dockerfile.prod}
@@ -84,23 +85,34 @@ services:
         read_only: true
         bind:
           create_host_path: false
+      - tts-cache:/tmp/tts_cache
     expose:
       - "8000"
     restart: always
     environment:
       - DEBUG=${DEBUG:-False}
       - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
-      - AI_TTS_FALLBACK_BASE_URLS=http://vieneu-tts:8298/v1
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-infohr.vn,s3.infohr.vn,admin.infohr.vn,employer.infohr.vn,113.177.113.137,113.177.129.249,localhost,127.0.0.1,backend,thinkgift.square.vn,.square.vn,.infohr.vn}
+      - AI_TTS_BASE_URL=${AI_TTS_BASE_URL:-https://api.metaconnect.vn/v1}
+      - AI_TTS_API_KEY=${AI_TTS_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - AI_TTS_MODEL=${AI_TTS_MODEL:-tts-vi}
+      - AI_TTS_DEFAULT_VOICE=${AI_TTS_DEFAULT_VOICE:-Trúc Ly}
+      - AI_TTS_FALLBACK_BASE_URLS=${AI_TTS_FALLBACK_BASE_URLS:-}
+      - AI_STT_BASE_URL=${AI_STT_BASE_URL:-https://api.metaconnect.vn/v1}
+      - AI_STT_API_KEY=${AI_STT_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - AI_STT_MODEL=${AI_STT_MODEL:-asr-vi}
+      - AI_STT_LANGUAGE=${AI_STT_LANGUAGE:-vi}
+      - NOTEBOOKLM_MCP_URL=${NOTEBOOKLM_MCP_URL:-http://host.docker.internal:8000/mcp}
+      - DEFAULT_NOTEBOOKLM_NOTEBOOK_ID=${DEFAULT_NOTEBOOKLM_NOTEBOOK_ID:-}
       - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with livekit-agent}
       - INTERVIEW_AGENT_AUTH_REQUIRED=${INTERVIEW_AGENT_AUTH_REQUIRED:-True}
       - INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS=${INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS:-300}
-    # Needed only when enabling local Docker/host AI fallback.
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -141,6 +153,31 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
+  # NotebookLM MCP Service
+  # ---------------------------------------------------------------------------
+  notebooklm-mcp:
+    container_name: tuyendung-studio-notebooklm-mcp
+    build:
+      context: ./notebooklm-mcp
+    ports:
+      - "8000:8000"
+    environment:
+      - NOTEBOOKLM_PORT=8000
+      - NOTEBOOKLM_HOST=0.0.0.0
+      - NOTEBOOKLM_TRANSPORT=http
+    volumes:
+      - ${APPDATA}/notebooklm-mcp/Data:/root/.local/share/notebooklm-mcp
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+      - proxy-net
+
+  # ---------------------------------------------------------------------------
   # Celery Worker
   # ---------------------------------------------------------------------------
   celery-worker:
@@ -152,13 +189,15 @@ services:
     env_file:
       - .env
     restart: always
+    volumes:
+      - tts-cache:/tmp/tts_cache
     # Needed only when enabling local Docker/host AI fallback.
     # extra_hosts:
     #   - "host.docker.internal:host-gateway"
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 2G
     depends_on:
       db:
         condition: service_healthy
@@ -202,16 +241,49 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
       MYSQL_DATABASE: ${DB_NAME:-square_db}
+    command: --max-connections=500 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - db_data:/var/lib/mysql
-      - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:?Set DB_PASSWORD in .env}"]
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysqladmin ping -h localhost -u root || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
     restart: always
+    networks:
+      - data-net
+
+  # ---------------------------------------------------------------------------
+  # Database Automated Daily Backup Service (mysqldump + compression + retention)
+  # ---------------------------------------------------------------------------
+  db-backup:
+    container_name: tuyendung-studio-db-backup
+    image: public.ecr.aws/docker/library/mysql:8.0
+    restart: always
+    entrypoint: >
+      /bin/sh -c "
+      echo '🚀 [DB Backup Service] Initializing Automated Database Daily Backup...';
+      while true; do
+        DATE=$$(date +%Y-%m-%d_%H%M%S);
+        FILE=/backups/db_backup_square_$${DATE}.sql.gz;
+        echo \"[$$DATE] 🔄 Executing zero-downtime mysqldump...\";
+        MYSQL_PWD=\"$$MYSQL_ROOT_PASSWORD\" mysqldump -h db -u root --single-transaction --quick --routines --triggers $${MYSQL_DATABASE} | gzip > $$FILE;
+        SIZE=$$(du -sh $$FILE 2>/dev/null | cut -f1);
+        echo \"[$$DATE] ✅ Daily backup created successfully: $$FILE ($$SIZE)\";
+        find /backups -name 'db_backup_*.sql.gz' -mtime +30 -delete 2>/dev/null;
+        echo \"[$$DATE] 💤 Next automated backup scheduled in 24 hours.\";
+        sleep 86400;
+      done
+      "
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+      MYSQL_DATABASE: ${DB_NAME:-square_db}
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - data-net
 
@@ -236,269 +308,6 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
-  # Frappe HRMS (external HRM system, enabled with --profile frappe-hrm)
-  # ---------------------------------------------------------------------------
-  frappe-hrms-backend:
-    container_name: tuyendung-studio-frappe-hrms-backend
-    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
-    build:
-      context: .
-      dockerfile: infra/frappe-hrms/Containerfile
-      args:
-        FRAPPE_BRANCH: ${FRAPPE_HR_FRAPPE_BRANCH:-version-16}
-        FRAPPE_IMAGE_PREFIX: ${FRAPPE_HR_IMAGE_PREFIX:-frappe}
-        CACHE_BUST: ${FRAPPE_HR_BUILD_CACHE_BUST:-}
-    profiles: ["frappe-hrm"]
-    environment:
-      DB_HOST: frappe-hrms-db
-      DB_PORT: "3306"
-      MYSQL_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
-      MARIADB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
-    volumes:
-      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
-      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
-    restart: unless-stopped
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-configurator:
-    container_name: tuyendung-studio-frappe-hrms-configurator
-    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
-    profiles: ["frappe-hrm"]
-    entrypoint:
-      - bash
-      - -c
-    command:
-      - |
-        ls -1 apps > sites/apps.txt;
-        bench set-config -g db_host $$DB_HOST;
-        bench set-config -gp db_port $$DB_PORT;
-        bench set-config -g redis_cache "redis://$$REDIS_CACHE";
-        bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
-        bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
-        bench set-config -gp socketio_port $$SOCKETIO_PORT;
-    environment:
-      DB_HOST: frappe-hrms-db
-      DB_PORT: "3306"
-      REDIS_CACHE: frappe-hrms-redis-cache:6379
-      REDIS_QUEUE: frappe-hrms-redis-queue:6379
-      SOCKETIO_PORT: "9000"
-    volumes:
-      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
-      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
-    depends_on:
-      frappe-hrms-db:
-        condition: service_healthy
-      frappe-hrms-redis-cache:
-        condition: service_started
-      frappe-hrms-redis-queue:
-        condition: service_started
-    restart: "no"
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-create-site:
-    container_name: tuyendung-studio-frappe-hrms-create-site
-    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
-    profiles: ["frappe-hrm"]
-    entrypoint:
-      - bash
-      - -c
-    command:
-      - |
-        wait-for-it frappe-hrms-db:3306 -t 180;
-        wait-for-it frappe-hrms-redis-cache:6379 -t 180;
-        wait-for-it frappe-hrms-redis-queue:6379 -t 180;
-        export start=`date +%s`;
-        until [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".db_host // empty"` ]] &&
-          [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_cache // empty"` ]] &&
-          [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_queue // empty"` ]];
-        do
-          echo "Waiting for sites/common_site_config.json to be created";
-          sleep 5;
-          if (( `date +%s`-start > 180 )); then
-            echo "could not find sites/common_site_config.json with required keys";
-            exit 1;
-          fi
-        done;
-        if [ ! -d "sites/$${FRAPPE_SITE_NAME}" ]; then
-          bench new-site --mariadb-user-host-login-scope='%' --admin-password="$${ADMIN_PASSWORD}" --db-root-username=root --db-root-password="$${DB_ROOT_PASSWORD}" --install-app erpnext --install-app hrms --install-app square_hrm_branding --set-default "$${FRAPPE_SITE_NAME}";
-        else
-          echo "Frappe HR site already exists: $${FRAPPE_SITE_NAME}";
-          bench --site "$${FRAPPE_SITE_NAME}" migrate;
-          if ! bench --site "$${FRAPPE_SITE_NAME}" list-apps | grep -qx erpnext; then
-            bench --site "$${FRAPPE_SITE_NAME}" install-app erpnext;
-          fi
-          if ! bench --site "$${FRAPPE_SITE_NAME}" list-apps | grep -qx hrms; then
-            bench --site "$${FRAPPE_SITE_NAME}" install-app hrms;
-          fi
-          if ! bench --site "$${FRAPPE_SITE_NAME}" list-apps | grep -qx square_hrm_branding; then
-            bench --site "$${FRAPPE_SITE_NAME}" install-app square_hrm_branding;
-          fi
-          bench --site "$${FRAPPE_SITE_NAME}" migrate;
-        fi
-        bench --site "$${FRAPPE_SITE_NAME}" execute frappe.db.set_default --args "['desktop:home_page','workspace']";
-        bench --site "$${FRAPPE_SITE_NAME}" clear-cache;
-    environment:
-      FRAPPE_SITE_NAME: ${FRAPPE_HR_SITE_NAME:-hrm.infohr.vn}
-      ADMIN_PASSWORD: ${FRAPPE_HR_ADMIN_PASSWORD:?Set FRAPPE_HR_ADMIN_PASSWORD in .env}
-      DB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
-    volumes:
-      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
-      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
-    depends_on:
-      frappe-hrms-configurator:
-        condition: service_completed_successfully
-    restart: "no"
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-db:
-    container_name: tuyendung-studio-frappe-hrms-db
-    image: mariadb:11.8
-    profiles: ["frappe-hrm"]
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-      - --skip-character-set-client-handshake
-    environment:
-      MYSQL_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
-      MARIADB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:?Set FRAPPE_HR_DB_ROOT_PASSWORD in .env}
-    volumes:
-      - frappe-hrms-db-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 10s
-    restart: unless-stopped
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-frontend:
-    container_name: tuyendung-studio-frappe-hrms-frontend
-    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
-    profiles: ["frappe-hrm"]
-    command:
-      - nginx-entrypoint.sh
-    environment:
-      BACKEND: frappe-hrms-backend:8000
-      FRAPPE_SITE_NAME_HEADER: ${FRAPPE_HR_SITE_NAME:-hrm.infohr.vn}
-      SOCKETIO: frappe-hrms-websocket:9000
-      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
-      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
-      UPSTREAM_REAL_IP_RECURSIVE: "off"
-      PROXY_READ_TIMEOUT: 120
-      CLIENT_MAX_BODY_SIZE: 100m
-    ports:
-      - "${FRAPPE_HR_PORT:-8081}:8080"
-    volumes:
-      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
-      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
-    depends_on:
-      frappe-hrms-websocket:
-        condition: service_started
-      frappe-hrms-create-site:
-        condition: service_completed_successfully
-    restart: unless-stopped
-    networks:
-      proxy-net:
-        aliases:
-          - frappe-hrms
-      app-net:
-        aliases:
-          - frappe-hrms-frontend
-      frappe-hrms-net: {}
-
-  frappe-hrms-queue-long:
-    container_name: tuyendung-studio-frappe-hrms-queue-long
-    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
-    profiles: ["frappe-hrm"]
-    command:
-      - bench
-      - worker
-      - --queue
-      - long,default,short
-    environment:
-      FRAPPE_REDIS_CACHE: redis://frappe-hrms-redis-cache:6379
-      FRAPPE_REDIS_QUEUE: redis://frappe-hrms-redis-queue:6379
-    volumes:
-      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
-      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
-    restart: unless-stopped
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-queue-short:
-    container_name: tuyendung-studio-frappe-hrms-queue-short
-    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
-    profiles: ["frappe-hrm"]
-    command:
-      - bench
-      - worker
-      - --queue
-      - short,default
-    environment:
-      FRAPPE_REDIS_CACHE: redis://frappe-hrms-redis-cache:6379
-      FRAPPE_REDIS_QUEUE: redis://frappe-hrms-redis-queue:6379
-    volumes:
-      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
-      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
-    restart: unless-stopped
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-redis-cache:
-    container_name: tuyendung-studio-frappe-hrms-redis-cache
-    image: redis:6.2-alpine
-    profiles: ["frappe-hrm"]
-    restart: unless-stopped
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-redis-queue:
-    container_name: tuyendung-studio-frappe-hrms-redis-queue
-    image: redis:6.2-alpine
-    profiles: ["frappe-hrm"]
-    volumes:
-      - frappe-hrms-redis-queue-data:/data
-    restart: unless-stopped
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-scheduler:
-    container_name: tuyendung-studio-frappe-hrms-scheduler
-    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
-    profiles: ["frappe-hrm"]
-    command:
-      - bench
-      - schedule
-    volumes:
-      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
-      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
-    restart: unless-stopped
-    networks:
-      - frappe-hrms-net
-
-  frappe-hrms-websocket:
-    container_name: tuyendung-studio-frappe-hrms-websocket
-    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
-    profiles: ["frappe-hrm"]
-    command:
-      - node
-      - /home/frappe/frappe-bench/apps/frappe/socketio.js
-    environment:
-      FRAPPE_REDIS_CACHE: redis://frappe-hrms-redis-cache:6379
-      FRAPPE_REDIS_QUEUE: redis://frappe-hrms-redis-queue:6379
-    volumes:
-      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
-      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
-    restart: unless-stopped
-    networks:
-      - frappe-hrms-net
-
-  # ---------------------------------------------------------------------------
   # LiveKit Server
   # ---------------------------------------------------------------------------
   livekit:
@@ -516,7 +325,7 @@ services:
     ports:
       - "7881:7881/tcp"
       - "7882:7882/udp"
-      - "50000-50010:50000-50010/udp"
+      - "50000-50100:50000-50100/udp"
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "wget --spider -q http://localhost:7880/ || exit 1"]
@@ -565,95 +374,65 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
-  # Local AI Services are disabled because LLM/STT/TTS run on FPT GPU.
-  # Uncomment this block only when intentionally running inference locally.
   # ---------------------------------------------------------------------------
-  # whisper:
-  #   container_name: tuyendung-studio-whisper
-  #   build:
-  #     context: ./voice-ai/inference/whisper
-  #   profiles: ["local-ai"]
-  #   init: true
-  #   environment:
-  #     - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-large-v3}
-  #     - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cpu}
-  #     - DATA_DIR=${WHISPER_DATA_DIR:-/data}
-  #   volumes:
-  #     - whisper-data:/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/v1/models > /dev/null"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 20
-  #     start_period: 60s
-  #   restart: always
-  #   networks:
-  #     - app-net
-
-  # vieneu-tts:
-  #   container_name: tuyendung-studio-tts
-  #   build:
-  #     context: ./voice-ai/inference/vieneu-text-to-speech
-  #   profiles: ["local-ai"]
-  #   init: true
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     - PORT=${VIENEU_TTS_PORT:-8298}
-  #     - TTS_DEVICE=${TTS_DEVICE:-cuda}
-  #     - TTS_MODE=${TTS_MODE:-turbo_gpu}
-  #   volumes:
-  #     - huggingface-cache:/root/.cache/huggingface
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:$${PORT:-8298}/health > /dev/null"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 120
-  #     start_period: 20m
-  #   restart: always
-  #   networks:
-  #     - app-net
-
-  livekit-agent:
-    container_name: tuyendung-studio-livekit-agent
+  # Local Voice AI Inference Services (Optional local GPU fallback)
+  # ---------------------------------------------------------------------------
+  whisper:
+    profiles: ["local-gpu"]
+    container_name: tuyendung-studio-whisper
+    image: voice-ai-whisper:latest
     build:
-      context: ./voice-ai/livekit_agent
-    env_file:
-      - .env
+      context: ./voice-ai/inference/whisper
     environment:
-      - BACKEND_API_URL=${BACKEND_API_URL:-http://backend:8000/api}
-      - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with backend}
-      - LIVEKIT_URL=${LIVEKIT_URL:-http://tuyendung-studio-livekit:7880}
-      - LIVEKIT_AGENT_NAME=square-ai-interviewer
-      - STT_LANGUAGE=${STT_LANGUAGE:-vi}
-      - TTS_VOICE=${TTS_VOICE:-Ly}
-
-    depends_on:
-      backend:
-        condition: service_started
-      livekit:
-        condition: service_healthy
-    # Needed only when enabling local Docker/host AI fallback.
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
+      - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-deepdml/faster-whisper-large-v3-turbo-ct2}
+      - VOXBOX_DEVICE=cuda
+      - DATA_DIR=/data
+    volumes:
+      - whisper-data:/data
+    ports:
+      - "11437:8080"
+    expose:
+      - "8080"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/v1/models > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     restart: always
     networks:
       - app-net
-      - data-net
 
   vieneu-tts:
+    profiles: ["local-gpu"]
     container_name: tuyendung-studio-vieneu-tts
+    image: voice-ai-vieneu:latest
     build:
       context: ./voice-ai/inference/vieneu-text-to-speech
     env_file:
       - .env
     environment:
       - PORT=8298
-      - TTS_DEVICE=cpu
-      - TTS_MODE=turbo
-      - TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-v2-Turbo-GGUF
-      - TTS_GGUF_FILENAME=vieneu-tts-v2-turbo.gguf
+      - TTS_DEVICE=cuda
+      - TTS_MODE=v3turbo
+      - TTS_BACKBONE_REPO=pnnbao-ump/VieNeu-TTS-v3-Turbo
       - HF_HOME=/models/huggingface
+    volumes:
+      - huggingface-cache:/models/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     expose:
       - "8298"
     ports:
@@ -667,6 +446,38 @@ services:
       start_period: 2m
     networks:
       - app-net
+
+  livekit-agent:
+    container_name: tuyendung-studio-livekit-agent
+    build:
+      context: ./voice-ai/livekit_agent
+    env_file:
+      - .env
+    environment:
+      - BACKEND_API_URL=${BACKEND_API_URL:-http://backend:8000/api}
+      - INTERVIEW_AGENT_SHARED_SECRET=${INTERVIEW_AGENT_SHARED_SECRET:?Set INTERVIEW_AGENT_SHARED_SECRET in .env and share it with backend}
+      - LIVEKIT_URL=${LIVEKIT_URL:-http://tuyendung-studio-livekit:7880}
+      - LIVEKIT_AGENT_NAME=square-ai-interviewer
+      - STT_BASE_URL=${STT_BASE_URL:-https://api.metaconnect.vn/v1}
+      - STT_API_KEY=${STT_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - STT_MODEL=${STT_MODEL:-asr-vi}
+      - STT_LANGUAGE=${STT_LANGUAGE:-vi}
+      - TTS_BASE_URL=${TTS_BASE_URL:-https://api.metaconnect.vn/v1}
+      - TTS_API_KEY=${TTS_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - TTS_MODEL=${TTS_MODEL:-tts-vi}
+      - TTS_VOICE=${TTS_VOICE:-Trúc Ly}
+    depends_on:
+      backend:
+        condition: service_started
+      livekit:
+        condition: service_healthy
+    volumes:
+      - ./voice-ai/livekit_agent/src:/app/src
+      - tts-cache:/tmp/tts_cache
+    restart: always
+    networks:
+      - app-net
+      - data-net
 
   # ---------------------------------------------------------------------------
   # MinIO (Object Storage)
@@ -709,7 +520,9 @@ services:
     entrypoint: >
       /bin/sh -c "
       sleep 5;
-      mc alias set local http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD};
+      ROOT_USER="$${MINIO_ROOT_USER:-$${MINIO_ACCESS_KEY:-minioadmin}}";
+      ROOT_PASS="$${MINIO_ROOT_PASSWORD:-$${MINIO_SECRET_KEY}}";
+      mc alias set local http://minio:9000 "$$ROOT_USER" "$$ROOT_PASS";
       mc mb --ignore-existing local/$${MINIO_BUCKET:-square};
       mc anonymous set download local/$${MINIO_BUCKET:-square};
       echo 'MinIO bucket policy set to public download';
@@ -755,17 +568,11 @@ networks:
     driver: bridge
   data-net:
     driver: bridge
-  frappe-hrms-net:
-    driver: bridge
 
 volumes:
   db_data:
-  # Local AI volumes are disabled while using FPT GPU.
-  # huggingface-cache:
-  # whisper-data:
+  huggingface-cache:
+  whisper-data:
   minio-data:
   elasticsearch-data:
-  frappe-hrms-db-data:
-  frappe-hrms-redis-queue-data:
-  frappe-hrms-sites:
-  frappe-hrms-logs:
+  tts-cache:

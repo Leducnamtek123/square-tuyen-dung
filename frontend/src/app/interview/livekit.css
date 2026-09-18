@@ -1,11 +1,11 @@
-/* ─────────────────────────────────────────────────────────────────
-   LiveKit Components Styles — scoped to /interview/* pages only.
+/* -----------------------------------------------------------------
+   LiveKit Components Styles - scoped to /interview/* pages only.
    Using a local vendor copy of @livekit/components-styles to bypass
    Turbopack's "style" condition resolution issue with the package.
-   ───────────────────────────────────────────────────────────────── */
+   ----------------------------------------------------------------- */
 @import "./livekit-vendor.css";
 
-/* ── Custom theme: override LiveKit CSS variables ── */
+/* -- Custom theme: override LiveKit CSS variables -- */
 :root {
   /* Brand colours */
   --lk-bg: #020617;
@@ -42,7 +42,7 @@
   --lk-focus-ring: 0 0 0 2px #0ea5e9;
 }
 
-/* ── Layout overrides ── */
+/* -- Layout overrides -- */
 .lk-room-container {
   background: linear-gradient(180deg, #020617 0%, #020617 100%);
   border-radius: 0;

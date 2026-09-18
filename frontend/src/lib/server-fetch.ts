@@ -11,8 +11,8 @@ const stripTrailingSlash = (value = '') => value.replace(/\/+$/, '');
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 const unwrapEnvelopeData = (payload: unknown) =>
-  isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
-    ? payload.data
+  isRecord(payload) && 'data' in (payload as object)
+    ? (payload as Record<string, unknown>).data
     : payload;
 
 const ensureApiBase = (value: string) => {
@@ -27,9 +27,12 @@ const dockerHostApiProxyOrigin = `http://host.docker.internal:${process.env.NGIN
 
 const resolveBackendBaseUrl = () => {
   const backendUrl = process.env.BACKEND_API_URL || '';
-
-  if (backendUrl && !isDockerBackendHost(backendUrl)) {
+  if (backendUrl) {
     return ensureApiBase(backendUrl);
+  }
+
+  if (isDockerRuntime) {
+    return ensureApiBase('http://backend:8000/api');
   }
 
   const apiProxyOrigin = process.env.API_PROXY_ORIGIN || '';
@@ -42,15 +45,7 @@ const resolveBackendBaseUrl = () => {
     return ensureApiBase(publicApiBase);
   }
 
-  if (isDockerRuntime) {
-    return ensureApiBase(dockerHostApiProxyOrigin);
-  }
-
-  if (!isDockerRuntime) {
-    return ensureApiBase(`http://localhost:${process.env.NGINX_PORT || '8080'}`);
-  }
-
-  return 'http://backend:8000/api';
+  return ensureApiBase(`http://localhost:${process.env.NGINX_PORT || '8080'}`);
 };
 
 const baseUrl = `${resolveBackendBaseUrl()}/`;

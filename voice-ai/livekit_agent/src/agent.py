@@ -1,6 +1,10 @@
 import asyncio
+import hashlib
 import json
 import logging
+import os
+import pathlib
+import re
 from collections.abc import Awaitable
 from typing import Any
 
@@ -13,6 +17,7 @@ from livekit.agents import (
     AutoSubscribe,
     JobContext,
     JobProcess,
+    WorkerOptions,
     cli,
     room_io,
 )
@@ -20,6 +25,7 @@ from livekit.agents.job import get_job_context
 from livekit.agents.llm import ChatMessage
 from livekit.agents.voice.events import CloseEvent, SessionUsageUpdatedEvent
 from livekit.plugins import openai, silero
+from livekit.plugins.openai import tts as openai_tts
 
 from .backend_auth import auth_event_hook
 from .config import config
@@ -35,6 +41,8 @@ logger.setLevel(logging.INFO)
 CHAT_TOPIC = "lk.chat"
 AI_CONTROL_TOPIC = "square.interview.ai_control"
 AI_TAKEOVER_TOPIC = "square.interview.ai_takeover"
+QUESTION_CONTROL_TOPIC = "square.interview.question_control"
+QUESTION_CHANGE_TOPIC = "square.interview.question_change"
 EMPLOYER_CONTROL_ROLES = {"employer", "observer"}
 _BACKGROUND_TASKS: set[asyncio.Task[Any]] = set()
 
@@ -58,8 +66,120 @@ async def _update_backend_status(room_name: str, status: str) -> None:
         logger.warning(f"Failed to update backend status for {room_name}: {e}")
 
 
+def _clean_tts_text(text: str) -> str:
+    if not text:
+        return ""
+    cleaned = text.replace("\u200b", " ").replace("\ufeff", " ")
+    cleaned = re.sub(r"<think>[\s\S]*?</think>", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"```[\s\S]*?```", " ", cleaned)
+    return " ".join(cleaned.split()).strip()
+
+
+# --- Resilient Transport for Voice Providers with Disk Cache ---
+class RetryRateLimitTransport(httpx.AsyncBaseTransport):
+    """
+    Intelligent rate limit (429) backoff transport with local TTS audio disk cache.
+    1. Checks local cache (/tmp/tts_cache/<hash>.mp3) for repeated phrases, returning instantly with 0ms latency.
+    2. Automatically handles voice provider concurrency caps and 429 limits with exponential backoff & jitter.
+    3. Saves successful TTS responses to disk cache so subsequent candidates hit cache immediately.
+    """
+    def __init__(self, transport: httpx.AsyncBaseTransport, max_retries: int = 12):
+        self._transport = transport
+        self._max_retries = max_retries
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        import random
+        body = await request.aread()
+
+        # Check if this is an audio synthesis request
+        is_tts_request = request.method == "POST" and ("/audio/speech" in str(request.url.path))
+        cache_file: str | None = None
+
+        if is_tts_request:
+            try:
+                data = json.loads(body.decode("utf-8"))
+                model = str(data.get("model") or "")
+                voice = str(data.get("voice") or "")
+                speed = round(float(data.get("speed") or 1.0), 2)
+                text = _clean_tts_text(str(data.get("input") or ""))
+
+                key_str = f"{model}:{voice}:{speed}:{text}"
+                cache_key = hashlib.sha256(key_str.encode("utf-8")).hexdigest()
+
+                cache_dir = os.getenv("TTS_CACHE_DIR", "/tmp/tts_cache")
+                os.makedirs(cache_dir, exist_ok=True)
+                cache_file = os.path.join(cache_dir, f"{cache_key}.mp3")
+
+                if os.path.exists(cache_file) and os.path.getsize(cache_file) > 100:
+                    cached_bytes = await asyncio.to_thread(pathlib.Path(cache_file).read_bytes)
+                    logger.info("TTS Cache HIT for key %s (%d bytes): '%s...'", cache_key[:10], len(cached_bytes), text[:30])
+                    return httpx.Response(
+                        status_code=200,
+                        headers={"content-type": "audio/mpeg", "x-cache": "HIT"},
+                        content=cached_bytes,
+                    )
+                logger.info("TTS Cache MISS for key %s: '%s...'", cache_key[:10], text[:30])
+            except Exception as parse_exc:
+                logger.debug("TTS Cache inspection skipped: %s", parse_exc)
+
+        # Retry loop for upstream calls
+        headers = httpx.Headers(request.headers)
+        headers["User-Agent"] = "curl/7.68.0"
+
+        for attempt in range(self._max_retries):
+            retry_req = httpx.Request(
+                method=request.method,
+                url=request.url,
+                headers=headers,
+                content=body,
+            )
+            resp = await self._transport.handle_async_request(retry_req)
+            if resp.status_code == 429 and attempt < self._max_retries - 1:
+                wait = 1.0 + random.uniform(0.3, 1.2) * min(attempt + 1, 5)
+                retry_header = resp.headers.get("Retry-After")
+                if retry_header:
+                    try:
+                        wait = max(1.0, float(retry_header))
+                    except ValueError:
+                        pass
+                logger.warning(
+                    "Voice AI Provider returned HTTP 429 (Rate Limit). Retrying attempt %d/%d after %.2fs...",
+                    attempt + 1,
+                    self._max_retries,
+                    wait,
+                )
+                await resp.aclose()
+                await asyncio.sleep(wait)
+                continue
+
+            if resp.status_code == 200 and cache_file:
+                resp_content = await resp.aread()
+                if len(resp_content) > 100:
+                    try:
+                        def _save_to_disk():
+                            tmp_f = f"{cache_file}.tmp.{os.getpid()}"
+                            pathlib.Path(tmp_f).write_bytes(resp_content)
+                            os.replace(tmp_f, cache_file)
+                            try:
+                                os.chmod(cache_file, 0o666)
+                            except Exception:
+                                pass
+                        await asyncio.to_thread(_save_to_disk)
+                        logger.info("TTS Cache SAVED to %s (%d bytes)", cache_file, len(resp_content))
+                    except Exception as save_exc:
+                        logger.warning("Failed to save TTS cache: %s", save_exc)
+                return httpx.Response(
+                    status_code=200,
+                    headers=resp.headers,
+                    content=resp_content,
+                )
+
+            return resp
+        return resp
+
+
 # --- AgentServer Setup (1.5.x Pattern) ---
-server = AgentServer()
+server = AgentServer(load_threshold=float(os.getenv("LIVEKIT_LOAD_THRESHOLD", "0.9")))
 
 
 def prewarm(proc: JobProcess) -> None:
@@ -195,28 +315,7 @@ async def entrypoint(ctx: JobContext) -> None:
     ctx.log_context_fields = {"room": ctx.room.name}
     logger.info(f"Starting interview agent for room: {ctx.room.name}")
 
-    # 1. Initialize Models
-    stt_model = openai.STT(
-        api_key=config.STT_API_KEY,
-        base_url=config.STT_BASE_URL,
-        model=config.STT_MODEL,
-        language=config.STT_LANGUAGE,
-    )
-
-    llm_model = openai.LLM(
-        client=openai_lib.AsyncOpenAI(
-            api_key=config.LLM_API_KEY,
-            base_url=config.LLM_BASE_URL,
-            http_client=httpx.AsyncClient(timeout=httpx.Timeout(600.0, connect=15.0)),
-        ),
-        model=config.LLM_MODEL,
-        temperature=config.LLM_TEMPERATURE,
-        top_p=config.LLM_TOP_P,
-        max_completion_tokens=config.LLM_MAX_COMPLETION_TOKENS,
-        extra_body=_build_llm_extra_body(),
-    )
-
-    # 2. Context Preparation from room metadata
+    # 1. Context Preparation from room metadata
     agent_context = {
         "candidateName": "Ứng viên",
         "jobTitle": "đang ứng tuyển",
@@ -224,6 +323,7 @@ async def entrypoint(ctx: JobContext) -> None:
         "backendApiUrl": config.BACKEND_API_URL,
         "roomName": ctx.room.name,
         "participantIdentity": "",
+        "interviewLanguage": "vi",
     }
     try:
         metadata = ctx.room.metadata
@@ -234,6 +334,7 @@ async def entrypoint(ctx: JobContext) -> None:
                     "candidateName": pm.get("candidate_name", "Ứng viên"),
                     "jobTitle": pm.get("job_title", "đang ứng tuyển"),
                     "jobDescription": pm.get("job_description", ""),
+                    "interviewLanguage": pm.get("interview_language") or pm.get("interviewLanguage", "vi"),
                 }
             )
     except Exception as e:
@@ -252,37 +353,84 @@ async def entrypoint(ctx: JobContext) -> None:
                 agent_context.update(data)
                 agent_context["questions"] = data.get("questions", [])
                 logger.info(
-                    "Loaded interview context for room %s: questionCount=%s, candidate=%s, job=%s",
+                    "Loaded interview context for room %s: questionCount=%s, candidate=%s, job=%s, lang=%s",
                     ctx.room.name,
                     data.get("questionCount", len(data.get("questions", []))),
                     data.get("candidateName"),
                     data.get("jobTitle"),
+                    data.get("interviewLanguage", "vi"),
                 )
     except Exception as e:
         logger.warning(f"Failed to fetch predefined questions: {e}")
 
-    tts_voice = str(agent_context.get("ttsVoice") or config.TTS_VOICE)
-    logger.info("Using TTS voice for room %s: %s", ctx.room.name, tts_voice)
+    session_lang = str(agent_context.get("interviewLanguage") or "vi").lower()
+    stt_lang = session_lang if session_lang in {"vi", "en", "ja", "ko"} else config.STT_LANGUAGE
+
+    # 2. Initialize Models
+    curl_headers = {"User-Agent": "curl/7.68.0"}
+    stt_transport = RetryRateLimitTransport(httpx.AsyncHTTPTransport(verify=False))
+    stt_model = openai.STT(
+        client=openai_lib.AsyncOpenAI(
+            api_key=config.STT_API_KEY or "dummy",
+            base_url=config.STT_BASE_URL,
+            default_headers=curl_headers,
+            http_client=httpx.AsyncClient(transport=stt_transport, headers=curl_headers),
+        ),
+        model=config.STT_MODEL,
+        language=stt_lang,
+    )
+
+    llm_model = openai.LLM(
+        client=openai_lib.AsyncOpenAI(
+            api_key=config.LLM_API_KEY or "dummy",
+            base_url=config.LLM_BASE_URL,
+            http_client=httpx.AsyncClient(timeout=httpx.Timeout(600.0, connect=15.0)),
+        ),
+        model=config.LLM_MODEL,
+        temperature=config.LLM_TEMPERATURE,
+        top_p=config.LLM_TOP_P,
+        max_completion_tokens=config.LLM_MAX_COMPLETION_TOKENS,
+        extra_body=_build_llm_extra_body(),
+    )
+
+    tts_voice = str(agent_context.get("ttsVoice") or "").strip()
+    if not tts_voice:
+        if session_lang in {"en", "ja", "ko"}:
+            tts_voice = "alloy"
+        else:
+            tts_voice = config.TTS_VOICE
+    if tts_voice in {"TrAc Ly", "TrÃºc Ly", "Trc Ly", "Trc Ly", "Tr?c Ly"}:
+        tts_voice = "Trúc Ly"
+    logger.info("Using TTS voice for room %s (%s): %s", ctx.room.name, session_lang, tts_voice)
     tts_speed = resolve_tts_speed(agent_context)
     if tts_speed is not None:
         logger.info("Using TTS speed for room %s: %s", ctx.room.name, tts_speed)
 
+    # Ensure custom audio stream models stream raw audio chunks instead of expecting SSE events
+    openai_tts.AUDIO_STREAM_MODELS.add(config.TTS_MODEL)
+    openai_tts.AUDIO_STREAM_MODELS.add("tts-vi")
+
+    tts_transport = RetryRateLimitTransport(httpx.AsyncHTTPTransport(verify=False))
     tts_kwargs = {
         "client": openai_lib.AsyncOpenAI(
-            api_key=config.TTS_API_KEY,
+            api_key=config.TTS_API_KEY or "dummy",
             base_url=config.TTS_BASE_URL,
+            default_headers=curl_headers,
             max_retries=config.TTS_MAX_RETRIES,
             http_client=httpx.AsyncClient(
+                headers=curl_headers,
+                transport=tts_transport,
                 timeout=httpx.Timeout(
                     connect=config.TTS_CONNECT_TIMEOUT_SECONDS,
                     read=config.TTS_READ_TIMEOUT_SECONDS,
                     write=config.TTS_WRITE_TIMEOUT_SECONDS,
                     pool=config.TTS_POOL_TIMEOUT_SECONDS,
-                )
+                ),
             ),
         ),
         "model": config.TTS_MODEL,
         "voice": tts_voice,
+        "response_format": "mp3",
     }
     if tts_speed is not None:
         tts_kwargs["speed"] = tts_speed
@@ -422,6 +570,49 @@ async def entrypoint(ctx: JobContext) -> None:
 
         interviewer.resume_from_employer_takeover(speaker_name)
 
+    async def _handle_question_control_stream(reader, participant_identity) -> None:
+        participant_identity = _participant_identity(participant_identity)
+        text = (await reader.read_all()).strip()
+        if not text:
+            return
+
+        try:
+            payload = json.loads(text)
+        except Exception:
+            payload = {"action": text}
+
+        action = str(payload.get("action") or payload.get("type") or "").strip().lower()
+        logger.info(
+            "Received question control event for room %s from %s: action=%s",
+            ctx.room.name,
+            participant_identity,
+            action,
+        )
+
+        target_index = payload.get("question_index")
+        if not isinstance(target_index, int):
+            target_index = None
+
+        if action in {"time_up", "timeout"}:
+            next_idx = target_index + 1 if target_index is not None else None
+            await interviewer.handle_question_timeout(target_index=next_idx)
+        elif action in {"next_question", "skip_question", "done_question"}:
+            await interviewer.handle_candidate_next_question(target_index=target_index)
+        elif action in {"finish_interview", "end_session", "complete_interview"}:
+            await interviewer.handle_candidate_finish_interview()
+
+    async def _handle_question_change_stream(reader, participant_identity) -> None:
+        text = (await reader.read_all()).strip()
+        if not text:
+            return
+        try:
+            payload = json.loads(text)
+        except Exception:
+            return
+        q_idx = payload.get("question_index")
+        if isinstance(q_idx, int) and 0 <= q_idx < len(interviewer.questions):
+            interviewer.current_question_index = q_idx
+
     # 4. Setup Session (Standard 1.5.x Pattern)
     session = AgentSession(
         stt=stt_model,
@@ -533,6 +724,18 @@ async def entrypoint(ctx: JobContext) -> None:
             _handle_employer_takeover_stream(reader, participant_identity)
         ),
     )
+    ctx.room.register_text_stream_handler(
+        QUESTION_CONTROL_TOPIC,
+        lambda reader, participant_identity: asyncio.create_task(
+            _handle_question_control_stream(reader, participant_identity)
+        ),
+    )
+    ctx.room.register_text_stream_handler(
+        QUESTION_CHANGE_TOPIC,
+        lambda reader, participant_identity: asyncio.create_task(
+            _handle_question_change_stream(reader, participant_identity)
+        ),
+    )
 
     # 7. Start the Session (no ctx.connect() needed - handled by session.start)
     try:
@@ -576,8 +779,13 @@ async def entrypoint(ctx: JobContext) -> None:
         await _update_backend_status(ctx.room.name, "interrupted")
         raise
 
-    # NO busy-wait loop needed - framework manages lifecycle automatically
-
+# Worker options for test harnesses / runners that instantiate WorkerOptions directly
+worker_options = WorkerOptions(
+    entrypoint_fnc=entrypoint,
+    prewarm_fnc=prewarm,
+    load_threshold=float(os.getenv("LIVEKIT_LOAD_THRESHOLD", "0.9")),
+)
 
 if __name__ == "__main__":
     cli.run_app(server)
+

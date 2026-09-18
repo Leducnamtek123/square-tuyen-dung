@@ -1,8 +1,8 @@
 import React from 'react';
 import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import jobService from '../../../../../services/jobService';
-import type { JobPostFilter } from '../../../../../redux/filterSlice';
-import type { GetJobPostsParams } from '../../../../../services/jobService';
+import jobService from '@/services/jobService';
+import type { JobPostFilter } from '@/redux/filterSlice';
+import type { GetJobPostsParams } from '@/services/jobService';
 
 export const useJobPosts = (params: JobPostFilter, page: number) => {
     const queryClient = useQueryClient();

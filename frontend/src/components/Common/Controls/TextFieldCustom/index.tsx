@@ -1,12 +1,10 @@
 'use client';
 import React from 'react';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { InputAdornment, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import ValidationError from '../ValidationError';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 const EMPTY_SX: SxProps<Theme> = {};
 
@@ -37,27 +35,23 @@ const TextFieldCustom = <T extends FieldValues = FieldValues>({
 }: Props<T>) => {
 
   // Format display number with comma
-
   const formatDisplay = (value: unknown) => {
     if (type !== 'number' || !value) return value;
     return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
   return (
-
     <div>
-
       {title && (
         <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, display: 'block', color: 'text.primary' }}>
           {title}{showRequired && <span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
         </Typography>
       )}
 
-      <ControllerAny
+      <TypedController
         name={name as Path<T>}
         control={control}
-
-        render={({ field, fieldState }: any) => (
+        render={({ field, fieldState }) => (
 
           <>
 

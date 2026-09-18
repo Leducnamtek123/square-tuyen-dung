@@ -3,11 +3,12 @@ import { Avatar, Box, Chip, CircularProgress, Stack, Typography, alpha } from '@
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
+import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { BarVisualizer, RoomAudioRenderer, StartAudio, VideoTrack, useTracks } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
-import interviewService from '../../../../services/interviewService';
-import { type InterviewSession } from '../../../../types/models';
+import interviewService from '@/services/interviewService';
+import { type InterviewSession } from '@/types/models';
 
 const ACTIVE_STATUSES = new Set(['scheduled', 'calibration', 'in_progress']);
 const normalizeStatus = (status: string) => status.trim().toLowerCase();
@@ -63,7 +64,11 @@ const formatElapsed = (startTime: string | null | undefined, now = Date.now()) =
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 };
 
-export const ElapsedTimer: React.FC<{ startTime: string | null | undefined }> = ({ startTime }) => {
+export const ElapsedTimer: React.FC<{
+  startTime: string | null | undefined;
+  sx?: any;
+  color?: string;
+}> = ({ startTime, sx, color }) => {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -81,8 +86,9 @@ export const ElapsedTimer: React.FC<{ startTime: string | null | undefined }> = 
         fontWeight: 900,
         fontFamily: 'monospace',
         fontSize: '0.85rem',
-        color: 'primary.main',
+        color: color || 'primary.main',
         letterSpacing: 1,
+        ...sx,
       }}
     >
       {elapsed}
@@ -125,7 +131,7 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
             overflow: 'hidden',
             border: '1px solid',
             borderColor: alpha('#22c55e', 0.25),
-            bgcolor: '#000',
+            bgcolor: '#020617',
           }}
         >
           <VideoTrack
@@ -163,9 +169,9 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
             borderRadius: 2,
             overflow: 'hidden',
             border: '1px solid',
-            borderColor: alpha('#a855f7', 0.35),
-            boxShadow: screenTracks.length > 0 ? '0 8px 32px rgba(0,0,0,0.45)' : 'none',
-            bgcolor: '#000',
+            borderColor: alpha('#2563eb', 0.35),
+            boxShadow: screenTracks.length > 0 ? '0 8px 32px rgba(2,6,23,0.45)' : 'none',
+            bgcolor: '#020617',
           }}
         >
           <VideoTrack
@@ -174,50 +180,146 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
           />
         </Box>
       ) : audioTracks.length > 0 ? (
-        <Stack spacing={1.5} alignItems="center" sx={{ py: 2 }}>
-          <Box sx={{ height: 92, width: '100%', maxWidth: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <BarVisualizer barCount={15} style={{ height: '60px', width: '200px' }} />
+        <Stack
+          spacing={1.5}
+          alignItems="center"
+          justifyContent="center"
+          sx={{
+            width: '100%',
+            height: '100%',
+            minHeight,
+            py: 3,
+            borderRadius: 2,
+            bgcolor: '#080c14',
+          }}
+        >
+          <Box sx={{ height: 72, width: '100%', maxWidth: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <BarVisualizer barCount={18} style={{ height: '48px', width: '220px' }} />
           </Box>
           <Typography
             variant="caption"
             sx={{
-              color: '#22c55e',
-              fontWeight: 900,
+              color: '#34d399',
+              fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: 2,
+              letterSpacing: 1.5,
               display: 'flex',
               alignItems: 'center',
               gap: 1,
             }}
           >
-            <FiberManualRecordIcon sx={{ fontSize: 8, animation: 'pulse 1.5s infinite' }} />
+            <FiberManualRecordIcon sx={{ fontSize: 8, animation: 'pulse 1.5s infinite', color: '#10b981' }} />
             {t('employer:interviewLive.candidateCard.liveAudioNoVideo')}
           </Typography>
         </Stack>
       ) : (
-        <Stack spacing={1.5} alignItems="center" sx={{ py: 2 }}>
+        <Box
+          sx={{
+            width: '100%',
+            height: '100%',
+            minHeight,
+            borderRadius: 2,
+            bgcolor: '#080c14',
+            backgroundImage: 'radial-gradient(circle at 50% 35%, rgba(37, 99, 235, 0.14) 0%, #080c14 70%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 2.5,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Ambient subtle radar ring animation */}
           <Box
             sx={{
-              width: '100%',
-              minHeight,
-              borderRadius: 2,
-              border: '1px dashed',
-              borderColor: alpha('#60a5fa', 0.28),
-              bgcolor: alpha('#0f172a', 0.55),
-              display: 'grid',
-              placeItems: 'center',
+              width: 54,
+              height: 54,
+              borderRadius: '50%',
+              bgcolor: 'rgba(37, 99, 235, 0.15)',
+              border: '1px solid rgba(59, 130, 246, 0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mb: 1.5,
+              position: 'relative',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                inset: -8,
+                borderRadius: '50%',
+                border: '1px solid rgba(59, 130, 246, 0.35)',
+                animation: 'radarPulseLive 2.2s cubic-bezier(0, 0, 0.2, 1) infinite',
+              },
+              '@keyframes radarPulseLive': {
+                '0%': { transform: 'scale(0.85)', opacity: 1 },
+                '100%': { transform: 'scale(1.8)', opacity: 0 },
+              },
             }}
           >
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 900, mb: 0.5 }}>
-                {t('employer:interviewLive.candidateCard.waitingSignal')}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                {t('employer:interviewLive.candidateCard.waitingSignalHint')}
-              </Typography>
-            </Box>
+            <VideocamOutlinedIcon sx={{ fontSize: 24, color: '#60a5fa' }} />
           </Box>
-        </Stack>
+
+          <Typography variant="subtitle2" sx={{ color: '#f8fafc', fontWeight: 700, mb: 0.5, letterSpacing: '-0.01em', textAlign: 'center' }}>
+            {t('employer:interviewLive.candidateCard.waitingSignal', 'Đang chờ tín hiệu...')}
+          </Typography>
+
+          <Typography variant="caption" sx={{ color: '#94a3b8', maxWidth: 360, textAlign: 'center', lineHeight: 1.5, mb: 2, fontSize: '0.78rem' }}>
+            {t('employer:interviewLive.candidateCard.waitingSignalHint')}
+          </Typography>
+
+          {/* Live Telemetry Status Chips */}
+          <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                px: 1.2,
+                py: 0.3,
+                borderRadius: '6px',
+                bgcolor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#94a3b8',
+                fontSize: '0.7rem',
+                fontWeight: 600,
+              }}
+            >
+              Camera: Chờ mở
+            </Box>
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                px: 1.2,
+                py: 0.3,
+                borderRadius: '6px',
+                bgcolor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                color: '#94a3b8',
+                fontSize: '0.7rem',
+                fontWeight: 600,
+              }}
+            >
+              Micrô: Chờ mở
+            </Box>
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                px: 1.2,
+                py: 0.3,
+                borderRadius: '6px',
+                bgcolor: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                color: '#34d399',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+              }}
+            >
+              Phòng AI: Sẵn sàng
+            </Box>
+          </Stack>
+        </Box>
       )}
       <RoomAudioRenderer />
       <StartAudio label={t('interview:controls.enableAudio')} />

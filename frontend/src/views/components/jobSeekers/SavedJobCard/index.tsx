@@ -2,13 +2,13 @@ import React from 'react';
 import Link from 'next/link';
 import { Box, Stack, Button, Pagination } from "@mui/material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { ROUTES } from '../../../../configs/constants';
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import JobPostAction from '../../../../components/Features/JobPostAction';
-import toastMessages from '../../../../utils/toastMessages';
+import { ROUTES } from '@/configs/constants';
+import NoDataCard from '@/components/Common/NoDataCard';
+import JobPostAction from '@/components/Features/JobPostAction';
+import toastMessages from '@/utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import { useSavedJobs, useToggleSaveJob } from '../hooks/useJobSeekerQueries';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface JobPost {
   id: string | number;
@@ -35,9 +35,17 @@ const SavedJobCard = () => {
   const [page, setPage] = React.useState(1);
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
 
-  const { data, isLoading } = useSavedJobs({ pageSize, page });
+  const queryParams = React.useMemo(() => ({ pageSize, page }), [page]);
+  const { data, isLoading } = useSavedJobs(queryParams);
   const jobPosts = (data?.results || []) as Array<JobPost>;
   const count = data?.count || 0;
+  const totalPages = Math.max(1, Math.ceil(count / pageSize));
+
+  React.useEffect(() => {
+    if (count > 0 && page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [count, page, totalPages]);
 
   const toggleSave = useToggleSaveJob();
 
@@ -110,14 +118,14 @@ const SavedJobCard = () => {
               </JobPostAction>
             ))}
             <Stack sx={{ pt: 2 }} alignItems="center">
-              {Math.ceil(count / pageSize) > 1 && (
+              {totalPages > 1 && (
                 <Pagination
                   color="primary"
                   size="medium"
                   variant="text"
                   sx={{ margin: '0 auto' }}
-                  count={Math.ceil(count / pageSize)}
-                  page={page}
+                  count={totalPages}
+                  page={Math.min(page, totalPages)}
                   onChange={handleChangePage}
                 />
               )}

@@ -184,14 +184,19 @@ class JobActivityService:
     APPLICATION_STATUS_TRANSITIONS = {
         var_sys.ApplicationStatus.PENDING_CONFIRMATION: {
             var_sys.ApplicationStatus.CONTACTED,
+            var_sys.ApplicationStatus.TESTED,
+            var_sys.ApplicationStatus.INTERVIEWED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.CONTACTED: {
             var_sys.ApplicationStatus.TESTED,
+            var_sys.ApplicationStatus.INTERVIEWED,
+            var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.TESTED: {
             var_sys.ApplicationStatus.INTERVIEWED,
+            var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.INTERVIEWED: {
@@ -214,6 +219,19 @@ class JobActivityService:
         job_post = validated_data.get('job_post')
         resume = validated_data.get('resume')
 
+        if isinstance(job_post, (int, str)):
+            job_post = JobPost.objects.filter(id=job_post).first()
+
+        from apps.profiles.models import Resume
+        if isinstance(resume, (int, str)):
+            resume = Resume.objects.filter(id=resume).first()
+
+        if not resume and user and getattr(user, 'is_authenticated', False):
+            resume = (
+                Resume.objects.filter(user=user, is_active=True).order_by('-update_at', '-create_at').first()
+                or Resume.objects.filter(user=user).order_by('-update_at', '-create_at').first()
+            )
+
         logger.info("Apply attempt: user=%s, job=%s, resume=%s", user.email, job_post.id if job_post else None, resume.id if resume else None)
 
         if not job_post:
@@ -226,7 +244,7 @@ class JobActivityService:
 
         if not job_post.company.is_verified:
             logger.warning("Apply failed: job %s company %s is not verified", job_post.id, job_post.company_id)
-            raise CompanyNotVerifiedError("CÃ´ng ty cá»§a tin tuyá»ƒn dá»¥ng chÆ°a Ä‘Æ°á»£c xÃ¡c thá»±c.")
+            raise CompanyNotVerifiedError("Công ty của tin tuyển dụng chưa được xác thực.")
 
         if hasattr(timezone, 'localdate'):
             current_date = timezone.localdate()
@@ -248,13 +266,17 @@ class JobActivityService:
             logger.info("Application reused: User %s already applied to job %s", user.email, job_post.id)
             return existing
 
+        phone_val = validated_data.get("phone", "")
+        if not phone_val and resume and getattr(resume, "job_seeker_profile", None):
+            phone_val = getattr(resume.job_seeker_profile, "phone", "") or getattr(user, "phone", "")
+
         # Create the activity in its own atomic block
         activity_payload = {
             "job_post": job_post,
             "resume": resume,
             "full_name": validated_data.get("full_name", validated_data.get("fullName", user.full_name)),
             "email": validated_data.get("email", user.email),
-            "phone": validated_data.get("phone", ""),
+            "phone": phone_val or getattr(user, "phone", ""),
         }
         with transaction.atomic():
             activity, _ = JobPostActivity.objects.get_or_create(
@@ -289,17 +311,8 @@ class JobActivityService:
                 activity.ai_analysis_progress = 0
                 activity.ai_analysis_summary = "Không thể khởi tạo tác vụ phân tích AI. Vui lòng thử lại."
                 activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
-        
-        # Auto-schedule AI Screening if Job Post has Interview Template
-        if job_post.interview_template_id:
-            try:
-                from apps.interviews.tasks import auto_schedule_screening_interview
-                auto_schedule_screening_interview.delay(activity.id)
-            except Exception as ex:
-                helper.print_log_error("auto schedule screening", ex)
-
         company = job_post.company
-        domain = settings.DOMAIN_CLIENT["job_seeker"]
+        domain = settings.DOMAIN_CLIENT["job_seeker"].rstrip("/")
 
         subject = f"Xác nhận ứng tuyển: {job_post.job_name}"
         to = [user.email]
@@ -307,7 +320,8 @@ class JobActivityService:
             "full_name": user.full_name,
             "company_name": company.company_name,
             "job_name": job_post.job_name,
-            "find_job_post_link": domain + "viec-lam",
+            "job_title": job_post.job_name,
+            "find_job_post_link": f"{domain}/viec-lam",
         }
 
         if email_notifications_enabled():
@@ -441,41 +455,72 @@ class JobActivityService:
         from shared.configs import variable_system as var_sys
         from console.jobs import queue_mail
 
-        if not email_notifications_enabled():
-            logger.info("Employer email skipped because email notifications are disabled.")
-            return
-
-        company = user.active_company
+        company = getattr(user, 'active_company', None) or getattr(activity.job_post, 'company', None)
         if not company:
-            logger.error("Cannot send email: Recruiter %s has no active company", user.email)
+            logger.error("Cannot send email: Recruiter %s has no active company", getattr(user, 'email', 'unknown'))
             return
 
         to = [validated_data.get("email")]
         is_send_me = validated_data.get("isSendMe", False)
 
-        if is_send_me:
+        if is_send_me and getattr(user, 'email', None):
             to.append(user.email)
 
+        candidate_name = validated_data.get("fullName") or activity.full_name or "Ứng viên"
+        job_title = activity.job_post.job_name if activity.job_post else "Vị trí tuyển dụng"
+
         email_data = {
+            'candidate_name': candidate_name,
+            'full_name': candidate_name,
             'content': validated_data.get("content"),
+            'message_content': validated_data.get("content"),
             'company_image': company.logo.get_full_url()
             if company.logo
             else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
             'company_name': company.company_name,
-            'company_phone': company.company_phone,
-            'company_email': company.company_email,
+            'company_phone': company.company_phone or getattr(user, 'phone', ''),
+            'company_email': company.company_email or getattr(user, 'email', ''),
+            'contact_email': company.company_email or getattr(user, 'email', ''),
+            'contact_phone': company.company_phone or getattr(user, 'phone', ''),
             'company_address': getattr(company.location, 'address', "") if company.location else "",
             'company_website_url': company.website_url,
+            'job_name': job_title,
+            'job_title': job_title,
+            'status': activity.get_status_display() if hasattr(activity, 'get_status_display') else "Đang xử lý",
         }
 
-        queue_mail.send_email_reply_job_seeker_task.delay(
-            to=to,
-            subject=validated_data.get("title"),
-            data=email_data,
-        )
+        # 1. Send Email (with Celery delay and direct synchronous fallback)
+        try:
+            queue_mail.send_email_reply_job_seeker_task.delay(
+                to=to,
+                subject=validated_data.get("title"),
+                data=email_data,
+            )
+        except Exception:
+            try:
+                queue_mail.send_email_reply_job_seeker_task(
+                    to=to,
+                    subject=validated_data.get("title"),
+                    data=email_data,
+                )
+            except Exception as mail_err:
+                logger.exception("Failed to send email reply to job seeker: %s", mail_err)
+
+        # 2. In-App Notification to Job Seeker
+        try:
+            if activity.user:
+                from shared.services.notification_service import NotificationService
+                NotificationService.add_apply_status_notifications(
+                    title=f"Thư phản hồi từ {company.company_name}",
+                    content=f"Nhà tuyển dụng {company.company_name} đã gửi email phản hồi cho bạn về hồ sơ ứng tuyển '{job_title}': {validated_data.get('title')}",
+                    image=company.logo.get_full_url() if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
+                    user_id=activity.user.id,
+                )
+        except Exception as notif_err:
+            logger.exception("Failed to push in-app notification for email reply: %s", notif_err)
 
         activity.is_sent_email = True
-        activity.save()
+        activity.save(update_fields=['is_sent_email'])
 
     @staticmethod
     def trigger_ai_analysis(activity: JobPostActivity, criteria: Any = None) -> None:
@@ -484,19 +529,20 @@ class JobActivityService:
         try:
             if isinstance(criteria, list):
                 activity.ai_analysis_criteria = criteria
-            analyze_resume_ai.delay(activity.id)
             activity.ai_analysis_status = 'processing'
             activity.ai_analysis_progress = 5
-            update_fields = ['ai_analysis_status', 'ai_analysis_progress', 'update_at']
+            activity.ai_analysis_summary = ""
+            update_fields = ['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at']
             if isinstance(criteria, list):
                 update_fields.append('ai_analysis_criteria')
             activity.save(update_fields=update_fields)
+
+            analyze_resume_ai.delay(activity.id)
         except Exception:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Không thể gửi tác vụ phân tích AI vào hàng đợi."
+            activity.ai_analysis_summary = "Không thể khởi tạo tác vụ phân tích AI. Vui lòng thử lại."
             activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
-            raise
 
     @staticmethod
     def get_employer_job_stats(company: Any) -> Dict[str, int]:

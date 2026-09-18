@@ -1,7 +1,7 @@
 // Jest globals: describe, it, expect
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { ROUTES, HOST_NAME, ROLES_NAME, AUTH_CONFIG } from '../../configs/constants';
+import { ROUTES, HOST_NAME, ROLES_NAME, AUTH_CONFIG } from '@/configs/constants';
 
 describe('Application Constants', () => {
   describe('HOST_NAME', () => {

@@ -1,0 +1,32 @@
+{
+  "rules": [
+    {
+      "ruleId": "BIZ-AUTH-001",
+      "name": "Unverified Account Pre-Flight Interception",
+      "description": "If user credentials exist but email is unverified, login redirects immediately to /email-verification-required without full token grant.",
+      "ownership": "SHARED_CONTRACT",
+      "verified": true
+    },
+    {
+      "ruleId": "BIZ-CANDIDATE-001",
+      "name": "CV Health Score Scale",
+      "description": "Calculates visual progress value as Math.min(viewedCount * 20, 100).",
+      "ownership": "FRONTEND_PRESENTATION_ONLY",
+      "verified": true
+    },
+    {
+      "ruleId": "BIZ-PROFILE-001",
+      "name": "Candidate Profile ↔ Primary Active Resume Synchronization",
+      "description": "Updates to candidate profile trigger bio & title updates to primary active website resume to prevent model split.",
+      "ownership": "SHARED_CONTRACT",
+      "verified": true
+    },
+    {
+      "ruleId": "BIZ-CONTENT-001",
+      "name": "Contact Message Auto-Population",
+      "description": "Pre-populates contact form with active authenticated user's name & email.",
+      "ownership": "FRONTEND_PRESENTATION_ONLY",
+      "verified": true
+    }
+  ]
+}

@@ -1,0 +1,413 @@
+{
+  "entities": {
+    "User": {
+      "backendService": "auth-service / user-service",
+      "frontendService": "authService",
+      "endpoints": [
+        "/api/v1/auth/user/",
+        "/api/v1/auth/avatar/"
+      ],
+      "idField": "id",
+      "roles": [
+        "JOB_SEEKER",
+        "EMPLOYER",
+        "ADMIN"
+      ],
+      "keyFields": [
+        "id",
+        "email",
+        "fullName",
+        "avatarUrl",
+        "coverUrl",
+        "roleName",
+        "isOnboarded"
+      ],
+      "routesConsuming": [
+        "/(candidate)/*",
+        "/employer/*",
+        "/admin/*",
+        "/login",
+        "/register"
+      ]
+    },
+    "Candidate": {
+      "backendService": "candidate-service",
+      "frontendService": "jobSeekerProfileService",
+      "endpoints": [
+        "/api/v1/job-seekers/profile/"
+      ],
+      "idField": "id",
+      "keyFields": [
+        "id",
+        "phone",
+        "birthday",
+        "gender",
+        "maritalStatus",
+        "isJobSeeking",
+        "location",
+        "user"
+      ],
+      "routesConsuming": [
+        "/(candidate)/dashboard",
+        "/(candidate)/profile",
+        "/(candidate)/account"
+      ]
+    },
+    "Job": {
+      "backendService": "job-post-service",
+      "frontendService": "jobService",
+      "endpoints": [
+        "/api/v1/job-posts/",
+        "/api/v1/info/web/job-posts/{slug}/"
+      ],
+      "idField": "id / slug",
+      "statusEnums": [
+        "PENDING",
+        "APPROVED",
+        "REJECTED",
+        "EXPIRED"
+      ],
+      "keyFields": [
+        "id",
+        "slug",
+        "title",
+        "company",
+        "city",
+        "salaryMin",
+        "salaryMax",
+        "currency",
+        "jobType",
+        "position",
+        "experience",
+        "deadline"
+      ],
+      "routesConsuming": [
+        "/jobs",
+        "/jobs/[slug]",
+        "/jobs-by-career",
+        "/jobs-by-city",
+        "/jobs-by-type",
+        "/(candidate)/dashboard",
+        "/(candidate)/my-jobs"
+      ]
+    },
+    "Company": {
+      "backendService": "company-service",
+      "frontendService": "companyService",
+      "endpoints": [
+        "/api/v1/companies/",
+        "/api/v1/companies/{slug}/",
+        "/api/v1/companies/followed/"
+      ],
+      "idField": "id / slug",
+      "keyFields": [
+        "id",
+        "slug",
+        "companyName",
+        "logoUrl",
+        "bannerUrl",
+        "companyEmail",
+        "companyPhone",
+        "taxCode",
+        "employeeSize",
+        "websiteUrl",
+        "address"
+      ],
+      "routesConsuming": [
+        "/companies",
+        "/companies/[slug]",
+        "/(candidate)/my-company",
+        "/(candidate)/dashboard"
+      ]
+    },
+    "Resume": {
+      "backendService": "resume-service",
+      "frontendService": "resumeService",
+      "endpoints": [
+        "/api/v1/resumes/",
+        "/api/v1/resumes/{slug}/"
+      ],
+      "idField": "id / slug",
+      "types": [
+        "WEBSITE",
+        "ATTACHED"
+      ],
+      "keyFields": [
+        "id",
+        "slug",
+        "title",
+        "description",
+        "resumeType",
+        "templateId",
+        "academicLevel",
+        "experience",
+        "career",
+        "city",
+        "advancedSkills",
+        "updateAt"
+      ],
+      "routesConsuming": [
+        "/(candidate)/profile",
+        "/(candidate)/dashboard",
+        "/online-profile/[slug]",
+        "/attached-profile/[slug]"
+      ]
+    },
+    "Profile": {
+      "backendService": "profile-service",
+      "frontendService": "jobSeekerProfileService",
+      "endpoints": [
+        "/api/v1/job-seekers/profile/"
+      ],
+      "idField": "id",
+      "keyFields": [
+        "id",
+        "isJobSeeking",
+        "phone",
+        "birthday",
+        "gender",
+        "maritalStatus",
+        "location"
+      ],
+      "routesConsuming": [
+        "/(candidate)/profile",
+        "/(candidate)/dashboard",
+        "/online-profile/[slug]"
+      ]
+    },
+    "Interview": {
+      "backendService": "interview-service",
+      "frontendService": "interviewService",
+      "endpoints": [
+        "/api/v1/interviews/my-interviews/",
+        "/api/v1/interviews/sessions/{id}/"
+      ],
+      "idField": "id / inviteToken",
+      "statusEnums": [
+        "SCHEDULED",
+        "CONFIRMED",
+        "IN_PROGRESS",
+        "COMPLETED",
+        "CANCELLED",
+        "EXPIRED"
+      ],
+      "keyFields": [
+        "id",
+        "jobName",
+        "companyName",
+        "inviteToken",
+        "roomName",
+        "status",
+        "scheduledAt",
+        "interviewType"
+      ],
+      "routesConsuming": [
+        "/(candidate)/my-interviews",
+        "/(candidate)/dashboard",
+        "/interview-room/:id"
+      ]
+    },
+    "Application": {
+      "backendService": "job-post-activity-service",
+      "frontendService": "jobPostActivityService",
+      "endpoints": [
+        "/api/v1/job-post-activities/"
+      ],
+      "idField": "id",
+      "statusEnums": [
+        "APPLIED",
+        "REVIEWING",
+        "INTERVIEW_INVITED",
+        "ACCEPTED",
+        "REJECTED"
+      ],
+      "keyFields": [
+        "id",
+        "jobPost",
+        "appliedAt",
+        "status",
+        "resume"
+      ],
+      "routesConsuming": [
+        "/(candidate)/my-jobs",
+        "/(candidate)/dashboard"
+      ]
+    },
+    "SavedJob": {
+      "backendService": "job-post-activity-service",
+      "frontendService": "jobPostActivityService",
+      "endpoints": [
+        "/api/v1/job-post-saved/"
+      ],
+      "idField": "id",
+      "keyFields": [
+        "id",
+        "jobPost",
+        "savedAt"
+      ],
+      "routesConsuming": [
+        "/(candidate)/my-jobs",
+        "/(candidate)/dashboard"
+      ]
+    },
+    "Notification": {
+      "backendService": "notification-service",
+      "frontendService": "notificationService",
+      "endpoints": [
+        "/api/v1/notifications/",
+        "/api/v1/notifications/read-all/"
+      ],
+      "idField": "id / key",
+      "types": [
+        "NEW_MESSAGE",
+        "APPLY_JOB",
+        "POST_VERIFY_REQUIRED",
+        "SYSTEM_ALERT"
+      ],
+      "keyFields": [
+        "id",
+        "title",
+        "content",
+        "type",
+        "is_read",
+        "created_at",
+        "target_url"
+      ],
+      "routesConsuming": [
+        "/notifications",
+        "/employer/notifications",
+        "/(candidate)/dashboard"
+      ]
+    },
+    "SearchAlert": {
+      "backendService": "job-post-notification-service",
+      "frontendService": "jobPostNotificationService",
+      "endpoints": [
+        "/api/v1/job-post-notifications/"
+      ],
+      "idField": "id",
+      "keyFields": [
+        "id",
+        "career",
+        "city",
+        "position",
+        "frequency",
+        "isActive"
+      ],
+      "routesConsuming": [
+        "/(candidate)/my-jobs",
+        "/jobs"
+      ]
+    },
+    "BlogPost": {
+      "backendService": "content-service / cms-service",
+      "frontendService": "contentService",
+      "endpoints": [
+        "/api/v1/articles/",
+        "/api/v1/articles/{slug}/"
+      ],
+      "idField": "id / slug",
+      "statusEnums": [
+        "DRAFT",
+        "PUBLISHED",
+        "ARCHIVED"
+      ],
+      "keyFields": [
+        "id",
+        "slug",
+        "title",
+        "excerpt",
+        "content",
+        "coverImage",
+        "author",
+        "category",
+        "tags",
+        "publishedAt",
+        "viewCount"
+      ],
+      "routesConsuming": [
+        "/blog",
+        "/tin-tuc",
+        "/blog/[slug]",
+        "/tin-tuc/[slug]"
+      ]
+    },
+    "BlogCategory": {
+      "backendService": "content-service",
+      "frontendService": "contentService",
+      "endpoints": [
+        "/api/v1/article-categories/"
+      ],
+      "idField": "id / slug",
+      "keyFields": [
+        "id",
+        "name",
+        "slug",
+        "description",
+        "articleCount"
+      ],
+      "routesConsuming": [
+        "/blog",
+        "/tin-tuc"
+      ]
+    },
+    "BlogAuthor": {
+      "backendService": "content-service",
+      "frontendService": "contentService",
+      "idField": "id",
+      "keyFields": [
+        "id",
+        "name",
+        "avatarUrl",
+        "bio"
+      ],
+      "routesConsuming": [
+        "/blog/[slug]",
+        "/tin-tuc/[slug]"
+      ]
+    },
+    "BlogTag": {
+      "backendService": "content-service",
+      "frontendService": "contentService",
+      "idField": "id / slug",
+      "keyFields": [
+        "id",
+        "name",
+        "slug"
+      ],
+      "routesConsuming": [
+        "/blog",
+        "/tin-tuc",
+        "/blog/[slug]"
+      ]
+    },
+    "ContactMessage": {
+      "backendService": "contact-service",
+      "frontendService": "contactMessageService",
+      "endpoints": [
+        "/api/v1/contact-messages/"
+      ],
+      "idField": "id",
+      "categories": [
+        "bug_report",
+        "feedback",
+        "support"
+      ],
+      "keyFields": [
+        "id",
+        "category",
+        "subject",
+        "pageUrl",
+        "name",
+        "email",
+        "phone",
+        "content",
+        "createdAt"
+      ],
+      "routesConsuming": [
+        "/contact",
+        "/lien-he"
+      ]
+    }
+  }
+}

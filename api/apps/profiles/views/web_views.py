@@ -10,7 +10,7 @@ from shared.configs import variable_response as var_res
 
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 
-from django.db.models import Count, Q, Prefetch
+from django.db.models import Count, Q, Prefetch, Case, When, Value, IntegerField, F, ExpressionWrapper
 
 from django.db import transaction
 from django.utils import timezone
@@ -139,7 +139,15 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
 
         query_params = request.query_params
 
-        resume_type = query_params.get("resumeType", None)
+        raw_type = query_params.get("resumeType", None) or query_params.get("type", None)
+        resume_type = None
+        if raw_type is not None:
+            if str(raw_type).upper() == "WEBSITE" or str(raw_type) == "1":
+                resume_type = var_sys.CV_WEBSITE
+            elif str(raw_type).upper() == "UPLOAD" or str(raw_type) == "2":
+                resume_type = var_sys.CV_UPLOAD
+            else:
+                resume_type = raw_type
 
         job_seeker_profile = JobSeekerProfile.objects.filter(pk=pk, user=request.user).first()
 
@@ -152,53 +160,114 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
         resumes = job_seeker_profile.resumes
 
         # get all
-
         if resume_type is None:
-
             serializer = ResumeSerializer(resumes, many=True, fields=[
-
-                "id", "slug", "title", "type", "updateAt", "isActive"
-
+                "id", "slug", "title", "type", "updateAt", "fileUrl", "imageUrl", "isActive"
             ])
 
         else:
-
             # get by type
-
             if not (resume_type == var_sys.CV_WEBSITE) and not (resume_type == var_sys.CV_UPLOAD):
-
                 return var_res.response_data(status=status.HTTP_400_BAD_REQUEST,
-
                                              errors={"detail": "resumeType is invalid."})
 
             resumes = resumes.filter(type=resume_type)
 
             if resume_type == var_sys.CV_WEBSITE:
+                resume_obj = resumes.filter(type=var_sys.CV_WEBSITE).first()
+                if not resume_obj:
+                    # Check if candidate has any existing resume (e.g. from onboarding where type was set to CV_UPLOAD)
+                    donor_resume = job_seeker_profile.resumes.order_by('-update_at').first()
+                    if donor_resume:
+                        donor_resume.type = var_sys.CV_WEBSITE
+                        donor_resume.save(update_fields=['type', 'update_at'])
+                        resume_obj = donor_resume
+                    else:
+                        user_label = getattr(job_seeker_profile.user, 'full_name', None) or getattr(job_seeker_profile.user, 'email', '')
+                        resume_obj = Resume.objects.create(
+                            user=job_seeker_profile.user,
+                            job_seeker_profile=job_seeker_profile,
+                            type=var_sys.CV_WEBSITE,
+                            title=f"Hồ sơ trực tuyến của {user_label}".strip()
+                        )
+                else:
+                    # Check if another resume has more complete onboarding data
+                    donor_resume = job_seeker_profile.resumes.exclude(id=resume_obj.id).order_by('-update_at').first()
+                    if donor_resume:
+                        needs_repair = (
+                            not resume_obj.career_id or
+                            not resume_obj.city_id or
+                            (resume_obj.title and resume_obj.title.startswith("Hồ sơ trực tuyến của")) or
+                            resume_obj.advanced_skills.count() < donor_resume.advanced_skills.count()
+                        )
+                        if needs_repair:
+                            if not resume_obj.career_id and donor_resume.career_id:
+                                resume_obj.career = donor_resume.career
+                            if not resume_obj.city_id and donor_resume.city_id:
+                                resume_obj.city = donor_resume.city
+                            if (resume_obj.title and resume_obj.title.startswith("Hồ sơ trực tuyến của")) and donor_resume.title:
+                                resume_obj.title = donor_resume.title
+                            if (not resume_obj.experience or resume_obj.experience == 1) and donor_resume.experience:
+                                resume_obj.experience = donor_resume.experience
+                            if (not resume_obj.academic_level or resume_obj.academic_level == 1) and donor_resume.academic_level:
+                                resume_obj.academic_level = donor_resume.academic_level
+                            if not resume_obj.type_of_workplace and donor_resume.type_of_workplace:
+                                resume_obj.type_of_workplace = donor_resume.type_of_workplace
+                            if not resume_obj.salary_min and donor_resume.salary_min:
+                                resume_obj.salary_min = donor_resume.salary_min
+                            if not resume_obj.salary_max and donor_resume.salary_max:
+                                resume_obj.salary_max = donor_resume.salary_max
+                            if not resume_obj.expected_salary and donor_resume.expected_salary:
+                                resume_obj.expected_salary = donor_resume.expected_salary
+                            if donor_resume.skills_summary and (not resume_obj.skills_summary or resume_obj.skills_summary != donor_resume.skills_summary):
+                                resume_obj.skills_summary = donor_resume.skills_summary
+                            if donor_resume.file and not resume_obj.file:
+                                f = donor_resume.file
+                                donor_resume.file = None
+                                donor_resume.save(update_fields=['file'])
+                                resume_obj.file = f
 
-                if not resumes.first():
+                            donor_skills = list(donor_resume.advanced_skills.all())
+                            if len(donor_skills) > resume_obj.advanced_skills.count():
+                                for s in donor_skills:
+                                    AdvancedSkill.objects.get_or_create(resume=resume_obj, name=s.name, defaults={'level': s.level})
 
-                    return var_res.response_data()
+                            resume_obj.save()
+                            if donor_resume.is_active:
+                                donor_resume.is_active = False
+                                donor_resume.save(update_fields=['is_active'])
 
-                serializer = ResumeSerializer(resumes.first(),
+                # Bidirectional profile synchronization
+                if resume_obj:
+                    if resume_obj.city_id and (not job_seeker_profile.location or not job_seeker_profile.location.city_id):
+                        if not job_seeker_profile.location:
+                            job_seeker_profile.location = Location.objects.create(city=resume_obj.city)
+                            job_seeker_profile.save(update_fields=['location'])
+                        else:
+                            job_seeker_profile.location.city = resume_obj.city
+                            job_seeker_profile.location.save(update_fields=['city'])
 
-                                              fields=["id", "slug", "title", "experience", "position",
+                    if not job_seeker_profile.phone and job_seeker_profile.user.phone_number:
+                        job_seeker_profile.phone = job_seeker_profile.user.phone_number
+                        job_seeker_profile.save(update_fields=['phone'])
+                    elif not job_seeker_profile.user.phone_number and job_seeker_profile.phone:
+                        job_seeker_profile.user.phone_number = job_seeker_profile.phone
+                        job_seeker_profile.user.save(update_fields=['phone_number'])
 
-                                                      "salaryMin", "salaryMax", "updateAt", "user", "isActive",
 
+                serializer = ResumeSerializer(resume_obj,
+                                              fields=["id", "slug", "title", "description", "career", "city",
+                                                      "academicLevel", "experience", "position",
+                                                      "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
+                                                      "updateAt", "user", "isActive", "file", "fileUrl", "fileDict", "imageUrl",
                                                       "positionChooseData", "experienceChooseData", "academicLevelChooseData",
-
-                                                      "typeOfWorkplaceChooseData", "jobTypeChooseData",
-
+                                                      "typeOfWorkplaceChooseData", "jobTypeChooseData", "careerChooseData", "cityChooseData",
                                                       "experienceDetails", "educationDetails", "certificateDetails",
-
                                                       "languageSkills", "advancedSkills"])
 
             else:
-
                 serializer = ResumeSerializer(resumes, many=True,
-
                                               fields=["id", "slug", "title", "updateAt",
-
                                                       "imageUrl", "fileUrl", "isActive"])
 
         return var_res.response_data(data=serializer.data)
@@ -237,17 +306,36 @@ class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,
     }
     default_permission_classes = [perms_sys.IsAuthenticated]
 
+    def get_object(self):
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_val = self.kwargs.get(lookup_url_kwarg)
+        queryset = self.filter_queryset(self.get_queryset())
+        if lookup_val is not None and str(lookup_val).isdigit():
+            obj = queryset.filter(Q(pk=int(lookup_val)) | Q(slug=lookup_val)).first()
+        else:
+            obj = queryset.filter(slug=lookup_val).first()
+        if not obj:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Resume not found.")
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def create(self, request, *args, **kwargs):
 
-        data = request.data.copy()
+        data = {k: v for k, v in request.data.items()} if hasattr(request.data, 'items') else dict(request.data)
+        if "file" in request.FILES:
+            data["file"] = request.FILES["file"]
+        if not data.get("title") and data.get("file"):
+            file_name = getattr(data["file"], "name", "")
+            data["title"] = file_name.rsplit(".", 1)[0] if file_name else "Hồ sơ ứng tuyển"
 
         serializer = ResumeSerializer(data=data, fields=[
 
-            "title", "description", "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
+            "id", "slug", "title", "description", "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
 
             "position", "experience", "academicLevel", "typeOfWorkplace",
 
-            "jobType", "city", "career", "file"
+            "jobType", "city", "career", "file", "fileUrl", "type", "updateAt", "isActive"
 
         ], context={'request': request})
 
@@ -477,6 +565,11 @@ class ResumeViewSet(viewsets.ViewSet,
 
     permission_classes = [perms_custom.CanManageCandidates]
 
+    def get_permissions(self):
+        if self.action in ["semantic_match"]:
+            return [perms_custom.IsEmployerOrAdminUser()]
+        return super().get_permissions()
+
     renderer_classes = [renderers.MyJSONRenderer]
 
     pagination_class = paginations.CustomPagination
@@ -493,6 +586,27 @@ class ResumeViewSet(viewsets.ViewSet,
 
     lookup_field = "slug"
 
+    def get_object(self):
+        queryset = self.get_queryset()
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs.get(lookup_url_kwarg)
+
+        if not lookup_value:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Hồ sơ không tồn tại.")
+
+        if str(lookup_value).isdigit():
+            obj = queryset.filter(Q(id=int(lookup_value)) | Q(slug=str(lookup_value))).first()
+        else:
+            obj = queryset.filter(slug=str(lookup_value)).first()
+
+        if not obj:
+            from rest_framework.exceptions import NotFound
+            raise NotFound("Hồ sơ không tồn tại.")
+
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def get_serializer_class(self):
 
         if self.action in ["retrieve"]:
@@ -504,9 +618,101 @@ class ResumeViewSet(viewsets.ViewSet,
     def list(self, request, *args, **kwargs):
         user = request.user
         company = user.active_company if getattr(user, 'is_authenticated', False) else None
+
+        active_career_ids = []
+        active_city_ids = []
+        active_exp_ids = []
+        job_keywords = []
+        target_job = None
+
+        if company:
+            from apps.jobs.models import JobPost
+            job_post_id = request.query_params.get('jobPostId') or request.query_params.get('job_post_id')
+            if job_post_id and str(job_post_id).isdigit():
+                target_job = JobPost.objects.filter(company=company, id=int(job_post_id)).first()
+
+            if target_job:
+                if target_job.career_id:
+                    active_career_ids = [target_job.career_id]
+                if target_job.location and target_job.location.city_id:
+                    active_city_ids = [target_job.location.city_id]
+                if target_job.experience:
+                    active_exp_ids = [target_job.experience]
+                
+                job_names = [target_job.job_name]
+            else:
+                active_jobs = JobPost.objects.filter(
+                    company=company,
+                    status=var_sys.JobPostStatus.APPROVED
+                )
+                if not active_jobs.exists():
+                    active_jobs = JobPost.objects.filter(company=company)
+                
+                active_career_ids = list(
+                    active_jobs.exclude(career__isnull=True)
+                    .values_list('career_id', flat=True)
+                    .distinct()
+                )
+                active_city_ids = list(
+                    active_jobs.exclude(location__city__isnull=True)
+                    .values_list('location__city_id', flat=True)
+                    .distinct()
+                )
+                active_exp_ids = list(
+                    active_jobs.exclude(experience__isnull=True)
+                    .values_list('experience', flat=True)
+                    .distinct()
+                )
+                job_names = list(active_jobs.values_list('job_name', flat=True))
+
+            ignored_words = {"nhân", "viên", "thực", "tập", "công", "ty", "tại", "cho", "vị", "trí", "tuyển", "dụng", "dự", "án"}
+            for jn in job_names:
+                if jn:
+                    for term in jn.replace('/', ' ').replace('-', ' ').replace('(', ' ').replace(')', ' ').split():
+                        clean_term = term.strip()
+                        if len(clean_term) >= 3 and clean_term.lower() not in ignored_words:
+                            if clean_term.lower() not in [k.lower() for k in job_keywords]:
+                                job_keywords.append(clean_term)
+
+        base_qs = self.get_queryset().filter(is_active=True).filter(
+            Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True)
+        )
+
+        career_whens = [When(career_id__in=active_career_ids, then=Value(35))] if active_career_ids else []
+        city_whens = [When(city_id__in=active_city_ids, then=Value(20))] if active_city_ids else []
+        exp_whens = [When(experience__in=active_exp_ids, then=Value(20))] if active_exp_ids else []
+        kw_whens = [When(title__icontains=kw, then=Value(15)) for kw in job_keywords[:10]]
+
+        if career_whens or city_whens or exp_whens or kw_whens:
+            base_qs = base_qs.annotate(
+                score_career=Case(*career_whens, default=Value(0), output_field=IntegerField()),
+                score_city=Case(*city_whens, default=Value(0), output_field=IntegerField()),
+                score_exp=Case(*exp_whens, default=Value(0), output_field=IntegerField()),
+                score_kw=Case(*kw_whens, default=Value(0), output_field=IntegerField()),
+            ).annotate(
+                match_score=ExpressionWrapper(
+                    F('score_career') + F('score_city') + F('score_exp') + F('score_kw'),
+                    output_field=IntegerField()
+                )
+            )
+        else:
+            base_qs = base_qs.annotate(
+                match_score=Value(0, output_field=IntegerField())
+            )
+
+        ai_suggested = request.query_params.get('aiSuggested', '').lower() in ['true', '1']
+        if ai_suggested and (career_whens or city_whens or exp_whens or kw_whens):
+            base_qs = base_qs.filter(match_score__gte=20)
+
+        sort_param = request.query_params.get('sort', '').lower()
+        ordering_param = request.query_params.get('ordering', '')
+        if sort_param == 'newest' or ordering_param in ['-update_at', '-updateAt']:
+            order_args = ('-update_at', '-create_at', '-id')
+        else:
+            order_args = ('-match_score', '-update_at', '-id')
+
         queryset = self.filter_queryset(
-            self.get_queryset()
-            .filter(is_active=True)
+            base_qs
             .prefetch_related(
                 Prefetch(
                     'resumesaved_set',
@@ -525,89 +731,74 @@ class ResumeViewSet(viewsets.ViewSet,
                     queryset=JobPostActivity.objects.filter(job_post__company=company, is_deleted=False).select_related('job_post').order_by('-create_at') if company else JobPostActivity.objects.none(),
                 ),
             )
-            .order_by('-id', 'update_at', 'create_at')
+            .order_by(*order_args)
         )
 
         page = self.paginate_queryset(queryset)
 
         if page is not None:
-
             serializer = self.get_serializer(page, many=True, fields=[
-
                 'id', 'slug', 'title', 'salaryMin', 'salaryMax',
-
                 'experience', 'viewEmployerNumber', 'updateAt',
-
                 'userDict', 'jobSeekerProfileDict', 'city',
-
-                'isSaved', 'type', 'lastViewedDate'
-
+                'isSaved', 'type', 'lastViewedDate', 'matchScore'
             ])
 
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
-
         return var_res.response_data(data=serializer.data)
 
     @action(methods=["post"], detail=True,
-
             url_path="resume-saved", url_name="resume-saved")
-
-    def resume_saved(self, request, slug):
-
+    def resume_saved(self, request, slug=None):
         user = request.user
-
-        saved_resumes = ResumeSaved.objects.filter(
-
-            company=user.active_company, resume=self.get_object())
-
-        is_saved = False
-
-        if saved_resumes.exists():
-
-            saved_resume = saved_resumes.first()
-
-            saved_resume.delete()
-
-        else:
-
-            ResumeSaved.objects.create(
-
-                company=request.user.active_company,
-
-                resume=self.get_object()
-
+        company = user.get_active_company() if hasattr(user, 'get_active_company') else getattr(user, 'active_company', None)
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["Vui lòng chọn công ty để thực hiện thao tác này."]}
             )
 
+        resume_obj = self.get_object()
+        saved_resumes = ResumeSaved.objects.filter(
+            company=company, resume=resume_obj)
+
+        is_saved = False
+        if saved_resumes.exists():
+            saved_resume = saved_resumes.first()
+            saved_resume.delete()
+        else:
+            ResumeSaved.objects.create(
+                company=company,
+                resume=resume_obj
+            )
             is_saved = True
 
-        # send notification
+        # Send notification via Celery async queue
+        try:
+            notification_content = NOTIFICATION_MESSAGES[
+                'RESUME_SAVED'] if is_saved else NOTIFICATION_MESSAGES['RESUME_UNSAVED']
 
-        company = user.active_company
+            logo_url = var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+            if company and company.logo:
+                if hasattr(company.logo, 'get_full_url'):
+                    try:
+                        logo_url = company.logo.get_full_url()
+                    except Exception:
+                        pass
 
-        notification_content = NOTIFICATION_MESSAGES[
-
-            'RESUME_SAVED'] if is_saved else NOTIFICATION_MESSAGES['RESUME_UNSAVED']
-
-        helper.add_employer_saved_resume_notifications(
-
-            company.company_name,
-
-            notification_content,
-
-            company.logo.get_full_url(
-
-            ) if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
-
-            self.get_object().user_id
-
-        )
+            helper.add_employer_saved_resume_notifications(
+                company.company_name if company else "Công ty",
+                notification_content,
+                logo_url,
+                resume_obj.user_id
+            )
+        except Exception as ex:
+            helper.print_log_error("ResumeSavedViewSet.toggle_save_resume.notify", ex)
 
         return var_res.response_data(data={
-
             "isSaved": is_saved
-
         })
 
     @action(methods=["post"], detail=True,
@@ -699,6 +890,35 @@ class ResumeViewSet(viewsets.ViewSet,
             )
 
         return var_res.response_data()
+
+    @action(methods=["post", "get"], detail=True,
+            url_path="semantic-match", url_name="semantic-match")
+    def semantic_match(self, request, slug=None):
+        user = request.user
+        company = user.get_active_company() if hasattr(user, 'get_active_company') else getattr(user, 'active_company', None)
+        resume_obj = self.get_object()
+
+        job_post_id = (
+            request.data.get("job_post_id")
+            or request.query_params.get("job_post_id")
+            or request.data.get("jobPostId")
+            or request.query_params.get("jobPostId")
+        )
+        manual_jd_text = request.data.get("jd_text") or request.data.get("manual_job_text", "")
+
+        from apps.jobs.models import JobPost
+        job_post = None
+        if job_post_id and str(job_post_id).isdigit():
+            job_post = JobPost.objects.filter(id=int(job_post_id)).first()
+        elif company:
+            job_post = JobPost.objects.filter(company=company).order_by('-create_at').first()
+
+        from apps.profiles.services.semantic_matching import evaluate_cv_jd_semantic_match
+        result = evaluate_cv_jd_semantic_match(resume=resume_obj, job_post=job_post, manual_job_text=manual_jd_text)
+        if job_post:
+            result["job_name"] = job_post.job_name
+            result["job_post_id"] = job_post.id
+        return var_res.response_data(data=result)
 
 
 class EmployerCandidateProfileViewSet(viewsets.ModelViewSet):
@@ -855,40 +1075,38 @@ class ResumeSavedViewSet(viewsets.ViewSet,
             return var_res.response_data(data=serializer.data)
         except Exception as ex:
             helper.print_log_error("ResumeSavedViewSet.list", ex)
-            return var_res.response_data(data=self._empty_result())
+            return var_res.response_data(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                errors={"detail": "Không thể tải danh sách hồ sơ đã lưu."}
+            )
 
     @action(methods=["get"], detail=False,
-
             url_path="export", url_name="resumes-export")
-
     def export_resumes(self, request):
         try:
             user = request.user
-
             company = user.get_active_company()
-
             if not company:
-
-                return var_res.response_data(data=[])
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"detail": "Tài khoản chưa liên kết doanh nghiệp."}
+                )
 
             queryset = self.filter_queryset(self.get_queryset()
-
                                             .filter(company=company,
-
                                                     resume__is_active=True)
-
                                             .order_by("-create_at"))
 
             serializer = ResumeSavedExportSerializer(queryset, many=True)
-
             result_data = utils.convert_data_with_en_key_to_vn_kew(serializer.data,
-
                                                                    table_export.RESUMES_EXPORT_FIELD)
-
             return var_res.response_data(data=result_data)
         except Exception as ex:
             helper.print_log_error("ResumeSavedViewSet.export_resumes", ex)
-            return var_res.response_data(data=[])
+            return var_res.response_data(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                errors={"detail": "Không thể xuất danh sách hồ sơ."}
+            )
 
 class EducationDetailViewSet(viewsets.ViewSet,
 

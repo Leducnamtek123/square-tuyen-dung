@@ -18,9 +18,9 @@ import {
   Typography,
 } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import ImageCropDialog from '../../../components/Common/ImageCropDialog';
-import { IMAGES } from '../../../configs/constants';
-import type { Banner } from '../../../types/models';
+import ImageCropDialog from '@/components/Common/ImageCropDialog';
+import { IMAGES } from '@/configs/constants';
+import type { Banner } from '@/types/models';
 import {
   getBannerFormValidationErrors,
   type BannerChoiceOption,
@@ -82,14 +82,14 @@ const ImagePreview = ({
           width,
           height: 80,
           borderRadius: 1,
-          border: '1px dashed',
-          borderColor: 'divider',
+          border: '1px solid',
+          borderColor: '#E2E8F0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'text.secondary',
           fontSize: 13,
-          bgcolor: 'action.hover',
+          bgcolor: '#F8FAFC',
         }}
       >
         {emptyText}
@@ -125,12 +125,13 @@ const ImagePreview = ({
           width,
           height: 80,
           borderRadius: 1,
-          border: '1px dashed',
-          borderColor: 'divider',
+          border: '1px solid',
+          borderColor: '#E2E8F0',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'text.secondary',
           fontSize: 13,
+          bgcolor: '#F8FAFC',
         }}
       >
         {errorText}
@@ -187,8 +188,8 @@ const BannerFormDialog = ({
     <>
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{dialogMode === 'add' ? t('pages.banners.addTitle') : t('pages.banners.editTitle')}</DialogTitle>
-      <DialogContent>
-        <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <DialogContent sx={{ pt: '20px !important' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
             label={t('pages.banners.form.description')}
             fullWidth

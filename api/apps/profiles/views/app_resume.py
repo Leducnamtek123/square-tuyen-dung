@@ -62,7 +62,12 @@ class PrivateResumeViewSet(
     default_permission_classes = [perms_sys.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        data = request.data.copy()
+        data = {k: v for k, v in request.data.items()} if hasattr(request.data, 'items') else dict(request.data)
+        if "file" in request.FILES:
+            data["file"] = request.FILES["file"]
+        if not data.get("title") and data.get("file"):
+            file_name = getattr(data["file"], "name", "")
+            data["title"] = file_name.rsplit(".", 1)[0] if file_name else "Hồ sơ ứng tuyển"
 
         serializer = ResumeSerializer(
             data=data,

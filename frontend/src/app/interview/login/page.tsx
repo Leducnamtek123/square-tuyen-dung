@@ -1,10 +1,11 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import DefaultLayout from '@/layouts/DefaultLayout';
 import CandidateLoginPage from '@/views/jobSeekerPages/CandidateLoginPage';
 
-export const metadata = {
-  title: 'Interview Login',
-  description: 'Browse Interview Login.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('interview.login');
+}
 
 export default function Page() {
   return (

@@ -17,11 +17,17 @@ export const unwrapDataResponse = <T>(raw: unknown, maxDepth = 3): T => {
   let value = raw;
 
   for (let depth = 0; depth < maxDepth; depth += 1) {
-    if (!isObject(value) || !Object.prototype.hasOwnProperty.call(value, 'data')) {
+    if (!isObject(value) || !('data' in (value as object))) {
       break;
     }
 
-    value = value.data;
+    // If value is already a paginated container with count & data array, do not peel off count
+    const obj = value as Record<string, unknown>;
+    if (typeof obj.count === 'number' && Number.isFinite(obj.count) && Array.isArray(obj.data)) {
+      break;
+    }
+
+    value = obj.data;
   }
 
   return value as T;
@@ -37,26 +43,72 @@ export const normalizePaginatedResponse = <T>(raw: unknown): PaginatedResponse<T
     return { count: 0, results: [] };
   }
 
-  const obj = raw as PaginatedLike<T>;
-  const nested = isObject(obj.data) ? obj.data : null;
-  const nestedItems = nested ? asItems<T>((nested as { data?: unknown }).data) : null;
-  const nestedData = nested && isObject((nested as { data?: unknown }).data)
-    ? (nested as { data?: unknown }).data
-    : null;
+  let current: unknown = raw;
+  for (let depth = 0; depth < 4; depth += 1) {
+    if (!isObject(current)) break;
 
-  const results =
-    asItems<T>(obj.results) ||
-    asItems<T>(obj.data) ||
-    (nested ? asItems<T>((nested as Partial<PaginatedResponse<T>>).results) : null) ||
-    nestedItems ||
-    (nestedData ? asItems<T>((nestedData as Partial<PaginatedResponse<T>>).results) : null) ||
-    [];
+    const countVal = asCount(current.count);
+    const resultsVal = asItems<T>(current.results) || asItems<T>(current.data) || asItems<T>(current.items);
 
-  const count =
-    asCount(obj.count) ??
-    (nested ? asCount((nested as Partial<PaginatedResponse<T>>).count) : null) ??
-    (nestedData ? asCount((nestedData as Partial<PaginatedResponse<T>>).count) : null) ??
-    results.length;
+    // If this level has a finite count and items array, return it directly
+    if (countVal !== null && resultsVal !== null) {
+      return { count: countVal, results: resultsVal };
+    }
 
-  return { count, results };
+    // If current contains 'data', drill down while checking if it has count attached
+    if ('data' in current) {
+      const nested = (current as Record<string, unknown>).data;
+      const nestedItems = asItems<T>(nested);
+      if (nestedItems) {
+        const count = countVal !== null ? countVal : nestedItems.length;
+        return { count, results: nestedItems };
+      }
+      current = nested;
+    } else {
+      break;
+    }
+  }
+
+  if (asItems<T>(current)) {
+    const items = asItems<T>(current)!;
+    return { count: items.length, results: items };
+  }
+
+  if (isObject(current)) {
+    const results =
+      asItems<T>(current.results) ||
+      asItems<T>(current.data) ||
+      asItems<T>(current.items);
+    if (results !== null) {
+      const count = asCount(current.count) ?? results.length;
+      return { count, results };
+    }
+    if ('id' in current || 'slug' in current) {
+      return { count: 1, results: [current as unknown as T] };
+    }
+    return { count: 0, results: [] };
+  }
+
+  return { count: 0, results: [] };
+};
+
+export const getApiErrorMessage = (error: unknown, fallbackMessage: string): string => {
+  if (error && typeof error === 'object') {
+    const errObj = error as {
+      response?: {
+        data?: {
+          detail?: string;
+          message?: string;
+          error?: { message?: string; details?: unknown };
+        };
+      };
+      message?: string;
+    };
+    const responseData = errObj.response?.data;
+    if (responseData?.error?.message && typeof responseData.error.message === 'string') {
+      return responseData.error.message;
+    }
+    return responseData?.detail || responseData?.message || errObj.message || fallbackMessage;
+  }
+  return fallbackMessage;
 };

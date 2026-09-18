@@ -9,7 +9,7 @@ type Props = {
 };
 
 const CVDocSkillsSection = ({ title, items, styles }: Props) => {
-  if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) return <View style={{ height: 0 }} />;
 
   return (
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
@@ -17,8 +17,8 @@ const CVDocSkillsSection = ({ title, items, styles }: Props) => {
       <View style={styles.skillsWrapper}>
         <View style={styles.skillsGrid}>
           {items.map((skill) => (
-            <View key={`${skill?.name || 'skill'}-${skill?.level ?? 'level'}`} style={styles.skillItem}>
-              <Text>{skill?.name} ({skill?.level}/5)</Text>
+            <View key={String(skill?.id)} style={styles.skillItem}>
+              <Text>{skill?.name || ''} ({skill?.level ?? 0}/5)</Text>
             </View>
           ))}
         </View>

@@ -1,7 +1,7 @@
 'use client';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'next/navigation';
-import InterviewCreateCard from '../../components/employers/InterviewCreateCard';
+import InterviewCreateCard from '@/views/components/employers/InterviewCreateCard';
 
 const InterviewEditPage = () => {
     const { t } = useTranslation('employer');

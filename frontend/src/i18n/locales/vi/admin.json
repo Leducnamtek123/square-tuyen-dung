@@ -92,8 +92,8 @@
   },
   "sidebar": {
     "systemOverview": "Tổng quan",
-    "agentAssistants": "Agent Assistants",
-    "systemAndUsers": "Người dùng & HT",
+    "agentAssistants": "Trợ lý AI AILA",
+    "systemAndUsers": "Hệ thống & Người dùng",
     "usersAndPermissions": "Phân quyền",
     "systemConfiguration": "Cấu hình hệ thống",
     "auditLogs": "Nhật ký hệ thống",
@@ -114,18 +114,33 @@
     "questionBank": "Ngân hàng câu hỏi",
     "interviewQuestionSets": "Bộ câu hỏi",
     "interviewSchedule": "Lịch phỏng vấn",
-    "interviewLive": "Phỏng vấn Live",
+    "interviewLive": "Phỏng vấn trực tiếp",
     "jobNotifications": "Thông báo việc làm",
     "contentManagement": "Quản lý nội dung",
     "bannersManagement": "Quản lý Banner",
     "bannerTypes": "Loại banner",
-    "feedbacksManagement": "Quản lý đánh giá người dùng",
-    "contactMessages": "Báo lỗi & tin nhắn liên hệ",
+    "feedbacksManagement": "Đánh giá người dùng",
+    "contactMessages": "Báo lỗi & liên hệ",
     "articlesManagement": "Tin tức & Blog",
     "chatWithEmployers": "Kết nối với nhà tuyển dụng",
     "voiceProfiles": "Hồ sơ giọng nói AI",
-    "interviewPreview": "Xem trước giao diện phỏng vấn",
-    "squareHrmAdmin": "Mở InfoHR HRM"
+    "interviewPreview": "Xem trước phòng PV",
+    "squareHrmAdmin": "Quản trị nhân sự",
+    "aiAgents": "Trợ lý AI",
+    "articles": "Bài viết",
+    "banners": "Banner quảng cáo",
+    "careers": "Ngành nghề",
+    "cities": "Tỉnh / Thành phố",
+    "companies": "Công ty",
+    "dashboard": "Bảng điều khiển",
+    "hrmDashboard": "HRM Tổng quan",
+    "hrmEmployees": "HRM Nhân viên",
+    "hrmOrgChart": "HRM Sơ đồ tổ chức",
+    "jobs": "Tin tuyển dụng",
+    "questions": "Ngân hàng câu hỏi",
+    "settings": "Cài đặt hệ thống",
+    "users": "Người dùng",
+    "verifications": "Xác thực công ty"
   },
   "aiHealth": {
     "title": "Dịch vụ AI",
@@ -150,7 +165,7 @@
       "addConfirmTitle": "Thêm ngành nghề mới",
       "editConfirmTitle": "Sửa ngành nghề",
       "careerNameLabel": "Tên ngành nghề",
-      "iconLabel": "Biểu tượng (App)",
+      "iconLabel": "Biểu tượng ứng dụng",
       "keyCareerLabel": "Ngành nghề trọng điểm",
       "keyCareerBadge": "Trọng điểm",
       "uploadIconBtn": "Tải ảnh đại diện",
@@ -588,12 +603,17 @@
         "updateSuccess": "Đã cập nhật hồ sơ",
         "updateError": "Không thể cập nhật hồ sơ",
         "deleteSuccess": "Đã xóa hồ sơ",
-        "deleteError": "Không thể xóa hồ sơ"
+        "deleteError": "Không thể xóa hồ sơ",
+        "bulkDeleteSuccess": "Đã xóa các hồ sơ thành công.",
+        "importQueued": "Đã thêm tiến trình nhập hồ sơ vào hàng đợi.",
+        "importError": "Không thể khởi tạo tiến trình nhập hồ sơ.",
+        "importSuccess": "Imported {{created}} new candidates, updated {{updated}} profiles, skipped {{skipped}}."
       },
       "addCandidate": "Thêm ứng viên",
       "searchPlaceholder": "Tìm kiếm ứng viên...",
       "filter": {
-        "title": "Bộ lọc hồ sơ"
+        "title": "Bộ lọc hồ sơ",
+        "helper": "Lọc danh sách hồ sơ ứng viên"
       },
       "addTitle": "Thêm hồ sơ ứng viên mới",
       "editTitle": "Sửa hồ sơ ứng viên",
@@ -643,7 +663,31 @@
       "breadcrumbResources": "Tài nguyên",
       "breadcrumbProfiles": "Hồ sơ",
       "deleteConfirm": "Sẽ xóa vĩnh viễn, tiếp tục?",
-      "cancel": "Hủy"
+      "cancel": "Hủy",
+      "import": {
+        "openButton": "Nhập hồ sơ CV",
+        "dialogTitle": "Nhập hồ sơ ứng viên từ hệ thống",
+        "accountLabel": "Tài khoản nguồn",
+        "passwordLabel": "Mật khẩu",
+        "careerLabel": "Ngành nghề mặc định",
+        "careerPlaceholder": "Chọn ngành nghề...",
+        "cancel": "Hủy bỏ",
+        "importing": "Đang nhập...",
+        "confirm": "Bắt đầu nhập",
+        "completedTitle": "Nhập hoàn tất",
+        "failedTitle": "Nhập thất bại",
+        "processingTitle": "Đang xử lý nhập hồ sơ",
+        "completedMessage": "Đã nhập thành công các hồ sơ CV.",
+        "failedMessage": "Có lỗi xảy ra trong quá trình nhập hồ sơ.",
+        "processingMessage": "Hệ thống đang tiến hành xử lý hồ sơ nền...",
+        "sourceUrlLabel": "Đường dẫn nguồn ứng viên"
+      },
+      "bulkSelect": {
+        "selectedCount": "Đã chọn {{count}} hồ sơ",
+        "deleteBtn": "Xóa các mục đã chọn",
+        "deleteTitle": "Xác nhận xóa hàng loạt",
+        "deleteConfirm": "Bạn có chắc chắn muốn xóa các hồ sơ đã chọn? Hành động này không thể hoàn tác."
+      }
     },
     "questionGroups": {
       "title": "Quản lý Nhóm câu hỏi",
@@ -724,8 +768,8 @@
         "lastUpdate": "Cập nhật lần cuối",
         "status": "Trạng thái",
         "actions": "Thao tác",
-        "uploadedFile": "Tệp tải lên",
-        "onlineProfile": "Hồ sơ trực tuyến",
+        "uploadedFile": "File đính kèm",
+        "onlineProfile": "Hồ sơ ứng viên",
         "active": "Đang hoạt động",
         "inactive": "Không hoạt động",
         "viewDetails": "Xem chi tiết",
@@ -767,7 +811,8 @@
         "scheduleInterview": "Lên lịch phỏng vấn",
         "blockAccount": "Khóa tài khoản",
         "unblockAccount": "Mở khóa tài khoản",
-        "noUsers": "Không tìm thấy người dùng"
+        "noUsers": "Không tìm thấy người dùng",
+        "delete": "Xóa"
       },
       "filter": {
         "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
@@ -811,7 +856,11 @@
       },
       "title": "Quản lý người dùng",
       "breadcrumbAdmin": "Admin",
-      "breadcrumbList": "Danh sách"
+      "breadcrumbList": "Danh sách",
+      "deleteTitle": "Xóa người dùng",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa người dùng này khỏi hệ thống?",
+      "cancel": "Hủy",
+      "deleteBtn": "Xóa"
     },
     "companyVerifications": {
       "title": "Xác thực công ty",
@@ -875,7 +924,8 @@
         "open": "Mới",
         "reviewing": "Đang xem xét",
         "resolved": "Đã xử lý",
-        "rejected": "Từ chối"
+        "rejected": "Từ chối",
+        "in_review": "Đang thẩm định"
       },
       "toast": {
         "updateSuccess": "Đã cập nhật trạng thái báo cáo.",
@@ -883,40 +933,41 @@
       }
     },
     "auditLogs": {
-      "title": "Nh\u1eadt k\u00fd h\u1ec7 th\u1ed1ng",
-      "breadcrumbAdmin": "Qu\u1ea3n tr\u1ecb",
-      "breadcrumb": "Nh\u1eadt k\u00fd h\u1ec7 th\u1ed1ng",
-      "searchPlaceholder": "T\u00ecm email, h\u00e0nh \u0111\u1ed9ng, \u0111\u1ed1i t\u01b0\u1ee3ng, request...",
-      "exportCsv": "Xu\u1ea5t CSV",
-      "exportingCsv": "\u0110ang xu\u1ea5t...",
+      "title": "Nhật ký hệ thống",
+      "breadcrumbAdmin": "Quản trị",
+      "breadcrumb": "Nhật ký hệ thống",
+      "searchPlaceholder": "Tìm email, hành động, đối tượng, request...",
+      "exportCsv": "Xuất CSV",
+      "exportingCsv": "Đang xuất...",
       "filter": {
-        "title": "B\u1ed9 l\u1ecdc nh\u1eadt k\u00fd",
-        "action": "H\u00e0nh \u0111\u1ed9ng",
-        "allActions": "T\u1ea5t c\u1ea3",
-        "actorEmail": "Email ng\u01b0\u1eddi thao t\u00e1c",
-        "resourceType": "Lo\u1ea1i \u0111\u1ed1i t\u01b0\u1ee3ng",
-        "resourceId": "ID \u0111\u1ed1i t\u01b0\u1ee3ng",
-        "dateFrom": "T\u1eeb ng\u00e0y",
-        "dateTo": "\u0110\u1ebfn ng\u00e0y"
+        "title": "Bộ lọc nhật ký",
+        "action": "Hành động",
+        "allActions": "Tất cả",
+        "actorEmail": "Email người thao tác",
+        "resourceType": "Loại đối tượng",
+        "resourceId": "ID đối tượng",
+        "dateFrom": "Từ ngày",
+        "dateTo": "Đến ngày"
       },
       "actions": {
-        "create": "T\u1ea1o",
-        "update": "C\u1eadp nh\u1eadt",
-        "delete": "X\u00f3a",
-        "approve": "Duy\u1ec7t",
-        "reject": "T\u1eeb ch\u1ed1i",
-        "status_change": "\u0110\u1ed5i tr\u1ea1ng th\u00e1i",
-        "bulk_status": "\u0110\u1ed5i tr\u1ea1ng th\u00e1i h\u00e0ng lo\u1ea1t",
-        "agent_access": "Agent truy c\u1eadp",
-        "export": "Xu\u1ea5t"
+        "create": "Tạo",
+        "update": "Cập nhật",
+        "delete": "Xóa",
+        "approve": "Duyệt",
+        "reject": "Từ chối",
+        "status_change": "Đổi trạng thái",
+        "bulk_status": "Đổi trạng thái hàng loạt",
+        "agent_access": "Agent truy cập",
+        "export": "Xuất"
       },
       "table": {
-        "time": "Th\u1eddi gian",
-        "action": "H\u00e0nh \u0111\u1ed9ng",
-        "actor": "Ng\u01b0\u1eddi thao t\u00e1c",
-        "resource": "\u0110\u1ed1i t\u01b0\u1ee3ng",
+        "time": "Thời gian",
+        "action": "Hành động",
+        "actor": "Người thao tác",
+        "resource": "Đối tượng",
         "request": "Request"
-      }
+      },
+      "subtitle": "Theo dõi và ghi nhận toàn bộ nhật ký hoạt động trên hệ thống."
     },
     "questions": {
       "title": "Ngân hàng Câu hỏi Phỏng vấn",
@@ -1006,7 +1057,7 @@
       "editTitle": "Chỉnh sửa thông báo",
       "labelTitle": "Tiêu đề",
       "labelContent": "Nội dung",
-      "labelRecipient": "ID người nhận (Để trống nếu gửi toàn hệ thống)",
+      "labelRecipient": "ID người nhận",
       "cancelBtn": "Hủy",
       "confirmBtn": "Xác nhận",
       "sendingBtn": "Đang gửi...",
@@ -1033,9 +1084,9 @@
         "imageUrl": "URL Ảnh",
         "content": "Nội dung",
         "salary": "Mức lương kỳ vọng",
-        "frequency": "Tần suất thông báo (ngày)",
+        "frequency": "Tần suất thông báo",
         "position": "Vị trí / Tên công việc",
-        "experience": "Kinh nghiệm (năm)",
+        "experience": "Kinh nghiệm",
         "careerId": "Lĩnh vực / Ngành nghề",
         "cityId": "Tỉnh / Thành phố",
         "isActive": "Đang hoạt động"
@@ -1134,34 +1185,34 @@
         "description": "Gửi thông báo hệ thống qua email cho quản trị viên",
         "desc": "Gửi thông báo hệ thống qua email cho quản trị viên"
       },
-    "interviewAi": {
-      "pacingTitle": "Nhịp phỏng vấn AI",
-      "pacingDescription": "Tinh chỉnh tốc độ nói của AI và thời gian chờ trước khi hỏi câu tiếp theo.",
-      "preset": {
-        "label": "Mẫu nhịp",
-        "helper": "Chọn một mẫu để điền sẵn các giá trị timing, hoặc chọn Tùy chỉnh để sửa tay.",
-        "options": {
-          "balanced": "Cân bằng",
-          "natural": "Tự nhiên",
-          "snappy": "Nhanh",
-          "custom": "Tùy chỉnh"
+      "interviewAi": {
+        "pacingTitle": "Cấu Hình Nhịp Độ Phỏng Vấn AI",
+        "pacingDescription": "Tùy chỉnh tốc độ đọc câu hỏi phỏng vấn và khoảng nghỉ nhận diện câu trả lời của ứng viên.",
+        "preset": {
+          "label": "Preset nhịp độ phỏng vấn",
+          "helper": "Chọn nhanh bộ tham số tối ưu hóa trải nghiệm phỏng vấn giọng nói.",
+          "options": {
+            "balanced": "Cân bằng tiêu chuẩn",
+            "natural": "Tự nhiên, chậm rãi",
+            "snappy": "Nhanh nhạy, phản hồi gấp",
+            "custom": "Tùy chỉnh thủ công"
+          }
+        },
+        "questionGap": {
+          "label": "Khoảng nghỉ chuyển câu",
+          "helper": "Thời gian chờ giữa 2 câu hỏi tính bằng giây"
+        },
+        "silenceThreshold": {
+          "label": "Ngưỡng nhận diện im lặng",
+          "helper": "Thời gian im lặng để AI nhận diện ứng viên đã nói xong"
+        },
+        "ttsTitle": "Tốc Độ Đọc Giọng Nói AI",
+        "ttsDescription": "Điều chỉnh tốc độ phát âm thanh của trợ lý phỏng vấn ảo.",
+        "ttsSpeed": {
+          "label": "Tốc độ đọc câu hỏi",
+          "helper": "Tốc độ chuẩn: 0.92, thang đo từ 0.5 đến 2.0"
         }
       },
-      "questionGap": {
-        "label": "Khoảng chờ trước câu tiếp theo (giây)",
-        "helper": "Tăng giá trị này nếu AI hỏi quá nhanh khi ứng viên còn đang suy nghĩ."
-      },
-      "silenceThreshold": {
-        "label": "Ngưỡng im lặng tối thiểu (giây)",
-        "helper": "Giữ giá trị này lớn hơn 0 nếu muốn AI bớt chen vào quá sớm."
-      },
-      "ttsTitle": "Tốc độ TTS",
-      "ttsDescription": "Điều chỉnh tốc độ giọng AI khi phỏng vấn.",
-      "ttsSpeed": {
-        "label": "Tốc độ giọng",
-        "helper": "1.0 là bình thường. Giá trị thấp hơn sẽ chậm và dịu hơn, cao hơn sẽ nhanh hơn."
-      }
-    },
       "apiTitle": "API & Dịch vụ bên ngoài",
       "googleApiKey": "Google API Key",
       "supportEmail": "Email hỗ trợ",
@@ -1277,7 +1328,7 @@
         },
         "typeOptions": {
           "home": "Trang chủ",
-          "mainJobRight": "Việc làm chính (phải)"
+          "mainJobRight": "Việc làm chính bên phải"
         },
         "descLocationOptions": {
           "topLeft": "Trên trái",
@@ -1324,7 +1375,12 @@
       "categories": {
         "all": "Tất cả",
         "news": "Tin tức",
-        "blog": "Blog tuyển dụng"
+        "blog": "Blog tuyển dụng",
+        "cam-nang": "Cẩm nang nghề nghiệp",
+        "thu-tuc-lao-dong": "Thủ tục & Quyền lợi",
+        "thue-tncn": "Thuế & TNCN",
+        "bi-quyet-cv": "Bí quyết viết CV",
+        "xu-huong": "Báo cáo & Xu hướng"
       },
       "statuses": {
         "all": "Tất cả",
@@ -1562,6 +1618,10 @@
         "prepareError": "Không thể chuẩn bị hồ sơ giọng nói.",
         "grantSuccess": "Đã cấp quyền dùng giọng.",
         "grantError": "Không thể cấp quyền dùng giọng."
+      },
+      "types": {
+        "preset": "Giọng mẫu hệ thống",
+        "cloned": "Giọng nhân bản AI"
       }
     },
     "bannerTypes": {
@@ -1586,7 +1646,7 @@
         "deleteError": "Không thể xóa loại banner"
       },
       "table": {
-        "id": "ID",
+        "id": "STT",
         "code": "Mã",
         "name": "Tên",
         "value": "Giá trị",
@@ -1641,7 +1701,9 @@
         "active": "Hiển thị",
         "hidden": "Ẩn",
         "withEvidence": "Có bằng chứng",
-        "withoutEvidence": "Không có bằng chứng"
+        "withoutEvidence": "Không có bằng chứng",
+        "star": "sao",
+        "stars": "sao"
       },
       "deleteTitle": "Xóa Đánh giá",
       "deleteConfirm": "Bạn có chắc muốn xóa đánh giá của {{name}}?",
@@ -1731,7 +1793,59 @@
         "markAsReadError": "Không thể đánh dấu đã đọc",
         "deleteSuccess": "Đã xóa tin nhắn",
         "deleteError": "Không thể xóa tin nhắn"
-      }
+      },
+      "deleteTooltip": "Xóa tin nhắn liên hệ"
+    },
+    "profileDetail": {
+      "title": "Chi tiết Hồ sơ Ứng viên",
+      "subtitle": "Xem thông tin chi tiết, lịch sử và các CV đính kèm của ứng viên.",
+      "deleteBtn": "Xóa hồ sơ",
+      "deleteTitle": "Xác nhận xóa hồ sơ",
+      "deletingBtn": "Đang xóa...",
+      "labels": {
+        "inactive": "Ngừng hoạt động",
+        "active": "Đang hoạt động",
+        "profileId": "Mã hồ sơ",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "location": "Tỉnh / Thành phố",
+        "district": "Quận / Huyện",
+        "address": "Địa chỉ",
+        "fullName": "Họ và tên",
+        "birthday": "Ngày sinh",
+        "gender": "Giới tính",
+        "maritalStatus": "Tình trạng hôn nhân",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "source": "Nguồn hồ sơ",
+        "noData": "Không có dữ liệu"
+      },
+      "sections": {
+        "contact": "Thông tin liên hệ",
+        "details": "Thông tin cá nhân",
+        "summary": "Tổng quan",
+        "resumes": "Danh sách Hồ sơ / CV"
+      },
+      "table": {
+        "attached": "Đính kèm",
+        "title": "Tên hồ sơ / CV",
+        "online": "Hồ sơ trực tuyến",
+        "resumeType": "Loại hồ sơ",
+        "createdAt": "Ngày tạo",
+        "updatedAt": "Ngày cập nhật",
+        "actions": "Hành động",
+        "openOnline": "Mở xem trực tuyến",
+        "view": "Xem",
+        "download": "Tải xuống",
+        "noData": "No related CVs"
+      },
+      "messages": {
+        "noResumes": "Ứng viên chưa tải lên CV nào.",
+        "notFound": "Không tìm thấy thông tin hồ sơ ứng viên.",
+        "loading": "Loading profile..."
+      },
+      "back": "Quay lại",
+      "deleteConfirm": "Are you sure you want to delete the profile of <strong>{{name}}</strong>? This action cannot be undone."
     }
   },
   "common": {
@@ -1782,6 +1896,12 @@
     "pagination": {
       "rowsPerPage": "Số dòng mỗi trang",
       "displayedRows": "{{from}}-{{to}} trên {{count}}"
+    },
+    "noOptions": "Không có lựa chọn nào",
+    "autocomplete": {
+      "open": "Mở danh sách",
+      "close": "Đóng danh sách",
+      "clear": "Xóa lựa chọn"
     }
   },
   "chat": {
@@ -1820,5 +1940,26 @@
       "noMessages": "Không tìm thấy tin nhắn.",
       "openAttachment": "Mở tệp đính kèm"
     }
+  },
+  "confirmDialog": {
+    "reasonLabel": "Lý do thực hiện",
+    "reasonPlaceholder": "Nhập lý do chi tiết để ghi vào nhật ký kiểm toán...",
+    "reasonRequired": "Vui lòng nhập lý do để tiếp tục"
+  },
+  "commandPalette": {
+    "ai": "AI & Tự động hóa",
+    "aiInterview": "Phỏng vấn AI",
+    "categories": "Danh mục",
+    "content": "Nội dung",
+    "hintNavigate": "Điều hướng",
+    "hintToClose": "để đóng",
+    "hintToMove": "để di chuyển",
+    "hintToSelect": "để chọn",
+    "noResults": "Không tìm thấy kết quả",
+    "overview": "Tổng quan",
+    "placeholder": "Tìm kiếm lệnh hoặc trang...",
+    "profiles": "Hồ sơ",
+    "recruitment": "Tuyển dụng",
+    "system": "Hệ thống"
   }
 }

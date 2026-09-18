@@ -5,6 +5,7 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { JobPostActivity } from '@/types/models';
 import pc from '@/utils/muiColors';
+import { OperationProgress, adaptResumeAnalysisOperation } from '@/components/operation';
 
 interface AIAnalysisComponentProps {
   row: JobPostActivity;
@@ -58,30 +59,8 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
   }
 
   if (isProcessing) {
-    return (
-      <Tooltip title={t('appliedResume.ai.processing')} arrow>
-        <Chip
-          icon={<CircularProgress size={12} color="inherit" thickness={5} />}
-          label={t('appliedResume.ai.processing')}
-          onClick={onOpenDrawer}
-          variant="outlined"
-          sx={{ 
-            cursor: 'pointer', 
-            borderRadius: 1.5,
-            fontWeight: 800,
-            fontSize: '0.7rem',
-            bgcolor: pc.info( 0.08),
-            color: 'info.main',
-            borderColor: pc.info( 0.2),
-            '& .MuiChip-icon': { ml: 0.5 },
-            '&:hover': {
-                bgcolor: pc.info( 0.15),
-                borderColor: 'info.main'
-            }
-          }}
-        />
-      </Tooltip>
-    );
+    const operation = adaptResumeAnalysisOperation(row, row.aiAnalysisProgress || 10);
+    return <OperationProgress operation={operation} size="sm" onClick={onOpenDrawer} />;
   }
 
   if (isFailed) {
@@ -118,18 +97,19 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
       onClick={onOpenDrawer}
       sx={{ 
         textTransform: 'none', 
-         
         fontSize: '0.75rem', 
         py: 0.5,
         px: 1.5,
-        fontWeight: 900,
-        color: 'primary.main',
-        borderColor: pc.primary( 0.3),
-        borderStyle: 'dashed',
+        fontWeight: 800,
+        color: '#2563EB',
+        border: '1px solid #BFDBFE',
+        bgcolor: '#EFF6FF',
+        borderRadius: '8px',
+        transition: 'all 0.2s ease',
         '&:hover': {
-            bgcolor: pc.primary( 0.06),
-            borderColor: 'primary.main',
-            borderStyle: 'solid'
+          bgcolor: '#DBEAFE',
+          borderColor: '#1D4ED8',
+          color: '#1D4ED8',
         }
       }}
     >

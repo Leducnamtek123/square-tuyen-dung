@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Stack, Typography } from "@mui/material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { useTranslation } from 'react-i18next';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
@@ -13,6 +14,8 @@ interface ChatInfoProps {
 }
 
 const ChatInfo = ({ avatarUrl, title, subTitle, description }: ChatInfoProps) => {
+  const { t } = useTranslation('chat');
+
   return (
     <Stack justifyContent="center" alignItems="center" spacing={1.5} mt={3}>
       <Box>
@@ -41,7 +44,7 @@ const ChatInfo = ({ avatarUrl, title, subTitle, description }: ChatInfoProps) =>
           <FontAwesomeIcon icon={faCheckCircle} /> {description}
         </Typography>
         <Typography textAlign="center" variant="caption" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-          Hãy bắt đầu cuộc trò chuyện bằng một lời chào <FavoriteIcon sx={{ fontSize: 14, color: 'error.main' }} />
+          {t('startWithGreeting', 'Hãy bắt đầu cuộc trò chuyện bằng một lời chào')} <FavoriteIcon sx={{ fontSize: 14, color: 'error.main' }} />
         </Typography>
       </Stack>
     </Stack>

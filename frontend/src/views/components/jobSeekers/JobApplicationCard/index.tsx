@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from "react";
 import { useAppSelector } from '@/redux/hooks';
@@ -8,12 +8,12 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
-import { CV_TYPES, ROUTES } from "../../../../configs/constants";
+import { CV_TYPES, ROUTES } from "@/configs/constants";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useResumes } from "../hooks/useJobSeekerQueries";
 import { Theme } from "@mui/material/styles";
-import { Resume } from "../../../../types/models";
-import { localizeRoutePath } from "../../../../configs/routeLocalization";
+import { Resume } from "@/types/models";
+import { localizeRoutePath } from "@/configs/routeLocalization";
 
 interface JobApplicationExt extends Omit<Resume, 'type'> {
   isActive?: boolean;
@@ -74,7 +74,7 @@ const JobApplicationCard = () => {
           <List disablePadding>
             {((data as JobApplicationExt[]) || []).map((item: JobApplicationExt) => (
               <ListItem
-                key={item?.id || item?.title}
+                key={item.id}
                 sx={{
                   p: 2,
                   mb: 1,

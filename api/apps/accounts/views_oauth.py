@@ -1,4 +1,4 @@
-﻿import copy
+import copy
 import json
 import logging
 import re
@@ -17,6 +17,8 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from drf_social_oauth2.views import TokenView, ConvertTokenView, RevokeTokenView
+from drf_social_oauth2 import oauth2_endpoints
+from oauth2_provider.generators import generate_client_secret
 
 from oauth2_provider.models import (
     get_access_token_model,
@@ -32,11 +34,38 @@ from shared.configs.messages import ERROR_MESSAGES
 from shared.configs.variable_response import response_data
 from shared.helpers import helper
 
-from common.firebase import verify_id_token
+from apps.common.firebase import verify_id_token
 
 from .models import User
 
 logger = logging.getLogger(__name__)
+
+# Bugfix for drf-social-oauth2: automatically create RefreshToken if missing on AccessToken
+_orig_social_token_server_create = oauth2_endpoints.SocialTokenServer.create_token_response
+
+
+def _safe_social_token_server_create(self, uri, http_method="GET", body=None, headers=None, credentials=None):
+    try:
+        return _orig_social_token_server_create(self, uri, http_method, body, headers, credentials)
+    except Exception as exc:
+        if "refresh_token" in str(exc) or "RelatedObjectDoesNotExist" in exc.__class__.__name__:
+            logger.warning("Auto-healing missing refresh_token in SocialTokenServer: %s", exc)
+            RefreshToken = get_refresh_token_model()
+            AccessToken = get_access_token_model()
+            for tok in AccessToken.objects.filter(refresh_token__isnull=True):
+                RefreshToken.objects.get_or_create(
+                    access_token=tok,
+                    defaults={
+                        "user": tok.user,
+                        "token": generate_client_secret(),
+                        "application": tok.application,
+                    },
+                )
+            return _orig_social_token_server_create(self, uri, http_method, body, headers, credentials)
+        raise
+
+
+oauth2_endpoints.SocialTokenServer.create_token_response = _safe_social_token_server_create
 
 
 def _phone_digits(value):
@@ -140,9 +169,13 @@ class CustomTokenView(TokenView):
                         )
 
                     if not allow_login:
+                        try:
+                            token.delete()
+                        except Exception as token_err:
+                            logger.error("Failed to revoke unapproved token %s: %s", access_token, token_err)
                         return response_data(
                             status=status.HTTP_400_BAD_REQUEST,
-                            errors={"errorMessage": ["TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c."]}
+                            errors={"errorMessage": ["Tài khoản hoặc mật khẩu không chính xác."]}
                         )
 
             return response_data(status=stt, data=json.loads(body))
@@ -228,10 +261,15 @@ class CustomConvertTokenView(ConvertTokenView):
                 "grant_type": "authorization_code",
             }
 
-            response = requests.post(
-                settings.SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL,
-                data=data,
-            )
+            try:
+                response = requests.post(
+                    settings.SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL,
+                    data=data,
+                    timeout=10,
+                )
+            except requests.RequestException as req_err:
+                logger.error("Google OAuth token request failed: %s", req_err)
+                raise BadRequest("Không thể kết nối đến máy chủ xác thực Google. Vui lòng thử lại sau.")
 
             # Check response status
             if response.status_code != 200:
@@ -281,7 +319,25 @@ class CustomConvertTokenView(ConvertTokenView):
                 )
 
             oauth_request = _build_oauth_request(request, request_data)
-            url, headers, body, stt = self.create_token_response(oauth_request)
+            try:
+                url, headers, body, stt = self.create_token_response(oauth_request)
+            except Exception as ex:
+                if "refresh_token" in str(ex) or "RelatedObjectDoesNotExist" in ex.__class__.__name__:
+                    logger.warning("CustomConvertTokenView: Auto-healing missing refresh token: %s", ex)
+                    RefreshToken = get_refresh_token_model()
+                    AccessToken = get_access_token_model()
+                    for tok in AccessToken.objects.filter(refresh_token__isnull=True):
+                        RefreshToken.objects.get_or_create(
+                            access_token=tok,
+                            defaults={
+                                "user": tok.user,
+                                "token": generate_client_secret(),
+                                "application": tok.application,
+                            },
+                        )
+                    url, headers, body, stt = self.create_token_response(oauth_request)
+                else:
+                    raise
 
             if stt == status.HTTP_400_BAD_REQUEST:
                 error_body = json.loads(body)
@@ -357,13 +413,16 @@ class CustomConvertTokenView(ConvertTokenView):
 
 class CustomRevokeTokenView(RevokeTokenView):
     def facebook_revoke_token(self, access_token):
-        response = requests.delete(
-            url=settings.SOCIAL_AUTH_FACEBOOK_OAUTH2_REVOKE_TOKEN_URL,
-            headers={"Authorization": "Bearer {}".format(access_token)},
-        )
-
-        if response.status_code == status.HTTP_200_OK:
-            logger.info("Revoke facebook token success.")
+        try:
+            response = requests.delete(
+                url=settings.SOCIAL_AUTH_FACEBOOK_OAUTH2_REVOKE_TOKEN_URL,
+                headers={"Authorization": "Bearer {}".format(access_token)},
+                timeout=10,
+            )
+            if response.status_code == status.HTTP_200_OK:
+                logger.info("Revoke facebook token success.")
+        except requests.RequestException as req_err:
+            logger.warning("Revoke facebook token failed: %s", req_err)
 
     def google_revoke_token(self, access_token):
         pass
@@ -449,9 +508,16 @@ class FirebaseLoginView(TokenView):
             return None, "Sá»‘ Ä‘iá»‡n thoáº¡i nÃ y Ä‘ang liÃªn káº¿t vá»›i nhiá»u tÃ i khoáº£n. Vui lÃ²ng Ä‘Äƒng nháº­p báº±ng email hoáº·c liÃªn há»‡ há»— trá»£."
 
         user = next(iter(unique_users.values()), None)
-        if user and not user.phone_number:
-            user.phone_number = phone_number
-            user.save(update_fields=["phone_number"])
+        if user:
+            update_fields = []
+            if not user.phone_number:
+                user.phone_number = phone_number
+                update_fields.append("phone_number")
+            if not getattr(user, "is_verify_phone", False):
+                user.is_verify_phone = True
+                update_fields.append("is_verify_phone")
+            if update_fields:
+                user.save(update_fields=update_fields)
 
         return user, None
 
@@ -513,6 +579,7 @@ class FirebaseLoginView(TokenView):
                         phone_number=phone_number,
                         is_active=True,
                         is_verify_email=True,
+                        is_verify_phone=True,
                     )
                     # Create associated profile for JOB_SEEKER
                     if role_name == var_sys.JOB_SEEKER:

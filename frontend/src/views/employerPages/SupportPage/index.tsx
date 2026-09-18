@@ -8,8 +8,8 @@ import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
 import ChatBubbleOutlineOutlinedIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 
-import { TabTitle } from "../../../utils/generalFunction";
-import { APP_NAME } from "../../../configs/constants";
+import { TabTitle } from "@/utils/generalFunction";
+import { APP_NAME } from "@/configs/constants";
 
 const SupportPage = () => {
   const { t } = useTranslation("employer");
@@ -56,6 +56,7 @@ const SupportPage = () => {
       <Box sx={{ mb: 6, textAlign: "center" }}>
         <Typography
           variant="h3"
+          component="h1"
           sx={{
             mb: 2,
             background: (theme: Theme) => theme.palette.primary.main,

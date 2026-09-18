@@ -1,7 +1,7 @@
 
 import re
 
-from console.jobs import queue_notification
+from console.jobs.queue_notification import add_notification_to_user
 
 from django.db import models
 
@@ -14,7 +14,7 @@ from shared.configs import variable_response as var_res, variable_system as var_
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
 from rest_framework import status
 
@@ -228,7 +228,10 @@ def get_web_banner(request):
         return var_res.response_data(data=_run_blocking(_build))
     except Exception as ex:
         helper.print_log_error("get_web_banner", ex)
-        return var_res.response_data(data=[])
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"detail": "Không thể tải banner web."}
+        )
 
 
 @api_view(http_method_names=['get'])
@@ -261,43 +264,11 @@ def get_mobile_banner(request):
         return var_res.response_data(data=data)
     except Exception as ex:
         helper.print_log_error("get_mobile_banner", ex)
-        return var_res.response_data(data=[])
+        return var_res.response_data(
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"detail": "Không thể tải banner mobile."}
+        )
 
-
-@api_view(http_method_names=['post'])
-@permission_classes([perms_sys.IsAdminUser])
-def send_notification_demo(request):
-    data = request.data
-
-    title = data.get("title", "TEST")
-
-    content = data.get('content', "TEST CONTENT")
-
-    user_list = data.get('userList', [])
-
-    notification_type = data.get("type", "SYSTEM")
-
-    body_content = data.get('bodyContent', {})
-
-    image_link = data.get("imageLink", None)
-
-    queue_notification.add_notification_to_user.delay(
-
-        title=title,
-
-        content=content,
-
-        type_name=notification_type,
-
-        image=image_link,
-
-        content_of_type=body_content,
-
-        user_id_list=user_list
-
-    )
-
-    return var_res.response_data()
 
 
 # ===== Admin ViewSets =====
@@ -390,6 +361,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if web_image:
             file_record = self._handle_image_upload(web_image, File.WEB_BANNER_TYPE)
             if file_record:
+                Banner.objects.filter(image=file_record).exclude(id=banner.id).update(image=None)
                 banner.image = file_record
                 banner.save()
 
@@ -397,6 +369,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if mobile_image:
             file_record = self._handle_image_upload(mobile_image, File.MOBILE_BANNER_TYPE)
             if file_record:
+                Banner.objects.filter(image_mobile=file_record).exclude(id=banner.id).update(image_mobile=None)
                 banner.image_mobile = file_record
                 banner.save()
 
@@ -417,6 +390,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if web_image:
             file_record = self._handle_image_upload(web_image, File.WEB_BANNER_TYPE, banner.image)
             if file_record:
+                Banner.objects.filter(image=file_record).exclude(id=banner.id).update(image=None)
                 banner.image = file_record
                 banner.save()
 
@@ -424,6 +398,7 @@ class AdminBannerViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         if mobile_image:
             file_record = self._handle_image_upload(mobile_image, File.MOBILE_BANNER_TYPE, banner.image_mobile)
             if file_record:
+                Banner.objects.filter(image_mobile=file_record).exclude(id=banner.id).update(image_mobile=None)
                 banner.image_mobile = file_record
                 banner.save()
 
@@ -639,7 +614,11 @@ class EmployerArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def _handle_thumbnail(self, request, article):
         from shared.helpers.cloudinary_service import CloudinaryService
         from apps.files.models import File
-        thumb_file = request.FILES.get('thumbnailFile')
+        thumb_file = (
+            request.FILES.get('thumbnailFile') or
+            request.FILES.get('thumbnail') or
+            request.FILES.get('thumbnail_file')
+        )
         if thumb_file:
             upload_result = CloudinaryService.upload_image(thumb_file, 'articles')
             if upload_result:
@@ -648,7 +627,15 @@ class EmployerArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 )
                 if file_record:
                     article.thumbnail = file_record
-                    article.save()
+                    article.save(update_fields=['thumbnail'])
+        elif (
+            request.data.get('clearThumbnail') == 'true' or
+            request.data.get('clear_thumbnail') == 'true' or
+            request.data.get('clearThumbnail') is True
+        ):
+            if article.thumbnail:
+                article.thumbnail = None
+                article.save(update_fields=['thumbnail'])
 
 
 class ArticlePublicViewSet(viewsets.ReadOnlyModelViewSet):
@@ -663,8 +650,11 @@ class ArticlePublicViewSet(viewsets.ReadOnlyModelViewSet):
         category = self.request.GET.get('category')
         tag = self.request.GET.get('tag')
         search = self.request.GET.get('search') or self.request.GET.get('kw')
-        if category:
-            qs = qs.filter(category=category)
+        if category and category != 'all':
+            qs = qs.filter(
+                models.Q(category=category) |
+                models.Q(tags__icontains=category)
+            )
         if tag:
             qs = qs.filter(tags__icontains=tag)
         if search:
@@ -752,7 +742,11 @@ class AdminArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def _handle_thumbnail(self, request, article):
         from shared.helpers.cloudinary_service import CloudinaryService
         from apps.files.models import File
-        thumb_file = request.FILES.get('thumbnailFile')
+        thumb_file = (
+            request.FILES.get('thumbnailFile') or
+            request.FILES.get('thumbnail') or
+            request.FILES.get('thumbnail_file')
+        )
         if thumb_file:
             upload_result = CloudinaryService.upload_image(thumb_file, 'articles')
             if upload_result:
@@ -761,7 +755,15 @@ class AdminArticleViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 )
                 if file_record:
                     article.thumbnail = file_record
-                    article.save()
+                    article.save(update_fields=['thumbnail'])
+        elif (
+            request.data.get('clearThumbnail') == 'true' or
+            request.data.get('clear_thumbnail') == 'true' or
+            request.data.get('clearThumbnail') is True
+        ):
+            if article.thumbnail:
+                article.thumbnail = None
+                article.save(update_fields=['thumbnail'])
 
 
 # ===== ContactMessage ViewSets =====
@@ -830,3 +832,81 @@ class AdminContactMessageViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
+
+
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([perms_sys.AllowAny])
+def get_article_categories(request):
+    """
+    Returns list of article categories derived from Article.CATEGORY_CHOICES.
+    """
+    categories = []
+    for idx, (code, label) in enumerate(Article.CATEGORY_CHOICES, start=1):
+        categories.append({
+            "id": idx,
+            "name": label,
+            "slug": code,
+            "description": f"Chuyên mục {label}",
+            "iconName": "book" if code == Article.CATEGORY_CAM_NANG else "newspaper",
+            "sortOrder": idx,
+            "isActive": True,
+        })
+    return var_res.response_data(data=categories)
+
+
+@api_view(["POST"])
+@permission_classes([perms_sys.IsAdminUser])
+def send_notification_demo(request):
+    """
+    Admin demo notification dispatch.
+    """
+    title = request.data.get("title", "Thông báo thử nghiệm")
+    content = request.data.get("content", "Đây là thông báo kiểm tra hệ thống.")
+    notification_type = request.data.get("type", "SYSTEM")
+    user_list = request.data.get("userList", [])
+
+    dispatched_count = 0
+    failed_count = 0
+
+    if user_list:
+        for uid in user_list:
+            try:
+                add_notification_to_user.delay(
+                    title=title,
+                    content=content,
+                    type_name=notification_type,
+                    user_id_list=[int(uid)],
+                )
+                dispatched_count += 1
+            except Exception as ex:
+                helper.print_log_error("send_notification_demo", ex)
+                failed_count += 1
+    else:
+        try:
+            add_notification_to_user.delay(
+                title=title,
+                content=content,
+                type_name=notification_type,
+                user_id_list=[request.user.id],
+            )
+            dispatched_count += 1
+        except Exception as ex:
+            helper.print_log_error("send_notification_demo", ex)
+            failed_count += 1
+
+    if dispatched_count == 0 and failed_count > 0:
+        return var_res.response_data(
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            errors={"detail": "Không thể kết nối hàng đợi Celery/Redis để gửi thông báo."}
+        )
+
+    return var_res.response_data(
+        data={
+            "success": True,
+            "dispatched": dispatched_count,
+            "failed": failed_count,
+            "message": "Demo notification triggered successfully."
+        },
+        status=status.HTTP_200_OK,
+    )

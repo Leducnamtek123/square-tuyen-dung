@@ -16,10 +16,10 @@ import { IMAGES } from '@/configs/images';
 import { ROUTES } from '@/configs/routeConfig';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 
-// ─── Fake data ────────────────────────────────────────────────────────────────
+// --- Fake data ----------------------------------------------------------------
 const FAKE_SESSION = {
   jobName: 'Frontend Engineer – React/Next.js',
-  candidateName: 'Lê Đức Nam',
+  candidateName: 'Ứng viên mẫu (Demo)',
   roomCode: 'SQ-2026-C219012',
   scheduledAt: '2026-04-25T14:00:00',
   status: 'in_progress',
@@ -27,7 +27,7 @@ const FAKE_SESSION = {
 
 type Step = 'waiting' | 'preflight' | 'connected';
 
-// ─── Step labels ──────────────────────────────────────────────────────────────
+// --- Step labels --------------------------------------------------------------
 const STEPS: { key: Step; labelKey: string; descKey: string }[] = [
   {
     key: 'waiting',
@@ -46,13 +46,26 @@ const STEPS: { key: Step; labelKey: string; descKey: string }[] = [
   },
 ];
 
-import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
+import { LiveAudioVisualizerContainer } from '../interviewPages/components/LiveAudioVisualizerContainer';
+import { InterviewAvatar } from '../interviewPages/components/avatar/InterviewAvatar';
 
-// ─── Mock Participant Tile ────────────────────────────────────────────────────
+// --- Mock Participant Tile ----------------------------------------------------
 function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
   name: string; isAI?: boolean; isSelf?: boolean; speaking?: boolean;
 }) {
   const { t } = useTranslation('admin');
+
+  if (isAI) {
+    return (
+      <div className="aspect-video w-full">
+        <InterviewAvatar
+          isSpeakingHint={speaking}
+          voiceAssistantState={speaking ? 'speaking' : 'listening'}
+          interviewerName={name}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className={`relative flex flex-col items-center justify-center rounded-2xl border bg-[#0f172a] overflow-hidden aspect-video
@@ -60,17 +73,36 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
       {/* Fake video bg */}
       <div className={`absolute inset-0 ${isAI ? 'bg-zinc-950' : isSelf ? 'bg-gradient-to-br from-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-blue-950 to-zinc-900'}`} />
       {/* Avatar / Visualizer */}
-      <div className="relative z-10 flex h-full w-full items-center justify-center">
+      <div className="relative z-10 flex h-full w-full items-center justify-center px-4">
         {isAI ? (
-           <AgentAudioVisualizerAura 
-             state={speaking ? 'speaking' : 'listening'} 
-             size="lg" 
-             color="#8b5cf6" 
-           />
+          <LiveAudioVisualizerContainer
+            isSpeakingHint={speaking}
+            state={speaking ? 'speaking' : 'listening'}
+            color="#38bdf8"
+            secondaryColor="#818cf8"
+            defaultMode="wave"
+            allowModeSwitch={true}
+            role="agent"
+            height={130}
+          />
         ) : (
-          <div className={`flex size-16 items-center justify-center rounded-full border text-2xl
-            ${isSelf ? 'border-cyan-400/30 bg-cyan-500/10 text-zinc-200' : 'border-zinc-500/30 bg-zinc-500/10 text-zinc-200'}`}>
-            <FontAwesomeIcon icon={faUser} />
+          <div className="flex flex-col items-center justify-center gap-1 pb-6">
+            <div className={`flex size-14 items-center justify-center rounded-full border text-xl
+              ${isSelf ? 'border-cyan-400/30 bg-cyan-500/10 text-zinc-200' : 'border-zinc-500/30 bg-zinc-500/10 text-zinc-200'}`}>
+              <FontAwesomeIcon icon={faUser} />
+            </div>
+            <div className="w-[180px] sm:w-[220px]">
+              <LiveAudioVisualizerContainer
+                isSpeakingHint={speaking}
+                state={speaking ? 'speaking' : 'listening'}
+                color="#38bdf8"
+                secondaryColor="#6366f1"
+                defaultMode="wave"
+                allowModeSwitch={false}
+                role="candidate"
+                height={75}
+              />
+            </div>
           </div>
         )}
       </div>
@@ -81,7 +113,7 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
       {/* Name bar */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
         <div className="flex items-center gap-1.5">
-          {isAI && <span className="rounded bg-violet-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-violet-300">AI</span>}
+          {isAI && <span className="rounded bg-sky-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-sky-300">AI</span>}
           {isSelf && <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-cyan-300">{t('pages.interviewPreview.connected.you')}</span>}
           <span className="text-xs font-semibold text-white">{name}</span>
           {speaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
@@ -91,7 +123,7 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
   );
 }
 
-// ─── Step: Waiting ────────────────────────────────────────────────────────────
+// --- Step: Waiting ------------------------------------------------------------
 function WaitingStep({ onNext }: { onNext: () => void }) {
   const { t } = useTranslation('admin');
 
@@ -130,7 +162,7 @@ function WaitingStep({ onNext }: { onNext: () => void }) {
   );
 }
 
-// ─── Step: Preflight ──────────────────────────────────────────────────────────
+// --- Step: Preflight ----------------------------------------------------------
 function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const { t } = useTranslation('admin');
   const [micOk] = useState(true);
@@ -193,7 +225,7 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
   );
 }
 
-// ─── Step: Connected (mock VideoConference) ───────────────────────────────────
+// --- Step: Connected (mock VideoConference) -----------------------------------
 function ConnectedStep({ onEnd }: { onEnd: () => void }) {
   const { t } = useTranslation('admin');
   const [micOn, setMicOn] = useState(true);
@@ -277,7 +309,7 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
               {FAKE_MESSAGES.map((m) => (
                 <div key={`${m.from}-${m.textKey}`} className={`flex gap-2 ${m.from === 'candidate' ? 'flex-row-reverse' : ''}`}>
                   <div className={`flex size-7 flex-shrink-0 items-center justify-center rounded-full text-xs
-                    ${m.from === 'AI' ? 'bg-violet-500/20 text-violet-300' : 'bg-cyan-500/20 text-cyan-300'}`}>
+                    ${m.from === 'AI' ? 'bg-sky-500/20 text-sky-300' : 'bg-cyan-500/20 text-cyan-300'}`}>
                     <FontAwesomeIcon icon={m.from === 'AI' ? faRobot : faUser} />
                   </div>
                   <div className={`max-w-[200px] rounded-xl px-3 py-2 text-xs text-zinc-200
@@ -325,10 +357,10 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
   );
 }
 
-// ─── Main Preview Page ────────────────────────────────────────────────────────
+// --- Main Preview Page --------------------------------------------------------
 export default function InterviewPreviewPage() {
   const { t, i18n } = useTranslation('admin');
-  const [step, setStep] = useState<Step>('waiting');
+  const [step, setStep] = useState<Step>('connected');
   const previewRoute = localizeRoutePath(`/${ROUTES.ADMIN.INTERVIEW_PREVIEW}`, i18n.language);
 
   const statusChip = {
@@ -338,7 +370,7 @@ export default function InterviewPreviewPage() {
   }[step];
 
   return (
-    <div className="min-h-screen bg-[#020617] p-4 md:p-6 text-white">
+    <div className="min-h-[100dvh] bg-[#020617] p-4 md:p-6 text-white">
       {/* Admin top bar */}
       <div className="mb-4 flex items-center justify-between rounded-2xl border border-white/8 bg-zinc-900/50 px-4 py-3 backdrop-blur-xl">
         <div>

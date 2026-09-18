@@ -3,10 +3,16 @@
 import DefaultLayout from '@/layouts/DefaultLayout';
 import JobDetailPage from '@/views/defaultPages/JobDetailPage';
 
-export default function JobDetailClientPage() {
+import type { JobPost } from '@/types/models';
+
+interface JobDetailClientPageProps {
+  initialJob?: JobPost | null;
+}
+
+export default function JobDetailClientPage({ initialJob }: JobDetailClientPageProps) {
   return (
     <DefaultLayout>
-      <JobDetailPage />
+      <JobDetailPage initialJob={initialJob} />
     </DefaultLayout>
   );
 }

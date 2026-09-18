@@ -2,7 +2,7 @@
 from celery import shared_task
 
 from shared.helpers import helper
-from common.firebase import get_firestore_client
+from apps.common.firebase import get_firestore_client
 
 from shared.configs import variable_system as var_sys
 

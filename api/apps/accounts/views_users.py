@@ -40,6 +40,7 @@ from .services import (
     PasswordResetService,
     EmailVerificationService,
     AvatarService,
+    CoverImageService,
     RegistrationService,
     AccountService,
     UserNotFoundError,
@@ -71,9 +72,15 @@ USER_INFO_BASIC_FIELDS = (
     "id",
     "fullName",
     "email",
+    "phoneNumber",
     "isActive",
     "isVerifyEmail",
+    "isVerifyPhone",
+    "isPhoneVerified",
+    "isOnboarded",
+    "onboardingStep",
     "avatarUrl",
+    "coverUrl",
     "roleName",
     "jobSeekerProfileId",
     "jobSeekerProfile",
@@ -151,6 +158,7 @@ def check_creds(request):
         "exists": False,
         "email": "",
         "email_verified": False,
+        "other_role": None,
     }
 
     check_creds_serializer = CheckCredsSerializer(data=data)
@@ -173,6 +181,10 @@ def check_creds(request):
         res_data["exists"] = True
         if user.is_verify_email:
             res_data["email_verified"] = True
+    else:
+        other_user = User.objects.filter(email__iexact=email).first()
+        if other_user:
+            res_data["other_role"] = other_user.role_name
 
     return response_data(data=res_data)
 
@@ -196,8 +208,11 @@ def send_verify_email(request):
             errors={"errorMessage": [ERROR_MESSAGES["EMAIL_NOT_REGISTERED"]]},
         )
 
-    if user.is_verify_email:
-        return response_data(status=status.HTTP_200_OK, data={"emailVerified": True})
+    if user.is_verify_email or user.is_active:
+        return response_data(
+            status=status.HTTP_200_OK,
+            data={"emailVerified": True, "message": SUCCESS_MESSAGES["EMAIL_VERIFIED"]},
+        )
 
     helper.send_email_verify_email(request, user, platform=platform)
 
@@ -207,33 +222,20 @@ def send_verify_email(request):
 @api_view(http_method_names=["GET"])
 @permission_classes([AllowAny])
 def user_active(request, encoded_data, token):
-    if "platform" not in request.GET:
-        return HttpResponseNotFound()
-
-    platform = request.GET.get("platform")
-    if platform not in (var_sys.Platform.WEB, var_sys.Platform.APP):
-        return HttpResponseNotFound()
-
-    redirect_login = ""
-    if platform == var_sys.Platform.WEB:
-        if "redirectLogin" not in request.GET:
-            return HttpResponseNotFound()
-        redirect_login = request.GET.get("redirectLogin")
-        if redirect_login != settings.REDIRECT_LOGIN_CLIENT:
-            return HttpResponseNotFound()
+    platform = request.GET.get("platform", var_sys.Platform.WEB)
+    raw_redirect = request.GET.get("redirectLogin", settings.REDIRECT_LOGIN_CLIENT)
+    redirect_login = raw_redirect.strip("/") if raw_redirect else settings.REDIRECT_LOGIN_CLIENT
 
     user, error_key = EmailVerificationService.verify_user(encoded_data, token)
-
     domain_type = EmailVerificationService.get_domain_type(user)
 
     if error_key:
-        error_msg = ERROR_MESSAGES[error_key]
+        error_msg = ERROR_MESSAGES.get(error_key, "Lỗi xác thực email")
         if platform == var_sys.Platform.WEB:
-            return HttpResponseRedirect(
-                helper.get_full_client_url(
-                    f"{redirect_login}/?errorMessage={error_msg}", domain_type
-                )
+            target_url = helper.get_full_client_url(
+                f"{redirect_login}/?errorMessage={error_msg}", domain_type
             )
+            return HttpResponseRedirect(target_url)
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
             errors={"errorMessage": [error_msg]},
@@ -241,13 +243,51 @@ def user_active(request, encoded_data, token):
 
     # Success
     if platform == var_sys.Platform.WEB:
-        return HttpResponseRedirect(
-            helper.get_full_client_url(
-                f"{redirect_login}/?successMessage={SUCCESS_MESSAGES['EMAIL_VERIFIED']}",
-                domain_type,
-            )
+        target_url = helper.get_full_client_url(
+            f"{redirect_login}/?successMessage={SUCCESS_MESSAGES['EMAIL_VERIFIED']}",
+            domain_type,
         )
+        return HttpResponseRedirect(target_url)
     return response_data(status=status.HTTP_200_OK)
+
+
+@api_view(http_method_names=["POST"])
+@permission_classes([AllowAny])
+def verify_email_otp(request):
+    """
+    Verify email via 6-digit OTP.
+    Request payload: { "email": "user@domain.com", "otp": "101485" }
+    """
+    email = request.data.get("email") or ""
+    otp = request.data.get("otp") or request.data.get("code") or ""
+
+    if not email or not otp:
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": ["Vui lòng cung cấp địa chỉ email và mã OTP."]},
+        )
+
+    user, error_key = EmailVerificationService.verify_email_otp(str(email).strip(), str(otp).strip())
+
+    if error_key:
+        error_messages = {
+            "EMAIL_NOT_REGISTERED": "Email không tồn tại trong hệ thống.",
+            "OTP_EXPIRED": "Mã xác thực đã hết hạn (sau 15 phút). Vui lòng nhấn gửi lại mã mới.",
+            "INVALID_OTP": "Mã xác thực không chính xác. Vui lòng kiểm tra lại.",
+        }
+        error_msg = error_messages.get(error_key, "Mã xác thực không hợp lệ.")
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": [error_msg]},
+        )
+
+    return response_data(
+        status=status.HTTP_200_OK,
+        data={
+            "emailVerified": True,
+            "message": SUCCESS_MESSAGES["EMAIL_VERIFIED"],
+        },
+    )
 
 
 
@@ -333,13 +373,14 @@ def change_password(request):
 
 @api_view(http_method_names=["patch"])
 @permission_classes(permission_classes=[IsAuthenticated])
+@transaction.atomic
 def update_user_account(request):
     data = request.data
 
     user = request.user
 
     user_account_serializer = UserSerializer(
-        user, data=data, partial=True, fields=["id", "fullName"]
+        user, data=data, partial=True, fields=["id", "fullName", "phoneNumber", "phone", "isPhoneVerified"]
     )
 
     if not user_account_serializer.is_valid():
@@ -354,6 +395,80 @@ def update_user_account(request):
 
     return response_data(
         status=status.HTTP_200_OK, data=user_info_serializer.data
+    )
+
+
+@api_view(http_method_names=["post", "put"])
+@permission_classes(permission_classes=[IsAuthenticated])
+def verify_phone_number(request):
+    data = request.data
+    phone = data.get("phone") or data.get("phoneNumber") or data.get("phone_number")
+    id_token = (
+        data.get("id_token")
+        or data.get("idToken")
+        or data.get("firebaseToken")
+        or data.get("otp")
+        or data.get("code")
+    )
+
+    if not phone or not str(phone).strip():
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"phone": ["Vui lòng cung cấp số điện thoại hợp lệ."]},
+        )
+
+    clean_phone = str(phone).strip()
+
+    # Validate verification proof via Firebase ID token or OTP code
+    is_verified = False
+    if id_token:
+        try:
+            from apps.common.firebase import verify_id_token
+            decoded = verify_id_token(str(id_token).strip())
+            if decoded:
+                is_verified = True
+        except Exception as ex:
+            helper.print_log_error("verify_phone_number.firebase_token", ex)
+
+    # In development mode or if test OTP code provided
+    if not is_verified:
+        if getattr(settings, "DEBUG", False) and str(id_token).strip() in ["123456", "test", "dev"]:
+            is_verified = True
+        elif not id_token:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Vui lòng cung cấp mã xác thực OTP hoặc token xác minh hợp lệ."]},
+            )
+        else:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Mã xác thực hoặc token không hợp lệ hoặc đã hết hạn."]},
+            )
+
+    user = request.user
+    user.phone_number = clean_phone
+    user.is_verify_phone = True
+    user.save(update_fields=["phone_number", "is_verify_phone"])
+
+    # Synchronize with JobSeekerProfile
+    try:
+        profile = getattr(user, "job_seeker_profile", None)
+        if profile:
+            profile.phone = clean_phone
+            profile.save(update_fields=["phone"])
+    except Exception as ex:
+        helper.print_log_error("verify_phone_number.job_seeker_profile", ex)
+
+    user_info_serializer = UserSerializer(user, fields=USER_INFO_BASIC_FIELDS)
+    return response_data(
+        status=status.HTTP_200_OK,
+        data={
+            "success": True,
+            "phoneNumber": clean_phone,
+            "isVerifyPhone": True,
+            "isPhoneVerified": True,
+            "user": user_info_serializer.data,
+        },
     )
 
 
@@ -381,6 +496,38 @@ def avatar(request):
         return response_data(
             status=status.HTTP_200_OK,
             data={"avatarUrl": avatar_url}
+        )
+
+    return response_data(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(http_method_names=["put", "delete"])
+@permission_classes(permission_classes=[IsAuthenticated])
+def cover_image(request):
+    if request.method == "PUT":
+        file = request.FILES.get("file") or request.FILES.get("cover")
+        if not file:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"file": ["No file provided."]}
+            )
+        try:
+            cover_url = CoverImageService.update_cover(request.user, file)
+            return response_data(
+                status=status.HTTP_200_OK,
+                data={"coverUrl": cover_url}
+            )
+        except Exception as ex:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": [str(ex)]}
+            )
+
+    if request.method == "DELETE":
+        cover_url = CoverImageService.delete_cover(request.user)
+        return response_data(
+            status=status.HTTP_200_OK,
+            data={"coverUrl": cover_url}
         )
 
     return response_data(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -525,7 +672,11 @@ class UserViewSet(
     pagination_class = paginations.CustomPagination
 
     def get_queryset(self):
-        queryset = User.objects.all().order_by("-id")
+        queryset = (
+            User.objects.select_related("avatar", "company")
+            .prefetch_related("company_memberships__role")
+            .order_by("-id")
+        )
         role_name = self.request.query_params.get("roleName", None)
         if role_name:
             queryset = queryset.filter(role_name=role_name)

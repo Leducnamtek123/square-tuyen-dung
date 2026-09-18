@@ -1,10 +1,10 @@
 ﻿'use client';
 
 import { useMutation, useQuery, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
-import adminManagementService, { AdminBannerTypePayload, AdminListParams } from '../../../../services/adminManagementService';
-import { BannerType } from '../../../../types/models';
-import { PaginatedResponse } from '../../../../types/api';
-import toastMessages from '../../../../utils/toastMessages';
+import adminManagementService, { AdminBannerTypePayload, AdminListParams } from '@/services/adminManagementService';
+import { BannerType } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
+import toastMessages from '@/utils/toastMessages';
 import i18next from 'i18next';
 
 type UseBannerTypesResult = UseQueryResult<PaginatedResponse<BannerType>> & {

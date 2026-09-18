@@ -945,3 +945,32 @@ def test_job_seeker_cannot_use_internal_agent_assistant(job_seeker_user):
     )
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_notebooklm_mcp_tools_registered_and_executable(employer_user, monkeypatch):
+    client = APIClient()
+    client.force_authenticate(user=employer_user)
+
+    response = client.get("/api/v1/agent-assistants/tools/")
+    assert response.status_code == 200
+    tools = response.data["data"]["tools"]
+    assert any(t["name"] == "query_notebook_knowledge" for t in tools)
+    assert any(t["name"] == "evaluate_cv_with_notebook" for t in tools)
+
+    def mock_query(notebook_id, query):
+        return {"content": "MTCV Quan ly du an dam bao dung tien do va ngan sach."}
+
+    def mock_eval(cv_content, job_title=None, notebook_id=None):
+        return {"content": "Diem match: 85%. Tiieu chi DAT: Bang cap, Kinh nghiem. KHONG DAT: Chi tiet KPI 3 nam."}
+
+    monkeypatch.setattr("integrations.notebooklm_mcp.mcp_client.query_notebook", mock_query)
+    monkeypatch.setattr("integrations.notebooklm_mcp.mcp_client.evaluate_cv", mock_eval)
+
+    from apps.agent_assistants.services import AgentAssistantService
+    query_res = AgentAssistantService._query_notebook_knowledge("Tieu chuan QLDA")
+    assert "MTCV Quan ly du an" in query_res["message"]
+
+    eval_res = AgentAssistantService._evaluate_cv_with_notebook("CV Nguyen Van A")
+    assert "Diem match: 85%" in eval_res["message"]
+

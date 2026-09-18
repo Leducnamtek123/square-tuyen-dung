@@ -1,17 +1,12 @@
-'use client';
 import React from 'react';
-
 import { useTheme } from '@mui/material/styles';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
+import { Control, FieldValues, Path } from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-
 import Autocomplete from '@mui/material/Autocomplete';
 import { useTranslation } from 'react-i18next';
 import type { SelectOption } from '@/types/models';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 const EMPTY_OPTIONS: SelectOption[] = [];
 
@@ -22,6 +17,9 @@ interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
   placeholder?: string;
+  disabledPlaceholder?: string;
+  disabled?: boolean;
+  loading?: boolean;
   options?: SelectOption[];
   noOptionsText?: string;
   variant?: 'default' | 'hero';
@@ -30,6 +28,9 @@ interface Props<T extends FieldValues = FieldValues> {
 
 const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   placeholder = '',
+  disabledPlaceholder,
+  disabled = false,
+  loading = false,
   name,
   control,
   options = EMPTY_OPTIONS,
@@ -41,21 +42,17 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   const theme = useTheme();
   const { t } = useTranslation('common');
   const isHero = variant === 'hero';
+  const activePlaceholder = disabled && disabledPlaceholder ? disabledPlaceholder : placeholder;
 
   return (
-
-    <ControllerAny
-
+    <TypedController
       name={name as Path<T>}
-
       control={control}
-
-      render={({ field }: any) => (
-
+      render={({ field }) => (
         <Autocomplete
-
           fullWidth
-
+          disabled={disabled}
+          loading={loading}
           id={field.name}
 
           options={options}
@@ -77,6 +74,9 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
           onChange={(e, value) => field.onChange(value?.id ?? '')}
 
           slotProps={{
+            popper: {
+              sx: { zIndex: 9999 },
+            },
             paper: {
               sx: {
                 width: 'max-content',
@@ -126,7 +126,8 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
               size="small"
 
-              placeholder={placeholder}
+              placeholder={activePlaceholder}
+              disabled={disabled}
               slotProps={{
                 input: {
                   ...params.InputProps,

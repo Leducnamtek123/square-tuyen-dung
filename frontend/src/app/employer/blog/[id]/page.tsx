@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import EmployerBlogFormPage from '@/views/employerPages/BlogPage/EmployerBlogFormPage';
 
-export const metadata = {
-  title: 'Quản lý blog tuyển dụng | Employer',
-  description: 'Chỉnh sửa bài viết blog tuyển dụng.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.blog-edit');
+}
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

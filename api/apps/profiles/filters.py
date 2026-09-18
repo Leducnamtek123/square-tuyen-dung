@@ -71,6 +71,7 @@ class ResumeFilter(django_filters.FilterSet):
 
     maritalStatusId = django_filters.ChoiceFilter(choices=var_sys.MARITAL_STATUS_CHOICES, field_name="job_seeker_profile__marital_status")
     maritalStatusIds = ChoiceInFilter(choices=var_sys.MARITAL_STATUS_CHOICES, field_name="job_seeker_profile__marital_status", lookup_expr='in')
+    isSeekingJob = django_filters.BooleanFilter(field_name='job_seeker_profile__is_seeking_job')
 
     def title_or_full_name(self, queryset, name, value):
         try:
@@ -135,9 +136,13 @@ class CompanyFilter(django_filters.FilterSet):
 
     excludeSlug = django_filters.CharFilter(method="exclude_slug")
 
+    employeeSize = django_filters.NumberFilter(field_name='employee_size')
+
+    fieldOperation = django_filters.CharFilter(field_name='field_operation', lookup_expr='icontains')
+
     class Meta:
         model = Company
-        fields = ['kw', 'cityId', 'excludeSlug', 'cityIds']
+        fields = ['kw', 'cityId', 'excludeSlug', 'cityIds', 'employeeSize', 'fieldOperation']
 
     class NumberInFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
         pass

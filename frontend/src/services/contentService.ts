@@ -50,7 +50,7 @@ const unwrapDetailResponse = <T>(raw: unknown): T => {
   return value as T;
 };
 
-// ─── Article & Category Types ──────────────────────────────────────────────────
+// --- Article & Category Types --------------------------------------------------
 
 export type ArticleCategory = string;
 export type ArticleStatus = 'draft' | 'pending' | 'published' | 'archived';
@@ -127,7 +127,7 @@ type PaginatedArticles = PaginatedResponse<Article> & {
 const normalizeArticleListResponse = (raw: unknown): PaginatedArticles =>
   normalizePaginatedResponse<Article>(raw);
 
-// ─── Content Service ──────────────────────────────────────────────────────────
+// --- Content Service ----------------------------------------------------------
 
 const contentService = {
   normalizeArticleListParams: (params: ArticleListParams = {}): Record<string, string | number | undefined> => {
@@ -170,14 +170,7 @@ const contentService = {
     return toListData<Banner>(response);
   },
 
-  sendNotificationDemo: (): Promise<{ success?: boolean; message?: string }> => {
-    const url = 'content/send-noti-demo/';
-    return (httpRequest.post(url) as Promise<unknown>).then((response) =>
-      normalizeActionResponse(response, { success: true })
-    );
-  },
-
-  // ─── Public Article Category API ─────────────────────────────────────────
+  // --- Public Article Category API -----------------------------------------
 
   getPublicArticleCategories: async (): Promise<ArticleCategoryInfo[]> => {
     const url = 'content/web/article-categories/';
@@ -185,7 +178,7 @@ const contentService = {
     return toListData<ArticleCategoryInfo>(response);
   },
 
-  // ─── Admin Article Category CMS API ──────────────────────────────────────
+  // --- Admin Article Category CMS API --------------------------------------
 
   adminGetArticleCategories: async (): Promise<ArticleCategoryInfo[]> => {
     const url = 'content/web/admin/article-categories/';
@@ -193,21 +186,7 @@ const contentService = {
     return toListData<ArticleCategoryInfo>(response);
   },
 
-  adminCreateArticleCategory: (data: ArticleCategoryPayload): Promise<ArticleCategoryInfo> => {
-    return (httpRequest.post('content/web/admin/article-categories/', data) as Promise<unknown>)
-      .then(unwrapDetailResponse<ArticleCategoryInfo>);
-  },
-
-  adminUpdateArticleCategory: (id: number, data: Partial<ArticleCategoryPayload>): Promise<ArticleCategoryInfo> => {
-    return (httpRequest.patch(`content/web/admin/article-categories/${id}/`, data) as Promise<unknown>)
-      .then(unwrapDetailResponse<ArticleCategoryInfo>);
-  },
-
-  adminDeleteArticleCategory: (id: number): Promise<void> => {
-    return httpRequest.delete(`content/web/admin/article-categories/${id}/`) as Promise<void>;
-  },
-
-  // ─── Public Article API ──────────────────────────────────────────────────
+  // --- Public Article API --------------------------------------------------
 
   getPublicArticles: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
     const response = await httpRequest.get('content/web/articles/', {
@@ -221,7 +200,7 @@ const contentService = {
     return unwrapDetailResponse<Article>(response);
   },
 
-  // ─── Admin Article API ───────────────────────────────────────────────────
+  // --- Admin Article API ---------------------------------------------------
 
   adminGetArticles: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
     const response = await httpRequest.get('content/web/admin/articles/', {
@@ -241,7 +220,9 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return (httpRequest.post('content/web/admin/articles/', form) as Promise<unknown>)
+    return (httpRequest.post('content/web/admin/articles/', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>)
       .then(unwrapDetailResponse<Article>);
   },
 
@@ -251,7 +232,9 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return (httpRequest.patch(`content/web/admin/articles/${id}/`, form) as Promise<unknown>)
+    return (httpRequest.patch(`content/web/admin/articles/${id}/`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>)
       .then(unwrapDetailResponse<Article>);
   },
 
@@ -259,7 +242,7 @@ const contentService = {
     return httpRequest.delete(`content/web/admin/articles/${id}/`) as Promise<void>;
   },
 
-  // ─── Employer Article (Blog) API ─────────────────────────────────────────
+  // --- Employer Article (Blog) API -----------------------------------------
 
   employerGetBlogs: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
     const response = await httpRequest.get('content/web/employer/articles/', {
@@ -279,7 +262,9 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return (httpRequest.post('content/web/employer/articles/', form) as Promise<unknown>)
+    return (httpRequest.post('content/web/employer/articles/', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>)
       .then(unwrapDetailResponse<Article>);
   },
 
@@ -289,7 +274,9 @@ const contentService = {
       if (v !== undefined && v !== null) form.append(k, String(v));
     });
     if (thumbnailFile) form.append('thumbnailFile', thumbnailFile);
-    return (httpRequest.patch(`content/web/employer/articles/${id}/`, form) as Promise<unknown>)
+    return (httpRequest.patch(`content/web/employer/articles/${id}/`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }) as Promise<unknown>)
       .then(unwrapDetailResponse<Article>);
   },
 

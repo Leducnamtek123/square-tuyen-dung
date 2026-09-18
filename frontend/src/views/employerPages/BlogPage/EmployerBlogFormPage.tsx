@@ -211,7 +211,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
     <Box sx={{ p: 3, maxWidth: 1100, mx: 'auto' }}>
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <IconButton onClick={() => push('/employer/blog')} sx={{ bgcolor: 'action.hover' }}>
+        <IconButton aria-label="Thao tác" onClick={() => push('/employer/blog')} sx={{ bgcolor: 'action.hover' }}>
           <ArrowBackIcon />
         </IconButton>
         <Box flex={1}>
@@ -295,7 +295,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
               <Box sx={{ position: 'relative' }}>
                 <Box component="img" src={thumbnailPreview || existingThumbnailUrl!} alt={t('blog.form.thumbnailAlt')}
                   sx={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 1.5 }} />
-                <IconButton size="small"
+                <IconButton aria-label="Thao tác" size="small"
                   sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}
                   onClick={() => dispatch({ type: 'clearThumbnail' })}>
                   <CloseIcon fontSize="small" />
@@ -305,9 +305,26 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
                 </Button>
               </Box>
             ) : (
-              <Button variant="outlined" fullWidth startIcon={<ImageIcon />}
+              <Button
+                variant="outlined"
+                fullWidth
+                startIcon={<ImageIcon />}
                 onClick={() => fileInputRef.current?.click()}
-                sx={{ height: 100, borderStyle: 'dashed' }}>
+                sx={{
+                  height: 100,
+                  border: '1.5px solid #E2E8F0',
+                  bgcolor: '#F8FAFC',
+                  borderRadius: '14px',
+                  color: '#475569',
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#2563EB',
+                    bgcolor: '#EFF6FF',
+                    color: '#2563EB',
+                  },
+                }}
+              >
                 {t('blog.actions.chooseImage')}
               </Button>
             )}

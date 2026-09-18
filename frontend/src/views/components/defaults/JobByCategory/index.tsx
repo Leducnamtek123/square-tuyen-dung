@@ -5,10 +5,10 @@ import { Grid2 as Grid, Stack, Typography } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch } from '../../../../hooks/useAppStore';
-import { buildJobPostFilter, searchJobPost } from '../../../../redux/filterSlice';
-import { ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { useAppDispatch } from '@/hooks/useAppStore';
+import { buildJobPostFilter, searchJobPost } from '@/redux/filterSlice';
+import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useConfig } from '@/hooks/useConfig';
 
 interface Option {

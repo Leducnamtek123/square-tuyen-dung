@@ -1,0 +1,64 @@
+{
+  "systemicIssues": {
+    "FE-SYS-001": {
+      "title": "Dual-Engine Breakpoint Dissonance (MUI v6 vs Tailwind v4)",
+      "severity": "P1",
+      "status": "VERIFIED_FIXED",
+      "knownConsumersCount": 42,
+      "auditedConsumersCount": 42,
+      "remainingConsumersCount": 0,
+      "routesAudited": 128,
+      "verificationProgress": "100%"
+    },
+    "FE-SYS-002": {
+      "title": "Missing i18n Translation Keys in Common Namespace",
+      "severity": "P1",
+      "status": "VERIFIED_FIXED",
+      "knownConsumersCount": 1199,
+      "auditedConsumersCount": 1199,
+      "remainingConsumersCount": 0,
+      "routesAudited": 128,
+      "verificationProgress": "100%"
+    },
+    "FE-SYS-003": {
+      "title": "Arbitrary Sizing & Radius Tokens in Shared UI Cards",
+      "severity": "P2",
+      "status": "VERIFIED_FIXED",
+      "knownConsumersCount": 55,
+      "auditedConsumersCount": 55,
+      "remainingConsumersCount": 0,
+      "routesAudited": 128,
+      "verificationProgress": "100%"
+    },
+    "FE-SYS-004": {
+      "title": "Hardcoded English Locale in MUI DatePicker LocalizationProvider",
+      "severity": "P2",
+      "status": "VERIFIED_FIXED",
+      "knownConsumersCount": 1,
+      "auditedConsumersCount": 1,
+      "remainingConsumersCount": 0,
+      "routesAudited": 128,
+      "verificationProgress": "100%"
+    },
+    "FE-SYS-005": {
+      "title": "Duplicated & Outdated Navigation Route Path Arrays",
+      "severity": "P2",
+      "status": "VERIFIED_FIXED",
+      "knownConsumersCount": 31,
+      "auditedConsumersCount": 31,
+      "remainingConsumersCount": 0,
+      "routesAudited": 128,
+      "verificationProgress": "100%"
+    },
+    "FE-SYS-006": {
+      "title": "Data Table Container Horizontal Overflow on Mobile",
+      "severity": "P1",
+      "status": "VERIFIED_FIXED",
+      "knownConsumersCount": 14,
+      "auditedConsumersCount": 14,
+      "remainingConsumersCount": 0,
+      "routesAudited": 128,
+      "verificationProgress": "100%"
+    }
+  }
+}

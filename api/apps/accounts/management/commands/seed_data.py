@@ -6,7 +6,7 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.locations.models import City, District, Location
 from apps.files.models import File
-from common.models import Career
+from apps.common.models import Career
 from apps.profiles.models import Company, JobSeekerProfile, Resume
 from apps.jobs.models import JobPost, JobPostActivity
 from apps.interviews.models import Question, QuestionGroup, InterviewSession

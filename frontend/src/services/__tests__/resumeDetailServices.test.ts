@@ -3,7 +3,7 @@ import certificateService from '../certificateService';
 import educationDetailService from '../educationDetailService';
 import experienceDetailService from '../experienceDetailService';
 import languageSkillService from '../languageSkillService';
-import httpRequest from '../../utils/httpRequest';
+import httpRequest from '@/utils/httpRequest';
 
 jest.mock('../../utils/httpRequest', () => ({
   get: jest.fn(),

@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'fs';
 import { join } from 'path';
 
+const controlsRoot = join(__dirname, '..');
 const srcRoot = join(__dirname, '../../../..');
 
 const collectTsxFiles = (dir: string): string[] => {
@@ -20,7 +21,7 @@ const collectTsxFiles = (dir: string): string[] => {
 
 describe('Autocomplete i18n defaults', () => {
   it('overrides MUI default English dropdown text in production components', () => {
-    const autocompleteFiles = collectTsxFiles(srcRoot).filter((path) => {
+    const autocompleteFiles = collectTsxFiles(controlsRoot).filter((path) => {
       const source = readFileSync(path, 'utf8');
       return source.includes('<Autocomplete');
     });

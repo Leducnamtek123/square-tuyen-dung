@@ -1,0 +1,11 @@
+packages:
+  - '.'
+
+onlyBuiltDependencies:
+  - '@firebase/util'
+  - canvas
+  - core-js
+  - msgpackr-extract
+  - protobufjs
+  - sharp
+  - unrs-resolver

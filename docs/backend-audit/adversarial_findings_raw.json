@@ -1,0 +1,332 @@
+[
+  {
+    "id": "ADV-TX-CELERY-001",
+    "category": "Transaction & Concurrency",
+    "severity": "P1",
+    "file": "api/apps/accounts/services.py",
+    "line": 262,
+    "rule": "CELERY_DISPATCH_BEFORE_COMMIT",
+    "evidence": "if not user.has_company:\n                queue_auth.update_avatar.delay(user.id, user.avatar.get_full_url())\n\n        return user.avatar.get_full_url()",
+    "detail": "Celery task dispatched via `queue_auth.update_avatar.delay(user.id, user.avatar.get_full_url())` inside `transaction.atomic()` without `transaction.on_commit()`. Worker may read uncommitted data or fail if transaction rolls back."
+  },
+  {
+    "id": "ADV-TX-CELERY-002",
+    "category": "Transaction & Concurrency",
+    "severity": "P1",
+    "file": "api/apps/accounts/services.py",
+    "line": 285,
+    "rule": "CELERY_DISPATCH_BEFORE_COMMIT",
+    "evidence": "if not user.has_company:\n                queue_auth.update_avatar.delay(user.id, var_sys.AVATAR_DEFAULT[\"AVATAR\"])\n\n        return var_sys.AVATAR_DEFAULT[\"AVATAR\"]",
+    "detail": "Celery task dispatched via `queue_auth.update_avatar.delay(user.id, var_sys.AVATAR_DEFAULT['AVATAR'])` inside `transaction.atomic()` without `transaction.on_commit()`. Worker may read uncommitted data or fail if transaction rolls back."
+  },
+  {
+    "id": "ADV-PERF-SYNCHTTP-003",
+    "category": "Performance",
+    "severity": "P2",
+    "file": "api/apps/accounts/views_oauth.py",
+    "line": 360,
+    "rule": "SYNC_HTTP_IN_REQUEST_THREAD",
+    "evidence": "def facebook_revoke_token(self, access_token):\n        response = requests.delete(\n            url=settings.SOCIAL_AUTH_FACEBOOK_OAUTH2_REVOKE_TOKEN_URL,\n            headers={\"Authorization\": \"Bearer {}\".format(access_token)},",
+    "detail": "Synchronous `requests` HTTP call `requests.delete(url=settings.SOCIAL_AUTH_FACEBOOK_OAUTH2_REVOKE_TOKEN_URL, heade` executed directly in WSGI request thread without async/Celery offloading."
+  },
+  {
+    "id": "ADV-PERF-SYNCHTTP-004",
+    "category": "Performance",
+    "severity": "P2",
+    "file": "api/apps/accounts/views_oauth.py",
+    "line": 231,
+    "rule": "SYNC_HTTP_IN_REQUEST_THREAD",
+    "evidence": "response = requests.post(\n                settings.SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL,\n                data=data,",
+    "detail": "Synchronous `requests` HTTP call `requests.post(settings.SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL, data=data)` executed directly in WSGI request thread without async/Celery offloading."
+  },
+  {
+    "id": "ADV-TX-MUTATION-005",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/content/views.py",
+    "line": 347,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def create(self, request, *args, **kwargs):\n        from apps.files.models import File\n\n        serializer = self.get_serializer(data=request.data)\n        serializer.is_valid(raise_exception=True)",
+    "detail": "Method `create` performs multiple mutations (3 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-MUTATION-006",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/content/views.py",
+    "line": 373,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def update(self, request, *args, **kwargs):\n        from apps.files.models import File\n\n        banner = self.get_object()\n        serializer = self.get_serializer(banner, data=request.data, partial=True)",
+    "detail": "Method `update` performs multiple mutations (3 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-MUTATION-007",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/interviews/serializers.py",
+    "line": 161,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def create(self, validated_data):\n        rubric = validated_data.pop(\"evaluation_rubric_input\", serializers.empty)\n        instance = super().create(validated_data)\n        if rubric is not serializers.empty and hasattr(instance, \"evaluation_rubric\"):\n            instance.evaluation_rubric = rubric",
+    "detail": "Method `create` performs multiple mutations (2 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-MUTATION-008",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/interviews/views.py",
+    "line": 298,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def perform_create(self, serializer):\n        profile = serializer.save(created_by=self.request.user)\n        if profile.voice_type == VoiceProfile.TYPE_PRESET and profile.status == VoiceProfile.STATUS_DRAFT:\n            profile.status = VoiceProfile.STATUS_READY\n            profile.save(update_fields=[\"status\", \"update_at\"])",
+    "detail": "Method `perform_create` performs multiple mutations (2 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-MUTATION-009",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/interviews/views.py",
+    "line": 461,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def perform_create(self, serializer):\n        user = self.request.user\n        company = self._resolve_company(user)\n        if _is_admin_user(user):\n            question = serializer.save(author=user)",
+    "detail": "Method `perform_create` performs multiple mutations (2 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-MUTATION-010",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/interviews/views.py",
+    "line": 520,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def perform_create(self, serializer):\n        user = self.request.user\n        company = self._resolve_company(user)\n        if _is_admin_user(user):\n            group = serializer.save(author=user)",
+    "detail": "Method `perform_create` performs multiple mutations (2 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-MUTATION-011",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/interviews/views.py",
+    "line": 947,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def create(self, request, *args, **kwargs):\n        serializer = self.get_serializer(data=request.data)\n        serializer.is_valid(raise_exception=True)\n\n        interview = serializer.validated_data.get(\"interview\")",
+    "detail": "Method `create` performs multiple mutations (2 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-MUTATION-012",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/profiles/serializers_pkg/company_serializers.py",
+    "line": 593,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def update(self, instance, validated_data):\n        request = self.context.get(\"request\")\n        status_value = validated_data.get(\"status\")\n        instance = super().update(instance, validated_data)\n        if status_value:",
+    "detail": "Method `update` performs multiple mutations (2 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-CELERY-013",
+    "category": "Transaction & Concurrency",
+    "severity": "P1",
+    "file": "api/apps/profiles/serializers_pkg/company_serializers.py",
+    "line": 336,
+    "rule": "CELERY_DISPATCH_BEFORE_COMMIT",
+    "evidence": "# update in firebase\n                queue_auth.update_info.delay(instance.user_id, instance.company_name)\n\n                return instance",
+    "detail": "Celery task dispatched via `queue_auth.update_info.delay(instance.user_id, instance.company_name)` inside `transaction.atomic()` without `transaction.on_commit()`. Worker may read uncommitted data or fail if transaction rolls back."
+  },
+  {
+    "id": "ADV-TX-CELERY-014",
+    "category": "Transaction & Concurrency",
+    "severity": "P1",
+    "file": "api/apps/profiles/serializers_pkg/company_serializers.py",
+    "line": 726,
+    "rule": "CELERY_DISPATCH_BEFORE_COMMIT",
+    "evidence": "queue_auth.update_avatar.delay(company.user_id, company.logo.get_full_url())\n\n            return company",
+    "detail": "Celery task dispatched via `queue_auth.update_avatar.delay(company.user_id, company.logo.get_full_url())` inside `transaction.atomic()` without `transaction.on_commit()`. Worker may read uncommitted data or fail if transaction rolls back."
+  },
+  {
+    "id": "ADV-TX-MUTATION-015",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/profiles/serializers_pkg/profile_serializers.py",
+    "line": 129,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def update(self, instance, validated_data):\n        instance.birthday = validated_data.get('birthday', instance.birthday)\n        instance.phone = validated_data.get('phone', instance.phone)\n        instance.gender = validated_data.get('gender', instance.gender)\n        instance.marital_status = validated_data.get('marital_status', instance.marital_status)",
+    "detail": "Method `update` performs multiple mutations (4 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-PERF-SYNCHTTP-016",
+    "category": "Performance",
+    "severity": "P2",
+    "file": "api/apps/profiles/services/vieclam24h_import.py",
+    "line": 272,
+    "rule": "SYNC_HTTP_IN_REQUEST_THREAD",
+    "evidence": "import requests\n            resp = requests.get(\n                remote_url,\n                headers={\"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\"},",
+    "detail": "Synchronous `requests` HTTP call `requests.get(remote_url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; W` executed directly in WSGI request thread without async/Celery offloading."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-017",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/app_companies.py",
+    "line": 177,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class CompanyFollowedAPIView(views.APIView):\n    permission_classes = [perms_custom.IsJobSeekerUser]\n    renderer_classes = [renderers.MyJSONRenderer]\n    pagination_class = paginations.CustomPagination\n\n    def get(self, request):\n        user = request.user",
+    "detail": "View class `CompanyFollowedAPIView` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-018",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/app_resume.py",
+    "line": 40,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class PrivateResumeViewSet(\n    PermissionActionMapMixin, viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIView, generics.DestroyAPIView\n):\n    queryset = Resume.objects.all()\n    serializer_class = ResumeSerializer\n\n    permission_action_map = {",
+    "detail": "View class `PrivateResumeViewSet` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-019",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/app_resume.py",
+    "line": 313,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class ResumeViewedAPIView(views.APIView):\n    permission_classes = [perms_custom.IsJobSeekerUser]\n    renderer_classes = [renderers.MyJSONRenderer]\n    pagination_class = paginations.CustomPagination\n\n    def get(self, request):\n        user = request.user",
+    "detail": "View class `ResumeViewedAPIView` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-020",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/web_admin.py",
+    "line": 317,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class ResumeImportJobViewSet(AuditLogViewSetMixin, viewsets.ReadOnlyModelViewSet):\n    queryset = ResumeImportJob.objects.select_related(\"created_by\", \"target_city\", \"target_district\").all().order_by(\"-id\")\n    serializer_class = Vieclam24hImportJobSerializer\n    permission_classes = [perms_custom.IsAdminUser]\n    pagination_class = paginations.CustomPagination",
+    "detail": "View class `ResumeImportJobViewSet` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-021",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/web_companies.py",
+    "line": 78,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class CompanyView(viewsets.ViewSet):\n\n    def get_permissions(self):\n\n        if self.action in [\"get_company_info\", \"get_job_post_detail\"]:\n\n            return [perms_custom.IsEmployerUser()]",
+    "detail": "View class `CompanyView` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-022",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/web_companies.py",
+    "line": 148,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class PrivateCompanyViewSet(viewsets.ViewSet,\n\n                            generics.UpdateAPIView):\n\n    queryset = Company.objects\n\n    serializer_class = CompanySerializer",
+    "detail": "View class `PrivateCompanyViewSet` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-023",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/web_companies.py",
+    "line": 464,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class CompanyFollowedAPIView(views.APIView):\n\n    permission_classes = [perms_custom.IsJobSeekerUser]\n\n    renderer_classes = [renderers.MyJSONRenderer]\n\n    pagination_class = paginations.CustomPagination",
+    "detail": "View class `CompanyFollowedAPIView` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TX-MUTATION-024",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/profiles/views/web_companies.py",
+    "line": 620,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def put(self, request):\n        company = self.get_company(request)\n        if not company:\n            return var_res.response_data(\n                status=status.HTTP_400_BAD_REQUEST,",
+    "detail": "Method `put` performs multiple mutations (2 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TX-MUTATION-025",
+    "category": "Transaction & Concurrency",
+    "severity": "P2",
+    "file": "api/apps/profiles/views/web_companies.py",
+    "line": 919,
+    "rule": "MULTI_MUTATION_WITHOUT_ATOMIC",
+    "evidence": "def create(self, request, *args, **kwargs):\n        company = self.get_company()\n        if not company:\n            return var_res.response_data(\n                status=status.HTTP_400_BAD_REQUEST,",
+    "detail": "Method `create` performs multiple mutations (2 creates/saves) without an explicit `transaction.atomic()` block."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-026",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/web_views.py",
+    "line": 206,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,\n\n                           generics.CreateAPIView,\n\n                           generics.UpdateAPIView,\n\n                           generics.DestroyAPIView):",
+    "detail": "View class `PrivateResumeViewSet` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-027",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/web_views.py",
+    "line": 464,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class ResumeViewSet(viewsets.ViewSet,\n\n                    generics.ListAPIView,\n\n                    generics.RetrieveAPIView):\n\n    queryset = Resume.objects.select_related(",
+    "detail": "View class `ResumeViewSet` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-028",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/web_views.py",
+    "line": 856,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class ResumeViewedAPIView(views.APIView):\n\n    permission_classes = [perms_custom.IsJobSeekerUser]\n\n    renderer_classes = [renderers.MyJSONRenderer]\n\n    pagination_class = paginations.CustomPagination",
+    "detail": "View class `ResumeViewedAPIView` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-TENANT-SCOPE-029",
+    "category": "Multi-Tenancy & Authorization",
+    "severity": "P1",
+    "file": "api/apps/profiles/views/web_views.py",
+    "line": 892,
+    "rule": "STATIC_QUERYSET_WITHOUT_TENANT_FILTER",
+    "evidence": "class ResumeSavedViewSet(viewsets.ViewSet,\n\n                         generics.ListAPIView):\n\n    queryset = ResumeSaved.objects\n\n    permission_classes = [perms_custom.CanManageCandidates]",
+    "detail": "View class `ResumeSavedViewSet` defines static queryset without dynamic `get_queryset()` tenant filtering."
+  },
+  {
+    "id": "ADV-PERF-SYNCHTTP-030",
+    "category": "Performance",
+    "severity": "P2",
+    "file": "api/integrations/ai/views.py",
+    "line": 388,
+    "rule": "SYNC_HTTP_IN_REQUEST_THREAD",
+    "evidence": "try:\n        response = requests.get(f\"{probe_url.rstrip('/')}{path}\", headers=headers or {}, timeout=(2, 4))\n        latency_ms = int((time.time() - started_at) * 1000)\n        return {",
+    "detail": "Synchronous `requests` HTTP call `requests.get(f\"{probe_url.rstrip('/')}{path}\", headers=headers or {}, timeout=(2` executed directly in WSGI request thread without async/Celery offloading."
+  },
+  {
+    "id": "ADV-PERF-SYNCHTTP-031",
+    "category": "Performance",
+    "severity": "P2",
+    "file": "api/integrations/ai/views.py",
+    "line": 633,
+    "rule": "SYNC_HTTP_IN_REQUEST_THREAD",
+    "evidence": "try:\n        response = requests.get(\n            getattr(settings, \"FPT_GPU_BSS_TOKEN_EXCHANGE_URL\", \"\"),\n            headers={",
+    "detail": "Synchronous `requests` HTTP call `requests.get(getattr(settings, 'FPT_GPU_BSS_TOKEN_EXCHANGE_URL', ''), headers={'` executed directly in WSGI request thread without async/Celery offloading."
+  },
+  {
+    "id": "ADV-PERF-SYNCHTTP-032",
+    "category": "Performance",
+    "severity": "P2",
+    "file": "api/integrations/ai/views.py",
+    "line": 230,
+    "rule": "SYNC_HTTP_IN_REQUEST_THREAD",
+    "evidence": "try:\n            upstream = requests.post(url, json=payload, stream=False, timeout=(5, 30))\n        except requests.RequestException as e:\n            last_error = {\"source\": \"primary\" if index == 0 else f\"fallback-{index}\", \"detail\": str(e)}",
+    "detail": "Synchronous `requests` HTTP call `requests.post(url, json=payload, stream=False, timeout=(5, 30))` executed directly in WSGI request thread without async/Celery offloading."
+  },
+  {
+    "id": "ADV-PERF-SYNCHTTP-033",
+    "category": "Performance",
+    "severity": "P2",
+    "file": "api/integrations/ai/views.py",
+    "line": 318,
+    "rule": "SYNC_HTTP_IN_REQUEST_THREAD",
+    "evidence": "try:\n            upstream = requests.post(url, data=data, files=files, timeout=(5, 30))\n        except requests.RequestException as e:\n            last_error = {\"source\": \"primary\" if index == 0 else f\"fallback-{index}\", \"detail\": str(e)}",
+    "detail": "Synchronous `requests` HTTP call `requests.post(url, data=data, files=files, timeout=(5, 30))` executed directly in WSGI request thread without async/Celery offloading."
+  }
+]

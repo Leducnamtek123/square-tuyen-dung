@@ -18,6 +18,9 @@ export interface QuestionGroupPayload {
   description?: string;
   evaluationRubricInput?: unknown;
   questionIds?: number[];
+  question_ids?: number[];
+  is_public?: boolean;
+  isPublic?: boolean;
 }
 
 const questionGroupService = {

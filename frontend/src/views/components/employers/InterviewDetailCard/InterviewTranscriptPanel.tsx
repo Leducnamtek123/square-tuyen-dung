@@ -8,7 +8,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { InterviewSession } from '@/types/models';
 
 import { i18n, TFunction } from 'i18next';
-import type { SSETranscript } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
+import type { SSETranscript } from '@/views/employerPages/InterviewPages/hooks/useInterviewSSE';
 import type { InterviewTranscript } from '@/types/models';
 import pc from '@/utils/muiColors';
 
@@ -41,14 +41,14 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
         const mapped: TranscriptItem[] = existingTranscripts.map((transcript: InterviewTranscript) => ({
             speaker: transcript.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
             text: transcript.content || transcript.text || '',
-            timestamp: transcript.createAt ? new Date(transcript.createAt).toLocaleTimeString() : '',
+            timestamp: transcript.createAt ? new Date(transcript.createAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' }) : '',
             id: transcript.id,
             isLive: false,
         }));
         const liveMapped: TranscriptItem[] = liveOnly.map((lt) => ({
             speaker: lt.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
             text: lt.content,
-            timestamp: lt.createAt ? new Date(lt.createAt).toLocaleTimeString() : '',
+            timestamp: lt.createAt ? new Date(lt.createAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' }) : '',
             id: lt.id,
             isLive: true,
         }));

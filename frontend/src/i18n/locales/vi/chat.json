@@ -26,25 +26,27 @@
   "noAppliedJobs": "Bạn chưa ứng tuyển vị trí nào",
   "candidates": "ỨNG VIÊN ỨNG TUYỂN",
   "chatbot": {
-    "launcherAria": "Mở trợ lý InfoHR AI",
-    "panelAria": "Trò chuyện với InfoHR AI",
+    "launcherAria": "Mở trợ lý AILA AI",
+    "panelAria": "Trò chuyện với AILA AI",
     "closeAria": "Đóng chat",
     "status": "Đang sẵn sàng",
     "placeholder": "Nhập tin nhắn...",
     "greeting": {
-      "employer": "Chào bạn! Tôi là InfoHR AI, trợ lý tuyển dụng của bạn. Tôi có thể giúp gì cho quý đối tác hôm nay? (Ví dụ: tìm ứng viên tiềm năng, soạn tin nhắn mời phỏng vấn...)",
-      "jobSeeker": "Chào bạn! Tôi là InfoHR AI, trợ lý sự nghiệp của bạn. Bạn cần tìm việc làm hay tư vấn gì không?"
+      "employer": "Chào bạn! Tôi là AILA AI, trợ lý tuyển dụng của bạn. Tôi có thể hỗ trợ quý đối tác tìm ứng viên tiềm năng, soạn tin nhắn mời phỏng vấn và giải đáp mọi thắc mắc tuyển dụng.",
+      "jobSeeker": "Chào bạn! Tôi là AILA AI, trợ lý sự nghiệp của bạn. Bạn cần tìm việc làm hay tư vấn gì không?"
     },
     "systemPrompt": {
-      "employer": "Bạn là InfoHR AI, trợ lý AI thông minh dành cho nhà tuyển dụng trên nền tảng InfoHR-Tuyen-Dung. Bạn am hiểu về thị trường lao động, cách viết JD, và quy trình phỏng vấn chuyên nghiệp.",
-      "jobSeeker": "Bạn là InfoHR AI, trợ lý AI thông minh dành cho người tìm việc trên nền tảng InfoHR-Tuyen-Dung. Bạn giúp họ tìm việc, tư vấn sửa CV và chuẩn bị phỏng vấn."
+      "employer": "Bạn là AILA AI, trợ lý AI thông minh dành cho nhà tuyển dụng trên nền tảng InfoHR-Tuyen-Dung. Bạn am hiểu về thị trường lao động, cách viết JD, và quy trình phỏng vấn chuyên nghiệp. Trả lời trực tiếp, mạch lạc và thân thiện bằng Markdown đẹp mắt. Tuyệt đối không trích dẫn hay hiển thị các khối nguồn/ngữ cảnh thô.",
+      "jobSeeker": "Bạn là AILA AI, trợ lý AI thông minh dành cho người tìm việc trên nền tảng InfoHR-Tuyen-Dung. Bạn giúp họ tìm việc, tư vấn sửa CV và chuẩn bị phỏng vấn. Trả lời trực tiếp, mạch lạc và thân thiện bằng Markdown đẹp mắt. Tuyệt đối không trích dẫn hay hiển thị các khối nguồn/ngữ cảnh thô."
     },
     "error": {
       "apology": "Xin lỗi, tôi gặp chút trục trặc khi xử lý câu hỏi này.",
       "busy": "Máy chủ đang bận, vui lòng thử lại sau.",
       "tryAgainLater": "Tôi xin lỗi, hiện tại tôi không thể phản hồi. Vui lòng thử lại sau giây lát."
     },
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "subtitleEmployer": "Hỗ trợ tuyển dụng thông minh cho Doanh nghiệp",
+    "subtitleJobSeeker": "Trợ lý tìm việc và tối ưu hồ sơ AI"
   },
   "loadPreviousMessages": "Tải tin nhắn trước",
   "typeAMessage": "Nhập tin nhắn...",
@@ -52,5 +54,28 @@
     "index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32": "Chọn một cuộc hội thoại ở danh sách bên trái để bắt đầu nhắn tin"
   },
   "slogan": "Cách mới để nắm bắt cơ hội của bạn.",
-  "sloganSub": "Tương tác nhiều hơn, thành công nhiều hơn"
+  "sloganSub": "Tương tác nhiều hơn, thành công nhiều hơn",
+  "noSearchResults": "Không tìm thấy hội thoại phù hợp",
+  "tryDifferentKeyword": "Thử tìm với từ khóa hoặc tên khác",
+  "startChatFromRight": "Chọn việc làm hoặc ứng viên bên phải để bắt đầu nhắn tin",
+  "conversationPartner": "Người liên hệ",
+  "activeNow": "Đang hoạt động",
+  "employerBadge": "Nhà tuyển dụng",
+  "candidateBadge": "Ứng viên",
+  "viewDetails": "Xem thông tin liên quan",
+  "backToList": "Quay lại danh sách",
+  "chooseConversationHint": "Chọn một cuộc hội thoại ở danh sách bên trái hoặc việc làm bên phải để bắt đầu trò chuyện.",
+  "clickToDownload": "Nhấn để tải về",
+  "suggestions": {
+    "findDesigners": "Tìm ứng viên cho vị trí thiết kế",
+    "writeInterviewInvite": "Soạn tin mời phỏng vấn",
+    "marketSalary": "Mức lương thị trường hiện nay",
+    "findFrontendJobs": "Tìm việc làm vị trí Frontend",
+    "downloadEnglishCv": "Tải mẫu CV tiếng Anh",
+    "salaryInterviewTips": "Cách trả lời phỏng vấn về mức lương"
+  },
+  "startWithGreeting": "Hãy bắt đầu cuộc trò chuyện bằng một lời chào",
+  "startConversationWith": "Bắt đầu cuộc trò chuyện với {{name}}",
+  "startConversation": "Bắt đầu cuộc trò chuyện",
+  "sendFirstMessageHint": "Gửi lời chào hoặc đặt câu hỏi để kết nối ngay."
 }

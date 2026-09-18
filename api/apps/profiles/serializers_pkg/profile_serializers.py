@@ -15,7 +15,7 @@ from console.jobs import queue_auth
 from ..models import JobSeekerProfile
 from apps.locations.models import Location
 from apps.accounts import serializers as auth_serializers
-from common import serializers as common_serializers
+from apps.common import serializers as common_serializers
 
 
 PHONE_PATTERN = re.compile(
@@ -28,13 +28,13 @@ def _choice_values(choices):
 
 
 class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    phone = serializers.CharField(required=True, max_length=15)
-    birthday = serializers.DateField(required=True,
+    phone = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=15)
+    birthday = serializers.DateField(required=False, allow_null=True,
                                      input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
                                                     var_sys.DATE_TIME_FORMAT["Ymd"]])
-    gender = serializers.CharField(required=True, max_length=1)
+    gender = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=1)
     maritalStatus = serializers.CharField(source='marital_status',
-                                          required=True, max_length=1)
+                                          required=False, allow_blank=True, allow_null=True, max_length=1)
     idCardNumber = serializers.CharField(source='id_card_number', required=False,
                                          allow_blank=True, allow_null=True, max_length=30)
     idCardIssueDate = serializers.DateField(source='id_card_issue_date', required=False, allow_null=True,
@@ -54,21 +54,34 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
                                                  allow_blank=True, allow_null=True, max_length=100)
     emergencyContactPhone = serializers.CharField(source='emergency_contact_phone', required=False,
                                                   allow_blank=True, allow_null=True, max_length=20)
-    location = common_serializers.ProfileLocationSerializer()
+    isJobSeeking = serializers.BooleanField(source='is_seeking_job', required=False, default=True)
+    location = common_serializers.ProfileLocationSerializer(required=False, allow_null=True)
+    coverUrl = serializers.SerializerMethodField(method_name="get_cover_url", read_only=True)
 
-    user = auth_serializers.UserSerializer(fields=["fullName", "email", "avatarUrl"])
+    user = auth_serializers.UserSerializer(fields=["fullName", "email", "avatarUrl", "coverUrl"], required=False, allow_null=True)
 
     userDict = serializers.SerializerMethodField(method_name="get_user_dict", read_only=True)
 
     old = serializers.SerializerMethodField(method_name="get_old", read_only=True)
 
+    def get_cover_url(self, profile):
+        try:
+            if profile.cover_image:
+                return profile.cover_image.get_full_url()
+        except Exception:
+            pass
+        return None
 
     def get_user_dict(self, profile):
         user = profile.user
+        avatar_url = user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None
+        cover_url = profile.cover_image.get_full_url() if getattr(profile, 'cover_image', None) else None
         return {
             "fullName": user.full_name,
             "email": user.email,
-            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else var_sys.AVATAR_DEFAULT["AVATAR"],
+            "avatar": avatar_url,
+            "avatarUrl": avatar_url,
+            "coverUrl": cover_url,
             "phone": profile.phone,
             "gender": profile.gender,
             "birthday": profile.birthday,
@@ -105,9 +118,9 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
             errors["birthday"] = ["Birthday must be before today."]
         if "id_card_issue_date" in attrs and id_card_issue_date and id_card_issue_date > today:
             errors["idCardIssueDate"] = ["ID card issue date cannot be in the future."]
-        if "gender" in attrs and gender not in _choice_values(var_sys.GENDER_CHOICES):
+        if "gender" in attrs and gender and gender not in _choice_values(var_sys.GENDER_CHOICES):
             errors["gender"] = ["Invalid choice."]
-        if "marital_status" in attrs and marital_status not in _choice_values(var_sys.MARITAL_STATUS_CHOICES):
+        if "marital_status" in attrs and marital_status and marital_status not in _choice_values(var_sys.MARITAL_STATUS_CHOICES):
             errors["maritalStatus"] = ["Invalid choice."]
 
         if errors:
@@ -122,6 +135,7 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
                   'taxCode', 'socialInsuranceNo',
                   'permanentAddress', 'contactAddress',
                   'emergencyContactName', 'emergencyContactPhone',
+                  'isJobSeeking', 'coverUrl',
                   'location', 'user', 'userDict', 'old')
 
     def update(self, instance, validated_data):
@@ -138,6 +152,7 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
         instance.contact_address = validated_data.get('contact_address', instance.contact_address)
         instance.emergency_contact_name = validated_data.get('emergency_contact_name', instance.emergency_contact_name)
         instance.emergency_contact_phone = validated_data.get('emergency_contact_phone', instance.emergency_contact_phone)
+        instance.is_seeking_job = validated_data.get('is_seeking_job', instance.is_seeking_job)
         location_obj = instance.location
         user_obj = instance.user
         location_data = validated_data.get("location")
@@ -145,10 +160,14 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
 
         if location_data:
             if location_obj:
-                location_obj.city = location_data.get("city", location_obj.city)
-                location_obj.district = location_data.get("district", location_obj.district)
-                location_obj.ward = location_data.get("ward", location_obj.ward)
-                location_obj.address = location_data.get("address", location_obj.address)
+                if "city" in location_data:
+                    location_obj.city = location_data.get("city")
+                if "district" in location_data:
+                    location_obj.district = location_data.get("district")
+                if "ward" in location_data:
+                    location_obj.ward = location_data.get("ward")
+                if "address" in location_data:
+                    location_obj.address = location_data.get("address")
                 location_obj.save()
             else:
                 location_new = Location.objects.create(**location_data)
@@ -157,7 +176,13 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
             user_obj.full_name = user_data.get("full_name", user_obj.full_name)
             user_obj.save()
             # update in firebase
-            queue_auth.update_info.delay(user_obj.id, user_obj.full_name)
+            user_id = user_obj.id
+            full_name = user_obj.full_name
+            transaction.on_commit(lambda: queue_auth.update_info.delay(user_id, full_name))
+
+        if "phone" in validated_data and instance.phone and user_obj:
+            user_obj.phone_number = instance.phone
+            user_obj.save(update_fields=['phone_number'])
 
         instance.save()
         return instance

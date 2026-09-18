@@ -1,27 +1,27 @@
-﻿'use client';
+'use client';
 import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { useTranslation } from 'react-i18next';
 
-import { TabTitle } from '../../../utils/generalFunction';
+import { TabTitle } from '@/utils/generalFunction';
 
-import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '../../../configs/constants';
+import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '@/configs/constants';
 
-import toastMessages from '../../../utils/toastMessages';
+import toastMessages from '@/utils/toastMessages';
 
-import { updateVerifyEmail } from '../../../redux/authSlice';
+import { updateVerifyEmail } from '@/redux/authSlice';
 
-import { getUserInfo } from '../../../redux/userSlice';
+import { getUserInfo } from '@/redux/userSlice';
 
-import authService from '../../../services/authService';
+import authService from '@/services/authService';
 
-import tokenService from '../../../services/tokenService';
+import tokenService from '@/services/tokenService';
 
-import { useAppDispatch } from '../../../hooks/useAppStore';
+import { useAppDispatch } from '@/hooks/useAppStore';
 
-import type { RoleName, AuthProvider } from '../../../types/auth';
+import type { RoleName, AuthProvider } from '@/types/auth';
 
 import type { AxiosError } from 'axios';
 
@@ -72,8 +72,16 @@ const JobSeekerLogin = () => {
   }, [t]);
 
   const navigateHome = async () => {
-    await dispatch(getUserInfo()).unwrap();
-    push('/');
+    const user = await dispatch(getUserInfo()).unwrap();
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+    const redirectUrl = params?.get('redirect') || params?.get('redirect_url');
+    if (user?.isOnboarded === false) {
+      push('/onboarding/candidate');
+    } else if (redirectUrl && redirectUrl.startsWith('/')) {
+      push(redirectUrl);
+    } else {
+      push('/');
+    }
   };
 
   const handleLogin = (data: { email: string; password?: string }) => {
@@ -81,7 +89,7 @@ const JobSeekerLogin = () => {
       setIsFullScreenLoading(true);
       try {
         const resData = await authService.checkCreds(data.email, ROLES_NAME.JOB_SEEKER as RoleName);
-        const { exists, email: resEmail, emailVerified } = resData;
+        const { exists, email: resEmail, emailVerified, otherRole, other_role } = resData;
 
         if (exists === true && emailVerified === false) {
           dispatch(
@@ -96,6 +104,13 @@ const JobSeekerLogin = () => {
         }
 
         if (exists === false) {
+          const detectedOtherRole = otherRole || other_role;
+          if (detectedOtherRole === ROLES_NAME.EMPLOYER) {
+            setErrorMessage(
+              'Email này đã được đăng ký cho tài khoản Nhà tuyển dụng. Vui lòng đăng nhập tại Cổng Doanh nghiệp.'
+            );
+            return;
+          }
           setErrorMessage(t('messages.noCandidateAccount'));
           return;
         }

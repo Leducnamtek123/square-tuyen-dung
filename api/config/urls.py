@@ -5,7 +5,8 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from config.admin import custom_admin_site
-from config import interviews_compat_views, views
+from config import views
+from apps.interviews import views_compat as interviews_compat_views
 from config.health import health_check
 from integrations.ai import views as ai_views
 from integrations.livekit import webhook as livekit_webhook
@@ -23,19 +24,23 @@ schema_view = get_schema_view(
 )
 
 api_v1_patterns = [
-    path("common/", include("common.urls")),
+    path("common/", include("apps.common.urls")),
     path("auth/", include("apps.accounts.urls")),
     path("info/", include("apps.profiles.urls")),
     path("job/", include("apps.jobs.urls")),
+    path("cv/", include("apps.cv_builder.urls")),
     path("content/", include("apps.content.urls")),
     path("chatbot/", include("apps.chatbot.urls")),
     path("interview/", include("apps.interviews.urls")),
     path("agent-assistants/", include("apps.agent_assistants.urls")),
-    path("hrm/", include("integrations.frappe_hr.urls")),
+    path("native-hrm/", include("apps.hrm.urls")),
+    path("exchange/", include("apps.exchange.urls")),
+    path("operations/", include("apps.operations.urls")),
     path("admin/web/system-settings/", views.SystemSettingsAPIView.as_view()),
     path("ai/tts/", ai_views.tts),
     path("ai/transcribe/", ai_views.transcribe),
     path("ai/chat/", ai_views.chat),
+    path("ai/chatbot/config/", ai_views.chatbot_config),
     path("ai/health/", ai_views.health),
     path("ai/gpu-control/", ai_views.gpu_control_status),
     path("ai/gpu-control/<str:action>/", ai_views.gpu_control_action),
@@ -57,7 +62,6 @@ urlpatterns = [
     path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("auth/", include("drf_social_oauth2.urls", namespace="drf")),
     path("api/v1/", include((api_v1_patterns, "api-v1"))),
-    # Backward compatibility during migration. Remove after clients move to /api/v1/.
     path("api/", include((api_v1_patterns, "api-legacy"))),
     path("", custom_admin_site.urls),
 ]

@@ -68,23 +68,25 @@ const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
           <Typography
             variant="h5"
             sx={{
-              color: "text.primary",
-              fontWeight: 600,
+              color: "#0f172a",
+              fontWeight: 700,
               display: "flex",
               alignItems: "center",
-              gap: 1,
+              gap: 1.5,
+              fontSize: { xs: '1.25rem', md: '1.4rem' },
             }}
           >
             {t("home.topCompanies")}
             <Box
               component="span"
               sx={{
-                color: "primary.main",
+                color: "#2563eb",
                 fontWeight: 600,
-                backgroundColor: "primary.background",
-                padding: "4px 12px",
-                borderRadius: "20px",
-                fontSize: "0.9em",
+                backgroundColor: "#eff6ff",
+                border: "1px solid #dbeafe",
+                padding: "3px 12px",
+                borderRadius: "999px",
+                fontSize: "0.78em",
               }}
             >
               {t("home.companiesCount", { count: count })}

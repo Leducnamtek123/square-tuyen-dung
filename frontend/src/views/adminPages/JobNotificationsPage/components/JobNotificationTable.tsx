@@ -5,9 +5,9 @@ import { Typography, IconButton, Tooltip, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import dayjs from '../../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 
 type JobNotificationRow = {
   title?: string;
@@ -82,12 +82,12 @@ const JobNotificationTable = ({
             cell: (info) => (
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <Tooltip title={t('pages.jobNotifications.table.edit')}>
-                        <IconButton size="small" onClick={() => onEdit?.(info.row.original)} color="primary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onEdit?.(info.row.original)} color="primary">
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.jobNotifications.table.delete')}>
-                        <IconButton size="small" onClick={() => onDelete?.(info.row.original)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onDelete?.(info.row.original)} color="error">
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

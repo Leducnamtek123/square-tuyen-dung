@@ -1,8 +1,7 @@
-﻿'use client';
+'use client';
 
 import * as React from 'react';
-import type { AppDispatch } from '../../../redux/store';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import {
@@ -15,22 +14,22 @@ import {
   styled,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { TabTitle } from '../../../utils/generalFunction';
-import { ROLES_NAME, ROUTES } from '../../../configs/constants';
-import toastMessages from '../../../utils/toastMessages';
-import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
-import { updateVerifyEmail } from '../../../redux/authSlice';
-import { getUserInfo } from '../../../redux/userSlice';
-import AdminLoginForm from '../../components/auths/JobSeekerLoginForm';
-import authService from '../../../services/authService';
-import tokenService from '../../../services/tokenService';
-import type { RoleName } from '../../../types/auth';
-import { getPreferredLanguage } from '../../../configs/portalRouting';
-import { localizeRoutePath } from '../../../configs/routeLocalization';
+import { TabTitle } from '@/utils/generalFunction';
+import { ROLES_NAME, ROUTES } from '@/configs/constants';
+import toastMessages from '@/utils/toastMessages';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { updateVerifyEmail } from '@/redux/authSlice';
+import { getUserInfo } from '@/redux/userSlice';
+import AdminLoginForm from '@/views/components/auths/JobSeekerLoginForm';
+import authService from '@/services/authService';
+import tokenService from '@/services/tokenService';
+import type { RoleName } from '@/types/auth';
+import { getPreferredLanguage } from '@/configs/portalRouting';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 const INTERVAL_MS = 5000;
 
-/* ────────────── styled components ────────────── */
+/* -------------- styled components -------------- */
 const Card = styled(Box)(() => ({
   display: 'flex',
   width: '100%',
@@ -92,17 +91,17 @@ const Dot = styled('button')<{ active: boolean }>(({ active }) => ({
   padding: 0,
 }));
 
-/* ────────────── component ────────────── */
+/* -------------- component -------------- */
 const AdminLogin: React.FC = () => {
   const { t } = useTranslation(['auth', 'admin']);
   TabTitle(t('auth:login.adminTitle'));
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const { push } = useRouter();
 
   const [isAuthenticating, setIsAuthenticating] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  /* ── slider data ── */
+  /* -- slider data -- */
   const SLIDES = [
     {
       image: '/images/admin-login/slide-1.png',
@@ -121,7 +120,7 @@ const AdminLogin: React.FC = () => {
     },
   ];
 
-  /* ── slider state ── */
+  /* -- slider state -- */
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -144,7 +143,7 @@ const AdminLogin: React.FC = () => {
     resetTimer();
   };
 
-  /* ── auth logic ── */
+  /* -- auth logic -- */
   const handleLogin: React.ComponentProps<typeof AdminLoginForm>['onLogin'] = (data) => {
     const getAccessToken = async (email: string, password: string, roleName: string) => {
       try {
@@ -218,7 +217,7 @@ const AdminLogin: React.FC = () => {
   return (
     <>
       <Card>
-        {/* ─── LEFT: Form ─── */}
+        {/* --- LEFT: Form --- */}
         <LeftPanel>
           <Box sx={{ mb: 1 }}>
             <Image
@@ -268,7 +267,7 @@ const AdminLogin: React.FC = () => {
           </Typography>
         </LeftPanel>
 
-        {/* ─── RIGHT: Image slides (no animation) ─── */}
+        {/* --- RIGHT: Image slides (no animation) --- */}
         <RightPanel>
           {SLIDES.map((slide, idx) => (
             <SlideImage

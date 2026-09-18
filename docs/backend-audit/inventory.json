@@ -1,0 +1,110 @@
+{
+  "architecture": {
+    "framework": "Django 4.1.7 + Django REST Framework 3.14.0",
+    "runtime": "Python 3.11 + Gunicorn / Uvicorn (ASGI) + Celery Worker/Beat",
+    "database": "MySQL 8.0 / SQLite (dev) + Redis 7.0 + Elasticsearch 7.17",
+    "fileStorage": "MinIO S3-compatible Object Storage / Cloudinary",
+    "voiceAiSubsystem": "LiveKit WebRTC Server + LiveKit Egress + LiveKit Agent + VieNeu TTS + Whisper STT"
+  },
+  "applications": {
+    "accounts": {
+      "role": "User identity, authentication, OAuth2, RBAC, Onboarding wizard, and account settings",
+      "modelsCount": 2,
+      "serializersCount": 11,
+      "viewsCount": 9,
+      "tasksCount": 2
+    },
+    "jobs": {
+      "role": "Job post publishing, application lifecycle, auto-sourcing matching, saved jobs, notifications",
+      "modelsCount": 4,
+      "serializersCount": 14,
+      "viewsCount": 16,
+      "tasksCount": 4
+    },
+    "interviews": {
+      "role": "AI-driven live interviews, question bank, rubric evaluations, transcripts, voice profiles",
+      "modelsCount": 7,
+      "serializersCount": 12,
+      "viewsCount": 14,
+      "tasksCount": 3
+    },
+    "profiles": {
+      "role": "Candidate online CVs, attached resumes, PDF parsing, company profiles, team memberships, ViecLam24h ingestion",
+      "modelsCount": 15,
+      "serializersCount": 16,
+      "viewsCount": 18,
+      "tasksCount": 2
+    },
+    "hrm": {
+      "role": "Enterprise workforce management, candidate-to-employee conversion, departments, contracts, leaves, org chart",
+      "modelsCount": 6,
+      "serializersCount": 8,
+      "viewsCount": 7,
+      "tasksCount": 0
+    },
+    "content": {
+      "role": "Editorial CMS articles, hero banners, feedback ratings, trust reports, inbound contact tickets",
+      "modelsCount": 6,
+      "serializersCount": 7,
+      "viewsCount": 8,
+      "tasksCount": 0
+    },
+    "agent_assistants": {
+      "role": "AILA AI recruitment copilot, multi-step LLM planner, tool registry, chat thread persistence",
+      "modelsCount": 3,
+      "serializersCount": 4,
+      "viewsCount": 5,
+      "tasksCount": 0
+    },
+    "chatbot": {
+      "role": "Rule-based and AI support chat responses for candidates and recruiters",
+      "modelsCount": 0,
+      "serializersCount": 1,
+      "viewsCount": 3,
+      "tasksCount": 0
+    },
+    "locations": {
+      "role": "Administrative geography hierarchy (Vietnam Cities, Districts, Wards, Locations)",
+      "modelsCount": 4,
+      "serializersCount": 4,
+      "viewsCount": 4,
+      "tasksCount": 0
+    },
+    "files": {
+      "role": "Unified file entity, Cloudinary/MinIO upload handler, metadata and virus scanning",
+      "modelsCount": 1,
+      "serializersCount": 2,
+      "viewsCount": 2,
+      "tasksCount": 0
+    },
+    "integrations_ai": {
+      "role": "LLM client proxy, prompt engineering, TTS voice synthesis, STT transcription, FPT GPU control-plane",
+      "modelsCount": 0,
+      "serializersCount": 2,
+      "viewsCount": 9,
+      "tasksCount": 0
+    },
+    "integrations_frappe_hr": {
+      "role": "ERPNext / Frappe HR sync adapter and webhook handlers",
+      "modelsCount": 0,
+      "serializersCount": 3,
+      "viewsCount": 3,
+      "tasksCount": 1
+    },
+    "integrations_livekit": {
+      "role": "LiveKit WebRTC token generation, room dispatching, webhook event handler, egress recording",
+      "modelsCount": 0,
+      "serializersCount": 0,
+      "viewsCount": 2,
+      "tasksCount": 0
+    }
+  },
+  "summaryMetrics": {
+    "totalApplications": 15,
+    "totalModels": 118,
+    "totalSerializers": 97,
+    "totalViews": 107,
+    "totalEndpoints": 193,
+    "totalCeleryTasks": 12
+  }
+}

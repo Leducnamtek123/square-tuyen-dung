@@ -1,33 +1,35 @@
 'use client';
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { Box, Button, Drawer, Stack, Divider, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
+import { useRouter, usePathname } from 'next/navigation';
+import { Box, Button, Drawer, Stack, Divider, List, ListItem, ListItemButton, ListItemText, Typography, IconButton, Collapse } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import Link from 'next/link';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import errorHandling from '../../../../utils/errorHandling';
-import { IMAGES, ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
-import { removeUserInfo } from '../../../../redux/userSlice';
-import tokenService from '../../../../services/tokenService';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import errorHandling from '@/utils/errorHandling';
+import { IMAGES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { removeUserInfo } from '@/redux/userSlice';
+import tokenService from '@/services/tokenService';
 import AccountSwitchMenu from '../AccountSwitchMenu';
-import { isEmployerPortalPath } from '../../../../configs/portalRouting';
-import type { ApiError } from '../../../../types/api';
+import { isEmployerPortalPath } from '@/configs/portalRouting';
+import type { ApiError } from '@/types/api';
 import type { AxiosError } from 'axios';
-import type { AppDispatch } from '../../../../redux/store';
+import type { AppDispatch } from '@/redux/store';
 import {
   resetSearchCompany,
   resetSearchJobPostFilter,
   resetSearchResume,
-} from '../../../../redux/filterSlice';
+} from '@/redux/filterSlice';
 
 interface PageItem {
   id: string;
   path: string;
   label: string;
   requireAuth?: boolean;
+  isHot?: boolean;
   children?: {
     id: string;
     path: string;
@@ -38,20 +40,20 @@ interface PageItem {
 }
 
 interface LeftDrawerProps {
-  window?: () => Window;
+  windowProp?: () => Window;
   pages: PageItem[];
   mobileOpen: boolean;
   handleDrawerToggle: () => void;
   showPublicActions?: boolean;
 }
 
-const DRAWER_WIDTH_SM = 260;
-const DRAWER_WIDTH_XS = '80vw';
+const DRAWER_WIDTH = 'min(320px, 85vw)';
 
-const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
+const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
   const { t } = useTranslation('common');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { push } = useRouter();
+  const pathname = usePathname() || '';
   const { isAuthenticated } = useAppSelector((state) => state.user);
   const [openSubMenus, setOpenSubMenus] = React.useState<Record<string, boolean>>({});
 
@@ -59,8 +61,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
     setOpenSubMenus((prev) => ({ ...prev, [pageId]: !prev[pageId] }));
   };
 
-  const container = window !== undefined ? () => window().document.body : undefined;
-  const pathname = globalThis?.window?.location?.pathname || '';
+  const container = windowProp !== undefined ? () => windowProp().document.body : undefined;
   const isEmployerPortal = isEmployerPortalPath(pathname);
   const loginRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.LOGIN : ROUTES.AUTH.LOGIN;
   const registerRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.REGISTER : ROUTES.AUTH.REGISTER;
@@ -69,7 +70,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
     const backend = tokenService.getProviderFromCookie() || '';
 
-    (dispatch as AppDispatch)(removeUserInfo({ accessToken, backend }))
+    dispatch(removeUserInfo({ accessToken, backend }))
       .unwrap()
       .then(() => {
         dispatch(resetSearchJobPostFilter());
@@ -109,53 +110,83 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
       onClose={handleDrawerToggle}
       ModalProps={{
         keepMounted: true, // Better open performance on mobile.
+        disableRestoreFocus: true,
       }}
       sx={{
         display: { xs: 'block', md: 'none' },
         '& .MuiDrawer-paper': {
           boxSizing: 'border-box',
-          width: { xs: DRAWER_WIDTH_XS, sm: DRAWER_WIDTH_SM },
-          maxWidth: DRAWER_WIDTH_SM,
+          width: DRAWER_WIDTH,
+          maxWidth: 320,
           boxShadow: (theme) => theme.customShadows?.card || '0 8px 32px rgba(0,0,0,0.15)',
           border: 'none',
-          borderRadius: '0 16px 16px 0',
+          borderRadius: 0,
           overflow: 'hidden',
         },
       }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0 }} role="dialog" aria-label={t('nav.mainNav', { defaultValue: 'Menu điều hướng' })}>
+        {/* Drawer Header with Logo & Accessible Close Button */}
         <Box
           sx={{
-            px: 2.5,
-            py: 2,
+            px: 2,
+            py: 1.5,
+            minHeight: 56,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '1px solid',
             borderColor: 'divider',
             flexShrink: 0,
+            minWidth: 0,
           }}
         >
           <Box
             component={Link}
             href="/"
             onClick={handleDrawerToggle}
-            sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none' }}
+            sx={{ display: 'flex', alignItems: 'center', textDecoration: 'none', minWidth: 0 }}
           >
             <Box
               component="img"
               src={IMAGES.getTextLogo('dark')}
+<<<<<<< HEAD
               alt="Logo"
               sx={{ width: 32, height: 32, objectFit: 'contain' }}
+=======
+              alt="InfoHR"
+              sx={{ height: 30, width: 'auto', maxWidth: 130, objectFit: 'contain' }}
+>>>>>>> feature/hrm-time-attendance
             />
-            <Typography variant="h6" fontWeight={700} color="primary.main">
-              INFO HR
-            </Typography>
           </Box>
+
+          <IconButton
+            aria-label={t('actions.closeDrawer', { defaultValue: 'Đóng menu' })}
+            onClick={handleDrawerToggle}
+            size="small"
+            sx={{
+              minWidth: 40,
+              minHeight: 40,
+              color: 'text.secondary',
+              borderRadius: 2,
+              '&:hover': {
+                backgroundColor: 'action.hover',
+                color: 'text.primary',
+              },
+              '&:focus-visible': {
+                outline: '2px solid',
+                outlineColor: 'primary.main',
+                outlineOffset: '2px',
+              },
+            }}
+          >
+            <CloseIcon sx={{ fontSize: 20 }} />
+          </IconButton>
         </Box>
 
-        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-          <List sx={{ py: 1.5 }}>
+        {/* Scrollable Navigation Body */}
+        <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minWidth: 0 }} component="nav" aria-label={t('nav.mobileMenu', { defaultValue: 'Menu chính' })}>
+          <List sx={{ py: 1.5, minWidth: 0 }}>
             {pages.map((page) => {
               const hasSubItems = Boolean(page.children && page.children.length > 0);
               const isSubOpen = Boolean(openSubMenus[page.id]);
@@ -168,15 +199,29 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                     className={pathname.startsWith(page.path) ? 'active' : ''}
                     disablePadding
                     onClick={(e: React.MouseEvent<HTMLElement>) => handleItemClick(e, page)}
+<<<<<<< HEAD
                     sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer' }}
+=======
+                    sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer', minWidth: 0 }}
+>>>>>>> feature/hrm-time-attendance
                   >
                     <ListItemButton
+                      aria-expanded={hasSubItems ? isSubOpen : undefined}
+                      aria-haspopup={hasSubItems ? 'true' : undefined}
                       sx={{
+                        minHeight: 44,
                         textAlign: 'left',
                         borderRadius: 2,
-                        transition: 'all 0.2s ease-in-out',
+                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
                         color: 'text.primary',
                         justifyContent: 'space-between',
+                        minWidth: 0,
+                        px: 1.5,
+                        '&:focus-visible': {
+                          outline: '2px solid',
+                          outlineColor: 'primary.main',
+                          outlineOffset: '2px',
+                        },
                         '&.active': {
                           backgroundColor: 'primary.main',
                           color: 'white',
@@ -189,39 +234,129 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                         },
                       }}
                     >
-                      <ListItemText primary={page.label} slotProps={{ primary: { fontSize: '0.9rem', fontWeight: 600 } }} />
+                      <ListItemText
+                        primary={
+                          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+                            <span>{page.label}</span>
+                            {page.isHot && (
+                              <Box
+                                component="span"
+                                sx={{
+                                  bgcolor: '#ef4444',
+                                  color: '#ffffff',
+                                  fontSize: '0.625rem',
+                                  fontWeight: 900,
+                                  letterSpacing: '0.04em',
+                                  lineHeight: 1,
+                                  px: 0.75,
+                                  py: 0.35,
+                                  borderRadius: '5px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.45)',
+                                  animation: 'hotBadgePulse 1.8s infinite ease-in-out',
+                                  '@keyframes hotBadgePulse': {
+                                    '0%': {
+                                      transform: 'scale(1)',
+                                      boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.65)',
+                                    },
+                                    '50%': {
+                                      transform: 'scale(1.08)',
+                                      boxShadow: '0 0 0 5px rgba(239, 68, 68, 0)',
+                                    },
+                                    '100%': {
+                                      transform: 'scale(1)',
+                                      boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)',
+                                    },
+                                  },
+                                }}
+                              >
+                                HOT
+                              </Box>
+                            )}
+                          </Box>
+                        }
+                        slotProps={{
+                          primary: {
+                            fontSize: '0.9rem',
+                            fontWeight: 600,
+                            sx: { overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0 },
+                          },
+                        }}
+                      />
                       {hasSubItems && (
-                        <Typography variant="caption" sx={{ color: 'text.secondary', ml: 1 }}>
-                          {isSubOpen ? '▲' : '▼'}
-                        </Typography>
+                        <KeyboardArrowDownIcon
+                          sx={{
+                            fontSize: 18,
+                            color: 'text.secondary',
+                            ml: 1,
+                            flexShrink: 0,
+                            transform: isSubOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                          }}
+                        />
                       )}
                     </ListItemButton>
                   </ListItem>
 
-                  {hasSubItems && isSubOpen && (
-                    <List disablePadding sx={{ pl: 2, pr: 1, mb: 1 }}>
-                      {page.children?.map((child) => (
-                        <ListItem
-                          key={child.id}
-                          component={Link}
-                          href={child.path}
-                          disablePadding
-                          onClick={() => handleDrawerToggle()}
-                          sx={{ mb: 0.5 }}
-                        >
-                          <ListItemButton sx={{ borderRadius: 1.5, py: 0.75 }}>
-                            <ListItemText
-                              primary={child.label}
-                              secondary={child.description}
-                              slotProps={{
-                                primary: { fontSize: '0.825rem', fontWeight: 600, color: '#334155' },
-                                secondary: { fontSize: '0.725rem', color: '#64748b' },
+                  {hasSubItems && (
+                    <Collapse in={isSubOpen} timeout="auto" unmountOnExit>
+                      <List disablePadding sx={{ pl: 2, pr: 1, mb: 1, minWidth: 0 }}>
+                        {page.children?.map((child) => {
+                          const isExternal = child.path?.startsWith('http://') || child.path?.startsWith('https://');
+                          return (
+                            <ListItem
+                              key={child.id}
+                              component={isExternal ? 'a' : Link}
+                              href={child.path}
+                              {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                              disablePadding
+                              onClick={() => handleDrawerToggle()}
+                              sx={{ mb: 0.5, minWidth: 0 }}
+                            >
+                            <ListItemButton
+                              sx={{
+                                minHeight: 44,
+                                borderRadius: 1.5,
+                                py: 0.75,
+                                px: 1.25,
+                                minWidth: 0,
+                                alignItems: 'flex-start',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                                transition: 'background-color 0.15s ease',
+                                '&:focus-visible': {
+                                  outline: '2px solid',
+                                  outlineColor: 'primary.main',
+                                  outlineOffset: '2px',
+                                },
                               }}
-                            />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
+                            >
+                              <ListItemText
+                                primary={child.label}
+                                secondary={child.description}
+                                slotProps={{
+                                  primary: {
+                                    fontSize: '0.825rem',
+                                    fontWeight: 600,
+                                    color: '#334155',
+                                    sx: { overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0 },
+                                  },
+                                  secondary: {
+                                    fontSize: '0.725rem',
+                                    color: '#64748b',
+                                    sx: { overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0, mt: 0.25 },
+                                  },
+                                }}
+                                sx={{ m: 0, minWidth: 0, width: '100%' }}
+                              />
+                            </ListItemButton>
+                          </ListItem>
+                            );
+                          })}
+                      </List>
+                    </Collapse>
                   )}
                 </React.Fragment>
               );
@@ -229,25 +364,28 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
           </List>
 
           {showPublicActions && !isAuthenticated && (
-            <Box onClick={(e) => e.stopPropagation()}>
+            <Box onClick={(e) => e.stopPropagation()} sx={{ minWidth: 0 }}>
               <Divider sx={{ mx: 2, borderColor: 'divider' }}>
                 <Typography variant="caption" color="text.secondary" sx={{ px: 1, fontSize: '0.7rem' }}>
                   {isEmployerPortal ? t('nav.switch.forJobSeekers') : t('nav.switch.forEmployers')}
                 </Typography>
               </Divider>
-              <Box sx={{ px: 2, py: 1.5 }}>
+              <Box sx={{ px: 2, py: 1.5, minWidth: 0 }}>
                 <AccountSwitchMenu isShowButton={true} />
               </Box>
             </Box>
           )}
         </Box>
 
+        {/* Bottom Actions with Safe Area Inset */}
         <Box
           sx={{
             flexShrink: 0,
             borderTop: '1px solid',
             borderColor: 'divider',
             p: 2,
+            pb: 'max(16px, env(safe-area-inset-bottom, 16px))',
+            minWidth: 0,
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -258,15 +396,16 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
               fullWidth
               size="medium"
               sx={{
+                minHeight: 44,
                 textTransform: 'none',
-                
                 fontWeight: 600,
+                fontSize: '0.875rem',
                 '&:hover': {
                   backgroundColor: 'error.main',
                   color: 'white',
                 },
               }}
-              onClick={() => confirmModal(handleLogout, t('nav.logoutTitle'), t('nav.logoutConfirm'), 'question')}
+              onClick={() => confirmModal(handleLogout, t('nav.logoutTitle'), t('nav.logoutConfirm'), 'logout')}
             >
               {t('nav.logout')}
             </Button>
@@ -278,9 +417,10 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                 fullWidth
                 size="medium"
                 sx={{
+                  minHeight: 44,
                   textTransform: 'none',
-                  
-                  fontSize: '0.85rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
                 }}
                 onClick={() => {
                   push(`/${loginRoute}`);
@@ -295,9 +435,9 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                 fullWidth
                 size="medium"
                 sx={{
+                  minHeight: 44,
                   textTransform: 'none',
-                  
-                  fontSize: '0.85rem',
+                  fontSize: '0.875rem',
                   fontWeight: 600,
                 }}
                 onClick={() => {

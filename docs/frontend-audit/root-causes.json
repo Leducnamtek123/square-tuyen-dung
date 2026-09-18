@@ -1,0 +1,88 @@
+[
+  {
+    "id": "RC-RESP-001",
+    "type": "SYSTEMIC",
+    "category": "RESPONSIVE",
+    "title": "MUI and Tailwind Breakpoint Discrepancy",
+    "description": "Tailwind breakpoints (sm:640, md:768, lg:1024) and MUI breakpoints (sm:600, md:900, lg:1200) diverge, leading to unexpected layout snapping between 768px and 900px in mixed components.",
+    "blastRadius": {
+      "portals": [
+        "Public",
+        "Employer",
+        "Admin",
+        "Candidate"
+      ],
+      "estimatedRoutesAffected": 128
+    },
+    "recommendation": "Align MUI theme breakpoints with Tailwind standard or enforce single-system responsive logic per component.",
+    "status": "IDENTIFIED"
+  },
+  {
+    "id": "RC-UI-001",
+    "type": "SHARED_COMPONENT",
+    "category": "SHARED_COMPONENT",
+    "title": "Arbitrary CSS Spacing & Dimension Tokens in Shared UI",
+    "description": "Multiple shared buttons, modals, and input cards use arbitrary Tailwind brackets (e.g. min-w-[320px], h-[52px]) instead of design system spacing scale.",
+    "blastRadius": {
+      "portals": [
+        "Public",
+        "Candidate",
+        "Employer",
+        "Admin"
+      ],
+      "estimatedRoutesAffected": 65
+    },
+    "recommendation": "Normalize component sizing to standard spacing tokens (h-10, h-12, min-w-full sm:min-w-xs).",
+    "status": "IDENTIFIED"
+  },
+  {
+    "id": "RC-DATA-001",
+    "type": "BACKEND_CONTRACT",
+    "category": "DATA",
+    "title": "Client-Side Fallback Fabrication vs Backend Contract Verification",
+    "description": "Several service clients catch errors and return empty mock objects/arrays without bubbling actionable error states to UI components.",
+    "blastRadius": {
+      "portals": [
+        "Employer",
+        "Admin"
+      ],
+      "estimatedRoutesAffected": 45
+    },
+    "recommendation": "Ensure services throw typed API errors and views use standardized Query/ErrorBoundary loading/error states.",
+    "status": "IDENTIFIED"
+  },
+  {
+    "id": "RC-LAYOUT-001",
+    "type": "LAYOUT",
+    "category": "LAYOUT",
+    "title": "Portal Sidebar and Table Container Overflow on Narrow Viewports",
+    "description": "Admin & Employer data tables can induce viewport-level horizontal overflow if table wrappers lack strict `overflow-x-auto` + `max-w-full` constraint inside flex layouts.",
+    "blastRadius": {
+      "portals": [
+        "Admin",
+        "Employer"
+      ],
+      "estimatedRoutesAffected": 55
+    },
+    "recommendation": "Wrap all portal table regions in standardized responsive container wrappers with fluid scrollbars.",
+    "status": "IDENTIFIED"
+  },
+  {
+    "id": "RC-I18N-001",
+    "type": "I18N",
+    "category": "I18N",
+    "title": "Missing Centralized Missing-Key Telemetry in Development/Test",
+    "description": "While 25 i18n resource files exist, fallback strings in UI components can silently mask missing translation keys.",
+    "blastRadius": {
+      "portals": [
+        "Public",
+        "Candidate",
+        "Employer",
+        "Admin"
+      ],
+      "estimatedRoutesAffected": 128
+    },
+    "recommendation": "Run `audit_i18n.cjs` as part of CI and ensure all view components use `useTranslation` namespaces correctly.",
+    "status": "IDENTIFIED"
+  }
+]

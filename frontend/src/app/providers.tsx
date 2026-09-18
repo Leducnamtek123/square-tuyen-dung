@@ -8,8 +8,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import store from '../redux/store';
 import '../configs/dayjs-config';
 import '../i18n';
+import { useTranslation } from 'react-i18next';
 import errorHandling from '@/utils/errorHandling';
 import { isMaintenanceModeError } from '@/utils/maintenanceMode';
+import { OperationProvider, OperationCenterDock } from '@/components/operation';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -22,8 +24,11 @@ function makeQueryClient() {
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        retry: (failureCount, error) =>
-          !isMaintenanceModeError(error) && failureCount < 1,
+        retry: (failureCount, error: any) =>
+          !isMaintenanceModeError(error) &&
+          error?.response?.status !== 429 &&
+          error?.status !== 429 &&
+          failureCount < 1,
         staleTime: 5 * 60_000,
         gcTime: 10 * 60_000,
       },
@@ -31,19 +36,21 @@ function makeQueryClient() {
   });
 }
 
-export function Providers({ children }: { children: any }) {
-  // Use useRef instead of module-level singleton to avoid shared state
-  // between SSR requests in Next.js App Router.
-  const queryClientRef = React.useRef<QueryClient | null>(null);
-  if (!queryClientRef.current) {
-    queryClientRef.current = makeQueryClient();
-  }
+export function Providers({ children }: { children: React.ReactNode }) {
+  // Use useState lazy initializer to avoid mutating ref during render
+  // and maintain component instance isolation in Next.js App Router.
+  const [queryClient] = React.useState(() => makeQueryClient());
+  const { i18n } = useTranslation();
+  const activeLocale = i18n.language?.startsWith('en') ? 'en' : 'vi';
 
   return (
     <Provider store={store}>
-      <QueryClientProvider client={queryClientRef.current}>
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
-          {children}
+      <QueryClientProvider client={queryClient}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={activeLocale}>
+          <OperationProvider>
+            {children}
+            <OperationCenterDock />
+          </OperationProvider>
         </LocalizationProvider>
       </QueryClientProvider>
     </Provider>

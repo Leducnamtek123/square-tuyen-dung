@@ -1,60 +1,74 @@
-﻿'use client';
+'use client';
 import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from '@mui/material';
+import { Alert, AlertTitle, Box, Card, Container, Typography, styled } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { TabTitle } from '../../../utils/generalFunction';
-import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '../../../configs/constants';
-import { localizeRoutePath } from '../../../configs/routeLocalization';
-import toastMessages from '../../../utils/toastMessages';
-import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
-import { updateVerifyEmail } from '../../../redux/authSlice';
-import { getUserInfo, setActiveWorkspace } from '../../../redux/userSlice';
-import EmployerLoginForm, { EmployerLoginFormData } from '../../components/auths/EmployerLoginForm';
-import authService from '../../../services/authService';
-import tokenService from '../../../services/tokenService';
-import { useAppDispatch } from '../../../hooks/useAppStore';
-import type { RoleName, AuthProvider } from '../../../types/auth';
-import type { User, Workspace } from '../../../types/models';
+import { TabTitle } from '@/utils/generalFunction';
+import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import toastMessages from '@/utils/toastMessages';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { updateVerifyEmail } from '@/redux/authSlice';
+import { getUserInfo, setActiveWorkspace } from '@/redux/userSlice';
+import EmployerLoginForm, { EmployerLoginFormData } from '@/views/components/auths/EmployerLoginForm';
+import AuthShowcasePanel from '@/views/components/auths/AuthShowcasePanel';
+import authService from '@/services/authService';
+import tokenService from '@/services/tokenService';
+import { useAppDispatch } from '@/hooks/useAppStore';
+import type { RoleName, AuthProvider } from '@/types/auth';
+import type { User, Workspace } from '@/types/models';
 import type { AxiosError } from 'axios';
 import type { CodeResponse } from '@react-oauth/google';
+import SecurityIcon from '@mui/icons-material/Security';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
-const StyledCard = styled(Card)(({ theme }) => ({
-  background: 'rgba(255, 255, 255, 0.9)',
-  backdropFilter: 'blur(10px)',
-  borderRadius: '16px',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+const UnifiedAuthCard = styled(Card)(({ theme }) => ({
+  background: '#FFFFFF',
+  borderRadius: 0,
+  boxShadow: 'none',
+  border: 'none',
+  [theme.breakpoints.up('sm')]: {
+    borderRadius: '28px',
+    boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
+    border: '1px solid #E2E8F0',
+  },
   transition: 'all 0.3s ease',
-}));
-
-const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  margin: '16px',
-  width: '56px',
-  height: '56px',
-  backgroundColor: theme.palette.primary.main,
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+  width: '100%',
+  maxWidth: '1080px',
+  margin: '0 auto',
+  overflow: 'hidden',
 }));
 
 const StyledLink = styled(Link)(({ theme }) => ({
   textDecoration: 'none',
-  color: theme.palette.primary.main,
-  fontWeight: 500,
+  color: '#2563EB',
+  fontWeight: 600,
+  fontSize: '14px',
   transition: 'all 0.2s ease',
   '&:hover': {
-    color: theme.palette.primary.dark,
+    color: '#1D4ED8',
     textDecoration: 'underline',
   },
 }));
 
 const getCompanyPortalPath = (language: string) => {
   return localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, language);
+};
+
+const getSafeRedirectPath = (fallback: string) => {
+  if (typeof window === 'undefined') return fallback;
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get('redirect');
+  if (redirect && redirect.startsWith('/') && !redirect.startsWith('//') && !redirect.includes('\\')) {
+    return redirect;
+  }
+  return fallback;
 };
 
 const getCompanyWorkspace = (user?: User | null) =>
@@ -80,6 +94,7 @@ const EmployerLogin = () => {
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const forgotPasswordHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.FORGOT_PASSWORD}`, i18n.language);
   const registerHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
+  const candidateLoginHref = localizeRoutePath(`/${ROUTES.AUTH.LOGIN}`, i18n.language);
   const socialAuthInFlightRef = React.useRef(false);
   const lastSocialAuthAttemptAtRef = React.useRef(0);
 
@@ -102,11 +117,9 @@ const EmployerLogin = () => {
   const extractErrorMessage = (res: { data?: ApiErrorPayload } | undefined): string | null => {
     if (!res?.data) return null;
 
-    // V2 envelope: { success: false, error: { details: { errorMessage: [...] }, message: '...' } }
     const v2Details = res.data.error?.details;
     const v2ErrorMsg = v2Details?.errorMessage;
 
-    // V1 format: { errors: { errorMessage: [...] } }
     const v1Errors = res.data.errors;
     const v1ErrorMsg = v1Errors?.errorMessage;
 
@@ -139,12 +152,16 @@ const EmployerLogin = () => {
         if (isSaveTokenToCookie) {
           dispatch(getUserInfo())
             .unwrap()
-            .then((user) => {
+            .then((user: any) => {
               const companyWorkspace = getCompanyWorkspace(user);
               if (companyWorkspace) {
                 dispatch(setActiveWorkspace(companyWorkspace));
               }
-              push(getCompanyPortalPath(i18n.language));
+              if (user?.isOnboarded === false) {
+                push('/onboarding/employer');
+              } else {
+                push(getSafeRedirectPath(getCompanyPortalPath(i18n.language)));
+              }
             })
             .catch(() => {
               toastMessages.error(t('messages.loginError'));
@@ -238,12 +255,16 @@ const EmployerLogin = () => {
       if (isSaveTokenToCookie) {
         dispatch(getUserInfo())
           .unwrap()
-          .then((user) => {
+          .then((user: any) => {
             const companyWorkspace = getCompanyWorkspace(user);
             if (companyWorkspace) {
               dispatch(setActiveWorkspace(companyWorkspace));
             }
-            push(getCompanyPortalPath(i18n.language));
+            if (user?.isOnboarded === false) {
+              push('/onboarding/employer');
+            } else {
+              push(getSafeRedirectPath(getCompanyPortalPath(i18n.language)));
+            }
           })
           .catch(() => {
             toastMessages.error(t('messages.loginError'));
@@ -284,124 +305,262 @@ const EmployerLogin = () => {
   return (
     <>
       <Container
-        maxWidth="sm"
+        maxWidth="lg"
+        disableGutters
         sx={{
-          marginTop: { xs: 0, sm: 2, md: 3 },
-          p: { xs: 0, sm: 3 },
+          py: { xs: 0, sm: 4, md: 5 },
+          px: { xs: 0, sm: 2, md: 3 },
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          minHeight: { xs: 'auto', sm: 'calc(100vh - 120px)' },
         }}
       >
-        <StyledCard
-          sx={{
-            p: { xs: 2, sm: 4, md: 5 },
-            width: '100%',
-            borderRadius: { xs: 0, sm: '16px' },
-            boxShadow: { xs: 'none', sm: '0 8px 32px rgba(0, 0, 0, 0.1)' },
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              mb: 4,
-            }}
-          >
-            <StyledAvatar>
-              <LockOutlinedIcon sx={{ fontSize: 28 }} />
-            </StyledAvatar>
-            <Typography
-              component="h1"
-              variant="h4"
-              align="center"
-              sx={{
-                fontWeight: 600,
-                color: 'primary.main',
-                mb: 1,
-              }}
-            >
-              {t('login.heading')}
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              align="center"
-              sx={{
-                color: 'text.secondary',
-                mb: 2,
-              }}
-            >
-              {t('login.welcomeBack')}
-            </Typography>
-          </Box>
-
-          {errorMessage && (
-            <Alert
-              severity="error"
-              sx={{
-                mb: 3,
-                borderRadius: '8px',
-              }}
-            >
-              <AlertTitle>{t('login.errorTitle')}</AlertTitle>
-              {errorMessage}
-            </Alert>
-          )}
-
-          {successMessage && (
-            <Alert
-              severity="success"
-              sx={{
-                mb: 3,
-                borderRadius: '8px',
-              }}
-            >
-              <AlertTitle>{t('login.successTitle')}</AlertTitle>
-              {successMessage}
-            </Alert>
-          )}
-
-          <Box sx={{ mt: 2 }}>
-            <EmployerLoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />
-          </Box>
-
+        <UnifiedAuthCard>
           <Grid
             container
-            spacing={2}
+            spacing={0}
+            alignItems="stretch"
             sx={{
-              mt: 4,
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              width: '100%',
             }}
           >
+            {/* Left Column: Login Form */}
             <Grid
-              size={{
-                xs: 12,
-                sm: 6,
+              size={{ xs: 12, md: 6 }}
+              sx={{
+                p: { xs: 2.25, sm: 4, md: 4.5 },
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                backgroundColor: '#FFFFFF',
               }}
             >
-              <StyledLink href={forgotPasswordHref}>
-                {t('login.forgotPassword')}
-              </StyledLink>
+              {/* Card Top / Header */}
+              <Box>
+                {/* Role and Switcher header */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 1.5,
+                    mb: 2.5,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      backgroundColor: '#EFF6FF',
+                      border: '1px solid #DBEAFE',
+                      px: 1.5,
+                      py: 0.6,
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <Typography
+                      component="span"
+                      sx={{
+                        color: '#2563EB',
+                        fontWeight: 700,
+                        fontSize: '12px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                        whiteSpace: 'nowrap',
+                        lineHeight: 1,
+                      }}
+                    >
+                      Nhà tuyển dụng
+                    </Typography>
+                  </Box>
+
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: '#64748B',
+                      fontSize: '13px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <span>Bạn là Người tìm việc?</span>
+                    <StyledLink
+                      href={candidateLoginHref}
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.35,
+                        fontWeight: 700,
+                        color: '#2563EB',
+                        textDecoration: 'none',
+                        '&:hover': {
+                          textDecoration: 'underline',
+                        },
+                      }}
+                    >
+                      <span>Tìm việc ngay</span>
+                      <ArrowForwardIcon sx={{ fontSize: 14 }} />
+                    </StyledLink>
+                  </Typography>
+                </Box>
+
+                <Box sx={{ mb: 2.5 }}>
+                  <Typography
+                    component="h1"
+                    variant="h4"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: { xs: '22px', sm: '26px', md: '28px' },
+                      color: '#0F172A',
+                      letterSpacing: '-0.02em',
+                      mb: 0.75,
+                    }}
+                  >
+                    {t('login.heading')}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: '#64748B',
+                      fontSize: '14px',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {t('login.welcomeBack')}
+                  </Typography>
+                </Box>
+
+                {errorMessage && (
+                  <Alert
+                    severity="error"
+                    sx={{
+                      mb: 2.5,
+                      borderRadius: '12px',
+                      fontSize: '13.5px',
+                    }}
+                  >
+                    <AlertTitle sx={{ fontWeight: 600 }}>{t('login.errorTitle')}</AlertTitle>
+                    {errorMessage}
+                  </Alert>
+                )}
+
+                {successMessage && (
+                  <Alert
+                    severity="success"
+                    sx={{
+                      mb: 2.5,
+                      borderRadius: '12px',
+                      fontSize: '13.5px',
+                    }}
+                  >
+                    <AlertTitle sx={{ fontWeight: 600 }}>{t('login.successTitle')}</AlertTitle>
+                    {successMessage}
+                  </Alert>
+                )}
+
+                <Box sx={{ mt: 0.5 }}>
+                  <EmployerLoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />
+                </Box>
+              </Box>
+
+              {/* Card Bottom / Legal Disclaimer & Links */}
+              <Box sx={{ mt: 'auto', pt: 2.5 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    textAlign: 'center',
+                    color: '#64748B',
+                    fontSize: '12.5px',
+                    lineHeight: 1.55,
+                    mb: 2,
+                  }}
+                >
+                  Bằng việc đăng nhập, quý doanh nghiệp đồng ý tuân thủ các{' '}
+                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                    Điều khoản dịch vụ
+                  </StyledLink>{' '}
+                  và{' '}
+                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '12.5px', color: '#2563EB' }}>
+                    Chính sách bảo mật
+                  </StyledLink>{' '}
+                  của InfoHR.
+                </Typography>
+
+                <Box
+                  sx={{
+                    pt: 2,
+                    borderTop: '1px solid #F1F5F9',
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    textAlign: { xs: 'center', sm: 'left' },
+                  }}
+                >
+                  <StyledLink
+                    href={forgotPasswordHref}
+                    sx={{
+                      color: '#64748B',
+                      fontSize: '13.5px',
+                      fontWeight: 500,
+                      textDecoration: 'none',
+                      '&:hover': { color: '#2563EB', textDecoration: 'underline' },
+                    }}
+                  >
+                    {t('login.forgotPassword')}
+                  </StyledLink>
+
+                  <StyledLink
+                    href={registerHref}
+                    sx={{
+                      color: '#2563EB',
+                      fontWeight: 700,
+                      fontSize: '13.5px',
+                      textDecoration: 'none',
+                      '&:hover': { textDecoration: 'underline' },
+                    }}
+                  >
+                    {t('login.noAccount')} {t('login.signUp')}
+                  </StyledLink>
+                </Box>
+
+                {/* Security Trust Indicator */}
+                <Box
+                  sx={{
+                    mt: 2,
+                    pt: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 0.75,
+                    color: '#94A3B8',
+                    fontSize: '12px',
+                  }}
+                >
+                  <SecurityIcon sx={{ fontSize: 15, color: '#10B981' }} />
+                  <span>Bảo mật thông tin doanh nghiệp theo tiêu chuẩn SSL 256-bit</span>
+                </Box>
+              </Box>
             </Grid>
 
+            {/* Right Column: Showcase Panel (Desktop only) */}
             <Grid
+              size={{ xs: 12, md: 6 }}
               sx={{
-                textAlign: { xs: 'left', sm: 'right' },
-              }}
-              size={{
-                xs: 12,
-                sm: 6,
+                display: { xs: 'none', md: 'flex' },
+                position: 'relative',
               }}
             >
-              <StyledLink href={registerHref}>
-                {t('login.noAccount')} {t('login.signUp')}
-              </StyledLink>
+              <AuthShowcasePanel variant="employer" />
             </Grid>
           </Grid>
-        </StyledCard>
+        </UnifiedAuthCard>
       </Container>
 
       {isFullScreenLoading && <BackdropLoading />}

@@ -10,13 +10,13 @@ import LocationIcon from '@mui/icons-material/LocationOn';
 import SalaryIcon from '@mui/icons-material/MonetizationOn';
 import BuildingIcon from '@mui/icons-material/Business';
 import WorkerIcon from '@mui/icons-material/Engineering';
-import { tConfig } from '../../../../utils/tConfig';
-import { formatLocalizedSalaryRange } from '../../../../utils/customData';
+import { tConfig } from '@/utils/tConfig';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
 import InfoItem from './InfoItem';
 import { useConfig } from '@/hooks/useConfig';
-import { JobSeekerProfile } from '../../../../types/models';
-import type { Career } from '../../../../types/models';
-import type { City } from '../../../../types/models';
+import { JobSeekerProfile } from '@/types/models';
+import type { Career } from '@/types/models';
+import type { City } from '@/types/models';
 import pc from '@/utils/muiColors';
 
 type ConfigDict = Record<string, string>;
@@ -42,7 +42,7 @@ interface GeneralInfoSectionProps {
 const resolveConfigText = (dict: ConfigDict | undefined, value: ConfigValue): string => {
     if (value === undefined || value === null || value === '') return '';
     if (typeof value === 'object') {
-        return value.name || tConfig(dict?.[String(value.id ?? '')]);
+        return value.name || (value.id != null ? tConfig(dict?.[String(value.id)]) : '');
     }
     return tConfig(dict?.[String(value)]);
 };

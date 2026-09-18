@@ -1,17 +1,17 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo } from 'react';
 import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useCities } from './hooks/useCities';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { City } from '../../../types/models';
-import type { CityPayload } from '../../../services/adminManagementService';
+import { useDataTable, useDebounce } from '@/hooks';
+import { City } from '@/types/models';
+import type { CityPayload } from '@/services/adminManagementService';
 import FilterBar from '@/components/Common/FilterBar';
 import {
   getLocationEntityFormValidationErrors,
@@ -142,7 +142,6 @@ const CitiesPage = () => {
 
   const columns = useMemo<ColumnDef<City>[]>(
     () => [
-      { accessorKey: 'id', header: 'ID', enableSorting: true },
       {
         accessorKey: 'name',
         header: t('pages.cities.table.name') as string,
@@ -157,12 +156,12 @@ const CitiesPage = () => {
         cell: (info) => (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             <Tooltip title={t('pages.cities.table.edit')}>
-              <IconButton size="small" onClick={() => dispatch({ type: 'open-edit', city: info.row.original })} color="primary">
+              <IconButton aria-label="Thao tác" size="small" onClick={() => dispatch({ type: 'open-edit', city: info.row.original })} color="primary">
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('pages.cities.table.delete')}>
-              <IconButton size="small" onClick={() => dispatch({ type: 'open-delete', city: info.row.original })} color="error">
+              <IconButton aria-label="Thao tác" size="small" onClick={() => dispatch({ type: 'open-delete', city: info.row.original })} color="error">
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Tooltip>

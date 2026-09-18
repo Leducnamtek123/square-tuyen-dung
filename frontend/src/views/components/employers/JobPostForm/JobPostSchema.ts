@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import dayjs from 'dayjs';
-import { REGEX_VALIDATE } from '../../../../configs/constants';
+import { REGEX_VALIDATE } from '@/configs/constants';
 import type { TFunction } from 'i18next';
 import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 
@@ -13,6 +13,8 @@ export interface JobPostFormValues {
   career?: number | string;
   position?: number | string;
   interviewTemplate?: number | string | null;
+  autoInterviewEnabled?: boolean;
+  minScreeningScore?: number | string | null;
   experience?: number | string;
   typeOfWorkplace?: number | string;
   jobType?: number | string;
@@ -43,6 +45,14 @@ export const getJobPostSchema = (t: TFunction<string | string[], undefined>) =>
   yup.object().shape({
     jobName: yup.string().required(t('jobPostForm.validation.jobnameisrequired')).max(255, t('jobPostForm.validation.jobnameexceededallowedlength')),
     interviewTemplate: yup.number().nullable().integer(t('jobPostForm.validation.interviewtemplateinvalid')).moreThan(0, t('jobPostForm.validation.interviewtemplateinvalid')).typeError(t('jobPostForm.validation.interviewtemplateinvalid')),
+    autoInterviewEnabled: yup.boolean().default(true),
+    minScreeningScore: yup
+      .number()
+      .nullable()
+      .transform((value, originalValue) => (originalValue === '' || originalValue === null ? 70 : value))
+      .typeError(t('jobPostForm.validation.invalidminscore'))
+      .min(0, t('jobPostForm.validation.minscoreoutofrange'))
+      .max(100, t('jobPostForm.validation.minscoreoutofrange')),
     career: yup.number().required(t('jobPostForm.validation.careerisrequired')).integer(t('jobPostForm.validation.careerisrequired')).moreThan(0, t('jobPostForm.validation.careerisrequired')).typeError(t('jobPostForm.validation.careerisrequired')),
     position: yup
       .number()

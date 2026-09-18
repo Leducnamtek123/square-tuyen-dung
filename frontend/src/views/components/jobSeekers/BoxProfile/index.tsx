@@ -19,33 +19,31 @@ import {
   faWarning,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { CV_TYPES, ROUTES, APP_NAME } from "../../../../configs/constants";
-import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
-import toastMessages from "../../../../utils/toastMessages";
-import errorHandling from "../../../../utils/errorHandling";
-import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
-import toSlug, { formatLocalizedSalaryRange } from "../../../../utils/customData";
-import NoDataCard from "../../../../components/Common/NoDataCard";
-import dynamic from "next/dynamic";
-import { PDFDownloadLink } from "../../../../components/Features/CVDoc/pdf";
-const PDFDownloadLinkAny = PDFDownloadLink as React.ElementType;
-import type { ExtendedResume } from "../../../../components/Features/CVDoc";
-import { reloadResume } from "../../../../redux/profileSlice";
-import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
-import resumeService from "../../../../services/resumeService";
-import { formatRoute } from "../../../../utils/funcUtils";
+import { CV_TYPES, ROUTES, APP_NAME } from "@/configs/constants";
+import BackdropLoading from "@/components/Common/Loading/BackdropLoading";
+import toastMessages from "@/utils/toastMessages";
+import errorHandling from "@/utils/errorHandling";
+import MuiImageCustom from "@/components/Common/MuiImageCustom";
+import toSlug, { formatLocalizedSalaryRange } from "@/utils/customData";
+import NoDataCard from "@/components/Common/NoDataCard";
+import type { ExtendedResume } from "@/components/Features/CVDoc";
+import { reloadResume } from "@/redux/profileSlice";
+import jobSeekerProfileService from "@/services/jobSeekerProfileService";
+import resumeService from "@/services/resumeService";
+import { formatRoute } from "@/utils/funcUtils";
 import { localizeRoutePath } from "@/configs/routeLocalization";
-import ColorPickerDialog from '../../../../components/Common/ColorPickerDialog';
+import ColorPickerDialog from '@/components/Common/ColorPickerDialog';
 import { useTranslation } from "react-i18next";
-import { tConfig } from '../../../../utils/tConfig';
+import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { useQueryClient } from '@tanstack/react-query';
 import { useResumes } from '../hooks/useJobSeekerQueries';
 import type { AxiosError } from "axios";
 import type { ApiError } from '@/types/api';
 
-import type { Resume } from '../../../../types/models';
-const CVDoc = dynamic(() => import("../../../../components/Features/CVDoc"), { ssr: false });
+import type { Resume } from '@/types/models';
+import dynamic from "next/dynamic";
+const CVDocDownloadButton = dynamic(() => import("./CVDocDownloadButton"), { ssr: false });
 
 const Loading = () => {
   return (
@@ -198,39 +196,15 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   </Tooltip>
                 </Stack>
                 {!isGeneratingPDF && (
-                  <PDFDownloadLinkAny
-                    document={<CVDoc resume={resume as ExtendedResume} user={currentUser} themeColor={selectedColor} />}
-                    fileName={`${APP_NAME}_CV_${currentUser?.fullName}-${toSlug(resume?.title || "title")}.pdf`}
-                    style={{ textDecoration: "none" }}
-                  >
-                    {({ loading, blob }: { loading: boolean, blob: Blob | null }) => {
-                      if (blob) {
-                        blobRef.current = blob;
-                      }
-                      return loading || isGeneratingPDF ? (
-                        <Chip
-                          size="small"
-                          icon={<CircularProgress size={16} />}
-                          color="secondary"
-                          label={t("common:loading")}
-                          sx={{ boxShadow: (theme) => theme.customShadows.medium }}
-                        />
-                      ) : (
-                        <Chip
-                          size="small"
-                          icon={<DownloadIcon />}
-                          color="secondary"
-                          label={t("common:actions.download")}
-                          onClick={handleDownloadClick}
-                          sx={{
-                            boxShadow: (theme) => theme.customShadows.medium,
-                            "&:hover": { transform: "scale(1.03)" },
-                            transition: "all 0.2s ease-in-out",
-                          }}
-                        />
-                      );
-                    }}
-                  </PDFDownloadLinkAny>
+                  <CVDocDownloadButton
+                    resume={resume as ExtendedResume}
+                    currentUser={currentUser}
+                    selectedColor={selectedColor}
+                    isGeneratingPDF={isGeneratingPDF}
+                    handleDownloadClick={handleDownloadClick}
+                    blobRef={blobRef}
+                    t={t}
+                  />
                 )}
                 {isGeneratingPDF && (
                   <Chip

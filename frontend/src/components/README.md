@@ -4,7 +4,7 @@ This directory contains all shared React components organized by purpose and dom
 
 ## Structure
 
-### `Common/` — Shared UI & Business Components
+### `Common/` - Shared UI & Business Components
 Reusable across multiple features and layouts. Contains components like:
 - **UI Utilities**: `LazyLoadSection`, `ScrollToTop`, `ThemeRegistry`
 - **Loading & Empty States**: `Loading/*`, `EmptyCard`, `NoDataCard`

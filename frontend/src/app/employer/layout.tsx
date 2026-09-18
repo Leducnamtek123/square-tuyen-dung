@@ -4,8 +4,8 @@ import EmployerSectionClient from './EmployerSectionClient';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | InfoHR Tuyá»ƒn Dá»¥ng',
-    default: 'NhÃ  tuyá»ƒn dá»¥ng | InfoHR Tuyá»ƒn Dá»¥ng',
+    template: '%s | InfoHR Tuyển Dụng',
+    default: 'Nhà tuyển dụng | InfoHR Tuyển Dụng',
   },
 };
 

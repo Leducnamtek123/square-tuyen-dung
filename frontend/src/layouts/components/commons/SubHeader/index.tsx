@@ -9,11 +9,11 @@ import { useTranslation } from 'react-i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faListUl } from '@fortawesome/free-solid-svg-icons';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import commonService from '../../../../services/commonService';
+import commonService from '@/services/commonService';
 import SubHeaderDialog from '../SubHeaderDialog';
-import { buildJobPostFilter, searchJobPost } from '../../../../redux/filterSlice';
-import { ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { buildJobPostFilter, searchJobPost } from '@/redux/filterSlice';
+import { ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface CareerItem {
   id: string | number;

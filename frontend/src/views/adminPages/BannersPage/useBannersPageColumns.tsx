@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Chip, IconButton, Stack, Typography } from '@mui/material';
@@ -6,8 +6,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { IMAGES } from '../../../configs/constants';
-import type { Banner } from '../../../types/models';
+import { IMAGES } from '@/configs/constants';
+import type { Banner } from '@/types/models';
 
 interface UseBannersPageColumnsArgs {
   typeOptions: { value: string | number; label: string }[];
@@ -22,8 +22,9 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
     () => [
       {
         accessorKey: 'id',
-        header: t('pages.banners.table.id') as string,
-        enableSorting: true,
+        header: 'STT',
+        cell: (info) => info.row.index + 1,
+        size: 60,
       },
       {
         accessorKey: 'imageUrl',
@@ -40,7 +41,7 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
               sx={{ width: 120, height: 60, objectFit: 'cover', borderRadius: 1 }}
             />
           ) : (
-            '—'
+            '-'
           ),
       },
       {
@@ -58,7 +59,7 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
               sx={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 1 }}
             />
           ) : (
-            '—'
+            '-'
           ),
       },
       {
@@ -67,7 +68,7 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
         enableSorting: true,
         cell: (info) => (
           <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {(info.getValue() as string) || '—'}
+            {(info.getValue() as string) || '-'}
           </Typography>
         ),
       },
@@ -108,10 +109,10 @@ export const useBannersPageColumns = ({ typeOptions, onEdit, onDelete }: UseBann
         meta: { align: 'right' },
         cell: (info) => (
           <Stack direction="row" spacing={1} justifyContent="flex-end">
-            <IconButton size="small" color="primary" onClick={() => onEdit(info.row.original)}>
+            <IconButton aria-label="Thao tác" size="small" color="primary" onClick={() => onEdit(info.row.original)}>
               <EditIcon fontSize="small" />
             </IconButton>
-            <IconButton size="small" color="error" onClick={() => onDelete(info.row.original)}>
+            <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => onDelete(info.row.original)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Stack>

@@ -1,4 +1,4 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 import { AUTH_CONFIG } from '../configs/constants';
 import { unwrapDataResponse } from '../utils/apiResponse';
 import { ensurePresignedUrl } from '../utils/presignUrl';
@@ -167,6 +167,14 @@ const authService = {
     return resData;
   },
 
+  verifyPhone: async (data: { phone: string }): Promise<{ success: boolean; phoneNumber: string; isVerifyPhone: boolean; isPhoneVerified: boolean; user?: User }> => {
+    const url = 'auth/verify-phone/';
+    const resData = unwrapDataResponse<{ success: boolean; phoneNumber: string; isVerifyPhone: boolean; isPhoneVerified: boolean; user?: User }>(
+      await httpRequest.post(url, data)
+    );
+    return resData;
+  },
+
   updateAvatar: async (data: FormData): Promise<UserResponse> => {
     const url = 'auth/avatar/';
     const resData = unwrapDataResponse<UserResponse>(await httpRequest.put(url, data, {
@@ -186,6 +194,28 @@ const authService = {
     if (resData?.avatarUrl) {
       resData.avatarUrl = await ensurePresignedUrl(resData.avatarUrl);
     }
+    return resData;
+  },
+
+  updateCover: async (data: FormData): Promise<{ coverUrl: string }> => {
+    const url = 'auth/cover/';
+    const resData = unwrapDataResponse<{ coverUrl: string }>(await httpRequest.put(url, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }));
+    if (resData?.coverUrl) {
+      const signed = await ensurePresignedUrl(resData.coverUrl);
+      if (signed) {
+        resData.coverUrl = signed;
+      }
+    }
+    return resData;
+  },
+
+  deleteCover: async (): Promise<{ coverUrl: string }> => {
+    const url = 'auth/cover/';
+    const resData = unwrapDataResponse<{ coverUrl: string }>(await httpRequest.delete(url));
     return resData;
   },
 
@@ -212,6 +242,46 @@ const authService = {
   updateUserSettings: (data: UserSettingsData): Promise<UserSettingsData> => {
     const url = 'auth/settings/';
     return Promise.resolve(httpRequest.put(url, data)).then(unwrapDataResponse<UserSettingsData>);
+  },
+
+  getOnboardingStatus: (): Promise<import('../types/auth').OnboardingStatusResponse> => {
+    const url = 'auth/onboarding/status/';
+    return Promise.resolve(httpRequest.get(url)).then(
+      unwrapDataResponse<import('../types/auth').OnboardingStatusResponse>,
+    );
+  },
+
+  saveCandidateOnboardingStep: (data: Record<string, unknown>): Promise<{ message: string; onboardingStep: number }> => {
+    const url = 'auth/onboarding/candidate/step/';
+    return Promise.resolve(httpRequest.patch(url, data)).then(
+      unwrapDataResponse<{ message: string; onboardingStep: number }>,
+    );
+  },
+
+  candidateOnboarding: (data: Record<string, unknown>): Promise<{ message: string; user: User; recommendedJobs?: import('../types/auth').RecommendedJobPreview[] }> => {
+    const url = 'auth/onboarding/candidate/';
+    return Promise.resolve(httpRequest.post(url, data)).then(
+      unwrapDataResponse<{ message: string; user: User; recommendedJobs?: import('../types/auth').RecommendedJobPreview[] }>,
+    );
+  },
+
+  saveEmployerOnboardingStep: (data: Record<string, unknown>): Promise<{ message: string; onboardingStep: number }> => {
+    const url = 'auth/onboarding/employer/step/';
+    return Promise.resolve(httpRequest.patch(url, data)).then(
+      unwrapDataResponse<{ message: string; onboardingStep: number }>,
+    );
+  },
+
+  employerOnboarding: (data: Record<string, unknown>): Promise<{ message: string; company: unknown; user: User }> => {
+    const url = 'auth/onboarding/employer/';
+    return Promise.resolve(httpRequest.post(url, data)).then(
+      unwrapDataResponse<{ message: string; company: unknown; user: User }>,
+    );
+  },
+
+  verifyEmailOtp: (email: string, otp: string): Promise<ActionResponse> => {
+    const url = 'auth/verify-email-otp/';
+    return Promise.resolve(httpRequest.post(url, { email, otp })).then(normalizeActionResponse);
   },
 };
 

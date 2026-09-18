@@ -29,7 +29,7 @@ const CVDocInfoSection = ({ resume, styles }: Props) => {
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.salary')}</Text>
-            <Text style={styles.infoValue}>{formatLocalizedSalaryRange(resume.salaryMin, resume.salaryMax, i18next.language)}</Text>
+            <Text style={styles.infoValue}>{formatLocalizedSalaryRange(resume?.salaryMin, resume?.salaryMax, i18next.language)}</Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.workplace')}</Text>

@@ -6,8 +6,8 @@ import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurned
 import BookmarkOutlinedIcon from '@mui/icons-material/BookmarkOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-import defaultTheme from '../../../../themeConfigs/defaultTheme';
-import statisticService from '../../../../services/statisticService';
+import defaultTheme from '@/configs/theme/defaultTheme';
+import statisticService from '@/services/statisticService';
 import { useTranslation } from 'react-i18next';
 
 interface StatItemProps {

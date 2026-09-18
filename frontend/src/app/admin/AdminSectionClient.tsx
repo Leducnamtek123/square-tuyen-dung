@@ -93,13 +93,13 @@ export default function AdminSectionClient({
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
 
-  const authSubPaths = ['/login', '/forgot-password', '/reset-password'];
+  const authSubPaths = ['/login', '/forgot-password', '/reset-password', '/interview-preview'];
   const isAuthPage = authSubPaths.some((subPath) => pathname.endsWith(subPath) || pathname.includes(`${subPath}/`));
   const isLoginPage = pathname.endsWith('/login') || pathname.endsWith('/quan-tri');
   const token = tokenService.getAccessTokenFromCookie();
   const lang = getPreferredLanguage();
   const adminPrefix = getPortalPrefix('admin', lang);
-  const loginPath = `${adminPrefix}/login`;
+  const loginUrl = `${adminPrefix}/login?redirect=${encodeURIComponent(pathname)}`;
   const dashboardPath = `${adminPrefix}/dashboard`;
   const [authGate, dispatchAuthGate] = useReducer(
     authGateReducer,
@@ -108,8 +108,10 @@ export default function AdminSectionClient({
   );
 
   useEffect(() => {
+    let isMounted = true;
+
     if (authGate.shouldRedirectToLogin) {
-      window.location.replace(loginPath);
+      window.location.replace(loginUrl);
       return;
     }
 
@@ -117,7 +119,7 @@ export default function AdminSectionClient({
       const currentToken = tokenService.getAccessTokenFromCookie();
 
       if (!currentToken) {
-        if (!isAuthPage) {
+        if (!isAuthPage && isMounted) {
           dispatchAuthGate({ type: 'redirectToLogin' });
         }
         return;
@@ -128,10 +130,14 @@ export default function AdminSectionClient({
         try {
           nextUser = await dispatch(getUserInfo()).unwrap();
         } catch {
-          dispatchAuthGate({ type: 'redirectToLogin' });
+          if (isMounted) {
+            dispatchAuthGate({ type: 'redirectToLogin' });
+          }
           return;
         }
       }
+
+      if (!isMounted) return;
 
       if (nextUser?.roleName && nextUser.roleName !== ROLES_NAME.ADMIN) {
         window.location.replace('/');
@@ -144,9 +150,15 @@ export default function AdminSectionClient({
     };
 
     void checkAuth().finally(() => {
-      dispatchAuthGate({ type: 'checked' });
+      if (isMounted) {
+        dispatchAuthGate({ type: 'checked' });
+      }
     });
-  }, [authGate.shouldRedirectToLogin, adminPrefix, currentUser, dashboardPath, dispatch, isAuthPage, isLoginPage, loginPath]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [authGate.shouldRedirectToLogin, adminPrefix, currentUser, dashboardPath, dispatch, isAuthPage, isLoginPage, loginUrl]);
 
   if (authGate.isChecking || authGate.shouldRedirectToLogin) {
     return <AuthLoadingScreen />;

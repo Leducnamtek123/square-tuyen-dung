@@ -3,21 +3,21 @@ import { useAppSelector } from '@/redux/hooks';
 import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
-import { PaginatedResponse } from '../../../../types/api';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import { PaginatedResponse } from '@/types/api';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import ProfileUploadForm from '../ProfileUploadForm';
-import jobSeekerProfileService from '../../../../services/jobSeekerProfileService';
-import resumeService from '../../../../services/resumeService';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import { reloadResume } from '../../../../redux/profileSlice';
-import { CV_TYPES } from '../../../../configs/constants';
+import jobSeekerProfileService from '@/services/jobSeekerProfileService';
+import resumeService from '@/services/resumeService';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import NoDataCard from '@/components/Common/NoDataCard';
+import { reloadResume } from '@/redux/profileSlice';
+import { CV_TYPES } from '@/configs/constants';
 import ProfileUploadResumeGrid from './ProfileUploadResumeGrid';
 import type { FormValues as ProfileUploadFormValues } from '../ProfileUploadForm';
-import type { JobSeekerProfileResumeParams } from '../../../../services/jobSeekerProfileService';
+import type { JobSeekerProfileResumeParams } from '@/services/jobSeekerProfileService';
 
 interface Resume {
   id: string | number;
@@ -83,22 +83,29 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
   const [state, uiDispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
+    let isMounted = true;
     const getOnlineProfile = async (jobSeekerProfileId: string | number | undefined, params: JobSeekerProfileResumeParams) => {
       if (!jobSeekerProfileId) return;
       uiDispatch({ type: 'set_loading_resumes', payload: true });
       try {
         const resData = (await jobSeekerProfileService.getResumes(jobSeekerProfileId, params)) as PaginatedResponse<Resume>;
+        if (!isMounted) return;
         uiDispatch({ type: 'set_resumes', payload: resData?.results || [] });
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        uiDispatch({ type: 'set_loading_resumes', payload: false });
+        if (isMounted) {
+          uiDispatch({ type: 'set_loading_resumes', payload: false });
+        }
       }
     };
 
     getOnlineProfile(currentUser?.jobSeekerProfile?.id ?? currentUser?.jobSeekerProfileId ?? undefined, {
       resumeType: CV_TYPES.cvUpload,
     });
+    return () => {
+      isMounted = false;
+    };
   }, [currentUser, reloadCounter, state.isSuccess]);
 
   const handleAdd = (data: ProfileUploadFormValues) => {

@@ -9,7 +9,6 @@ describe('AuditLogsPage i18n', () => {
       'common.advancedFilters',
       'common.clearFilters',
       'pages.auditLogs.exportCsv',
-      'pages.auditLogs.exportingCsv',
       'pages.auditLogs.filter.action',
       'pages.auditLogs.filter.actorEmail',
       'pages.auditLogs.filter.allActions',

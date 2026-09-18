@@ -1,34 +1,35 @@
-﻿'use client';
+'use client';
 import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { useTranslation } from 'react-i18next';
 
-import { TabTitle } from '../../../utils/generalFunction';
+import { TabTitle } from '@/utils/generalFunction';
 
-import { PLATFORM, ROLES_NAME, ROUTES, AUTH_CONFIG, AUTH_PROVIDER } from '../../../configs/constants';
+import { PLATFORM, ROLES_NAME, ROUTES, AUTH_CONFIG, AUTH_PROVIDER } from '@/configs/constants';
 
-import errorHandling from '../../../utils/errorHandling';
+import errorHandling from '@/utils/errorHandling';
 
-import { updateVerifyEmail } from '../../../redux/authSlice';
+import { updateVerifyEmail } from '@/redux/authSlice';
 
-import { getUserInfo } from '../../../redux/userSlice';
+import { getUserInfo } from '@/redux/userSlice';
 
-import authService from '../../../services/authService';
+import authService from '@/services/authService';
 
-import JobSeekerSignUpForm from '../../components/auths/JobSeekerSignUpForm';
+import JobSeekerSignUpForm from '@/views/components/auths/JobSeekerSignUpForm';
 
-import { useAppDispatch } from '../../../hooks/useAppStore';
+import { useAppDispatch } from '@/hooks/useAppStore';
 
-import type { RoleName, AuthProvider } from '../../../types/auth';
+import type { RoleName, AuthProvider } from '@/types/auth';
 
 import type { AxiosError } from 'axios';
 
-import tokenService from '../../../services/tokenService';
+import tokenService from '@/services/tokenService';
 
-import { JobSeekerSignUpFormData } from '../../components/auths/JobSeekerSignUpForm';
-import type { JobSeekerRegisterData } from '../../../types/auth';
+import { JobSeekerSignUpFormData } from '@/views/components/auths/JobSeekerSignUpForm';
+import type { JobSeekerRegisterData } from '@/types/auth';
+import type { User } from '@/types/models';
 import type { CodeResponse } from '@react-oauth/google';
 import JobSeekerSignUpView from './JobSeekerSignUpView';
 
@@ -84,10 +85,16 @@ const JobSeekerSignUp = () => {
                 updateVerifyEmail({
                   isAllowVerifyEmail: true,
                   email: data?.email,
-                  roleName: ROLES_NAME.JOB_SEEKER as RoleName,
+                  roleName: roleName,
                 })
               );
               push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+              return;
+            }
+            if ((resData as any)?.otherRole === ROLES_NAME.EMPLOYER || (resData as any)?.other_role === ROLES_NAME.EMPLOYER) {
+              setServerErrors({
+                email: ['Email này đã được đăng ký cho tài khoản Nhà tuyển dụng. Vui lòng đăng nhập tại Cổng Doanh nghiệp.']
+              });
               return;
             }
           } catch {
@@ -143,8 +150,12 @@ const JobSeekerSignUp = () => {
       if (isSaveTokenToCookie) {
         dispatch(getUserInfo())
           .unwrap()
-          .then(() => {
-            push('/');
+          .then((user: User | null) => {
+            if (user?.isOnboarded === false) {
+              push('/onboarding/candidate');
+            } else {
+              push('/');
+            }
           })
           .catch(() => {
             errorHandling(new Error('Login error'));

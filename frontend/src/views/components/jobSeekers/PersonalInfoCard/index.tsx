@@ -5,19 +5,19 @@ import { Box, Divider, Fab, Skeleton, Stack, Typography, SxProps, Theme } from '
 import { Grid2 as Grid } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 
-import NoDataCard from '../../../../components/Common/NoDataCard';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import NoDataCard from '@/components/Common/NoDataCard';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import PersonalProfileForm, { PersonalProfileFormValues } from '../PersonalProfileForm';
-import jobSeekerProfileService from '../../../../services/jobSeekerProfileService';
-import { getUserInfo } from '../../../../redux/userSlice';
-import { useAppDispatch } from '../../../../redux/hooks';
-import { tConfig } from '../../../../utils/tConfig';
+import jobSeekerProfileService from '@/services/jobSeekerProfileService';
+import { getUserInfo } from '@/redux/userSlice';
+import { useAppDispatch } from '@/redux/hooks';
+import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
-import type { JobSeekerProfile, Location } from '../../../../types/models';
-import type { JobSeekerProfileUpdatePayload } from '../../../../services/jobSeekerProfileService';
+import type { JobSeekerProfile, Location } from '@/types/models';
+import type { JobSeekerProfileUpdatePayload } from '@/services/jobSeekerProfileService';
 
 type EnhancedJobSeekerProfile = JobSeekerProfile & {
   user?: { fullName: string };
@@ -127,19 +127,26 @@ const PersonalInfoCard = ({ title, sx }: PersonalInfoCardProps) => {
   const [profile, setProfile] = React.useState<EnhancedJobSeekerProfile | null>(null);
 
   React.useEffect(() => {
+    let isMounted = true;
     const getProfile = async () => {
       dispatch({ type: 'set_loading_profile', payload: true });
       try {
         const resData = await jobSeekerProfileService.getProfile();
+        if (!isMounted) return;
         setProfile(resData as EnhancedJobSeekerProfile);
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set_loading_profile', payload: false });
+        if (isMounted) {
+          dispatch({ type: 'set_loading_profile', payload: false });
+        }
       }
     };
 
     getProfile();
+    return () => {
+      isMounted = false;
+    };
   }, [uiState.refreshToken]);
 
   const handleUpdateProfile = async (data: PersonalProfileFormValues) => {

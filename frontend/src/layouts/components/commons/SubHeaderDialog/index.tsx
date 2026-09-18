@@ -218,12 +218,12 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
     }
     if (Array.isArray(allConfig?.careerOptions)) {
       return allConfig.careerOptions
+        .filter((option): option is typeof option & { id: string | number } => option.id != null && Boolean(option.name))
         .map((option) => ({
-          id: option.id ?? '',
-          name: String(option.name ?? '').trim(),
+          id: option.id,
+          name: String(option.name).trim(),
           isHot: Boolean(option.isHot),
-        }))
-        .filter((option) => option.id && option.name);
+        }));
     }
     return [];
   }, [allConfig?.careers, allConfig?.careerOptions]);
@@ -232,6 +232,17 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
     () => customCareers(careersSource, topCareers),
     [careersSource, topCareers, customCareers]
   );
+
+  const [headerHeight, setHeaderHeight] = React.useState<number | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (open) {
+      const el = document.getElementById('common-header');
+      if (el) {
+        setHeaderHeight(el.clientHeight);
+      }
+    }
+  }, [open]);
 
   return (
     <Dialog
@@ -242,9 +253,7 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
       slotProps={{
         paper: {
           sx: {
-            top: typeof window === 'undefined'
-              ? undefined
-              : window.document.getElementById('common-header')?.clientHeight,
+            top: headerHeight,
             position: 'absolute',
           },
         }

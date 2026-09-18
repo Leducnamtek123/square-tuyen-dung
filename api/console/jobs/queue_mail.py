@@ -379,12 +379,9 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
             # Select domain of user type
 
             if user.role_name == var_sys.JOB_SEEKER:
-
-                domain = settings.DOMAIN_CLIENT["job_seeker"]
-
+                domain = settings.DOMAIN_CLIENT["job_seeker"].rstrip("/")
             else:
-
-                domain = settings.DOMAIN_CLIENT["employer"]
+                domain = settings.DOMAIN_CLIENT["employer"].rstrip("/")
 
             for item in job_post_list:
                 public_id = item.pop("company__logo__public_id", None)
@@ -392,21 +389,13 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
                 item["company__company_image_url"] = url or var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
 
             data = {
-
                 "my_address": var_sys.COMPANY_INFO["ADDRESS"],
-
                 "full_name": full_name,
-
                 "description": MAIL_MESSAGES["JOB_NOTIFICATION_FOUND"].format(total_result=total_result),
-
-                "job_post_link": f"{domain}viec-lam/",
-
-                "company_link": f"{domain}cong-ty/",
-
-                "job_post_notification_link": f"{domain}ung-vien/viec-lam-cua-toi/?tab=3",
-
+                "job_post_link": f"{domain}/viec-lam/",
+                "company_link": f"{domain}/cong-ty/",
+                "job_post_notification_link": f"{domain}/ung-vien/viec-lam-cua-toi/?tab=3",
                 "job_post_list": job_post_list
-
             }
 
             email_html = render_to_string('suggested-job-post.html', data)

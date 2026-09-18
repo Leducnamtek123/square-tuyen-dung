@@ -13,6 +13,7 @@ from functools import lru_cache
 
 from apps.accounts import permissions as perms_custom
 from apps.files.models import File
+from apps.profiles.models import Resume
 from apps.profiles.serializers import EmployerCandidateProfileSerializer, SendMailToJobSeekerSerializer
 from console.jobs import queue_mail
 from shared import pagination as paginations
@@ -38,7 +39,7 @@ from ..serializers import (
 )
 
 logger = logging.getLogger(__name__)
-AI_PROCESSING_TIMEOUT_MINUTES = 20
+AI_PROCESSING_TIMEOUT_MINUTES = 2
 
 
 def _is_truthy(value) -> bool:
@@ -164,6 +165,52 @@ class JobSeekerJobPostActivityViewSet(
 
         return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data, headers=headers)
 
+    @action(methods=["get", "post"], detail=True, url_path="offer-letter", url_name="job-seeker-offer-letter")
+    def offer_letter(self, request, pk=None):
+        """Ứng viên xem và phản hồi (chấp nhận/từ chối) Thư mời nhận việc."""
+        from ..models import JobOfferLetter
+        from ..serializers import JobOfferLetterSerializer
+        try:
+            activity = JobPostActivity.objects.select_related('job_post', 'job_post__company', 'user').get(pk=pk, user=request.user)
+        except JobPostActivity.DoesNotExist:
+            return var_res.response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": ["Không tìm thấy đơn ứng tuyển."]})
+
+        try:
+            offer = activity.offer_letter
+        except JobOfferLetter.DoesNotExist:
+            return var_res.response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": ["Chưa có thư mời nhận việc cho đơn ứng tuyển này."]})
+
+        if request.method == "GET":
+            return var_res.response_data(data=JobOfferLetterSerializer(offer).data)
+
+        # POST: Candidate responds
+        action_type = request.data.get("action")  # 'accept' or 'decline'
+        feedback = request.data.get("feedback", "")
+        if action_type not in ["accept", "decline"]:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"action": ["Hành động không hợp lệ. Chỉ chấp nhận 'accept' hoặc 'decline'."]}
+            )
+
+        if offer.status in [JobOfferLetter.STATUS_ACCEPTED, JobOfferLetter.STATUS_DECLINED]:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Thư mời nhận việc này đã được phản hồi trước đó."]}
+            )
+
+        if action_type == "accept":
+            offer.status = JobOfferLetter.STATUS_ACCEPTED
+            offer.candidate_signed_at = timezone.now()
+            offer.candidate_feedback = feedback
+            offer.save()
+        else:
+            offer.status = JobOfferLetter.STATUS_DECLINED
+            offer.candidate_signed_at = timezone.now()
+            offer.candidate_feedback = feedback
+            offer.save()
+
+        return var_res.response_data(status=status.HTTP_200_OK, data=JobOfferLetterSerializer(offer).data)
+
 
 class EmployerJobPostActivityViewSet(
     AuditLogViewSetMixin,
@@ -231,6 +278,13 @@ class EmployerJobPostActivityViewSet(
         instance = self.get_object()
         if instance.job_post.company != request.user.active_company:
             return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        stale_before = timezone.now() - timedelta(minutes=AI_PROCESSING_TIMEOUT_MINUTES)
+        if instance.ai_analysis_status == 'processing' and instance.update_at and instance.update_at < stale_before:
+            instance.ai_analysis_status = 'failed'
+            instance.ai_analysis_progress = 0
+            instance.ai_analysis_summary = "Phân tích AI quá thời gian xử lý. Vui lòng thử lại."
+            instance.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
         fields = [
             "id",
             "fullName",
@@ -242,6 +296,14 @@ class EmployerJobPostActivityViewSet(
             "manualCandidateProfile",
             "jobName",
             "resumeFileUrl",
+            "fileUrl",
+            "resume",
+            "resumeDict",
+            "cityChooseData",
+            "careerChooseData",
+            "companyDict",
+            "userDict",
+            "jobPostDict",
             "aiAnalysisScore",
             "aiAnalysisSummary",
             "aiAnalysisSkills",
@@ -301,6 +363,13 @@ class EmployerJobPostActivityViewSet(
                 "createAt",
                 "isSentEmail",
                 "resumeFileUrl",
+                "fileUrl",
+                "resume",
+                "resumeDict",
+                "cityChooseData",
+                "careerChooseData",
+                "companyDict",
+                "userDict",
                 "jobPostDict",
                 "aiAnalysisScore",
                 "aiAnalysisSummary",
@@ -364,6 +433,20 @@ class EmployerJobPostActivityViewSet(
             email=candidate_profile.email,
             phone=candidate_profile.phone,
         )
+
+        from django.conf import settings
+        from shared.helpers import helper
+
+        if getattr(settings, 'AI_RESUME_AUTO_ANALYZE', True):
+            try:
+                from apps.jobs.tasks import analyze_resume_ai
+                analyze_resume_ai.delay(job_post_activity.id)
+                job_post_activity.ai_analysis_status = 'processing'
+                job_post_activity.ai_analysis_progress = 5
+                job_post_activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
+            except Exception as ex:
+                helper.print_log_error("auto analyze resume manual candidate", ex)
+
         response_serializer = self.get_serializer(
             job_post_activity,
             fields=[
@@ -389,6 +472,109 @@ class EmployerJobPostActivityViewSet(
         )
         record_audit_log(request=request, action="create_manual_candidate", instance=job_post_activity)
         return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data)
+
+    @action(methods=["post"], detail=False, url_path="invite-candidate", url_name="invite-candidate")
+    def invite_candidate(self, request):
+        company = request.user.active_company
+        if not company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data if isinstance(request.data, dict) else {}
+        job_post_id = data.get("jobPostId") or data.get("job_post_id") or data.get("jobPost")
+        resume_slug = data.get("resumeSlug") or data.get("resume_slug")
+        resume_id = data.get("resumeId") or data.get("resume_id")
+        note = str(data.get("note", "")).strip()
+
+        if not job_post_id:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"jobPostId": ["Vui lòng chọn tin tuyển dụng."]},
+            )
+
+        try:
+            job_post = JobPost.objects.get(id=job_post_id, company=company)
+        except (JobPost.DoesNotExist, TypeError, ValueError):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"jobPostId": ["Tin tuyển dụng không tồn tại hoặc không thuộc công ty của bạn."]},
+            )
+
+        resume = None
+        if resume_slug:
+            resume = Resume.objects.filter(slug=resume_slug).select_related("user", "job_seeker_profile").first()
+        elif resume_id:
+            resume = Resume.objects.filter(id=resume_id).select_related("user", "job_seeker_profile").first()
+
+        if not resume:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"resume": ["Không tìm thấy thông tin hồ sơ ứng viên."]},
+            )
+
+        candidate_user = resume.user
+        if not candidate_user:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"resume": ["Hồ sơ này không liên kết với tài khoản ứng viên hợp lệ."]},
+            )
+
+        existing = JobPostActivity.objects.filter(
+            job_post=job_post,
+            user=candidate_user,
+            is_deleted=False,
+        ).first()
+
+        if existing:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Ứng viên này đã có trong danh sách ứng tuyển của tin này."]},
+            )
+
+        phone = candidate_user.phone
+        if not phone and hasattr(resume, "job_seeker_profile") and resume.job_seeker_profile:
+            phone = resume.job_seeker_profile.phone
+
+        job_post_activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=candidate_user,
+            resume=resume,
+            full_name=candidate_user.full_name or resume.title or "Ứng viên",
+            email=candidate_user.email,
+            phone=phone,
+            status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        )
+
+        from django.conf import settings
+        from shared.helpers import helper
+        if getattr(settings, "AI_RESUME_AUTO_ANALYZE", True):
+            try:
+                from apps.jobs.tasks import analyze_resume_ai
+                analyze_resume_ai.delay(job_post_activity.id)
+                job_post_activity.ai_analysis_status = "processing"
+                job_post_activity.ai_analysis_progress = 5
+                job_post_activity.save(update_fields=["ai_analysis_status", "ai_analysis_progress", "update_at"])
+            except Exception as ex:
+                helper.print_log_error("auto analyze resume invited candidate", ex)
+
+        try:
+            from shared.services.notification_service import NotificationService
+            company_name = company.company_name if hasattr(company, "company_name") else "Nhà tuyển dụng"
+            notif_title = f"{company_name} đã mời bạn ứng tuyển!"
+            notif_content = f"Nhà tuyển dụng {company_name} rất ấn tượng với hồ sơ của bạn và gửi lời mời bạn ứng tuyển cho vị trí: {job_post.job_name}."
+            if note:
+                notif_content += f" Lời nhắn: \"{note}\""
+            NotificationService.add_system_notifications(notif_title, notif_content, [candidate_user.id])
+        except Exception as ex:
+            helper.print_log_error("notify invited candidate", ex)
+
+        record_audit_log(request=request, action="invite_candidate", instance=job_post_activity)
+        return var_res.response_data(
+            status=status.HTTP_201_CREATED,
+            data={
+                "id": job_post_activity.id,
+                "message": "Đã gửi lời mời ứng tuyển thành công!",
+            },
+        )
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -448,6 +634,7 @@ class EmployerJobPostActivityViewSet(
             queryset,
             many=True,
             fields=[
+                "id",
                 "title",
                 "fullName",
                 "email",
@@ -635,6 +822,52 @@ class EmployerJobPostActivityViewSet(
         ])
         return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
 
+    @action(methods=["get", "post"], detail=True, url_path="offer-letter", url_name="employer-offer-letter")
+    def offer_letter(self, request, pk=None):
+        """NTD xem, tạo mới hoặc cập nhật Thư mời nhận việc cho ứng viên trúng tuyển."""
+        from ..models import JobOfferLetter
+        from ..serializers import JobOfferLetterSerializer
+        activity = self.get_object()
+        if activity.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        if request.method == "GET":
+            try:
+                offer = activity.offer_letter
+                return var_res.response_data(data=JobOfferLetterSerializer(offer).data)
+            except JobOfferLetter.DoesNotExist:
+                return var_res.response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": ["Chưa tạo thư mời nhận việc."]})
+
+        # POST: Create or Update Offer Letter
+        serializer = JobOfferLetterSerializer(data=request.data)
+        if not serializer.is_valid():
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors)
+
+        vd = serializer.validated_data
+        candidate_user = activity.user or request.user
+
+        offer, created = JobOfferLetter.objects.update_or_create(
+            application=activity,
+            defaults={
+                'job_post': activity.job_post,
+                'company': activity.job_post.company,
+                'candidate': candidate_user,
+                'position_title': vd.get('position_title') or activity.job_post.job_name,
+                'salary_offered': vd.get('salary_offered', 0),
+                'allowance': vd.get('allowance', 0),
+                'start_date': vd.get('start_date'),
+                'expiration_date': vd.get('expiration_date'),
+                'work_location': vd.get('work_location', ''),
+                'benefits_note': vd.get('benefits_note', ''),
+                'terms_and_conditions': vd.get('terms_and_conditions', ''),
+                'status': JobOfferLetter.STATUS_SENT,
+                'created_by': request.user,
+            }
+        )
+        return var_res.response_data(
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+            data=JobOfferLetterSerializer(offer).data
+        )
 
 
 class AdminJobPostActivityViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):

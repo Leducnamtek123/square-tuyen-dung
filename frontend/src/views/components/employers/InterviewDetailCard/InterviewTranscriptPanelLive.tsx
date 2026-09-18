@@ -32,6 +32,7 @@ const formatTime = (timestamp: number, language: string) =>
   new Date(timestamp).toLocaleTimeString(language === 'vi' ? 'vi-VN' : 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Asia/Ho_Chi_Minh',
   });
 
 const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['messages'], t: TFunction): TimelineItem[] =>

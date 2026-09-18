@@ -23,11 +23,12 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CategoryIcon from '@mui/icons-material/Category';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import QuizIcon from '@mui/icons-material/Quiz';
 import SendIcon from '@mui/icons-material/Send';
-import DateTimePickerCustom from '../../../../components/Common/Controls/DateTimePickerCustom';
+import DateTimePickerCustom from '@/components/Common/Controls/DateTimePickerCustom';
 import type { FormValues } from './types';
-import type { Question, QuestionGroup } from '../../../../types/models';
+import type { Question, QuestionGroup } from '@/types/models';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
 const ControllerAny = Controller as any;
@@ -43,11 +44,13 @@ type Props = {
   selectedJobPostId: string | number;
   selectedQuestionsCount: number;
   isInterviewMutating: boolean;
+  isStartingMock?: boolean;
   sessionId?: string | number;
   onCancel: () => void;
   onOpenAddQuestion: () => void;
   onOpenEditQuestion: () => void;
   onQuestionGroupChange: (value: string | number) => void;
+  onTestMockInterview?: () => void;
 };
 
 const InterviewCreateCardQuestionSection = ({
@@ -61,11 +64,13 @@ const InterviewCreateCardQuestionSection = ({
   selectedJobPostId,
   selectedQuestionsCount,
   isInterviewMutating,
+  isStartingMock,
   sessionId,
   onCancel,
   onOpenAddQuestion,
   onOpenEditQuestion,
   onQuestionGroupChange,
+  onTestMockInterview,
 }: Props) => {
   const minDateTime = React.useMemo(() => new Date().toISOString(), []);
 
@@ -157,7 +162,7 @@ const InterviewCreateCardQuestionSection = ({
                       return (
                         <Chip
                           key={val}
-                          label={(q?.text ?? `Q#${val}`).substring(0, 50)}
+                          label={(q?.text ?? 'Câu hỏi').substring(0, 50)}
                           size="small"
                           sx={{
                             fontWeight: 900,
@@ -209,7 +214,18 @@ const InterviewCreateCardQuestionSection = ({
             size="medium"
             startIcon={<AddCircleOutlineIcon />}
             onClick={onOpenAddQuestion}
-            sx={{ textTransform: 'none', fontWeight: 900, borderStyle: 'dashed', px: 3 }}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 800,
+              border: '1px solid #2563EB',
+              bgcolor: '#EFF6FF',
+              color: '#2563EB',
+              px: 3,
+              '&:hover': {
+                bgcolor: '#DBEAFE',
+                borderColor: '#1D4ED8',
+              },
+            }}
           >
             {t('interview:employer.questions.add')}
           </Button>
@@ -220,7 +236,18 @@ const InterviewCreateCardQuestionSection = ({
             startIcon={<EditIcon />}
             disabled={selectedQuestionsCount !== 1}
             onClick={onOpenEditQuestion}
-            sx={{ textTransform: 'none', fontWeight: 900, borderStyle: 'dashed', px: 3 }}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 800,
+              border: '1px solid #E2E8F0',
+              bgcolor: '#FFFFFF',
+              color: '#334155',
+              px: 3,
+              '&:hover': {
+                bgcolor: '#F8FAFC',
+                borderColor: '#CBD5E1',
+              },
+            }}
           >
             {t('interview:employer.questions.edit')}
           </Button>
@@ -228,8 +255,29 @@ const InterviewCreateCardQuestionSection = ({
       </Grid>
 
       <Grid size={12}>
-        <Divider sx={{ mt: 4, mb: 2, borderStyle: 'dashed' }} />
-        <Stack direction="row" spacing={2} justifyContent="flex-end">
+        <Divider sx={{ mt: 4, mb: 2, borderColor: '#E2E8F0' }} />
+        <Stack direction="row" spacing={2} justifyContent="flex-end" alignItems="center">
+          {onTestMockInterview && (
+            <Button
+              type="button"
+              variant="outlined"
+              color="info"
+              disabled={isStartingMock || isInterviewMutating}
+              startIcon={isStartingMock ? <CircularProgress size={18} color="inherit" /> : <PlayCircleOutlineIcon />}
+              onClick={onTestMockInterview}
+              sx={{
+                px: 3,
+                py: 1.5,
+                fontWeight: 800,
+                textTransform: 'none',
+                fontSize: '0.95rem',
+                borderRadius: '10px',
+                mr: 'auto',
+              }}
+            >
+              {isStartingMock ? t('interview:interviewCreateCard.actions.testing') : t('interview:interviewCreateCard.actions.testInterviewWithAI')}
+            </Button>
+          )}
           <Button
             onClick={onCancel}
             variant="text"
@@ -243,10 +291,9 @@ const InterviewCreateCardQuestionSection = ({
             type="submit"
             variant="contained"
             color="primary"
-            disabled={isInterviewMutating}
+            disabled={isInterviewMutating || isStartingMock}
             startIcon={!isInterviewMutating && <SendIcon />}
             sx={{
-              
               px: 8,
               py: 1.5,
               fontWeight: 900,

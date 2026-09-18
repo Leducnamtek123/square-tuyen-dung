@@ -2,18 +2,21 @@
 Interview Module — DRF Serializers
 """
 
+import logging
 from decimal import Decimal
 
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+
+logger = logging.getLogger(__name__)
 from .models import (
     Question, QuestionGroup,
     InterviewSession, InterviewTranscript, InterviewEvaluation,
     VoiceProfile, VoiceProfileSample, VoiceProfileGrant
 )
 from apps.jobs.models import JobPost
-from common import serializers as common_serializers
+from apps.common import serializers as common_serializers
 from shared.configs import variable_system as var_sys
 from apps.accounts.permissions import user_has_company_permission
 
@@ -73,19 +76,26 @@ def _can_user_write_company_scoped_item(user, item, request):
         return False
 
     item_company_id = getattr(item, "company_id", None)
-    return item_company_id is None or item_company_id == company.id
+    return item_company_id is not None and item_company_id == company.id
 
 
 class QuestionSerializer(serializers.ModelSerializer):
     questionText = serializers.CharField(source="text", read_only=True)
     careerDict = serializers.SerializerMethodField()
     canWrite = serializers.SerializerMethodField()
+    career_name = serializers.CharField(source="career.name", read_only=True, default="")
+    category_display = serializers.CharField(source="get_category_display", read_only=True)
+    difficulty_display = serializers.CharField(source="get_difficulty_display", read_only=True)
 
     class Meta:
         model = Question
         fields = [
-            'id', 'text', 'questionText', 'difficulty',
-            'career', 'careerDict', 'sort_order', 'author', 'company', 'canWrite', 'create_at', 'update_at'
+            'id', 'title', 'text', 'questionText', 'category', 'category_display',
+            'difficulty', 'difficulty_display',
+            'career', 'careerDict', 'career_name', 'sort_order',
+            'default_duration_seconds', 'answer_structure', 'interviewer_intent',
+            'important_tips', 'follow_up_questions',
+            'author', 'company', 'canWrite', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
 
@@ -122,7 +132,7 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionGroup
         fields = [
-            'id', 'name', 'description', 'evaluation_rubric', 'questions', 'questions_count',
+            'id', 'name', 'description', 'is_public', 'evaluation_rubric', 'questions', 'questions_count',
             'evaluation_rubric_input', 'question_ids', 'author', 'company', 'canWrite', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
@@ -136,7 +146,17 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         return getattr(obj, "evaluation_rubric", None)
 
     def get_questions_count(self, obj):
-        return obj.questions.count()
+        if not getattr(obj, "pk", None):
+            return 0
+        if hasattr(obj, "questions_count"):
+            return obj.questions_count
+        if hasattr(obj, "_prefetched_objects_cache") and "questions" in obj._prefetched_objects_cache:
+            return len(obj.questions.all())
+        try:
+            return obj.questions.count()
+        except Exception as ex:
+            logger.warning("Failed to count questions for QuestionGroup #%s: %s", getattr(obj, "id", None), ex)
+            return 0
 
     def get_canWrite(self, obj):
         request = self.context.get("request")
@@ -144,11 +164,20 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         return _can_user_write_company_scoped_item(user, obj, request)
 
     def get_questions(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
         items = []
-        for question in obj.questions.all():
+        questions_qs = obj.questions.all().order_by('sort_order', 'id')
+        for question in questions_qs:
             try:
                 items.append(QuestionSerializer(question, context=self.context).data)
-            except Exception:
+            except Exception as ex:
+                logger.warning(
+                    "Failed to serialize question #%s in QuestionGroup #%s: %s",
+                    getattr(question, "id", None),
+                    getattr(obj, "id", None),
+                    ex,
+                )
                 continue
         return items
 
@@ -164,6 +193,14 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         if rubric is not serializers.empty and hasattr(instance, "evaluation_rubric"):
             instance.evaluation_rubric = rubric
             instance.save(update_fields=["evaluation_rubric", "update_at"])
+
+        raw_question_ids = self.initial_data.get("question_ids")
+        if raw_question_ids and isinstance(raw_question_ids, list):
+            for idx, q_id in enumerate(raw_question_ids):
+                try:
+                    Question.objects.filter(id=q_id).update(sort_order=idx + 1)
+                except Exception:
+                    pass
         return instance
 
     def update(self, instance, validated_data):
@@ -172,6 +209,14 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         if rubric is not serializers.empty and hasattr(instance, "evaluation_rubric"):
             instance.evaluation_rubric = rubric
             instance.save(update_fields=["evaluation_rubric", "update_at"])
+
+        raw_question_ids = self.initial_data.get("question_ids")
+        if raw_question_ids and isinstance(raw_question_ids, list):
+            for idx, q_id in enumerate(raw_question_ids):
+                try:
+                    Question.objects.filter(id=q_id).update(sort_order=idx + 1)
+                except Exception:
+                    pass
         return instance
 
 
@@ -246,7 +291,7 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
     presetEngine = serializers.CharField(source="preset_engine", required=False, allow_blank=True)
     presetVoiceId = serializers.CharField(source="preset_voice_id", required=False, allow_blank=True)
     consentConfirmed = serializers.BooleanField(source="consent_confirmed", required=False)
-    samples = VoiceProfileSampleSerializer(many=True, read_only=True)
+    samples = serializers.SerializerMethodField()
     grants = serializers.SerializerMethodField()
     sampleCount = serializers.SerializerMethodField()
     totalDurationSeconds = serializers.SerializerMethodField()
@@ -268,28 +313,52 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "samples", "grants", "sampleCount", "grantCount", "created_by", "createdBy", "create_at", "update_at"]
 
+    def get_samples(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
+        try:
+            return VoiceProfileSampleSerializer(obj.samples.all(), many=True).data
+        except Exception:
+            return []
+
     def get_sampleCount(self, obj):
+        if not getattr(obj, "pk", None):
+            return 0
+        if hasattr(obj, "sample_count"):
+            return obj.sample_count
+        if hasattr(obj, "_prefetched_objects_cache") and "samples" in obj._prefetched_objects_cache:
+            return len(obj.samples.all())
         try:
             return obj.samples.count()
         except Exception:
             return 0
 
     def get_totalDurationSeconds(self, obj):
+        if not getattr(obj, "pk", None):
+            return 0.0
         try:
-            total = 0
-            for sample in obj.samples.all():
+            if hasattr(obj, "_prefetched_objects_cache") and "samples" in obj._prefetched_objects_cache:
+                samples = obj.samples.all()
+            else:
+                samples = obj.samples.all()
+            total = 0.0
+            for sample in samples:
                 if sample.duration_seconds is not None:
                     total += float(sample.duration_seconds)
             return total
         except Exception:
-            return 0
+            return 0.0
 
     def get_isReadyForTts(self, obj):
+        if not getattr(obj, "pk", None):
+            return False
         try:
             if obj.status != VoiceProfile.STATUS_READY:
                 return False
             if obj.voice_type == VoiceProfile.TYPE_PRESET:
                 return True
+            if hasattr(obj, "_prefetched_objects_cache") and "samples" in obj._prefetched_objects_cache:
+                return len(obj.samples.all()) > 0
             return obj.samples.exists()
         except Exception:
             return False
@@ -303,6 +372,8 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
         return metadata.get("lastError") or ""
 
     def _visible_grants_queryset(self, obj):
+        if not getattr(obj, "pk", None):
+            return VoiceProfileGrant.objects.none()
         qs = obj.grants.select_related("company", "job_post", "profile")
         request = self.context.get("request")
         user = getattr(request, "user", None)
@@ -325,6 +396,8 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
         )
 
     def get_grants(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
         try:
             qs = self._visible_grants_queryset(obj)
             return VoiceProfileGrantSerializer(qs, many=True, context=self.context).data
@@ -332,6 +405,8 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
             return []
 
     def get_grantCount(self, obj):
+        if not getattr(obj, "pk", None):
+            return 0
         try:
             return self._visible_grants_queryset(obj).filter(is_active=True).count()
         except Exception:
@@ -348,7 +423,7 @@ class VoiceProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"consentConfirmed": "Consent confirmation is required for cloned voices."})
         if attrs.get("status", getattr(self.instance, "status", VoiceProfile.STATUS_DRAFT)) == VoiceProfile.STATUS_READY and voice_type == VoiceProfile.TYPE_CLONED:
             profile = self.instance
-            has_samples = bool(profile and profile.samples.exists())
+            has_samples = bool(profile and getattr(profile, "pk", None) and profile.samples.exists())
             if not has_samples:
                 raise serializers.ValidationError({"status": "Cloned voice profiles must be prepared before they can be marked ready."})
         return attrs
@@ -360,7 +435,7 @@ class InterviewTranscriptSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'create_at']
 
 class InterviewEvaluationSerializer(serializers.ModelSerializer):
-    evaluator_name = serializers.CharField(source='evaluator.full_name', read_only=True)
+    evaluator_name = serializers.SerializerMethodField()
     attitude_score = serializers.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -393,6 +468,31 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'evaluator', 'create_at', 'update_at']
 
+    def get_evaluator_name(self, obj):
+        evaluator = getattr(obj, "evaluator", None)
+        if not evaluator:
+            return None
+        return (
+            getattr(evaluator, "full_name", None)
+            or getattr(evaluator, "email", None)
+            or getattr(evaluator, "phone_number", None)
+            or getattr(evaluator, "phone", None)
+            or getattr(evaluator, "username", None)
+            or f"User #{getattr(obj, 'evaluator_id', 'unknown')}"
+        )
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "attitudeScore" in payload and "attitude_score" not in payload:
+            payload["attitude_score"] = payload.get("attitudeScore")
+        if "professionalScore" in payload and "professional_score" not in payload:
+            payload["professional_score"] = payload.get("professionalScore")
+        if "overallScore" in payload and "overall_score" not in payload:
+            payload["overall_score"] = payload.get("overallScore")
+        if "proposedSalary" in payload and "proposed_salary" not in payload:
+            payload["proposed_salary"] = payload.get("proposedSalary")
+        return super().to_internal_value(payload)
+
     def validate(self, attrs):
         attitude = attrs.get("attitude_score")
         professional = attrs.get("professional_score")
@@ -401,89 +501,113 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
             attrs["overall_score"] = (attitude + professional) / 2
         return attrs
 
+def resolve_session_job_name(obj):
+    """Lấy tên vị trí công việc từ JobPost, metadata hoặc ghi chú phỏng vấn thử."""
+    if obj.job_post and getattr(obj.job_post, 'job_name', None):
+        return obj.job_post.job_name
+    if obj.session_metadata and isinstance(obj.session_metadata, dict):
+        title = obj.session_metadata.get('position_title') or obj.session_metadata.get('job_title')
+        if title:
+            return title
+    if obj.notes and 'vị trí:' in obj.notes:
+        parts = obj.notes.split('vị trí:')
+        if len(parts) > 1 and parts[1].strip():
+            return parts[1].strip()
+    if obj.question_group and getattr(obj.question_group, 'name', None):
+        return obj.question_group.name
+    if getattr(obj, 'session_type', '') == 'mock':
+        return "Luyện tập phỏng vấn AI"
+    return "Phỏng vấn trực tuyến"
+
+def resolve_session_company_name(obj):
+    """Lấy tên công ty / tổ chức phỏng vấn từ JobPost, QuestionGroup, Creator hoặc AI Practice."""
+    if obj.job_post and getattr(obj.job_post, 'company', None):
+        return obj.job_post.company.company_name
+    if obj.question_group and getattr(obj.question_group, 'company', None):
+        return obj.question_group.company.company_name
+    if obj.created_by:
+        from apps.profiles.models import Company
+        comp = getattr(obj.created_by, 'company', None) or Company.objects.filter(user=obj.created_by).first()
+        if comp and getattr(comp, 'company_name', None):
+            return comp.company_name
+    if getattr(obj, 'session_type', '') == 'mock':
+        return "Trợ lý Phỏng vấn AI - AILA InfoHR"
+    return "InfoHR Tuyển Dụng"
+
+def resolve_session_company_logo(obj):
+    """Lấy logo công ty nếu có."""
+    if obj.job_post and getattr(obj.job_post, 'company', None):
+        comp = obj.job_post.company
+        logo = getattr(comp, 'logo', None)
+        if logo:
+            try:
+                return logo.get_full_url()
+            except Exception:
+                return str(logo)
+    return None
+
+def resolve_session_questions_count(obj):
+    """Đếm số lượng câu hỏi trong phiên phỏng vấn."""
+    if obj.session_metadata and isinstance(obj.session_metadata, dict) and obj.session_metadata.get('total_questions'):
+        return obj.session_metadata.get('total_questions')
+    if not getattr(obj, "pk", None):
+        return 0
+    if hasattr(obj, "_prefetched_objects_cache") and "questions" in obj._prefetched_objects_cache:
+        return len(obj.questions.all())
+    try:
+        return obj.questions.count()
+    except Exception:
+        return 0
+
+
 class InterviewSessionListSerializer(serializers.ModelSerializer):
     """Serializer for list endpoint."""
-    candidate = serializers.SerializerMethodField()
-    job_post = serializers.SerializerMethodField()
-    candidate_name = serializers.SerializerMethodField()
-    candidate_email = serializers.SerializerMethodField()
+    candidate = serializers.IntegerField(source='candidate_id', read_only=True, default=None)
+    candidate_name = serializers.CharField(source='candidate.full_name', read_only=True, default=None)
+    candidate_email = serializers.CharField(source='candidate.email', read_only=True, default=None)
+    job_post = serializers.IntegerField(source='job_post_id', read_only=True, default=None)
     job_name = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
-    voice_profile = serializers.SerializerMethodField()
-    voice_profile_name = serializers.SerializerMethodField()
+    company_logo = serializers.SerializerMethodField()
+    voice_profile = serializers.IntegerField(source='voice_profile_id', read_only=True, default=None)
+    voice_profile_name = serializers.CharField(source='voice_profile.name', read_only=True, default=None)
     evaluations_count = serializers.SerializerMethodField()
+    questions_count = serializers.SerializerMethodField()
+    interview_language_display = serializers.CharField(source='get_interview_language_display', read_only=True)
 
     class Meta:
         model = InterviewSession
         fields = [
-            'id', 'room_name', 'invite_token', 'status', 'type',
+            'id', 'room_name', 'invite_token', 'status', 'type', 'session_type', 'interview_language', 'interview_language_display',
             'candidate', 'candidate_name', 'candidate_email',
-            'job_post', 'job_name', 'company_name',
+            'job_post', 'job_name', 'company_name', 'company_logo',
             'voice_profile', 'voice_profile_name',
             'scheduled_at', 'start_time', 'end_time', 'duration',
-            'ai_overall_score', 'evaluations_count',
-            'recording_url',
+            'ai_overall_score', 'ai_technical_score', 'ai_communication_score',
+            'ai_summary', 'ai_strengths', 'ai_weaknesses', 'session_metadata', 'questions_count', 'evaluations_count',
+            'recording_url', 'notes',
             'create_at', 'update_at'
         ]
 
-    def get_candidate_name(self, obj):
-        try:
-            return obj.candidate.full_name if obj.candidate else None
-        except Exception:
-            return None
-
-    def get_candidate(self, obj):
-        try:
-            return obj.candidate_id
-        except Exception:
-            return None
-
-    def get_candidate_email(self, obj):
-        try:
-            return obj.candidate.email if obj.candidate else None
-        except Exception:
-            return None
-
-    def get_job_post(self, obj):
-        try:
-            return obj.job_post_id
-        except Exception:
-            return None
-
     def get_job_name(self, obj):
-        try:
-            return obj.job_post.job_name if obj.job_post else None
-        except Exception:
-            return None
+        return resolve_session_job_name(obj)
 
     def get_company_name(self, obj):
-        try:
-            if obj.job_post and obj.job_post.company:
-                return obj.job_post.company.company_name
-        except Exception:
-            pass
+        return resolve_session_company_name(obj)
 
-        try:
-            if obj.question_group and obj.question_group.company:
-                return obj.question_group.company.company_name
-        except Exception:
-            pass
+    def get_company_logo(self, obj):
+        return resolve_session_company_logo(obj)
 
-        return None
-
-    def get_voice_profile(self, obj):
-        try:
-            return obj.voice_profile_id
-        except Exception:
-            return None
-
-    def get_voice_profile_name(self, obj):
-        try:
-            return obj.voice_profile.name if obj.voice_profile else None
-        except Exception:
-            return None
+    def get_questions_count(self, obj):
+        return resolve_session_questions_count(obj)
 
     def get_evaluations_count(self, obj):
+        if not getattr(obj, "pk", None):
+            return 0
+        if hasattr(obj, "evaluations_count"):
+            return obj.evaluations_count
+        if hasattr(obj, "_prefetched_objects_cache") and "evaluations" in obj._prefetched_objects_cache:
+            return len(obj.evaluations.all())
         try:
             return obj.evaluations.count()
         except Exception:
@@ -492,35 +616,39 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
 
 class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     """Serializer for detail endpoint."""
-    candidate = serializers.SerializerMethodField()
-    job_post = serializers.SerializerMethodField()
-    created_by = serializers.SerializerMethodField()
-    question_group = serializers.SerializerMethodField()
-    candidate_name = serializers.SerializerMethodField()
-    candidate_email = serializers.SerializerMethodField()
+    candidate = serializers.IntegerField(source='candidate_id', read_only=True, default=None)
+    candidate_name = serializers.CharField(source='candidate.full_name', read_only=True, default=None)
+    candidate_email = serializers.CharField(source='candidate.email', read_only=True, default=None)
+    job_post = serializers.IntegerField(source='job_post_id', read_only=True, default=None)
     job_name = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
+    company_logo = serializers.SerializerMethodField()
+    questions_count = serializers.SerializerMethodField()
+    created_by = serializers.IntegerField(source='created_by_id', read_only=True, default=None)
+    question_group = serializers.IntegerField(source='question_group_id', read_only=True, default=None)
     voice_profile = serializers.PrimaryKeyRelatedField(
         queryset=VoiceProfile.objects.all(),
         required=False,
         allow_null=True,
     )
-    voice_profile_name = serializers.SerializerMethodField()
-    questions = QuestionSerializer(many=True, read_only=True)
-    transcripts = InterviewTranscriptSerializer(many=True, read_only=True)
-    evaluations = InterviewEvaluationSerializer(many=True, read_only=True)
+    voice_profile_name = serializers.CharField(source='voice_profile.name', read_only=True, default=None)
+    questions = serializers.SerializerMethodField()
+    transcripts = serializers.SerializerMethodField()
+    evaluations = serializers.SerializerMethodField()
+    interview_language_display = serializers.CharField(source='get_interview_language_display', read_only=True)
 
     class Meta:
         model = InterviewSession
         fields = [
-            'id', 'room_name', 'invite_token', 'status', 'type',
+            'id', 'room_name', 'invite_token', 'status', 'type', 'session_type', 'interview_language', 'interview_language_display',
             'candidate', 'candidate_name', 'candidate_email',
-            'job_post', 'job_name', 'company_name',
+            'job_post', 'job_name', 'company_name', 'company_logo',
             'voice_profile', 'voice_profile_name',
             'scheduled_at', 'start_time', 'end_time', 'duration',
             'recording_url', 'transcript_url', 'notes',
             'ai_overall_score', 'ai_technical_score', 'ai_communication_score',
             'ai_summary', 'ai_strengths', 'ai_weaknesses', 'ai_detailed_feedback',
+            'session_metadata', 'questions_count',
             'created_by', 'question_group',
             'questions', 'transcripts', 'evaluations',
             'create_at', 'update_at'
@@ -530,68 +658,97 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             'created_by', 'create_at', 'update_at'
         ]
 
-    def get_candidate_name(self, obj):
+    def get_questions(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
+        from .services import get_session_questions
         try:
-            return obj.candidate.full_name if obj.candidate else None
+            qs = get_session_questions(obj).order_by('sort_order', 'create_at', 'id')
+            return QuestionSerializer(qs, many=True, context=self.context).data
         except Exception:
-            return None
+            return []
 
-    def get_candidate(self, obj):
+    def get_transcripts(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
         try:
-            return obj.candidate_id
+            if hasattr(obj, "_prefetched_objects_cache") and "transcripts" in obj._prefetched_objects_cache:
+                return InterviewTranscriptSerializer(obj.transcripts.all(), many=True).data
+            return InterviewTranscriptSerializer(obj.transcripts.all(), many=True).data
         except Exception:
-            return None
+            return []
 
-    def get_candidate_email(self, obj):
+    def get_evaluations(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
         try:
-            return obj.candidate.email if obj.candidate else None
+            if hasattr(obj, "_prefetched_objects_cache") and "evaluations" in obj._prefetched_objects_cache:
+                return InterviewEvaluationSerializer(obj.evaluations.all(), many=True).data
+            return InterviewEvaluationSerializer(obj.evaluations.all(), many=True).data
         except Exception:
-            return None
-
-    def get_job_post(self, obj):
-        try:
-            return obj.job_post_id
-        except Exception:
-            return None
-
-    def get_created_by(self, obj):
-        try:
-            return obj.created_by_id
-        except Exception:
-            return None
-
-    def get_question_group(self, obj):
-        try:
-            return obj.question_group_id
-        except Exception:
-            return None
-
-    def get_voice_profile_name(self, obj):
-        try:
-            return obj.voice_profile.name if obj.voice_profile else None
-        except Exception:
-            return None
+            return []
 
     def get_job_name(self, obj):
-        try:
-            return obj.job_post.job_name if obj.job_post else None
-        except Exception:
-            return None
+        return resolve_session_job_name(obj)
 
     def get_company_name(self, obj):
-        try:
-            if obj.job_post and obj.job_post.company:
-                return obj.job_post.company.company_name
-        except Exception:
-            pass
+        return resolve_session_company_name(obj)
 
-        try:
-            if obj.question_group and obj.question_group.company:
-                return obj.question_group.company.company_name
-        except Exception:
-            pass
+    def get_company_logo(self, obj):
+        return resolve_session_company_logo(obj)
 
-        return None
+    def get_questions_count(self, obj):
+        return resolve_session_questions_count(obj)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        scheduled_at = attrs.get("scheduled_at")
+        if scheduled_at:
+            session_type = attrs.get("session_type", getattr(self.instance, "session_type", "official"))
+            validate_interview_slot_capacity(scheduled_at, instance=self.instance, session_type=session_type)
+        return attrs
+
+
+SLOT_CAPACITY_FULL_MESSAGE = (
+    "Khung giờ này đã đạt giới hạn số lượng ứng viên phỏng vấn đồng thời "
+    "(nhằm đảm bảo đường truyền video và chất lượng tương tác giọng nói AI mượt mà nhất cho ứng viên của bạn). "
+    "Quý công ty vui lòng chọn khung giờ khác hoặc dời lịch lệch tối thiểu 30 phút."
+)
+
+
+def validate_interview_slot_capacity(scheduled_at, instance=None, session_type="official"):
+    """
+    Slot Capacity Guard: ensures the number of concurrent interviews within a 30-minute window
+    does not exceed MAX_CONCURRENT_INTERVIEWS_PER_SLOT (default: 30) to preserve network and GPU quality.
+    """
+    if not scheduled_at or session_type == "mock":
+        return
+
+    from django.conf import settings
+    from datetime import timedelta
+
+    slot_limit = getattr(settings, "MAX_CONCURRENT_INTERVIEWS_PER_SLOT", 30)
+    window_minutes = getattr(settings, "SLOT_WINDOW_MINUTES", 15)
+    start_window = scheduled_at - timedelta(minutes=window_minutes)
+    end_window = scheduled_at + timedelta(minutes=window_minutes)
+
+    qs = InterviewSession.objects.filter(
+        scheduled_at__gte=start_window,
+        scheduled_at__lte=end_window,
+    ).exclude(
+        status__in=["completed", "cancelled"]
+    ).exclude(
+        session_type="mock"
+    )
+
+    if instance and getattr(instance, "pk", None):
+        qs = qs.exclude(pk=instance.pk)
+
+    if qs.count() >= slot_limit:
+        raise serializers.ValidationError({
+            "scheduled_at": SLOT_CAPACITY_FULL_MESSAGE,
+            "detail": SLOT_CAPACITY_FULL_MESSAGE,
+        })
 
 
 class InterviewSessionCreateSerializer(serializers.ModelSerializer):
@@ -604,10 +761,29 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewSession
         fields = [
-            'candidate', 'job_post', 'type',
+            'candidate', 'job_post', 'type', 'interview_language',
             'scheduled_at', 'notes',
-            'question_group', 'question_ids', 'voice_profile'
+            'question_group', 'question_ids', 'voice_profile',
+            'session_metadata',
         ]
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "jobPost" in payload and "job_post" not in payload:
+            payload["job_post"] = payload.get("jobPost")
+        if "interviewLanguage" in payload and "interview_language" not in payload:
+            payload["interview_language"] = payload.get("interviewLanguage")
+        if "scheduledAt" in payload and "scheduled_at" not in payload:
+            payload["scheduled_at"] = payload.get("scheduledAt")
+        if "questionIds" in payload and "question_ids" not in payload:
+            payload["question_ids"] = payload.get("questionIds")
+        if "questionGroup" in payload and "question_group" not in payload:
+            payload["question_group"] = payload.get("questionGroup")
+        if "voiceProfile" in payload and "voice_profile" not in payload:
+            payload["voice_profile"] = payload.get("voiceProfile")
+        if "sessionMetadata" in payload and "session_metadata" not in payload:
+            payload["session_metadata"] = payload.get("sessionMetadata")
+        return super().to_internal_value(payload)
 
     def get_fields(self):
         fields = super().get_fields()
@@ -622,6 +798,11 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
         return candidate
 
     def validate(self, attrs):
+        scheduled_at = attrs.get("scheduled_at")
+        if scheduled_at:
+            session_type = attrs.get("session_type", "official")
+            validate_interview_slot_capacity(scheduled_at, instance=self.instance, session_type=session_type)
+
         job_post = attrs.get("job_post")
         question_group = attrs.get("question_group")
         question_ids = attrs.get("question_ids") or []
@@ -664,13 +845,20 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
             session.questions.set(question_ids)
         elif session.question_group:
             session.questions.set(session.question_group.questions.all())
+
+        try:
+            from .tasks import prewarm_interview_tts_task
+            prewarm_interview_tts_task.delay(session.id)
+        except Exception as exc:
+            logger.warning("Failed to queue prewarm_interview_tts_task for session %s: %s", session.id, exc)
+
         return session
 
 class InterviewContextSerializer(serializers.Serializer):
     """Context cho AI Agent khi join room (follow SquareAI)."""
-    candidateName = serializers.CharField()
-    candidateEmail = serializers.CharField()
-    jobTitle = serializers.CharField(allow_null=True)
+    candidateName = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    candidateEmail = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    jobTitle = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     questions = serializers.ListField()
     interviewType = serializers.CharField()
 
@@ -680,9 +868,31 @@ class AppendTranscriptSerializer(serializers.Serializer):
     content = serializers.CharField()
     speech_duration_ms = serializers.IntegerField(required=False, allow_null=True)
 
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "speakerRole" in payload and "speaker_role" not in payload:
+            payload["speaker_role"] = payload.get("speakerRole")
+        if "speechDurationMs" in payload and "speech_duration_ms" not in payload:
+            payload["speech_duration_ms"] = payload.get("speechDurationMs")
+        return super().to_internal_value(payload)
+
 class UpdateStatusSerializer(serializers.Serializer):
     """Serializer cập nhật status."""
     status = serializers.ChoiceField(
         choices=['scheduled', 'calibration', 'in_progress', 'completed', 'cancelled', 'interrupted']
     )
+
+
+class InterviewProctoringEventSerializer(serializers.ModelSerializer):
+    eventTypeLabel = serializers.CharField(source="get_event_type_display", read_only=True)
+
+    class Meta:
+        from .models import InterviewProctoringEvent
+        model = InterviewProctoringEvent
+        fields = [
+            'id', 'session', 'event_type', 'eventTypeLabel',
+            'timestamp', 'duration_seconds', 'details', 'create_at'
+        ]
+        read_only_fields = ['id', 'create_at', 'timestamp']
+
 

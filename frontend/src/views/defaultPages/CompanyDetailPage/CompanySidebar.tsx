@@ -2,9 +2,9 @@ import React from 'react';
 import { Box, Card, Stack, Typography, Link, IconButton } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobe, faEnvelope, faPhoneVolume, faHashtag, faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import { FacebookIcon, YoutubeIcon, LinkedinIcon } from "../../../components/Common/SocialIcons";
-import Map from "../../../components/Common/Map";
-import ImageGalleryCustom from "../../../components/Common/ImageGalleryCustom";
+import { FacebookIcon, YoutubeIcon, LinkedinIcon } from "@/components/Common/SocialIcons";
+import Map from "@/components/Common/Map";
+import ImageGalleryCustom from "@/components/Common/ImageGalleryCustom";
 import VerifiedIcon from "@mui/icons-material/Verified";
 
 import type { Theme as StylesTheme } from '@mui/material/styles';

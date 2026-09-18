@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Chip, Stack, Typography } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
-import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
+import MuiImageCustom from "@/components/Common/MuiImageCustom";
 
 const SidebarProfile = () => {
   const { t } = useTranslation('auth');
@@ -20,23 +20,39 @@ const SidebarProfile = () => {
             height: 90,
             padding: "4px",
             borderRadius: "50%",
-            background: `linear-gradient(45deg, #441da0, #6b4fd1)`,
-            boxShadow: "0 4px 14px 0 rgba(68, 29, 160, 0.15)",
+            background: `linear-gradient(45deg, #0f172a, #2563eb)`,
+            boxShadow: "0 4px 14px 0 rgba(15, 23, 42, 0.15)",
             "&:hover .avatar-actions": {
               opacity: 1,
             },
           }}
         >
-          <MuiImageCustom
-            src={currentUser?.avatarUrl}
-            width="100%"
-            height="100%"
-            sx={{
-              borderRadius: '50%',
-              objectFit: 'cover',
-              border: '2px solid white',
-            }}
-          />
+          {currentUser?.avatarUrl ? (
+            <MuiImageCustom
+              src={currentUser?.avatarUrl}
+              width="100%"
+              height="100%"
+              sx={{
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '2px solid white',
+              }}
+            />
+          ) : (
+            <Avatar
+              sx={{
+                width: '100%',
+                height: '100%',
+                bgcolor: 'primary.main',
+                color: 'common.white',
+                fontSize: '1.75rem',
+                fontWeight: 700,
+                border: '2px solid white',
+              }}
+            >
+              {currentUser?.fullName?.charAt(0)?.toUpperCase()}
+            </Avatar>
+          )}
         </Box>
         <Box flex={1}>
           <Typography variant="caption">{t('account.welcomeBack')}</Typography>

@@ -1,8 +1,8 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import httpRequest, { refreshClient } from '../httpRequest';
-import tokenService from '../../services/tokenService';
-import { AUTH_CONFIG } from '../../configs/constants';
+import tokenService from '@/services/tokenService';
+import { AUTH_CONFIG } from '@/configs/constants';
 import { ACTIVE_WORKSPACE_STORAGE_KEY } from '../storageKeys';
 
 jest.mock('../../services/tokenService', () => ({

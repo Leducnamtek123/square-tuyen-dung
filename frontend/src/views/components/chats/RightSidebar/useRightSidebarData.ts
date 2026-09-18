@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { ChatContext } from '../../../../context/ChatProvider';
-import { addDocument, checkChatRoomExists, checkExists, createUser } from '../../../../services/firebaseService';
-import { RootState } from '../../../../redux/store';
-import { normalizePaginatedResponse } from '../../../../utils/apiResponse';
-import type { ChatAccountData, ChatRoomDocument } from '../../../../services/firebaseService';
+import { ChatContext } from '@/context/ChatProvider';
+import { addDocument, checkChatRoomExists, checkExists, createUser } from '@/services/firebaseService';
+import { RootState } from '@/redux/store';
+import { normalizePaginatedResponse } from '@/utils/apiResponse';
+import type { ChatAccountData, ChatRoomDocument } from '@/services/firebaseService';
 
 export type UserDataPayload = ChatAccountData;
 
@@ -66,10 +66,12 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
   const { setSelectedRoomId } = context || {};
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
       dispatch({ type: 'loading' });
       try {
         const resData = await fetchData({ page, pageSize });
+        if (!isMounted) return;
         const data = normalizeRightSidebarResponse<T>(resData);
         dispatch({
           type: 'loaded',
@@ -77,42 +79,38 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
           results: data.results,
         });
       } catch (error) {
-        // Error handled silently
-        dispatch({ type: 'finished' });
+        if (isMounted) {
+          dispatch({ type: 'finished' });
+        }
       }
     };
     loadData();
+    return () => {
+      isMounted = false;
+    };
   }, [page, fetchData, pageSize]);
 
   const handleAddRoom = async (partnerId: string, userData: UserDataPayload) => {
     const normalizedPartnerId = String(partnerId || '').trim();
     if (!userId || !setSelectedRoomId || !normalizedPartnerId) return;
 
-    let allowCreateNewChatRoom = false;
-    const isExists = await checkExists('accounts', normalizedPartnerId);
-    if (!isExists) {
-      const createResult = await createUser('accounts', userData, normalizedPartnerId);
-      if (createResult) {
-        allowCreateNewChatRoom = true;
-      }
-    } else {
-      allowCreateNewChatRoom = true;
+    // Always merge latest partner information (avatar, name, company) into Firestore accounts
+    if (userData) {
+      await createUser('accounts', userData, normalizedPartnerId);
     }
 
-    if (allowCreateNewChatRoom) {
-      let chatRoomId = await checkChatRoomExists('chatRooms', userId, normalizedPartnerId);
-      if (chatRoomId === null) {
-        const newRoom: ChatRoomDocument = {
-          members: [`${userId}`, normalizedPartnerId],
-          membersString: [`${userId}-${normalizedPartnerId}`, `${normalizedPartnerId}-${userId}`],
-          recipientId: normalizedPartnerId,
-          createdBy: `${userId}`,
-          unreadCount: 0
-        };
-        chatRoomId = await addDocument('chatRooms', newRoom);
-      }
-      setSelectedRoomId(chatRoomId);
+    let chatRoomId = await checkChatRoomExists('chatRooms', userId, normalizedPartnerId);
+    if (chatRoomId === null) {
+      const newRoom: ChatRoomDocument = {
+        members: [`${userId}`, normalizedPartnerId],
+        membersString: [`${userId}-${normalizedPartnerId}`, `${normalizedPartnerId}-${userId}`],
+        recipientId: normalizedPartnerId,
+        createdBy: `${userId}`,
+        unreadCount: 0
+      };
+      chatRoomId = await addDocument('chatRooms', newRoom);
     }
+    setSelectedRoomId(chatRoomId);
   };
 
   return {

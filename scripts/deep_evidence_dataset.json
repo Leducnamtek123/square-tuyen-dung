@@ -1,0 +1,518 @@
+{
+  "root_items": [
+    {
+      "name": ".dockerignore",
+      "is_dir": false,
+      "size": 490,
+      "ext": ""
+    },
+    {
+      "name": ".env",
+      "is_dir": false,
+      "size": 15798,
+      "ext": ""
+    },
+    {
+      "name": ".env.example",
+      "is_dir": false,
+      "size": 6267,
+      "ext": ".example"
+    },
+    {
+      "name": ".env.prod",
+      "is_dir": false,
+      "size": 15834,
+      "ext": ".prod"
+    },
+    {
+      "name": ".firebaserc",
+      "is_dir": false,
+      "size": 57,
+      "ext": ""
+    },
+    {
+      "name": ".gitattributes",
+      "is_dir": false,
+      "size": 18,
+      "ext": ""
+    },
+    {
+      "name": ".github",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": ".gitignore",
+      "is_dir": false,
+      "size": 758,
+      "ext": ""
+    },
+    {
+      "name": "api",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "backups",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "docker-compose.yml",
+      "is_dir": false,
+      "size": 19581,
+      "ext": ".yml"
+    },
+    {
+      "name": "docs",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "ENVIRONMENT_AUDIT.md",
+      "is_dir": false,
+      "size": 28688,
+      "ext": ".md"
+    },
+    {
+      "name": "firebase-storage-cors.json",
+      "is_dir": false,
+      "size": 409,
+      "ext": ".json"
+    },
+    {
+      "name": "firebase.json",
+      "is_dir": false,
+      "size": 76,
+      "ext": ".json"
+    },
+    {
+      "name": "firestore.indexes.json",
+      "is_dir": false,
+      "size": 2906,
+      "ext": ".json"
+    },
+    {
+      "name": "frontend",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "HCNS.QT.01.F06 v1.3 Cau hoi phong van.doc",
+      "is_dir": false,
+      "size": 310272,
+      "ext": ".doc"
+    },
+    {
+      "name": "infra",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "MIGRATIONS.md",
+      "is_dir": false,
+      "size": 3697,
+      "ext": ".md"
+    },
+    {
+      "name": "nginx-gateway",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "notebooklm-mcp",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "README.md",
+      "is_dir": false,
+      "size": 5836,
+      "ext": ".md"
+    },
+    {
+      "name": "scripts",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "START_GUIDE.md",
+      "is_dir": false,
+      "size": 2887,
+      "ext": ".md"
+    },
+    {
+      "name": "tasks",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    },
+    {
+      "name": "tuyendungsqstudio.sql",
+      "is_dir": false,
+      "size": 0,
+      "ext": ".sql"
+    },
+    {
+      "name": "voice-ai",
+      "is_dir": true,
+      "size": 0,
+      "ext": "[dir]"
+    }
+  ],
+  "django_apps": [
+    "accounts",
+    "agent_assistants",
+    "chatbot",
+    "content",
+    "cv_builder",
+    "files",
+    "hrm",
+    "interviews",
+    "jobs",
+    "locations",
+    "profiles"
+  ],
+  "backend_anomalies": [
+    {
+      "path": "api/common",
+      "issue": "Django app 'api/common' located outside 'api/apps/' convention",
+      "severity": "HIGH"
+    },
+    {
+      "path": "api/config/admin.py",
+      "issue": "Application logic / admin / view / test 'admin.py' inside project root configuration package 'api/config/'",
+      "severity": "HIGH",
+      "size": 22219
+    },
+    {
+      "path": "api/config/interviews_compat_views.py",
+      "issue": "Application logic / admin / view / test 'interviews_compat_views.py' inside project root configuration package 'api/config/'",
+      "severity": "HIGH",
+      "size": 8388
+    },
+    {
+      "path": "api/config/tests.py",
+      "issue": "Application logic / admin / view / test 'tests.py' inside project root configuration package 'api/config/'",
+      "severity": "MEDIUM",
+      "size": 3702
+    },
+    {
+      "path": "api/config/views.py",
+      "issue": "Application logic / admin / view / test 'views.py' inside project root configuration package 'api/config/'",
+      "severity": "MEDIUM",
+      "size": 828
+    },
+    {
+      "path": "api/reset_db.py",
+      "issue": "Database seed/utility script 'reset_db.py' sitting in api root directory instead of management commands or api/scripts/",
+      "severity": "MEDIUM",
+      "size": 5460
+    },
+    {
+      "path": "api/seed_jobs.py",
+      "issue": "Database seed/utility script 'seed_jobs.py' sitting in api root directory instead of management commands or api/scripts/",
+      "severity": "MEDIUM",
+      "size": 7089
+    },
+    {
+      "path": "api/seed_users.py",
+      "issue": "Database seed/utility script 'seed_users.py' sitting in api root directory instead of management commands or api/scripts/",
+      "severity": "MEDIUM",
+      "size": 9122
+    }
+  ],
+  "frontend_anomalies": [
+    {
+      "path": "frontend/src/components/Commons",
+      "issue": "Duplicate / typo folder 'Commons' alongside 'Common' containing only a re-export shim",
+      "severity": "HIGH"
+    },
+    {
+      "path": "frontend/src/views/components",
+      "issue": "Parallel component hierarchy 'src/views/components/' competing with 'src/components/Common' and 'src/components/Features'",
+      "severity": "HIGH"
+    },
+    {
+      "path": "frontend/src/themeConfigs",
+      "issue": "Split configuration folders: 'src/themeConfigs/' vs 'src/configs/'",
+      "severity": "MEDIUM"
+    },
+    {
+      "path": "frontend/src/(mocks, test, __mocks__)",
+      "issue": "Fragmented test/mock directories in src: ['mocks', 'test', '__mocks__'] while frontend/tests also exists",
+      "severity": "MEDIUM"
+    },
+    {
+      "path": "frontend/audit_i18n.cjs",
+      "issue": "Ad-hoc audit/tooling file 'audit_i18n.cjs' placed in frontend root",
+      "severity": "LOW"
+    },
+    {
+      "path": "frontend/audit_output.md",
+      "issue": "Ad-hoc audit/tooling file 'audit_output.md' placed in frontend root",
+      "severity": "LOW"
+    },
+    {
+      "path": "frontend/doctor.config.json",
+      "issue": "Ad-hoc audit/tooling file 'doctor.config.json' placed in frontend root",
+      "severity": "LOW"
+    },
+    {
+      "path": "frontend/skills-lock.json",
+      "issue": "Ad-hoc audit/tooling file 'skills-lock.json' placed in frontend root",
+      "severity": "LOW"
+    }
+  ],
+  "assets_total": 196,
+  "assets_unused_count": 0,
+  "assets_unused": [],
+  "duplicate_assets_groups": {
+    "827a3df2561678f1561f380a4029600db744c2123526669ed47546ef5c5c1778": [
+      "api/config/static/admin/images/light-logo-medium.png",
+      "frontend/public/favicon.png"
+    ],
+    "7ee9ceae905b6053511ebdf6827ab9233614f298fee0975a12a9c8a44a0ea8f4": [
+      "api/data/seed_images/articles/ai_interview.jpg",
+      "frontend/public/images/blog/blog-ai-interview.jpg"
+    ],
+    "ba20dc83bd4711443756ffee40654e4edbf87bd1321da260c0d3f69a39cee4cd": [
+      "api/data/seed_images/articles/architecture.jpg",
+      "frontend/public/images/blog/blog-architecture-portfolio.jpg"
+    ],
+    "df001c2150c87df1cb0ad76d323575e2aba94b5fc8e7e13ad7b6ec8044bab4d2": [
+      "api/data/seed_images/articles/candidate_skills.jpg",
+      "frontend/public/images/blog/blog-candidate-skills.jpg"
+    ],
+    "78f8d35f6fb9c74eca550df8e928eed3f3e08bc2729f16fb6a1e5759480637a2": [
+      "api/data/seed_images/articles/construction.jpg",
+      "frontend/public/images/blog/blog-construction-site-hiring.jpg"
+    ],
+    "8dc635dc48feda4515511f0263803a2a0fce894ef46197510cd4abdab8eb72b7": [
+      "api/data/seed_images/articles/interior.jpg",
+      "frontend/public/images/blog/blog-interior-design-team.jpg"
+    ],
+    "eba6fe7633569741012a1b728c6438df297304a918265b4bedbcfbfae8d63309": [
+      "api/data/seed_images/articles/real_estate.jpg",
+      "frontend/public/images/blog/blog-real-estate-consultant.jpg"
+    ],
+    "431486e05690590015663cf0b3912d72bf5ffd351001348facb082a2979bfe23": [
+      "frontend/public/android-chrome-192x192.png",
+      "frontend/public/infohr-icons/android-chrome-192x192.png",
+      "frontend/src/app/android-chrome-192x192.png"
+    ],
+    "875defa637fae567e1188977b215badaf8c7a09678430ffe3e87e3b1f7921ebc": [
+      "frontend/public/android-chrome-512x512.png",
+      "frontend/public/infohr-icons/android-chrome-512x512.png",
+      "frontend/src/app/android-chrome-512x512.png"
+    ],
+    "9be5eacbd02d4a66990e72d2db062db5cb2799bbef5284a14378a3baf91f3f92": [
+      "frontend/public/apple-touch-icon.png",
+      "frontend/public/infohr-icons/apple-touch-icon.png",
+      "frontend/src/app/apple-touch-icon.png"
+    ],
+    "7b591514bad39e7d23c9bfc58908528ba0dbe20e9ae43d2856c69032cdfcaaaa": [
+      "frontend/public/company_cover_default.png",
+      "frontend/src/assets/images/company_cover_default.png"
+    ],
+    "352921785f0a0b3cecd49d000d649fb446331830412b8f1ac277d79c8803b35c": [
+      "frontend/public/company_logo_default.png",
+      "frontend/src/assets/images/company_logo_default.png"
+    ],
+    "367221db3af18735e5e89fb6770ee7aae28e27554bdd56d9a394b37d859a69d5": [
+      "frontend/public/favicon-16x16.png",
+      "frontend/public/infohr-icons/favicon-16x16.png",
+      "frontend/src/app/favicon-16x16.png"
+    ],
+    "273177f1728d72a7c6fd256e470466098839dc94b58745074d858f5585c0165b": [
+      "frontend/public/favicon-32x32.png",
+      "frontend/public/infohr-icons/favicon-32x32.png",
+      "frontend/src/app/favicon-32x32.png"
+    ],
+    "08208fc20003f1e6deeddd25da677c482653e0584af16f62bb0a06b14d13fce3": [
+      "frontend/public/favicon.ico",
+      "frontend/public/infohr-icons/favicon.ico",
+      "frontend/src/app/favicon.ico"
+    ],
+    "48c01564b22e0da29eedf002334de02fcdb6b1bb682a04576ca403a52153ece8": [
+      "frontend/public/loading-spinner.gif",
+      "frontend/src/assets/images/loading/loading-spinner.gif"
+    ],
+    "a769dcb3d8929e362ced705dc3b12262fa8693f705365121f68ae751030894e4": [
+      "frontend/public/images/aila/infohr-logo.png",
+      "frontend/public/infohr-icons/logo-brand.png"
+    ],
+    "f8598578acf79ffb1e11b1b51bd7c3b5ffc886613cc5b56f0b01ec4fad02ce86": [
+      "frontend/public/images/cv-avatars/avatar-minimal.jpg",
+      "frontend/public/images/cv-avatars/avatar-nordic.jpg"
+    ]
+  },
+  "semantic_duplications": [
+    {
+      "category": "Date / Time Formatting",
+      "count": 11,
+      "samples": [
+        {
+          "file": "frontend/src/components/Features/CVDoc/utils.tsx",
+          "line": 4,
+          "code": "export const formatDate = (dateString?: string) => {"
+        },
+        {
+          "file": "frontend/src/services/jobSeekerProfileService.ts",
+          "line": 45,
+          "code": "const formatDateForApi = (value: Date | string | null | undefined): string | null | undefined => {"
+        },
+        {
+          "file": "frontend/src/utils/dateHelper.ts",
+          "line": 37,
+          "code": "export const formatDateDivider = (timestamp: string | number | Date | null | undefined): string => {"
+        },
+        {
+          "file": "frontend/src/views/agentAssistantPage/index.tsx",
+          "line": 47,
+          "code": "const formatTime = (value?: string | null, locale = 'vi-VN') => {"
+        },
+        {
+          "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialogTranscript.tsx",
+          "line": 22,
+          "code": "const formatTime = (timestamp: number) =>"
+        },
+        {
+          "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewTranscriptPanelLive.tsx",
+          "line": 31,
+          "code": "const formatTime = (timestamp: number, language: string) =>"
+        },
+        {
+          "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard.tsx",
+          "line": 42,
+          "code": "const formatDate = (dateStr?: string | null) => {"
+        },
+        {
+          "file": "frontend/src/views/components/modals/PhoneVerificationModal.tsx",
+          "line": 113,
+          "code": "const formatTimer = (seconds: number): string => {"
+        }
+      ]
+    },
+    {
+      "category": "API Base URL / Axios Client Instantiations",
+      "count": 3,
+      "samples": [
+        {
+          "file": "frontend/src/services/nominatimService.ts",
+          "line": 35,
+          "code": "const nominatimAxios = axios.create({"
+        },
+        {
+          "file": "frontend/src/utils/httpRequest.ts",
+          "line": 43,
+          "code": "const httpRequest = axios.create({"
+        },
+        {
+          "file": "frontend/src/utils/httpRequest.ts",
+          "line": 61,
+          "code": "export const refreshClient = axios.create({"
+        }
+      ]
+    }
+  ],
+  "debug_items_count": 3,
+  "debug_items": [
+    {
+      "file": "frontend/src/app/tin-tuc/[slug]/page.tsx",
+      "line": 14,
+      "type": "console.log",
+      "code": "console.log('[generateMetadata tin-tuc/[slug]] fetching slug:', slug);"
+    },
+    {
+      "file": "frontend/src/app/tin-tuc/[slug]/page.tsx",
+      "line": 16,
+      "type": "console.log",
+      "code": "console.log('[generateMetadata tin-tuc/[slug]] fetched article:', article ? article.title : 'NULL');"
+    },
+    {
+      "file": "frontend/src/mocks/initMock.ts",
+      "line": 30,
+      "type": "console.log",
+      "code": "console.log('\ud83d\udca1 [Mock Mode] Initializing Axios Mock Adapter with rich sample data...');"
+    }
+  ],
+  "cycles_count": 12,
+  "cycles_sample": [
+    [
+      "frontend/src/types/models.ts",
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/types/models.ts"
+    ],
+    [
+      "frontend/src/redux/userSlice.ts",
+      "frontend/src/types/models.ts",
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/redux/store.ts",
+      "frontend/src/redux/userSlice.ts"
+    ],
+    [
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/redux/store.ts",
+      "frontend/src/redux/authSlice.ts",
+      "frontend/src/types/auth.ts"
+    ],
+    [
+      "frontend/src/configs/images.ts",
+      "frontend/src/configs/images.ts"
+    ],
+    [
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/views/components/auths/EmployerSignUpForm/AccountInfoStep.tsx",
+      "frontend/src/views/components/auths/EmployerSignUpForm/types.ts",
+      "frontend/src/types/auth.ts"
+    ],
+    [
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/types/auth.ts"
+    ],
+    [
+      "frontend/src/types/models.ts",
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/views/components/auths/EmployerSignUpForm/CompanyInfoStep.tsx",
+      "frontend/src/types/models.ts"
+    ],
+    [
+      "frontend/src/types/models.ts",
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/views/components/auths/EmployerSignUpForm/CompanyInfoStep.tsx",
+      "frontend/src/components/Common/Controls/SingleSelectCustom/index.tsx",
+      "frontend/src/types/models.ts"
+    ],
+    [
+      "frontend/src/types/models.ts",
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/services/commonService.ts",
+      "frontend/src/types/models.ts"
+    ],
+    [
+      "frontend/src/types/auth.ts",
+      "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "frontend/src/services/commonService.ts",
+      "frontend/src/utils/httpRequest.ts",
+      "frontend/src/types/auth.ts"
+    ]
+  ]
+}

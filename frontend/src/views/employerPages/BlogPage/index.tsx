@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import contentService, { Article, ArticleStatus } from '@/services/contentService';
 import DataTable from '@/components/Common/DataTable';
 import toastMessages from '@/utils/toastMessages';
+import { confirmModal } from '@/utils/sweetalert2Modal';
 import dayjs from '@/configs/dayjs-config';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
@@ -108,6 +109,7 @@ const EmployerBlogListPage = () => {
         status: statusFilter === 'all' ? undefined : statusFilter,
         search: search || undefined,
         page: pagination.pageIndex + 1,
+        pageSize: pagination.pageSize,
         page_size: pagination.pageSize,
       });
       dispatch({ type: 'loaded', articles: res.results || [], total: res.count || 0 });
@@ -119,15 +121,21 @@ const EmployerBlogListPage = () => {
 
   useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
-  const handleDelete = async (id: number, title: string) => {
-    if (!window.confirm(t('blog.messages.deleteConfirm', { title }))) return;
-    try {
-      await contentService.employerDeleteBlog(id);
-      toastMessages.success(t('blog.messages.deleteSuccess'));
-      fetchArticles();
-    } catch {
-      toastMessages.error(t('blog.messages.deleteError'));
-    }
+  const handleDelete = (id: number, title: string) => {
+    confirmModal(
+      async () => {
+        try {
+          await contentService.employerDeleteBlog(id);
+          toastMessages.success(t('blog.messages.deleteSuccess'));
+          fetchArticles();
+        } catch {
+          toastMessages.error(t('blog.messages.deleteError'));
+        }
+      },
+      t('blog.deleteTitle', { defaultValue: 'Xác nhận xóa bài viết' }),
+      t('blog.messages.deleteConfirm', { title }),
+      'warning'
+    );
   };
 
   const getStatusLabel = (status: ArticleStatus) => t(`blog.statuses.${status}`);
@@ -164,7 +172,7 @@ const EmployerBlogListPage = () => {
       header: t('blog.table.publishedAt'),
       cell: ({ row }: { row: { original: Article } }) => (
         <Typography variant="body2">
-          {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY') : '—'}
+          {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY') : '-'}
         </Typography>
       ),
     },
@@ -181,12 +189,12 @@ const EmployerBlogListPage = () => {
       cell: ({ row }: { row: { original: Article } }) => (
         <Stack direction="row" spacing={0.5}>
           <Tooltip title={t('blog.actions.edit')}>
-            <IconButton size="small" onClick={() => push(`/employer/blog/${row.original.id}`)}>
+            <IconButton aria-label="Thao tác" size="small" onClick={() => push(`/employer/blog/${row.original.id}`)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={t('blog.actions.delete')}>
-            <IconButton size="small" color="error" onClick={() => handleDelete(row.original.id, row.original.title)}>
+            <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => handleDelete(row.original.id, row.original.title)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -200,7 +208,7 @@ const EmployerBlogListPage = () => {
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Box>
-          <Typography variant="h4" fontWeight={900} letterSpacing="-0.5px">
+          <Typography variant="h4" component="h1" fontWeight={900} letterSpacing="-0.5px">
             {t('blog.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary" mt={0.5}>

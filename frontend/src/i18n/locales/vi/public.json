@@ -6,6 +6,7 @@
     "urgentJobs": "Việc làm tuyển gấp",
     "urgentJobsAria": "Việc làm tuyển gấp",
     "keyCareers": "Ngành nghề trọng điểm",
+    "keyCareersTitle": "Ngành nghề nổi bật",
     "keyCareersSubtitle": "Khám phá các nhóm nghề đang có nhu cầu cao để rút ngắn bước tìm kiếm.",
     "suggestedJobs": "Việc làm đề xuất",
     "suggestedJobsAria": "Việc làm đề xuất",
@@ -13,7 +14,12 @@
     "exploreDescription": "Bắt đầu từ một nơi duy nhất để tìm việc, xem công ty, lọc theo ngành và đi nhanh đến hành động tiếp theo.",
     "startExploring": "Bắt đầu khám phá",
     "userFeedback": "Đánh giá từ người dùng",
-    "userFeedbackSubtitle": "Đánh giá thật từ người dùng giúp trải nghiệm tuyển dụng thêm tin cậy.",
+    "userFeedbackSubtitle": "Đánh giá thật từ đối tác doanh nghiệp và người tìm việc giúp trải nghiệm tuyển dụng thêm tin cậy.",
+    "feedbackAll": "Tất cả",
+    "feedbackEmployers": "Nhà tuyển dụng & Doanh nghiệp",
+    "feedbackCandidates": "Ứng viên tìm việc",
+    "feedbackVerifiedEmployer": "Doanh nghiệp xác thực",
+    "feedbackVerifiedCandidate": "Ứng viên đã có việc",
     "noFeedbacks": "Chưa có người dùng nào đánh giá",
     "noCompaniesFound": "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
     "jobsCount": "{{count}} Việc Làm",
@@ -37,12 +43,14 @@
     "candidateBenefit2": "Lưu và theo dõi job",
     "candidateBenefit3": "Gợi ý phù hợp",
     "candidateCta": "Khám phá việc làm",
+    "candidateStatusBadge": "+450 việc làm mới cập nhật hôm nay",
     "employerTitle": "Dành cho nhà tuyển dụng",
     "employerDescription": "Đăng tin, tìm hồ sơ và rút ngắn quy trình tuyển dụng với bộ công cụ dành cho doanh nghiệp.",
     "employerBenefit1": "Đăng tin nhanh",
     "employerBenefit2": "Tìm hồ sơ phù hợp",
     "employerBenefit3": "Phỏng vấn hiệu quả",
-    "employerCta": "Xem giải pháp"
+    "employerCta": "Xem giải pháp",
+    "employerStatusBadge": "AI Matching 98.4% chuẩn xác"
   },
   "jobDetail": {
     "deadline": "Hạn nộp",
@@ -185,7 +193,16 @@
     "searchPlaceholder": "Nhập tên công ty hoặc lĩnh vực cần tìm kiếm",
     "allCities": "Tất cả tỉnh thành",
     "searchButton": "Tìm kiếm",
-    "resetFiltersAria": "Đặt lại bộ lọc tìm công ty"
+    "resetFiltersAria": "Đặt lại bộ lọc tìm công ty",
+    "openFiltersAria": "Mở bộ lọc tìm công ty",
+    "filterDrawerTitle": "Bộ lọc nâng cao",
+    "filterLocation": "Địa điểm / Tỉnh thành",
+    "filterEmployeeSize": "Quy mô nhân sự",
+    "allEmployeeSizes": "Tất cả quy mô nhân sự",
+    "applyFilters": "Áp dụng",
+    "resetFilters": "Xóa bộ lọc",
+    "activeFilters": "Đang lọc",
+    "clearAll": "Xóa tất cả"
   },
   "jobsByCategoryPage": {
     "careerTitle": "Việc làm theo ngành nghề",
@@ -252,7 +269,15 @@
       "phoneMax": "Số điện thoại vượt quá độ dài cho phép.",
       "resumeRequired": "Vui lòng chọn hồ sơ."
     },
-    "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn."
+    "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn.",
+    "consentNotice": {
+      "text": "Bằng việc nhấn nút nộp hồ sơ, tôi đồng ý chia sẻ thông tin cá nhân của mình với nhà tuyển dụng theo các",
+      "terms": "Điều khoản sử dụng",
+      "privacy": "Chính sách bảo mật",
+      "and": "và",
+      "dataPolicy": "Chính sách dữ liệu cá nhân",
+      "ofInfoHR": "của InfoHR."
+    }
   },
   "applyCard": {
     "positionCaption": "Ứng tuyển vị trí",
@@ -262,7 +287,8 @@
   "company": {
     "following": "Đang theo dõi",
     "follow": "Theo dõi",
-    "followers": "{{count}} người theo dõi",
+    "followers": "người theo dõi",
+    "openingJobs": "việc làm đang tuyển",
     "notUpdated": "Chưa cập nhật",
     "jobCount": "{{count}} việc làm"
   },
@@ -466,5 +492,51 @@
         }
       ]
     }
+  },
+  "authRequired": {
+    "title": "Đăng nhập để tiếp tục",
+    "defaultMsg": "Vui lòng đăng nhập tài khoản để sử dụng đầy đủ các tính năng trên hệ thống.",
+    "saveJobMsg": "Vui lòng đăng nhập tài khoản Ứng viên để lưu tin tuyển dụng và xem lại bất cứ lúc nào.",
+    "applyJobMsg": "Vui lòng đăng nhập tài khoản Ứng viên để nộp hồ sơ trực tiếp đến nhà tuyển dụng.",
+    "followCompanyMsg": "Vui lòng đăng nhập để theo dõi và nhận thông báo việc làm mới nhất từ công ty này.",
+    "loginBtn": "Đăng nhập ngay",
+    "registerPrompt": "Chưa có tài khoản?",
+    "registerBtn": "Đăng ký tài khoản",
+    "closeBtn": "Để sau"
+  },
+  "feedback": {
+    "employerRole": "Nhà tuyển dụng",
+    "candidateRole": "Ứng viên tìm việc",
+    "employerImpact": "Tuyển dụng nhanh & chính xác",
+    "candidateImpact": "Ứng tuyển thành công",
+    "enterpriseBadge": "Doanh nghiệp",
+    "candidateBadge": "Ứng viên"
+  },
+  "featuredCompanies": "Công ty nổi bật",
+  "openPositions": "{{count}} vị trí đang tuyển",
+  "salary": {
+    "allCategories": "Tất cả ngành nghề",
+    "seniorities": {
+      "all": "Tất cả cấp bậc",
+      "junior": "Junior / Mới bắt đầu (0 - 2 năm)",
+      "mid": "Trung cấp / Mid-level (2 - 4 năm)",
+      "senior": "Senior / Quản lý (> 4 năm)"
+    },
+    "metrics": {
+      "surveyedRoles": "Vị trí khảo sát",
+      "standardRanges": "{{count}} dải lương chuẩn",
+      "zeroRanges": "0 dải lương",
+      "medianSalary": "Mức lương trung vị (P50)",
+      "perMonth": "{{val}} / tháng",
+      "highestSalary": "Mốc trần cao nhất",
+      "upTo": "Lên đến {{val}}"
+    },
+    "cta": {
+      "eyebrow": "Bước tiếp theo để đạt mức lương kỳ vọng",
+      "title": "Tự Tin Chinh Phục Buổi Phỏng Vấn Với AI Interviewer",
+      "desc": "Trải nghiệm phòng phỏng vấn trực tuyến với AI, bộ đếm ngược từng câu hỏi, cấu trúc câu trả lời chi tiết và mẹo phỏng vấn hoàn toàn miễn phí.",
+      "button": "Vào phòng phỏng vấn thử ngay"
+    },
+    "errorFetch": "Không thể tải dữ liệu mức lương. Vui lòng thử lại!"
   }
 }

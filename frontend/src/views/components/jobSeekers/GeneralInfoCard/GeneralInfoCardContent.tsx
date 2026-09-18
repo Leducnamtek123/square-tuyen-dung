@@ -3,8 +3,8 @@ import { Box, Divider, Fab, Stack, Typography } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { Theme } from '@mui/material/styles';
-import { formatLocalizedSalaryRange } from '../../../../utils/customData';
-import { tConfig } from '../../../../utils/tConfig';
+import { formatLocalizedSalaryRange } from '@/utils/customData';
+import { tConfig } from '@/utils/tConfig';
 import type { ResumeDetail } from './types';
 
 type GeneralInfoCardContentProps = {

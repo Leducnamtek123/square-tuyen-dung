@@ -1,19 +1,20 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Paper, Tooltip, IconButton, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useResumes } from './hooks/useResumes';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { Resume } from '../../../types/models';
-import dayjs from '../../../configs/dayjs-config';
+import { useDataTable, useDebounce } from '@/hooks';
+import { Resume } from '@/types/models';
+import dayjs from '@/configs/dayjs-config';
 import FilterBar from '@/components/Common/FilterBar';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
+import { downloadPdf } from '@/utils/funcUtils';
 
 const ResumesPage = () => {
     const { t } = useTranslation('admin');
@@ -72,9 +73,10 @@ const ResumesPage = () => {
 
     const columns = useMemo<ColumnDef<Resume>[]>(() => [
         {
-            accessorKey: 'id',
-            header: 'ID',
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             accessorKey: 'title',
@@ -86,7 +88,7 @@ const ResumesPage = () => {
                         {info.getValue() as string}
                     </Typography>
                     <Typography variant="caption" color="textSecondary">
-                        {info.row.original.userDict?.fullName || '—'}
+                        {info.row.original.userDict?.fullName || '-'}
                     </Typography>
                 </Box>
             ),
@@ -99,7 +101,7 @@ const ResumesPage = () => {
         {
             accessorKey: 'createAt',
             header: t('pages.resumes.table.createdAt') as string,
-            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-',
         },
         {
             id: 'actions',
@@ -109,20 +111,44 @@ const ResumesPage = () => {
                 const resume = info.row.original;
                 const fileUrl = resume.fileUrl || '';
                 const safeFileUrl = getSafeResourceUrl(fileUrl);
+                const onlineHref = resume.slug ? `/cv/${resume.slug}` : undefined;
+                const safeTargetUrl = safeFileUrl || onlineHref;
+
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.resumes.table.view')}>
-                             <IconButton size="small" component="a" href={safeFileUrl} target="_blank" rel="noopener noreferrer" color="info" disabled={!safeFileUrl}>
+                             <IconButton
+                                aria-label="Thao tác"
+                                size="small"
+                                component="a"
+                                href={safeTargetUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                color="info"
+                                disabled={!safeTargetUrl}
+                            >
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={t('pages.resumes.table.download')}>
-                             <IconButton size="small" component="a" href={safeFileUrl} download color="primary" disabled={!safeFileUrl}>
+                             <IconButton
+                                aria-label="Tải xuống"
+                                size="small"
+                                onClick={() => {
+                                    if (safeFileUrl) {
+                                        downloadPdf(safeFileUrl, resume.title);
+                                    } else if (onlineHref) {
+                                        window.open(onlineHref, '_blank');
+                                    }
+                                }}
+                                color="primary"
+                                disabled={!safeTargetUrl}
+                            >
                                 <DownloadIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={t('pages.resumes.table.delete')}>
-                            <IconButton size="small" onClick={() => handleOpenDelete(resume)} color="error">
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(resume)} color="error">
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>

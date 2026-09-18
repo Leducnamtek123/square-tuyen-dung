@@ -87,7 +87,21 @@ const DEFAULT_LAYOUT_PATHS = [
   '/employer/faq',
   '/nha-tuyen-dung/cau-hoi-thuong-gap',
   '/employer/terms-of-service',
+  '/employer/terms-and-conditions',
   '/nha-tuyen-dung/dieu-khoan-dich-vu',
+  '/nha-tuyen-dung/terms-and-conditions',
+  '/employer/privacy-policy',
+  '/nha-tuyen-dung/chinh-sach-bao-mat',
+  '/employer/legal',
+  '/nha-tuyen-dung/legal',
+  '/employer/thoa-thuan-su-dung.html',
+  '/employer/chinh-sach-bao-mat.html',
+  '/employer/chinh-sach-bao-hanh.html',
+  '/employer/quy-dinh-dang-tin.html',
+  '/nha-tuyen-dung/thoa-thuan-su-dung.html',
+  '/nha-tuyen-dung/chinh-sach-bao-mat.html',
+  '/nha-tuyen-dung/chinh-sach-bao-hanh.html',
+  '/nha-tuyen-dung/quy-dinh-dang-tin.html',
   // /employer/candidates & /employer/blog are protected routes requiring employer login.
 ];
 
@@ -127,7 +141,17 @@ export default function EmployerSectionClient({
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
 
-  const isPublicPage = DEFAULT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const isPublicPage =
+    DEFAULT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`)) ||
+    pathname.endsWith('.html') ||
+    pathname.includes('/legal/') ||
+    pathname.includes('/thoa-thuan-su-dung') ||
+    pathname.includes('/chinh-sach-bao-mat') ||
+    pathname.includes('/quy-dinh-bao-mat') ||
+    pathname.includes('/chinh-sach-bao-hanh') ||
+    pathname.includes('/quy-dinh-dang-tin') ||
+    pathname.includes('/tuan-thu-va-su-dong-y-cua-khach-hang') ||
+    pathname.includes('/so-do-trang-web');
   const [authGate, dispatchAuthGate] = useReducer(
     authGateReducer,
     isPublicPage,
@@ -135,18 +159,17 @@ export default function EmployerSectionClient({
   );
 
   useEffect(() => {
+    const lang = getPreferredLanguage();
+    const employerPrefix = getPortalPrefix('employer', lang);
+    const loginUrl = `${employerPrefix}/login?redirect=${encodeURIComponent(pathname)}`;
+    const dashboardPath = `${employerPrefix}/bang-dieu-khien`;
+
     if (authGate.shouldRedirectToLogin) {
-      const lang = getPreferredLanguage();
-      const employerPrefix = getPortalPrefix('employer', lang);
-      window.location.replace(`${employerPrefix}/login`);
+      window.location.replace(loginUrl);
       return;
     }
 
     const checkAuth = async () => {
-      const lang = getPreferredLanguage();
-      const employerPrefix = getPortalPrefix('employer', lang);
-      const loginPath = `${employerPrefix}/login`;
-      const dashboardPath = `${employerPrefix}/bang-dieu-khien`;
       const token = tokenService.getAccessTokenFromCookie();
 
       if (isPublicPage) {
@@ -156,7 +179,6 @@ export default function EmployerSectionClient({
             try {
               user = await dispatch(getUserInfo()).unwrap();
             } catch {
-              window.location.replace(loginPath);
               return;
             }
           }
@@ -184,13 +206,18 @@ export default function EmployerSectionClient({
         try {
           user = await dispatch(getUserInfo()).unwrap();
         } catch {
-          window.location.replace(loginPath);
+          window.location.replace(loginUrl);
           return;
         }
       }
 
       if (user?.roleName !== ROLES_NAME.EMPLOYER && !user?.canAccessEmployerPortal) {
         window.location.replace('/');
+        return;
+      }
+
+      if (user?.isOnboarded === false && !pathname.includes('/onboarding')) {
+        window.location.replace('/onboarding/employer');
         return;
       }
     };

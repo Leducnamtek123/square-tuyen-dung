@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { BACKEND_CHOICE_VALUES } from '../../../../utils/backendChoiceValues';
+import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 import { createEmptyJobNotificationFormData } from '../types';
 
 describe('Admin JobNotificationsPage frequency contract', () => {

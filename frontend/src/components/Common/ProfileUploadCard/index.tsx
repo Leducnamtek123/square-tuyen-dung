@@ -15,7 +15,7 @@ import DeleteForever from '@mui/icons-material/DeleteForever';
 import downloadPdf, { formatRoute } from '@/utils/funcUtils';
 import { IMAGES, ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
-import defaultTheme from '@/themeConfigs/defaultTheme';
+import defaultTheme from '@/configs/theme/defaultTheme';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
 interface ProfileUploadCardProps {
@@ -239,6 +239,7 @@ const ProfileUploadCard = ({
                 sx={{
                   minWidth: 0,
                   pr: 1,
+                  color: '#ffffff',
                   overflow: 'hidden',
                   display: '-webkit-box',
                   WebkitBoxOrient: 'vertical',
@@ -289,7 +290,7 @@ const ProfileUploadCard = ({
 
             </Stack>
 
-            <Typography variant="caption" sx={{ opacity: 0.8 }}>
+            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)' }}>
 
               {t('profileUpload.lastUpdated', { date: formattedUpdatedAt })}
 

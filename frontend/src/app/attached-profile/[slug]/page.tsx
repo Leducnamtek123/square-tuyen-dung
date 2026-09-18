@@ -1,10 +1,5 @@
-import AttachedProfilePageClient from './page.client';
-
-export const metadata = {
-  title: 'Attached profile',
-  description: 'Browse the attached profile page.',
-};
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return <AttachedProfilePageClient />;
+  redirect('/dashboard');
 }

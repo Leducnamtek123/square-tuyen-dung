@@ -5,7 +5,12 @@ const LeftSidebar = () => {
   return (
     <SidebarRenderer
       searchPlaceholderKey="searchPlaceholderCompany"
-      getSubtextName={(user) => `${user?.company?.companyName || '---'}`}
+      getSubtextName={(user) => {
+        const cName = user?.company?.companyName;
+        const uName = user?.name;
+        if (cName && uName && cName !== uName) return cName;
+        return user?.email || cName || '';
+      }}
     />
   );
 };
@@ -14,7 +19,7 @@ const EmployerSidebar = () => {
   return (
     <SidebarRenderer
       searchPlaceholderKey="searchPlaceholderCandidate"
-      getSubtextName={(user) => `${user?.email || '---'}`}
+      getSubtextName={(user) => user?.email || ''}
     />
   );
 };

@@ -1,0 +1,2349 @@
+{
+  "total_files": 2193,
+  "extensions": {
+    ".dockerignore": 5,
+    ".env": 7,
+    ".example": 6,
+    ".prod": 3,
+    ".firebaserc": 1,
+    ".gitattributes": 1,
+    ".gitignore": 6,
+    ".yml": 10,
+    ".md": 61,
+    ".json": 65,
+    ".doc": 1,
+    ".sql": 1,
+    ".flake8": 1,
+    ".pylintrc": 1,
+    ".py": 386,
+    ".sh": 9,
+    "[no extension]": 14,
+    ".ini": 2,
+    ".txt": 3,
+    ".html": 14,
+    ".js": 14,
+    ".css": 10,
+    ".png": 70,
+    ".zip": 2,
+    ".jpg": 53,
+    ".svg": 38,
+    ".log": 2,
+    ".cjs": 2,
+    ".yaml": 11,
+    ".mjs": 3,
+    ".ts": 580,
+    ".conf": 4,
+    ".tsbuildinfo": 1,
+    ".crt": 1,
+    ".key": 1,
+    ".gif": 11,
+    ".ico": 3,
+    ".webmanifest": 3,
+    ".xml": 1,
+    ".ttf": 12,
+    ".webp": 9,
+    ".tsx": 758,
+    ".ps1": 3,
+    ".prettierignore": 1,
+    ".gguf": 1,
+    ".toml": 1,
+    ".lock": 1
+  },
+  "root_issues": [
+    {
+      "file": "ENVIRONMENT_AUDIT.md",
+      "type": "LOOSE_DOCS",
+      "reason": "Markdown documentation at repo root instead of docs/",
+      "expected": "docs/"
+    },
+    {
+      "file": "HCNS.QT.01.F06 v1.3 Cau hoi phong van.doc",
+      "type": "LOOSE_DATABASE_OR_DOC",
+      "reason": "Database dump or binary doc file at repo root",
+      "expected": "backups/ or docs/"
+    },
+    {
+      "file": "MIGRATIONS.md",
+      "type": "LOOSE_DOCS",
+      "reason": "Markdown documentation at repo root instead of docs/",
+      "expected": "docs/"
+    },
+    {
+      "file": "START_GUIDE.md",
+      "type": "LOOSE_DOCS",
+      "reason": "Markdown documentation at repo root instead of docs/",
+      "expected": "docs/"
+    },
+    {
+      "file": "tuyendungsqstudio.sql",
+      "type": "LOOSE_DATABASE_OR_DOC",
+      "reason": "Database dump or binary doc file at repo root",
+      "expected": "backups/ or docs/"
+    }
+  ],
+  "total_assets": 197,
+  "duplicate_assets_count": 18,
+  "duplicate_assets": {
+    "827a3df2561678f1561f380a4029600db744c2123526669ed47546ef5c5c1778": [
+      "api/config/static/admin/images/light-logo-medium.png",
+      "frontend/public/favicon.png"
+    ],
+    "7ee9ceae905b6053511ebdf6827ab9233614f298fee0975a12a9c8a44a0ea8f4": [
+      "api/data/seed_images/articles/ai_interview.jpg",
+      "frontend/public/images/blog/blog-ai-interview.jpg"
+    ],
+    "ba20dc83bd4711443756ffee40654e4edbf87bd1321da260c0d3f69a39cee4cd": [
+      "api/data/seed_images/articles/architecture.jpg",
+      "frontend/public/images/blog/blog-architecture-portfolio.jpg"
+    ],
+    "df001c2150c87df1cb0ad76d323575e2aba94b5fc8e7e13ad7b6ec8044bab4d2": [
+      "api/data/seed_images/articles/candidate_skills.jpg",
+      "frontend/public/images/blog/blog-candidate-skills.jpg"
+    ],
+    "78f8d35f6fb9c74eca550df8e928eed3f3e08bc2729f16fb6a1e5759480637a2": [
+      "api/data/seed_images/articles/construction.jpg",
+      "frontend/public/images/blog/blog-construction-site-hiring.jpg"
+    ],
+    "8dc635dc48feda4515511f0263803a2a0fce894ef46197510cd4abdab8eb72b7": [
+      "api/data/seed_images/articles/interior.jpg",
+      "frontend/public/images/blog/blog-interior-design-team.jpg"
+    ],
+    "eba6fe7633569741012a1b728c6438df297304a918265b4bedbcfbfae8d63309": [
+      "api/data/seed_images/articles/real_estate.jpg",
+      "frontend/public/images/blog/blog-real-estate-consultant.jpg"
+    ],
+    "431486e05690590015663cf0b3912d72bf5ffd351001348facb082a2979bfe23": [
+      "frontend/public/android-chrome-192x192.png",
+      "frontend/public/infohr-icons/android-chrome-192x192.png",
+      "frontend/src/app/android-chrome-192x192.png"
+    ],
+    "875defa637fae567e1188977b215badaf8c7a09678430ffe3e87e3b1f7921ebc": [
+      "frontend/public/android-chrome-512x512.png",
+      "frontend/public/infohr-icons/android-chrome-512x512.png",
+      "frontend/src/app/android-chrome-512x512.png"
+    ],
+    "9be5eacbd02d4a66990e72d2db062db5cb2799bbef5284a14378a3baf91f3f92": [
+      "frontend/public/apple-touch-icon.png",
+      "frontend/public/infohr-icons/apple-touch-icon.png",
+      "frontend/src/app/apple-touch-icon.png"
+    ],
+    "7b591514bad39e7d23c9bfc58908528ba0dbe20e9ae43d2856c69032cdfcaaaa": [
+      "frontend/public/company_cover_default.png",
+      "frontend/src/assets/images/company_cover_default.png"
+    ],
+    "352921785f0a0b3cecd49d000d649fb446331830412b8f1ac277d79c8803b35c": [
+      "frontend/public/company_logo_default.png",
+      "frontend/src/assets/images/company_logo_default.png"
+    ],
+    "367221db3af18735e5e89fb6770ee7aae28e27554bdd56d9a394b37d859a69d5": [
+      "frontend/public/favicon-16x16.png",
+      "frontend/public/infohr-icons/favicon-16x16.png",
+      "frontend/src/app/favicon-16x16.png"
+    ],
+    "273177f1728d72a7c6fd256e470466098839dc94b58745074d858f5585c0165b": [
+      "frontend/public/favicon-32x32.png",
+      "frontend/public/infohr-icons/favicon-32x32.png",
+      "frontend/src/app/favicon-32x32.png"
+    ],
+    "08208fc20003f1e6deeddd25da677c482653e0584af16f62bb0a06b14d13fce3": [
+      "frontend/public/favicon.ico",
+      "frontend/public/infohr-icons/favicon.ico",
+      "frontend/src/app/favicon.ico"
+    ],
+    "48c01564b22e0da29eedf002334de02fcdb6b1bb682a04576ca403a52153ece8": [
+      "frontend/public/loading-spinner.gif",
+      "frontend/src/assets/images/loading/loading-spinner.gif"
+    ],
+    "a769dcb3d8929e362ced705dc3b12262fa8693f705365121f68ae751030894e4": [
+      "frontend/public/images/aila/infohr-logo.png",
+      "frontend/public/infohr-icons/logo-brand.png"
+    ],
+    "f8598578acf79ffb1e11b1b51bd7c3b5ffc886613cc5b56f0b01ec4fad02ce86": [
+      "frontend/public/images/cv-avatars/avatar-minimal.jpg",
+      "frontend/public/images/cv-avatars/avatar-nordic.jpg"
+    ]
+  },
+  "unused_assets_count": 33,
+  "unused_assets": [
+    "HCNS.QT.01.F06 v1.3 Cau hoi phong van.doc",
+    "api/config/static/admin/images/dark-logo-large.png",
+    "api/config/static/admin/images/dark-logo-medium.png",
+    "api/config/static/admin/images/dark-logo-small.png",
+    "api/config/static/admin/images/dark-text-logo.png",
+    "api/config/static/admin/images/light-logo-large.png",
+    "api/config/static/admin/images/light-logo-small.png",
+    "api/config/static/admin/images/light-text-logo.png",
+    "api/data/seed_images/articles/ai_interview.jpg",
+    "api/data/seed_images/articles/candidate_skills.jpg",
+    "api/data/seed_images/articles/real_estate.svg",
+    "api/data/seed_images/banners/banner_1_web.png",
+    "api/data/seed_images/banners/banner_2_web.png",
+    "api/data/seed_images/banners/banner_3_web.png",
+    "api/data/seed_images/banners/banner_4_web.png",
+    "api/data/seed_images/banners/banner_5_web.png",
+    "frontend/public/300.gif",
+    "frontend/public/fonts/roboto/Roboto-BlackItalic.ttf",
+    "frontend/public/fonts/roboto/Roboto-BoldItalic.ttf",
+    "frontend/public/fonts/roboto/Roboto-Light.ttf",
+    "frontend/public/fonts/roboto/Roboto-LightItalic.ttf",
+    "frontend/public/fonts/roboto/Roboto-MediumItalic.ttf",
+    "frontend/public/fonts/roboto/Roboto-Thin.ttf",
+    "frontend/public/fonts/roboto/Roboto-ThinItalic.ttf",
+    "frontend/public/images/aila/aila-dashboard.png",
+    "frontend/public/images/aila/aila-hero.png",
+    "frontend/public/images/aila/infohr-logo.png",
+    "frontend/public/infohr-icons/logo-light.svg",
+    "frontend/public/square-icons/logo square svg-black.svg",
+    "frontend/public/square-icons/logo square svg-white.svg",
+    "frontend/public/square-icons/logo square-white_small.png",
+    "frontend/public/square-icons/logo square_black_small.png",
+    "frontend/src/assets/images/certification-logo.png"
+  ],
+  "orphan_ts_count": 9,
+  "orphan_ts": [
+    "frontend/src/components/Common/DataTableCustom/AIScoreBadge.tsx",
+    "frontend/src/hooks/AgentsUi/use-agent-audio-visualizer-grid.ts",
+    "frontend/src/hooks/AgentsUi/use-agent-audio-visualizer-radial.ts",
+    "frontend/src/hooks/AgentsUi/use-agent-audio-visualizer-wave.ts",
+    "frontend/src/hooks/AgentsUi/use-agent-control-bar.ts",
+    "frontend/src/views/adminPages/DashboardPage/components/StatCard.tsx",
+    "frontend/src/views/agentAssistantPage/hooks/useAgentStreamingEngine.ts",
+    "frontend/src/views/components/employers/ProfileDetailCard/CareerGoalsSection.tsx",
+    "frontend/src/views/components/employers/ProfileDetailCard/PersonalInfoSection.tsx"
+  ],
+  "orphan_py_count": 17,
+  "orphan_py": [
+    "api/reset_db.py",
+    "api/apps/interviews/tests_voice_profiles.py",
+    "api/apps/jobs/tests_api_contract_rbac.py",
+    "api/apps/jobs/test_auto_pipeline.py",
+    "api/apps/profiles/tests/test_admin_job_seeker_profile_filters.py",
+    "api/apps/profiles/tests/test_vieclam24h_import.py",
+    "api/console/jobs/thread_mail.py",
+    "api/scripts/backend_guard.py",
+    "api/scripts/convert_to_34_provinces_units.py",
+    "api/scripts/fetch_and_update_vn_units.py",
+    "api/scripts/generate_rich_banners.py",
+    "api/scripts/process_generated_banners.py",
+    "api/scripts/run_all_system_flows_live.py",
+    "api/scripts/seed_square_candidates_interviews.py",
+    "api/scripts/verify_api_contracts.py",
+    "api/shared/test_pagination.py",
+    "api/shared/middleware/authen_user_middleware.py"
+  ],
+  "placement_anomalies_count": 321,
+  "placement_anomalies": [
+    {
+      "file": "frontend/src/hooks/notificationsState.ts",
+      "category": "NON_HOOK_IN_HOOKS",
+      "detail": "File in hooks/ does not start with 'use'",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/utils/apiClient.ts",
+      "category": "SERVICE_IN_UTILS",
+      "detail": "Service/API logic placed in utils/",
+      "severity": "HIGH"
+    },
+    {
+      "file": "frontend/src/views/components/auths/AuthShowcasePanel.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/AccountCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/AccountForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/AvatarCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/EmployerLoginForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/EmployerLoginForm/__tests__/EmployerLoginFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/EmployerSignUpForm/AccountInfoStep.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/EmployerSignUpForm/CompanyInfoStep.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/EmployerSignUpForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/EmployerSignUpForm/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/EmployerSignUpForm/__tests__/EmployerSignUpFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/ForgotPasswordForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/ForgotPasswordForm/__tests__/ForgotPasswordFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/JobSeekerLoginForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/JobSeekerLoginForm/__tests__/JobSeekerLoginFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/JobSeekerSignUpForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/JobSeekerSignUpForm/JobSeekerSignUpFormFields.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/JobSeekerSignUpForm/JobSeekerSignUpSocialButtons.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/JobSeekerSignUpForm/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/JobSeekerSignUpForm/__tests__/JobSeekerSignUpFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/PhoneOTPLoginForm/CountryPhoneInput.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/PhoneOTPLoginForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/PhoneOTPLoginForm/phoneNumberUtils.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/PhoneOTPLoginForm/__tests__/PhoneOTPLoginFormI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/ResetPasswordForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/auths/UpdatePasswordForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/ChatWindow/ChatPartnerHeader.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/ChatWindow/ChatWindowComposer.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/ChatWindow/ChatWindowMessagePanel.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/ChatWindow/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/ChatWindow/__tests__/ChatPartnerHeader.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/ChatWindow/__tests__/ChatWindowComposerI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/LeftSidebar/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/LeftSidebar/SidebarRenderer.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/LeftSidebar/useChatRooms.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/LeftSidebar/__tests__/SidebarRenderer.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/LeftSidebar/__tests__/useChatRooms.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/Message/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/Message/__tests__/MessageI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/RightSidebar/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/RightSidebar/RightSidebarRenderer.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/RightSidebar/useRightSidebarData.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/RightSidebar/__tests__/RightSidebarRenderer.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/chats/RightSidebar/__tests__/useRightSidebarData.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/CareerJobPostTabs/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/CareerJobPostTabs/__tests__/CareerJobPostTabs.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/CategoryCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/CompanySearch/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/CompanySearch/__tests__/CompanySearchI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/FilterJobPostCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/HomeSearch/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/JobByCategory/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/JobPostSearch/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/JobPostSearch/JobPostSearchAdvancedFilters.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/JobPostSearch/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/JobPostSearch/useJobPostSearchLocationOptions.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/JobPostSearch/__tests__/JobPostSearchI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/MainJobPostCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/MainJobPostCard/hooks/useJobPosts.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/NotificationCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/NotificationCard/__tests__/NotificationCardI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/defaults/SuggestedJobPostCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AiCandidateRecommendationModal.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/applicationStatusTransitions.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/appliedResumeUtils.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/EmployeeFromApplicationDialog.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/employeeFromApplicationDialogState.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewLiveCandidateCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerHeader.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerResumeSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerStatePanels.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/AIAnalysisDrawerView.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/ScoreGauge.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/SectionCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/SkillChipList.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/__tests__/AIAnalysisDrawer.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AIAnalysisDrawer/__tests__/AIAnalysisDrawerI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AiCandidateRecommendationModal/__tests__/AiCandidateRecommendationModal.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeCard/AppliedResumeToolbar.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeCard/__tests__/AppliedResumeToolbarI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeKanban/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeKanban/__tests__/AppliedResumeKanban.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/AIAnalysisComponent.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/applicationStatusPresentation.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/AppliedStatusComponent.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/sendEmailAction.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/SendEmailComponent.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/__tests__/applicationStatusPresentation.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/__tests__/AppliedResumeListI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/__tests__/AppliedResumeTable.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/AppliedResumeTable/__tests__/sendEmailAction.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/charts/ApplicationChart/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/charts/CandidateChart/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/charts/HiringAcademicChart/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/charts/InterviewStatsChart/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/charts/InterviewStatsChart/__tests__/InterviewStatsChartI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/charts/RecruitmentChart/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/charts/RecruitmentFunnelCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/charts/__tests__/DashboardChartsI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyForm/CompanyFormFields.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyForm/CompanyFormLoading.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyForm/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyForm/__tests__/CompanyFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyImageCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyImageCard/__tests__/CompanyImageCardI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyTeamCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyTeamCard/__tests__/CompanyTeamCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/CompanyTeamCard/__tests__/CompanyTeamCardI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/EmployerQuantityStatistics/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/EmployerQuantityStatistics/__tests__/EmployerQuantityStatisticsI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/hooks/useEmployerQueries.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/hooks/__tests__/useEmployerQueries.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewCreateCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardForm.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewCreateCard/InterviewCreateCardQuestionSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewCreateCard/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewCreateCard/__tests__/InterviewCreateCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewCreateCard/__tests__/InterviewCreateCardFormI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewCreateCard/__tests__/InterviewCreateCardQuestionSection.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/evaluationFormValidation.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewAiEvaluationCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewAnalysisPanel.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailHeader.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewDetailSectionHeader.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewHrEvaluationForm.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewInfoCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialog.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialogHeader.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialogTranscript.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewObserverDialogVisualizer.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewQuestionsCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewRecordingCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewTranscriptPanel.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/InterviewTranscriptPanelLive.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/sectionStyles.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/__tests__/evaluationFormValidation.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/__tests__/InterviewDetailCardI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewDetailCard/__tests__/InterviewInfoCardVisibility.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewListCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewListCard/useInterviewListCardColumns.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewListCard/__tests__/InterviewStatusI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewLiveCandidateCard/InterviewLiveCandidateCardPresence.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewLiveCandidateCard/__tests__/InterviewLiveAudioRenderer.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/InterviewLiveCandidateCard/__tests__/InterviewLiveCandidateCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/JobPostCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/JobPostCard/__tests__/JobPostCardI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/JobPostForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/JobPostForm/JobPostFormFields.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/JobPostForm/JobPostSchema.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/JobPostForm/__tests__/JobPostForm.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/JobPostForm/__tests__/JobPostSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/JobPostsTable/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ManualCandidateForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ManualCandidateForm/__tests__/ManualCandidateFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileCard/components/CandidateDetailPreviewPanel.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileCard/components/MasterCandidateItem.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileCard/hooks/useProfileCardState.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/AdvancedSkillSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/AttachedDocumentRow.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateActivityTab.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateDocumentsTab.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateExperienceTab.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateHeader.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateInterviewTab.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateOverview.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateSidebar.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateSkillsTab.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CandidateTabs.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CareerGoalsSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CareerObjective.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/CertificateSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/EducationSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/ExperienceSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/GeneralInformation.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/GeneralInfoSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/InfoItem.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/LanguageSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/PersonalInformation.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileDetailCard/PersonalInfoSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileSearch/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/ProfileSearch/__tests__/ProfileSearch.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/QuestionBankCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/QuestionBankCard/__tests__/QuestionBankCardI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/QuestionGroupsCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/QuestionGroupsCard/QuestionGroupsDialogs.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/QuestionGroupsCard/__tests__/QuestionGroupsCardI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/RecentApplicationsWidget/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/SavedResumeCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/SavedResumeCard/__tests__/SavedResumeCardI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/SavedResumeTable/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/SavedResumeTable/savedResumeActions.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/SavedResumeTable/__tests__/savedResumeActions.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/SendMailCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/SendMailCard/__tests__/SendMailCardSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/__tests__/applicationStatusTransitions.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/__tests__/appliedResumeUtils.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/__tests__/employeeFromApplicationDialogState.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/__tests__/EmployerRemainingRouteLinks.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/employers/__tests__/EmployerRouteLinks.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/AdvancedSkillCard/AdvancedSkillCardLoading.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/AdvancedSkillCard/AdvancedSkillCardTable.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/AdvancedSkillCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/AdvancedSkillForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/AdvancedSkillForm/__tests__/AdvancedSkillFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/AppliedJobCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/AppliedJobCard/__tests__/AppliedJobCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/BoxProfile/CVDocDownloadButton.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/BoxProfile/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/BoxProfile/__tests__/BoxProfile.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboard/CandidateSidebar.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/AiRecommendedJobsSection.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateActivityChartCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateAppliedResumeCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateCompletenessBannerCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateCvScoreCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateQuickSupportCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateRecommendedJobsCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/CandidateTopKpiRow.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/AiRecommendedJobsSection.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateActivityChartCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateAppliedResumeCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateCvScoreCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateRecommendedJobsCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateDashboardMain/__tests__/CandidateTopKpiRow.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateProfile/CandidateEditProfileModal.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateProfile/CandidateProfileHeroBanner.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateProfile/CandidateResumePreviewModal.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateProfile/CandidateSkillsCard.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateProfile/__tests__/CandidateEditProfileModal.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateProfile/__tests__/CandidateProfileHeroBanner.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CandidateProfile/__tests__/CandidateSkillsCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CertificateCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CertificateForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CertificateForm/__tests__/CertificateFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/charts/ActivityChartClient.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/charts/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/charts/__tests__/ActivityChartClientI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CompanyFollowedCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CompanyFollowedCard/__tests__/CompanyFollowedCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CompanyViewedCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CompanyViewedCard/__tests__/CompanyViewedCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CVCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CVForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/CVForm/__tests__/CVFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/EducationDetailCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/EducationDetailForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/EducationDetailForm/__tests__/EducationDetailFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ExperienceDetailCard/ExperienceDetailCardLoading.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ExperienceDetailCard/ExperienceDetailTimelineItem.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ExperienceDetailCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ExperienceDetailForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ExperienceDetailForm/__tests__/ExperienceDetailFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoCard/GeneralInfoCardContent.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoCard/GeneralInfoCardLoading.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoCard/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoForm/GeneralInfoFormFields.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoForm/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoForm/__tests__/CandidateSalaryFields.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/GeneralInfoForm/__tests__/GeneralInfoFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/hooks/useJobSeekerQueries.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/hooks/__tests__/useJobSeekerQueriesFlow.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/hooks/__tests__/useJobSeekerQueriesI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobApplicationCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobPostNotificationCard/ActiveButtonComponent.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobPostNotificationCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobPostNotificationCard/ItemComponent.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobPostNotificationCard/ItemLoading.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobPostNotificationCard/__tests__/JobPostNotificationCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobPostNotificationForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobPostNotificationForm/__tests__/JobPostNotificationFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobSeekerQuantityStatistics/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/JobSeekerQuantityStatistics/__tests__/JobSeekerQuantityStatistics.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/LanguageSkillCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/LanguageSkillCard/LanguageSkillCardLoading.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/LanguageSkillCard/useLanguageSkillCardColumns.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/LanguageSkillForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/LanguageSkillForm/__tests__/LanguageSkillFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/PersonalInfoCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/PersonalProfileFormFields.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/usePersonalProfileDistrictOptions.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/__tests__/PersonalProfileFormFields.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/__tests__/PersonalProfileFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/PersonalProfileForm/__tests__/usePersonalProfileDistrictOptions.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ProfileUpload/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ProfileUpload/ProfileUploadResumeGrid.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ProfileUploadForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ProfileUploadForm/ProfileUploadFormFields.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ProfileUploadForm/types.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/ProfileUploadForm/__tests__/ProfileUploadFormSchema.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/SavedJobCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/SavedJobCard/__tests__/SavedJobCard.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/SidebarProfile/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/SidebarProfile/__tests__/SidebarProfile.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/SidebarViewTotal/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/__tests__/JobSeekerActionRoutes.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/jobSeekers/__tests__/JobSeekerProfileRoutes.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/modals/PhoneVerificationModal.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/settings/SettingCard/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/settings/SettingForm/index.tsx",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/views/components/settings/__tests__/UserSettingsI18n.test.ts",
+      "category": "COMPONENTS_IN_VIEWS",
+      "detail": "Shared/feature components placed in src/views/components/ instead of src/components/ or src/features/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "frontend/src/__mocks__/queryString.cjs",
+      "category": "DUPLICATE_MOCK_DIR",
+      "detail": "Duplicate __mocks__ alongside src/mocks/",
+      "severity": "LOW"
+    },
+    {
+      "file": "api/reset_db.py",
+      "category": "LOOSE_SCRIPTS_IN_API_ROOT",
+      "detail": "Root database seed/reset scripts in api/ root instead of api/apps/.../management/commands or api/scripts/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "api/seed_jobs.py",
+      "category": "LOOSE_SCRIPTS_IN_API_ROOT",
+      "detail": "Root database seed/reset scripts in api/ root instead of api/apps/.../management/commands or api/scripts/",
+      "severity": "MEDIUM"
+    },
+    {
+      "file": "api/seed_users.py",
+      "category": "LOOSE_SCRIPTS_IN_API_ROOT",
+      "detail": "Root database seed/reset scripts in api/ root instead of api/apps/.../management/commands or api/scripts/",
+      "severity": "MEDIUM"
+    }
+  ],
+  "cycles_count": 10,
+  "cycles": [
+    [
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "types/models.ts",
+      "types/auth.ts"
+    ],
+    [
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "types/auth.ts"
+    ],
+    [
+      "redux/store.ts",
+      "redux/userSlice.ts",
+      "types/models.ts",
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "redux/store.ts"
+    ],
+    [
+      "redux/store.ts",
+      "redux/userSlice.ts",
+      "services/authService.ts",
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "redux/store.ts"
+    ],
+    [
+      "redux/authSlice.ts",
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "redux/store.ts",
+      "redux/authSlice.ts"
+    ],
+    [
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "views/components/auths/EmployerSignUpForm/AccountInfoStep.tsx",
+      "views/components/auths/EmployerSignUpForm/types.ts",
+      "types/auth.ts"
+    ],
+    [
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "views/components/auths/EmployerSignUpForm/CompanyInfoStep.tsx",
+      "types/models.ts",
+      "types/auth.ts"
+    ],
+    [
+      "components/Common/Controls/SingleSelectCustom/index.tsx",
+      "types/models.ts",
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "views/components/auths/EmployerSignUpForm/CompanyInfoStep.tsx",
+      "components/Common/Controls/SingleSelectCustom/index.tsx"
+    ],
+    [
+      "services/commonService.ts",
+      "types/models.ts",
+      "types/auth.ts",
+      "views/components/auths/EmployerSignUpForm/index.tsx",
+      "services/commonService.ts"
+    ],
+    [
+      "views/adminPages/SettingsPage/components/VoiceInterviewTab.tsx",
+      "views/adminPages/SettingsPage/index.tsx",
+      "views/adminPages/SettingsPage/components/VoiceInterviewTab.tsx"
+    ]
+  ],
+  "debug_count": 18,
+  "debug_findings_summary": {
+    "TODO_FIXME": 4,
+    "CONSOLE_LOG": 14
+  },
+  "debug_samples": [
+    {
+      "file": "api/config/static/admin/css/base.css",
+      "line": 736,
+      "type": "TODO_FIXME",
+      "text": "color: #CC3434; /* XXX Probably unused? */"
+    },
+    {
+      "file": "api/config/static/admin/css/base.css",
+      "line": 740,
+      "type": "TODO_FIXME",
+      "text": "color: #993333; /* XXX Probably unused? */"
+    },
+    {
+      "file": "frontend/src/app/tin-tuc/[slug]/page.tsx",
+      "line": 14,
+      "type": "CONSOLE_LOG",
+      "text": "console.log('[generateMetadata tin-tuc/[slug]] fetching slug:', slug);"
+    },
+    {
+      "file": "frontend/src/app/tin-tuc/[slug]/page.tsx",
+      "line": 16,
+      "type": "CONSOLE_LOG",
+      "text": "console.log('[generateMetadata tin-tuc/[slug]] fetched article:', article ? article.title : 'NULL');"
+    },
+    {
+      "file": "frontend/src/i18n/locales/en/employer.json",
+      "line": 1435,
+      "type": "TODO_FIXME",
+      "text": "\"TODO\": \"To do\","
+    },
+    {
+      "file": "frontend/src/i18n/locales/vi/employer.json",
+      "line": 1435,
+      "type": "TODO_FIXME",
+      "text": "\"TODO\": \"C\u1ea7n l\u00e0m\","
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 59,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(`\u2705 Profile set to: ${value}`);"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 66,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(`\u2705 Disabled tools set to: ${tools.join(\", \") || \"(none)\"}`);"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 76,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(\"\ud83d\udd27 Current Configuration:\");"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 77,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(`  Profile: ${settings.profile}`);"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 78,
+      "type": "CONSOLE_LOG",
+      "text": "console.log("
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 81,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(`  Settings File: ${this.settingsManager.getSettingsPath()}`);"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 82,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(\"\");"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 83,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(\"\ud83d\udccb Active Tools in this profile:\");"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 87,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(\"  - All Tools (except disabled)\");"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 89,
+      "type": "CONSOLE_LOG",
+      "text": "activeInProfile.forEach((t) => console.log(`  - ${t}`));"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 98,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(\"\u2705 Configuration reset to defaults (Profile: full, No disabled tools)\");"
+    },
+    {
+      "file": "notebooklm-mcp/src/utils/cli-handler.ts",
+      "line": 102,
+      "type": "CONSOLE_LOG",
+      "text": "console.log(`"
+    }
+  ]
+}

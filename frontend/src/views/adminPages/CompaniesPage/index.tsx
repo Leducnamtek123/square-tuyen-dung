@@ -1,25 +1,33 @@
-﻿'use client';
+'use client';
 
-import React, { useCallback, useMemo, useReducer } from 'react';
-import { Box, Paper, Button, Typography, Avatar, Chip, Tooltip, IconButton } from '@mui/material';
+import React, { useCallback, useMemo, useReducer, useState } from 'react';
+import { Box, Paper, Button, Typography, Avatar, Chip, Tooltip, IconButton, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { ColumnDef } from '@tanstack/react-table';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DataTable from '../../../components/Common/DataTable';
-import { useDataTable } from '../../../hooks';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import DataTable from '@/components/Common/DataTable';
+import { ExportModal } from '@/components/Common/ExportModal';
+import { useDataTable } from '@/hooks';
 import { useCompanies } from './hooks/useCompanies';
-import type { Company } from '../../../types/models';
+import type { Company } from '@/types/models';
 import type { AdminCompanyPayload } from './hooks/useCompanies';
 import CompanyFormDialog from './CompanyFormDialog';
 import CompanyDeleteDialog from './CompanyDeleteDialog';
 import { createEmptyCompanyFormData, type CompanyFormData } from './types';
 import FilterBar from '@/components/Common/FilterBar';
-import { ROUTES } from '../../../configs/routeConfig';
-import { localizeRoutePath } from '../../../configs/routeLocalization';
-import { formatRoute } from '../../../utils/funcUtils';
+import AdminDetailDrawer from '@/components/Common/AdminDetailDrawer';
+import TechnicalDetails from '@/components/Common/TechnicalDetails';
+import dayjs from 'dayjs';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
+import { ROUTES } from '@/configs/routeConfig';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { formatRoute } from '@/utils/funcUtils';
+import { useConfig } from '@/hooks/useConfig';
+import { tConfig } from '@/utils/tConfig';
 
 type CompanyPageState = {
   dialogOpen: boolean;
@@ -128,6 +136,7 @@ function reducer(state: CompanyPageState, action: CompanyPageAction): CompanyPag
 
 const CompaniesPage = () => {
   const { t, i18n } = useTranslation('admin');
+  const { allConfig } = useConfig();
   const {
     page,
     pageSize,
@@ -141,6 +150,8 @@ const CompaniesPage = () => {
     onSearchChange,
   } = useDataTable({ initialPageSize: 10 });
 
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+
   const { data, isLoading, createCompany, updateCompany, deleteCompany, isMutating } = useCompanies({
     page: page + 1,
     pageSize,
@@ -149,6 +160,7 @@ const CompaniesPage = () => {
   });
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [inspectingCompany, setInspectingCompany] = useState<Company | null>(null);
 
   const handleSearch = (value: string) => {
     onSearchChange(value);
@@ -204,10 +216,13 @@ const CompaniesPage = () => {
     try {
       await deleteCompany(state.currentCompany.id);
       dispatch({ type: 'close_delete' });
+      if (inspectingCompany?.id === state.currentCompany.id) {
+        setInspectingCompany(null);
+      }
     } catch (error) {
       console.error(error);
     }
-  }, [deleteCompany, state.currentCompany]);
+  }, [deleteCompany, inspectingCompany?.id, state.currentCompany]);
 
   const columns = useMemo<ColumnDef<Company>[]>(() => [
     {
@@ -217,7 +232,7 @@ const CompaniesPage = () => {
         <Avatar
           src={(info.getValue() as string) || ''}
           variant="rounded"
-          sx={{ width: 48, height: 48, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}
+          sx={{ width: 44, height: 44, borderRadius: 2, border: '1px solid #E2E8F0', bgcolor: '#F8FAFC' }}
         />
       ),
     },
@@ -227,67 +242,122 @@ const CompaniesPage = () => {
       enableSorting: true,
       cell: (info) => (
         <Box>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          <Typography
+            variant="subtitle2"
+            onClick={() => setInspectingCompany(info.row.original)}
+            sx={{ fontWeight: 700, color: '#1E293B', cursor: 'pointer', '&:hover': { color: '#2563EB', textDecoration: 'underline' } }}
+          >
             {info.getValue() as string}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {info.row.original.taxCode || '---'}
+          <Typography variant="caption" sx={{ color: '#64748B' }}>
+            MST: {info.row.original.taxCode || 'Chưa cung cấp'}
           </Typography>
         </Box>
       ),
     },
-    { accessorKey: 'employeeSize', header: t('pages.companies.table.scale'), enableSorting: true, cell: (info) => (info.getValue() as number | string) || '---' },
+    {
+      accessorKey: 'employeeSize',
+      header: t('pages.companies.table.scale'),
+      enableSorting: true,
+      cell: (info) => {
+        const val = info.getValue() as number | string;
+        return tConfig(allConfig?.employeeSizeDict?.[String(val)]) || (val ? `${val} nhân viên` : '---');
+      },
+    },
     { accessorKey: 'fieldOperation', header: t('pages.companies.table.field'), enableSorting: true, cell: (info) => (info.getValue() as string) || '---' },
-    { accessorKey: 'locationDict.city', header: t('pages.companies.table.location'), cell: (info) => (info.getValue() as string) || '---' },
-    { accessorKey: 'jobPostNumber', header: t('pages.companies.table.jobPosts'), meta: { align: 'center' }, cell: (info) => <Chip label={String((info.getValue() as number) || 0)} size="small" variant="outlined" /> },
-    { accessorKey: 'followNumber', header: t('pages.companies.table.followers'), meta: { align: 'center' }, cell: (info) => <Chip label={String((info.getValue() as number) || 0)} size="small" /> },
+    {
+      accessorKey: 'locationDict.city',
+      header: t('pages.companies.table.location'),
+      cell: (info) => {
+        const val = info.getValue() as string | number;
+        return tConfig(allConfig?.cityDict?.[String(val)]) || (val ? String(val) : '---');
+      },
+    },
+    { accessorKey: 'jobPostNumber', header: t('pages.companies.table.jobPosts'), meta: { align: 'center' }, cell: (info) => <Chip label={String((info.getValue() as number) || 0)} size="small" variant="outlined" sx={{ height: 22, fontWeight: 700 }} /> },
+    { accessorKey: 'followNumber', header: t('pages.companies.table.followers'), meta: { align: 'center' }, cell: (info) => <Chip label={String((info.getValue() as number) || 0)} size="small" sx={{ height: 22, fontWeight: 700, bgcolor: '#EFF6FF', color: '#2563EB' }} /> },
     {
       id: 'actions',
       header: t('pages.companies.table.actions'),
       meta: { align: 'right' },
       cell: (info) => {
         const company = info.row.original;
-        const detailHref = company.slug
-          ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company.slug)}`, i18n.language)
-          : undefined;
 
         return (
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
             <Tooltip title={t('pages.companies.table.viewDetails')}>
-              <IconButton size="small" component="a" href={detailHref} target={detailHref ? '_blank' : undefined} rel={detailHref ? 'noopener noreferrer' : undefined} disabled={!detailHref}>
-                <VisibilityIcon fontSize="small" />
+              <IconButton aria-label="Xem chi tiết" size="small" onClick={() => setInspectingCompany(company)} sx={{ color: '#64748B' }}>
+                <VisibilityIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('pages.companies.table.edit')}>
-              <IconButton size="small" color="primary" onClick={() => handleOpenEdit(company)}>
-                <EditIcon fontSize="small" />
+              <IconButton aria-label="Thao tác" size="small" color="primary" onClick={() => handleOpenEdit(company)}>
+                <EditIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('pages.companies.table.delete')}>
-              <IconButton size="small" color="error" onClick={() => handleOpenDelete(company)}>
-                <DeleteIcon fontSize="small" />
+              <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => handleOpenDelete(company)}>
+                <DeleteIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
           </Box>
         );
       },
     },
-  ], [handleOpenDelete, handleOpenEdit, i18n.language, t]);
+  ], [allConfig, handleOpenDelete, handleOpenEdit, t]);
 
   return (
-    <Box>
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Box sx={{ width: '100%', pb: 6 }}>
+      {/* Header */}
+      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.5rem', sm: '1.875rem' }, lineHeight: 1.2 }}>
             {t('pages.companies.title')}
           </Typography>
+          <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>
+            Quản lý hồ sơ công ty, quy mô nhân sự, mã số thuế và thông tin liên hệ của các nhà tuyển dụng.
+          </Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd} sx={{ textTransform: 'none' }}>
-          {t('pages.companies.addCompany')}
-        </Button>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Button
+            variant="outlined"
+            startIcon={<FileDownloadOutlinedIcon />}
+            onClick={() => setExportModalOpen(true)}
+            sx={{
+              borderRadius: 2.5,
+              textTransform: 'none',
+              fontWeight: 700,
+              color: '#0f172a',
+              borderColor: '#cbd5e1',
+              bgcolor: '#ffffff',
+              px: 2,
+              '&:hover': { bgcolor: '#f8fafc', borderColor: '#94a3b8' },
+            }}
+          >
+            Xuất danh sách doanh nghiệp
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAdd}
+            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2.5, px: 2.5 }}
+          >
+            {t('pages.companies.addCompany')}
+          </Button>
+        </Stack>
       </Box>
 
-      <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
+      {/* Main Table Container */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2, sm: 2.5 },
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid #E2E8F0',
+          bgcolor: '#FFFFFF',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
+        }}
+      >
         <FilterBar
           title={t('pages.companies.filter.title')}
           searchValue={searchTerm}
@@ -311,6 +381,118 @@ const CompaniesPage = () => {
         />
       </Paper>
 
+      {/* Detail Drawer */}
+      <AdminDetailDrawer
+        open={Boolean(inspectingCompany)}
+        onClose={() => setInspectingCompany(null)}
+        title={inspectingCompany?.companyName || 'Hồ sơ doanh nghiệp'}
+        subtitle={inspectingCompany?.taxCode ? `MST: ${inspectingCompany.taxCode}` : (inspectingCompany?.fieldOperation || undefined)}
+        footerAction={
+          inspectingCompany && (
+            <Stack direction="row" spacing={1}>
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={<EditIcon />}
+                onClick={() => {
+                  handleOpenEdit(inspectingCompany);
+                  setInspectingCompany(null);
+                }}
+                sx={{ textTransform: 'none', fontWeight: 600 }}
+              >
+                Chỉnh sửa thông tin
+              </Button>
+              {inspectingCompany.slug && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  href={localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, inspectingCompany.slug)}`, i18n.language)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ textTransform: 'none', fontWeight: 600 }}
+                >
+                  Xem trang công khai
+                </Button>
+              )}
+            </Stack>
+          )
+        }
+      >
+        {inspectingCompany && (
+          <Stack spacing={2.5}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, bgcolor: '#F8FAFC', borderRadius: 2, border: '1px solid #E2E8F0' }}>
+              <Avatar
+                src={inspectingCompany.companyImageUrl || ''}
+                variant="rounded"
+                sx={{ width: 56, height: 56, borderRadius: 2, border: '1px solid #E2E8F0', bgcolor: '#FFFFFF' }}
+              />
+              <Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                  {inspectingCompany.companyName}
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#64748B' }}>
+                  MST: {inspectingCompany.taxCode || 'Chưa cung cấp'}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', mb: 1 }}>
+                Thông tin liên hệ & Pháp lý
+              </Typography>
+              <Box sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: 2, border: '1px solid #E2E8F0' }}>
+                <Stack spacing={1.25}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ color: '#64748B' }}>Email:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{inspectingCompany.companyEmail || 'Chưa cung cấp'}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ color: '#64748B' }}>Số điện thoại:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{inspectingCompany.companyPhone || 'Chưa cung cấp'}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ color: '#64748B' }}>Quy mô nhân sự:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {tConfig(allConfig?.employeeSizeDict?.[String(inspectingCompany.employeeSize)]) || (inspectingCompany.employeeSize ? `${inspectingCompany.employeeSize} nhân viên` : 'Chưa cập nhật')}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ color: '#64748B' }}>Địa điểm:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {inspectingCompany.locationDict?.address ? `${inspectingCompany.locationDict.address}, ` : ''}
+                      {tConfig(allConfig?.cityDict?.[String(inspectingCompany.locationDict?.city)]) || (inspectingCompany.locationDict?.city ? String(inspectingCompany.locationDict.city) : 'Chưa cập nhật')}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ color: '#64748B' }}>Lĩnh vực hoạt động:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{inspectingCompany.fieldOperation || 'Chưa cập nhật'}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant="body2" sx={{ color: '#64748B' }}>Website:</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: '#2563EB' }}>
+                      {getSafeExternalOpenUrl(inspectingCompany.websiteUrl) ? (
+                        <a href={getSafeExternalOpenUrl(inspectingCompany.websiteUrl)} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                          {inspectingCompany.websiteUrl}
+                        </a>
+                      ) : (
+                        inspectingCompany.websiteUrl || 'Chưa cung cấp'
+                      )}
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Box>
+            </Box>
+
+            <TechnicalDetails
+              data={{
+                'ID Doanh nghiệp': inspectingCompany.id,
+                'Ngày tạo': inspectingCompany.createAt,
+              }}
+            />
+          </Stack>
+        )}
+      </AdminDetailDrawer>
+
       <CompanyFormDialog
         open={state.dialogOpen}
         mode={state.dialogMode}
@@ -331,6 +513,20 @@ const CompaniesPage = () => {
         t={t}
         onClose={() => dispatch({ type: 'close_delete' })}
         onDelete={handleDelete}
+      />
+
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName="DanhSachDoanhNghiep"
+        columns={[]}
+        entity="company"
+        totalRecords={{
+          all: data?.count || 0,
+          filtered: data?.count || 0,
+          selected: 0,
+        }}
       />
     </Box>
   );

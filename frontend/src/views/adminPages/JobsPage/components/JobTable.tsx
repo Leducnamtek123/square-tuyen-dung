@@ -7,12 +7,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import dayjs from '../../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 
-import { JobPost } from '../../../../types/models';
+import { JobPost } from '@/types/models';
 import type { CellContext as ReactTableCellContext } from '@tanstack/react-table';
 
 interface JobPostExt extends JobPost {
@@ -107,31 +107,31 @@ const JobTable = ({
             cell: (info: ReactTableCellContext<JobPostExt, unknown>) => (
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title={t('pages.jobs.table.viewDetails')}>
-                        <IconButton size="small" onClick={() => onView(info.row.original)} color="primary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onView(info.row.original)} color="primary">
                             <VisibilityOutlinedIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.jobs.table.edit')}>
-                        <IconButton size="small" onClick={() => onEdit(info.row.original)} color="secondary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onEdit(info.row.original)} color="secondary">
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     {info.row.original.status === 1 && (
                         <>
                             <Tooltip title={t('pages.jobs.table.approveAction')}>
-                                <IconButton size="small" onClick={() => onApprove(info.row.original.id)} color="success">
+                                <IconButton aria-label="Thao tác" size="small" onClick={() => onApprove(info.row.original.id)} color="success">
                                     <CheckCircleOutlineIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title={t('pages.jobs.table.rejectAction')}>
-                                <IconButton size="small" onClick={() => onReject(info.row.original.id)} color="error">
+                                <IconButton aria-label="Thao tác" size="small" onClick={() => onReject(info.row.original.id)} color="error">
                                     <HighlightOffIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                         </>
                     )}
                     <Tooltip title={t('pages.jobs.table.delete')}>
-                        <IconButton size="small" onClick={() => onDelete(info.row.original.id)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onDelete(info.row.original.id)} color="error">
                             <DeleteOutlineIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

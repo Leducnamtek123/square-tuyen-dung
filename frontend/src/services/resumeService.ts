@@ -13,7 +13,7 @@ import type { PaginatedResponse } from '../types/api';
 
 type IdType = string | number;
 
-/* ── Request DTOs ─────────────────────────────────────────────────────── */
+/* -- Request DTOs ------------------------------------------------------- */
 
 export interface GetResumesParams {
   kw?: string;
@@ -26,6 +26,9 @@ export interface GetResumesParams {
   jobTypeId?: string | number;
   genderId?: string | number;
   maritalStatusId?: string | number;
+  jobPostId?: string | number;
+  aiSuggested?: boolean | string;
+  sort?: string;
   page?: number;
   pageSize?: number;
   ordering?: string;
@@ -54,7 +57,7 @@ interface SendEmailInput {
   toEmail?: string;
 }
 
-/* ── Response Types ───────────────────────────────────────────────────── */
+/* -- Response Types ----------------------------------------------------- */
 
 interface ResumeOwner {
   fullName?: string;
@@ -71,6 +74,41 @@ interface ResumeCV {
 export type ResumeActiveStatusResponse = { isActive: boolean };
 type ActionSuccessResponse = { success: boolean };
 
+export interface SemanticMatchResponse {
+  semanticScore?: number;
+  semantic_score?: number;
+  fitLevel?: string;
+  fit_level?: string;
+  matchedSkills?: string[];
+  matched_skills?: string[];
+  missingSkills?: string[];
+  missing_skills?: string[];
+  dimensionScores?: {
+    skillsOverlap?: number;
+    skills_overlap?: number;
+    experienceFit?: number;
+    experience_fit?: number;
+    domainRelevance?: number;
+    domain_relevance?: number;
+    educationFit?: number;
+    education_fit?: number;
+  };
+  dimension_scores?: {
+    skills_overlap?: number;
+    experience_fit?: number;
+    domain_relevance?: number;
+    education_fit?: number;
+  };
+  aiRecommendation?: string;
+  ai_recommendation?: string;
+  resumeId?: number | null;
+  resume_id?: number | null;
+  jobPostId?: number | null;
+  job_post_id?: number | null;
+  jobName?: string | null;
+  job_name?: string | null;
+}
+
 const normalizeListResponse = <T>(raw: unknown): T[] =>
   normalizePaginatedResponse<T>(raw).results;
 
@@ -84,7 +122,7 @@ const normalizeSuccessAction = <T extends Record<string, unknown>>(raw: unknown,
     : fallback;
 };
 
-/* ── Service ──────────────────────────────────────────────────────────── */
+/* -- Service ------------------------------------------------------------ */
 
 const resumeService = {
   sendEmail: (slug: IdType, data: SendEmailInput): Promise<{ sent: boolean }> => {
@@ -185,6 +223,18 @@ const resumeService = {
   getAdvancedSkills: (resumeSlug: IdType): Promise<AdvancedSkill[]> => {
     const url = `info/web/private-resumes/${resumeSlug}/advanced-skills/`;
     return (httpRequest.get(url) as Promise<unknown>).then(normalizeListResponse<AdvancedSkill>);
+  },
+
+  getSemanticMatch: async (
+    resumeSlug: IdType,
+    params?: { jobPostId?: number | string; jdText?: string }
+  ): Promise<SemanticMatchResponse> => {
+    const url = `info/web/resumes/${resumeSlug}/semantic-match/`;
+    const resData = (await httpRequest.post(url, {
+      job_post_id: params?.jobPostId,
+      jd_text: params?.jdText,
+    })) as unknown;
+    return unwrapDataResponse<SemanticMatchResponse>(resData);
   },
 };
 

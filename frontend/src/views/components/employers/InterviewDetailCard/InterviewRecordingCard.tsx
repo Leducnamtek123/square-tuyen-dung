@@ -78,9 +78,10 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
             sx={{
               ...interviewDetailPanelSx,
               p: 2.5,
-              borderStyle: 'dashed',
-              borderColor: pc.primary(0.18),
-              bgcolor: pc.primary(0.025),
+              borderStyle: 'solid',
+              borderWidth: 1,
+              borderColor: '#BFDBFE',
+              bgcolor: '#EFF6FF',
               textAlign: 'center',
             }}
           >

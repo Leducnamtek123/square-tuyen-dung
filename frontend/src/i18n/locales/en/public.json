@@ -6,14 +6,20 @@
     "urgentJobs": "Urgent Jobs",
     "urgentJobsAria": "Urgent jobs",
     "keyCareers": "Key Careers",
+    "keyCareersTitle": "Key Careers",
     "keyCareersSubtitle": "Explore high-demand career groups to narrow your search faster.",
     "suggestedJobs": "Suggested Jobs",
     "suggestedJobsAria": "Suggested jobs",
     "exploreHeading": "Need to find the right job for you?",
     "exploreDescription": "Start from one place to search jobs, view companies, filter by industry, and move quickly to your next step.",
     "startExploring": "Start exploring",
-    "userFeedback": "User Feedback",
-    "userFeedbackSubtitle": "Real user feedback adds more trust to the recruitment experience.",
+    "userFeedback": "User & Partner Feedback",
+    "userFeedbackSubtitle": "Real feedback from enterprise partners and job seekers adds more trust to the recruitment experience.",
+    "feedbackAll": "All",
+    "feedbackEmployers": "Employers & Enterprise",
+    "feedbackCandidates": "Job Seekers",
+    "feedbackVerifiedEmployer": "Verified Employer",
+    "feedbackVerifiedCandidate": "Hired Candidate",
     "noFeedbacks": "No user reviews yet",
     "noCompaniesFound": "No companies match your criteria",
     "jobsCount": "{{count}} Jobs",
@@ -34,15 +40,17 @@
     "candidateTitle": "For candidates",
     "candidateDescription": "Find relevant jobs by career, city, and company in just a few steps.",
     "candidateBenefit1": "Filter by industry",
-    "candidateBenefit2": "Save and follow jobs",
-    "candidateBenefit3": "Relevant suggestions",
-    "candidateCta": "Explore jobs",
-    "employerTitle": "For employers",
-    "employerDescription": "Post jobs, search resumes, and shorten the hiring cycle with tools built for businesses.",
-    "employerBenefit1": "Post jobs fast",
-    "employerBenefit2": "Find matching resumes",
-    "employerBenefit3": "Run interviews efficiently",
-    "employerCta": "View solutions"
+    "candidateBenefit2": "Save and track jobs",
+    "candidateBenefit3": "Personalized suggestions",
+    "candidateCta": "Explore Jobs",
+    "candidateStatusBadge": "+450 new jobs updated today",
+    "employerTitle": "For Employers",
+    "employerDescription": "Post jobs, search candidates, and streamline your recruitment workflow with dedicated enterprise tools.",
+    "employerBenefit1": "Fast Job Posting",
+    "employerBenefit2": "Find Matching Profiles",
+    "employerBenefit3": "Effective Interviews",
+    "employerCta": "View Solutions",
+    "employerStatusBadge": "AI Matching 98.4% accuracy"
   },
   "jobDetail": {
     "deadline": "Deadline",
@@ -185,7 +193,16 @@
     "searchPlaceholder": "Enter company name or field to search",
     "allCities": "All cities",
     "searchButton": "Search",
-    "resetFiltersAria": "Reset company search filters"
+    "resetFiltersAria": "Reset company search filters",
+    "openFiltersAria": "Open company search filters",
+    "filterDrawerTitle": "Advanced Filters",
+    "filterLocation": "Location / City",
+    "filterEmployeeSize": "Company Size",
+    "allEmployeeSizes": "All company sizes",
+    "applyFilters": "Apply",
+    "resetFilters": "Reset filters",
+    "activeFilters": "Filtering by",
+    "clearAll": "Clear all"
   },
   "jobsByCategoryPage": {
     "careerTitle": "Jobs by Career",
@@ -252,7 +269,15 @@
       "phoneMax": "Phone number exceeds allowed length.",
       "resumeRequired": "Please select a resume."
     },
-    "note": "Please provide accurate full name, email, and phone number so employers can contact you."
+    "note": "Please provide accurate full name, email, and phone number so employers can contact you.",
+    "consentNotice": {
+      "text": "By clicking submit application, I agree to share my personal information with employers in accordance with InfoHR's",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "dataPolicy": "Personal Data Policy",
+      "ofInfoHR": "."
+    }
   },
   "applyCard": {
     "positionCaption": "Apply for position",
@@ -262,7 +287,8 @@
   "company": {
     "following": "Following",
     "follow": "Follow",
-    "followers": "{{count}} followers",
+    "followers": "followers",
+    "openingJobs": "opening jobs",
     "notUpdated": "Not updated",
     "jobCount": "{{count}} jobs"
   },
@@ -466,6 +492,51 @@
         }
       ]
     }
+  },
+  "authRequired": {
+    "title": "Sign in to continue",
+    "defaultMsg": "Please sign in to access all platform features.",
+    "saveJobMsg": "Please sign in to your Candidate account to save this job post and review it anytime.",
+    "applyJobMsg": "Please sign in to your Candidate account to submit your application directly to the employer.",
+    "followCompanyMsg": "Please sign in to follow and receive job updates from this company.",
+    "loginBtn": "Sign in now",
+    "registerPrompt": "Don't have an account?",
+    "registerBtn": "Create an account",
+    "closeBtn": "Maybe later"
+  },
+  "feedback": {
+    "employerRole": "Employer",
+    "candidateRole": "Job Seeker",
+    "employerImpact": "Fast & Accurate Hiring",
+    "candidateImpact": "Applied Successfully",
+    "enterpriseBadge": "Enterprise",
+    "candidateBadge": "Candidate"
+  },
+  "featuredCompanies": "Featured Companies",
+  "openPositions": "{{count}} open positions",
+  "salary": {
+    "allCategories": "All Industries",
+    "seniorities": {
+      "all": "All Seniority Levels",
+      "junior": "Junior / Entry-level (0 - 2 years)",
+      "mid": "Mid-level (2 - 4 years)",
+      "senior": "Senior / Manager (> 4 years)"
+    },
+    "metrics": {
+      "surveyedRoles": "Surveyed Roles",
+      "standardRanges": "{{count}} benchmark roles",
+      "zeroRanges": "0 benchmark roles",
+      "medianSalary": "Median Salary (P50)",
+      "perMonth": "{{val}} / month",
+      "highestSalary": "Highest Ceiling (Max)",
+      "upTo": "Up to {{val}}"
+    },
+    "cta": {
+      "eyebrow": "Next step toward your target compensation",
+      "title": "Confidently Ace Your Interviews with AI Interviewer",
+      "desc": "Experience online practice interviews with AI, question timers, structured STAR responses, and comprehensive feedback for free.",
+      "button": "Start Practice Interview Now"
+    },
+    "errorFetch": "Failed to load salary benchmarks. Please try again!"
   }
 }
-

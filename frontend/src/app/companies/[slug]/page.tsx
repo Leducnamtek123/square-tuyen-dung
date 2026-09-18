@@ -9,47 +9,93 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return {
+      title: 'Thông tin công ty & Doanh nghiệp',
+      description: 'Khám phá văn hóa doanh nghiệp, chế độ đãi ngộ và các vị trí tuyển dụng mới nhất trên InfoHR.',
+    };
+  }
   const company = await serverFetch<Company>(`info/web/companies/${slug}/`);
+
+  const canonicalUrl = `https://infohr.vn/cong-ty/${slug}`;
 
   if (!company) {
     return {
-      title: 'Công ty | InfoHR Tuyển Dụng',
-      description: 'Thông tin công ty trên InfoHR Tuyển Dụng',
+      title: 'Thông tin công ty & Doanh nghiệp',
+      description: 'Khám phá văn hóa doanh nghiệp, chế độ đãi ngộ và các vị trí tuyển dụng mới nhất trên InfoHR.',
+      alternates: {
+        canonical: canonicalUrl,
+      },
     };
   }
 
-  const companyName = company.companyName || 'Công ty';
+  const companyName = (company.companyName || 'Công ty').replace(/\s*\|\s*InfoHR\s*$/i, '').trim();
   const fieldOperation = company.fieldOperation || '';
   const employeeSize = company.employeeSize || '';
 
-  const title = `${companyName} - Tuyển dụng & Việc làm | InfoHR`;
+  const title = `${companyName} - Tuyển dụng & Thông tin doanh nghiệp`;
 
-  const description = [
-    `${companyName}`,
+  const rawDescription = [
+    companyName,
     fieldOperation && `Lĩnh vực: ${fieldOperation}`,
     employeeSize && `Quy mô: ${employeeSize} nhân viên`,
-    'Xem thông tin công ty và các vị trí đang tuyển trên InfoHR Tuyển Dụng.',
+    'Xem hồ sơ doanh nghiệp và các vị trí đang tuyển trên InfoHR.',
   ]
     .filter(Boolean)
     .join('. ');
 
+  const description = rawDescription.length > 155
+    ? rawDescription.slice(0, 152) + '...'
+    : rawDescription;
+
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
       type: 'website',
-      url: `/cong-ty/${slug}`,
-      siteName: 'InfoHR Tuyển Dụng',
+      url: canonicalUrl,
+      siteName: 'InfoHR',
       locale: 'vi_VN',
       ...(company.companyImageUrl && {
-        images: [{ url: company.companyImageUrl }],
+        images: [{ url: company.companyImageUrl, alt: title }],
       }),
     },
   };
 }
 
-export default function Page() {
-  return <CompanyDetailClientPage />;
+export default async function Page({ params }: Props) {
+  const { slug } = await params;
+  if (!slug || slug === ':slug') {
+    return <CompanyDetailClientPage />;
+  }
+  const company = await serverFetch<Company>(`info/web/companies/${slug}/`);
+
+  const jsonLd = company
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: company.companyName || 'Doanh nghiệp',
+        url: `https://infohr.vn/cong-ty/${slug}`,
+        logo: company.companyImageUrl || company.logoUrl || undefined,
+        description: company.description || undefined,
+        sameAs: company.websiteUrl || undefined,
+      }
+    : null;
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <CompanyDetailClientPage />
+    </>
+  );
 }

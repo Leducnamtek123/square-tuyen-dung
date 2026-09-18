@@ -23,25 +23,17 @@ const StatCard = ({ title, value, icon, color, loading, trend, helper, footerLab
         elevation={0}
         sx={{
             height: '100%',
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: 'divider',
-            background: `linear-gradient(180deg, ${rgba(color, 0.08)} 0%, #ffffff 72%)`,
-            boxShadow: '0 14px 34px rgba(15, 57, 127, 0.06)',
+            borderRadius: '14px',
+            border: '1px solid #E5E7EB',
+            background: '#FFFFFF',
+            boxShadow: '0px 1px 3px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px -1px rgba(0, 0, 0, 0.04)',
             overflow: 'hidden',
             position: 'relative',
-            transition: 'border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
-            '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: '0 0 auto 0',
-                height: 3,
-                backgroundColor: color,
-            },
+            transition: 'box-shadow 100ms ease-in-out, border-color 100ms ease-in-out, transform 100ms ease-in-out',
             '&:hover': {
-                borderColor: rgba(color, 0.42),
-                boxShadow: '0 18px 42px rgba(15, 57, 127, 0.11)',
-                transform: 'translateY(-2px)',
+                borderColor: '#D1D5DB',
+                boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.06)',
+                transform: 'translateY(-1px)',
             },
         }}
     >

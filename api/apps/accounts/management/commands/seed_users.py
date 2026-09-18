@@ -28,10 +28,12 @@ class Command(BaseCommand):
             emp_user = User.objects.create_user_with_role_name(
                 email=employer_email,
                 full_name="Square Group HR",
-                password="Password123!",
+                password="Squaretuyendung@2026",
                 role_name=var_sys.EMPLOYER
             )
             emp_user.has_company = True
+            emp_user.is_onboarded = True
+            emp_user.onboarding_step = 4
             emp_user.is_active = True
             emp_user.is_verify_email = True
             emp_user.save()

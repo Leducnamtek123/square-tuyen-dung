@@ -1,11 +1,11 @@
 import React from 'react';
 import { Grid2 as Grid } from "@mui/material";
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
-import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import FileUploadCustom from '../../../../components/Common/Controls/FileUploadCustom';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
+import FileUploadCustom from '@/components/Common/Controls/FileUploadCustom';
 import type { Control } from 'react-hook-form';
-import type { SystemConfig } from '../../../../types/models';
+import type { SystemConfig } from '@/types/models';
 import type { FormValues } from './types';
 
 interface ProfileUploadFormFieldsProps {

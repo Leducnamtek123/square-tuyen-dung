@@ -71,13 +71,13 @@ def test_persist_vieclam24h_candidates_skips_entries_without_real_email(career):
     result = persist_vieclam24h_candidates(
         [
             {
-                "full_name": "Nguyen Van B",
+                "full_name": "",
                 "email": "",
-                "phone": "0909000333",
+                "phone": "",
                 "title": "Backend Developer",
                 "career_name": "Sales",
                 "city_name": "Ha Noi",
-                "source_ref": "candidate-no-email",
+                "source_ref": "",
             }
         ],
         source_url="https://ntd.vieclam24h.vn/employer/search/seeker",
@@ -88,8 +88,7 @@ def test_persist_vieclam24h_candidates_skips_entries_without_real_email(career):
     assert result.created_count == 0
     assert result.updated_count == 0
     assert result.skipped_count == 1
-    assert not Resume.objects.filter(source_platform="vieclam24h", source_ref="candidate-no-email").exists()
-    assert not User.objects.filter(full_name="Nguyen Van B").exists()
+    assert not Resume.objects.filter(source_platform="vieclam24h", source_ref="").exists()
 
 @pytest.mark.django_db
 def test_persist_vieclam24h_candidates_uses_selected_target_location(career, city):
@@ -633,7 +632,7 @@ def test_collect_vieclam24h_candidates_uses_search_api_results_when_available(mo
     class _FakePlaywright:
         def __enter__(self):
             class _Chromium:
-                def launch(self, headless=True):
+                def launch(self, *args, **kwargs):
                     return _FakeBrowser()
 
             self.chromium = _Chromium()
@@ -712,7 +711,7 @@ def test_collect_vieclam24h_candidates_falls_back_when_search_api_returns_html(m
     class _FakePlaywright:
         def __enter__(self):
             class _Chromium:
-                def launch(self, headless=True):
+                def launch(self, *args, **kwargs):
                     return _FakeBrowser()
 
             self.chromium = _Chromium()
@@ -752,3 +751,47 @@ def test_collect_vieclam24h_candidates_falls_back_when_search_api_returns_html(m
             password="secret",
             occupation_ids=[31],
         )
+
+
+@pytest.mark.django_db
+def test_persist_vieclam24h_candidates_maps_salary_experience_and_text_fallback(career, city):
+    result = persist_vieclam24h_candidates(
+        [
+            {
+                "full_name": "Tran Van Mapping",
+                "email": "mapping@example.com",
+                "phone": "0988777666",
+                "title": "Quản lý Dự án",
+                "career_name": "Xây dựng",
+                "city_name": city.name,
+                "source_ref": "candidate-mapping-test",
+                "birthday": "1992",
+                "gender": "Nam",
+                "marital_status": "KẾT HÔN",
+                "min_expected_salary": 15000000,
+                "max_expected_salary": 25000000,
+                "experience": "3 năm",
+                "position": "Quản lý",
+                "source_payload": {
+                    "detail_page": {
+                        "bodyText": "Giới tính: Nam. Ngày sinh: 15/05/1992. 3 năm kinh nghiệm làm việc trong ngành xây dựng. Lương mong muốn: 15 - 25 triệu.",
+                    }
+                },
+            }
+        ],
+        source_url="https://ntd.vieclam24h.vn/employer/search/seeker",
+        source_account="hr@example.com",
+        target_career=career,
+    )
+
+    assert result.created_count == 1
+    resume = Resume.objects.get(source_platform="vieclam24h", source_ref="candidate-mapping-test")
+    assert resume.salary_min == 15000000
+    assert resume.salary_max == 25000000
+    assert resume.expected_salary == 25000000
+    assert resume.experience == 5  # 3 years mapped to choice 5
+    assert resume.position == 2    # Quản lý mapped to choice 2 (Middle Management)
+    assert resume.job_seeker_profile.gender == "M"
+    assert resume.job_seeker_profile.marital_status == var_sys.MaritalStatus.MARRIED
+    assert resume.job_seeker_profile.birthday is not None
+

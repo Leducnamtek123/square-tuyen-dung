@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import LanguageIcon from '@mui/icons-material/Language';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 
 
 interface LanguageSwitcherProps {
   color?: string;
+  size?: 'small' | 'medium';
 }
 
 const languages = [
@@ -27,7 +28,7 @@ const languages = [
   }
 ];
 
-const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
+const LanguageSwitcher = ({ color = 'inherit', size = 'medium' }: LanguageSwitcherProps) => {
   const { i18n } = useTranslation();
   const navigate = useRouter();
   const theme = useTheme();
@@ -81,14 +82,37 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
         sx={{
           textTransform: 'none',
           color: color,
+          minWidth: size === 'small' ? 32 : { xs: 36, sm: 'auto' },
+          minHeight: size === 'small' ? 36 : 40,
+          height: size === 'small' ? 36 : 40,
+          px: size === 'small' ? 1 : { xs: 0.75, sm: 1.25 },
+          py: 0.5,
+          borderRadius: '10px',
+          border: '1px solid transparent',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
-            backgroundColor: color === 'white' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-          }
+            backgroundColor: color === 'white' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.05)',
+            borderColor: color === 'white' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(15, 23, 42, 0.08)',
+          },
+          '&:focus-visible': {
+            outline: '2px solid #2563eb',
+            outlineOffset: '2px',
+          },
+          '&:active': {
+            transform: 'scale(0.98)',
+          },
         }}
-        startIcon={<LanguageIcon sx={{ fontSize: 18 }} />}
-        endIcon={<KeyboardArrowDownIcon />}
+        startIcon={<LanguageIcon sx={{ fontSize: size === 'small' ? 17 : { xs: 20, sm: 18 } }} />}
+        endIcon={<KeyboardArrowDownIcon sx={{ fontSize: size === 'small' ? 17 : { xs: 16, sm: 20 } }} />}
       >
-        <Typography variant="body2" sx={{ fontWeight: 600, display: { xs: 'none', sm: 'block' } }}>
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 600,
+            fontSize: size === 'small' ? '0.8125rem' : '0.875rem',
+            display: { xs: 'none', sm: 'block' },
+          }}
+        >
           {currentLanguage.shortLabel}
         </Typography>
       </Button>

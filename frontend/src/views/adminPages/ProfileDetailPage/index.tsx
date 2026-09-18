@@ -36,9 +36,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation, Trans } from 'react-i18next';
 import DataTable from '@/components/Common/DataTable';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import TechnicalDetails from '@/components/Common/TechnicalDetails';
 import adminManagementService from '@/services/adminManagementService';
 import { CV_TYPES, ROUTES } from '@/configs/constants';
-import { formatRoute } from '@/utils/funcUtils';
+import { formatRoute, downloadPdf } from '@/utils/funcUtils';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import dayjs from '@/configs/dayjs-config';
 import { useConfig } from '@/hooks/useConfig';
@@ -68,7 +69,7 @@ const getInitials = (name?: string | null): string => {
 };
 
 const valueOrDash = (value?: React.ReactNode): React.ReactNode => {
-  if (value === undefined || value === null || value === '') return '—';
+  if (value === undefined || value === null || value === '') return '-';
   return value;
 };
 
@@ -139,24 +140,25 @@ const InfoRow = ({
   </Box>
 );
 
-const ProfileDetailPage = () => {
+const ProfileDetailPage = ({ id }: { id?: string } = {}) => {
   const { t, i18n } = useTranslation('admin');
   const router = useRouter();
-  const params = useParams<{ id: string }>();
-  const profileId = params?.id;
+  const params = useParams<{ id?: string; slug?: string | string[] }>();
+  const slugId = Array.isArray(params?.slug) ? params.slug[params.slug.length - 1] : params?.slug;
+  const profileId = id || params?.id || slugId;
   const queryClient = useQueryClient();
   const { allConfig } = useConfig();
 
   const profileQuery = useQuery<ProfileDetailRecord>({
     queryKey: ['admin-profile-detail', profileId],
-    queryFn: async () => adminManagementService.getProfileDetail(profileId),
+    queryFn: async () => adminManagementService.getProfileDetail(profileId!),
     enabled: Boolean(profileId),
   });
 
   const resumesQuery = useQuery<Resume[]>({
     queryKey: ['admin-profile-resumes', profileId],
     queryFn: async () => {
-      const response = await adminManagementService.getResumes({ jobSeekerProfileId: profileId });
+      const response = await adminManagementService.getResumes({ jobSeekerProfileId: profileId! });
       return response.results || [];
     },
     enabled: Boolean(profileId),
@@ -198,10 +200,10 @@ const ProfileDetailPage = () => {
         return (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 900 }}>
-              {info.getValue() as string || '—'}
+              {info.getValue() as string || '-'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {isOnline ? t('pages.profileDetail.table.online') : t('pages.profileDetail.table.attached')}
+              {t('pages.profileDetail.table.online')}
             </Typography>
           </Box>
         );
@@ -211,13 +213,12 @@ const ProfileDetailPage = () => {
       accessorKey: 'type',
       header: t('pages.profileDetail.table.resumeType') as string,
       cell: (info) => {
-        const isOnline = info.getValue() === CV_TYPES.cvWebsite;
         return (
           <Chip
             size="small"
-            label={isOnline ? t('pages.profileDetail.table.online') : t('pages.profileDetail.table.attached')}
-            color={isOnline ? 'primary' : 'default'}
-            variant={isOnline ? 'filled' : 'outlined'}
+            label={t('pages.profileDetail.table.online')}
+            color="primary"
+            variant="filled"
           />
         );
       },
@@ -225,12 +226,12 @@ const ProfileDetailPage = () => {
     {
       accessorKey: 'createAt',
       header: t('pages.profileDetail.table.createdAt') as string,
-      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—'),
+      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-'),
     },
     {
       accessorKey: 'updateAt',
       header: t('pages.profileDetail.table.updatedAt') as string,
-      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—'),
+      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-'),
     },
     {
       id: 'actions',
@@ -243,19 +244,21 @@ const ProfileDetailPage = () => {
         const onlineHref = resume.slug
           ? localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, resume.slug, ':slug')}`, i18n.language)
           : undefined;
+        const publicCvHref = resume.slug ? `/cv/${resume.slug}` : undefined;
+        const safeTargetViewUrl = isOnline ? (publicCvHref || onlineHref) : (safeFileUrl || onlineHref);
 
         return (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             <Tooltip title={isOnline ? t('pages.profileDetail.table.openOnline') : t('pages.profileDetail.table.view')}>
               <span>
-                <IconButton
+                <IconButton aria-label="Thao tác"
                   size="small"
                   component="a"
-                  href={isOnline ? onlineHref : safeFileUrl || undefined}
+                  href={safeTargetViewUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   color="info"
-                  disabled={!onlineHref && !safeFileUrl}
+                  disabled={!safeTargetViewUrl}
                 >
                   {isOnline ? <OpenInNewIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                 </IconButton>
@@ -263,13 +266,17 @@ const ProfileDetailPage = () => {
             </Tooltip>
             <Tooltip title={t('pages.profileDetail.table.download')}>
               <span>
-                <IconButton
+                <IconButton aria-label="Tải xuống"
                   size="small"
-                  component="a"
-                  href={safeFileUrl || undefined}
-                  download
+                  onClick={() => {
+                    if (safeFileUrl) {
+                      downloadPdf(safeFileUrl, resume.title);
+                    } else if (publicCvHref || onlineHref) {
+                      window.open(publicCvHref || onlineHref, '_blank');
+                    }
+                  }}
                   color="primary"
-                  disabled={!safeFileUrl}
+                  disabled={!safeFileUrl && !publicCvHref && !onlineHref}
                 >
                   <DownloadIcon fontSize="small" />
                 </IconButton>
@@ -370,11 +377,6 @@ const ProfileDetailPage = () => {
                   variant={profile.isActive === false ? 'outlined' : 'filled'}
                   size="small"
                 />
-                <Chip
-                  label={`${t('pages.profileDetail.labels.profileId')}: ${profile.id}`}
-                  size="small"
-                  variant="outlined"
-                />
               </Stack>
               <Typography variant="h4" sx={{ fontWeight: 1000, overflowWrap: 'anywhere' }}>
                 {candidateName}
@@ -426,7 +428,7 @@ const ProfileDetailPage = () => {
                 <InfoRow
                   icon={<BadgeIcon fontSize="small" />}
                   label={t('pages.profileDetail.table.resumeType')}
-                  value={valueOrDash(primaryResume?.type === CV_TYPES.cvWebsite ? t('pages.profileDetail.table.online') : primaryResume ? t('pages.profileDetail.table.attached') : '')}
+                  value={valueOrDash(primaryResume ? t('pages.profileDetail.table.online') : '')}
                 />
                 <InfoRow
                   icon={<BadgeIcon fontSize="small" />}
@@ -480,6 +482,16 @@ const ProfileDetailPage = () => {
             </Typography>
           )}
         </SectionCard>
+
+        {profile && (
+          <TechnicalDetails
+            data={{
+              'ID Hồ sơ': profile.id,
+              'User ID': profile.user,
+              'Ngày cập nhật': profile.updateAt,
+            }}
+          />
+        )}
       </Stack>
 
         <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>

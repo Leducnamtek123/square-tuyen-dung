@@ -11,15 +11,21 @@ export const useConfig = () => {
   const query = useQuery<SystemConfig>({
     queryKey: CONFIG_QUERY_KEY,
     queryFn: async () => {
-      // Fire both requests in parallel
-      const [resData, careersRes] = await Promise.all([
+      // Fire all requests in parallel with resilient settlement
+      const [configRes, careersSettled, citiesSettled] = await Promise.allSettled([
         commonService.getConfigs(),
-        commonService.getAllCareersSimple().catch(() => [] as Career[]),
+        commonService.getAllCareersSimple(),
+        commonService.getAllCitiesSimple(),
       ]);
 
-      let merged = { ...(resData as SystemConfig) };
+      if (configRes.status === 'rejected') {
+        throw configRes.reason;
+      }
 
-      if (Array.isArray(careersRes) && careersRes.length > 0) {
+      let merged = { ...(configRes.value as SystemConfig) };
+
+      if (careersSettled.status === 'fulfilled' && Array.isArray(careersSettled.value) && careersSettled.value.length > 0) {
+        const careersRes = careersSettled.value;
         merged = {
           ...merged,
           careers: careersRes,
@@ -30,12 +36,28 @@ export const useConfig = () => {
         };
       }
 
+      if (citiesSettled.status === 'fulfilled' && Array.isArray(citiesSettled.value) && citiesSettled.value.length > 0) {
+        const citiesRes = citiesSettled.value;
+        merged = {
+          ...merged,
+          cities: citiesRes.map((c) => ({ id: Number(c.id), name: c.name })),
+          cityOptions: citiesRes.map((c) => ({
+            id: c.id,
+            name: c.name,
+          })),
+        };
+      }
+
       return merged;
     },
     staleTime: STALE_TIME,
     gcTime: STALE_TIME + 5 * 60 * 1000,
-    retry: (failureCount, error) =>
-      !isMaintenanceModeError(error) && failureCount < 2,
+    retry: (failureCount, error: any) => {
+      if (isMaintenanceModeError(error)) return false;
+      if (error?.response?.status === 429 || error?.status === 429) return false;
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     refetchOnWindowFocus: false,
   });
 

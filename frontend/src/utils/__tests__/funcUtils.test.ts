@@ -1,5 +1,5 @@
 /**
- * Frontend E2E Tests — funcUtils
+ * Frontend E2E Tests - funcUtils
  * Tests the formatRoute utility that caused routing bugs.
  */
 

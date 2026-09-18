@@ -25,10 +25,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import DataTable from '../../../components/Common/DataTable';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { Career } from '../../../types/models';
-import type { CareerPayload } from '../../../services/adminManagementService';
+import DataTable from '@/components/Common/DataTable';
+import { useDataTable, useDebounce } from '@/hooks';
+import { Career } from '@/types/models';
+import type { CareerPayload } from '@/services/adminManagementService';
 import { useCareers } from './hooks/useCareers';
 import FilterBar from '@/components/Common/FilterBar';
 import {
@@ -244,9 +244,10 @@ const CareerFormDialog = ({
             <Paper
               variant="outlined"
               sx={{
-                p: 2,
-                borderStyle: 'dashed',
-                borderRadius: 2,
+                p: 2.5,
+                border: '1px solid #E2E8F0',
+                bgcolor: '#F8FAFC',
+                borderRadius: 3,
                 textAlign: 'center',
               }}
             >
@@ -433,9 +434,10 @@ const CareersPage = () => {
 
   const columns: ColumnDef<Career>[] = [
     {
-      accessorKey: 'id',
-      header: 'ID',
-      enableSorting: true,
+      id: 'index',
+      header: 'STT',
+      cell: (info) => info.row.index + 1,
+      size: 60,
     },
     {
       id: 'icon',
@@ -506,12 +508,12 @@ const CareersPage = () => {
       cell: (info) => (
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
           <Tooltip title={t('pages.careers.table.edit')}>
-            <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={t('pages.careers.table.delete')}>
-            <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>

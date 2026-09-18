@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button } from "@mui/material";
 import type { JobPost } from "@/types/models";
 import type { AxiosError } from "axios";
 import type { ApiError } from "@/types/api";
@@ -13,20 +13,21 @@ import JobDetailDescriptionCard from "./components/JobDetailDescriptionCard";
 import JobDetailContactCard from "./components/JobDetailContactCard";
 import JobDetailSidebar from "./components/JobDetailSidebar";
 
-import toastMessages from "../../../utils/toastMessages";
-import errorHandling from "../../../utils/errorHandling";
-import NoDataCard from "../../../components/Common/NoDataCard";
-import jobService from "../../../services/jobService";
-import companyService from "../../../services/companyService";
-import ApplyCard from "../../../components/Features/ApplyCard";
-import JobSalaryInsightCard from "../../../components/Features/JobSalaryInsightCard";
-import TrustReportDialog from "../../../components/Features/TrustReportDialog";
-import SocialNetworkSharingPopup from "../../../components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
-import { ROLES_NAME, ROUTES } from "../../../configs/constants";
-import { useAppSelector } from "../../../hooks/useAppStore";
-import useSEO from "../../../hooks/useSEO";
-import useStructuredData from "../../../hooks/useStructuredData";
+import toastMessages from "@/utils/toastMessages";
+import errorHandling from "@/utils/errorHandling";
+import NoDataCard from "@/components/Common/NoDataCard";
+import jobService from "@/services/jobService";
+import companyService from "@/services/companyService";
+import ApplyCard from "@/components/Features/ApplyCard";
+import JobSalaryInsightCard from "@/components/Features/JobSalaryInsightCard";
+import TrustReportDialog from "@/components/Features/TrustReportDialog";
+import SocialNetworkSharingPopup from "@/components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
+import { ROLES_NAME, ROUTES } from "@/configs/constants";
+import { useAppSelector } from "@/hooks/useAppStore";
+import useSEO from "@/hooks/useSEO";
+import useStructuredData from "@/hooks/useStructuredData";
 import { useConfig } from '@/hooks/useConfig';
+import useRequireAuth from '@/hooks/useRequireAuth';
 import type { Location } from '@/types/models';
 import type { Company } from '@/types/models';
 
@@ -104,50 +105,89 @@ const jobDetailReducer = (
   }
 };
 
-const JobDetailPage = () => {
+interface JobDetailPageProps {
+  initialJob?: ExtendedJobPost | JobPost | null;
+}
+
+const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
   const { slug } = useParams();
   const { push } = useRouter();
   const { t } = useTranslation(["public"]);
   const { allConfig } = useConfig();
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
+  const { requireAuth, AuthModal } = useRequireAuth();
   const [openReportPopup, setOpenReportPopup] = React.useState(false);
 
-  const [state, dispatch] = React.useReducer(jobDetailReducer, initialJobDetailState);
+  const [state, dispatch] = React.useReducer(
+    jobDetailReducer,
+    initialJobDetailState,
+    (baseState: JobDetailState): JobDetailState => {
+      if (initialJob) {
+        return {
+          ...baseState,
+          isLoading: false,
+          jobPostDetail: initialJob as ExtendedJobPost,
+        };
+      }
+      return baseState;
+    }
+  );
   const canApply =
     !isAuthenticated ||
     currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   React.useEffect(() => {
+    if (initialJob) {
+      dispatch({ type: 'set-job-post-detail', value: initialJob as ExtendedJobPost });
+      dispatch({ type: 'set-loading', value: false });
+    }
+  }, [initialJob]);
+
+  React.useEffect(() => {
     let isActive = true;
     const getJobPostDetail = async (jobPostSlug: string | undefined) => {
+      if (!jobPostSlug || jobPostSlug === ':slug') return;
+      // If we have initialJob and user is NOT authenticated, SSR data is already sufficient
+      if (
+        initialJob &&
+        !isAuthenticated &&
+        (initialJob.slug === jobPostSlug || String(initialJob.id) === String(jobPostSlug))
+      ) {
+        return;
+      }
 
-      if (!jobPostSlug) return;
+      // Only show full loading spinner if we do not already have SSR job data
+      if (!initialJob) {
+        dispatch({ type: 'set-loading', value: true });
+      }
+
       try {
         const resData = await jobService.getJobPostDetailById(jobPostSlug);
-        const data = resData;
         if (isActive) {
-          dispatch({ type: 'set-job-post-detail', value: data as ExtendedJobPost });
+          dispatch({ type: 'set-job-post-detail', value: resData as ExtendedJobPost });
         }
       } catch (error) {
-        const slugValue = String(jobPostSlug || '');
-        const isNumericId = /^\d+$/.test(slugValue);
-        if (isNumericId) {
-          try {
-            const fallbackData = await companyService.getCompanyJobPostDetailById(
-              Number(slugValue)
-            );
-            if (isActive) {
-              dispatch({ type: 'set-job-post-detail', value: fallbackData as ExtendedJobPost });
+        if (!initialJob) {
+          const slugValue = String(jobPostSlug || '');
+          const isNumericId = /^\d+$/.test(slugValue);
+          if (isNumericId) {
+            try {
+              const fallbackData = await companyService.getCompanyJobPostDetailById(
+                Number(slugValue)
+              );
+              if (isActive) {
+                dispatch({ type: 'set-job-post-detail', value: fallbackData as ExtendedJobPost });
+              }
+              return;
+            } catch (fallbackError) {
+              errorHandling(fallbackError as AxiosError<{ errors?: ApiError }>);
             }
-            return;
-          } catch (fallbackError) {
-            errorHandling(fallbackError as AxiosError<{ errors?: ApiError }>);
+          } else {
+            errorHandling(error);
           }
-        } else {
-          errorHandling(error);
         }
       } finally {
-        if (isActive) {
+        if (isActive && !initialJob) {
           dispatch({ type: 'set-loading', value: false });
         }
       }
@@ -156,7 +196,7 @@ const JobDetailPage = () => {
     return () => {
       isActive = false;
     };
-  }, [slug]);
+  }, [slug, initialJob, isAuthenticated]);
 
   // --- Dynamic SEO ---
   const jobDescription = state.jobPostDetail?.jobDescription || '';
@@ -211,15 +251,13 @@ const JobDetailPage = () => {
   );
 
   const handleSave = () => {
+    if (!requireAuth({ actionType: 'save_job' })) return;
     const saveJobPost = async () => {
       dispatch({ type: 'set-loading-save', value: true });
       try {
         const resData = await jobService.saveJobPost(slug as string) as { isSaved: boolean };
         const isSaved = resData.isSaved;
         dispatch({ type: 'mark-saved', value: isSaved });
-        toastMessages.success(
-          isSaved ? t("jobDetail.savedSuccess") : t("jobDetail.unsavedSuccess")
-        );
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -230,15 +268,17 @@ const JobDetailPage = () => {
   };
 
   const handleShowApplyForm = () => {
+    if (!requireAuth({ actionType: 'apply_job' })) return;
     dispatch({ type: 'open-popup' });
   };
 
   const handleMobileApplyClick = () => {
-    if (!isAuthenticated) {
-      push(`/${ROUTES.AUTH.LOGIN}`);
-      return;
-    }
     handleShowApplyForm();
+  };
+
+  const handleOpenReport = () => {
+    if (!requireAuth({ actionType: 'report', title: 'Báo cáo tin tuyển dụng', message: 'Vui lòng đăng nhập để gửi báo cáo về tin tuyển dụng này.' })) return;
+    setOpenReportPopup(true);
   };
 
   return (
@@ -248,7 +288,7 @@ const JobDetailPage = () => {
       ) : state.jobPostDetail === null ? (
         <NoDataCard title={t("jobDetail.noData")} />
       ) : (
-        <div className={cn("mt-2", canApply ? "pb-20 md:pb-0" : "")}>
+        <div className={cn("mt-2", canApply ? "pb-[calc(96px+env(safe-area-inset-bottom,1.25rem))] md:pb-0" : "")}>
           <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <div className="flex flex-col gap-8">
               <JobDetailHeaderCard
@@ -260,13 +300,13 @@ const JobDetailPage = () => {
                 onSave={handleSave}
                 onShowApplyForm={handleShowApplyForm}
                 onOpenSharePopup={(open) => dispatch({ type: 'open-share-popup', value: open })}
-                onOpenReport={() => setOpenReportPopup(true)}
+                onOpenReport={handleOpenReport}
               />
-              <JobSalaryInsightCard slug={slug as string} />
               <JobDetailDescriptionCard
                 jobPostDetail={state.jobPostDetail}
                 allConfig={allConfig}
               />
+              <JobSalaryInsightCard slug={slug as string} />
               <JobDetailContactCard jobPostDetail={state.jobPostDetail as JobPost & { companyDict?: Company; location?: Location & { lat?: number; lng?: number; } }} />
             </div>
             <div>
@@ -277,12 +317,29 @@ const JobDetailPage = () => {
       )}
 
       {!state.isLoading && state.jobPostDetail && canApply && (
-        <div className="fixed inset-x-0 bottom-0 z-50 block border-t border-border bg-background p-4 md:hidden">
+        <div
+          className="job-detail-sticky-bar fixed inset-x-0 bottom-0 z-50 block border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)] backdrop-blur-md md:hidden"
+          data-sticky-bottom="true"
+        >
           <Button
-            className="w-full bg-primary text-white hover:bg-primary/90"
-            size="lg"
+            fullWidth
+            variant="contained"
+            size="large"
             disabled={state.jobPostDetail?.isApplied}
             onClick={handleMobileApplyClick}
+            sx={{
+              bgcolor: '#2563eb',
+              color: '#ffffff',
+              fontWeight: 700,
+              borderRadius: '10px',
+              py: 1.25,
+              textTransform: 'none',
+              fontSize: '0.95rem',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.28)',
+              '&:hover': {
+                bgcolor: '#1d4ed8',
+              },
+            }}
           >
             {state.jobPostDetail?.isApplied
               ? t("jobDetail.actions.applied")
@@ -307,7 +364,7 @@ const JobDetailPage = () => {
           facebook: {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
             quote: state.jobPostDetail?.jobName,
-            hashtag: "#Project",
+            hashtag: "#InfoHR",
           },
           facebookMessenger: {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
@@ -316,12 +373,12 @@ const JobDetailPage = () => {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
             title: state.jobPostDetail?.jobName,
             summary: state.jobPostDetail?.jobDescription,
-            source: "Project",
+            source: "InfoHR",
           },
           twitter: {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
             title: state.jobPostDetail?.jobName,
-            hashtags: ["Project", "tuyendung"],
+            hashtags: ["InfoHR", "tuyendung"],
           },
           email: {
             url: (typeof window !== 'undefined' ? window.location.href : ''),
@@ -338,6 +395,8 @@ const JobDetailPage = () => {
         jobPostId={state.jobPostDetail?.id ?? null}
         targetName={state.jobPostDetail?.jobName}
       />
+
+      {AuthModal}
     </>
   );
 };

@@ -1,5 +1,5 @@
 // =============================================================================
-// Services Index — Domain-based re-exports
+// Services Index - Domain-based re-exports
 // =============================================================================
 // This file re-exports all services so existing imports still work.
 // New code should import from domain subfolders:
@@ -39,7 +39,6 @@ export { default as questionService } from './questionService';
 export { default as questionGroupService } from './questionGroupService';
 
 // --- Admin ---
-export { default as adminService } from './adminService';
 export { default as adminJobService } from './adminJobService';
 export { default as adminManagementService } from './adminManagementService';
 export { default as adminInterviewService } from './adminInterviewService';
@@ -54,5 +53,6 @@ export { default as mediaService } from './mediaService';
 // --- External Integrations ---
 export * as firebaseService from './firebaseService';
 export { default as goongService } from './goongService';
+export { default as nominatimService } from './nominatimService';
 export { default as chatbotService } from './chatbotService';
 export { default as aiService } from './aiService';

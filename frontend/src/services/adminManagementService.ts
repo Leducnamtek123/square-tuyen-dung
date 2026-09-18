@@ -12,11 +12,9 @@ import {
   JobSeekerProfile,
   Resume,
   JobPostActivity,
-  QuestionGroup,
   Banner,
   BannerType,
   Feedback,
-  Question,
   JobPostNotification,
   TrustReport,
   CompanyVerification,
@@ -130,19 +128,6 @@ export interface JobPostNotificationPayload {
   isActive?: boolean;
   career?: number | null;
   city?: number | null;
-}
-
-interface QuestionPayload {
-  text: string;
-  difficulty?: string;
-  career?: number | null;
-}
-
-interface QuestionGroupPayload {
-  name: string;
-  description?: string;
-  evaluation_rubric_input?: unknown;
-  question_ids?: number[];
 }
 
 export type JobSeekerProfilePayload = Partial<JobSeekerProfile>;
@@ -536,47 +521,6 @@ const adminManagementService = {
 
   deleteJobNotification: (id: IdType): Promise<void> => {
     const url = `job/web/admin/job-post-notifications/${id}/`;
-    return httpRequest.delete(url);
-  },
-
-  getQuestionGroups: (params: AdminListParams = {}): Promise<PaginatedResponse<QuestionGroup>> => {
-    const url = 'interview/web/question-groups/';
-    return normalizePaginated<QuestionGroup>(httpRequest.get(url, { params: cleanParams(params) }));
-  },
-
-  createQuestionGroup: (data: QuestionGroupPayload): Promise<QuestionGroup> => {
-    const url = 'interview/web/question-groups/';
-    return unwrapEntity<QuestionGroup>(httpRequest.post(url, data));
-  },
-
-  updateQuestionGroup: (id: string | number, data: Partial<QuestionGroupPayload>): Promise<QuestionGroup> => {
-    const url = `interview/web/question-groups/${id}/`;
-    return unwrapEntity<QuestionGroup>(httpRequest.patch(url, data));
-  },
-
-  deleteQuestionGroup: (id: string | number): Promise<void> => {
-    const url = `interview/web/question-groups/${id}/`;
-    return httpRequest.delete(url);
-  },
-
-  // Questions (Admin)
-  getQuestions: (params: AdminListParams = {}): Promise<PaginatedResponse<Question>> => {
-    const url = 'interview/web/questions/';
-    return normalizePaginated<Question>(httpRequest.get(url, { params: cleanParams(params) }));
-  },
-
-  createQuestion: (data: QuestionPayload): Promise<Question> => {
-    const url = 'interview/web/questions/';
-    return unwrapEntity<Question>(httpRequest.post(url, data));
-  },
-
-  updateQuestion: (id: string | number, data: Partial<QuestionPayload>): Promise<Question> => {
-    const url = `interview/web/questions/${id}/`;
-    return unwrapEntity<Question>(httpRequest.patch(url, data));
-  },
-
-  deleteQuestion: (id: string | number): Promise<void> => {
-    const url = `interview/web/questions/${id}/`;
     return httpRequest.delete(url);
   },
 };

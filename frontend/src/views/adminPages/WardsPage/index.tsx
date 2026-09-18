@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
@@ -22,13 +22,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import { useWards } from './hooks/useWards';
 import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
-import { useDataTable, useDebounce } from '../../../hooks';
-import type { Ward, District, City } from '../../../types/models';
-import type { WardPayload } from '../../../services/adminManagementService';
+import { useDataTable, useDebounce } from '@/hooks';
+import type { Ward, District, City } from '@/types/models';
+import type { WardPayload } from '@/services/adminManagementService';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
 import {
@@ -402,11 +402,6 @@ const WardsPage = () => {
   const columns = React.useMemo<ColumnDef<Ward>[]>(
     () => [
       {
-        accessorKey: 'id',
-        header: 'ID',
-        enableSorting: true,
-      },
-      {
         accessorKey: 'name',
         header: t('pages.wards.table.name') as string,
         enableSorting: true,
@@ -424,12 +419,12 @@ const WardsPage = () => {
       {
         accessorKey: 'districtDict.name',
         header: t('pages.wards.table.district') as string,
-        cell: (info) => (info.getValue() as string) || '—',
+        cell: (info) => (info.getValue() as string) || '-',
       },
       {
         accessorKey: 'districtDict.cityDict.name',
         header: t('pages.wards.table.city') as string,
-        cell: (info) => (info.getValue() as string) || '—',
+        cell: (info) => (info.getValue() as string) || '-',
       },
       {
         id: 'actions',
@@ -438,12 +433,12 @@ const WardsPage = () => {
         cell: (info) => (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             <Tooltip title={t('pages.wards.table.edit')}>
-              <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+              <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title={t('pages.wards.table.delete')}>
-              <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+              <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Tooltip>

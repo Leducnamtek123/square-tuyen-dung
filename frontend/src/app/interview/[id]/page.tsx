@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import InterviewRoomPageClient from './page.client';
 
-export const metadata = {
-  title: 'Interview',
-  description: 'Join the interview room.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('interview.room');
+}
 
 export default function Page() {
   return <InterviewRoomPageClient />;

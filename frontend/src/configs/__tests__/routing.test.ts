@@ -1,7 +1,7 @@
 // Jest globals: describe, it, expect
 import {
   getLocalizedRouteVariants,
-} from '../../configs/routeLocalization';
+} from '@/configs/routeLocalization';
 import { 
   isAdminPortalPath, 
   isEmployerPortalPath,
@@ -11,7 +11,7 @@ import {
   stripPortalPrefix,
   buildPortalPath,
   normalizePortalPath
-} from '../../configs/portalRouting';
+} from '@/configs/portalRouting';
 
 describe('Portal Routing', () => {
   describe('getPreferredLanguage', () => {

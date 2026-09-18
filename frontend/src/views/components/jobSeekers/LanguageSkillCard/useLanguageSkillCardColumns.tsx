@@ -4,8 +4,8 @@ import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutl
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import { tConfig } from '../../../../utils/tConfig';
-import type { LanguageSkill } from '../../../../types/models';
+import { tConfig } from '@/utils/tConfig';
+import type { LanguageSkill } from '@/types/models';
 
 interface Args {
   languageDict?: Record<string, string>;
@@ -34,7 +34,7 @@ export const useLanguageSkillCardColumns = ({ languageDict, onEdit, onDelete }: 
         meta: { align: 'right' },
         cell: (info) => (
           <Stack direction="row" spacing={1} justifyContent="flex-end">
-            <IconButton
+            <IconButton aria-label="Quay lại"
               size="small"
               sx={{
                 color: 'secondary.main',
@@ -48,7 +48,7 @@ export const useLanguageSkillCardColumns = ({ languageDict, onEdit, onDelete }: 
             >
               <ModeEditOutlineOutlinedIcon fontSize="small" />
             </IconButton>
-            <IconButton
+            <IconButton aria-label="Quay lại"
               size="small"
               sx={{
                 color: 'error.main',

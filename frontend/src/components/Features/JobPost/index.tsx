@@ -22,6 +22,7 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 import { ROUTES, IMAGES } from '@/configs/constants';
 import { useConfig } from '@/hooks/useConfig';
 import { tConfig } from '@/utils/tConfig';
+import { JobHoverPreviewCard, useJobHoverPreview, type JobHoverPreviewData } from '@/components/Features/JobHoverPreview';
 
 interface JobPostProps {
   id: number;
@@ -35,6 +36,13 @@ interface JobPostProps {
   isHot?: boolean;
   salaryMin?: number;
   salaryMax?: number;
+  salaryType?: string | number;
+  experience?: number;
+  academicLevel?: number;
+  jobDescription?: string;
+  jobRequirement?: string | null;
+  benefitsEnjoyed?: string | null;
+  disableHoverPreview?: boolean;
 }
 
 const MetaItem = ({
@@ -55,6 +63,7 @@ const MetaItem = ({
 );
 
 const JobPost = ({
+  id,
   slug,
   companyImageUrl,
   companyName,
@@ -65,182 +74,259 @@ const JobPost = ({
   isHot,
   salaryMin,
   salaryMax,
+  salaryType,
+  experience,
+  academicLevel,
+  jobDescription,
+  jobRequirement,
+  benefitsEnjoyed,
+  disableHoverPreview = false,
 }: JobPostProps) => {
   const theme = useTheme();
   const { allConfig } = useConfig();
   const { t, i18n } = useTranslation(['public', 'common']);
+  const isEn = Boolean(i18n.language && i18n.language.startsWith('en'));
+
+  const daysLeftText = React.useMemo(() => {
+    if (!deadline) return isEn ? '30 days left' : '30 ngày';
+    const diffDays = dayjs(deadline).diff(dayjs(), 'day');
+    if (diffDays > 0) {
+      return isEn ? `${diffDays} days left` : `${diffDays} ngày`;
+    }
+    const diffHours = dayjs(deadline).diff(dayjs(), 'hour');
+    if (diffHours > 0) {
+      return isEn ? `${diffHours} hours left` : `${diffHours} giờ`;
+    }
+    return isEn ? 'Expired' : 'Hết hạn';
+  }, [deadline, isEn]);
+
+  const {
+    hoveredJob,
+    anchorEl: previewAnchorEl,
+    isOpen: isPreviewOpen,
+    handleCardMouseEnter,
+    handleCardMouseLeave,
+    handlePopperMouseEnter,
+    handlePopperMouseLeave,
+    handleClose: handleClosePreview,
+  } = useJobHoverPreview();
+
+  const previewData: JobHoverPreviewData = React.useMemo(() => ({
+    id,
+    slug,
+    jobName: jobName || '',
+    companyDict: { companyName, companyImageUrl },
+    locationDict: { city: cityId },
+    salaryMin,
+    salaryMax,
+    salaryType,
+    deadline,
+    isUrgent,
+    isHot,
+    experience,
+    academicLevel,
+    jobDescription,
+    jobRequirement,
+    benefitsEnjoyed,
+  }), [
+    id,
+    slug,
+    jobName,
+    companyName,
+    companyImageUrl,
+    cityId,
+    salaryMin,
+    salaryMax,
+    salaryType,
+    deadline,
+    isUrgent,
+    isHot,
+    experience,
+    academicLevel,
+    jobDescription,
+    jobRequirement,
+    benefitsEnjoyed,
+  ]);
 
   const detailHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language);
 
   return (
-    <Card
-      component={Link}
-      href={detailHref}
-      prefetch
-      variant="outlined"
-      aria-label={jobName || t('common:viewDetails')}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100%',
-        minHeight: 150,
-        boxShadow: 0,
-        cursor: 'pointer',
-        color: 'inherit',
-        textDecoration: 'none',
-        px: 2,
-        pt: 2,
-        pb: 1,
-        transition: 'all 0.3s ease',
-        borderRadius: '24px 8px 24px 8px',
-        border: `1px solid ${theme.palette.divider}`,
-        position: 'relative',
-        overflow: 'hidden',
-        backgroundColor: theme.palette.background.paper,
-        ...(isUrgent && {
-          borderLeft: 'none',
-          backgroundColor: theme.palette.secondary.background,
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 4,
-            background: theme.palette.secondary.main,
-            borderRadius: '24px 0 0 8px',
-            boxShadow: `0 0 8px ${theme.palette.secondary.main}40`,
+    <>
+      <Card
+        component={Link}
+        href={detailHref}
+        prefetch
+        variant="outlined"
+        aria-label={jobName || t('common:viewDetails')}
+        onMouseEnter={disableHoverPreview ? undefined : (e) => handleCardMouseEnter(e, previewData)}
+        onMouseLeave={disableHoverPreview ? undefined : handleCardMouseLeave}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          minHeight: 150,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          cursor: 'pointer',
+          color: 'inherit',
+          textDecoration: 'none',
+          px: 2,
+          pt: 2,
+          pb: 1.5,
+          transition: 'all 0.25s ease',
+          borderRadius: '16px',
+          border: `1px solid ${theme.palette.divider}`,
+          position: 'relative',
+          overflow: 'hidden',
+          backgroundColor: theme.palette.background.paper,
+          ...(isUrgent && {
+            borderLeft: '3.5px solid #f97316',
+            backgroundColor: '#fffcf7',
+          }),
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 10px 25px rgba(37, 99, 235, 0.12)',
+            borderColor: isUrgent ? '#f97316' : '#93c5fd',
           },
-        }),
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: theme.customShadows.large,
-          ...(isUrgent
-            ? {
-                borderColor: theme.palette.secondary.main,
-                borderLeft: 'none',
-                backgroundColor: theme.palette.secondary.backgroundHover,
-              }
-            : { borderColor: theme.palette.primary.main }),
-        },
-      }}
-    >
-      {isHot && (
-        <Tooltip title={t('common:common.hot')} placement="top">
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 5,
-              right: 6,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              backgroundColor: theme.palette.hot.background,
-              padding: '4px 8px',
-              borderRadius: '4px',
-              zIndex: 1,
-            }}
-          >
-            <FontAwesomeIcon icon={faFire} style={{ fontSize: 14, color: theme.palette.hot.main }} />
-            <Typography sx={{ fontSize: 12, fontWeight: 'bold', color: theme.palette.hot.main, lineHeight: 1 }}>
-                {t('common:common.hot')}
-            </Typography>
-          </Box>
-        </Tooltip>
-      )}
-
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Box sx={{ position: 'relative' }}>
-          <MuiImageCustom
-            width={65}
-            height={65}
-            src={companyImageUrl}
-            fallbackSrc={IMAGES.companyLogoDefault}
-            sx={{
-              border: 1,
-              borderRadius: '12px 4px 12px 4px',
-              borderColor: theme.palette.grey[200],
-              p: 1,
-              backgroundColor: theme.palette.common.white,
-              transition: 'transform 0.2s ease',
-              '&:hover': { transform: 'scale(1.05)' },
-            }}
-          />
-          {isUrgent && (
-            <Tooltip title={t('jobPostForm.label.isUrgent')} placement="top">
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: -6,
-                  left: -6,
-                  backgroundColor: theme.palette.common.white,
-                  borderRadius: '50%',
-                  width: 20,
-                  height: 20,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: theme.customShadows.small,
-                  zIndex: 1,
-                }}
-              >
-                <FontAwesomeIcon icon={faBolt} style={{ fontSize: 12, color: theme.palette.warning.main }} />
-              </Box>
-            </Tooltip>
-          )}
-        </Box>
-
-        <Stack spacing={0.5} sx={{ minWidth: 0, flex: 1 }}>
-          <Tooltip followCursor title={jobName}>
-            <Typography
-              variant="subtitle2"
-              noWrap
-              flex={1}
+        }}
+      >
+        {isHot && (
+          <Tooltip title={t('common:common.hot')} placement="top">
+            <Box
               sx={{
-                fontSize: 14,
-                fontWeight: 600,
-                fontFamily: 'Open Sans',
-                color: theme.palette.grey[800],
-                textOverflow: 'ellipsis',
-                minWidth: 0,
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                padding: '3px 8px',
+                borderRadius: '6px',
+                zIndex: 2,
               }}
             >
-              {jobName}
-            </Typography>
+              <FontAwesomeIcon icon={faFire} style={{ color: '#ef4444', fontSize: 11 }} />
+              <Typography sx={{ color: '#ef4444', fontSize: 11, fontWeight: 700, lineHeight: 1 }}>
+                {t('common:common.hot')}
+              </Typography>
+            </Box>
           </Tooltip>
-          <Tooltip followCursor title={companyName}>
-            <Typography
-              variant="subtitle2"
-              noWrap
-              sx={{ fontSize: 13, color: theme.palette.grey[600], fontWeight: 500 }}
+        )}
+
+        {isUrgent && !isHot && (
+          <Tooltip title={t('common:common.urgent')} placement="top">
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                backgroundColor: '#fff7ed',
+                border: '1px solid #fed7aa',
+                padding: '3px 8px',
+                borderRadius: '6px',
+                zIndex: 2,
+              }}
             >
-              {companyName}
-            </Typography>
+              <FontAwesomeIcon icon={faBolt} style={{ color: '#f97316', fontSize: 11 }} />
+              <Typography sx={{ color: '#f97316', fontSize: 11, fontWeight: 700, lineHeight: 1 }}>
+                {t('common:common.urgent')}
+              </Typography>
+            </Box>
           </Tooltip>
+        )}
+
+        <Stack direction="row" spacing={1.5} sx={{ minWidth: 0 }}>
+          <Box sx={{ flexShrink: 0 }}>
+            <MuiImageCustom
+              src={companyImageUrl || IMAGES.companyLogoDefault}
+              alt={companyName}
+              width={54}
+              height={54}
+              sx={{
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0',
+                p: 0.5,
+                objectFit: 'contain',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+              }}
+            />
+          </Box>
+          <Stack flex={1} sx={{ minWidth: 0, pr: (isHot || isUrgent) ? 7.5 : 0 }} spacing={0.4}>
+            <Tooltip followCursor title={jobName}>
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontSize: '0.925rem',
+                  fontWeight: 700,
+                  color: '#0f172a',
+                  lineHeight: 1.35,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  minHeight: '2.7em',
+                }}
+              >
+                {jobName}
+              </Typography>
+            </Tooltip>
+            <Tooltip followCursor title={companyName}>
+              <Typography
+                variant="subtitle2"
+                noWrap
+                sx={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}
+              >
+                {companyName}
+              </Typography>
+            </Tooltip>
+          </Stack>
         </Stack>
-      </Stack>
 
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 2, rowGap: 1, mt: 2 }}>
-        <MetaItem icon={<FontAwesomeIcon icon={faCircleDollarToSlot} color={theme.palette.primary.main} />}>
-          {formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
-        </MetaItem>
-        <MetaItem icon={<FontAwesomeIcon icon={faLocationDot} color={theme.palette.primary.main} />}>
-          {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>{t('common:labels.notUpdated')}</span>}
-        </MetaItem>
-        <MetaItem icon={<FontAwesomeIcon icon={faCalendarDays} color={theme.palette.primary.main} />}>
-          {dayjs(deadline).format('DD/MM/YYYY')}
-        </MetaItem>
-      </Box>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', columnGap: 2, rowGap: 0.75, mt: 1.5 }}>
+          <MetaItem icon={<FontAwesomeIcon icon={faCircleDollarToSlot} style={{ color: '#2563eb', fontSize: 13 }} />}>
+            <span style={{ color: '#2563eb', fontWeight: 700 }}>
+              {formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
+            </span>
+          </MetaItem>
+          <MetaItem icon={<FontAwesomeIcon icon={faLocationDot} style={{ color: '#64748b', fontSize: 13 }} />}>
+            {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: '#94a3b8' }}>{t('common:labels.notUpdated')}</span>}
+          </MetaItem>
+          <MetaItem icon={<FontAwesomeIcon icon={faCalendarDays} style={{ color: '#64748b', fontSize: 13 }} />}>
+            {dayjs(deadline).format('DD/MM/YYYY')}
+          </MetaItem>
+        </Box>
 
-      <Divider sx={{ mt: 'auto', mb: 0.75, pt: 1, borderColor: theme.palette.grey[400] }} />
+        <Divider sx={{ mt: 'auto', mb: 0.75, pt: 1, borderColor: '#f1f5f9' }} />
 
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />}>
-          {t('jobPost.timeLeft')} <TimeAgo date={deadline} type="fromNow" />
-        </MetaItem>
-      </Box>
-    </Card>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 13, color: '#94a3b8' }} />}>
+            <span style={{ color: '#64748b', fontSize: '0.775rem' }}>
+              {isEn ? daysLeftText : `${t('jobPost.timeLeft')} ${daysLeftText}`}
+            </span>
+          </MetaItem>
+        </Box>
+      </Card>
+
+      {!disableHoverPreview && (
+        <JobHoverPreviewCard
+          job={hoveredJob}
+          anchorEl={previewAnchorEl}
+          open={isPreviewOpen}
+          onClose={handleClosePreview}
+          onMouseEnterPopper={handlePopperMouseEnter}
+          onMouseLeavePopper={handlePopperMouseLeave}
+          cityLabel={tConfig(allConfig?.cityDict?.[cityId])}
+          experienceLabel={experience ? tConfig(allConfig?.experienceDict?.[experience]) : undefined}
+          academicLevelLabel={academicLevel ? tConfig(allConfig?.academicLevelDict?.[academicLevel]) : undefined}
+        />
+      )}
+    </>
   );
 };
 

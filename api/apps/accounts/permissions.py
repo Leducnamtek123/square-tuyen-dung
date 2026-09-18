@@ -123,6 +123,9 @@ class CompanyPermissionRequired(IsEmployerUser):
         return user_has_company_permission(request.user, self.permission_key)
 
     def _resolve_object_company(self, obj):
+        if hasattr(obj, "_meta") and getattr(obj._meta, "model_name", None) == "company":
+            return obj
+
         company = getattr(obj, "company", None)
         if company is not None:
             return company

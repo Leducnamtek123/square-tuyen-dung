@@ -137,6 +137,18 @@ const jobPostActivityService = {
     }) as Promise<unknown>).then(unwrapDataResponse<JobPostActivity>);
   },
 
+  inviteCandidate: (data: {
+    jobPostId: string | number;
+    resumeSlug?: string;
+    resumeId?: string | number;
+    note?: string;
+  }): Promise<{ id: number; message: string }> => {
+    const url = 'job/web/employer-job-posts-activity/invite-candidate/';
+    return (httpRequest.post(url, data) as Promise<unknown>).then(
+      unwrapDataResponse<{ id: number; message: string }>
+    );
+  },
+
   deleteJobPostActivity: (id: IdType): Promise<void> => {
     const url = `job/web/employer-job-posts-activity/${id}/`;
     return httpRequest.delete(url);

@@ -19,13 +19,32 @@ import {
   Button,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useTranslation } from 'react-i18next';
 import contentService, { type Article } from '@/services/contentService';
 import { getArticleImage, withArticleImages } from '@/views/defaultPages/NewsPage/blogImages';
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
 
+const formatViTimeAgo = (dateStr?: string | null): string => {
+  if (!dateStr) return 'Mới cập nhật';
+  const now = dayjs();
+  const past = dayjs(dateStr);
+  const diffDays = now.diff(past, 'day');
+  if (diffDays < 1) return 'Hôm nay';
+  if (diffDays < 7) return `${diffDays} ngày trước`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} tuần trước`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} tháng trước`;
+  return `${Math.floor(diffDays / 365)} năm trước`;
+};
+
+const cleanAuthorName = (name?: string | null): string => {
+  if (!name) return 'InfoHR Tuyển Dụng';
+  return name.replace(/Square/gi, 'InfoHR');
+};
+
 const CareerHandbookSection = () => {
+  const { t } = useTranslation('common');
   const { data: articles = [], isLoading } = useQuery({
     queryKey: ['public-articles-handbook'],
     queryFn: async () => {
@@ -36,18 +55,18 @@ const CareerHandbookSection = () => {
   });
 
   return (
-    <Box sx={{ width: '100%', mt: 8, mb: 4 }}>
-      {/* ── Section Title ─────────────────────────────────────────────── */}
-      <Stack spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
-          Tin tức & Thông tin
+    <Box>
+      {/* -- Section Header ------------------------------------------------ */}
+      <Stack spacing={1} sx={{ mb: 3 }}>
+        <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
+          {t('news.handbookTitle', 'Tin tức & Thông tin')}
         </Typography>
-        <Typography variant="body1" sx={{ color: '#64748b', maxWidth: 640 }}>
-          Cập nhật những thông tin, tin tức tuyển dụng và thị trường lao động mới nhất.
+        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
+          {t('news.handbookSubtitle', 'Cập nhật những thông tin, tin tức tuyển dụng và thị trường lao động mới nhất.')}
         </Typography>
       </Stack>
 
-      {/* ── Articles Grid (3 Columns) ─────────────────────────────────── */}
+      {/* -- Articles Grid (3 Columns) ----------------------------------- */}
       {isLoading ? (
         <Grid container spacing={3}>
           {Array.from(Array(3).keys()).map((i) => (
@@ -60,7 +79,8 @@ const CareerHandbookSection = () => {
         <Grid container spacing={3}>
           {articles.map((article: Article) => {
             const articleHref = `/tin-tuc/${article.slug}`;
-            const publishedAgo = article.publishedAt ? dayjs(article.publishedAt).fromNow() : 'Mới cập nhật';
+            const publishedAgo = formatViTimeAgo(article.publishedAt);
+            const author = cleanAuthorName(article.authorName);
 
             return (
               <Grid key={article.id} size={{ xs: 12, md: 4 }}>
@@ -102,7 +122,7 @@ const CareerHandbookSection = () => {
                       }}
                     />
                     <Chip
-                      label={article.categoryName || 'CẨM NANG'}
+                      label={article.categoryName || t('news.defaultCategory', 'CẨM NANG')}
                       size="small"
                       sx={{
                         position: 'absolute',
@@ -155,7 +175,7 @@ const CareerHandbookSection = () => {
                     </Typography>
 
                     <Typography variant="caption" sx={{ color: '#94a3b8', mt: 'auto', fontWeight: 600 }}>
-                      Bởi {article.authorName || 'Admin'} • {publishedAgo}
+                      {t('news.byAuthor', 'Bởi {{author}} • {{time}}', { author, time: publishedAgo })}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -165,7 +185,7 @@ const CareerHandbookSection = () => {
         </Grid>
       )}
 
-      {/* ── Bottom Button ─────────────────────────────────────────────── */}
+      {/* -- Bottom Button ----------------------------------------------- */}
       <Stack direction="row" justifyContent="center" sx={{ mt: 4 }}>
         <Button
           component={Link}
@@ -188,7 +208,7 @@ const CareerHandbookSection = () => {
             },
           }}
         >
-          Xem thêm tin tức & thông tin
+          {t('news.viewMore', 'Xem thêm tin tức & thông tin')}
         </Button>
       </Stack>
     </Box>

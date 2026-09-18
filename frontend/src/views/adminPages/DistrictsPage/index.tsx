@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo, useReducer } from 'react';
 import {
@@ -18,15 +18,15 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { District, City } from '../../../types/models';
-import type { DistrictPayload } from '../../../services/adminManagementService';
+import { useDataTable, useDebounce } from '@/hooks';
+import { District, City } from '@/types/models';
+import type { DistrictPayload } from '@/services/adminManagementService';
 import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import type { SxProps, Theme } from '@mui/material/styles';
 import {
@@ -213,7 +213,6 @@ const DistrictsPage = () => {
   };
 
   const columns = useMemo<ColumnDef<District>[]>(() => [
-    { accessorKey: 'id', header: 'ID', enableSorting: true },
     {
       accessorKey: 'name',
       header: t('pages.districts.table.name') as string,
@@ -233,12 +232,12 @@ const DistrictsPage = () => {
       cell: (info) => (
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
           <Tooltip title={t('pages.districts.table.edit')}>
-            <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={t('pages.districts.table.delete')}>
-            <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>

@@ -1,5 +1,5 @@
 import trustReportService from '../trustReportService';
-import httpRequest from '../../utils/httpRequest';
+import httpRequest from '@/utils/httpRequest';
 
 jest.mock('../../utils/httpRequest', () => ({
   post: jest.fn(),

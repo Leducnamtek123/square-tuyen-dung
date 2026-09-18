@@ -21,10 +21,23 @@ type ChatResponse = {
   manualCandidateProfileId?: number;
 };
 
+export interface ChatbotConfigResponse {
+  title?: string;
+  subtitle?: string;
+  employerGreeting?: string;
+  jobSeekerGreeting?: string;
+  employerSuggestions?: string[];
+  jobSeekerSuggestions?: string[];
+}
+
 const chatbotService = {
   async chat(payload: ChatPayload): Promise<ChatResponse> {
     const response = await httpRequest.post('ai/chat/', payload, { timeout: 120000 });
     return unwrapDataResponse<ChatResponse>(response);
+  },
+  async getChatbotConfig(): Promise<ChatbotConfigResponse> {
+    const response = await httpRequest.get('ai/chatbot/config/');
+    return unwrapDataResponse<ChatbotConfigResponse>(response);
   },
 };
 

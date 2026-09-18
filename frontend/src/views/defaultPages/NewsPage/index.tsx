@@ -23,11 +23,8 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import SearchIcon from '@mui/icons-material/Search';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import contentService, { type Article, type ArticleCategoryInfo } from '@/services/contentService';
+import contentService, { type ArticleCategoryInfo } from '@/services/contentService';
 import commonService from '@/services/commonService';
 import useSEO from '@/hooks/useSEO';
 import NoDataCard from '@/components/Common/NoDataCard';
@@ -41,21 +38,44 @@ dayjs.locale('vi');
 
 const PAGE_SIZE = 9;
 
-const FALLBACK_POPULAR_KEYWORDS = [
+const FIXED_NEWS_KEYS = [
+  'news.category.all',
+  'news.category.news',
+  'news.category.blog',
+  'news.categoryFallback',
+  'news.topic.all',
+  'news.topic.recruitment',
+  'news.topic.realEstate',
+  'news.topic.construction',
+  'news.topic.interior',
+  'news.topic.architecture',
+  'news.topic.portfolio',
+  'news.topic.skills',
+  'news.views',
+  'news.heroEyebrow',
+  'news.heroTitle',
+  'news.heroSubtitle',
+  'news.viewAllArticles',
+  'news.exploreJobs',
+  'news.searchPlaceholder',
+  'news.searchButton',
+  'news.emptyTitle',
+  'news.emptyContent',
+  'news.quickReadTitle',
+  'news.quickReadDescription',
+  'news.currentFilter',
+  'news.audienceTitle',
+  'news.audienceDescription',
+  'news.newJobsCta',
+] as const;
+
+const FALLBACK_POPULAR_KEYWORDS: string[] = [
   'Đơn xin việc', 'Hồ sơ xin việc', 'BHXH 1 lần', 'Thủ tục nghỉ việc', 'Cách viết CV',
-  'Mẫu CV chuẩn', 'Câu hỏi phỏng vấn', 'Lương Gross sang Net', 'Thuế TNCN', 'Việc làm IT',
-  'Việc làm Marketing', 'Tuyển dụng Bán hàng', 'Kế toán tổng hợp', 'Nhân sự tổng hợp',
+  'Mẫu CV chuẩn', 'Câu hỏi phỏng vấn', 'Lương Gross sang Net', 'Thuế TNCN', 'Việc làm Xây dựng',
+  'Tuyển dụng Bất động sản', 'Kỹ sư Giám sát', 'Kiến trúc sư', 'Thiết kế Nội thất',
   'Cách tính trợ cấp', 'Quy trình thôi việc', 'Môi trường làm việc', 'Văn hóa doanh nghiệp',
   'Bảng lương 2026', 'Kỹ năng phỏng vấn', 'Thủ tục quyết toán thuế', 'Mẫu hợp đồng lao động',
   'Tuyển dụng việc làm', 'Kinh nghiệm tìm việc', 'Cách deal lương', 'Tạo CV miễn phí'
-];
-
-const DEFAULT_CATEGORIES: ArticleCategoryInfo[] = [
-  { id: 1, name: 'Cẩm nang nghề nghiệp', slug: 'cam-nang', description: '' },
-  { id: 2, name: 'Thủ tục & Quyền lợi lao động', slug: 'thu-tuc-lao-dong', description: '' },
-  { id: 3, name: 'Thuế & Quyết toán TNCN', slug: 'thue-tncn', description: '' },
-  { id: 4, name: 'Bí quyết viết CV & Phỏng vấn', slug: 'bi-quyet-cv', description: '' },
-  { id: 5, name: 'Báo cáo & Xu hướng tuyển dụng', slug: 'xu-huong', description: '' },
 ];
 
 const SubHeaderCategoryBar = ({
@@ -67,8 +87,6 @@ const SubHeaderCategoryBar = ({
   activeCategorySlug: string;
   onSelectCategory: (slug: string) => void;
 }) => {
-  const displayCategories = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
-
   return (
     <Box
       sx={{
@@ -85,7 +103,8 @@ const SubHeaderCategoryBar = ({
         <Stack
           direction="row"
           alignItems="center"
-          justifyContent="space-between"
+          justifyContent={{ xs: 'flex-start', md: 'space-between' }}
+          spacing={{ xs: 1, md: 0 }}
           sx={{
             py: 1,
             width: '100%',
@@ -95,15 +114,16 @@ const SubHeaderCategoryBar = ({
             scrollbarWidth: 'none',
           }}
         >
-          {displayCategories.map((cat) => {
-            const isSelected = activeCategorySlug === cat.slug;
-            return (
-              <Button
-                key={cat.id}
-                variant="text"
-                onClick={() => onSelectCategory(cat.slug)}
-                sx={{
-                  fontWeight: isSelected ? 800 : 600,
+          {categories.length > 0
+            ? categories.map((cat) => {
+                const isSelected = activeCategorySlug === cat.slug;
+                return (
+                  <Button
+                    key={cat.id}
+                    variant="text"
+                    onClick={() => onSelectCategory(cat.slug)}
+                    sx={{
+                      fontWeight: isSelected ? 800 : 600,
                   fontSize: '0.875rem',
                   color: isSelected ? '#e11d48' : '#475569',
                   px: 2.5,
@@ -122,7 +142,7 @@ const SubHeaderCategoryBar = ({
                 {cat.name}
               </Button>
             );
-          })}
+          }) : null}
         </Stack>
       </Container>
     </Box>
@@ -154,7 +174,20 @@ const NewsContent = () => {
     staleTime: 5 * 60_000,
   });
 
-  // Fetch Articles from API
+  // Fetch Top Featured Articles from API (fixed top 4 published across site)
+  const { data: featuredData } = useQuery({
+    queryKey: ['public-featured-articles'],
+    queryFn: async () => {
+      const response = await contentService.getPublicArticles({
+        page: 1,
+        page_size: 4,
+      });
+      return withArticleImages(response.results || []);
+    },
+    staleTime: 5 * 60_000,
+  });
+
+  // Fetch Articles from API for active category & page
   const { data: articleData, isLoading } = useQuery({
     queryKey: ['public-articles', activeCategorySlug, page],
     queryFn: async () => {
@@ -176,20 +209,45 @@ const NewsContent = () => {
     queryKey: ['popular-keywords'],
     queryFn: async () => {
       const res = await commonService.getPopularKeywords();
-      return res.map((k) => k.title || k.kw).filter(Boolean) as string[];
+      return res || [];
     },
     staleTime: 5 * 60_000,
   });
 
-  const popularKeywords = popularKeywordsApi.length > 0 ? popularKeywordsApi : FALLBACK_POPULAR_KEYWORDS;
+  const popularKeywords = React.useMemo(() => {
+    if (Array.isArray(popularKeywordsApi) && popularKeywordsApi.length > 0) {
+      return popularKeywordsApi
+        .map((k: unknown) => {
+          if (typeof k === 'string') return k;
+          if (k && typeof k === 'object') {
+            const obj = k as { title?: string; kw?: string; name?: string };
+            return obj.title || obj.kw || obj.name || '';
+          }
+          return '';
+        })
+        .filter(Boolean);
+    }
+    return FALLBACK_POPULAR_KEYWORDS;
+  }, [popularKeywordsApi]);
 
-  const articles = articleData?.articles || [];
+  const featuredArticles = featuredData || [];
+  const mainFeaturedArticle = featuredArticles[0] || null;
+  const sideFeaturedArticles = featuredArticles.slice(1, 4);
+
+  const articles = React.useMemo(() => articleData?.articles || [], [articleData?.articles]);
   const total = articleData?.total || 0;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const mainFeaturedArticle = articles[0] || null;
-  const sideFeaturedArticles = articles.slice(1, 4);
-  const remainingArticles = articles.slice(4);
+  // Determine articles for "Bài viết mới nhất" grid
+  const displayLatestArticles = React.useMemo(() => {
+    if (activeCategorySlug === 'all') {
+      if (page === 1 && articles.length > 4) {
+        return articles.slice(4);
+      }
+      return articles;
+    }
+    return articles;
+  }, [activeCategorySlug, page, articles]);
 
   const newsListHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language);
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
@@ -206,8 +264,8 @@ const NewsContent = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: '#f8fafc', minHeight: '100vh', pb: 8 }}>
-      {/* ── Sub-header Navigation Bar ──────────────────────────────────────── */}
+    <Box sx={{ bgcolor: '#f8fafc', minHeight: '100dvh', pb: 8 }}>
+      {/* -- Sub-header Navigation Bar ---------------------------------------- */}
       <SubHeaderCategoryBar
         categories={categories}
         activeCategorySlug={activeCategorySlug}
@@ -215,13 +273,13 @@ const NewsContent = () => {
       />
 
       <Container maxWidth="xl" sx={{ mt: 3 }}>
-        {/* ── Featured Articles Section ──────────────────────────────────────── */}
+        {/* -- Featured Articles Section ---------------------------------------- */}
         <Box sx={{ mb: 6 }}>
-          <Typography variant="h5" fontWeight={800} color="#0f172a" sx={{ mb: 3, letterSpacing: '-0.01em' }}>
-            Bài viết nổi bật
+          <Typography variant="h5" component="h1" fontWeight={800} color="#0f172a" sx={{ mb: 3, letterSpacing: '-0.01em' }}>
+            Tin tức &amp; Cẩm nang nghề nghiệp
           </Typography>
 
-          {isLoading ? (
+          {isLoading && featuredArticles.length === 0 ? (
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Skeleton variant="rectangular" height={380} sx={{ borderRadius: 3 }} />
@@ -340,7 +398,7 @@ const NewsContent = () => {
           )}
         </Box>
 
-        {/* ── Latest Articles Section with Filter Tabs ────────────────────────── */}
+        {/* -- Latest Articles Section with Filter Tabs -------------------------- */}
         <Box sx={{ mb: 6 }}>
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={2} sx={{ mb: 3 }}>
             <Typography variant="h5" fontWeight={800} color="#0f172a" sx={{ letterSpacing: '-0.01em' }}>
@@ -395,13 +453,14 @@ const NewsContent = () => {
                 </Grid>
               ))}
             </Grid>
-          ) : remainingArticles.length === 0 ? (
-            <NoDataCard title="Không tìm thấy bài viết" content="Hiện chưa có bài viết thuộc danh mục này." />
+          ) : displayLatestArticles.length === 0 ? (
+            <NoDataCard title={t('news.emptyTitle')} content={t('news.emptyContent')} />
           ) : (
             <Grid container spacing={3}>
-              {remainingArticles.map((article) => {
+              {displayLatestArticles.map((article) => {
                 const articleHref = localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.NEWS_DETAIL, article.slug)}`, i18n.language);
-                const publishedAgo = article.publishedAt ? dayjs(article.publishedAt).fromNow() : 'Mới cập nhật';
+                const articleTimestamp = article.publishedAt || article.createAt || article.updateAt;
+                const publishedAgo = articleTimestamp ? dayjs(articleTimestamp).fromNow() : 'Mới cập nhật';
 
                 return (
                   <Grid key={article.id} size={{ xs: 12, sm: 6, md: 4 }}>
@@ -497,7 +556,7 @@ const NewsContent = () => {
           )}
         </Box>
 
-        {/* ── In-feed Banner Promotion ───────────────────────────────────────── */}
+        {/* -- In-feed Banner Promotion ----------------------------------------- */}
         <Box
           sx={{
             borderRadius: '16px',
@@ -514,10 +573,10 @@ const NewsContent = () => {
           }}
         >
           <Box>
-            <Typography variant="h5" fontWeight={800} sx={{ mb: 0.5 }}>
+            <Typography variant="h5" fontWeight={800} sx={{ color: '#ffffff', mb: 0.5 }}>
               Khám phá 10.000+ việc làm đang tuyển dụng
             </Typography>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.80)' }}>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)' }}>
               Ứng tuyển nhanh chóng, kết nối trực tiếp với nhà tuyển dụng hàng đầu.
             </Typography>
           </Box>
@@ -541,34 +600,41 @@ const NewsContent = () => {
           </Button>
         </Box>
 
-        {/* ── Popular Keywords Tag Cloud ────────────────────────────────────── */}
+        {/* -- Popular Keywords Tag Cloud -------------------------------------- */}
         <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid #e2e8f0', p: 3, bgcolor: '#ffffff' }}>
           <Typography variant="h6" fontWeight={800} color="#0f172a" sx={{ mb: 2 }}>
             Từ khoá nổi bật
           </Typography>
           <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
-            {popularKeywords.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                clickable
-                component={Link}
-                href={jobsHref}
-                sx={{
-                  bgcolor: '#f1f5f9',
-                  color: '#475569',
-                  fontWeight: 600,
-                  fontSize: '0.8rem',
-                  borderRadius: '8px',
-                  border: '1px solid #e2e8f0',
-                  '&:hover': {
-                    bgcolor: '#ffffff',
-                    color: '#e11d48',
-                    borderColor: '#e11d48',
-                  },
-                }}
-              />
-            ))}
+            {popularKeywords.map((item, index) => {
+              const labelText = typeof item === 'string' ? item : (item as { title?: string; kw?: string })?.title || (item as { title?: string; kw?: string })?.kw || '';
+              if (!labelText) return null;
+              const itemKey = `kw-${labelText}-${index}`;
+              const searchHref = `${jobsHref}?kw=${encodeURIComponent(labelText)}`;
+
+              return (
+                <Chip
+                  key={itemKey}
+                  label={labelText}
+                  clickable
+                  component={Link}
+                  href={searchHref}
+                  sx={{
+                    bgcolor: '#f1f5f9',
+                    color: '#475569',
+                    fontWeight: 600,
+                    fontSize: '0.8rem',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0',
+                    '&:hover': {
+                      bgcolor: '#ffffff',
+                      color: '#e11d48',
+                      borderColor: '#e11d48',
+                    },
+                  }}
+                />
+              );
+            })}
           </Stack>
         </Card>
       </Container>

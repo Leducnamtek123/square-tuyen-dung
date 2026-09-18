@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useReducer } from 'react';
+import React, { useEffect, useMemo, useRef, useReducer, useState, useCallback } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 import { LOGO_IMAGES } from '@/configs/images';
 import { AUTH_CONFIG } from '@/configs/constants';
 import { CHATBOT_ICONS } from '@/configs/images';
 import { isEmployerPortalPath } from '@/configs/portalRouting';
-import chatbotService from '@/services/chatbotService';
+import chatbotService, { type ChatbotConfigResponse, type ChatPayload, type ChatMessagePayload } from '@/services/chatbotService';
 import { MessageResponse } from '@/components/Features/AiElements/message';
 import { useAppSelector } from '@/hooks/useAppStore';
 import type { BotConfig } from '@/types/auth';
-import type { ChatPayload, ChatMessagePayload } from '@/services/chatbotService';
 import './chatbot.css';
 
 type ChatRole = 'assistant' | 'user' | 'system';
@@ -87,10 +87,23 @@ const makeMessageId = (prefix: string) => {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 };
 
+const DEFAULT_EMPLOYER_SUGGESTIONS = [
+  'Tìm ứng viên cho vị trí thiết kế',
+  'Soạn tin mời phỏng vấn',
+  'Mức lương thị trường hiện nay',
+];
+
+const DEFAULT_JOBSEEKER_SUGGESTIONS = [
+  'Tìm việc làm vị trí Frontend',
+  'Tải mẫu CV tiếng Anh',
+  'Cách trả lời phỏng vấn về mức lương',
+];
+
 const ChatBot = () => {
   const { t } = useTranslation(['chat', 'common']);
   const { currentUser, isAuthenticated, activeWorkspace } = useAppSelector((state) => state.user);
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [serverConfig, setServerConfig] = useState<ChatbotConfigResponse | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
   const lastPayloadRef = useRef<ChatPayload | null>(null);
 
@@ -105,9 +118,46 @@ const ChatBot = () => {
     return AUTH_CONFIG.JOB_SEEKER_BOT || null;
   }, [currentUser, isAuthenticated, isEmployer]);
 
+  useEffect(() => {
+    chatbotService.getChatbotConfig().then((cfg) => {
+      if (cfg) setServerConfig(cfg);
+    }).catch(() => {
+      // Use fallback defaults
+    });
+  }, []);
+
+  const botTitle = serverConfig?.title || botConfig?.CHAT_TITLE || 'AILA AI';
+  const botSubtitle = serverConfig?.subtitle || (isEmployer ? t('chat:chatbot.subtitleEmployer', 'Trợ lý tuyển dụng thông minh') : t('chat:chatbot.subtitleJobSeeker', 'Trợ lý nghề nghiệp thông minh'));
+
   const greeting = useMemo(() => {
-    return isEmployer ? t('chat:chatbot.greeting.employer') : t('chat:chatbot.greeting.jobSeeker');
-  }, [isEmployer, t]);
+    if (isEmployer) {
+      return serverConfig?.employerGreeting || t('chat:chatbot.greeting.employer');
+    }
+    return serverConfig?.jobSeekerGreeting || t('chat:chatbot.greeting.jobSeeker');
+  }, [isEmployer, serverConfig, t]);
+
+  const defaultEmployerSuggestions = useMemo(() => [
+    t('chat:suggestions.findDesigners', 'Tìm ứng viên cho vị trí thiết kế'),
+    t('chat:suggestions.writeInterviewInvite', 'Soạn tin mời phỏng vấn'),
+    t('chat:suggestions.marketSalary', 'Mức lương thị trường hiện nay'),
+  ], [t]);
+
+  const defaultJobSeekerSuggestions = useMemo(() => [
+    t('chat:suggestions.findFrontendJobs', 'Tìm việc làm vị trí Frontend'),
+    t('chat:suggestions.downloadEnglishCv', 'Tải mẫu CV tiếng Anh'),
+    t('chat:suggestions.salaryInterviewTips', 'Cách trả lời phỏng vấn về mức lương'),
+  ], [t]);
+
+  const suggestions = useMemo(() => {
+    if (isEmployer) {
+      return serverConfig?.employerSuggestions && serverConfig.employerSuggestions.length > 0
+        ? serverConfig.employerSuggestions
+        : defaultEmployerSuggestions;
+    }
+    return serverConfig?.jobSeekerSuggestions && serverConfig.jobSeekerSuggestions.length > 0
+      ? serverConfig.jobSeekerSuggestions
+      : defaultJobSeekerSuggestions;
+  }, [isEmployer, serverConfig, defaultEmployerSuggestions, defaultJobSeekerSuggestions]);
 
   const systemPrompt = useMemo(() => {
     return isEmployer ? t('chat:chatbot.systemPrompt.employer') : t('chat:chatbot.systemPrompt.jobSeeker');
@@ -126,15 +176,15 @@ const ChatBot = () => {
 
   const enableRichRendering = true;
 
-  const buildPayload = (nextMessages: ChatMessage[]): ChatPayload => {
+  const buildPayload = useCallback((nextMessages: ChatMessage[]): ChatPayload => {
     const history: ChatMessagePayload[] = nextMessages
       .filter((message) => message.role !== 'system')
       .slice(-MAX_HISTORY)
       .map((message) => ({ role: message.role, content: message.content }));
     return { messages: [{ role: 'system', content: systemPrompt }, ...history], max_tokens: 1024 };
-  };
+  }, [systemPrompt]);
 
-  const sendChat = async (payload: ChatPayload) => {
+  const sendChat = useCallback(async (payload: ChatPayload) => {
     try {
       const response = await chatbotService.chat(payload);
       const reply = response?.reply || (response as { data?: { reply?: string } })?.data?.reply || t('chat:chatbot.error.apology');
@@ -151,11 +201,10 @@ const ChatBot = () => {
     } finally {
       dispatch({ type: 'set_sending', value: false });
     }
-  };
+  }, [t]);
 
-  const handleSend = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = state.input.trim();
+  const executeSendText = useCallback(async (text: string) => {
+    const trimmed = text.trim();
     if (!trimmed || state.isSending) return;
 
     dispatch({ type: 'set_error', value: '' });
@@ -169,6 +218,20 @@ const ChatBot = () => {
     const payload = buildPayload(nextMessages);
     lastPayloadRef.current = payload;
     await sendChat(payload);
+  }, [buildPayload, sendChat, state.isSending, state.messages]);
+
+  const handleSend = async (event: React.SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await executeSendText(state.input);
+  };
+
+  const handleSuggestionClick = async (promptText: string) => {
+    await executeSendText(promptText);
+  };
+
+  const handleReset = () => {
+    dispatch({ type: 'set_messages', value: [{ id: 'greeting', role: 'assistant', content: greeting }] });
+    dispatch({ type: 'reset_composer' });
   };
 
   const handleRetry = async () => {
@@ -189,32 +252,40 @@ const ChatBot = () => {
         onClick={() => dispatch({ type: 'toggle_open' })}
         aria-label={t('chat:chatbot.launcherAria')}
       >
-        <Image src={isEmployer ? CHATBOT_ICONS.EMPLOYER : CHATBOT_ICONS.JOB_SEEKER} alt="InfoHR AI" width={28} height={28} />
+        <Image src={isEmployer ? CHATBOT_ICONS.EMPLOYER : CHATBOT_ICONS.JOB_SEEKER} alt="AILA AI" width={28} height={28} />
         <span className="sq-chatbot__launcher-ring" />
       </button>
 
       <dialog className="sq-chatbot__panel" open aria-label={t('chat:chatbot.panelAria')}>
         <header className="sq-chatbot__header">
           <div className="sq-chatbot__title">
-            <span className="sq-chatbot__badge">
-              <Image src={LOGO_IMAGES.LOGO_WITH_BG} alt="InfoHR" width={28} height={28} style={{ borderRadius: 6, objectFit: 'contain' }} />
-            </span>
             <div>
-              <div className="sq-chatbot__name">{botConfig.CHAT_TITLE || 'InfoHR AI'}</div>
+              <div className="sq-chatbot__name">{botTitle}</div>
               <div className="sq-chatbot__status">
                 <span className="sq-chatbot__status-dot" />
-                {t('chat:chatbot.status')}
+                {botSubtitle}
               </div>
             </div>
           </div>
-          <button
-            className="sq-chatbot__close"
-            type="button"
-            onClick={() => dispatch({ type: 'close' })}
-            aria-label={t('chat:chatbot.closeAria')}
-          >
-            <CloseRoundedIcon fontSize="small" />
-          </button>
+          <div className="sq-chatbot__header-actions">
+            <button
+              className="sq-chatbot__icon-btn"
+              type="button"
+              onClick={handleReset}
+              title="Làm mới cuộc trò chuyện"
+              aria-label="Làm mới"
+            >
+              <RefreshRoundedIcon fontSize="small" />
+            </button>
+            <button
+              className="sq-chatbot__icon-btn"
+              type="button"
+              onClick={() => dispatch({ type: 'close' })}
+              aria-label={t('chat:chatbot.closeAria')}
+            >
+              <CloseRoundedIcon fontSize="small" />
+            </button>
+          </div>
         </header>
 
         <div className="sq-chatbot__messages" ref={listRef}>
@@ -225,6 +296,23 @@ const ChatBot = () => {
               </div>
             </div>
           ))}
+
+          {state.messages.length === 1 && suggestions.length > 0 && (
+            <div className="sq-chatbot__suggestions">
+              {suggestions.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className="sq-chatbot__suggestion-chip"
+                  onClick={() => handleSuggestionClick(item)}
+                  disabled={state.isSending}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          )}
+
           {state.isSending && (
             <div className="sq-chatbot__message sq-chatbot__message--assistant">
               <div className="sq-chatbot__bubble sq-chatbot__bubble--typing">

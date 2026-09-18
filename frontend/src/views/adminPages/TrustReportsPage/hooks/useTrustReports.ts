@@ -1,10 +1,10 @@
 'use client';
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
-import adminManagementService, { type AdminListParams } from '../../../../services/adminManagementService';
-import toastMessages from '../../../../utils/toastMessages';
-import type { PaginatedResponse } from '../../../../types/api';
-import type { TrustReport } from '../../../../types/models';
+import adminManagementService, { type AdminListParams } from '@/services/adminManagementService';
+import toastMessages from '@/utils/toastMessages';
+import type { PaginatedResponse } from '@/types/api';
+import type { TrustReport } from '@/types/models';
 import i18next from 'i18next';
 
 type UseTrustReportsResult = UseQueryResult<PaginatedResponse<TrustReport>> & {

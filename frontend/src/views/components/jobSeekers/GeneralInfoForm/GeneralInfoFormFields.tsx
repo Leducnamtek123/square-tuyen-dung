@@ -1,10 +1,10 @@
 import React from 'react';
 import { Grid2 as Grid } from '@mui/material';
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
+import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
 import type { Control } from 'react-hook-form';
-import type { SystemConfig } from '../../../../types/models';
+import type { SystemConfig } from '@/types/models';
 import type { TFunction } from 'i18next';
 import type { GeneralInfoFormValues } from './types';
 

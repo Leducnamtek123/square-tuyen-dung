@@ -191,6 +191,37 @@ TOOL_REGISTRY: list[dict[str, Any]] = [
             },
         },
     },
+    {
+        "name": "query_notebook_knowledge",
+        "displayName": "Query NotebookLM Knowledge Base",
+        "description": "Query company job descriptions, KPIs, HR regulations and evaluation standards directly from Google NotebookLM.",
+        "category": "recruitment",
+        "dangerLevel": "read",
+        "inputSchema": {
+            "type": "object",
+            "required": ["query"],
+            "properties": {
+                "query": {"type": "string", "description": "The specific job requirement, KPI, or HR standard question to query."},
+                "notebookId": {"type": "string", "description": "Optional NotebookLM ID (uses default if omitted)."},
+            },
+        },
+    },
+    {
+        "name": "evaluate_cv_with_notebook",
+        "displayName": "Evaluate CV against NotebookLM JD",
+        "description": "Cross-check candidate CV against exact job description and standards indexed in Google NotebookLM.",
+        "category": "recruitment",
+        "dangerLevel": "read",
+        "inputSchema": {
+            "type": "object",
+            "required": ["cvContent"],
+            "properties": {
+                "cvContent": {"type": "string", "description": "Text content or summary of the candidate CV."},
+                "jobTitle": {"type": "string", "description": "Target job position title."},
+                "notebookId": {"type": "string", "description": "Optional NotebookLM ID."},
+            },
+        },
+    },
 ]
 
 

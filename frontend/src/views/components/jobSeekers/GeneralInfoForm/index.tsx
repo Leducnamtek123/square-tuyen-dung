@@ -3,7 +3,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import * as yup from 'yup';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import { useConfig } from '@/hooks/useConfig';
 import GeneralInfoFormFields from './GeneralInfoFormFields';
 import type { TFunction } from 'i18next';

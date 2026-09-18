@@ -5,6 +5,7 @@ Re-exports all serializers so that existing import paths continue to work.
 from .company_serializers import (  # noqa: F401
     CompanyImageSerializer,
     CompanySerializer,
+    CompanyDetailSerializer,
     CompanyFollowedSerializer,
     TrustReportSerializer,
     AdminTrustReportSerializer,

@@ -33,17 +33,22 @@ import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-import DataTable from '../../../components/Common/DataTable';
-import TextFieldCustom from '../../../components/Common/Controls/TextFieldCustom';
-import SingleSelectCustom from '../../../components/Common/Controls/SingleSelectCustom';
+import DataTable from '@/components/Common/DataTable';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { JobSeekerProfile } from '../../../types/models';
-import dayjs from '../../../configs/dayjs-config';
-import { ROUTES } from '../../../configs/routeConfig';
-import { formatRoute } from '../../../utils/funcUtils';
-import adminManagementService, { Vieclam24hSourceOccupation } from '../../../services/adminManagementService';
-import type { Vieclam24hImportJob } from '../../../services/adminManagementService';
+import { useDataTable, useDebounce } from '@/hooks';
+import { JobSeekerProfile } from '@/types/models';
+import dayjs from '@/configs/dayjs-config';
+import { ROUTES } from '@/configs/routeConfig';
+import { formatRoute } from '@/utils/funcUtils';
+import adminManagementService, { Vieclam24hSourceOccupation } from '@/services/adminManagementService';
+import type { Vieclam24hImportJob } from '@/services/adminManagementService';
+import {
+    OperationTimeline,
+    adaptVieclam24hImportOperation,
+    useOperationContext,
+} from '@/components/operation';
 import { useProfiles } from './hooks/useProfiles';
 
 const IMPORT_JOB_STORAGE_KEY = 'admin-profiles-vieclam24h-import-job-id';
@@ -92,6 +97,7 @@ const ProfilesPage = () => {
     const { t } = useTranslation('admin');
     const { allConfig } = useConfig();
     const queryClient = useQueryClient();
+    const { registerOperation } = useOperationContext();
 
     const {
         page,
@@ -113,18 +119,53 @@ const ProfilesPage = () => {
     const debouncedSearch = useDebounce(filters.kw || '', 500);
     const previousFilterSignature = useRef('');
 
+    const filterSignature = useMemo(() => JSON.stringify({
+        kw: debouncedSearch,
+        cityId: filters.cityId,
+        careerId: filters.careerId,
+        experienceId: filters.experienceId,
+        positionId: filters.positionId,
+        academicLevelId: filters.academicLevelId,
+        typeOfWorkplaceId: filters.typeOfWorkplaceId,
+        jobTypeId: filters.jobTypeId,
+        genderId: filters.genderId,
+        maritalStatusId: filters.maritalStatusId,
+    }), [
+        debouncedSearch,
+        filters.cityId,
+        filters.careerId,
+        filters.experienceId,
+        filters.positionId,
+        filters.academicLevelId,
+        filters.typeOfWorkplaceId,
+        filters.jobTypeId,
+        filters.genderId,
+        filters.maritalStatusId,
+    ]);
+
+    useEffect(() => {
+        if (previousFilterSignature.current && previousFilterSignature.current !== filterSignature) {
+            onPaginationChange({ pageIndex: 0, pageSize });
+        }
+        previousFilterSignature.current = filterSignature;
+    }, [filterSignature, onPaginationChange, pageSize]);
+
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openBulkDeleteDialog, setOpenBulkDeleteDialog] = useState(false);
     const [openImportDialog, setOpenImportDialog] = useState(() => Boolean(readPersistedImportJobId()));
     const [currentProfile, setCurrentProfile] = useState<JobSeekerProfile | null>(null);
     const [importForm, setImportForm] = useState({
-        sourceUrl: 'https://ntd.vieclam24h.vn/employer/search/seeker',
+        sourceUrl: 'https://ntd.vieclam24h.vn/tim-kiem-ung-vien-nhanh',
         account: '',
         password: '',
         occupationIds: [] as number[],
     });
     const [importJobId, setImportJobId] = useState<number | null>(() => readPersistedImportJobId());
     const [importJob, setImportJob] = useState<Vieclam24hImportJob | null>(null);
+    const importOperation = useMemo(
+        () => adaptVieclam24hImportOperation(importJob),
+        [importJob]
+    );
 
     const queryParams = useMemo(
         () => ({
@@ -187,13 +228,27 @@ const ProfilesPage = () => {
 
     const occupationOptions: Vieclam24hSourceOccupation[] = useMemo(() => {
         const occupations = catalogQuery.data?.occupations || [];
-        const topIds = new Set(catalogQuery.data?.recommendedOccupationIds || []);
-        return occupations
+        const CORE_KEYWORDS = ['xây dựng', 'thiết kế', 'kiến trúc', 'điện', 'cơ khí'];
+        const filtered = occupations.filter((occupation) => {
+            const nameLower = (occupation.name || '').toLowerCase();
+            return CORE_KEYWORDS.some((kw) => nameLower.includes(kw));
+        });
+
+        if (filtered.length === 0) {
+            return [
+                { id: 31, name: 'Xây dựng', isTop: true, jobFieldIds: [] },
+                { id: 4, name: 'Kiến trúc - Thiết kế nội ngoại thất', isTop: true, jobFieldIds: [] },
+                { id: 41, name: 'Điện - Điện tử - Điện lạnh', isTop: true, jobFieldIds: [] },
+                { id: 47, name: 'Cơ khí - Ô tô - Tự động hóa', isTop: true, jobFieldIds: [] },
+            ];
+        }
+
+        return filtered
             .map((occupation) => ({
                 ...occupation,
-                isTop: occupation.isTop || topIds.has(occupation.id),
+                isTop: true,
             }))
-            .sort((a, b) => Number(b.isTop) - Number(a.isTop) || a.name.localeCompare(b.name, 'vi'));
+            .sort((a, b) => a.name.localeCompare(b.name, 'vi'));
     }, [catalogQuery.data]);
 
     useEffect(() => {
@@ -243,9 +298,10 @@ const ProfilesPage = () => {
 
     const columns = useMemo<ColumnDef<JobSeekerProfile>[]>(() => [
         {
-            accessorKey: 'id',
-            header: 'ID',
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             id: 'candidate',
@@ -260,10 +316,10 @@ const ProfilesPage = () => {
                         </Avatar>
                         <Box>
                             <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {user?.fullName || '—'}
+                                {user?.fullName || '-'}
                             </Typography>
                             <Typography variant="caption" color="textSecondary">
-                                {user?.email || '—'}
+                                {user?.email || '-'}
                             </Typography>
                         </Box>
                     </Box>
@@ -273,17 +329,17 @@ const ProfilesPage = () => {
         {
             accessorKey: 'phone',
             header: t('pages.profiles.table.phone') as string,
-            cell: (info) => (info.getValue() as string) || '—',
+            cell: (info) => (info.getValue() as string) || '-',
         },
         {
             accessorKey: 'currentJobTitle',
             header: t('pages.profiles.table.title') as string,
-            cell: (info) => (info.getValue() as string) || '—',
+            cell: (info) => (info.getValue() as string) || '-',
         },
         {
             accessorKey: 'createAt',
             header: t('pages.profiles.table.createdAt') as string,
-            cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—'),
+            cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-'),
         },
         {
             id: 'actions',
@@ -294,7 +350,7 @@ const ProfilesPage = () => {
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                         <Tooltip title={t('pages.profiles.table.view')}>
-                            <IconButton
+                            <IconButton aria-label="Xem chi tiết"
                                 size="small"
                                 component={Link}
                                 href={formatRoute(ROUTES.ADMIN.PROFILE_DETAIL, String(profile.id), ':id')}
@@ -304,7 +360,7 @@ const ProfilesPage = () => {
                             </IconButton>
                         </Tooltip>
                         <Tooltip title={t('pages.profiles.table.delete')}>
-                            <IconButton size="small" onClick={() => handleOpenDelete(profile)} color="error">
+                            <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(profile)} color="error">
                                 <DeleteIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
@@ -354,6 +410,10 @@ const ProfilesPage = () => {
             const job = await importCandidates(importForm);
             setImportJobId(job.id);
             setImportJob(job);
+            const op = adaptVieclam24hImportOperation(job);
+            if (op) {
+                registerOperation(op.id, op);
+            }
             setOpenImportDialog(true);
         } catch (error) {
             console.error(error);
@@ -363,7 +423,11 @@ const ProfilesPage = () => {
     useEffect(() => {
         if (!importJobQuery.data) return;
         setImportJob(importJobQuery.data);
-    }, [importJobQuery.data]);
+        const op = adaptVieclam24hImportOperation(importJobQuery.data);
+        if (op) {
+            registerOperation(op.id, op);
+        }
+    }, [importJobQuery.data, registerOperation]);
 
     useEffect(() => {
         if (!importJob) return;
@@ -419,47 +483,10 @@ const ProfilesPage = () => {
                 </Button>
             </Stack>
 
-            {importJob && (
-                <Paper
-                    sx={{
-                        p: 2,
-                        mb: 3,
-                        borderRadius: '12px',
-                        border: '1px solid',
-                        borderColor: importJob.status === 'failed' ? 'error.light' : 'primary.light',
-                        bgcolor: importJob.status === 'failed' ? 'error.50' : 'primary.50',
-                    }}
-                    elevation={0}
-                >
-                    <Stack spacing={1.25}>
-                        <Stack direction="row" alignItems="center" justifyContent="space-between" gap={2} flexWrap="wrap">
-                            <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                                    {importJob.status === 'completed'
-                                        ? t('pages.profiles.import.completedTitle', { defaultValue: 'Đã xong' })
-                                        : importJob.status === 'failed'
-                                            ? t('pages.profiles.import.failedTitle', { defaultValue: 'Đã lỗi' })
-                                            : t('pages.profiles.import.processingTitle', { defaultValue: 'Đang xử lý' })}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {importJob.status === 'completed'
-                                        ? t('pages.profiles.import.completedMessage', {
-                                              defaultValue: `Đã tạo ${importJob.createdCount} mới, cập nhật ${importJob.updatedCount}, bỏ qua ${importJob.skippedCount}.`,
-                                          })
-                                        : importJob.status === 'failed'
-                                            ? importJob.errorMessage || t('pages.profiles.import.failedMessage', { defaultValue: 'Tác vụ lấy ứng viên đã gặp lỗi.' })
-                                            : t('pages.profiles.import.processingMessage', {
-                                                  defaultValue: 'Hệ thống đang lấy và chuẩn hóa dữ liệu ứng viên trong nền.',
-                                              })}
-                                </Typography>
-                            </Box>
-                            <Typography variant="caption" sx={{ fontWeight: 800, color: importJob.status === 'failed' ? 'error.main' : 'primary.main' }}>
-                                {importJob.progress}%
-                            </Typography>
-                        </Stack>
-                        <LinearProgress variant="determinate" value={importJob.progress} sx={{ height: 8, borderRadius: 999 }} />
-                    </Stack>
-                </Paper>
+            {importOperation && (
+                <Box sx={{ mb: 3 }}>
+                    <OperationTimeline operation={importOperation} />
+                </Box>
             )}
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
@@ -715,35 +742,44 @@ const ProfilesPage = () => {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={openImportDialog} onClose={handleCloseImportDialog} fullWidth maxWidth="md">
-                <DialogTitle>{t('pages.profiles.import.dialogTitle')}</DialogTitle>
-                <DialogContent sx={{ pt: 1.5, maxHeight: '72vh' }} dividers>
-                    <Stack spacing={2} sx={{ mt: 1 }}>
+            <Dialog open={openImportDialog} onClose={handleCloseImportDialog} fullWidth maxWidth="sm">
+                <DialogTitle sx={{ fontWeight: 800, pb: 1 }}>
+                    {t('pages.profiles.import.dialogTitle', { defaultValue: 'Đồng bộ ứng viên từ Vieclam24h' })}
+                </DialogTitle>
+                <DialogContent sx={{ pt: 1.5, maxHeight: '78vh' }} dividers>
+                    <Stack spacing={2.5} sx={{ mt: 1 }}>
                         <TextField
-                            label={t('pages.profiles.import.sourceUrlLabel')}
+                            label={t('pages.profiles.import.sourceUrlLabel', { defaultValue: 'Source URL' })}
+                            placeholder="Nhập URL nguồn tìm kiếm"
                             value={importForm.sourceUrl}
                             onChange={(event) => setImportForm((prev) => ({ ...prev, sourceUrl: event.target.value }))}
                             fullWidth
                         />
                         <TextField
-                            label={t('pages.profiles.import.accountLabel')}
+                            label={t('pages.profiles.import.accountLabel', { defaultValue: 'Account' })}
+                            placeholder="Nhập email/tên tài khoản NTD"
                             value={importForm.account}
                             onChange={(event) => setImportForm((prev) => ({ ...prev, account: event.target.value }))}
                             fullWidth
                         />
                         <TextField
-                            label={t('pages.profiles.import.passwordLabel')}
+                            label={t('pages.profiles.import.passwordLabel', { defaultValue: 'Password' })}
                             type="password"
+                            placeholder="Nhập mật khẩu"
                             value={importForm.password}
                             onChange={(event) => setImportForm((prev) => ({ ...prev, password: event.target.value }))}
                             fullWidth
                         />
-                        <Divider sx={{ my: 0.5 }} />
                         <Autocomplete
                             multiple
                             options={occupationOptions}
                             loading={catalogQuery.isLoading}
                             disableCloseOnSelect
+                            noOptionsText={t('common.noOptions')}
+                            loadingText={t('common.loading')}
+                            openText={t('common.autocomplete.open')}
+                            closeText={t('common.autocomplete.close')}
+                            clearText={t('common.autocomplete.clear')}
                             value={occupationOptions.filter((option) => importForm.occupationIds.includes(option.id))}
                             onChange={(_, value) =>
                                 setImportForm((prev) => ({
@@ -764,70 +800,22 @@ const ProfilesPage = () => {
                                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                             {option.name}
                                         </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            #{option.id}
-                                            {option.isTop ? ' · Đề xuất' : ''}
-                                        </Typography>
                                     </Box>
                                 </li>
                             )}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    label={t('pages.profiles.import.careerLabel', { defaultValue: 'Ngành trọng điểm' })}
-                                    placeholder={t('pages.profiles.import.careerPlaceholder', { defaultValue: 'Chọn ngành cần lấy ứng viên' })}
-                                    helperText={
-                                        catalogQuery.isError
-                                            ? t('pages.profiles.import.catalogError', { defaultValue: 'Không tải được danh sách ngành nghề từ Vieclam24h.' })
-                                            : t('pages.profiles.import.occupationHelper', {
-                                                  defaultValue: 'Chọn một hoặc nhiều ngành nghề nguồn để AI lọc và chuẩn hóa hồ sơ.',
-                                              })
-                                    }
-                                    error={catalogQuery.isError}
+                                    label={t('pages.profiles.import.careerLabel', { defaultValue: 'Target industry' })}
+                                    placeholder={t('pages.profiles.import.careerPlaceholder', { defaultValue: 'Chọn ngành trọng điểm (Xây dựng, Kiến trúc, Điện, Cơ khí)' })}
                                     fullWidth
                                 />
                             )}
                         />
-                        {importJob && (
-                            <Paper
-                                variant="outlined"
-                                sx={{
-                                    p: 2,
-                                    borderRadius: 2,
-                                    bgcolor: importJob.status === 'failed' ? 'error.50' : 'primary.50',
-                                }}
-                            >
-                                <Stack spacing={1.25}>
-                                    <Stack direction="row" justifyContent="space-between" alignItems="center" gap={2}>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
-                                            {importJob.status === 'completed'
-                                                ? t('pages.profiles.import.completedTitle', { defaultValue: 'Đã xong' })
-                                                : importJob.status === 'failed'
-                                                    ? t('pages.profiles.import.failedTitle', { defaultValue: 'Đã lỗi' })
-                                                    : t('pages.profiles.import.processingTitle', { defaultValue: 'Đang xử lý' })}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: importJob.status === 'failed' ? 'error.main' : 'primary.main' }}>
-                                            {importJob.progress}%
-                                        </Typography>
-                                    </Stack>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={importJob.progress}
-                                        sx={{ height: 8, borderRadius: 999 }}
-                                    />
-                                    <Typography variant="body2" color="text.secondary">
-                                        {importJob.status === 'failed'
-                                            ? importJob.errorMessage || t('pages.profiles.import.failedMessage', { defaultValue: 'Tác vụ lấy ứng viên đã gặp lỗi.' })
-                                            : importJob.status === 'completed'
-                                                ? t('pages.profiles.import.completedMessage', {
-                                                      defaultValue: `Đã tạo ${importJob.createdCount} mới, cập nhật ${importJob.updatedCount}, bỏ qua ${importJob.skippedCount}.`,
-                                                  })
-                                                : t('pages.profiles.import.processingMessage', {
-                                                      defaultValue: 'Hệ thống đang lấy và chuẩn hóa dữ liệu ứng viên trong nền.',
-                                                  })}
-                                    </Typography>
-                                </Stack>
-                            </Paper>
+                        {importOperation && (
+                            <Box sx={{ mt: 1 }}>
+                                <OperationTimeline operation={importOperation} />
+                            </Box>
                         )}
                     </Stack>
                 </DialogContent>

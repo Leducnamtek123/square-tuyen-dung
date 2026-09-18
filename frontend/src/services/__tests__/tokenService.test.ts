@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import tokenService from '../tokenService';
-import { AUTH_CONFIG } from '../../configs/constants';
+import { AUTH_CONFIG } from '@/configs/constants';
 
 jest.mock('js-cookie');
 

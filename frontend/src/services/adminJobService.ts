@@ -27,6 +27,14 @@ const adminJobService = {
   deleteJob: (id: IdType): Promise<void> => {
     return httpRequest.delete(`job/web/admin-job-posts/${id}/`);
   },
+  bulkApproveJobs: (ids: IdType[]): Promise<{ updatedCount: number }> => {
+    return (httpRequest.post('job/web/admin-job-posts/bulk-approve/', { ids }) as Promise<unknown>)
+      .then(unwrapDataResponse<{ updatedCount: number }>);
+  },
+  bulkRejectJobs: (ids: IdType[], reason?: string): Promise<{ updatedCount: number }> => {
+    return (httpRequest.post('job/web/admin-job-posts/bulk-reject/', { ids, reason }) as Promise<unknown>)
+      .then(unwrapDataResponse<{ updatedCount: number }>);
+  },
 };
 
 export default adminJobService;

@@ -7,7 +7,7 @@ import { LiveKitRoom, RoomAudioRenderer, SessionProvider, useSession } from '@li
 import { TokenSource } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { AIInterviewLayout } from '../../../interviewPages/AIInterviewLayout';
+import { AIInterviewLayout } from '@/views/interviewPages/AIInterviewLayout';
 import InterviewAiEvaluationCard from './InterviewAiEvaluationCard';
 import InterviewAnalysisPanel from './InterviewAnalysisPanel';
 import InterviewHrEvaluationForm from './InterviewHrEvaluationForm';
@@ -24,14 +24,16 @@ import {
   getEvaluationFormValidationError,
 } from './evaluationFormValidation';
 import { useInterviewDetail, useInterviewMutations } from '../hooks/useEmployerQueries';
-import { useInterviewSSE } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
-import interviewService from '../../../../services/interviewService';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import { useInterviewSSE } from '@/views/employerPages/InterviewPages/hooks/useInterviewSSE';
+import interviewService from '@/services/interviewService';
+import toastMessages from '@/utils/toastMessages';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import { useTourAutoStart } from '@/components/Features/ProductTour';
 import type { AxiosError } from 'axios';
-import type { ApiError } from '../../../../types/api';
-import type { InterviewSession } from '../../../../types/models';
+import type { ApiError } from '@/types/api';
+import type { InterviewSession } from '@/types/models';
 import type { EvalFormType } from './types';
 
 const ACTIVE_STATUSES = ['scheduled', 'calibration', 'in_progress'];
@@ -107,7 +109,7 @@ const getLocalLiveKitUrl = () => {
   }
 };
 
-const resolveLiveKitServerUrl = (details: { serverUrl?: string; server_url?: string; url?: string }) => {
+const resolveLiveKitServerUrl = (details: { serverUrl?: string }) => {
   const localUrl = getLocalLiveKitUrl();
 
   if (
@@ -118,7 +120,7 @@ const resolveLiveKitServerUrl = (details: { serverUrl?: string; server_url?: str
     return localUrl;
   }
 
-  return details.serverUrl || details.server_url || details.url || localUrl;
+  return details.serverUrl || localUrl;
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -175,7 +177,7 @@ const InterviewDetailNotFound = ({
   actionLabel: string;
   onBack: () => void;
 }) => (
-  <Paper elevation={0} sx={{ textAlign: 'center', py: 10, px: 3, borderRadius: 2, bgcolor: 'background.paper', border: '1px dashed', borderColor: 'divider' }}>
+  <Paper elevation={0} sx={{ textAlign: 'center', py: 10, px: 3, borderRadius: 3, bgcolor: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)' }}>
     <Typography color="text.primary" variant="h5" sx={{ fontWeight: 800, mb: 1, letterSpacing: 0 }}>
       {title}
     </Typography>
@@ -194,6 +196,9 @@ const InterviewDetailCard = () => {
   const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
   const queryClient = useQueryClient();
   const [state, dispatch] = React.useReducer(reducer, initialState);
+
+  // Auto-start interview detail evaluation tour on first visit
+  useTourAutoStart('employer_interview_detail', 1000);
 
   const { data: session, isLoading: loading } = useInterviewDetail(id);
   const { submitEvaluation, isMutating: isInterviewMutating } = useInterviewMutations();
@@ -299,16 +304,22 @@ const InterviewDetailCard = () => {
     await ensureObserverConnection(true);
   };
 
-  const handleForceEndInterview = async () => {
+  const handleForceEndInterview = () => {
     if (!session?.roomName) return;
-    if (!window.confirm(t('interview:interviewDetail.messages.confirmForceEnd'))) return;
-    try {
-      await interviewService.updateSessionStatus(session.roomName, 'completed');
-      toastMessages.success(t('interview:interviewDetail.messages.forceEndSuccess'));
-      queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
-    } catch (e) {
-      errorHandling(e as AxiosError<{ errors?: ApiError }>);
-    }
+    confirmModal(
+      async () => {
+        try {
+          await interviewService.updateSessionStatus(session.roomName, 'completed');
+          toastMessages.success(t('interview:interviewDetail.messages.forceEndSuccess'));
+          queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
+        } catch (e) {
+          errorHandling(e as AxiosError<{ errors?: ApiError }>);
+        }
+      },
+      t('interview:interviewDetail.forceEndTitle', { defaultValue: 'Kết thúc phỏng vấn' }),
+      t('interview:interviewDetail.messages.confirmForceEnd'),
+      'warning'
+    );
   };
 
   const handleJoinAsHR = React.useCallback(async () => {
@@ -348,7 +359,7 @@ const InterviewDetailCard = () => {
   const recordingUrl = session.recordingUrl || session.recording_url || null;
   const liveKitReady = Boolean(isSessionActive && state.connectionDetails);
 
-  // â”€â”€ HR Presence fullscreen session â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // Phiên làm việc toàn màn hình của Nhà tuyển dụng
   if (state.hrConnected && state.hrConnectionDetails) {
     return (
       <Paper elevation={0} sx={{ position: 'fixed', inset: 0, zIndex: 1300, borderRadius: 0, bgcolor: '#020617' }}>
@@ -400,15 +411,19 @@ const InterviewDetailCard = () => {
         <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={3}>
             <InterviewInfoCard session={session} t={t} i18n={i18n} />
-            <InterviewAiEvaluationCard session={session} effectiveStatus={effectiveStatus} t={t} onTriggerAi={handleTriggerAi} isTriggeringAi={state.isTriggeringAi} />
-            <InterviewHrEvaluationForm
-              evalForm={state.evalForm}
-              onChange={handleEvalChange}
-              onSubmit={submitHRInfo}
-              disabled={isInterviewMutating || effectiveStatus !== 'completed'}
-              submitting={isInterviewMutating}
-              t={t}
-            />
+            <Box data-tour="interview-detail-score">
+              <InterviewAiEvaluationCard session={session} effectiveStatus={effectiveStatus} t={t} onTriggerAi={handleTriggerAi} isTriggeringAi={state.isTriggeringAi} />
+            </Box>
+            <Box data-tour="interview-detail-actions">
+              <InterviewHrEvaluationForm
+                evalForm={state.evalForm}
+                onChange={handleEvalChange}
+                onSubmit={submitHRInfo}
+                disabled={isInterviewMutating || effectiveStatus !== 'completed'}
+                submitting={isInterviewMutating}
+                t={t}
+              />
+            </Box>
             <InterviewQuestionsCard session={session} t={t} />
           </Stack>
         </Grid>
@@ -417,11 +432,13 @@ const InterviewDetailCard = () => {
           <Stack spacing={3}>
             <InterviewRecordingCard recordingUrl={recordingUrl} isCompleted={effectiveStatus === 'completed'} t={t} />
             <InterviewAnalysisPanel session={session} t={t} />
-            {liveKitReady ? (
-              <InterviewTranscriptPanelLive session={session} t={t} i18n={i18n} />
-            ) : (
-              <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
-            )}
+            <Box data-tour="interview-detail-transcript">
+              {liveKitReady ? (
+                <InterviewTranscriptPanelLive session={session} t={t} i18n={i18n} />
+              ) : (
+                <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
+              )}
+            </Box>
           </Stack>
         </Grid>
       </Grid>

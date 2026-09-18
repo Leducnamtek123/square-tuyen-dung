@@ -9,6 +9,7 @@ interface MapProps {
   subTitle?: string;
   latitude?: number;
   longitude?: number;
+  height?: string | number;
 }
 
 const MapContent: any = dynamic(() => import('./MapContent'), {

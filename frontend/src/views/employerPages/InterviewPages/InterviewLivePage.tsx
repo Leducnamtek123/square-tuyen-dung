@@ -1,25 +1,33 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import {
   Alert,
   Box,
   Button,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
   LinearProgress,
   Paper,
   Stack,
+  Switch,
+  TextField,
+  Tooltip,
   Typography,
+  alpha,
   useTheme,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
+import SearchOffIcon from '@mui/icons-material/SearchOff';
 
-import interviewService from '../../../services/interviewService';
-import { type InterviewSession } from '../../../types/models';
-import InterviewLiveCandidateCard from '../../../views/components/employers/InterviewLiveCandidateCard';
-import AIServiceHealthBanner from '../../../components/Features/AIServiceHealthBanner';
-import pc from '@/utils/muiColors';
+import interviewService from '@/services/interviewService';
+import { type InterviewSession } from '@/types/models';
+import InterviewLiveCandidateCard from '@/views/components/employers/InterviewLiveCandidateCard';
 import { getLiveInterviewSessions } from './liveInterviewSessions';
 
 type InterviewLivePageState = {
@@ -79,6 +87,23 @@ const InterviewLivePage = () => {
     () => getLiveInterviewSessions(state.allSessions),
     [state.allSessions],
   );
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredSessions = useMemo(() => {
+    if (!searchQuery.trim()) return activeSessions;
+    const q = searchQuery.trim().toLowerCase();
+    return activeSessions.filter((session) => {
+      const candidateName = (session.candidateName || '').toLowerCase();
+      const jobName = (
+        typeof session.questionGroup === 'object' && session.questionGroup && 'name' in session.questionGroup
+          ? String((session.questionGroup as any).name)
+          : session.jobName || ''
+      ).toLowerCase();
+      const room = (session.roomName || '').toLowerCase();
+      return candidateName.includes(q) || jobName.includes(q) || room.includes(q);
+    });
+  }, [activeSessions, searchQuery]);
 
   const fetchSessions = useCallback(async (opts?: { silent?: boolean }) => {
     const silent = opts?.silent ?? false;
@@ -141,45 +166,197 @@ const InterviewLivePage = () => {
   }, [fetchSessions, t]);
 
   return (
-    <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
+    <Box sx={{ px: { xs: 1.5, sm: 3 }, py: { xs: 2.5, sm: 3 }, maxWidth: 1600, mx: 'auto' }}>
+      {/* Top Header & Controls */}
       <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        direction={{ xs: 'column', md: 'row' }}
+        alignItems={{ xs: 'flex-start', md: 'center' }}
         justifyContent="space-between"
-        spacing={{ xs: 2, sm: 0 }}
-        mb={3}
+        spacing={2}
+        sx={{
+          mb: 3.5,
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: 4,
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 4px 20px -2px rgba(15, 23, 42, 0.04)',
+        }}
       >
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            {t('interviewLive.title')}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            {t('interviewLive.subtitle')}
-          </Typography>
+        <Box sx={{ minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 0.5 }}>
+            <Box
+              sx={{
+                width: 38,
+                height: 38,
+                borderRadius: '12px',
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                color: 'primary.main',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <FiberManualRecordIcon
+                sx={{
+                  fontSize: 14,
+                  color: activeSessions.length > 0 ? '#EF4444' : '#94A3B8',
+                  animation: activeSessions.length > 0 ? 'liveDotPing 1.8s infinite' : 'none',
+                  '@keyframes liveDotPing': {
+                    '0%, 100%': { transform: 'scale(1)', opacity: 1 },
+                    '50%': { transform: 'scale(1.4)', opacity: 0.5 },
+                  },
+                }}
+              />
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
+              <Stack direction="row" alignItems="center" spacing={1.25} flexWrap="wrap">
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 800,
+                    letterSpacing: '-0.02em',
+                    color: 'text.primary',
+                    fontSize: { xs: '1.25rem', sm: '1.45rem' },
+                  }}
+                >
+                  {t('interviewLive.title')}
+                </Typography>
+                <Box
+                  sx={{
+                    px: 1.25,
+                    py: 0.25,
+                    borderRadius: '20px',
+                    bgcolor: activeSessions.length > 0 ? alpha('#EF4444', 0.1) : alpha(theme.palette.text.secondary, 0.08),
+                    border: '1px solid',
+                    borderColor: activeSessions.length > 0 ? alpha('#EF4444', 0.25) : 'divider',
+                    color: activeSessions.length > 0 ? '#EF4444' : 'text.secondary',
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                  }}
+                >
+                  {searchQuery.trim() && filteredSessions.length !== activeSessions.length
+                    ? `${filteredSessions.length}/${activeSessions.length} ${t('interviewLive.activeNow').toLowerCase()}`
+                    : `${activeSessions.length} ${t('interviewLive.activeNow').toLowerCase()}`}
+                </Box>
+              </Stack>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.25, fontWeight: 500 }}>
+                {t('interviewLive.subtitle')}
+              </Typography>
+            </Box>
+          </Stack>
         </Box>
 
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <Button
-            variant="outlined"
-            color={state.autoRefresh ? 'primary' : 'inherit'}
-            onClick={() => dispatch({ type: 'toggle-auto-refresh' })}
-            sx={{ px: 2, textTransform: 'none' }}
-          >
-            {state.autoRefresh ? t('interviewLive.autoRefresh.on') : t('interviewLive.autoRefresh.off')}
-          </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => fetchSessions()}
-            startIcon={<RefreshIcon />}
-            sx={{ px: 2, textTransform: 'none' }}
-          >
-            {state.refreshing ? t('interviewLive.updating') : t('common:actions.refresh')}
-          </Button>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.5}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+          sx={{ width: { xs: '100%', md: 'auto' }, flexShrink: 0 }}
+        >
+          {/* Candidate search toolbar */}
+          <TextField
+            size="small"
+            placeholder={t('interviewLive.searchPlaceholder', 'Tìm theo tên ứng viên, vị trí...')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                </InputAdornment>
+              ),
+              endAdornment: searchQuery ? (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={() => setSearchQuery('')} edge="end" sx={{ p: 0.25 }}>
+                    <CloseIcon sx={{ fontSize: 15 }} />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+              sx: {
+                borderRadius: '10px',
+                fontSize: '0.8125rem',
+                bgcolor: 'background.paper',
+                height: 38,
+                '& fieldset': {
+                  borderColor: 'divider',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'primary.main',
+                },
+              },
+            }}
+            sx={{ width: { xs: '100%', sm: 240, md: 260 } }}
+          />
+
+          <Stack direction="row" spacing={1} alignItems="center">
+            {/* Auto-refresh toggle */}
+            <Tooltip title={state.autoRefresh ? 'Tắt tự động làm mới' : 'Bật tự động làm mới (mỗi 5s)'} arrow>
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={state.autoRefresh}
+                    onChange={() => dispatch({ type: 'toggle-auto-refresh' })}
+                    color="primary"
+                    sx={{ mr: 0.25 }}
+                  />
+                }
+                label={
+                  <Typography variant="body2" sx={{ fontSize: '0.78rem', fontWeight: 700, color: 'text.secondary', userSelect: 'none', whiteSpace: 'nowrap' }}>
+                    {state.autoRefresh ? t('interviewLive.autoRefresh.on', 'Tự động') : t('interviewLive.autoRefresh.off', 'Tắt')}
+                  </Typography>
+                }
+                sx={{
+                  m: 0,
+                  px: 1.25,
+                  py: 0.5,
+                  borderRadius: '10px',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
+                  height: 38,
+                }}
+              />
+            </Tooltip>
+
+            {/* Refresh icon button */}
+            <Tooltip title={state.refreshing ? t('interviewLive.updating') : t('common:actions.refresh')} arrow>
+              <span>
+                <IconButton
+                  onClick={() => fetchSessions()}
+                  disabled={state.refreshing}
+                  size="small"
+                  sx={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: '10px',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    color: 'text.primary',
+                    bgcolor: 'background.paper',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      bgcolor: alpha(theme.palette.primary.main, 0.04),
+                    },
+                  }}
+                >
+                  <RefreshIcon
+                    sx={{
+                      fontSize: 19,
+                      animation: state.refreshing ? 'spin 1s linear infinite' : 'none',
+                      '@keyframes spin': {
+                        '0%': { transform: 'rotate(0deg)' },
+                        '100%': { transform: 'rotate(360deg)' },
+                      },
+                    }}
+                  />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Stack>
         </Stack>
       </Stack>
-
-      <AIServiceHealthBanner />
 
       {state.error && (
         <Alert
@@ -189,47 +366,133 @@ const InterviewLivePage = () => {
               {t('common:actions.retry')}
             </Button>
           }
-          sx={{ mb: 2 }}
+          sx={{ mb: 3, borderRadius: 3 }}
         >
           {state.error}
         </Alert>
       )}
 
       {state.loading && (
-        <Box sx={{ width: '100%', mb: 2 }}>
-          <LinearProgress color="primary" sx={{ height: 4, borderRadius: 3 }} />
+        <Box sx={{ width: '100%', mb: 3 }}>
+          <LinearProgress
+            color="primary"
+            sx={{
+              height: 4,
+              borderRadius: 3,
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+            }}
+          />
         </Box>
       )}
 
-      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
-        <FiberManualRecordIcon sx={{ fontSize: 12, color: theme.palette.primary.main, animation: 'liveDot 2s infinite', '@keyframes liveDot': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.35 } } }} />
-        <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
-          {t('interviewLive.activeNow')}
-        </Typography>
-      </Stack>
-
+      {/* Main Content Area */}
       {activeSessions.length === 0 && !state.loading ? (
         <Paper
           elevation={0}
           sx={{
-            p: 4,
+            py: 8,
+            px: 3,
             borderRadius: 4,
             border: '1px dashed',
             borderColor: 'divider',
-            bgcolor: pc.bgPaper( 0.8),
+            bgcolor: 'background.paper',
             textAlign: 'center',
+            maxWidth: 640,
+            mx: 'auto',
+            my: 4,
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>
+          <Box
+            sx={{
+              width: 72,
+              height: 72,
+              borderRadius: '20px',
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              color: 'primary.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mx: 'auto',
+              mb: 2.5,
+            }}
+          >
+            <FiberManualRecordIcon sx={{ fontSize: 28, color: 'text.disabled' }} />
+          </Box>
+          <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', mb: 1, letterSpacing: '-0.01em' }}>
             {t('interviewLive.noData.title')}
           </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 440, mx: 'auto', lineHeight: 1.6 }}>
             {t('interviewLive.noData.subtitle')}
           </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => fetchSessions()}
+            startIcon={<RefreshIcon />}
+            sx={{ mt: 3, borderRadius: '10px', textTransform: 'none', fontWeight: 700 }}
+          >
+            {t('common:actions.refresh')}
+          </Button>
+        </Paper>
+      ) : filteredSessions.length === 0 && !state.loading ? (
+        <Paper
+          elevation={0}
+          sx={{
+            py: 7,
+            px: 3,
+            borderRadius: 4,
+            border: '1px dashed',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            textAlign: 'center',
+            maxWidth: 520,
+            mx: 'auto',
+            my: 4,
+          }}
+        >
+          <Box
+            sx={{
+              width: 56,
+              height: 56,
+              borderRadius: '16px',
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              color: 'text.secondary',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mx: 'auto',
+              mb: 2,
+            }}
+          >
+            <SearchOffIcon sx={{ fontSize: 28 }} />
+          </Box>
+          <Typography variant="h6" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.75 }}>
+            {t('interviewLive.noSearchMatch', 'Không tìm thấy phiên phỏng vấn phù hợp')}
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 400, mx: 'auto', mb: 2.5 }}>
+            {t('interviewLive.noSearchMatchHint', 'Thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc')}
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => setSearchQuery('')}
+            sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 700 }}
+          >
+            {t('common:actions.clear', 'Xóa bộ lọc')}
+          </Button>
         </Paper>
       ) : (
-        <Stack spacing={2}>
-          {activeSessions.map((session) => (
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              md: 'repeat(2, 1fr)',
+            },
+            gap: 2.5,
+          }}
+        >
+          {filteredSessions.map((session) => (
             <InterviewLiveCandidateCard
               key={session.id}
               session={session}
@@ -237,7 +500,7 @@ const InterviewLivePage = () => {
               isForceEnding={state.actionLoadingId === session.id}
             />
           ))}
-        </Stack>
+        </Box>
       )}
     </Box>
   );

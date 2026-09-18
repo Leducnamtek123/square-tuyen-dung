@@ -1,10 +1,10 @@
-import InterviewPreviewPage from '@/views/adminPages/InterviewPreviewPage';
 import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import InterviewPreviewPage from '@/views/adminPages/InterviewPreviewPage';
 
-export const metadata: Metadata = {
-  title: 'Interview UI Preview | InfoHR Admin',
-  description: 'Preview the full interview flow with fake data.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('admin.interview-preview');
+}
 
 export default function Page() {
   return <InterviewPreviewPage />;

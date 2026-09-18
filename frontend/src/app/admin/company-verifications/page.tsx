@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import CompanyVerificationsPage from '@/views/adminPages/CompanyVerificationsPage';
 
-export const metadata = {
-  title: 'Company Verifications',
-  description: 'Admin company verification review.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('admin.company-verifications');
+}
 
 export default function Page() {
   return <CompanyVerificationsPage />;

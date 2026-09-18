@@ -1,5 +1,5 @@
 /**
- * Typed API client — wraps httpRequest with proper generics.
+ * Typed API client - wraps httpRequest with proper generics.
  *
  * Usage:
  *   import { api } from '@/utils/apiClient';
@@ -7,7 +7,7 @@
  *   const jobs = await api.get<PaginatedResponse<JobPost>>('job/web/job-posts/', { params });
  *
  * Because httpRequest's response interceptor already unwraps `response.data.data`,
- * the return value is the actual payload — NOT an AxiosResponse.
+ * the return value is the actual payload - NOT an AxiosResponse.
  * This wrapper makes that explicit via generics.
  */
 

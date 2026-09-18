@@ -10,7 +10,7 @@ const readRepoSource = (relativePath: string) =>
 describe('admin table ordering contract', () => {
   it('keeps audit log sortable column ids aligned with backend ordering fields', () => {
     const pageSource = readAdminSource('AuditLogsPage/index.tsx');
-    const backendSource = readRepoSource('api/common/views.py');
+    const backendSource = readRepoSource('api/apps/common/views.py');
 
     expect(backendSource).toContain('ordering_fields = ["id", "create_at", "action", "resource_type"]');
     expect(pageSource).not.toContain("accessorKey: 'createAt'");

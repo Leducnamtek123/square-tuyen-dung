@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useForm, useWatch, Resolver } from 'react-hook-form';
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 import { useTranslation } from 'react-i18next';
-import useDebounce from '../../../../hooks/useDebounce';
-import errorHandling from '../../../../utils/errorHandling';
-import commonService from '../../../../services/commonService';
-import goongService from '../../../../services/goongService';
-import type { PlacePrediction } from '../../../../services/goongService';
+import useDebounce from '@/hooks/useDebounce';
+import errorHandling from '@/utils/errorHandling';
+import commonService from '@/services/commonService';
+import goongService from '@/services/goongService';
+import type { PlacePrediction } from '@/services/goongService';
 import { JobPostFormValues, getJobPostSchema } from './JobPostSchema';
 import JobPostFormFields from './JobPostFormFields';
 import { useConfig } from '@/hooks/useConfig';
@@ -15,6 +15,7 @@ import type { SelectOption } from '@/types/models';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 import { shouldResetChildLocationValue } from '@/utils/locationForm';
 import { Alert, Stack } from '@mui/material';
+import usePreventUnsavedChanges from '@/hooks/usePreventUnsavedChanges';
 
 interface JobPostFormProps {
   handleAddOrUpdate: (data: JobPostFormValues) => void;
@@ -58,6 +59,8 @@ const buildInitialValues = (editData: Partial<JobPostFormValues> | null): JobPos
     benefitsEnjoyed: createEditorStateFromHTMLString(''),
     isUrgent: false,
     interviewTemplate: null,
+    autoInterviewEnabled: true,
+    minScreeningScore: 70,
     location: { city: '', district: '', address: '', lat: '', lng: '' },
   } as JobPostFormValues;
 
@@ -91,10 +94,12 @@ const JobPostFormContent = ({
   const schema = useMemo(() => getJobPostSchema(t), [t]);
   const initialValues = React.useMemo(() => buildInitialValues(editData), [editData]);
 
-  const { handleSubmit, control, setValue } = useForm<JobPostFormValues>({
+  const { handleSubmit, control, setValue, formState: { isDirty } } = useForm<JobPostFormValues>({
     resolver: typedYupResolver(schema),
     defaultValues: initialValues,
   });
+
+  usePreventUnsavedChanges(isDirty);
 
   const cityId = useWatch({ control, name: 'location.city' });
   const address = useWatch({ control, name: 'location.address' });
@@ -102,9 +107,11 @@ const JobPostFormContent = ({
   const prevCityIdRef = useRef<number | string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const loadDistricts = async (id: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(id);
+        if (!isMounted) return;
         const results = (Array.isArray(resData?.data) ? resData.data : []).map((district) => ({
           id: district.id,
           name: district.name,
@@ -116,7 +123,7 @@ const JobPostFormContent = ({
         dispatch({ type: 'setDistrictOptions', value: results });
         prevCityIdRef.current = id;
       } catch (error) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       }
     };
 
@@ -128,16 +135,22 @@ const JobPostFormContent = ({
       dispatch({ type: 'setDistrictOptions', value: [] });
       prevCityIdRef.current = null;
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [cityId, setValue]);
 
   useEffect(() => {
+    let isMounted = true;
     const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
-        dispatch({ type: 'setLocationOptions', value: [] });
+        if (isMounted) dispatch({ type: 'setLocationOptions', value: [] });
         return;
       }
       try {
         const resData = await goongService.getPlaces(input);
+        if (!isMounted) return;
         const predictions = Array.isArray(resData?.predictions) ? resData.predictions : [];
         dispatch({
           type: 'setLocationOptions',
@@ -152,6 +165,9 @@ const JobPostFormContent = ({
       }
     };
     void loadLocation(addressDebounce);
+    return () => {
+      isMounted = false;
+    };
   }, [addressDebounce]);
 
   const handleSelectLocation = async (_e: React.SyntheticEvent, value: PlaceOption | null) => {
@@ -169,6 +185,14 @@ const JobPostFormContent = ({
     }
   };
 
+  const locationValue = useWatch({ control, name: 'location' });
+
+  const handleLocationChange = (val: { address?: string; lat?: number | string | null; lng?: number | string | null }) => {
+    if (val.address) setValue('location.address', val.address, { shouldDirty: true, shouldValidate: true });
+    if (val.lat !== null && val.lat !== undefined) setValue('location.lat', val.lat, { shouldDirty: true });
+    if (val.lng !== null && val.lng !== undefined) setValue('location.lng', val.lng, { shouldDirty: true });
+  };
+
   const errorText = serverErrors ? Object.values(serverErrors).flat().join(' ') : '';
 
   return (
@@ -182,7 +206,8 @@ const JobPostFormContent = ({
           districtOptions={state.districtOptions}
           locationOptions={state.locationOptions}
           interviewTemplateOptions={questionGroupOptions}
-          handleSelectLocation={handleSelectLocation}
+          locationValue={locationValue}
+          onLocationChange={handleLocationChange}
         />
       </Stack>
     </form>

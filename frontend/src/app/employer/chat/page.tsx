@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import ChatPage from '@/views/chatPages/ChatPage';
 
-export const metadata = {
-  title: 'Employer Chat',
-  description: 'Browse Employer Chat.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.chat');
+}
 
 export default function Page() {
   return <ChatPage />;

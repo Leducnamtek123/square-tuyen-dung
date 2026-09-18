@@ -31,8 +31,8 @@
       "jobSeeker": "Hello! I am InfoHR AI, your career assistant. Are you looking for a job or need any advice?"
     },
     "systemPrompt": {
-      "employer": "You are InfoHR AI, an intelligent AI assistant for employers on the InfoHR-Tuyen-Dung platform. You are knowledgeable about the labor market, JD writing, and professional interview processes.",
-      "jobSeeker": "You are InfoHR AI, an intelligent AI assistant for job seekers on the InfoHR-Tuyen-Dung platform. You help them find jobs, advise on CV editing, and interview preparation."
+      "employer": "You are InfoHR AI, an intelligent AI assistant for employers on the InfoHR-Tuyen-Dung platform. You are knowledgeable about the labor market, JD writing, and professional interview processes. Respond directly, concisely, and friendly using clean Markdown formatting. Never expose or quote raw context or source blocks.",
+      "jobSeeker": "You are InfoHR AI, an intelligent AI assistant for job seekers on the InfoHR-Tuyen-Dung platform. You help them find jobs, advise on CV editing, and interview preparation. Respond directly, concisely, and friendly using clean Markdown formatting. Never expose or quote raw context or source blocks."
     },
     "error": {
       "apology": "Sorry, I encountered a slight problem processing this question.",
@@ -44,7 +44,9 @@
     "panelAria": "InfoHR AI chat",
     "launcherAria": "Open InfoHR AI assistant",
     "closeAria": "Close chat",
-    "retry": "Retry"
+    "retry": "Retry",
+    "subtitleEmployer": "Smart recruitment assistant for Employers",
+    "subtitleJobSeeker": "AI job search and profile optimization assistant"
   },
   "loadPreviousMessages": "Load previous messages",
   "typeAMessage": "Type a message...",
@@ -52,6 +54,28 @@
     "index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32": "Choose a conversation from the list on the left to start messaging"
   },
   "slogan": "New way to follow your chance.",
-  "sloganSub": "More engage, more success"
+  "sloganSub": "More engage, more success",
+  "noSearchResults": "No matching conversations found",
+  "tryDifferentKeyword": "Try searching with a different keyword or name",
+  "startChatFromRight": "Select a job or candidate from the right to start messaging",
+  "conversationPartner": "Contact person",
+  "activeNow": "Active now",
+  "employerBadge": "Employer",
+  "candidateBadge": "Candidate",
+  "viewDetails": "View related details",
+  "backToList": "Back to list",
+  "chooseConversationHint": "Choose a conversation from the left or a job posting from the right to start chatting.",
+  "clickToDownload": "Click to download",
+  "suggestions": {
+    "findDesigners": "Find candidates for UI/UX Designer role",
+    "writeInterviewInvite": "Draft an interview invitation email",
+    "marketSalary": "Current market salary benchmarks",
+    "findFrontendJobs": "Find Frontend Developer jobs",
+    "downloadEnglishCv": "Download English CV templates",
+    "salaryInterviewTips": "Tips on discussing salary in an interview"
+  },
+  "startWithGreeting": "Start the conversation with a warm greeting",
+  "startConversationWith": "Start conversation with {{name}}",
+  "startConversation": "Start conversation",
+  "sendFirstMessageHint": "Send a greeting or ask a question to connect right away."
 }
-

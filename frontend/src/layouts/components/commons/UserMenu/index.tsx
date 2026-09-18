@@ -1,8 +1,7 @@
 'use client';
 import React, { useMemo } from "react";
-import { useAppSelector } from '@/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { usePathname, useRouter } from 'next/navigation';
-import { useDispatch } from "react-redux";
 import { useTranslation } from 'react-i18next';
 import { Button, Menu, Stack, Typography } from "@mui/material";
 
@@ -12,25 +11,25 @@ import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import LogoutIcon from "@mui/icons-material/Logout";
 import Feedback from '@/components/Features/Feedback';
 
-import { confirmModal } from "../../../../utils/sweetalert2Modal";
-import errorHandling from "../../../../utils/errorHandling";
+import { confirmModal } from "@/utils/sweetalert2Modal";
+import errorHandling from "@/utils/errorHandling";
 
-import { removeUserInfo } from "../../../../redux/userSlice";
-import { setActiveWorkspace } from "../../../../redux/userSlice";
+import { removeUserInfo } from "@/redux/userSlice";
+import { setActiveWorkspace } from "@/redux/userSlice";
 
-import { HOST_NAME, ROLES_NAME, ROUTES } from "../../../../configs/constants";
-import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";
-import { localizeRoutePath } from "../../../../configs/routeLocalization";
-import tokenService from "../../../../services/tokenService";
+import { HOST_NAME, ROLES_NAME, ROUTES } from "@/configs/constants";
+import { isAdminPortalPath, isEmployerPortalPath } from "@/configs/portalRouting";
+import { localizeRoutePath } from "@/configs/routeLocalization";
+import tokenService from "@/services/tokenService";
 import type { Workspace } from '@/types/models';
-import type { ApiError } from '../../../../types/api';
+import type { ApiError } from '@/types/api';
 import type { AxiosError } from 'axios';
-import type { AppDispatch } from '../../../../redux/store';
+import type { AppDispatch } from '@/redux/store';
 import {
   resetSearchCompany,
   resetSearchJobPostFilter,
   resetSearchResume,
-} from "../../../../redux/filterSlice";
+} from "@/redux/filterSlice";
 
 interface UserMenuProps {
   anchorElUser: HTMLElement | null;
@@ -56,17 +55,23 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const { t, i18n } = useTranslation('common');
   const { push } = useRouter();
   const pathname = usePathname() || "/";
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [feedbackOpen, setFeedbackOpen] = React.useState(false);
   const openFeedbackAfterMenuCloseRef = React.useRef(false);
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
   const canSubmitFeedback = !!currentUser && currentUser.roleName !== ROLES_NAME.ADMIN;
+  const [hostname, setHostname] = React.useState('');
+
+  React.useEffect(() => {
+    setHostname(window.location.hostname);
+  }, []);
+
   const isAdminPortal =
     isAdminPortalPath(pathname) ||
-    (typeof window !== "undefined" && window.location.hostname === HOST_NAME.ADMIN_PROJECT);
+    hostname === HOST_NAME.ADMIN_PROJECT;
   const isEmployerPortal =
     isEmployerPortalPath(pathname) ||
-    (typeof window !== "undefined" && window.location.hostname.startsWith("employer."));
+    hostname.startsWith("employer.");
   const shouldShowAdminPortalLink =
     currentUser?.roleName === ROLES_NAME.ADMIN && !isAdminPortal;
 
@@ -91,6 +96,40 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
 
   const menuItems = React.useMemo(() => {
     const items: MenuItem[] = [];
+
+    if (workspaces.length === 0 && currentUser && currentUser.roleName !== ROLES_NAME.ADMIN) {
+      const isEmployer = currentUser.roleName === ROLES_NAME.EMPLOYER || currentUser.canAccessEmployerPortal;
+      const isNotOnboarded = currentUser.isOnboarded === false;
+      const label = isEmployer
+        ? isNotOnboarded
+          ? t("nav.setupEmployer", { defaultValue: "Thiết lập doanh nghiệp" })
+          : t("nav.employerPortal", { defaultValue: "Quản lý tuyển dụng" })
+        : isNotOnboarded
+          ? t("nav.setupProfile", { defaultValue: "Hoàn tất hồ sơ ứng viên" })
+          : t("nav.accountManagement");
+
+      items.push({
+        key: 'default-workspace',
+        isSelected: false,
+        label,
+        onClick: () => {
+          if (isEmployer) {
+            if (isNotOnboarded) {
+              window.location.href = '/onboarding/employer';
+              return;
+            }
+            openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
+            return;
+          }
+          if (isNotOnboarded) {
+            window.location.href = '/onboarding/candidate';
+            return;
+          }
+          openPortal(false, ROUTES.JOB_SEEKER.DASHBOARD);
+        },
+      });
+    }
+
     workspaces.forEach((workspace) => {
       const key = `${workspace.type}-${workspace.companyId || "candidate"}`;
       const isSelected =
@@ -98,12 +137,15 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
         (workspace.type !== "company" ||
           Number(workspace.companyId) === Number(activeWorkspace?.companyId));
 
+      const rawRole = (workspace.roleCode || "member").toLowerCase();
+      const roleLabel = t(`nav.workspaceRoles.${rawRole}`, { defaultValue: workspace.roleCode || "member" });
+
       items.push({
         key,
         isSelected,
         label:
           workspace.type === "company"
-            ? `${workspace.label} (${workspace.roleCode || "member"})`
+            ? `${workspace.label} (${roleLabel})`
             : t("nav.accountManagement"),
         onClick: () => {
           const normalizedWorkspace: Workspace = {
@@ -113,7 +155,15 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
           };
           dispatch(setActiveWorkspace(normalizedWorkspace));
           if (workspace.type === "company") {
+            if (currentUser?.isOnboarded === false) {
+              window.location.href = '/onboarding/employer';
+              return;
+            }
             openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
+            return;
+          }
+          if (currentUser?.isOnboarded === false) {
+            window.location.href = '/onboarding/candidate';
             return;
           }
           openPortal(false, ROUTES.JOB_SEEKER.DASHBOARD);
@@ -121,12 +171,12 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
       });
     });
     return items;
-  }, [activeWorkspace, dispatch, openPortal, t, workspaces]);
+  }, [activeWorkspace, currentUser, dispatch, openPortal, t, workspaces]);
 
   const handleLogout = () => {
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
     const backend = tokenService.getProviderFromCookie() || '';
-    (dispatch as AppDispatch)(removeUserInfo({ accessToken, backend }))
+    dispatch(removeUserInfo({ accessToken, backend }))
       .unwrap()
       .then(() => {
         dispatch(resetSearchJobPostFilter());
@@ -279,7 +329,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
                 handleLogout,
                 t('nav.logoutTitle'),
                 t('nav.logoutConfirm'),
-                "question"
+                "logout"
               );
             }}
           >

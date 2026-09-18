@@ -1,5 +1,5 @@
 import React from "react";
-import InterviewSessionPageShared from "../../interviewPages/InterviewSessionPage";
+import InterviewSessionPageShared from "@/views/interviewPages/InterviewSessionPage";
 
 const InterviewSessionPage = () => <InterviewSessionPageShared participantRole="employer" />;
 

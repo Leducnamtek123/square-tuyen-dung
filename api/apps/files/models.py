@@ -13,6 +13,7 @@ class File(CommonBaseModel):
     WEB_BANNER_TYPE = "WEB_BANNER"
     MOBILE_BANNER_TYPE = "MOBILE_BANNER"
     SYSTEM_TYPE = "SYSTEM"
+    BUSINESS_LICENSE_TYPE = "BUSINESS_LICENSE"
     OTHER_TYPE = "OTHER"
 
     FILE_TYPES = [
@@ -25,6 +26,7 @@ class File(CommonBaseModel):
         (WEB_BANNER_TYPE, "Web Banner"),
         (MOBILE_BANNER_TYPE, "Mobile Banner"),
         (SYSTEM_TYPE, "System"),
+        (BUSINESS_LICENSE_TYPE, "Business License"),
         (OTHER_TYPE, "Other"),
     ]
 
@@ -84,12 +86,13 @@ class File(CommonBaseModel):
         cloudinary_upload_result,
         file_type: str = OTHER_TYPE,
     ):
+        from django.utils import timezone
         file_data = {
             "public_id": cloudinary_upload_result.get("public_id"),
             "version": cloudinary_upload_result.get("version"),
             "format": cloudinary_upload_result.get("format"),
             "resource_type": cloudinary_upload_result.get("resource_type"),
-            "uploaded_at": cloudinary_upload_result.get("created_at"),
+            "uploaded_at": cloudinary_upload_result.get("created_at") or timezone.now(),
             "metadata": cloudinary_upload_result,
             "file_type": file_type,
         }
@@ -102,6 +105,8 @@ class File(CommonBaseModel):
             file = File.objects.create(**file_data)
 
         return file
+
+    update_or_create_file_with_minio = update_or_create_file_with_cloudinary
 
     class Meta:
         db_table = "project_files"

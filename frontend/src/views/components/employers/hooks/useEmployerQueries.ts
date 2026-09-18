@@ -1,37 +1,37 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
-import statisticService from '../../../../services/statisticService';
-import resumeSavedService from '../../../../services/resumeSavedService';
-import resumeService from '../../../../services/resumeService';
-import jobPostActivityService from '../../../../services/jobPostActivityService';
-import jobService from '../../../../services/jobService';
-import interviewService from '../../../../services/interviewService';
-import voiceProfileService from '../../../../services/voiceProfileService';
-import questionService from '../../../../services/questionService';
-import questionGroupService from '../../../../services/questionGroupService';
-import companyService from '../../../../services/companyService';
-import companyImageService from '../../../../services/companyImageService';
-import { normalizePaginatedResponse } from '../../../../utils/apiResponse';
+import statisticService from '@/services/statisticService';
+import resumeSavedService from '@/services/resumeSavedService';
+import resumeService from '@/services/resumeService';
+import jobPostActivityService from '@/services/jobPostActivityService';
+import jobService from '@/services/jobService';
+import interviewService from '@/services/interviewService';
+import voiceProfileService from '@/services/voiceProfileService';
+import questionService from '@/services/questionService';
+import questionGroupService from '@/services/questionGroupService';
+import companyService from '@/services/companyService';
+import companyImageService from '@/services/companyImageService';
+import { normalizePaginatedResponse } from '@/utils/apiResponse';
 import { PaginatedResponse } from '@/types/api';
 import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup, CompanyImage, VoiceProfile } from '@/types/models';
-import type { ScheduleSessionInput } from '../../../../services/interviewService';
-import type { EmployerCandidateStats } from '../../../../services/statisticService';
-import type { JobPostInput } from '../../../../services/jobService';
-import type { GetJobPostsParams } from '../../../../services/jobService';
-import type { GetSessionsParams } from '../../../../services/interviewService';
-import type { EmployerRecruitmentStatItem } from '../../../../services/statisticService';
-import type { EmployerApplicationStats } from '../../../../services/statisticService';
-import type { EmployerGeneralStats } from '../../../../services/statisticService';
-import type { SubmitEvaluationInput } from '../../../../services/interviewService';
-import type { EmployerRecruitmentByRankStats } from '../../../../services/statisticService';
-import type { EmployerInterviewStats } from '../../../../services/statisticService';
-import type { EmployerStatsParams } from '../../../../services/statisticService';
-import type { QuestionPayload, QuestionListParams } from '../../../../services/questionService';
-import type { QuestionGroupPayload, QuestionGroupListParams } from '../../../../services/questionGroupService';
-import type { ResumeSavedListParams } from '../../../../services/resumeSavedService';
-import type { JobPostActivityListParams } from '../../../../services/jobPostActivityService';
-import type { GetResumesParams } from '../../../../services/resumeService';
+import type { ScheduleSessionInput } from '@/services/interviewService';
+import type { EmployerCandidateStats } from '@/services/statisticService';
+import type { JobPostInput } from '@/services/jobService';
+import type { GetJobPostsParams } from '@/services/jobService';
+import type { GetSessionsParams } from '@/services/interviewService';
+import type { EmployerRecruitmentStatItem } from '@/services/statisticService';
+import type { EmployerApplicationStats } from '@/services/statisticService';
+import type { EmployerGeneralStats } from '@/services/statisticService';
+import type { SubmitEvaluationInput } from '@/services/interviewService';
+import type { EmployerRecruitmentByRankStats } from '@/services/statisticService';
+import type { EmployerInterviewStats } from '@/services/statisticService';
+import type { EmployerStatsParams } from '@/services/statisticService';
+import type { QuestionPayload, QuestionListParams } from '@/services/questionService';
+import type { QuestionGroupPayload, QuestionGroupListParams } from '@/services/questionGroupService';
+import type { ResumeSavedListParams } from '@/services/resumeSavedService';
+import type { JobPostActivityListParams } from '@/services/jobPostActivityService';
+import type { GetResumesParams } from '@/services/resumeService';
 
-// ─── Types ───────────────────────────────────────────────────
+// --- Types ---------------------------------------------------
 type UseEmployerGeneralStatsResult = UseQueryResult<EmployerGeneralStats>;
 type UseEmployerApplicationStatsResult = UseQueryResult<EmployerApplicationStats>;
 type UseEmployerCandidateStatsResult = UseQueryResult<EmployerCandidateStats>;
@@ -85,7 +85,7 @@ export const normalizeJobPostOptions = (response: RawJobPostOptionResponse): Job
     .filter((option) => option.id !== undefined && option.id !== null && option.jobName);
 };
 
-// ─── Employer Statistics ─────────────────────────────────────
+// --- Employer Statistics -------------------------------------
 export const useEmployerGeneralStatistics = (): UseEmployerGeneralStatsResult => {
   return useQuery({
     queryKey: ['employerGeneralStatistics'],
@@ -146,7 +146,7 @@ export const useEmployerInterviewStatistics = (params: EmployerStatsParams = {})
   });
 };
 
-// ─── Job Posts ──────────────────────────────────────────────
+// --- Job Posts ----------------------------------------------
 export const useEmployerJobPosts = (params: GetJobPostsParams = {}): UseEmployerJobPostsResult => {
   return useQuery({
     queryKey: ['employerJobPosts', params],
@@ -193,7 +193,7 @@ export const useJobPostMutations = () => {
   };
 };
 
-// ─── Saved Resumes ──────────────────────────────────────────
+// --- Saved Resumes ------------------------------------------
 export const useSavedResumes = (params: ResumeSavedListParams): UseSavedResumesResult => {
   return useQuery({
     queryKey: ['savedResumes', params],
@@ -221,7 +221,7 @@ export const useToggleSaveResume = () => {
   };
 };
 
-// ─── Applied Resumes ────────────────────────────────────────
+// --- Applied Resumes ----------------------------------------
 export const useAppliedResumes = (params: JobPostActivityListParams, enabled: boolean = true): UseAppliedResumesResult => {
   return useQuery({
     queryKey: ['appliedResumes', params],
@@ -284,7 +284,7 @@ export const useUpdateApplicationStatus = () => {
   };
 };
 
-// ─── Employer Profile Search ────────────────────────────────
+// --- Employer Profile Search --------------------------------
 export const useEmployerResumes = (params: GetResumesParams): UseEmployerResumesResult => {
   return useQuery({
     queryKey: ['employerResumes', params],
@@ -300,8 +300,49 @@ export const useToggleSaveResumeOptimistic = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (slug: string) => resumeService.saveResume(slug),
-    onSuccess: () => {
+    onMutate: async (slug: string) => {
+      await queryClient.cancelQueries({ queryKey: ['employerResumes'] });
+      await queryClient.cancelQueries({ queryKey: ['resumeDetail', slug] });
+
+      const previousResumes = queryClient.getQueriesData({ queryKey: ['employerResumes'] });
+      const previousDetail = queryClient.getQueryData(['resumeDetail', slug]);
+
+      queryClient.setQueriesData({ queryKey: ['employerResumes'] }, (oldData: any) => {
+        if (!oldData || !Array.isArray(oldData.results)) return oldData;
+        return {
+          ...oldData,
+          results: oldData.results.map((resume: Resume) => {
+            if (resume.slug === slug) {
+              return { ...resume, isSaved: !resume.isSaved };
+            }
+            return resume;
+          }),
+        };
+      });
+
+      queryClient.setQueryData(['resumeDetail', slug], (oldDetail: any) => {
+        if (!oldDetail) return oldDetail;
+        return { ...oldDetail, isSaved: !oldDetail.isSaved };
+      });
+
+      return { previousResumes, previousDetail, slug };
+    },
+    onError: (_err, slug, context) => {
+      if (context?.previousResumes) {
+        context.previousResumes.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+      if (context?.previousDetail !== undefined) {
+        queryClient.setQueryData(['resumeDetail', slug], context.previousDetail);
+      }
+    },
+    onSettled: (_resData, _err, slug) => {
       queryClient.invalidateQueries({ queryKey: ['employerResumes'] });
+      queryClient.invalidateQueries({ queryKey: ['savedResumes'] });
+      if (slug) {
+        queryClient.invalidateQueries({ queryKey: ['resumeDetail', slug] });
+      }
     },
   });
 
@@ -320,7 +361,7 @@ export const useResumeDetail = (slug: string) => {
   });
 };
 
-// ─── Interview Management ────────────────────────────────────
+// --- Interview Management ------------------------------------
 export const useInterviewSessions = (params: GetSessionsParams = {}, refetchInterval?: number | false): UseInterviewSessionsResult => {
   return useQuery({
     queryKey: ['interviewSessions', params],
@@ -405,7 +446,7 @@ export const useInterviewMutations = () => {
   };
 };
 
-// ─── Questions & Groups ──────────────────────────────────────
+// --- Questions & Groups --------------------------------------
 export const useEmployerQuestions = (params: QuestionListParams = {}): UseEmployerQuestionsResult => {
   return useQuery({
     queryKey: ['employerQuestions', params],
@@ -486,7 +527,7 @@ export const useQuestionGroupMutations = () => {
   };
 };
 
-// ─── Company Profile ─────────────────────────────────────────
+// --- Company Profile -----------------------------------------
 export const useCompanyProfile = () => {
   return useQuery({
     queryKey: ['companyProfile'],

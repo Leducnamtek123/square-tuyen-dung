@@ -1,9 +1,10 @@
-﻿import IntroducePage from '@/views/employerPages/IntroducePage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import IntroducePage from '@/views/employerPages/IntroducePage';
 
-export const metadata = {
-  title: 'Giới thiệu',
-  description: 'Browse Employer Introduce.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.introduce');
+}
 
 export default function Page() {
   return <IntroducePage />;

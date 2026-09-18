@@ -36,22 +36,40 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const unwrapResponse = (response: { data?: unknown }): unknown => {
   const payload = response?.data;
-  return isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
-    ? payload.data
+  return isRecord(payload) && 'data' in (payload as object)
+    ? (payload as Record<string, unknown>).data
     : payload;
 };
 
 const requestPresign = async (url: string): Promise<string | null> => {
-  const accessToken = tokenService.getAccessTokenFromCookie();
-  const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
-  const response = await axios.get(`${getBaseUrl()}common/presign/`, {
-    params: { url },
-    headers,
-    withCredentials: true,
-    timeout: PRESIGN_REQUEST_TIMEOUT_MS,
-  });
-  const data = unwrapResponse(response) as { url?: string } | null;
-  return data?.url || null;
+  try {
+    const accessToken = tokenService.getAccessTokenFromCookie();
+    const headers = accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+    try {
+      const response = await axios.get(`${getBaseUrl()}common/presign/`, {
+        params: { url },
+        headers,
+        withCredentials: true,
+        timeout: PRESIGN_REQUEST_TIMEOUT_MS,
+      });
+      const data = unwrapResponse(response) as { url?: string } | null;
+      return data?.url || null;
+    } catch (firstErr: any) {
+      if (accessToken && firstErr?.response?.status === 401) {
+        // Stale or expired token: retry anonymously for public assets (logos, system icons)
+        const retryResponse = await axios.get(`${getBaseUrl()}common/presign/`, {
+          params: { url },
+          withCredentials: true,
+          timeout: PRESIGN_REQUEST_TIMEOUT_MS,
+        });
+        const retryData = unwrapResponse(retryResponse) as { url?: string } | null;
+        return retryData?.url || null;
+      }
+      throw firstErr;
+    }
+  } catch {
+    return null;
+  }
 };
 
 export const ensurePresignedUrl = async (
@@ -77,7 +95,7 @@ interface UrlLocation {
 /**
  * Simplified presignInObject: single-walk approach.
  *
- * 1. Deep clone the object first (safe — no cache mutation)
+ * 1. Deep clone the object first (safe - no cache mutation)
  * 2. Walk the clone once, collecting + replacing in-place
  *
  * This eliminates the fragile double-walk where clone tree order
@@ -97,7 +115,7 @@ export const presignInObject = async <T>(
     clone = (Array.isArray(value) ? [...value] : { ...value }) as T;
   }
 
-  // Phase 2: Single walk — collect all MinIO URL locations
+  // Phase 2: Single walk - collect all MinIO URL locations
   const locations: UrlLocation[] = [];
   const visited = new WeakSet();
 
@@ -135,7 +153,7 @@ export const presignInObject = async <T>(
     ),
   );
 
-  // Phase 4: Apply presigned URLs directly on the clone (safe — it's our copy)
+  // Phase 4: Apply presigned URLs directly on the clone (safe - it's our copy)
   for (const { path, presigned } of presignedResults) {
     if (typeof presigned !== 'string') continue;
 

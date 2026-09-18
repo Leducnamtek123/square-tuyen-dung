@@ -2,18 +2,45 @@ import toSlug from './customData';
 import { APP_NAME } from '../configs/constants';
 import { localizeRoutePath } from '../configs/routeLocalization';
 
-const downloadPdf = async (url: string, fileName?: string): Promise<void> => {
-  const fileDownloadName = `${APP_NAME}_CV-${toSlug(fileName || 'mytitle')}`;
-  const response = await fetch(url);
-  const blob = await response.blob();
-  const urlBlob = window.URL.createObjectURL(new Blob([blob]));
-  const link = document.createElement('a');
-  link.href = urlBlob;
-  link.setAttribute('download', `${fileDownloadName}.pdf`);
-  document.body.appendChild(link);
-  link.click();
-  if (link.parentNode) {
-    link.parentNode.removeChild(link);
+export const downloadPdf = async (url: string, fileName?: string): Promise<void> => {
+  if (!url || typeof window === 'undefined') return;
+  const rawBaseName = fileName || 'Square_CV';
+  const cleanBaseName = toSlug(rawBaseName.replace(/\.pdf$/i, ''));
+  const fileDownloadName = `${APP_NAME}_CV-${cleanBaseName || 'document'}.pdf`;
+
+  try {
+    const response = await fetch(url, { mode: 'cors' });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch file: ${response.status} ${response.statusText}`);
+    }
+    const blob = await response.blob();
+    const urlBlob = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = urlBlob;
+    link.download = fileDownloadName;
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+      window.URL.revokeObjectURL(urlBlob);
+    }, 250);
+  } catch (err) {
+    console.warn('[downloadPdf] Direct blob fetch failed (likely CORS), falling back to download anchor:', err);
+    // Fallback: create temporary direct download anchor
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileDownloadName;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    }, 250);
   }
 };
 

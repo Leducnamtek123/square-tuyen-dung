@@ -2,15 +2,33 @@
 .env
 .env.*
 !.env.example
+infra/fpt-gpu/*.env
+infra/fpt-gpu/*.runtime.env
+!infra/fpt-gpu/*.env.example
 
-# Database dumps
+# Secrets & Certificates
+.secrets/
+*.key
+*.pem
+*.crt
+docker/nginx/certs/
+frontend/docker/nginx/certs/
+
+# Database dumps & backups
 *.sql
+*.sql.gz
+!backups/db_backup_latest.sql.gz
+backups/*
+!backups/db_backup_latest.sql.gz
+!backups/README.md
 api/data/*.sql
 
 # Python
 __pycache__/
 *.py[cod]
 *.pyo
+.pytest_cache/
+*.egg-info/
 
 # Node
 node_modules/
@@ -41,10 +59,31 @@ audit_result*.txt
 build_err*.txt
 expect_output*.txt
 expect_cli_output*.txt
+temp_prompt.txt
+temp_*.txt
+prompt_*.txt
+*.mp3
+*.wav
 
-# Python cache
-.pytest_cache/
-*.egg-info/
+# AI Assistant & Tooling
+.superpowers/
+.agent/
+
+# Audit reports & screenshots
+docs/audit_reports/deep_screens_audit/
+docs/audit_reports/ntd_audit/
+docs/audit_reports/real_user_audit/
+docs/audit_reports/*.json
+docs/audit_reports/**/*.png
+*_findings.json
+deep_findings_report.txt
+audit_output.md
+
+# Test results & coverage
+playwright-report/
+test-results/
+coverage/
+.nyc_output/
 
 # Local isolated worktrees
 .worktrees/

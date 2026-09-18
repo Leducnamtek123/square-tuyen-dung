@@ -88,23 +88,18 @@ def convert_data_with_en_key_to_vn_kew(data, key_dict, show_status_number=True):
     return listNew
 
 def send_mail(subject, text_content, email_html, to=None, cc=None, bcc=None):
-
-    email = EmailMultiAlternatives(
-
-        subject,
-
-        text_content,
-
-        from_email=settings.EMAIL_HOST_USER,
-
-        to=to,
-
-        cc=cc,
-
-        bcc=bcc
-
-    )
-
-    email.attach_alternative(email_html, 'text/html')
-
-    return email.send()
+    from_email = getattr(settings, 'EMAIL_HOST_USER', '') or getattr(settings, 'DEFAULT_FROM_EMAIL', '') or 'noreply@tuyendung.studio'
+    try:
+        email = EmailMultiAlternatives(
+            subject,
+            text_content,
+            from_email=from_email,
+            to=to,
+            cc=cc,
+            bcc=bcc
+        )
+        email.attach_alternative(email_html, 'text/html')
+        return email.send()
+    except Exception as ex:
+        helper.print_log_error("utils.send_mail", ex)
+        return False

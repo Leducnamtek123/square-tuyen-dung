@@ -25,8 +25,9 @@ from .models import (
 )
 
 from apps.locations.models import Location
+from apps.profiles.models import Resume
 
-from common import serializers as common_serializers
+from apps.common import serializers as common_serializers
 
 from apps.profiles import serializers as info_serializers
 
@@ -161,6 +162,11 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     isExpired = serializers.SerializerMethodField(method_name='check_is_expired', read_only=True)
 
+    aiRecommendedCount = serializers.SerializerMethodField(method_name="get_ai_recommended_count", read_only=True)
+    ai_recommended_count = serializers.SerializerMethodField(method_name="get_ai_recommended_count", read_only=True)
+    aiRecommendedAvatars = serializers.SerializerMethodField(method_name="get_ai_recommended_avatars", read_only=True)
+    ai_recommended_avatars = serializers.SerializerMethodField(method_name="get_ai_recommended_avatars", read_only=True)
+
     from apps.interviews.models import QuestionGroup
     interviewTemplate = serializers.PrimaryKeyRelatedField(
         source='interview_template',
@@ -168,6 +174,13 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         required=False,
         allow_null=True
     )
+    isAutoSourcingEnabled = serializers.BooleanField(source='is_auto_sourcing_enabled', required=False, default=True)
+    autoSourcingLimit = serializers.IntegerField(source='auto_sourcing_limit', required=False, default=10)
+    autoInterviewEnabled = serializers.BooleanField(source='auto_interview_enabled', required=False, default=True)
+    minScreeningScore = serializers.IntegerField(source='min_screening_score', required=False, default=70)
+    cityChooseData = serializers.SerializerMethodField(method_name="get_city_choose_data", read_only=True)
+    careerChooseData = serializers.SerializerMethodField(method_name="get_career_choose_data", read_only=True)
+    fileUrl = serializers.SerializerMethodField(method_name="get_file_url", read_only=True)
 
     def get_fields(self):
         fields = super().get_fields()
@@ -202,6 +215,21 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     def get_city(self, obj):
         return obj.location.city.name if obj.location and obj.location.city else None
+
+    def get_city_choose_data(self, job_post):
+        if job_post.location and job_post.location.city:
+            return {'id': job_post.location.city.id, 'name': job_post.location.city.name}
+        return None
+
+    def get_career_choose_data(self, job_post):
+        if job_post.career:
+            return {'id': job_post.career.id, 'name': job_post.career.name}
+        return None
+
+    def get_file_url(self, job_post):
+        if job_post.company and job_post.company.logo:
+            return job_post.company.logo.get_full_url()
+        return None
 
     def get_applied_number(self, job_post):
 
@@ -249,14 +277,67 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return False
 
     def check_is_expired(self, job_post):
-
         deadline = job_post.deadline
-
         if deadline < timezone.localdate():
-
             return True
-
         return False
+
+    def _get_matching_resumes_info(self, job_post):
+        if hasattr(job_post, '_cached_matching_info'):
+            return job_post._cached_matching_info
+
+        # Single optimized queryset without multiple sequential .exists() checks
+        qs = Resume.objects.filter(
+            Q(job_seeker_profile__isnull=True) | Q(job_seeker_profile__is_seeking_job=True),
+            is_active=True
+        ).select_related('user', 'user__avatar')
+
+        if job_post.career_id:
+            matching = qs.filter(career_id=job_post.career_id)
+        elif job_post.job_name:
+            words = [w.strip() for w in job_post.job_name.split() if len(w.strip()) > 2]
+            if words:
+                query = Q()
+                for w in words:
+                    query |= Q(title__icontains=w) | Q(skills_summary__icontains=w)
+                matching = qs.filter(query)
+            else:
+                matching = qs
+        else:
+            matching = qs
+
+        resumes = list(matching[:3])
+        count = len(resumes) if len(resumes) < 3 else matching.count()
+
+        avatars = []
+        for r in resumes:
+            u = getattr(r, 'user', None)
+            name = (getattr(u, 'full_name', '') or getattr(u, 'username', '') or getattr(r, 'title', '') or "Ứng viên").strip()
+            initial = name[0].upper() if name else "U"
+            avatar_url = None
+            if u and getattr(u, 'avatar', None) and getattr(u.avatar, 'file', None):
+                try:
+                    avatar_url = helper.get_presigned_url(u.avatar.file.name)
+                except Exception:
+                    avatar_url = None
+
+            avatars.append({
+                "name": name,
+                "initial": initial,
+                "avatarUrl": avatar_url
+            })
+
+        info = (count, avatars)
+        job_post._cached_matching_info = info
+        return info
+
+    def get_ai_recommended_count(self, job_post):
+        count, _ = self._get_matching_resumes_info(job_post)
+        return count
+
+    def get_ai_recommended_avatars(self, job_post):
+        _, avatars = self._get_matching_resumes_info(job_post)
+        return avatars
 
 
 
@@ -314,7 +395,9 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
                   'isSaved', 'isApplied', 'companyDict', 'mobileCompanyDict', 'locationDict', 'views',
 
-                  'isExpired', 'salary', 'city', 'interviewTemplate')
+                  'isExpired', 'salary', 'city', 'cityChooseData', 'careerChooseData', 'fileUrl', 'interviewTemplate',
+                  'isAutoSourcingEnabled', 'autoSourcingLimit', 'autoInterviewEnabled', 'minScreeningScore',
+                  'aiRecommendedCount', 'aiRecommendedAvatars', 'ai_recommended_count', 'ai_recommended_avatars')
 
 
     def create(self, validated_data):
@@ -380,6 +463,11 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         except Exception as ex:
             helper.print_log_error("update job post", ex)
             raise
+
+
+class JobPostDetailSerializer(JobPostSerializer):
+    """Detailed serializer for JobPost including full metadata and relations."""
+    pass
 
 
 class JobPostAroundFilterSerializer(serializers.Serializer):
@@ -491,6 +579,13 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
 
     ], read_only=True)
 
+    fileUrl = serializers.SerializerMethodField(method_name="get_file_url", read_only=True)
+
+    def get_file_url(self, activity):
+        if activity.resume and getattr(activity.resume, "file", None):
+            return activity.resume.file.get_full_url()
+        return None
+
     def to_internal_value(self, data):
         if hasattr(data, "copy"):
             data = data.copy()
@@ -499,6 +594,11 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
 
         if "jobPost" in data and "job_post" not in data:
             data["job_post"] = data.get("jobPost")
+
+        if "resumeId" in data and "resume" not in data:
+            data["resume"] = data.get("resumeId")
+        elif "resume_id" in data and "resume" not in data:
+            data["resume"] = data.get("resume_id")
 
         return super().to_internal_value(data)
 
@@ -516,14 +616,14 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
                 raise serializers.ValidationError({"job_post": "Tin tuyển dụng đã hết hạn ứng tuyển."})
 
             if not job_post.company.is_verified:
-                raise serializers.ValidationError({"job_post": "CÃ´ng ty cá»§a tin tuyá»ƒn dá»¥ng chÆ°a Ä‘Æ°á»£c xÃ¡c thá»±c."})
+                raise serializers.ValidationError({"job_post": "Công ty của tin tuyển dụng chưa được xác thực."})
 
         return attrs
 
     class Meta:
         model = JobPostActivity
 
-        fields = ("id", "job_post", "resume", "fullName", "email", "phone",
+        fields = ("id", "job_post", "resume", "fullName", "email", "phone", "fileUrl",
 
                   "createAt", "updateAt", "jobPostDict", "mobileJobPostDict", "resumeDict")
 
@@ -602,6 +702,11 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
     aiAnalysisEffectiveScore = serializers.SerializerMethodField(method_name='get_ai_analysis_effective_score', read_only=True)
 
     resumeFileUrl = serializers.SerializerMethodField(method_name='get_resume_file_url', read_only=True)
+    fileUrl = serializers.SerializerMethodField(method_name='get_file_url', read_only=True)
+    cityChooseData = serializers.SerializerMethodField(method_name='get_city_choose_data', read_only=True)
+    careerChooseData = serializers.SerializerMethodField(method_name='get_career_choose_data', read_only=True)
+    resume = serializers.SerializerMethodField(method_name='get_resume', read_only=True)
+    resumeDict = serializers.SerializerMethodField(method_name='get_resume', read_only=True)
 
     def get_user_id(self, activity):
         return activity.user_id
@@ -629,11 +734,49 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
         return bool(activity.manual_candidate_profile_id)
 
     def get_resume_file_url(self, activity):
-        if activity.resume and activity.resume.file:
+        if activity.resume and getattr(activity.resume, "file", None):
             return activity.resume.file.get_full_url()
-        if activity.manual_candidate_profile and activity.manual_candidate_profile.file:
+        if activity.manual_candidate_profile and getattr(activity.manual_candidate_profile, "file", None):
             return activity.manual_candidate_profile.file.get_full_url()
         return None
+
+    def get_file_url(self, activity):
+        return self.get_resume_file_url(activity)
+
+    def get_city_choose_data(self, activity):
+        if activity.resume and activity.resume.city:
+            return {'id': activity.resume.city.id, 'name': activity.resume.city.name}
+        if activity.manual_candidate_profile and activity.manual_candidate_profile.city:
+            return {'id': activity.manual_candidate_profile.city.id, 'name': activity.manual_candidate_profile.city.name}
+        return None
+
+    def get_career_choose_data(self, activity):
+        if activity.resume and activity.resume.career:
+            return {'id': activity.resume.career.id, 'name': activity.resume.career.name}
+        if activity.manual_candidate_profile and activity.manual_candidate_profile.career:
+            return {'id': activity.manual_candidate_profile.career.id, 'name': activity.manual_candidate_profile.career.name}
+        return None
+
+    def get_resume(self, activity):
+        if not activity.resume:
+            return None
+        file_url = activity.resume.file.get_full_url() if (getattr(activity.resume, "file", None) and hasattr(activity.resume.file, 'get_full_url')) else None
+        city_data = {'id': activity.resume.city.id, 'name': activity.resume.city.name} if activity.resume.city else None
+        career_data = {'id': activity.resume.career.id, 'name': activity.resume.career.name} if activity.resume.career else None
+        return {
+            "id": activity.resume.id,
+            "slug": activity.resume.slug,
+            "title": activity.resume.title,
+            "type": activity.resume.type,
+            "fileUrl": file_url,
+            "cityChooseData": city_data,
+            "careerChooseData": career_data,
+            "skillsSummary": activity.resume.skills_summary,
+            "salaryMin": activity.resume.salary_min,
+            "salaryMax": activity.resume.salary_max,
+            "experience": activity.resume.experience,
+            "academicLevel": activity.resume.academic_level,
+        }
 
     def get_ai_analysis_reviewed_by(self, activity):
         user = getattr(activity, 'ai_analysis_reviewed_by', None)
@@ -673,14 +816,17 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                 "id": None,
                 "fullName": activity.full_name,
                 "email": activity.email,
-                "avatar": var_sys.AVATAR_DEFAULT["AVATAR"],
+                "avatar": None,
+                "avatarUrl": None,
                 "phone": activity.phone,
             }
+        avatar_url = user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None
         return {
             "id": user.id,
             "fullName": user.full_name,
             "email": user.email,
-            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else var_sys.AVATAR_DEFAULT["AVATAR"],
+            "avatar": avatar_url,
+            "avatarUrl": avatar_url,
             "phone": activity.phone,
         }
 
@@ -706,18 +852,31 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
         representation = super().to_representation(instance)
         if self.context.get("blind_screening"):
             representation["fullName"] = f"Candidate #{instance.id}"
+            representation["title"] = f"Hồ sơ ứng viên #{instance.id}"
             representation["email"] = None
             representation["phone"] = None
             representation["resumeFileUrl"] = None
             representation["resumeSlug"] = None
+            if representation.get("resume") and isinstance(representation["resume"], dict):
+                representation["resume"]["title"] = f"Hồ sơ ứng viên #{instance.id}"
+                representation["resume"]["fileUrl"] = None
+                representation["resume"]["slug"] = None
             representation["userDict"] = {
                 "id": instance.user_id,
                 "fullName": f"Candidate #{instance.id}",
                 "email": None,
-                "avatar": var_sys.AVATAR_DEFAULT["AVATAR"],
+                "avatar": None,
                 "phone": None,
             }
         return representation
+
+    def validate_status(self, value):
+        if self.instance:
+            current_status = self.instance.status
+            if current_status in [var_sys.ApplicationStatus.HIRED, var_sys.ApplicationStatus.NOT_SELECTED]:
+                if value == var_sys.ApplicationStatus.PENDING_CONFIRMATION:
+                    raise serializers.ValidationError("Không thể chuyển ngược trạng thái từ Đã Tuyển Dụng / Không Trúng Tuyển về Chờ Xác Nhận.")
+        return value
 
 
 
@@ -735,7 +894,12 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                   "aiAnalysisCriteria", "aiAnalysisEvidence",
                   "aiAnalysisReviewStatus", "aiAnalysisHrOverrideScore", "aiAnalysisHrOverrideNote",
                   "aiAnalysisReviewedAt", "aiAnalysisReviewedBy", "aiAnalysisEffectiveScore",
-                  "resumeFileUrl", "userDict", "jobPostDict", "companyDict")
+                  "resumeFileUrl", "fileUrl", "cityChooseData", "careerChooseData",
+                  "resume", "resumeDict", "userDict", "jobPostDict", "companyDict")
+
+
+JobPostActivitySerializer = EmployerJobPostActivitySerializer
+
 
 class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
@@ -888,4 +1052,40 @@ class StatisticsSerializer(serializers.Serializer):
     startDate = serializers.DateField(required=True)
 
     endDate = serializers.DateField(required=True)
+
+
+class JobOfferLetterSerializer(serializers.ModelSerializer):
+    statusLabel = serializers.CharField(source="get_status_display", read_only=True)
+    candidateName = serializers.CharField(source="candidate.full_name", read_only=True)
+    candidateEmail = serializers.CharField(source="candidate.email", read_only=True)
+    companyName = serializers.CharField(source="company.company_name", read_only=True)
+    jobName = serializers.CharField(source="job_post.job_name", read_only=True)
+
+    class Meta:
+        from .models import JobOfferLetter
+        model = JobOfferLetter
+        fields = (
+            "id", "application", "job_post", "company", "candidate",
+            "candidateName", "candidateEmail", "companyName", "jobName",
+            "position_title", "salary_offered", "allowance", "start_date",
+            "expiration_date", "work_location", "benefits_note",
+            "terms_and_conditions", "status", "statusLabel",
+            "candidate_signed_at", "candidate_feedback", "create_at", "update_at"
+        )
+        read_only_fields = ("id", "application", "company", "candidate", "job_post", "candidate_signed_at", "create_at", "update_at")
+
+    def validate(self, attrs):
+        start_date = attrs.get('start_date')
+        expiration_date = attrs.get('expiration_date')
+        salary_offered = attrs.get('salary_offered')
+        allowance = attrs.get('allowance')
+
+        if salary_offered is not None and salary_offered < 0:
+            raise serializers.ValidationError({"salary_offered": "Mức lương đề xuất không được là số âm."})
+        if allowance is not None and allowance < 0:
+            raise serializers.ValidationError({"allowance": "Phụ cấp không được là số âm."})
+        if start_date and expiration_date and expiration_date > start_date:
+            raise serializers.ValidationError({"expiration_date": "Hạn phản hồi thư mời phải trước hoặc bằng ngày nhận việc."})
+        return attrs
+
 

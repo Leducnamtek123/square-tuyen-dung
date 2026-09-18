@@ -6,7 +6,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
-import Map from "../../../../components/Common/Map";
+import Map from "@/components/Common/Map";
 import type { Location } from '@/types/models';
 import type { Company } from '@/types/models';
 import type { JobPost } from '@/types/models';
@@ -77,17 +77,18 @@ const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDeta
           </div>
         </div>
 
-        <div>
+        <div className="flex flex-col">
           <h3 className="text-lg font-semibold">
             {t("jobDetail.map")}
           </h3>
           <div className="mt-1 h-1 w-12 rounded bg-primary" />
-          <div className="mt-6 overflow-hidden rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
+          <div className="mt-6 flex-1 min-h-[260px] overflow-hidden rounded-xl border border-border/50 shadow-sm">
             <Map
               title={jobPostDetail?.jobName}
               subTitle={jobPostDetail?.location?.address}
               latitude={jobPostDetail?.location?.lat}
               longitude={jobPostDetail?.location?.lng}
+              height="100%"
             />
           </div>
         </div>

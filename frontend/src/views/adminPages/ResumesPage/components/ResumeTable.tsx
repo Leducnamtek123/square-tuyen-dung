@@ -6,9 +6,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
-import dayjs from '../../../../configs/dayjs-config';
-import { Resume } from '../../../../types/models';
+import DataTable from '@/components/Common/DataTable';
+import dayjs from '@/configs/dayjs-config';
+import { Resume } from '@/types/models';
 
 interface ResumeTableProps {
     data: Resume[];
@@ -91,12 +91,12 @@ const ResumeTable = ({ data, isLoading, rowCount, pagination, onPaginationChange
             cell: (info) => (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                     <Tooltip title={t('pages.resumes.table.viewDetails')}>
-                        <IconButton size="small" onClick={() => onEdit(info.row.original)}>
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onEdit(info.row.original)}>
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.resumes.table.delete')}>
-                        <IconButton size="small" onClick={() => onDelete(info.row.original)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onDelete(info.row.original)} color="error">
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

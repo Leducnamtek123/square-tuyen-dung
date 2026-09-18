@@ -23,7 +23,7 @@ const JobDetailInfoItem: React.FC<JobDetailInfoItemProps> = ({ title, value }) =
             {displayValue}
           </span>
         ) : (
-          <span className="text-xs italic text-zinc-300">
+          <span className="text-xs italic text-slate-500">
             {t("jobDetail.notUpdated")}
           </span>
         )}

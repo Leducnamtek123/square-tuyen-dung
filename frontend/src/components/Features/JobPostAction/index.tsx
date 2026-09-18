@@ -91,216 +91,114 @@ const JobPostAction = ({
 
       >
 
-        <Stack direction={stackDirection} spacing={2}>
-
-          <Box width={stackDirection === "row" ? "70%" : "100%"}>
-
-            <Stack direction="row" spacing={2}>
-
-              <Stack direction="row" justifyContent="center">
-
+        <Stack direction={stackDirection} spacing={2} justifyContent="space-between" alignItems="center">
+          <Box sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Stack direction="row" justifyContent="center" sx={{ flexShrink: 0 }}>
                 <MuiImageCustom
-
                   width={70}
-
                   height={70}
-
                   src={companyImageUrl || ''}
-
                   sx={{
-
                     borderRadius: 2,
-
                     border: `1px solid ${theme.palette.grey[200]}`,
-
                     p: 0.5,
-
                     backgroundColor: 'white',
-
                   }}
-
                 />
-
               </Stack>
-
               <Stack
-
                 flex={1}
-
                 justifyContent="space-between"
-
-                style={{ overflow: 'hidden' }}
-
+                style={{ overflow: 'hidden', minWidth: 0 }}
               >
-
                 <Box>
-
                   <Tooltip followCursor title={jobName}>
-
                     <Typography
-
                       component={detailHref ? Link : 'span'}
                       href={detailHref}
                       prefetch={Boolean(detailHref)}
                       variant="h6"
-
                       sx={{
-
                         fontSize: 16,
-
                         cursor: detailHref ? 'pointer' : 'default',
-
                         color: theme.palette.primary.main,
                         textDecoration: 'none',
-
                         transition: 'color 0.2s ease',
-
                         mb: 0.5,
-
                         '&:hover': {
-
                           color: theme.palette.primary.dark
-
                         }
-
                       }}
-
                       noWrap
-
                     >
-
                       {jobName}
-
                     </Typography>
-
                   </Tooltip>
-
                   <Tooltip followCursor title={companyName}>
-
                     <Typography
-
                       variant="body2"
-
                       sx={{
-
                         color: theme.palette.text.secondary,
-
                         fontWeight: 500,
-
                       }}
-
                       noWrap
-
                     >
-
                       {companyName}
-
                     </Typography>
-
                   </Tooltip>
-
                 </Box>
-
                 <Stack
-
                   direction="row"
-
                   spacing={2}
-
+                  flexWrap="wrap"
                   sx={{
-
                     '& .info-item': {
-
                       display: 'flex',
-
                       alignItems: 'center',
-
                       gap: 1,
-
                       color: theme.palette.text.secondary,
-
                       fontSize: '0.875rem',
-
                       '& svg': {
-
                         fontSize: 14,
-
                         color: theme.palette.grey[400]
-
                       }
-
                     }
-
                   }}
-
                 >
-
                   <Typography className="info-item">
-
                     <FontAwesomeIcon icon={faCircleDollarToSlot} />
-
                     {formatLocalizedSalaryRange(salaryMin, salaryMax, i18n.language)}
-
                   </Typography>
-
                   <Typography className="info-item">
-
                     <FontAwesomeIcon icon={faLocationDot} />
-
                     {tConfig(cityId ? allConfig?.cityDict?.[String(cityId)] : undefined) || (
-
                       <span style={{
-
                         color: theme.palette.grey[400],
-
                         fontStyle: 'italic',
-
                         fontSize: 13
-
                       }}>
-
                         {t('common:labels.notUpdated')}
-
                       </span>
-
                     )}
-
                   </Typography>
-
                   <Typography className="info-item">
-
                     <FontAwesomeIcon icon={faCalendarDays} />
-
                     {dayjs(deadline).format('DD/MM/YYYY')}
-
                   </Typography>
-
                 </Stack>
-
               </Stack>
-
             </Stack>
-
           </Box>
-
           <Stack
-
-            direction="row"
-
-            justifyContent="flex-end"
-
-            alignItems="center"
-
-            flex={1}
-
-            spacing={2}
-
+            direction="column"
+            justifyContent="center"
+            alignItems={stackDirection === "row" ? "flex-end" : "flex-start"}
+            sx={{ flexShrink: 0, minWidth: 0 }}
+            spacing={1}
           >
-
             {children}
-
           </Stack>
-
         </Stack>
 
       </Card>

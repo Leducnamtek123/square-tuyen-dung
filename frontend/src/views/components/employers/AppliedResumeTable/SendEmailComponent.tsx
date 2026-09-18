@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Button, Tooltip } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import MarkEmailReadRoundedIcon from '@mui/icons-material/MarkEmailReadRounded';
 
-import { convertEditorStateToHTMLString } from '../../../../utils/editorUtils';
+import { convertEditorStateToHTMLString } from '@/utils/editorUtils';
 import SendMailCard, { SendMailData, SendMailFormData } from '../SendMailCard';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import jobPostActivityService from '../../../../services/jobPostActivityService';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import jobPostActivityService from '@/services/jobPostActivityService';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
 import pc from '@/utils/muiColors';
 import { getAppliedResumeEmailActionState } from './sendEmailAction';
 
@@ -70,35 +70,37 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
     <>
       <Tooltip title={tooltipTitle} arrow>
         <span>
-          <Button
-            variant="contained"
+          <IconButton
+            aria-label={sentEmail ? t('appliedResume.email.resend') : t('appliedResume.email.send')}
             size="small"
             disabled={!emailActionState.canSend}
             onClick={() => handleOpenSendMail(email, fullName)}
             sx={{
-              textTransform: 'none',
-              minWidth: 100,
-              fontWeight: 900,
-              boxShadow: 'none',
-              fontSize: '0.7rem',
-              py: 0.6,
-              bgcolor: sentEmail ? pc.success( 0.1) : pc.secondary( 0.1),
-              color: sentEmail ? 'success.main' : 'secondary.main',
+              width: 32,
+              height: 32,
+              bgcolor: sentEmail ? '#ECFDF5' : '#EFF6FF',
+              color: sentEmail ? '#059669' : '#2563EB',
               border: '1px solid',
-              borderColor: sentEmail ? pc.success( 0.1) : pc.secondary( 0.1),
+              borderColor: sentEmail ? '#A7F3D0' : '#BFDBFE',
+              transition: 'all 0.15s ease',
               '&:hover': {
-                  bgcolor: sentEmail ? pc.success( 0.15) : pc.secondary( 0.15),
-                  borderColor: sentEmail ? 'success.main' : 'secondary.main',
-                  boxShadow: 'none'
+                bgcolor: sentEmail ? '#D1FAE5' : '#DBEAFE',
+                borderColor: sentEmail ? '#059669' : '#2563EB',
+                transform: 'translateY(-1px)',
               },
-              '& .MuiButton-startIcon': { mr: 0.5 }
+              '&.Mui-disabled': {
+                bgcolor: '#F1F5F9',
+                borderColor: '#E2E8F0',
+                color: '#94A3B8',
+              },
             }}
-            startIcon={
-              sentEmail ? <MarkEmailReadRoundedIcon sx={{ fontSize: 16 }} /> : <ForwardToInboxIcon sx={{ fontSize: 16 }} />
-            }
           >
-            {sentEmail ? t('appliedResume.email.resend').toUpperCase() : t('appliedResume.email.send').toUpperCase()}
-          </Button>
+            {sentEmail ? (
+              <MarkEmailReadRoundedIcon sx={{ fontSize: 17 }} />
+            ) : (
+              <ForwardToInboxIcon sx={{ fontSize: 17 }} />
+            )}
+          </IconButton>
         </span>
       </Tooltip>
 

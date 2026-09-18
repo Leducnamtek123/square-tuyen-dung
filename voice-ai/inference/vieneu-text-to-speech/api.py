@@ -93,14 +93,19 @@ def get_tts():
             codec_repo = os.getenv("TTS_CODEC_REPO", "neuphonic/neucodec").strip()
             mode = os.getenv("TTS_MODE", "").strip().lower()
             if not mode:
-                mode = "fast" if device.startswith("cuda") else "standard"
+                mode = "v3turbo" if device.startswith("cuda") else "v3turbo"
             default_backbone_repo = {
-                "fast": "pnnbao-ump/VieNeu-TTS",
-                "gpu": "pnnbao-ump/VieNeu-TTS",
-                "standard": "pnnbao-ump/VieNeu-TTS-0.3B-q4-gguf",
-                "turbo_gpu": "pnnbao-ump/VieNeu-TTS-v2-Turbo",
-                "turbo": "pnnbao-ump/VieNeu-TTS-v2-Turbo-GGUF",
-            }.get(mode, "pnnbao-ump/VieNeu-TTS")
+                "v3turbo": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+                "v3_turbo": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+                "v3": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+                "fast": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+                "gpu": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+                "standard": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+                "turbo": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+                "turbo_gpu": "pnnbao-ump/VieNeu-TTS-v3-Turbo",
+                "v2": "pnnbao-ump/VieNeu-TTS",
+                "v2_turbo": "pnnbao-ump/VieNeu-TTS-v2-Turbo",
+            }.get(mode, "pnnbao-ump/VieNeu-TTS-v3-Turbo")
             backbone_repo = os.getenv("TTS_BACKBONE_REPO", default_backbone_repo)
             emotion = os.getenv("TTS_EMOTION", "natural").strip()
             gguf_filename = os.getenv("TTS_GGUF_FILENAME", "").strip()
@@ -129,27 +134,22 @@ def get_tts():
 
             # Initialize TTS
             mode_key = mode.strip().lower()
-            if mode_key in {"turbo", "turbo_gpu"}:
+            if mode_key in {"v3turbo", "v3_turbo", "v3", "turbo", "fast", "gpu", "standard"}:
+                vieneu_kwargs = {
+                    "mode": "v3turbo",
+                    "device": device,
+                }
+                if backbone_repo and backbone_repo != "default":
+                    vieneu_kwargs["backbone_repo"] = backbone_repo
+            elif mode_key in {"turbo_gpu"}:
                 vieneu_kwargs = {
                     "mode": mode_key,
                     "backbone_repo": backbone_repo,
                     "device": device,
                 }
-                if mode_key == "turbo" and gguf_filename:
+                if gguf_filename:
                     vieneu_kwargs["backbone_filename"] = gguf_filename
-                if mode_key == "turbo_gpu":
-                    vieneu_kwargs["backend"] = os.getenv("TTS_TURBO_BACKEND", "standard").strip().lower()
-            elif mode_key in {"fast", "gpu"}:
-                vieneu_kwargs = {
-                    "mode": "fast",
-                    "backbone_repo": backbone_repo,
-                    "backbone_device": device,
-                    "codec_repo": codec_repo,
-                    "codec_device": codec_device,
-                }
-                memory_util = os.getenv("TTS_GPU_MEM_FRACTION", "").strip()
-                if memory_util:
-                    vieneu_kwargs["memory_util"] = float(memory_util)
+                vieneu_kwargs["backend"] = os.getenv("TTS_TURBO_BACKEND", "standard").strip().lower()
             else:
                 vieneu_kwargs = {
                     "mode": mode,
@@ -165,11 +165,13 @@ def get_tts():
             try:
                 tts = Vieneu(**vieneu_kwargs)
             except TypeError as exc:
-                if "emotion" not in vieneu_kwargs:
-                    raise
-                logger.warning(f"VieNeu SDK rejected TTS_EMOTION={emotion!r}: {exc}; retrying without emotion")
-                vieneu_kwargs.pop("emotion", None)
-                tts = Vieneu(**vieneu_kwargs)
+                logger.warning(f"VieNeu SDK rejected arguments {vieneu_kwargs}: {exc}; attempting fallback constructor")
+                clean_kwargs = {k: v for k, v in vieneu_kwargs.items() if k in {"device", "mode", "backend", "backbone_repo"}}
+                try:
+                    tts = Vieneu(**clean_kwargs)
+                except Exception:
+                    logger.warning("Falling back to default Vieneu() constructor")
+                    tts = Vieneu()
 
             # Log available voices once so operators can verify voice IDs from container logs.
             try:
@@ -297,7 +299,20 @@ def sanitize_tts_input(text: str) -> str:
     text = re.sub(r"\b\d+\s*/\s*\d+\b", " ", text)
     text = re.sub(r"[!?]+", ".", text)
     text = re.sub(r"[:;]+", ",", text)
+
+    # Preserve VieNeu-TTS v3 Turbo emotion cues like [cười], [thở dài], [hắng giọng]
+    preserved_cues: dict[str, str] = {}
+    def _mask_cue(m: re.Match) -> str:
+        key = f"__CUE_{len(preserved_cues)}__"
+        preserved_cues[key] = m.group(0)
+        return key
+
+    text = re.sub(r"\[(cười|thở dài|hắng giọng|ngập ngừng|cười nhẹ)\]", _mask_cue, text, flags=re.IGNORECASE)
     text = re.sub(r"[/\\|_*#`<>{}\[\]()]+", " ", text)
+
+    for key, val in preserved_cues.items():
+        text = text.replace(key, val)
+
     return " ".join(text.split()).strip()
 
 def float32_to_pcm16(audio_float):
@@ -474,9 +489,17 @@ async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
         logger.error(f"Voice resolution error: {e}")
         raise HTTPException(status_code=400, detail=f"Voice resolution failed: {str(e)}")
 
+    # Detect sample rate dynamically (VieNeu-TTS v3 Turbo is 48000, legacy v2 is 24000)
+    detected_rate = getattr(engine, "sample_rate", 0)
+    if not detected_rate:
+        backbone_str = str(os.getenv("TTS_BACKBONE_REPO", "")).lower()
+        mode_str = str(os.getenv("TTS_MODE", "")).lower()
+        detected_rate = 48000 if ("v3" in backbone_str or "turbo" in backbone_str or mode_str in {"v3turbo", "v3_turbo", "turbo", "fast", ""}) else 24000
+    target_sample_rate = _env_int("TTS_SAMPLE_RATE", detected_rate, minimum=8000, maximum=96000)
+
     def generator():
-        input_sample_rate = 24000
-        output_sample_rate = 24000
+        input_sample_rate = target_sample_rate
+        output_sample_rate = target_sample_rate
         stop_event = threading.Event()
         effective_speed = _effective_speed(req.speed)
         
@@ -628,7 +651,7 @@ async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
 
     media_type = "audio/mpeg" if req.response_format == "mp3" else "audio/wav"
     if req.response_format == "pcm":
-        media_type = "audio/pcm;rate=24000"
+        media_type = f"audio/pcm;rate={target_sample_rate}"
 
     async def collect_audio_bytes() -> bytes:
         """Run inference under the GPU semaphore and return a fully buffered payload."""

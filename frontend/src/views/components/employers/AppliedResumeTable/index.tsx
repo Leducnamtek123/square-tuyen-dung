@@ -19,13 +19,15 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DownloadIcon from '@mui/icons-material/Download';
 import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
+import EventIcon from '@mui/icons-material/Event';
+import type { ColumnDef, PaginationState, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 
+import { getAppliedResumeJobPostId } from '../appliedResumeUtils';
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
-import { CV_TYPES, ROUTES } from '../../../../configs/constants';
-import { localizeRoutePath } from '../../../../configs/routeLocalization';
-import DataTable from '../../../../components/Common/DataTable';
-import { formatRoute } from '@/utils/funcUtils';
+import { CV_TYPES, ROUTES } from '@/configs/constants';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import DataTable from '@/components/Common/DataTable';
+import { formatRoute, downloadPdf } from '@/utils/funcUtils';
 import { getSafeResourceUrl, openExternalUrlSafely } from '@/utils/safeExternalUrl';
 
 import SendEmailComponent from './SendEmailComponent';
@@ -41,6 +43,7 @@ interface AppliedResumeTableProps {
   handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
   handleDelete: (id: string | number) => void;
   onCreateEmployee?: (activity: JobPostActivity) => void;
+  onQuickScheduleInterview?: (activity: JobPostActivity) => void;
   onAnalysisStateChange?: (id: string | number, nextState: Partial<JobPostActivity>) => void;
   blindMode?: boolean;
   rowCount: number;
@@ -48,6 +51,12 @@ interface AppliedResumeTableProps {
   onPaginationChange: OnChangeFn<PaginationState>;
   sorting: SortingState;
   onSortingChange: OnChangeFn<SortingState>;
+  enableRowSelection?: boolean;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  variant?: 'card' | 'flat';
+  stickyHeader?: boolean;
+  maxHeight?: number | string;
 }
 
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
@@ -59,13 +68,20 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     handleChangeApplicationStatus, 
     handleDelete,
     onCreateEmployee,
+    onQuickScheduleInterview,
     onAnalysisStateChange,
     blindMode = false,
     rowCount,
     pagination,
     onPaginationChange,
     sorting,
-    onSortingChange
+    onSortingChange,
+    enableRowSelection = false,
+    rowSelection,
+    onRowSelectionChange,
+    variant = 'card',
+    stickyHeader = true,
+    maxHeight,
   } = props;
   const { allConfig } = useConfig();
   const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
@@ -88,75 +104,74 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       cell: (info) => (
         <Box sx={{ py: 0.5 }}>
           {(() => {
-            const resumeType = info.row.original.type || info.row.original.resume?.type;
+            const fullNameVal = String(info.getValue() ?? '');
+            const isAnonymized = blindMode || fullNameVal.startsWith('Candidate #');
             const resumeTitle = info.row.original.title || info.row.original.resume?.title;
             const isManualCandidate = Boolean(info.row.original.isManualCandidate);
             // File URL for attached CV download
             const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
             const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
+            const resumeSlug = info.row.original.resumeSlug || info.row.original.resume?.slug || '';
+            const publicCvHref = resumeSlug ? `/cv/${resumeSlug}` : undefined;
+            const hasCvTarget = Boolean(safeCvFileUrl || publicCvHref);
+
+            const rawDisplayTitle = isAnonymized
+              ? (isManualCandidate ? 'Hồ sơ thủ công ẩn danh' : 'Hồ sơ ứng viên ẩn danh')
+              : (resumeTitle || '---');
+            const displayTitle = rawDisplayTitle.replace(/^[-•*–—\s]+/, '').trim() || '---';
+
             return (
               <>
                 <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
-                  {String(info.getValue() ?? '')}
+                  {fullNameVal}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  {isManualCandidate ? (
+                  {isManualCandidate && (
                     <Chip
                       size="small"
                       label={t('manualCandidate.badge')}
                       sx={{ height: 22, fontSize: '0.68rem', fontWeight: 900 }}
                     />
-                  ) : resumeType === CV_TYPES.cvWebsite ? (
-                    /* Online CV – informational only */
-                    <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
-                      <Box sx={{ 
-                        display: 'flex', 
-                        p: 0.5, 
-                        borderRadius: 1, 
-                        bgcolor: pc.primary( 0.08), 
-                        color: 'primary.main' 
-                      }}>
-                        <DescriptionIcon sx={{ fontSize: 14 }} />
-                      </Box>
-                    </Tooltip>
-                  ) : (
-                    /* Attached CV – click or hover to download */
-                    <Tooltip
-                      title={
-                        safeCvFileUrl ? (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <span>{t('appliedResume.table.attachedResume')}</span>
-                            <DownloadIcon sx={{ fontSize: 13 }} />
-                          </Box>
-                        ) : t('appliedResume.table.attachedResume')
-                      }
-                      arrow
-                    >
-                      <Box
-                        sx={{ 
-                          display: 'flex', 
-                          p: 0.5, 
-                          borderRadius: 1, 
-                          bgcolor: pc.error( 0.08), 
-                          color: 'error.main',
-                          cursor: safeCvFileUrl ? 'pointer' : 'default',
-                          textDecoration: 'none',
-                          '&:hover': safeCvFileUrl ? { bgcolor: pc.error( 0.16) } : {},
-                          transition: 'background-color 0.15s',
+                  )}
+                  {!isAnonymized && hasCvTarget && (
+                    <Tooltip title={t('appliedResume.table.clickToDownload')} arrow>
+                      <IconButton aria-label="Thao tác"
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (safeCvFileUrl) {
+                            downloadPdf(safeCvFileUrl, fullNameVal || resumeTitle || 'CV');
+                          } else if (publicCvHref) {
+                            window.open(publicCvHref, '_blank', 'noopener,noreferrer');
+                          }
                         }}
-                        {...(safeCvFileUrl ? {
-                          component: 'a' as const,
-                          href: safeCvFileUrl,
-                          download: true,
-                          onClick: (e: React.MouseEvent) => e.stopPropagation(),
-                        } : {})}
+                        sx={{
+                          p: 0.5,
+                          borderRadius: 1,
+                          bgcolor: pc.error(0.08),
+                          color: 'error.main',
+                          '&:hover': { bgcolor: pc.error(0.16) },
+                        }}
                       >
-                        <PictureAsPdfIcon sx={{ fontSize: 14 }} />
-                      </Box>
+                        <PictureAsPdfIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
                     </Tooltip>
                   )}
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.2px' }}>
-                    {resumeTitle || t('appliedResume.table.notUpdated')}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 600,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 1,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: 260,
+                    }}
+                    title={displayTitle}
+                  >
+                    {displayTitle}
                   </Typography>
                 </Box>
               </>
@@ -167,68 +182,33 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     },
     {
       accessorKey: 'jobName',
+      id: 'jobName',
       header: t('appliedResume.table.appliedPosition'),
-      enableSorting: true,
-      cell: (info) => (
-        <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: 'primary.main', maxWidth: 200 }}>
-            {info.row.original.jobName ? String(info.row.original.jobName) : '---'}
-        </Typography>
-      ),
+      cell: (info) => {
+        const row = info.row.original as any;
+        const rawTitle =
+          (info.getValue() as string) ||
+          row.jobName ||
+          row.jobPost?.jobName ||
+          row.job_post?.job_name ||
+          row.jobPostDict?.jobName ||
+          '';
+        const cleanTitle = rawTitle.replace(/^\[?TUYỂN GẤP\]?\|?\s*/i, '').trim();
+        return (
+          <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
+            {cleanTitle ? `[TUYỂN GẤP] ${cleanTitle}` : '---'}
+          </Typography>
+        );
+      },
     },
     {
       accessorKey: 'createAt',
       header: t('appliedResume.table.appliedDate'),
-      enableSorting: true,
       cell: (info) => (
         <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
             {info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '---'}
         </Typography>
       ),
-    },
-    {
-      id: 'type',
-      header: t('appliedResume.table.profileType'),
-      cell: (info) => {
-        const resumeType = info.row.original.type || info.row.original.resume?.type;
-        const isManualCandidate = Boolean(info.row.original.isManualCandidate);
-        const isOnline = resumeType === CV_TYPES.cvWebsite;
-        const cvFileUrl = info.row.original.resumeFileUrl || info.row.original.resume?.fileUrl || '';
-        const safeCvFileUrl = getSafeResourceUrl(cvFileUrl);
-        return (
-          <Tooltip
-            title={!isOnline && safeCvFileUrl ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <span>{t('appliedResume.table.clickToDownload')}</span>
-                <DownloadIcon sx={{ fontSize: 13 }} />
-              </Box>
-            ) : ''}
-            arrow
-            disableHoverListener={isOnline || !safeCvFileUrl}
-          >
-            <Chip 
-                label={isManualCandidate ? t('manualCandidate.badge') : isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')}
-                size="small" 
-                sx={{ 
-                  fontWeight: 900, 
-                  fontSize: '0.7rem',
-                  borderRadius: 1.5,
-                  bgcolor: isManualCandidate ? pc.secondary(0.08) : isOnline ? pc.primary( 0.08) : pc.error( 0.08),
-                  color: isManualCandidate ? 'secondary.main' : isOnline ? 'primary.main' : 'error.main',
-                  border: '1px solid',
-                  borderColor: isManualCandidate ? pc.secondary(0.1) : isOnline ? pc.primary( 0.1) : pc.error( 0.1),
-                  '& .MuiChip-label': { px: 1.5 },
-                  cursor: !isOnline && safeCvFileUrl ? 'pointer' : 'default',
-                }}
-                {...(!isOnline && safeCvFileUrl ? {
-                  component: 'a' as const,
-                  href: safeCvFileUrl,
-                  download: true,
-                  onClick: (e: React.MouseEvent) => e.stopPropagation(),
-                } : {})}
-            />
-          </Tooltip>
-        );
-      },
     },
     {
       accessorKey: 'aiAnalysisScore',
@@ -256,99 +236,188 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       header: t('appliedResume.table.actions'),
       meta: { align: 'right' },
       cell: (info) => (
-        <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
+        <Stack direction="row" spacing={0.75} justifyContent="flex-end" alignItems="center">
           {(() => {
+            const isAnonymized = blindMode || String(info.row.original.fullName ?? '').startsWith('Candidate #');
             const detailSlug = info.row.original.resumeSlug || info.row.original.resume?.slug || '';
-            const detailHref = detailSlug
+            const detailHref = detailSlug && !isAnonymized
               ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`, i18n.language)
               : undefined;
             return (
-          <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-            <span>
-              <IconButton
-                color="primary"
-                size="small"
-                disabled={blindMode || !detailSlug}
-                onClick={() => {
-                  if (blindMode || !detailHref) return;
-                  push(detailHref);
-                }}
-                sx={{ 
-                  bgcolor: pc.primary( 0.06),
-                  
-                  '&:hover': { bgcolor: pc.primary( 0.12) }
-                }}
-              >
-                <RemoveRedEyeIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
+              <Tooltip title={isAnonymized ? t('appliedResume.table.tooltips.blindDisabled', { defaultValue: 'Hồ sơ đang ở chế độ ẩn danh' }) : t('appliedResume.table.tooltips.view')} arrow>
+                <span>
+                  <IconButton aria-label="Xem chi tiết"
+                    size="small"
+                    disabled={isAnonymized || !detailSlug}
+                    onClick={() => {
+                      if (isAnonymized || !detailHref) return;
+                      push(detailHref);
+                    }}
+                    sx={{ 
+                      width: 32,
+                      height: 32,
+                      bgcolor: '#EFF6FF',
+                      color: '#2563EB',
+                      border: '1px solid #BFDBFE',
+                      transition: 'all 0.15s ease',
+                      '&:hover': { 
+                        bgcolor: '#DBEAFE',
+                        borderColor: '#2563EB',
+                        transform: 'translateY(-1px)',
+                      },
+                      '&.Mui-disabled': {
+                        bgcolor: '#F1F5F9',
+                        borderColor: '#E2E8F0',
+                        color: '#94A3B8',
+                      },
+                    }}
+                  >
+                    <RemoveRedEyeIcon sx={{ fontSize: 17 }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            );
+          })()}
+
+          {(() => {
+            const item = info.row.original;
+            const jobPostId = getAppliedResumeJobPostId(item);
+            const canScheduleInterview = !blindMode && Boolean(item.userId) && Boolean(jobPostId);
+            const scheduleHref = canScheduleInterview
+              ? localizeRoutePath(
+                  `/${ROUTES.EMPLOYER.INTERVIEW_CREATE}?candidate=${item.userId}&jobPost=${jobPostId}`,
+                  i18n.language
+                )
+              : undefined;
+
+            return (
+              <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview', { defaultValue: 'Lên lịch phỏng vấn' })} arrow>
+                <span>
+                  <IconButton
+                    aria-label={t('appliedResume.table.tooltips.scheduleInterview', { defaultValue: 'Lên lịch phỏng vấn' })}
+                    size="small"
+                    disabled={!canScheduleInterview}
+                    onClick={() => {
+                      if (onQuickScheduleInterview) {
+                        onQuickScheduleInterview(item);
+                      } else if (scheduleHref) {
+                        push(scheduleHref);
+                      }
+                    }}
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      color: '#7C3AED',
+                      bgcolor: '#F5F3FF',
+                      border: '1px solid #DDD6FE',
+                      transition: 'all 0.15s ease',
+                      '&:hover': { 
+                        bgcolor: '#EDE9FE',
+                        borderColor: '#7C3AED',
+                        transform: 'translateY(-1px)',
+                      },
+                      '&.Mui-disabled': {
+                        bgcolor: '#F1F5F9',
+                        borderColor: '#E2E8F0',
+                        color: '#94A3B8',
+                      },
+                    }}
+                  >
+                    <EventIcon sx={{ fontSize: 17 }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
             );
           })()}
           
-          {!blindMode && (
-            <SendEmailComponent
-              jobPostActivityId={String(info.row.original.id)}
-              isSentEmail={info.row.original.isSentEmail || false}
-              email={info.row.original.email || ''}
-              fullName={info.row.original.fullName || ''}
-            />
-          )}
+          {(() => {
+            const isAnonymized = blindMode || String(info.row.original.fullName ?? '').startsWith('Candidate #');
+            if (isAnonymized) return null;
+            return (
+              <SendEmailComponent
+                jobPostActivityId={String(info.row.original.id)}
+                isSentEmail={info.row.original.isSentEmail || false}
+                email={info.row.original.email || ''}
+                fullName={info.row.original.fullName || ''}
+              />
+            );
+          })()}
 
           {!blindMode && info.row.original.hrmEmployeeId ? (
             <Tooltip title={t('employees.hrm.convert.openEmployee')} arrow>
-              <IconButton
+              <IconButton aria-label="Mở hồ sơ nhân viên HRM"
                 size="small"
-                color="primary"
                 onClick={() => {
                   if (info.row.original.hrmEmployeeUrl) {
                     openExternalUrlSafely(info.row.original.hrmEmployeeUrl);
                   }
                 }}
                 sx={{
-                  bgcolor: pc.primary(0.06),
-                  
-                  '&:hover': { bgcolor: pc.primary(0.12) }
+                  width: 32,
+                  height: 32,
+                  bgcolor: '#ECFDF5',
+                  color: '#059669',
+                  border: '1px solid #A7F3D0',
+                  transition: 'all 0.15s ease',
+                  '&:hover': { 
+                    bgcolor: '#D1FAE5',
+                    borderColor: '#059669',
+                    transform: 'translateY(-1px)',
+                  }
                 }}
               >
-                <PersonAddAltIcon fontSize="small" />
+                <PersonAddAltIcon sx={{ fontSize: 17 }} />
               </IconButton>
             </Tooltip>
           ) : (!blindMode && [4, 5].includes(Number(info.row.original.status)) && onCreateEmployee && (
             <Tooltip title={t('employees.hrm.convert.action')} arrow>
-              <IconButton
+              <IconButton aria-label="Tiếp nhận nhân sự vào HRM"
                 size="small"
-                color="success"
                 onClick={() => onCreateEmployee(info.row.original)}
                 sx={{
-                  bgcolor: pc.success(0.06),
-                  
-                  '&:hover': { bgcolor: pc.success(0.12) }
+                  width: 32,
+                  height: 32,
+                  bgcolor: '#ECFDF5',
+                  color: '#059669',
+                  border: '1px solid #A7F3D0',
+                  transition: 'all 0.15s ease',
+                  '&:hover': { 
+                    bgcolor: '#D1FAE5',
+                    borderColor: '#059669',
+                    transform: 'translateY(-1px)',
+                  }
                 }}
               >
-                <PersonAddAltIcon fontSize="small" />
+                <PersonAddAltIcon sx={{ fontSize: 17 }} />
               </IconButton>
             </Tooltip>
           ))}
 
           <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
-            <IconButton
+            <IconButton aria-label="Xóa hồ sơ"
               size="small"
-              color="error"
               onClick={() => handleDelete(info.row.original.id)}
               sx={{ 
-                bgcolor: pc.error( 0.06),
-                
-                '&:hover': { bgcolor: pc.error( 0.12) }
+                width: 32,
+                height: 32,
+                bgcolor: '#FFF1F2',
+                color: '#DC2626',
+                border: '1px solid #FECDD3',
+                transition: 'all 0.15s ease',
+                '&:hover': { 
+                  bgcolor: '#FFE4E6',
+                  borderColor: '#DC2626',
+                  transform: 'translateY(-1px)',
+                }
               }}
             >
-              <DeleteIcon fontSize="small" />
+              <DeleteIcon sx={{ fontSize: 17 }} />
             </IconButton>
           </Tooltip>
         </Stack>
       ),
     },
-  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, push, blindMode, i18n.language]);
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, onQuickScheduleInterview, push, blindMode, i18n.language]);
 
   return (
     <>
@@ -365,6 +434,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         />
       )}
       <DataTable
+        variant={variant}
         columns={columns}
         data={rows}
         isLoading={isLoading}
@@ -374,7 +444,12 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         enableSorting
         sorting={sorting}
         onSortingChange={onSortingChange}
+        enableRowSelection={enableRowSelection}
+        rowSelection={rowSelection}
+        onRowSelectionChange={onRowSelectionChange}
         emptyMessage={t('appliedResume.table.noCandidates')}
+        stickyHeader={stickyHeader}
+        maxHeight={maxHeight}
       />
     </>
   );

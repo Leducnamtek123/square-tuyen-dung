@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo } from 'react';
 import {
@@ -12,14 +12,15 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
-import { useDataTable } from '../../../hooks';
-import { InterviewSession } from '../../../types/models';
+import DataTable from '@/components/Common/DataTable';
+import { useDataTable } from '@/hooks';
+import { InterviewSession } from '@/types/models';
 import { useInterviews } from './hooks/useInterviews';
-import dayjs from '../../../configs/dayjs-config';
-import toastMessages from '../../../utils/toastMessages';
+import dayjs from '@/configs/dayjs-config';
+import toastMessages from '@/utils/toastMessages';
 import FilterBar from '@/components/Common/FilterBar';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
+import AIServiceHealthBanner from '@/components/Features/AIServiceHealthBanner';
 
 const STATUS_CHIP_COLORS: Record<string, "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"> = {
   'scheduled': 'info',
@@ -95,28 +96,20 @@ const InterviewsPage = () => {
 
   const columns = useMemo<ColumnDef<InterviewSession>[]>(() => [
     {
-      accessorKey: 'id',
-      header: 'ID',
-      enableSorting: true,
-    },
-    {
-      accessorKey: 'roomName',
-      header: t('pages.interviews.table.room') as string,
-      cell: (info) => (
-        <Typography variant="body2" fontWeight={600}>
-          {info.getValue() as string}
-        </Typography>
-      ),
-    },
-    {
-      accessorKey: 'jobName',
-      header: t('pages.interviews.table.jobPost') as string,
-      cell: (info) => info.getValue() as string || '—',
+      id: 'index',
+      header: 'STT',
+      cell: (info) => info.row.index + 1,
+      size: 60,
     },
     {
       accessorKey: 'candidateName',
       header: t('pages.interviews.table.candidate') as string,
-      cell: (info) => info.getValue() as string || '—',
+      cell: (info) => (info.getValue() as string) || '-',
+    },
+    {
+      accessorKey: 'jobName',
+      header: t('pages.interviews.table.jobPost') as string,
+      cell: (info) => (info.getValue() as string) || '-',
     },
     {
       accessorKey: 'status',
@@ -139,7 +132,7 @@ const InterviewsPage = () => {
       accessorFn: (row) => row.scheduledAt,
       header: t('pages.interviews.table.scheduledAt') as string,
       enableSorting: true,
-      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
+      cell: (info) => (info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '-'),
     },
     {
       id: 'actions',
@@ -151,14 +144,14 @@ const InterviewsPage = () => {
         return (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             <Tooltip title={t('pages.interviews.table.view')}>
-              <IconButton size="small" color="info" onClick={() => setSelectedInterview(interview)}>
+              <IconButton aria-label="Thao tác" size="small" color="info" onClick={() => setSelectedInterview(interview)}>
                 <VisibilityIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             {status !== 'completed' && status !== 'cancelled' && (
               <>
                 <Tooltip title={t('pages.interviews.table.markCompleted')}>
-                  <IconButton
+                  <IconButton aria-label="Thao tác"
                     size="small"
                     color="success"
                     disabled={isMutating}
@@ -168,7 +161,7 @@ const InterviewsPage = () => {
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={t('pages.interviews.table.cancel')}>
-                  <IconButton
+                  <IconButton aria-label="Thao tác"
                     size="small"
                     color="warning"
                     disabled={isMutating}
@@ -180,7 +173,7 @@ const InterviewsPage = () => {
               </>
             )}
             <Tooltip title={t('pages.interviews.table.delete')}>
-              <IconButton size="small" color="error" disabled={isMutating} onClick={() => setDeleteTarget(interview)}>
+              <IconButton aria-label="Thao tác" size="small" color="error" disabled={isMutating} onClick={() => setDeleteTarget(interview)}>
                 <DeleteIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -195,6 +188,8 @@ const InterviewsPage = () => {
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{t('pages.interviews.title')}</Typography>
       </Box>
+
+      <AIServiceHealthBanner />
 
       <Paper sx={{ p: 0, borderRadius: '12px', overflow: 'hidden' }} elevation={0}>
         <Box sx={{ p: 2, pb: 0 }}>
@@ -218,40 +213,63 @@ const InterviewsPage = () => {
           enableSorting
           sorting={sorting}
           onSortingChange={onSortingChange}
+          stickyHeader
+          maxHeight="calc(100dvh - 280px)"
         />
       </Paper>
 
-      <Dialog open={!!selectedInterview} onClose={() => setSelectedInterview(null)} fullWidth maxWidth="sm">
-        <DialogTitle>{t('pages.interviews.detailTitle')}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={1.25} sx={{ pt: 1 }}>
-            <Typography variant="body2"><strong>{t('pages.interviews.table.room')}:</strong> {selectedInterview?.roomName || '—'}</Typography>
-            <Typography variant="body2"><strong>{t('pages.interviews.table.candidate')}:</strong> {selectedInterview?.candidateName || '—'}</Typography>
-            <Typography variant="body2"><strong>{t('pages.interviews.table.jobPost')}:</strong> {selectedInterview?.jobName || '—'}</Typography>
-            <Typography variant="body2"><strong>{t('pages.interviews.table.status')}:</strong> {selectedInterview?.status || '—'}</Typography>
-            <Typography variant="body2"><strong>{t('pages.interviews.table.scheduledAt')}:</strong> {selectedInterview?.scheduledAt ? dayjs(selectedInterview.scheduledAt).format('DD/MM/YYYY HH:mm') : '—'}</Typography>
+      <Dialog
+        open={!!selectedInterview}
+        onClose={() => setSelectedInterview(null)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: '#0F172A' }}>{t('pages.interviews.detailTitle')}</DialogTitle>
+        <DialogContent dividers sx={{ borderColor: 'divider' }}>
+          <Stack spacing={1.5} sx={{ py: 1 }}>
+            <Typography variant="body2"><strong>{t('pages.interviews.table.room')}:</strong> {selectedInterview?.roomName || '-'}</Typography>
+            <Typography variant="body2"><strong>{t('pages.interviews.table.candidate')}:</strong> {selectedInterview?.candidateName || '-'}</Typography>
+            <Typography variant="body2"><strong>{t('pages.interviews.table.jobPost')}:</strong> {selectedInterview?.jobName || '-'}</Typography>
+            <Typography variant="body2"><strong>{t('pages.interviews.table.status')}:</strong> {selectedInterview?.status || '-'}</Typography>
+            <Typography variant="body2"><strong>{t('pages.interviews.table.scheduledAt')}:</strong> {selectedInterview?.scheduledAt ? dayjs(selectedInterview.scheduledAt).format('DD/MM/YYYY HH:mm') : '-'}</Typography>
             {safeSelectedRecordingUrl && (
-              <Link href={safeSelectedRecordingUrl} target="_blank" rel="noopener noreferrer">
-                {t('pages.interviews.recordingLink')}
-              </Link>
+              <Box sx={{ pt: 1 }}>
+                <Link
+                  href={safeSelectedRecordingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ fontWeight: 700, color: 'primary.main', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                >
+                  {t('pages.interviews.recordingLink')} ↗
+                </Link>
+              </Box>
             )}
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSelectedInterview(null)}>{t('common.close')}</Button>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setSelectedInterview(null)} variant="outlined" sx={{ borderRadius: 2 }}>
+            {t('common.close')}
+          </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>{t('pages.interviews.deleteTitle')}</DialogTitle>
+      <Dialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, color: '#DC2626' }}>{t('pages.interviews.deleteTitle')}</DialogTitle>
         <DialogContent>
-          <Typography>
+          <Typography sx={{ color: 'text.secondary' }}>
             {t('pages.interviews.deleteConfirm', { name: deleteTarget?.roomName || deleteTarget?.id || '' })}
           </Typography>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)} color="inherit">{t('common.cancel')}</Button>
-          <Button onClick={handleDelete} color="error" variant="contained" disabled={isMutating}>
+        <DialogActions sx={{ px: 3, py: 2 }}>
+          <Button onClick={() => setDeleteTarget(null)} color="inherit" variant="outlined" sx={{ borderRadius: 2 }}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={handleDelete} color="error" variant="contained" disabled={isMutating} sx={{ borderRadius: 2 }}>
             {isMutating ? t('common.deleting') : t('common.delete')}
           </Button>
         </DialogActions>

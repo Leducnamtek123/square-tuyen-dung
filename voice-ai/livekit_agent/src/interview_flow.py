@@ -50,6 +50,247 @@ def is_substantive_answer(text: str | None, *, min_words: int, min_chars: int) -
     return len(words) >= min_words
 
 
+def _strip_accents(value: str) -> str:
+    import unicodedata
+
+    normalized = unicodedata.normalize("NFD", value)
+    return "".join(char for char in normalized if unicodedata.category(char) != "Mn")
+
+
+_ABUSIVE_ACCENTED_WORDS_REGEX = re.compile(
+    r"\b("
+    r"đm|đcm|đmm|đcmm|đkm|"
+    r"vcl|vkl|đéo|địt|đụ|"
+    r"cút|lồn|cặc|buồi"
+    r")\b",
+    re.IGNORECASE,
+)
+
+_ABUSIVE_UNACCENTED_ACRONYMS_REGEX = re.compile(
+    r"\b("
+    r"dm|dcm|dmm|dcmm|dkm|"
+    r"vcl|vkl|"
+    r"fuck|fucking|bitch|asshole|shit|bullshit|bastard"
+    r")\b",
+    re.IGNORECASE,
+)
+
+_ABUSIVE_PHRASES = (
+    "cút đi",
+    "cut di",
+    "cút mẹ",
+    "cut me",
+    "biến đi",
+    "bien di",
+    "biến mẹ",
+    "bien me",
+    "biến luôn",
+    "bien luon",
+    "biến ngay",
+    "bien ngay",
+    "đụ má",
+    "du ma",
+    "đụ mẹ",
+    "du me",
+    "địt mẹ",
+    "dit me",
+    "má mày",
+    "ma may",
+    "mẹ mày",
+    "me may",
+    "bà mẹ mày",
+    "ba me may",
+    "mẹ kiếp",
+    "me kiep",
+    "mất dạy",
+    "mat day",
+    "vô học",
+    "vo hoc",
+    "vô văn hóa",
+    "vo van hoa",
+    "đồ ngu",
+    "do ngu",
+    "thằng ngu",
+    "thang ngu",
+    "con ngu",
+    "con ngu lol",
+    "óc chó",
+    "oc cho",
+    "ngu vãi",
+    "ngu vai",
+    "ngu vcl",
+    "ngu vl",
+    "ngu như chó",
+    "ngu nhu cho",
+    "ngu như bò",
+    "ngu nhu bo",
+    "thằng chó",
+    "thang cho",
+    "đồ chó",
+    "do cho",
+    "chó chết",
+    "cho chet",
+    "thằng khùng",
+    "thang khung",
+    "con điên",
+    "con dien",
+    "đồ điên",
+    "do dien",
+    "bị điên",
+    "bi dien",
+    "bị khùng",
+    "bi khung",
+    "hãm lol",
+    "ham lol",
+    "hãm l",
+    "ham l",
+    "rác rưởi",
+    "rac ruoi",
+    "đồ rác",
+    "do rac",
+    "con cặc",
+    "con cac",
+    "ăn cặc",
+    "an cac",
+    "đầu buồi",
+    "dau buoi",
+    "con lồn",
+    "con lon",
+    "mặt lồn",
+    "mat lon",
+    "nói ngu",
+    "noi ngu",
+    "hỏi ngu",
+    "hoi ngu",
+    "hỏi ngáo",
+    "hoi ngao",
+    "hỏi nhảm",
+    "hoi nham",
+    "nói nhảm",
+    "noi nham",
+    "lảm nhảm",
+    "lam nham",
+    "nhảm nhí",
+    "nham nhi",
+    "con bot ngu",
+    "bot ngu",
+    "ai ngu",
+    "ai rác",
+    "ai rac",
+    "bot dở hơi",
+    "bot do hoi",
+    "kệ mẹ tao",
+    "ke me tao",
+    "kệ mẹ mày",
+    "ke me may",
+    "kệ cha mày",
+    "ke cha may",
+    "bố mày",
+    "bo may",
+    "fuck you",
+    "shut up",
+    "get lost",
+)
+
+
+def is_hostile_or_abusive(text: str | None) -> bool:
+    if not text:
+        return False
+    normalized = " ".join(text.split()).strip().lower()
+    if not normalized:
+        return False
+
+    if _ABUSIVE_ACCENTED_WORDS_REGEX.search(normalized):
+        return True
+
+    if _ABUSIVE_UNACCENTED_ACRONYMS_REGEX.search(normalized):
+        return True
+
+    stripped = _strip_accents(normalized)
+    if _ABUSIVE_UNACCENTED_ACRONYMS_REGEX.search(stripped):
+        return True
+
+    return any(phrase in normalized or phrase in stripped for phrase in _ABUSIVE_PHRASES)
+
+
+_REFUSAL_OR_SKIP_PHRASES = (
+    "bỏ qua",
+    "bo qua",
+    "bỏ câu",
+    "bo cau",
+    "chuyển câu",
+    "chuyen cau",
+    "qua câu",
+    "qua cau",
+    "câu khác",
+    "cau khac",
+    "đổi câu",
+    "doi cau",
+    "next đi",
+    "next di",
+    "next câu",
+    "next cau",
+    "next",
+    "skip đi",
+    "skip di",
+    "skip câu",
+    "skip",
+    "không biết",
+    "khong biet",
+    "chịu thôi",
+    "chiu thoi",
+    "không rõ",
+    "khong ro",
+    "không rành",
+    "khong ranh",
+    "không trả lời",
+    "khong tra loi",
+    "không muốn trả lời",
+    "khong muon tra loi",
+    "không thèm trả lời",
+    "khong them tra loi",
+    "miễn trả lời",
+    "mien tra loi",
+    "miễn bình luận",
+    "mien binh luan",
+    "không có gì để nói",
+    "khong co gi de noi",
+    "hết rồi",
+    "het roi",
+    "hết ý rồi",
+    "het y roi",
+    "chỉ vậy thôi",
+    "chi vay thoi",
+    "có vậy thôi",
+    "co vay thoi",
+    "vậy thôi",
+    "vay thoi",
+)
+
+
+def is_explicit_refusal_or_skip(text: str | None) -> bool:
+    if not text:
+        return False
+    normalized = " ".join(text.split()).strip().lower()
+    if not normalized or len(normalized) > 160:
+        return False
+
+    clean_text = re.sub(r"[^\wÀ-ỹ\s]", " ", normalized)
+    clean_text = " ".join(clean_text.split())
+    stripped = _strip_accents(clean_text)
+
+    words = clean_text.split()
+    if len(words) <= 2 and words:
+        if words[0] in {"skip", "next", "chịu", "chiu"}:
+            return True
+
+    return any(
+        phrase in clean_text or phrase in stripped
+        for phrase in _REFUSAL_OR_SKIP_PHRASES
+    )
+
+
+
 _QUESTION_PROGRESS_PATTERN = re.compile(
     r"\b(?:câu\s*hỏi|cau\s*hoi)\s*(?:số\s*)?\d+\s*/\s*\d+\s*:?\s*",
     re.IGNORECASE,
@@ -66,6 +307,11 @@ _SPACE_BEFORE_PUNCTUATION_PATTERN = re.compile(r"\s+([,.;:!?…])")
 _MISSING_SPACE_AFTER_PUNCTUATION_PATTERN = re.compile(r"([,.;:!?…])(?=\S)")
 
 
+_EMOTION_CUE_PATTERN = re.compile(
+    r"\[(cười|thở dài|hắng giọng|ngập ngừng|cười nhẹ)\]", re.IGNORECASE
+)
+
+
 def redact_question_progress_labels(text: str) -> str:
     cleaned = _QUESTION_PROGRESS_PATTERN.sub(" ", text)
     cleaned = _NEXT_QUESTION_LABEL_PATTERN.sub(" ", cleaned)
@@ -76,7 +322,21 @@ def redact_question_progress_labels(text: str) -> str:
 def strip_punctuation_for_tts(text: str) -> str:
     cleaned = redact_question_progress_labels(text)
     cleaned = _FRACTION_PATTERN.sub(" ", cleaned)
+
+    # Protect VieNeu-TTS v3 Turbo emotion cues like [cười], [thở dài]
+    preserved_cues: dict[str, str] = {}
+
+    def _mask_cue(m: re.Match) -> str:
+        key = f"__CUE_{len(preserved_cues)}__"
+        preserved_cues[key] = m.group(0)
+        return key
+
+    cleaned = _EMOTION_CUE_PATTERN.sub(_mask_cue, cleaned)
     cleaned = _TTS_SYMBOL_PATTERN.sub(" ", cleaned)
+
+    for key, val in preserved_cues.items():
+        cleaned = cleaned.replace(key, val)
+
     cleaned = _SPACE_BEFORE_PUNCTUATION_PATTERN.sub(r"\1", cleaned)
     cleaned = _MISSING_SPACE_AFTER_PUNCTUATION_PATTERN.sub(r"\1 ", cleaned)
     cleaned = _EXTRA_SPACES_PATTERN.sub(" ", cleaned)

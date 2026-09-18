@@ -54,4 +54,13 @@ describe('AIInterviewLayout i18n', () => {
     expect(source).toContain("value=\"takeover\"");
     expect(source).not.toContain('!isLocalEmployer && takeoverActive');
   });
+
+  it('suppresses redundant display name for AI interviewer and local participant in timeline messages', () => {
+    const source = readFileSync(join(__dirname, '../AIInterviewLayout.tsx'), 'utf8');
+
+    expect(source).toContain('!isAgent &&');
+    expect(source).toContain('!isLocal &&');
+    expect(source).toContain('showDisplayName');
+    expect(source).toContain('{showDisplayName && (');
+  });
 });

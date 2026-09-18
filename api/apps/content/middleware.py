@@ -35,7 +35,7 @@ class MaintenanceModeMiddleware:
                 data=None,
                 errors={
                     "code": "MAINTENANCE_MODE",
-                    "message": "He thong dang bao tri. Vui long thu lai sau.",
+                    "message": "Hệ thống đang bảo trì. Vui lòng thử lại sau.",
                     "details": None,
                 },
             ),

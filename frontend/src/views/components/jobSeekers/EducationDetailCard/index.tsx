@@ -19,19 +19,19 @@ import IconButton from '@mui/material/IconButton';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import EmptyCard from '../../../../components/Common/EmptyCard';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import EmptyCard from '@/components/Common/EmptyCard';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import EducationDetaiForm from '../EducationDetailForm';
-import resumeService from '../../../../services/resumeService';
-import educationDetailService from '../../../../services/educationDetailService';
-import TimeAgo from '../../../../components/Common/TimeAgo';
+import resumeService from '@/services/resumeService';
+import educationDetailService from '@/services/educationDetailService';
+import TimeAgo from '@/components/Common/TimeAgo';
 import { Theme } from '@mui/material/styles';
 import { FormValues } from '../EducationDetailForm';
-import type { EducationDetail } from '../../../../types/models';
+import type { EducationDetail } from '@/types/models';
 
 interface EducationDetailCardProps {
   title: string;
@@ -110,21 +110,28 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
   const [editData, setEditData] = React.useState<Partial<FormValues> | null>(null);
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadEducationsDetail = async (slug: string | undefined) => {
       if (!slug) return;
 
       dispatch({ type: 'set_loading', payload: true });
       try {
         const resData = await resumeService.getEducationsDetail(slug);
+        if (!isMounted) return;
         setEducationsDetail(resData);
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set_loading', payload: false });
+        if (isMounted) {
+          dispatch({ type: 'set_loading', payload: false });
+        }
       }
     };
 
     loadEducationsDetail(resumeSlug);
+    return () => {
+      isMounted = false;
+    };
   }, [resumeSlug, uiState.refreshToken]);
 
   const handleShowUpdate = (id: string | number) => {
@@ -300,6 +307,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           <Stack direction="row" spacing={1}>
                             <IconButton
+                              aria-label={t('common:actions.edit')}
                               size="small"
                               sx={{
                                 color: 'secondary.main',
@@ -315,6 +323,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
                             </IconButton>
 
                             <IconButton
+                              aria-label={t('common:actions.delete')}
                               size="small"
                               sx={{
                                 color: 'error.main',

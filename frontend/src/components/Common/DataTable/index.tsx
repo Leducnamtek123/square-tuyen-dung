@@ -49,6 +49,7 @@ interface Props<TData> {
   enableRowSelection?: boolean;
   rowSelection?: RowSelectionState;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  getRowId?: (row: TData, relativeIndex: number) => string;
 
   // Deprecated: use rowCount, pagination, and onPaginationChange instead
   count?: number;
@@ -58,6 +59,9 @@ interface Props<TData> {
   onRowsPerPageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   emptyMessage?: string;
   paginationMode?: 'visible' | 'hidden';
+  variant?: 'card' | 'flat';
+  stickyHeader?: boolean;
+  maxHeight?: number | string;
 }
 
 type CellAlign = 'left' | 'center' | 'right' | 'justify' | 'inherit';
@@ -76,6 +80,7 @@ const DataTable = <TData,>({
     enableRowSelection = false,
     rowSelection,
     onRowSelectionChange,
+    getRowId,
     count = 0,
     page = 0,
     rowsPerPage = 10,
@@ -83,13 +88,27 @@ const DataTable = <TData,>({
     onRowsPerPageChange,
     emptyMessage,
     paginationMode = 'visible',
+    variant = 'card',
+    stickyHeader = false,
+    maxHeight,
 }: Props<TData>) => {
     const { t } = useTranslation('admin');
     
     // Resolve props for backward compatibility
     const finalCount = rowCount ?? count;
-    const finalPageIndex = pagination?.pageIndex ?? page;
+    const rawPageIndex = pagination?.pageIndex ?? page;
     const finalPageSize = pagination?.pageSize ?? rowsPerPage;
+    const maxPageIndex = finalCount > 0 ? Math.max(0, Math.ceil(finalCount / finalPageSize) - 1) : 0;
+    const finalPageIndex = Math.min(Math.max(0, rawPageIndex), maxPageIndex);
+
+    // Auto-adjust pagination state if page index is out of bounds
+    React.useEffect(() => {
+        if (finalCount > 0 && rawPageIndex > maxPageIndex) {
+            if (onPaginationChange && pagination) {
+                onPaginationChange({ ...pagination, pageIndex: maxPageIndex });
+            }
+        }
+    }, [finalCount, rawPageIndex, maxPageIndex, onPaginationChange, pagination]);
 
     const handlePageChange = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         if (onPaginationChange && pagination) {
@@ -100,55 +119,65 @@ const DataTable = <TData,>({
     };
 
     const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newSize = parseInt(event.target.value, 10);
+        const newPageSize = parseInt(event.target.value, 10);
         if (onPaginationChange && pagination) {
-            onPaginationChange({ ...pagination, pageIndex: 0, pageSize: newSize });
+            onPaginationChange({ pageIndex: 0, pageSize: newPageSize });
         } else if (onRowsPerPageChange) {
             onRowsPerPageChange(event);
         }
     };
 
-    const finalColumns = React.useMemo(() => {
-        const cols = [...userColumns];
-        if (enableRowSelection) {
-            cols.unshift({
-                id: 'select',
-                header: ({ table }) => (
-                    <Checkbox
-                        checked={table.getIsAllPageRowsSelected()}
-                        indeterminate={table.getIsSomePageRowsSelected()}
-                        onChange={table.getToggleAllPageRowsSelectedHandler()}
-                        size="small"
-                        sx={{ p: 0 }}
-                    />
-                ),
-                cell: ({ row }) => (
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        disabled={!row.getCanSelect()}
-                        onChange={row.getToggleSelectedHandler()}
-                        size="small"
-                        sx={{ p: 0 }}
-                    />
-                ),
-                size: 40,
-                meta: { align: 'center' },
-            });
-        }
-        return cols;
-    }, [userColumns, enableRowSelection]);
+    // Auto add selection column if enabled and not already present
+    const columns = React.useMemo(() => {
+        if (!enableRowSelection) return userColumns;
+        
+        const hasSelectionCol = userColumns.some(col => col.id === 'select' || (col as any).accessorKey === 'select');
+        if (hasSelectionCol) return userColumns;
+
+        const selectionColumn: ColumnDef<TData, unknown> = {
+            id: 'select',
+            header: ({ table }) => (
+                <Checkbox
+                    checked={table.getIsAllPageRowsSelected()}
+                    indeterminate={table.getIsSomePageRowsSelected()}
+                    onChange={table.getToggleAllPageRowsSelectedHandler()}
+                    size="small"
+                    color="primary"
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    disabled={!row.getCanSelect()}
+                    onChange={row.getToggleSelectedHandler()}
+                    size="small"
+                    color="primary"
+                />
+            ),
+            size: 48,
+            enableSorting: false,
+        };
+
+        return [selectionColumn, ...userColumns];
+    }, [enableRowSelection, userColumns]);
     
     const table = useReactTable({
         data,
-        columns: finalColumns,
+        columns,
+        pageCount: Math.ceil(finalCount / finalPageSize),
         state: {
-            sorting,
+            pagination: {
+                pageIndex: finalPageIndex,
+                pageSize: finalPageSize,
+            },
+            sorting: sorting ?? [],
             rowSelection: rowSelection ?? {},
         },
         enableRowSelection,
         enableSorting,
         onSortingChange,
         onRowSelectionChange,
+        getRowId: getRowId || ((row: any, index) => String(row?.id ?? row?.code ?? row?.slug ?? row?.uuid ?? (index !== undefined ? `row-${index}` : ''))),
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         manualPagination: true,
@@ -159,9 +188,42 @@ const DataTable = <TData,>({
     const displayEmptyMessage = emptyMessage || t('common.table.noData');
 
     return (
-        <Box sx={{ width: '100%' }}>
-            <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 'none', border: '1px solid', borderColor: 'divider' }}>
-                <Table sx={{ minWidth: 650 }}>
+        <Box sx={{ width: '100%', overflow: 'hidden' }}>
+            {/* Mobile Swipe Cue Banner */}
+            <Box
+                sx={{
+                    display: { xs: 'flex', md: 'none' },
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    px: 1.5,
+                    py: 0.75,
+                    bgcolor: '#F1F5F9',
+                    borderRadius: 1,
+                    mb: 1,
+                    color: '#64748B',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                }}
+            >
+                <span>⇄ Vuốt ngang để xem đủ các cột & thao tác</span>
+            </Box>
+            <TableContainer
+                component={variant === 'flat' ? Box : Paper}
+                sx={{
+                    maxHeight: maxHeight || undefined,
+                    overflowX: 'auto',
+                    WebkitOverflowScrolling: 'touch',
+                    scrollbarWidth: 'thin',
+                    '&::-webkit-scrollbar': { height: 6, width: 6 },
+                    '&::-webkit-scrollbar-thumb': { bgcolor: '#CBD5E1', borderRadius: 3 },
+                    '&::-webkit-scrollbar-track': { bgcolor: '#F1F5F9' },
+                    width: '100%',
+                    ...(variant === 'flat'
+                        ? { borderRadius: 0, boxShadow: 'none', border: 'none' }
+                        : { borderRadius: 2, boxShadow: 'none', border: '1px solid', borderColor: 'divider' })
+                }}
+            >
+                <Table sx={{ minWidth: { xs: 720, md: 650 } }} stickyHeader={stickyHeader}>
                     <TableHead sx={{ bgcolor: 'grey.50' }}>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
@@ -206,7 +268,7 @@ const DataTable = <TData,>({
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={finalColumns.length} align="center" sx={{ py: 8 }}>
+                                <TableCell colSpan={columns.length} align="center" sx={{ py: 8 }}>
                                     <CircularProgress size={40} />
                                 </TableCell>
                             </TableRow>
@@ -226,7 +288,7 @@ const DataTable = <TData,>({
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={finalColumns.length} align="center" sx={{ py: 8 }}>
+                                <TableCell colSpan={columns.length} align="center" sx={{ py: 8 }}>
                                     <Typography color="text.secondary">{displayEmptyMessage}</Typography>
                                 </TableCell>
                             </TableRow>
@@ -244,10 +306,23 @@ const DataTable = <TData,>({
                     page={finalPageIndex}
                     onPageChange={handlePageChange}
                     onRowsPerPageChange={handleRowsPerPageChange}
+                    backIconButtonProps={{ disabled: isLoading }}
+                    nextIconButtonProps={{ disabled: isLoading }}
                     labelRowsPerPage={t('common.pagination.rowsPerPage')}
                     labelDisplayedRows={({ from, to, count }) => 
                         t('common.pagination.displayedRows', { from, to, count })
                     }
+                    sx={{
+                        '& .MuiTablePagination-toolbar': {
+                            flexWrap: 'wrap',
+                            justifyContent: { xs: 'center', sm: 'flex-end' },
+                            px: { xs: 1, sm: 2 },
+                            gap: { xs: 0.5, sm: 0 },
+                        },
+                        '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                            fontSize: '0.8125rem',
+                        },
+                    }}
                 />
             )}
         </Box>

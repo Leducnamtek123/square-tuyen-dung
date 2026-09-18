@@ -1,17 +1,17 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo, useReducer } from 'react';
 import { Box, Typography, Paper, TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import dayjs from '../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 
 import { useJobActivities } from './hooks/useJobActivities';
-import { useDataTable, useDebounce } from '../../../hooks';
-import { JobPostActivity } from '../../../types/models';
+import { useDataTable, useDebounce } from '@/hooks';
+import { JobPostActivity } from '@/types/models';
 import FilterBar from '@/components/Common/FilterBar';
 import {
     JOB_ACTIVITY_STATUS_OPTIONS,
@@ -142,9 +142,10 @@ const JobActivityPage = () => {
 
     const columns = useMemo<ColumnDef<JobPostActivity>[]>(() => [
         {
-            accessorKey: 'id',
-            header: 'ID',
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             accessorKey: 'fullName',
@@ -192,7 +193,7 @@ const JobActivityPage = () => {
             accessorKey: 'createAt',
             header: t('pages.jobActivity.table.updatedAt') as string,
             enableSorting: true,
-            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '-',
         },
         {
             id: 'actions',
@@ -201,12 +202,12 @@ const JobActivityPage = () => {
             cell: (info) => (
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title={t('pages.jobActivity.table.updateStatus')}>
-                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.jobActivity.table.delete')}>
-                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

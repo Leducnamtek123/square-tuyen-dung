@@ -44,7 +44,7 @@ export function initMockAdapter(client: AxiosInstance) {
   mock.onGet(/\/common\/popular-keywords\/?/).reply(200, { data: mockPopularKeywords, results: mockPopularKeywords, count: mockPopularKeywords.length });
 
   // 2. Banners, Feedbacks, Articles & Categories
-  mock.onGet(/\/banner\/?/).reply(200, { data: mockBanners, results: mockBanners, count: mockBanners.length });
+  mock.onGet(/\/(banner|common\/banners|content\/banners)\/?/).reply(200, { data: mockBanners, results: mockBanners, count: mockBanners.length });
   mock.onGet(/\/feedbacks\/?/).reply(200, { data: mockFeedbacks, results: mockFeedbacks, count: mockFeedbacks.length });
   mock.onGet(/\/content\/web\/article-categories\/?/).reply(200, { data: mockArticleCategories, results: mockArticleCategories, count: mockArticleCategories.length });
   mock.onGet(/\/content\/web\/admin\/article-categories\/?/).reply(200, { data: mockArticleCategories, results: mockArticleCategories, count: mockArticleCategories.length });
@@ -72,14 +72,14 @@ export function initMockAdapter(client: AxiosInstance) {
   });
 
   // 4. Companies list & detail
-  mock.onGet(/\/company\/web\/companies\/[^\/]+\/?$/).reply((config) => {
+  mock.onGet(/\/(company\/web\/companies|info\/web\/companies)\/[^\/]+\/?$/).reply((config) => {
     const parts = (config.url || '').split('?')[0].split('/').filter(Boolean);
     const slugOrId = parts[parts.length - 1];
     const found = mockCompanies.find((c) => String(c.id) === slugOrId || c.slug === slugOrId) || mockCompanies[0];
     return [200, { data: found }];
   });
 
-  mock.onGet(/\/(company\/web\/companies|info\/web\/companies\/top)\/?/).reply(() => {
+  mock.onGet(/\/(company\/web\/companies|info\/web\/companies|info\/web\/companies\/top)\/?/).reply(() => {
     return [
       200,
       {
@@ -99,12 +99,6 @@ export function initMockAdapter(client: AxiosInstance) {
       token_type: 'Bearer',
       expires_in: 3600,
     },
-  });
-
-  // 6. Generic catch-all fallback (returns valid empty payload for any unspecified route)
-  mock.onAny().reply((config) => {
-    console.log(`[Mock Fallback] Handled ${config.method?.toUpperCase()} ${config.url}`);
-    return [200, { data: [], results: [], count: 0, success: true }];
   });
 
   mockAdapterInstance = mock;

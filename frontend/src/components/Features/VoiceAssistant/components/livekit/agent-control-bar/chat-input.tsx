@@ -43,7 +43,7 @@ export function ChatInput({
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState<string>('');
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {

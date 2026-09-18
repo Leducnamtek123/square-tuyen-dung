@@ -18,6 +18,8 @@ export interface JobPostFilter {
 export interface CompanyFilter {
   kw: string;
   cityId: string;
+  employeeSize?: string;
+  fieldOperation?: string;
   page: number;
   pageSize: number;
 }
@@ -33,6 +35,9 @@ export interface ResumeFilter {
   jobTypeId: string;
   genderId: string;
   maritalStatusId: string;
+  jobPostId?: string;
+  sort?: string;
+  aiSuggested?: boolean;
   page: number;
   pageSize: number;
 }
@@ -68,6 +73,8 @@ const buildJobPostFilter = (
 const initialCompanyFilter: CompanyFilter = {
   kw: '',
   cityId: '',
+  employeeSize: '',
+  fieldOperation: '',
   page: 1,
   pageSize: 12,
 };
@@ -84,7 +91,7 @@ const initialResumeFilter: ResumeFilter = {
   genderId: '',
   maritalStatusId: '',
   page: 1,
-  pageSize: 10,
+  pageSize: 6,
 };
 
 const filterSlice = createSlice({

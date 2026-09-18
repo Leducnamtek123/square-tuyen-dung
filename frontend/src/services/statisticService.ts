@@ -136,6 +136,15 @@ export interface AdminGeneralStats {
   newInterviews30d?: number;
 }
 
+export interface AdminTrendStats {
+  days: number;
+  labels: string[];
+  newUsers: number[];
+  newJobs: number[];
+  newApplications: number[];
+  newInterviews: number[];
+}
+
 export type EmployerStatsParams = {
   startDate?: string;
   endDate?: string;
@@ -203,6 +212,12 @@ const statisticService = {
     const url = 'job/web/statistics/admin/';
     return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)
       .then(unwrapDataResponse<AdminGeneralStats>);
+  },
+
+  adminTrendStatistics: (days: number = 30): Promise<AdminTrendStats> => {
+    const url = 'job/web/statistics/admin/';
+    return (httpRequest.get(url, { params: { type: 'trend', days } }) as Promise<unknown>)
+      .then(unwrapDataResponse<AdminTrendStats>);
   },
 };
 

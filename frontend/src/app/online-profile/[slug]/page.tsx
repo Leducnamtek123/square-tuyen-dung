@@ -1,15 +1,16 @@
-import DefaultLayout from '@/layouts/DefaultLayout';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import JobSeekerLayout from '@/layouts/JobSeekerLayout';
 import OnlineProfilePage from '@/views/jobSeekerPages/OnlineProfilePage';
 
-export const metadata = {
-  title: 'Online Profile',
-  description: 'Browse Online Profile.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('online-profile');
+}
 
 export default function Page() {
   return (
-    <DefaultLayout>
+    <JobSeekerLayout>
       <OnlineProfilePage />
-    </DefaultLayout>
+    </JobSeekerLayout>
   );
 }

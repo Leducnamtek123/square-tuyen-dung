@@ -20,7 +20,7 @@ from apps.files.models import File
 from apps.jobs.models import JobPostActivity
 from apps.accounts import serializers as auth_serializers
 from apps.locations.models import City
-from common.models import Career
+from apps.common.models import Career
 
 # Import from sibling submodules
 from .profile_serializers import JobSeekerProfileSerializer, PHONE_PATTERN
@@ -123,42 +123,48 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     title = serializers.CharField(required=True, max_length=200)
     description = serializers.CharField(
         required=False, allow_null=True, allow_blank=True)
-    salaryMin = serializers.IntegerField(source="salary_min", required=True)
-    salaryMax = serializers.IntegerField(source="salary_max", required=True)
+    salaryMin = serializers.IntegerField(source="salary_min", required=False, allow_null=True, default=0)
+    salaryMax = serializers.IntegerField(source="salary_max", required=False, allow_null=True, default=0)
     expectedSalary = serializers.IntegerField(source="expected_salary", required=False, allow_null=True)
     skillsSummary = serializers.CharField(source="skills_summary", required=False, allow_null=True, allow_blank=True)
-    position = serializers.IntegerField(required=True)
+    position = serializers.IntegerField(required=False, allow_null=True, default=1)
     positionChooseData = serializers.SerializerMethodField(
         method_name="get_position_data", read_only=True)
-    experience = serializers.IntegerField(required=True)
+    experience = serializers.IntegerField(required=False, allow_null=True, default=1)
     experienceChooseData = serializers.SerializerMethodField(
         method_name="get_experience_data", read_only=True)
-    academicLevel = serializers.IntegerField(source="academic_level", required=True)
+    academicLevel = serializers.IntegerField(source="academic_level", required=False, allow_null=True, default=1)
     academicLevelChooseData = serializers.SerializerMethodField(
         method_name="get_academic_level_data", read_only=True)
-    typeOfWorkplace = serializers.IntegerField(source="type_of_workplace", required=True)
+    typeOfWorkplace = serializers.IntegerField(source="type_of_workplace", required=False, allow_null=True, default=1)
     typeOfWorkplaceChooseData = serializers.SerializerMethodField(
         method_name="get_type_of_workplace_data", read_only=True)
-    jobType = serializers.IntegerField(source="job_type", required=True)
+    jobType = serializers.IntegerField(source="job_type", required=False, allow_null=True, default=1)
     jobTypeChooseData = serializers.SerializerMethodField(
         method_name="get_job_type_data", read_only=True)
-    isActive = serializers.BooleanField(source="is_active", default=False)
+    careerChooseData = serializers.SerializerMethodField(
+        method_name="get_career_data", read_only=True)
+    cityChooseData = serializers.SerializerMethodField(
+        method_name="get_city_data", read_only=True)
+    isActive = serializers.BooleanField(source="is_active", default=True)
     updateAt = serializers.DateTimeField(source="update_at", read_only=True)
     imageUrl = serializers.SerializerMethodField(
         method_name="get_cv_image_url", read_only=True)
     fileUrl = serializers.SerializerMethodField(
         method_name="get_cv_file_url", read_only=True)
+    fileDict = serializers.SerializerMethodField(
+        method_name="get_file_dict", read_only=True)
     file = serializers.FileField(required=True, write_only=True)
     user = auth_serializers.UserSerializer(
-        fields=["id", "fullName", "avatarUrl"], read_only=True)
+        fields=["id", "fullName", "email", "avatarUrl"], read_only=True)
     isSaved = serializers.SerializerMethodField(
         method_name='check_saved', read_only=True)
     viewEmployerNumber = serializers.SerializerMethodField(
         method_name="get_view_number", read_only=True)
     userDict = auth_serializers.UserSerializer(
-        source='user', fields=["id", "fullName"], read_only=True)
+        source='user', fields=["id", "fullName", "email", "avatarUrl"], read_only=True)
     jobSeekerProfileDict = JobSeekerProfileSerializer(source="job_seeker_profile",
-                                                      fields=["id", "old"],
+                                                      fields=["id", "phone", "old", "contactAddress", "birthday", "gender", "maritalStatus", "location"],
                                                       read_only=True)
     lastViewedDate = serializers.SerializerMethodField(
         method_name='get_last_viewed_date', read_only=True)
@@ -183,19 +189,47 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def get_fields(self, *args, **kwargs):
         fields = super(ResumeSerializer, self).get_fields(*args, **kwargs)
         request = self.context.get('request', None)
-        if request and getattr(request, 'method', None) in ["PUT"]:
-            fields['file'].required = False
+        if request and getattr(request, 'method', None) in ["PUT", "PATCH"]:
+            if 'file' in fields:
+                fields['file'].required = False
+            if 'title' in fields:
+                fields['title'].required = False
+        if request:
+            user = getattr(request, 'user', None)
+            if user and (getattr(user, 'role_name', None) == 'EMPLOYER' or getattr(user, 'active_company', None) is not None):
+                for f in ['sourcePlatform', 'sourceUrl', 'sourceAccount', 'sourceRef', 'isImported']:
+                    fields.pop(f, None)
         return fields
+
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        if "skills_summary" in validated_data:
+            summary = validated_data.get("skills_summary") or ""
+            instance.advanced_skills.all().delete()
+            for s in summary.split(","):
+                name = s.strip()
+                if name:
+                    AdvancedSkill.objects.create(resume=instance, name=name, level=3)
+        return instance
 
     def validate_file(self, cv_file):
         return validate_pdf_cv_file(cv_file)
 
     def get_view_number(self, resume):
+        if hasattr(resume, "view_count"):
+            return resume.view_count
         if hasattr(resume, "_prefetched_objects_cache") and "resumesaved_set" in resume._prefetched_objects_cache:
             return len(resume.resumesaved_set.all())
         return resume.resumesaved_set.count()
 
+    matchScore = serializers.SerializerMethodField(read_only=True)
+
+    def get_matchScore(self, resume):
+        return getattr(resume, "match_score", 0)
+
     def check_saved(self, resume):
+        if hasattr(resume, "is_saved"):
+            return resume.is_saved
         request = self.context.get('request', None)
         if request is None:
             return None
@@ -207,6 +241,8 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return None
 
     def get_last_viewed_date(self, resume):
+        if hasattr(resume, "last_viewed_at"):
+            return resume.last_viewed_at
         request = self.context.get('request', None)
         if request is None:
             return None
@@ -233,6 +269,23 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             return cv_file.get_full_url()
         return None
 
+    def get_file_dict(self, resume):
+        cv_file = resume.file
+        if cv_file:
+            name = ""
+            if cv_file.metadata and isinstance(cv_file.metadata, dict):
+                name = cv_file.metadata.get("name") or cv_file.metadata.get("filename") or cv_file.metadata.get("original_name") or ""
+            if not name and cv_file.public_id:
+                name = cv_file.public_id.split("/")[-1]
+            return {
+                "id": cv_file.id,
+                "url": cv_file.get_full_url(),
+                "fileUrl": cv_file.get_full_url(),
+                "name": name,
+                "size": cv_file.metadata.get("size") if (cv_file.metadata and isinstance(cv_file.metadata, dict)) else None,
+            }
+        return None
+
     def get_position_data(self, resume):
         if resume.position is not None:
             return {'id': resume.position, 'name': resume.get_position_display()}
@@ -256,6 +309,16 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def get_job_type_data(self, resume):
         if resume.job_type is not None:
             return {'id': resume.job_type, 'name': resume.get_job_type_display()}
+        return None
+
+    def get_career_data(self, resume):
+        if resume.career:
+            return {'id': resume.career.id, 'name': resume.career.name}
+        return None
+
+    def get_city_data(self, resume):
+        if resume.city:
+            return {'id': resume.city.id, 'name': resume.city.name}
         return None
 
     def get_experience_details(self, resume):
@@ -297,7 +360,8 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         for lang in resume.language_skills.all():
             languages.append({
                 'id': lang.id,
-                'language': lang.get_language_display() if lang.language else None,
+                'language': lang.language,
+                'languageName': lang.get_language_display() if lang.language else None,
                 'level': lang.level
             })
         return languages
@@ -340,14 +404,14 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   "position", "experience", "academicLevel",
                   "typeOfWorkplace", "jobType", "isActive",
                   "career", "updateAt", "file",
-                  "imageUrl", "fileUrl", "user", "city", 'isSaved',
+                  "imageUrl", "fileUrl", "fileDict", "user", "city", 'isSaved',
                   "viewEmployerNumber", "lastViewedDate",
                   "userDict", "jobSeekerProfileDict",
                   "type", "positionChooseData", "experienceChooseData", "academicLevelChooseData",
-                  "typeOfWorkplaceChooseData", "jobTypeChooseData",
+                  "typeOfWorkplaceChooseData", "jobTypeChooseData", "careerChooseData", "cityChooseData",
                   "experienceDetails", "educationDetails", "certificateDetails",
                   "languageSkills", "advancedSkills",
-                  "sourcePlatform", "sourceUrl", "sourceAccount", "sourceRef", "isImported")
+                  "sourcePlatform", "sourceUrl", "sourceAccount", "sourceRef", "isImported", "matchScore")
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -355,11 +419,13 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             user = request.user
             job_seeker_profile = getattr(user, 'job_seeker_profile', None)
             if not job_seeker_profile:
-                # If it's a job seeker without a profile, we should probably create one or error out gracefully.
-                # For now, we'll error out as a resume requires a profile context.
-                from rest_framework.exceptions import ValidationError
-                raise ValidationError({"errorMessage": ["User does not have a job seeker profile. Please complete your profile first."]})
+                from apps.profiles.models import JobSeekerProfile
+                job_seeker_profile, _ = JobSeekerProfile.objects.get_or_create(user=user)
             pdf_file = validated_data.pop('file')
+
+            validated_data.setdefault('type', var_sys.CV_UPLOAD)
+            validated_data.setdefault('salary_min', 0)
+            validated_data.setdefault('salary_max', 0)
 
             resume = Resume.objects.create(**validated_data,
                                            user=user,
@@ -872,6 +938,11 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 "permanentAddress", "contactAddress",
                 "emergencyContactName", "emergencyContactPhone"],
         read_only=True)
+    experienceDetails = ExperienceSerializer(
+        source="experience_details",
+        fields=['id', 'jobName', 'companyName', 'startDate', 'endDate',
+                'description', 'lastSalary', 'leaveReason'],
+        read_only=True, many=True)
     experiencesDetails = ExperienceSerializer(
         source="experience_details",
         fields=['id', 'jobName', 'companyName', 'startDate', 'endDate',
@@ -885,6 +956,10 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     certificates = CertificateSerializer(
         fields=['id', 'name', 'trainingPlace', 'startDate', 'expirationDate'],
         read_only=True, many=True)
+    certificateDetails = CertificateSerializer(
+        source="certificates",
+        fields=['id', 'name', 'trainingPlace', 'startDate', 'expirationDate'],
+        read_only=True, many=True)
     languageSkills = LanguageSkillSerializer(
         source="language_skills",
         fields=['id', 'language', 'level'],
@@ -896,11 +971,15 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     lastViewedDate = serializers.SerializerMethodField(method_name='get_last_viewed_date', read_only=True)
     isSentEmail = serializers.SerializerMethodField(method_name='check_sent_email', read_only=True)
     aiAnalysis = serializers.SerializerMethodField(method_name='get_ai_analysis', read_only=True)
+    matchScore = serializers.SerializerMethodField(method_name='get_match_score', read_only=True)
     sourcePlatform = serializers.CharField(source="source_platform", read_only=True, allow_null=True, required=False)
     sourceUrl = serializers.CharField(source="source_url", read_only=True, allow_null=True, required=False)
     sourceAccount = serializers.CharField(source="source_account", read_only=True, allow_null=True, required=False)
     sourceRef = serializers.CharField(source="source_ref", read_only=True, allow_null=True, required=False)
     isImported = serializers.BooleanField(source="is_imported", read_only=True, required=False)
+
+    def get_match_score(self, resume):
+        return getattr(resume, "match_score", 0)
 
     def check_saved(self, resume):
         request = self.context.get('request', None)
@@ -967,6 +1046,8 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         cv_file = resume.file
         if cv_file:
             return cv_file.get_full_url()
+        if resume.source_payload and isinstance(resume.source_payload, dict):
+            return resume.source_payload.get("cvFileUrl") or (resume.source_payload.get("detail_page") or {}).get("cv_file_url")
         return None
 
     def get_cv_file_public_id(self, resume):
@@ -975,6 +1056,16 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             return cv_file.public_id
         return None
 
+    def get_fields(self, *args, **kwargs):
+        fields = super().get_fields(*args, **kwargs)
+        request = self.context.get('request', None)
+        if request:
+            user = getattr(request, 'user', None)
+            if user and (getattr(user, 'role_name', None) == 'EMPLOYER' or getattr(user, 'active_company', None) is not None):
+                for f in ['sourcePlatform', 'sourceUrl', 'sourceAccount', 'sourceRef', 'isImported']:
+                    fields.pop(f, None)
+        return fields
+
     class Meta:
         model = Resume
         fields = ("id", "slug", "title", "description",
@@ -982,9 +1073,9 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   "position", "experience", "academicLevel",
                   "typeOfWorkplace", "jobType", "isActive",
                   "city", "career", "updateAt", "fileUrl",
-                  "filePublicId", "city", 'isSaved', "type",
+                  "filePublicId", 'isSaved', "type",
                   "user", "jobSeekerProfile",
-                  "experiencesDetails", "educationDetails",
-                  "certificates", "languageSkills", "advancedSkills",
-                  "lastViewedDate", "isSentEmail", "aiAnalysis",
+                  "experienceDetails", "experiencesDetails", "educationDetails",
+                  "certificates", "certificateDetails", "languageSkills", "advancedSkills",
+                  "lastViewedDate", "isSentEmail", "aiAnalysis", "matchScore",
                   "sourcePlatform", "sourceUrl", "sourceAccount", "sourceRef", "isImported")

@@ -2,7 +2,10 @@
   "appliedResume": {
     "title": "Quản lý hồ sơ ứng tuyển",
     "downloadList": "Tải danh sách",
-    "filters": "Bộ lọc:",
+    "filters": {
+      "selectJobPost": "Chọn tin tuyển dụng",
+      "searchPlaceholder": "Tìm kiếm theo tên ứng viên, email, số điện thoại..."
+    },
     "allJobPosts": "Tất cả tin tuyển dụng",
     "allStatuses": "Tất cả trạng thái tuyển dụng",
     "advancedFilter": "Bộ lọc nâng cao",
@@ -10,8 +13,8 @@
     "boardView": "Thẻ",
     "table": {
       "noCandidates": "Chưa có ứng viên nào ứng tuyển",
-      "onlineResume": "Hồ sơ Trực tuyến",
-      "attachedResume": "Hồ sơ Đính kèm",
+      "onlineResume": "Hồ sơ ứng viên",
+      "attachedResume": "Hồ sơ ứng viên",
       "notUpdated": "Chưa cập nhật",
       "profileName": "Tên ứng viên",
       "appliedPosition": "Vị trí ứng tuyển",
@@ -23,9 +26,15 @@
       "tooltips": {
         "view": "Xem hồ sơ",
         "delete": "Xóa hồ sơ",
-        "scheduleInterview": "Lên lịch phỏng vấn"
+        "scheduleInterview": "Lên lịch phỏng vấn",
+        "blindDisabled": "Thao tác bị vô hiệu hóa ở chế độ đánh giá ẩn danh"
       },
-      "clickToDownload": "Nhấp để tải xuống"
+      "clickToDownload": "Nhấp để tải xuống",
+      "candidateName": "Họ và tên Ứng viên",
+      "jobTitle": "Vị trí ứng tuyển",
+      "phone": "Số điện thoại",
+      "email": "Email",
+      "aiScore": "Điểm đánh giá AI"
     },
     "ai": {
       "analysisStarted": "Đã bắt đầu phân tích AI. Vui lòng đợi trong giây lát.",
@@ -59,9 +68,9 @@
       "allSkillsTitle": "Tất cả kỹ năng",
       "noData": "Không có dữ liệu",
       "resumeTitle": "Hồ sơ ứng viên",
-      "onlineResumeLabel": "Hồ sơ trực tuyến",
-      "onlineResumeHint": "AI sẽ phân tích hồ sơ trực tuyến của ứng viên.",
-      "viewOnlineProfile": "Xem hồ sơ trực tuyến",
+      "onlineResumeLabel": "Thông tin hồ sơ ứng viên",
+      "onlineResumeHint": "AI sẽ phân tích chi tiết thông tin hồ sơ của ứng viên.",
+      "viewOnlineProfile": "Xem chi tiết hồ sơ",
       "viewAnalysis": "Xem phân tích AI",
       "failed": "Phân tích AI thất bại",
       "allStatuses": "Trạng thái AI",
@@ -72,6 +81,12 @@
       "overrideScore": "Điểm ghi đè",
       "reviewNote": "Ghi chú rà soát",
       "saveReview": "Lưu rà soát",
+      "reviewedAtLabel": "Đã đánh giá: {{date}}",
+      "reviewStatus": {
+        "ai_only": "Chỉ AI",
+        "reviewed": "Đã rà soát",
+        "overridden": "Đã ghi đè điểm"
+      },
       "criteriaTitle": "Tiêu chí có trọng số",
       "evidenceTitle": "Bằng chứng",
       "identityWarningTitle": "Cảnh báo tên CV không khớp",
@@ -94,17 +109,19 @@
     },
     "status": {
       "updateTitle": "Cập nhật trạng thái ứng tuyển",
-      "updateConfirm": "Hồ sơ sẽ được cập nhật sang trạng thái <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Bạn có chắc chắn không?",
+      "updateConfirm": "Hồ sơ sẽ được cập nhật sang trạng thái <strong>\"{{statusName}}\"</strong>. Bạn có chắc chắn không?",
       "errorTitle": "Đã xảy ra lỗi",
-      "errorMsg": "Bạn không được phép thay đổi trạng thái ứng tuyển từ <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> sang <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
-      "updateSuccess": "Cập nhật thành công."
+      "errorMsg": "Bạn không được phép thay đổi trạng thái ứng tuyển từ <strong>\"{{fromStatus}}\"</strong> sang <strong>\"{{toStatus}}\"</strong>",
+      "updateSuccess": "Cập nhật thành công.",
+      "rollbackMsg": "Không thể cập nhật trạng thái hồ sơ. Đã khôi phục trạng thái ban đầu."
     },
     "delete": {
       "title": "Xóa hồ sơ ứng tuyển",
       "confirm": "Hồ sơ ứng tuyển này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
       "success": "Xóa hồ sơ ứng tuyển thành công."
     },
-    "manageSubtitle": "Quản lý hồ sơ ứng tuyển"
+    "manageSubtitle": "Quản lý hồ sơ ứng tuyển",
+    "subtitle": "Theo dõi, đánh giá và quản lý toàn bộ hồ sơ ứng viên ứng tuyển vào các vị trí của doanh nghiệp."
   },
   "savedResume": {
     "title": "Quản lý hồ sơ đã lưu",
@@ -115,7 +132,22 @@
     },
     "confirmUnsaveTitle": "Bỏ lưu hồ sơ",
     "confirmUnsaveMessage": "Bạn có chắc muốn bỏ lưu hồ sơ này?",
-    "manageSubtitle": "Quản lý hồ sơ đã lưu"
+    "manageSubtitle": "Quản lý hồ sơ đã lưu",
+    "table": {
+      "candidateName": "Họ và tên",
+      "jobTitle": "Tên vị trí / Chức danh",
+      "savedDate": "Ngày lưu",
+      "phone": "Số điện thoại",
+      "email": "Email"
+    },
+    "subtitle": "Quản lý và theo dõi các hồ sơ ứng viên bạn đã lưu lại để tiện liên hệ hoặc tuyển dụng sau này.",
+    "columns": {
+      "candidateName": "Họ và tên",
+      "jobTitle": "Vị trí / Chức danh",
+      "experience": "Kinh nghiệm",
+      "city": "Tỉnh / Thành phố",
+      "savedAt": "Ngày lưu"
+    }
   },
   "savedResumeTable": {
     "title": {
@@ -238,7 +270,8 @@
     "candidateChart": "BIỂU ĐỒ ỨNG VIÊN",
     "applicationChart": "BIỂU ĐỒ TUYỂN DỤNG & ỨNG TUYỂN",
     "academicChart": "BIỂU ĐỒ TUYỂN DỤNG THEO TRÌNH ĐỘ",
-    "interviewChart": "THỐNG KÊ PHỎNG VẤN"
+    "interviewChart": "THỐNG KÊ PHỎNG VẤN",
+    "recruitmentFunnel": "Phễu tuyển dụng"
   },
   "jobPost": {
     "title": "Quản lý tin tuyển dụng",
@@ -252,7 +285,10 @@
       "applications": "Lượt ứng tuyển",
       "views": "Lượt xem",
       "status": "Trạng thái",
-      "actions": "Thao tác"
+      "actions": "Thao tác",
+      "title": "Tiêu đề công việc",
+      "createdDate": "Ngày tạo",
+      "creator": "Người tạo"
     },
     "urgent": "Gấp",
     "noData": "Bạn chưa có tin tuyển dụng nào",
@@ -264,7 +300,7 @@
       "keywordsPlaceholder": "Nhập tiêu đề công việc",
       "urgent": "Gấp",
       "notUrgent": "Không gấp",
-      "urgentPlaceholder": "Trạng thái tuyển dụng (gấp)",
+      "urgentPlaceholder": "Trạng thái tuyển dụng khẩn cấp",
       "statusPlaceholder": "Trạng thái phê duyệt",
       "reset": "Làm mới",
       "search": "Tìm kiếm"
@@ -284,7 +320,38 @@
       "toast": "Vui lòng xác thực Nhà tuyển dụng trước khi đăng tin."
     },
     "popupTitle": "Tin tuyển dụng",
-    "manageSubtitle": "Quản lý các tin tuyển dụng"
+    "manageSubtitle": "Quản lý các tin tuyển dụng",
+    "editor": {
+      "createTitle": "Tạo tin tuyển dụng mới",
+      "editTitle": "Chỉnh sửa tin tuyển dụng",
+      "createSubtitle": "Điền đầy đủ thông tin vị trí công việc, đãi ngộ và cấu hình phỏng vấn AI để tiếp cận ứng viên tiềm năng nhanh chóng.",
+      "editSubtitle": "Cập nhật nội dung tin tuyển dụng, yêu cầu ứng viên và điều chỉnh ngưỡng điểm đánh giá phỏng vấn AI.",
+      "backToList": "Quay lại danh sách",
+      "confirmCancelTitle": "Hủy bỏ thao tác",
+      "confirmCancelMessage": "Bạn có thay đổi chưa được lưu. Rời khỏi trang này sẽ làm mất toàn bộ nội dung vừa nhập. Bạn có chắc chắn muốn rời đi?",
+      "confirmCancelButton": "Rời khỏi trang",
+      "continueEditingButton": "Tiếp tục chỉnh sửa",
+      "saveButton": "Đăng tin tuyển dụng",
+      "updateButton": "Lưu thay đổi",
+      "cancelButton": "Hủy bỏ",
+      "progressTitle": "Tiến độ hoàn thiện tin",
+      "progressSubtitle": "Tin càng chi tiết càng tăng cơ hội thu hút ứng viên xuất sắc",
+      "sectionBasic": "Thông tin vị trí",
+      "sectionSalary": "Lương và thời hạn",
+      "sectionAi": "Thiết lập phỏng vấn AI",
+      "sectionContent": "Mô tả và quyền lợi",
+      "sectionLocation": "Địa điểm làm việc",
+      "sectionContact": "Thông tin liên hệ",
+      "tipsTitle": "Mẹo đăng tin tuyển dụng hiệu quả",
+      "tip1Title": "Mô tả công việc rõ ràng",
+      "tip1Desc": "Liệt kê từ 5 đến 7 trách nhiệm chính và nêu rõ các công nghệ hoặc kỹ năng cần thiết.",
+      "tip2Title": "Mức lương minh bạch",
+      "tip2Desc": "Tin tuyển dụng có khoảng lương cụ thể nhận được lượng ứng tuyển cao hơn 40 phần trăm.",
+      "tip3Title": "Tự động hóa phỏng vấn AI",
+      "tip3Desc": "Bật sàng lọc tự động giúp rút ngắn thời gian liên hệ và nâng cao trải nghiệm ứng viên.",
+      "policyTitle": "Quy định kiểm duyệt tin",
+      "policyDesc": "Tin tuyển dụng sẽ được kiểm duyệt trong vòng 2 giờ làm việc để đảm bảo tính minh bạch và bảo vệ quyền lợi ứng viên."
+    }
   },
   "sendEmailComponent": {
     "label": {
@@ -351,7 +418,8 @@
       "tested": "Đã làm bài test",
       "interviewed": "Đã phỏng vấn",
       "notselected": "Không được chọn"
-    }
+    },
+    "tooltip": "Thống kê tuyển dụng trong giai đoạn này"
   },
   "companyForm": {
     "title": {
@@ -385,6 +453,7 @@
       "entercompanyemail": "Nhập email công ty",
       "entercompanyphonenumber": "Nhập số điện thoại công ty",
       "selectcityprovince": "Chọn Tỉnh/Thành phố",
+      "selectCityFirst": "Vui lòng chọn Tỉnh / Thành phố trước",
       "selectdistrict": "Chọn Quận/Huyện",
       "enteraddress": "Nhập địa chỉ",
       "enterlatitudecoordinateonthemap": "Nhập vĩ độ trên bản đồ",
@@ -428,7 +497,7 @@
     "label": {
       "selectjobpost": "Chọn tin tuyển dụng",
       "selectcandidate": "Chọn ứng viên",
-      "selectquestiongroupoptional": "Chọn nhóm câu hỏi (Không bắt buộc)",
+      "selectquestiongroupoptional": "Chọn nhóm câu hỏi",
       "selectinterviewquestions": "Chọn câu hỏi phỏng vấn"
     },
     "helperText": {
@@ -453,7 +522,7 @@
     "scheduleNow": "Lên lịch ngay"
   },
   "interviewDetail": {
-    "title": "Chi tiết Phỏng vấn Online",
+    "title": "Chi tiết phỏng vấn trực tuyến",
     "subtitle": {
       "info": "Thông tin Phỏng vấn",
       "aiEvaluation": "Kết quả đánh giá AI",
@@ -523,11 +592,11 @@
       "resultLabel": "Kết quả cuối cùng",
       "commentsPlaceholder": "Thêm ghi chú HR và đánh giá cuối cùng...",
       "comments": "Nhận xét chi tiết",
-      "proposedSalary": "Lương đề xuất (VNĐ)",
+      "proposedSalary": "Lương đề xuất",
       "submitEvaluation": "Gửi đánh giá cuối cùng",
       "evalSuccess": "Gửi đánh giá thành công!",
-      "passed": "Chấp nhận (Đạt)",
-      "failed": "Từ chối (Không đạt)",
+      "passed": "Đạt yêu cầu",
+      "failed": "Không đạt",
       "pending": "Chờ xem xét"
     }
   },
@@ -580,7 +649,9 @@
       "contactpersonphoneexceededallowedlength": "SĐT quá dài",
       "contactpersonemailisrequired": "Yêu cầu email",
       "invalidemail": "Email không hợp lệ",
-      "contactpersonemailexceededallowedlength": "Email quá dài"
+      "contactpersonemailexceededallowedlength": "Email quá dài",
+      "invalidminscore": "Điểm tối thiểu không hợp lệ.",
+      "minscoreoutofrange": "Điểm tối thiểu phải từ 0 đến 100."
     },
     "warning": "Khi cập nhật, bài viết sẽ ở trạng thái chờ duyệt!",
     "title": {
@@ -609,13 +680,20 @@
       "contactpersonphone": "SĐT liên hệ",
       "contactpersonemail": "Email liên hệ",
       "contactinformation": "Thông tin liên hệ",
-      "urgent": "Gấp"
+      "urgent": "Gấp",
+      "autointerview": "Tự động mời phỏng vấn AI khi đạt yêu cầu",
+      "autointerviewdesc": "Tự động gửi thư mời phỏng vấn AI ngay khi điểm sàng lọc CV của ứng viên đạt hoặc vượt ngưỡng.",
+      "minscreeningscore": "Ngưỡng điểm CV tối thiểu để tự động mời",
+      "aiPipelineHelp": "Cơ chế song song: Ứng viên đạt từ điểm này trở lên sẽ được hệ thống tự động tạo lịch phỏng vấn và gửi email mời ngay. Ứng viên chưa đủ điểm hoặc khi tắt tính năng tự động sẽ được lưu ở danh sách chờ để Nhà tuyển dụng xem xét và bấm hẹn lịch thủ công."
+    },
+    "tooltip": {
+      "minscreeningscore": "Thang điểm đánh giá từ 0 đến 100 điểm."
     },
     "label": {
       "isUrgent": "Tuyển gấp"
     },
     "placeholder": {
-      "enterjobtitle": "Nhập tiêu đề C.V",
+      "enterjobtitle": "Nhập tiêu đề công việc (ví dụ: Kỹ sư phần mềm, Nhân viên kinh doanh...)",
       "selectcareer": "Chọn ngành nghề",
       "selectposition": "Chọn cấp bậc",
       "selectrequiredexperience": "Chọn kinh nghiệm",
@@ -627,7 +705,9 @@
       "entermaximumsalary": "Nhập lương tối đa",
       "selectacademiclevel": "Chọn trình độ HV",
       "selectinterviewtemplate": "Chọn mẫu phỏng vấn cho đánh giá sơ bộ tự động...",
+      "enterminscreeningscore": "Nhập điểm từ 0 đến 100",
       "selectcityprovince": "Chọn Tỉnh/Thành phố",
+      "selectCityFirst": "Vui lòng chọn Tỉnh / Thành phố trước",
       "selectdistrict": "Chọn Quận/Huyện",
       "enteraddress": "Nhập địa chỉ",
       "enterlatitudecoordinateofthecompanyonthemap": "Nhập vĩ độ trên bản đồ",
@@ -641,6 +721,8 @@
     },
     "section": {
       "basicInfo": "Thông tin cơ bản",
+      "aiPipeline": "Quy trình Phỏng vấn AI & Tự động hóa",
+      "content": "Chi tiết công việc & Quyền lợi",
       "location": "Địa điểm làm việc",
       "contact": "Thông tin liên hệ"
     }
@@ -657,6 +739,33 @@
       "updatedAt": "Cập nhật: {{date}}",
       "viewsCount": "{{count}} lượt xem"
     },
+    "tabs": {
+      "findNewCandidates": "Tìm kiếm ứng viên",
+      "aiSuggestedCandidates": "Ứng viên AI gợi ý",
+      "aiBeta": "AI Match"
+    },
+    "sort": {
+      "label": "Sắp xếp theo:",
+      "mostSuitable": "Phù hợp nhất",
+      "newest": "Mới nhất"
+    },
+    "aiMatch": {
+      "score": "Độ phù hợp AI: {{score}}%",
+      "badge": "{{score}}% Phù hợp",
+      "badgeText": "Phù hợp",
+      "highMatch": "Rất phù hợp",
+      "mediumMatch": "Phù hợp",
+      "jobPostSelector": "Khớp theo tin tuyển dụng...",
+      "allJobPosts": "Tất cả tin tuyển dụng đang mở",
+      "insightsTitle": "Đánh giá mức độ phù hợp bởi AI",
+      "insightsSubtitle": "Phân tích tự động dựa trên JD tin tuyển dụng và hồ sơ ứng viên",
+      "criteriaCareer": "Ngành nghề & Vị trí",
+      "criteriaLocation": "Địa điểm làm việc",
+      "criteriaExperience": "Kinh nghiệm thực chiến",
+      "criteriaSalary": "Mức lương kỳ vọng",
+      "matchingHighlights": "Điểm mạnh phù hợp",
+      "noAnalysisYet": "Hồ sơ ứng viên đang được AI phân tích chi tiết."
+    },
     "messages": {
       "saveSuccess": "Lưu hồ sơ thành công.",
       "unsaveSuccess": "Bỏ lưu hồ sơ thành công."
@@ -665,7 +774,11 @@
       "unsave": "Bỏ lưu",
       "save": "Lưu lại",
       "viewProfile": "Xem hồ sơ"
-    }
+    },
+    "matchingNeeds": "Phù hợp nhu cầu",
+    "positionNotUpdated": "Chưa cập nhật vị trí",
+    "unsaveCandidate": "Bỏ lưu hồ sơ",
+    "saveCandidate": "Lưu hồ sơ"
   },
   "profileSearch": {
     "title": {
@@ -715,7 +828,9 @@
       "updateError": "Có lỗi xảy ra khi cập nhật bộ câu hỏi",
       "deleteSuccess": "Xóa nhóm câu hỏi thành công",
       "deleteError": "Có lỗi xảy ra khi xóa bộ câu hỏi",
-      "createSuccess": "Tạo nhóm câu hỏi thành công"
+      "createSuccess": "Tạo nhóm câu hỏi thành công",
+      "testRoomCreated": "Đã khởi tạo phòng phỏng vấn thử nghiệm thành công!",
+      "emptyGroupWarning": "Bộ câu hỏi này chưa có câu hỏi nào để thử nghiệm."
     },
     "onlineInterview": "Phỏng vấn trực tuyến",
     "questionGroups": "Nhóm câu hỏi",
@@ -724,6 +839,7 @@
     "table": {
       "groupName": "Tên nhóm câu hỏi",
       "numberOfQuestions": "Số câu hỏi",
+      "status": "Trạng thái",
       "description": "Mô tả",
       "na": "N/A",
       "noData": "Không có dữ liệu"
@@ -747,7 +863,10 @@
     "title": "Nhóm câu hỏi",
     "actions": {
       "addGroup": "Thêm nhóm",
-      "createNewQuestion": "Tạo câu hỏi mới"
+      "createNewQuestion": "Tạo câu hỏi mới",
+      "testWithAI": "Thử nghiệm AI",
+      "testGroupTooltip": "Phỏng vấn thử với bộ câu hỏi này",
+      "testInDialog": "Thử nghiệm bộ câu hỏi"
     },
     "noData": "Chưa có nhóm câu hỏi"
   },
@@ -781,30 +900,41 @@
   },
   "sidebar": {
     "dashboard": "Bảng điều khiển",
-    "agentAssistants": "Agent Assistants",
-    "jobPostList": "Danh sách tin TD",
+    "agentAssistants": "Trợ lý AI AILA",
+    "jobPostList": "Tin tuyển dụng",
     "candidateManagement": "Quản lý ứng viên",
     "appliedApplications": "Hồ sơ ứng tuyển",
     "savedProfiles": "Hồ sơ đã lưu",
     "findCandidates": "Tìm kiếm ứng viên",
-    "onlineInterviews": "Phỏng vấn Online",
-    "interviewList": "Danh sách PV",
+    "onlineInterviews": "Phỏng vấn trực tuyến",
+    "interviewList": "Lịch phỏng vấn",
     "interviewLive": "Phỏng vấn Live",
     "interviewHistory": "Thư viện Video",
-    "questionBank": "Ngân hàng QA",
+    "questionBank": "Ngân hàng câu hỏi",
     "questionSets": "Bộ câu hỏi",
+    "aiSettings": "Cài đặt AI Phỏng vấn",
     "notifications": "Thông báo",
     "accountManagement": "Quản lý tài khoản",
     "companyInfo": "Thông tin công ty",
     "employerVerification": "Xác thực danh tính",
     "account": "Tài khoản",
     "settings": "Cài đặt",
-    "employeeRoles": "Nhân viên & Vai trò",
-    "hrm": "Quản trị nhân sự",
-    "hrmEmployees": "Hồ sơ nhân sự",
-    "hrmRoles": "Vai trò & quyền",
-    "hrmMembers": "Thành viên công ty",
-    "squareHrmAdmin": "Mở InfoHR HRM"
+    "squareHrmAdmin": "Quản lý Nhân sự",
+    "hrmManagement": "Quản lý Nhân sự",
+    "hrmDashboard": "Tổng quan nhân sự",
+    "hrmEmployeesList": "Hồ sơ Nhân viên",
+    "hrmOnboarding": "Tiếp nhận nhân sự",
+    "hrmDepartments": "Phòng ban & Vị trí",
+    "hrmContracts": "Hợp đồng Lao động",
+    "hrmAttendances": "Chấm công",
+    "hrmLeaves": "Quản lý Nghỉ phép",
+    "hrmPayroll": "Bảng Lương & Chi phí",
+    "hrmOrgChart": "Sơ đồ Cây Tổ chức",
+    "employeeRoles": "Employees & Roles",
+    "hrm": "HRM",
+    "hrmEmployees": "Employee records",
+    "hrmRoles": "Roles & permissions",
+    "hrmMembers": "Company members"
   },
   "interviewHistory": {
     "title": "Thư viện Video",
@@ -832,13 +962,16 @@
       "scheduledLabel": "Đã lên lịch",
       "completedLabel": "Đã hoàn thành"
     },
-    "subtitle": "Chỉ hiển thị các phiên đang live và preview realtime của ứng viên.",
+    "subtitle": "Giám sát tín hiệu và đồng hành cùng các phiên phỏng vấn đang diễn ra theo thời gian thực.",
     "autoRefresh": {
       "on": "Tự động làm mới: Bật",
       "off": "Tự động làm mới: Tắt"
     },
     "updating": "Đang cập nhật...",
     "activeNow": "Đang hoạt động",
+    "searchPlaceholder": "Tìm theo tên ứng viên, vị trí...",
+    "noSearchMatch": "Không tìm thấy phiên phỏng vấn phù hợp",
+    "noSearchMatchHint": "Thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc",
     "noData": {
       "title": "Chưa có phiên live nào",
       "subtitle": "Khi ứng viên bật camera hoặc mic, card realtime sẽ xuất hiện ở đây."
@@ -876,7 +1009,7 @@
       "screenShare": "Chia sẻ màn hình",
       "liveAudioNoVideo": "Âm thanh trực tiếp - Không có video",
       "waitingForMediaTracks": "Đang chờ luồng âm thanh/video...",
-      "waitingSignal": "Đang chờ tín hiệu",
+      "waitingSignal": "Đang chờ tín hiệu...",
       "waitingSignalHint": "Khi ứng viên bật camera hoặc mic, preview sẽ hiện ở đây",
       "tokenError": "Không thể lấy token quan sát.",
       "unknownCandidate": "Ứng viên không xác định",
@@ -891,16 +1024,16 @@
       "time": "Thời gian",
       "endSession": "Kết thúc phiên",
       "noConnectionDetails": "Chưa có connection details để mở fullscreen.",
-      "joinPresence": "Tham gia hiện diện",
+      "joinPresence": "Tham gia phòng",
       "joinPresenceLoading": "Đang kết nối...",
-      "joinPresenceTooltip": "Vào phòng với tư cách Nhà tuyển dụng — ứng viên sẽ thấy bạn",
-      "presenceTitle": "Tham gia hiện diện",
+      "joinPresenceTooltip": "Vào phòng với tư cách Nhà tuyển dụng - ứng viên sẽ thấy bạn",
+      "presenceTitle": "Tham gia phòng",
       "presenceSubtitle": "Bạn đang tham gia với tư cách Nhà tuyển dụng. Ứng viên có thể thấy sự hiện diện của bạn.",
       "presenceExit": "Rời phòng"
     }
   },
   "verification": {
-    "title": "Xác thực Nhà tuyển dụng",
+    "title": "Xác thực doanh nghiệp",
     "step1": {
       "title": "Bước 1: Cập nhật Hồ sơ công ty",
       "description": "Hoàn thiện thông tin công ty trước khi gửi tài liệu xác thực. Admin sẽ xem xét nội dung này trước khi cấp quyền đăng tin.",
@@ -921,10 +1054,10 @@
       "statusPending": "Trạng thái: Chờ phê duyệt"
     },
     "status": {
-      "pending": "Chờ duyệt",
-      "reviewing": "Đang xem xét",
-      "approved": "Đã duyệt",
-      "rejected": "Từ chối"
+      "pending": "Chưa hoàn tất",
+      "reviewing": "Đang chờ duyệt",
+      "approved": "Đã xác minh",
+      "rejected": "Cần bổ sung"
     },
     "messages": {
       "infoRecorded": "Thông tin đã được ghi lại.",
@@ -933,8 +1066,8 @@
       "saveFailed": "Không thể lưu hồ sơ xác thực. Vui lòng thử lại."
     },
     "summary": {
-      "companyProfile": "Hồ sơ công ty",
-      "legalProfile": "Hồ sơ pháp lý",
+      "companyProfile": "Thông tin doanh nghiệp",
+      "legalProfile": "Tài liệu pháp lý",
       "progress": "Mức độ hoàn thiện",
       "canPost": "Công ty đã được xác thực và có thể đăng tin tuyển dụng.",
       "cannotPost": "Vui lòng hoàn thiện hồ sơ pháp lý và chờ admin xác thực trước khi đăng tin."
@@ -964,8 +1097,8 @@
     "label": {
       "lastUpdated": "Cập nhật:",
       "lastViewed": "Xem lần cuối:",
-      "onlineCv": "CV trực tuyến",
-      "attachedCv": "CV đính kèm",
+      "onlineCv": "Hồ sơ ứng viên",
+      "attachedCv": "Hồ sơ ứng viên",
       "active": "Đang hoạt động",
       "inactive": "Không hoạt động",
       "printProfile": "In hồ sơ",
@@ -1065,7 +1198,8 @@
       "statusDisabled": "Đã khóa",
       "statusInvited": "Đã mời",
       "systemRoleLocked": "Vai trò hệ thống đã được khóa",
-      "userId": "ID người dùng"
+      "userId": "ID người dùng",
+      "deleteSuccess": "Xóa thành viên thành công."
     },
     "title": "Thông tin công ty",
     "following": "Đang theo dõi",
@@ -1151,7 +1285,7 @@
         "desc": "Hệ thống lọc thông minh theo kỹ năng, kinh nghiệm và vị trí địa lý giúp bạn tiếp cận đúng đối tượng mục tiêu."
       },
       "h3": {
-        "title": "Quản lý ứng viên tập trung (CRM)",
+        "title": "Quản lý ứng viên tập trung",
         "desc": "Theo dõi toàn bộ vòng đời ứng viên từ lúc nộp hồ sơ đến khi nhận việc trên một giao diện quản trị duy nhất."
       },
       "h4": {
@@ -1185,7 +1319,7 @@
     "directSupport": {
       "title": "Hỗ trợ trực tiếp",
       "desc": "Liên hệ with đội ngũ hỗ trợ kỹ thuật và tư vấn tuyển dụng.",
-      "note": "Thời gian: 8:00 - 18:00 (Thứ 2 - Thứ 7)"
+      "note": "Thời gian: 8:00 - 18:00 từ Thứ 2 đến Thứ 7"
     },
     "docs": {
       "title": "Tài liệu hướng dẫn",
@@ -1239,6 +1373,7 @@
   "blog": {
     "title": "Blog tuyển dụng",
     "subtitle": "Chia sẻ kinh nghiệm, tips tuyển dụng của doanh nghiệp bạn",
+    "deleteTitle": "Xác nhận xóa bài viết",
     "newPost": "Viết bài mới",
     "reviewNotice": "Bài viết sẽ được gửi cho Admin duyệt trước khi hiển thị trên website. Thời gian duyệt thường trong 24 giờ.",
     "filter": {
@@ -1557,7 +1692,7 @@
     "dialog": {
       "addRoleTitle": "Thêm vai trò mới",
       "roleNameLabel": "Tên vai trò",
-      "codeLabel": "Mã (slug)",
+      "codeLabel": "Mã vai trò",
       "codeHelperText": "Để trống sẽ tự sinh từ tên vai trò.",
       "descriptionLabel": "Mô tả",
       "permissionsLabel": "Quyền",
@@ -1568,7 +1703,7 @@
       "userIdHelperText": "Nhập ID tài khoản người dùng cần thêm vào công ty.",
       "roleLabel": "Vai trò",
       "statusLabel": "Trạng thái",
-      "invitedEmailLabel": "Email được mời (không bắt buộc)",
+      "invitedEmailLabel": "Email được mời",
       "createMember": "Thêm nhân viên"
     },
     "memberStatus": {
@@ -1645,5 +1780,167 @@
   "questionBank": {
     "deleteTitle": "Xóa câu hỏi",
     "hint": "Nhập nội dung câu hỏi rõ ràng và ngắn gọn."
+  },
+  "employerOnboarding": {
+    "pageTitle": "Thiết lập Tài khoản Doanh nghiệp | InfoHR",
+    "steps": {
+      "companyProfile": "Thương hiệu Doanh nghiệp",
+      "recruiterProfile": "Đại diện Tuyển dụng",
+      "verification": "Xác thực GPKD",
+      "complete": "Hoàn tất"
+    },
+    "consentNotice": {
+      "text": "Bằng việc tiếp tục thiết lập, bạn đồng ý với",
+      "terms": "Điều khoản sử dụng",
+      "privacy": "Chính sách bảo mật",
+      "and": "và",
+      "postPolicy": "Quy định đăng tin",
+      "ofInfoHR": "của InfoHR."
+    },
+    "stepCounter": "Bước {{current}} / {{total}}",
+    "invitation": {
+      "title": "Bạn đã được mời tham gia doanh nghiệp",
+      "subtitle": "Tài khoản của bạn đã được mời làm việc tại doanh nghiệp với vai trò được cấp sẵn.",
+      "company": "Doanh nghiệp",
+      "role": "Vai trò",
+      "acceptAndContinue": "Chấp nhận & Tiếp tục"
+    },
+    "step1": {
+      "title": "Thông tin Thương hiệu Doanh nghiệp",
+      "subtitle": "Hoàn tất thông tin doanh nghiệp để xây dựng thương hiệu uy tín và thu hút ứng viên tài năng",
+      "logoLabel": "Logo Doanh nghiệp",
+      "logoUpload": "Tải Logo",
+      "logoChange": "Đổi Logo",
+      "logoHint": "Định dạng PNG, JPG với dung lượng tối đa 5MB. Khuyên dùng tỉ lệ 1:1.",
+      "companyName": "Tên doanh nghiệp / Công ty đầy đủ",
+      "companyNamePlaceholder": "VD: Công ty Cổ phần Công nghệ Square...",
+      "companyNameHelper": "Nhập chính xác tên doanh nghiệp theo Giấy phép ĐKKD",
+      "taxCode": "Mã số thuế",
+      "taxCodePlaceholder": "VD: 0101234567",
+      "taxCodeHelper": "Mã số thuế doanh nghiệp",
+      "employeeSize": "Quy mô nhân sự",
+      "fieldOperation": "Lĩnh vực hoạt động chính",
+      "fieldOperationPlaceholder": "VD: Công nghệ thông tin, Xây dựng, Bán lẻ...",
+      "locationSection": "Địa chỉ trụ sở / Chi nhánh tuyển dụng",
+      "city": "Tỉnh / Thành phố",
+      "cityPlaceholder": "Chọn Tỉnh / Thành phố...",
+      "district": "Quận / Huyện",
+      "districtPlaceholder": "Chọn Quận / Huyện...",
+      "address": "Địa chỉ chi tiết",
+      "addressPlaceholder": "Số nhà, tên đường, tòa nhà...",
+      "website": "Website công ty",
+      "websitePlaceholder": "https://company.vn",
+      "selectCityFirst": "Vui lòng chọn Tỉnh/Thành phố trước",
+      "cityFirstHelper": "Chọn Tỉnh/Thành phố để tải danh sách Quận/Huyện"
+    },
+    "step2": {
+      "title": "Thông tin Đại diện Tuyển dụng",
+      "subtitle": "Thông tin người phụ trách giúp ứng viên và hệ thống liên hệ trao đổi công việc dễ dàng",
+      "recruiterName": "Họ và tên người phụ trách",
+      "recruiterNamePlaceholder": "VD: Nguyễn Văn A",
+      "recruiterTitle": "Chức danh / Vị trí công tác",
+      "recruiterTitlePlaceholder": "VD: Trưởng phòng Tuyển dụng, HR Manager...",
+      "recruiterPhone": "Số điện thoại liên hệ / Zalo",
+      "recruiterPhonePlaceholder": "VD: 0912345678",
+      "recruiterEmail": "Email nhận thông báo ứng tuyển",
+      "recruiterEmailPlaceholder": "recruitment@company.vn",
+      "hiringNeeds": "Nhu cầu tuyển dụng trọng tâm",
+      "hiringNeedsPlaceholder": "Nhập vị trí hoặc ngành cần tuyển",
+      "hiringNeedsHelper": "Nhập và nhấn Enter để thêm các vị trí ưu tiên tuyển dụng",
+      "description": "Giới thiệu ngắn về môi trường làm việc & văn hóa",
+      "descriptionPlaceholder": "Mô tả điểm nổi bật về phúc lợi, môi trường làm việc, văn hóa doanh nghiệp..."
+    },
+    "step3": {
+      "title": "Xác thực doanh nghiệp",
+      "subtitle": "Doanh nghiệp có tích xanh xác thực sẽ nhận được độ tin cậy cao và thu hút ứng viên gấp 3 lần",
+      "benefitsTitle": "Lợi ích khi xác thực Giấy phép ĐKKD ngay:",
+      "benefit1": "Huy hiệu Tích xanh Doanh nghiệp uy tín",
+      "benefit2": "Ưu tiên hiển thị tin tuyển dụng ở vị trí nổi bật",
+      "benefit3": "Tăng x3 tỷ lệ ứng tuyển của các ứng viên chất lượng cao",
+      "dropzoneTitle": "Kéo thả tài liệu xác thực vào đây hoặc bấm để chọn",
+      "dropzoneSubtitle": "Định dạng hỗ trợ: JPG, PNG, PDF với dung lượng tối đa 10MB",
+      "uploading": "Đang tải file lên...",
+      "selectFile": "Chọn tệp từ máy tính",
+      "uploadedFile": "Giấy phép kinh doanh đã tải lên",
+      "replaceFile": "Thay đổi file",
+      "removeFile": "Xóa file",
+      "skipNotice": "Bạn có thể bỏ qua bước này và cập nhật GPKD bất kỳ lúc nào trong phần Cài đặt công ty."
+    },
+    "step4": {
+      "title": "Chào mừng bạn gia nhập InfoHR!",
+      "subtitle": "Hồ sơ doanh nghiệp đã được thiết lập thành công. Bạn có thể bắt đầu đăng tin và tuyển dụng nhân tài ngay bây giờ.",
+      "freeBanner": "Hệ thống hỗ trợ Nhà tuyển dụng đăng tin và quản lý ứng viên hoàn toàn <b>miễn phí không giới hạn</b>.",
+      "summaryTitle": "Thông tin doanh nghiệp đã tạo",
+      "companyName": "Công ty",
+      "recruiter": "Đại diện",
+      "location": "Địa chỉ",
+      "verificationStatus": "Trạng thái xác thực",
+      "verifiedPending": "Đang chờ duyệt GPKD",
+      "notSubmitted": "Chưa nộp GPKD",
+      "postJob": "Đăng tin Tuyển dụng ngay",
+      "dashboard": "Vào Bảng điều khiển Quản trị"
+    },
+    "actions": {
+      "back": "Quay lại",
+      "next": "Tiếp theo",
+      "complete": "Hoàn thành thiết lập",
+      "skipVerification": "Bỏ qua & Xác thực sau",
+      "saving": "Đang lưu...",
+      "submitting": "Đang hoàn tất..."
+    },
+    "validation": {
+      "companyNameRequired": "Vui lòng nhập tên công ty / doanh nghiệp.",
+      "recruiterNameRequired": "Vui lòng nhập họ tên người phụ trách tuyển dụng.",
+      "recruiterPhoneRequired": "Vui lòng nhập số điện thoại liên hệ.",
+      "cityRequired": "Vui lòng chọn Tỉnh / Thành phố trụ sở.",
+      "saveFailed": "Không thể lưu thông tin doanh nghiệp. Vui lòng thử lại.",
+      "uploadFailed": "Tải file lên thất bại. Vui lòng thử lại."
+    }
+  },
+  "candidateDetail": {
+    "messages": {
+      "noEmail": "Ứng viên chưa cập nhật địa chỉ email"
+    }
+  },
+  "candidate": "Ứng viên",
+  "introduce": {
+    "tabTitle": "Giới thiệu & Dịch vụ Tuyển dụng - {{appName}}",
+    "badge": "GIẢI PHÁP TUYỂN DỤNG THÔNG MINH CHO DOANH NGHIỆP",
+    "industries": {
+      "construction": "Xây dựng",
+      "realEstate": "Bất động sản",
+      "architecture": "Kiến trúc / Thiết kế nội thất",
+      "mep": "Kỹ thuật & Cơ điện (MEP)"
+    },
+    "stats": {
+      "screeningTime": "Rút ngắn thời gian sơ tuyển",
+      "screeningTimeDesc": "Sàng lọc CV & phỏng vấn AI",
+      "hiringSuccess": "Tăng tỷ lệ tuyển thành công",
+      "hiringSuccessDesc": "So khớp đúng năng lực thực tế",
+      "matchAccuracy": "Độ chính xác AI Match Score",
+      "matchAccuracyDesc": "Chuẩn hóa tiêu chí đánh giá",
+      "trustedCompanies": "Doanh nghiệp tin cậy",
+      "trustedCompaniesDesc": "Tập đoàn & công ty đồng hành"
+    },
+    "valueProps": {
+      "poolTitle": "Kho Ứng Viên 4 Khối Ngành Trọng Điểm",
+      "poolDesc": "Tập trung chuyên sâu dữ liệu ứng viên Xây dựng, Bất động sản, Thiết kế kiến trúc và Kỹ thuật MEP với hồ sơ xác thực chuẩn mực.",
+      "aiMatchingTitle": "AI So Khớp & Phỏng Vấn Tự Động",
+      "aiMatchingDesc": "AILA AI tự động phân tích CV, tính điểm Match Score và thực hiện phỏng vấn sơ loại Voice AI 24/7 loại bỏ hoàn toàn định kiến.",
+      "pipelineTitle": "Quản Lý Đường Ống Tuyển Dụng CRM",
+      "pipelineDesc": "Theo dõi toàn bộ vòng đời hồ sơ ứng viên từ tiếp nhận, xếp lịch phỏng vấn đến tiếp nhận onboarding trên một màn hình trực quan.",
+      "guaranteeTitle": "Đồng Hành & Bảo Hành Tuyển Dụng",
+      "guaranteeDesc": "Đội ngũ chuyên viên tư vấn hỗ trợ 24/7, tối ưu tin đăng việc làm và chính sách đồng hành bảo đảm sự thành công của doanh nghiệp."
+    },
+    "steps": {
+      "step1Title": "Khởi Tạo & Xác Thực Doanh Nghiệp",
+      "step1Desc": "Đăng ký tài khoản nhà tuyển dụng nhanh chóng và nhận huy hiệu Doanh nghiệp uy tín đã xác thực.",
+      "step2Title": "Đăng Tin Tuyển Dụng Thông Minh",
+      "step2Desc": "Tạo tin tuyển dụng chuẩn SEO nhanh chóng với gợi ý JD chuyên nghiệp từ AI.",
+      "step3Title": "AI Sàng Lọc & Phỏng Vấn Tự Động",
+      "step3Desc": "Tự động phân loại hồ sơ, chấm điểm Match Score và xếp lịch phỏng vấn AI tức thì.",
+      "step4Title": "Tiếp Nhận & Tối Ưu Nhân Sự",
+      "step4Desc": "Duyệt ứng viên trúng tuyển, ký hợp đồng và quản lý toàn diện quy trình Onboarding."
+    }
   }
 }

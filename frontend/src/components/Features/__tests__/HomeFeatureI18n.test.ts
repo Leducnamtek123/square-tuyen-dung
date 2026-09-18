@@ -26,11 +26,11 @@ describe('Home feature i18n', () => {
       expect(source).not.toMatch(/t\(\s*["']home\.[^"']+["']\s*,\s*["']/);
     });
 
-    expect(careerCarouselSource).toContain('"home.jobsCount"');
-    expect(companiesSource).toContain('"home.companiesCount"');
-    expect(companiesSource).toContain('"home.topCompanies"');
-    expect(companiesSource).toContain('"home.noCompaniesFound"');
-    expect(feedbackCarouselSource).toContain('"home.noFeedbacks"');
+    expect(careerCarouselSource).toMatch(/['"]home\.jobsCount['"]/);
+    expect(companiesSource).toMatch(/['"]home\.companiesCount['"]/);
+    expect(companiesSource).toMatch(/['"]home\.topCompanies['"]/);
+    expect(companiesSource).toMatch(/['"]home\.noCompaniesFound['"]/);
+    expect(feedbackCarouselSource).toMatch(/['"]home\.noFeedbacks['"]/);
   });
 
   it('has Vietnamese and English locale entries for home feature copy', () => {

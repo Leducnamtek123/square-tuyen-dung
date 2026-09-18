@@ -1,0 +1,181 @@
+'use client';
+
+import React from 'react';
+import { Paper, Stack, Box, Button } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { useTranslation } from 'react-i18next';
+import TextFieldCustom from '../Controls/TextFieldCustom';
+import SingleSelectCustom from '../Controls/SingleSelectCustom';
+import type { useForm } from 'react-hook-form';
+import type { SxProps, Theme } from '@mui/material/styles';
+
+const searchControlSx = {
+  '& .MuiOutlinedInput-root': {
+    height: 42,
+    fontSize: '0.875rem',
+    borderRadius: '8px',
+    backgroundColor: '#FFFFFF',
+  },
+} as SxProps<Theme>;
+
+export interface GlobalFilterBarProps {
+  control: ReturnType<typeof useForm<any>>['control'];
+  handleSubmit: ReturnType<typeof useForm<any>>['handleSubmit'];
+  handleSearchSubmit: (data: any) => void;
+  // Primary inline filter field (context-aware: cityId, statusId, jobPostId, etc.)
+  primaryFieldName?: string;
+  primaryFieldOptions?: any[];
+  primaryFieldPlaceholder?: string;
+  // Legacy alias support
+  cityOptions?: any[];
+  cityPlaceholder?: string;
+  searchPlaceholder?: string;
+  searchFieldName?: string;
+  onOpenFilterDrawer: () => void;
+  activeFilterCount: number;
+  extraActions?: React.ReactNode;
+}
+
+export const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({
+  control,
+  handleSubmit,
+  handleSearchSubmit,
+  primaryFieldName = 'cityId',
+  primaryFieldOptions,
+  primaryFieldPlaceholder,
+  cityOptions = [],
+  cityPlaceholder,
+  searchPlaceholder,
+  searchFieldName = 'kw',
+  onOpenFilterDrawer,
+  activeFilterCount,
+  extraActions,
+}) => {
+  const { t } = useTranslation('common');
+  const options = primaryFieldOptions || cityOptions;
+  const defaultCityPlaceholder = t('filters.selectCity', 'Chọn tỉnh thành');
+  const defaultSearchPlaceholder = t('filters.searchKeyword', 'Nhập từ khóa...');
+  const placeholder = primaryFieldPlaceholder || cityPlaceholder || defaultCityPlaceholder;
+  const effectiveSearchPlaceholder = searchPlaceholder || defaultSearchPlaceholder;
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 1.25,
+        borderRadius: '10px',
+        bgcolor: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+        width: '100%',
+      }}
+    >
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={1.5}
+        component="form"
+        onSubmit={handleSubmit(handleSearchSubmit)}
+        alignItems="center"
+        flexWrap="wrap"
+        sx={{ width: '100%' }}
+      >
+        {/* Keyword Input */}
+        <Box sx={{ flex: { xs: '1 1 100%', sm: 1 }, minWidth: { xs: '100%', sm: 180 }, width: { xs: '100%', sm: 'auto' } }}>
+          <TextFieldCustom
+            name={searchFieldName}
+            placeholder={effectiveSearchPlaceholder}
+            control={control}
+            icon={<SearchIcon sx={{ color: 'primary.main', fontSize: 20 }} />}
+            sx={searchControlSx}
+          />
+        </Box>
+
+        {/* Context-aware Primary Select (City / Status / Job Post) */}
+        {options && options.length > 0 && (
+          <Box sx={{ width: { xs: '100%', sm: 180, md: 220 }, flexShrink: 0 }}>
+            <SingleSelectCustom
+              name={primaryFieldName}
+              control={control}
+              options={options}
+              placeholder={placeholder}
+              sx={searchControlSx}
+            />
+          </Box>
+        )}
+
+        {/* Buttons Group: Filter Drawer Trigger & Primary Search */}
+        <Stack
+          direction="row"
+          spacing={1.25}
+          sx={{
+            width: { xs: '100%', sm: 'auto' },
+            flexShrink: 0,
+          }}
+        >
+          {/* Advanced Filter Drawer Trigger Button */}
+          <Button
+            variant={activeFilterCount > 0 ? 'contained' : 'outlined'}
+            color={activeFilterCount > 0 ? 'primary' : 'inherit'}
+            startIcon={<FilterAltIcon sx={{ fontSize: 18 }} />}
+            onClick={onOpenFilterDrawer}
+            sx={{
+              flex: { xs: 1, sm: 'none' },
+              height: 42,
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.875rem',
+              textTransform: 'none',
+              px: 2,
+              whiteSpace: 'nowrap',
+              borderColor: activeFilterCount > 0 ? 'primary.main' : '#CBD5E1',
+              bgcolor: activeFilterCount > 0 ? undefined : '#F8FAFC',
+              color: activeFilterCount > 0 ? '#FFFFFF' : '#334155',
+              '&:hover': {
+                bgcolor: activeFilterCount > 0 ? undefined : '#F1F5F9',
+                borderColor: activeFilterCount > 0 ? undefined : '#94A3B8',
+              },
+            }}
+          >
+            {t('filters.filterButton', 'Bộ lọc')} {activeFilterCount > 0 ? `(${activeFilterCount})` : ''}
+          </Button>
+
+          {/* Primary Search Button */}
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<SearchIcon />}
+            type="submit"
+            sx={{
+              flex: { xs: 1, sm: 'none' },
+              minWidth: { sm: 120 },
+              height: 42,
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.875rem',
+              textTransform: 'none',
+              px: 2.5,
+              whiteSpace: 'nowrap',
+              boxShadow: 'none',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+              },
+            }}
+          >
+            {t('common.search.button', 'Tìm kiếm')}
+          </Button>
+        </Stack>
+
+        {/* Extra Actions Slot (e.g. View switches, Create button, Export) */}
+        {extraActions && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: { sm: 'auto' }, width: { xs: '100%', sm: 'auto' } }}>
+            {extraActions}
+          </Box>
+        )}
+      </Stack>
+    </Paper>
+  );
+};
+
+export default GlobalFilterBar;
+

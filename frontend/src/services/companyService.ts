@@ -11,6 +11,8 @@ type IdType = string | number;
 type CompanyListParams = {
   kw?: string;
   cityId?: string | number;
+  employeeSize?: string | number;
+  fieldOperation?: string;
   page?: number;
   pageSize?: number;
   ordering?: string;
@@ -102,6 +104,12 @@ const companyService = {
     const url = `info/web/companies/top/`;
     const data = await httpRequest.get<unknown>(url);
     return normalizePaginatedResponse<Company>(await presignInObject(data)).results;
+  },
+
+  claimCompany: async (id: IdType): Promise<{ id: number; companyId: number; status: string; message: string }> => {
+    const url = `info/web/companies/${id}/claim/`;
+    const data = await httpRequest.post(url);
+    return unwrapDataResponse<{ id: number; companyId: number; status: string; message: string }>(data);
   },
 };
 

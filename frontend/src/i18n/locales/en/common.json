@@ -1,5 +1,15 @@
 {
   "appName": "Project",
+  "header": {
+    "auth": {
+      "login": "Login",
+      "signUp": "Sign Up"
+    },
+    "userMenu": "User Menu"
+  },
+  "home": {
+    "trending": "Trending:"
+  },
   "city": "City/Province",
   "career": "Industry",
   "experience": "Experience",
@@ -13,7 +23,12 @@
   "lastModified": "Last modified",
   "all": "All",
   "select": "Select",
-  "search": "Search",
+  "search": {
+    "button": "Search",
+    "suggestions": "Search suggestions",
+    "recent": "Recent searches",
+    "noResults": "No results found"
+  },
   "reset": "Reset",
   "loading": "Loading...",
   "noData": "No data",
@@ -30,11 +45,13 @@
     "defaultDescription": "A dynamic, creative workplace with many opportunities for advancement and career growth.",
     "notUpdated": "Not updated",
     "jobCount": "{{count}} jobs",
-    "followers": "{{count}} followers"
+    "followers": "followers"
   },
   "nav": {
+    "createCv": "Create CV",
     "jobs": "Jobs",
     "companies": "Companies",
+    "practice": "Mock Interview",
     "aboutUs": "About Us",
     "introduction": "Introduction",
     "services": "Services",
@@ -45,10 +62,16 @@
     "login": "Login",
     "register": "Register",
     "accountManagement": "Account Management",
+    "employerPortal": "Recruitment Portal",
+    "setupEmployer": "Setup Employer Profile",
+    "setupProfile": "Complete Candidate Profile",
     "reportBug": "Report a bug",
     "logout": "Logout",
     "logoutConfirm": "Are you sure you want to logout?",
     "logoutTitle": "Logout Account",
+    "candidateNav": "Candidate Navigation",
+    "mainNav": "Main Navigation",
+    "mobileMenu": "Mobile Menu",
     "switch": {
       "forEmployers": "For Employers",
       "postFreeJob": "Post a free job",
@@ -63,9 +86,34 @@
       "allCareersList": "List of all careers",
       "topCareers": "Top 10 Careers",
       "otherCareers": "Other Careers"
-    }
+    },
+    "workspaceRoles": {
+      "owner": "Owner",
+      "admin": "Administrator",
+      "member": "Member",
+      "recruiter": "Recruiter",
+      "interviewer": "Interviewer"
+    },
+    "information": "Information",
+    "introServices": "About & Services",
+    "findCandidates": "Find Candidates",
+    "careerGuide": "Career Handbook",
+    "careerGuideDesc": "Career development insights and guidance",
+    "laborRights": "Labor Rights & Procedures",
+    "laborRightsDesc": "Social insurance, labor contracts and worker benefits",
+    "taxGuide": "Personal Income Tax & Settlement",
+    "taxGuideDesc": "Guidelines for personal tax declaration and settlement",
+    "cvInterviewTips": "CV & Interview Mastery",
+    "cvInterviewTipsDesc": "Standard CV templates and successful interview skills",
+    "recruitmentTrends": "Recruitment Trends & Reports",
+    "recruitmentTrendsDesc": "Updated HR market reports and analytics",
+    "aboutInfoHR": "About InfoHR & Ecosystem",
+    "aboutInfoHRDesc": "Introduction to InfoHR recruitment platform & HR solutions",
+    "ailaPlatform": "AILA AI - Interview Platform",
+    "ailaPlatformDesc": "Access automated voice & video interview solutions at aila.infohr.vn"
   },
   "footer": {
+    "createCv": "Create CV Online",
     "aboutApp": "About {{appName}}",
     "contact": "Contact",
     "faq": "FAQ",
@@ -82,7 +130,31 @@
     "employerDashboard": "Employer Dashboard",
     "connectWith": "Connect with {{appName}}",
     "rightsReserved": "Â© {{year}} {{appName}}. All Rights Reserved.",
-    "forJobSeekers": "For Job Seekers"
+    "forJobSeekers": "For Job Seekers",
+    "support": "Help & Support",
+    "aboutUs": "About Us",
+    "headquarters": "Headquarters: ",
+    "phone": "Phone: ",
+    "jobSeekerEmailSupport": "Job seeker support email: ",
+    "employerEmailSupport": "Employer support email: ",
+    "information": "Information",
+    "connectWithUs": "Connect with us",
+    "careerGuide": "Career Handbook",
+    "servicePricing": "Service Pricing",
+    "pricingTable": "Service Pricing Table",
+    "employerBlog": "Recruitment Blog",
+    "employerFaq": "Frequently Asked Questions (FAQ)",
+    "warrantyPolicy": "Warranty & Refund Policy",
+    "employerTerms": "Terms of Use for Employers",
+    "employerPrivacy": "Information Privacy Policy",
+    "termsOfUse": "Terms of Use",
+    "privacyPolicy": "Privacy Policy",
+    "sitemap": "Sitemap",
+    "complianceConsent": "Customer Compliance & Consent",
+    "allRightsReserved": "All rights reserved.",
+    "downloadGooglePlay": "Get it on Google Play",
+    "downloadAppStore": "Download on the App Store",
+    "ministryRegistered": "Registered with Ministry of Industry and Trade"
   },
   "next": "Next",
   "actionsLabel": "Actions",
@@ -95,6 +167,7 @@
     "joinNow": "Join now",
     "openNewTab": "Open in new tab",
     "openDrawer": "Open navigation menu",
+    "closeDrawer": "Close drawer",
     "refresh": "Refresh",
     "retry": "Retry",
     "details": "Details",
@@ -104,6 +177,9 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
+    "clear": "Clear filter",
+    "reset": "Reset",
+    "undo": "Undo",
     "confirm": "Confirm",
     "apply": "Apply",
     "add": "Add",
@@ -118,20 +194,19 @@
     "sendOTP": "Send OTP",
     "verifyOTP": "Verify OTP",
     "changePhone": "Change Phone",
-    "resendOTP": "Resend OTP"
+    "resendOTP": "Resend OTP",
+    "addNew": "Add new",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right",
+    "viewAll": "View all",
+    "viewMore": "View more"
   },
   "userSettings": {
     "emailNotifications": "Enable email notifications",
     "smsNotifications": "Enable SMS notifications"
   },
   "status": {
-    "pending": "Pending",
-    "active": "Active",
-    "inactive": "Inactive",
-    "scheduled": "Scheduled",
-    "inProgress": "In Progress",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
+    "loading": "Loading...",
     "searchable": "Searchable",
     "notSearchable": "Not Searchable"
   },
@@ -214,6 +289,7 @@
   "feedback": {
     "button": "Review",
     "title": "Your Review",
+    "subtitle": "Share your experience to help us improve service quality",
     "placeholder": "Share your review...",
     "submit": "Submit Review",
     "ratingRequired": "Please select a rating.",
@@ -316,12 +392,53 @@
   "common": {
     "hot": "Hot",
     "status": {
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "completed": "Completed"
     },
     "na": "N/A",
     "table": {
       "noData": "No data"
-    }
+    },
+    "actions": {
+      "apply": "Apply",
+      "cancel": "Cancel",
+      "clear": "Clear",
+      "close": "Close",
+      "export": "Export",
+      "refreshData": "Refresh Data",
+      "reset": "Reset",
+      "resetFilter": "Reset Filter",
+      "retry": "Retry"
+    },
+    "all": "All",
+    "dateRange": {
+      "days30": "30 days",
+      "days90": "90 days",
+      "fromDate": "From date",
+      "selectTitle": "Select date range",
+      "toDate": "To date"
+    },
+    "export": {
+      "csv": "Export CSV",
+      "excel": "Export Excel"
+    },
+    "location": {
+      "geocoding": "Geocoding address...",
+      "gpsTooltip": "Get current GPS coordinates",
+      "helperBadge": "Select precise location on map",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "myLocation": "My Location",
+      "selectedAddress": "Selected Address"
+    },
+    "noResults": "No results",
+    "search": {
+      "button": "Search"
+    },
+    "searchPlaceholder": "Quick search...",
+    "selectedCount": "Selected {{count}} items",
+    "urgent": "Urgent",
+    "user": "User"
   },
   "validation": {
     "max255": "Maximum 255 characters",
@@ -333,7 +450,8 @@
     "loadingPdf": "Loading PDF...",
     "saveSuccess": "Saved successfully.",
     "loadFailed": "Unable to load data. Please try again.",
-    "actionFailed": "Unable to perform this action right now. Please try again."
+    "actionFailed": "Unable to perform this action right now. Please try again.",
+    "copied": "Copied to clipboard!"
   },
   "breadcrumbs": {
     "label": "Breadcrumb",
@@ -362,7 +480,13 @@
     "resendIn": "Resend code in...",
     "title": "Title",
     "body": "Body",
-    "label": "Label"
+    "label": "Label",
+    "welcomeBack": "Welcome Back",
+    "errorTitle": "Error Title",
+    "successTitle": "Success Title",
+    "forgotPassword": "Forgot Password",
+    "noAccount": "No Account",
+    "signUp": "Sign Up"
   },
   "form": {
     "phoneNumber": "Your phone number",
@@ -396,7 +520,8 @@
     "districtPlaceholder": "District Placeholder",
     "address": "Address",
     "addressPlaceholder": "Address Placeholder",
-    "addressHelper": "Address Helper"
+    "addressHelper": "Address Helper",
+    "selectCityFirst": "Select City First"
   },
   "loadPreviousMessages": "Load previous messages",
   "typeAMessage": "Type a message...",
@@ -407,11 +532,36 @@
   "appliedResume": {
     "ai": {
       "viewAnalysis": "View AI Analysis",
-      "failed": "AI analysis failed"
+      "failed": "Analysis failed",
+      "resumeTitle": "Resume Title",
+      "onlineResumeLabel": "Online Resume Label",
+      "onlineResumeHint": "Online Resume Hint",
+      "viewOnlineProfile": "View Online Profile",
+      "scanStatusScanning": "Scan Status Scanning",
+      "scanStatusIdle": "Scan Status Idle",
+      "openCV": "Open C V",
+      "scanning": "Scanning",
+      "scanProgress": "Scan Progress",
+      "failedTitle": "Failed Title",
+      "retry": "Retry",
+      "idleTitle": "Idle Title",
+      "idleHint": "Idle Hint",
+      "startScan": "Start Scan",
+      "completeTitle": "Complete Title",
+      "overviewTitle": "Overview Title",
+      "noEvaluation": "No Evaluation",
+      "prosTitle": "Pros Title",
+      "consTitle": "Cons Title",
+      "matchingSkillsTitle": "Matching Skills Title",
+      "missingSkillsTitle": "Missing Skills Title",
+      "allSkillsTitle": "All Skills Title",
+      "reanalyze": "Reanalyze",
+      "drawerTitle": "Drawer Title",
+      "loading": "Loading"
     },
     "email": {
       "resendTooltip": "Resend email",
-      "sendTooltip": "Send email"
+      "sendTooltip": "Send feedback"
     },
     "table": {
       "profileName": "Profile Name",
@@ -426,9 +576,16 @@
       "actions": "Actions",
       "tooltips": {
         "view": "View profile",
-        "delete": "Delete profile"
+        "delete": "Delete profile",
+        "scheduleInterview": "Schedule Interview"
       },
-      "noCandidates": "No candidates have applied yet"
+      "noCandidates": "No candidates have applied yet",
+      "clickToDownload": "Click To Download"
+    },
+    "status": {
+      "errorTitle": "Error Title",
+      "errorMsg": "Error Msg",
+      "rollbackMsg": "Rollback Msg"
     }
   },
   "companyProfile": {
@@ -474,7 +631,8 @@
       "selectdistrict": "Select district",
       "enteraddress": "Enter address",
       "enterlatitudecoordinateonthemap": "Enter latitude coordinate on the map.",
-      "enterlongitudecoordinateonthemap": "Enter longitude coordinate on the map."
+      "enterlongitudecoordinateonthemap": "Enter longitude coordinate on the map.",
+      "selectCityFirst": "Select City First"
     },
     "helperText": {
       "automaticallyfilledifyouchooseasuggestedaddress": "Automatically filled if you choose a suggested address."
@@ -506,11 +664,12 @@
       "comments": "Detailed Comments",
       "proposedSalary": "Proposed Salary (VND)",
       "submitEvaluation": "Submit Final Evaluation",
-      "openRecording": "Open recording"
+      "openRecording": "Open recording",
+      "commentsPlaceholder": "Comments Placeholder"
     },
     "subtitle": {
-      "analysis": "AI Analysis",
-      "questions": "Question List",
+      "analysis": "Analysis Results",
+      "questions": "Suggested Questions",
       "transcript": "Conversation Transcript",
       "aiEvaluation": "AI Evaluation Result",
       "info": "Interview Information",
@@ -526,11 +685,27 @@
       "candidate": "CANDIDATE",
       "position": "POSITION",
       "type": "INTERVIEW TYPE",
-      "schedule": "SCHEDULE"
+      "schedule": "SCHEDULE",
+      "aiOverallQuality": "Ai Overall Quality",
+      "softSkills": "Soft Skills",
+      "confidence": "Confidence",
+      "clarity": "Clarity",
+      "tone": "Tone",
+      "culturalFit": "Cultural Fit",
+      "questionPerformance": "Question Performance",
+      "question": "Question"
     },
     "title": "Online Interview Details"
   },
   "jobPost": {
+    "urgentHiring": "Urgent Hiring",
+    "jobsCount": "{{count}} jobs",
+    "table": {
+      "title": "Job Post Title",
+      "createdDate": "Created Date",
+      "creator": "Creator"
+    },
+    "timeLeft": "Time Left",
     "manageSubtitle": "Manage post details",
     "remaining": "Remaining"
   },
@@ -562,7 +737,8 @@
       "address": "Address",
       "contactpersonname": "Contact Person Name",
       "contactpersonphone": "Contact Person Phone",
-      "contactpersonemail": "Contact Person Email"
+      "contactpersonemail": "Contact Person Email",
+      "interviewtemplate": "Interviewtemplate"
     },
     "placeholder": {
       "enterjobtitle": "Enter job title",
@@ -581,7 +757,9 @@
       "enteraddress": "Enter address",
       "entercontactpersonname": "Enter contact person name",
       "entercontactpersonphone": "Enter contact person phone",
-      "entercontactpersonemail": "Enter contact person email"
+      "entercontactpersonemail": "Enter contact person email",
+      "selectinterviewtemplate": "Selectinterviewtemplate",
+      "selectCityFirst": "Select City First"
     },
     "label": {
       "isUrgent": "Urgent Hiring"
@@ -626,7 +804,10 @@
       "contactpersonphoneexceededallowedlength": "Contact person phone exceeded allowed length.",
       "contactpersonemailisrequired": "Contact person email is required.",
       "invalidemail": "Invalid email.",
-      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length."
+      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length.",
+      "interviewtemplateinvalid": "Interviewtemplateinvalid",
+      "choiceInvalid": "Choice Invalid",
+      "salaryTooLarge": "Salary Too Large"
     }
   },
   "minimum-wage-comparison": "Minimum wage",
@@ -661,7 +842,10 @@
       "workExperience": "Work Experience",
       "generalInfo": "General Information",
       "languages": "Languages",
-      "personalInfo": "Personal Information"
+      "personalInfo": "Personal Information",
+      "profileNotFound": "Profile Not Found",
+      "privateProfile": "Private Profile",
+      "profileDetail": "Profile Detail"
     },
     "messages": {
       "noAttachedFile": "No attached file"
@@ -679,7 +863,12 @@
     }
   },
   "pagination": {
-    "rowsPerPage": "Rows per page"
+    "rowsPerPage": "Rows per page",
+    "firstPage": "First page",
+    "lastPage": "Last page",
+    "nextPage": "Next page",
+    "prevPage": "Previous page",
+    "zeroItems": "0 items"
   },
   "errors": {
     "networkError": "Network error. Please check your connection.",
@@ -693,7 +882,8 @@
     "missingInvite": "Missing invitation",
     "missingSessionId": "Missing session ID",
     "invalidSession": "Invalid session",
-    "tokenMissing": "Authentication token missing"
+    "tokenMissing": "Authentication token missing",
+    "mic_denied": "Mic_denied"
   },
   "pages": {
     "interviews": {
@@ -709,6 +899,90 @@
         "actionFailed": "Action Failed",
         "roleUpdated": "Role Updated",
         "roleUpdateFailed": "Role Update Failed"
+      },
+      "scheduleInterviewDialog": {
+        "success": "Success",
+        "error": "Error",
+        "questionFallback": "Question Fallback",
+        "title": "Title",
+        "timeLabel": "Time Label",
+        "questionsLabel": "Questions Label",
+        "questionsPlaceholder": "Questions Placeholder",
+        "notesLabel": "Notes Label",
+        "notesPlaceholder": "Notes Placeholder",
+        "cancelBtn": "Cancel Btn",
+        "schedulingBtn": "Scheduling Btn",
+        "submitBtn": "Submit Btn"
+      }
+    },
+    "banners": {
+      "deleteTitle": "Delete Title",
+      "deleteConfirm": "Delete Confirm",
+      "cancel": "Cancel",
+      "deleting": "Deleting",
+      "delete": "Delete",
+      "addTitle": "Add Title",
+      "editTitle": "Edit Title",
+      "form": {
+        "description": "Description",
+        "buttonText": "Button Text",
+        "buttonLink": "Button Link",
+        "platform": "Platform",
+        "bannerType": "Banner Type",
+        "descLocation": "Desc Location",
+        "showButton": "Show Button",
+        "activeLabel": "Active Label",
+        "webImageLabel": "Web Image Label",
+        "chooseWeb": "Choose Web",
+        "mobileImageLabel": "Mobile Image Label",
+        "chooseMobile": "Choose Mobile"
+      },
+      "noWebImage": "No Web Image",
+      "errorLoadingImage": "Error Loading Image",
+      "noMobileImage": "No Mobile Image",
+      "saving": "Saving",
+      "save": "Save"
+    },
+    "companies": {
+      "deleteTitle": "Delete Title",
+      "cancelBtn": "Cancel Btn",
+      "deletingBtn": "Deleting Btn",
+      "deleteBtn": "Delete Btn",
+      "addConfirmTitle": "Add Confirm Title",
+      "editConfirmTitle": "Edit Confirm Title",
+      "companyNameLabel": "Company Name Label",
+      "taxCodeLabel": "Tax Code Label",
+      "employeeSizeLabel": "Employee Size Label",
+      "companyEmailLabel": "Company Email Label",
+      "companyPhoneLabel": "Company Phone Label",
+      "fieldOperationLabel": "Field Operation Label",
+      "websiteLabel": "Website Label",
+      "form": {
+        "since": "Since",
+        "cityId": "City Id",
+        "districtId": "District Id",
+        "wardId": "Ward Id",
+        "address": "Address"
+      },
+      "descriptionLabel": "Description Label",
+      "savingBtn": "Saving Btn",
+      "saveBtn": "Save Btn"
+    },
+    "jobNotifications": {
+      "deleteTitle": "Delete Title",
+      "deleteConfirm": "Delete Confirm",
+      "cancel": "Cancel",
+      "addNotification": "Add Notification",
+      "editNotification": "Edit Notification",
+      "form": {
+        "title": "Title",
+        "salary": "Salary",
+        "frequency": "Frequency",
+        "position": "Position",
+        "experience": "Experience",
+        "careerId": "Career Id",
+        "cityId": "City Id",
+        "isActive": "Is Active"
       }
     }
   },
@@ -740,7 +1014,14 @@
     "allWorkplaces": "All Workplaces",
     "allGenders": "All Genders",
     "tabTitle": "Tab Title",
-    "recommendedJobs": "Recommended Jobs"
+    "recommendedJobs": "Recommended Jobs",
+    "savedAlert": {
+      "defaultName": "Default Name",
+      "success": "Success"
+    },
+    "saveSearch": "Save Search",
+    "resetFiltersAria": "Reset Filters Aria",
+    "closeAdvancedFiltersAria": "Close Advanced Filters Aria"
   },
   "profile": {
     "messages": {
@@ -771,7 +1052,10 @@
     "followAt": "Follow At",
     "generalInfo": "General Info",
     "map": "Map",
-    "images": "Images"
+    "images": "Images",
+    "verified": "Verified",
+    "report": "Report",
+    "verifiedDescription": "Verified Description"
   },
   "jobDetail": {
     "actions": {
@@ -779,7 +1063,8 @@
       "apply": "Apply",
       "saved": "Saved",
       "save": "Save",
-      "share": "Share"
+      "share": "Share",
+      "report": "Report"
     },
     "contactInfo": "Contact Info",
     "contactPerson": "Contact Person",
@@ -825,7 +1110,15 @@
     }
   },
   "controls": {
-    "end": "End"
+    "end": "End",
+    "muteMicrophone": "Mute Microphone",
+    "unmuteMicrophone": "Unmute Microphone",
+    "turnCameraOff": "Turn Camera Off",
+    "turnCameraOn": "Turn Camera On",
+    "stopScreenShare": "Stop Screen Share",
+    "startScreenShare": "Start Screen Share",
+    "ending": "Ending",
+    "enableAudio": "Enable Audio"
   },
   "sessionNotJoinable": "Session Not Joinable",
   "readyBody": "Ready Body",
@@ -857,19 +1150,14 @@
     }
   },
   "auto": {
-    "index_wwwInfoHRvn_9a21": "www.InfoHR.vn"
+    "index_wwwInfoHRvn_9a21": "www.InfoHR.vn",
+    "index_wwwsquarevn_9a21": "Index_wwwsquarevn_9a21"
   },
   "fileUpload": {
     "dragDropOrSelect": "Drag and drop file here or",
     "selectFile": "Select file",
     "pdfOnly": "Only PDF files accepted",
     "delete": "Delete"
-  },
-  "search": {
-    "button": "Search",
-    "suggestions": "Search suggestions",
-    "recent": "Recent searches",
-    "noResults": "No results found"
   },
   "notFound": {
     "title": "Page not found",
@@ -891,7 +1179,7 @@
     "statusCode": "Status code"
   },
   "language": {
-    "vietnamese": "Tiáº¿ng Viá»‡t",
+    "vietnamese": "Tiếng Việt",
     "english": "English"
   },
   "notification": {
@@ -903,10 +1191,6 @@
     "read": "Read",
     "unreadCount": "{{count}} unread",
     "viewAll": "View all"
-  },
-  "jobPost": {
-    "urgentHiring": "Urgent Hiring",
-    "jobsCount": "{{count}} jobs"
   },
   "profileUpload": {
     "allowSearch": "Allow search",
@@ -922,19 +1206,23 @@
     "recordingWaiting": "The interview has ended, the system is waiting for the recording to sync before displaying here."
   },
   "agentAssistant": {
-    "title": "Agent Assistants",
+    "title": "AILA",
     "recents": "Recents",
     "newChat": "New chat",
     "ready": "Ready",
-    "empty": "Agent is ready",
-    "placeholder": "Message the agent...",
+    "empty": "AILA is ready",
+    "placeholder": "Message AILA...",
     "send": "Send",
     "deleteHistory": "Delete chat history",
     "deleteCurrentHistory": "Delete current chat history",
     "deleteError": "Could not delete this chat history. Please try again.",
-    "loadError": "Could not load Agent Assistants. Please try again.",
-    "sendError": "Agent could not process this request. Please check the content and try again.",
-    "thinking": "Agent is thinking...",
+    "initError": "Failed to initialize AI Assistant. Please try again.",
+    "createThreadError": "Failed to create a new chat session.",
+    "deleteThreadError": "Failed to delete chat session.",
+    "loadMessagesError": "Failed to load message history.",
+    "loadError": "Could not load AILA. Please try again.",
+    "sendError": "AILA could not process this request. Please check the content and try again.",
+    "thinking": "AILA is thinking...",
     "attachments": {
       "addImage": "Attach image",
       "remove": "Remove image",
@@ -942,11 +1230,15 @@
       "limit": "You can attach up to {{count}} images.",
       "unsupported": "Only PNG, JPG, WebP, or GIF images are supported.",
       "tooLarge": "Each image must be smaller than 2MB.",
-      "readError": "Could not read this image. Please try another image."
+      "readError": "Could not read this image. Please try another image.",
+      "invalidType": "Unsupported file format. Please upload a valid image.",
+      "fileTooLarge": "Image file size exceeds the allowed limit.",
+      "maxCountExceeded": "Maximum number of image attachments reached.",
+      "readFailed": "Failed to read image file."
     },
     "portals": {
-      "admin": "InfoHR Admin",
-      "employer": "InfoHR Employer"
+      "admin": "Admin Portal",
+      "employer": "Employer Portal"
     },
     "threadGroups": {
       "today": "Today",
@@ -972,7 +1264,9 @@
       "list_questions": "List questions",
       "create_question_group": "Create question group",
       "list_question_groups": "List question groups",
-      "list_interviews": "List interviews"
+      "list_interviews": "List interviews",
+      "query_notebook_knowledge": "Query NotebookLM Knowledge Base",
+      "evaluate_cv_with_notebook": "Evaluate CV with NotebookLM"
     },
     "rows": {
       "candidate": "Candidate",
@@ -993,12 +1287,665 @@
       "fallback": "Result {{index}}",
       "more": "And {{count}} more results.",
       "openRecord": "Open record"
-    }
+    },
+    "openLink": "Open link"
   },
   "sidebarHeader": {
     "backToHome": "Back to Home",
     "backToAdmin": "Back to Admin"
+  },
+  "forbiddenCode": "403",
+  "forbiddenTitle": "Access Forbidden",
+  "forbiddenBody": "You do not have permission to access this page or resource.",
+  "backHome": "Back to Home",
+  "notFoundCode": "404",
+  "notFoundTitle": "Page Not Found",
+  "notFoundBody": "The page you are looking for does not exist or has been moved.",
+  "systemErrorCode": "500",
+  "systemErrorTitle": "System Error",
+  "systemErrorBody": "An internal server error occurred. We are working on resolving it.",
+  "tryAgain": "Try Again",
+  "appDownload": {
+    "smsSuccess": "App download link sent via SMS successfully!",
+    "readyToBreakthrough": "Ready to accelerate your hiring?",
+    "communityDesc": "Join a modern recruitment ecosystem where enterprises and top talent connect through verified profiles and smart interview intelligence.",
+    "findJobsNow": "Find Jobs Now",
+    "forEmployers": "For Employers",
+    "enterPhonePlaceholder": "Enter phone number to receive download link...",
+    "sendAppLink": "Send App Link"
+  },
+  "connectingTitle": "Connecting voice assistant...",
+  "connectingDescription": "Please stay connected and prepare your microphone.",
+  "startAudio": "Start Audio",
+  "preconnectMessage": "Establishing secure voice channel...",
+  "startCall": "Start Call",
+  "welcomeMessage": "Hello! I am InfoHR AI Virtual Assistant. How can I help you today?",
+  "setupHelpPrefix": "Need technical help? ",
+  "setupHelpLink": "View setup guide",
+  "applyForm": {
+    "validation": {
+      "phoneMax": "Phone Max"
+    }
+  },
+  "EmptyCard": " Empty Card",
+  "profileDetail": {
+    "": ""
+  },
+  "signup": {
+    "heading": "Heading",
+    "jobSeekerSubtitle": "Job Seeker Subtitle",
+    "haveAccount": "Have Account",
+    "signIn": "Sign In"
+  },
+  "companySearch": {
+    "resetFiltersAria": "Reset Filters Aria"
+  },
+  "manualCandidate": {
+    "badge": "Badge",
+    "form": {
+      "jobPost": "Job Post",
+      "selectJobPost": "Select Job Post",
+      "cvFile": "Cv File",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Full Name Placeholder",
+      "title": "Title",
+      "titlePlaceholder": "Title Placeholder",
+      "email": "Email",
+      "emailPlaceholder": "Email Placeholder",
+      "phone": "Phone",
+      "phonePlaceholder": "Phone Placeholder",
+      "career": "Career",
+      "selectCareer": "Select Career",
+      "city": "City",
+      "selectCity": "Select City",
+      "experience": "Experience",
+      "selectExperience": "Select Experience",
+      "position": "Position",
+      "selectPosition": "Select Position",
+      "academicLevel": "Academic Level",
+      "selectAcademicLevel": "Select Academic Level",
+      "typeOfWorkplace": "Type Of Workplace",
+      "selectTypeOfWorkplace": "Select Type Of Workplace",
+      "jobType": "Job Type",
+      "selectJobType": "Select Job Type",
+      "salaryMin": "Salary Min",
+      "salaryMinPlaceholder": "Salary Min Placeholder",
+      "salaryMax": "Salary Max",
+      "salaryMaxPlaceholder": "Salary Max Placeholder",
+      "expectedSalary": "Expected Salary",
+      "expectedSalaryPlaceholder": "Expected Salary Placeholder",
+      "description": "Description",
+      "descriptionPlaceholder": "Description Placeholder",
+      "skillsSummary": "Skills Summary",
+      "skillsSummaryPlaceholder": "Skills Summary Placeholder",
+      "note": "Note",
+      "notePlaceholder": "Note Placeholder"
+    }
+  },
+  "employees": {
+    "hrm": {
+      "convert": {
+        "openEmployee": "Open Employee",
+        "action": "Action"
+      }
+    }
+  },
+  "viewMore": "View More",
+  "liveRoom": {
+    "participants": {
+      "employer": "Employer",
+      "observer": "Observer",
+      "candidate": "Candidate",
+      "guest": "Guest",
+      "you": "You",
+      "aiInterviewer": "Ai Interviewer"
+    },
+    "chat": {
+      "close": "Close",
+      "open": "Open",
+      "aiControlPlaceholder": "Ai Control Placeholder",
+      "placeholder": "Placeholder",
+      "aiControlSend": "Ai Control Send",
+      "send": "Send",
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "messagesCount": "Messages Count",
+      "noMessages": "No Messages",
+      "noMessagesDesc": "No Messages Desc",
+      "chatMode": "Chat Mode",
+      "aiControlMode": "Ai Control Mode",
+      "takeoverMode": "Takeover Mode",
+      "takeoverActive": "Takeover Active",
+      "takeoverInactive": "Takeover Inactive",
+      "takeoverTitle": "Takeover Title",
+      "takeoverHint": "Takeover Hint",
+      "takeoverSending": "Takeover Sending",
+      "takeoverRelease": "Takeover Release",
+      "takeoverAcquire": "Takeover Acquire"
+    },
+    "chips": {
+      "you": "You",
+      "ai": "Ai",
+      "employer": "Employer",
+      "live": "Live"
+    },
+    "observingBar": {
+      "hrObserving": "Hr Observing",
+      "hrWaiting": "Hr Waiting",
+      "employerObserving": "Employer Observing",
+      "live": "Live",
+      "waiting": "Waiting"
+    }
+  },
+  "profileCard": {
+    "messages": {
+      "saveSuccess": "Save Success",
+      "unsaveSuccess": "Unsave Success"
+    },
+    "title": {
+      "noresultsfound": "Noresultsfound"
+    }
+  },
+  "seo": {
+    "jobDetail": {
+      "titlePrefix": "Title Prefix",
+      "at": "At",
+      "reputableCompany": "Reputable Company",
+      "keywordsSuffix": "Keywords Suffix",
+      "breadcrumb": {
+        "home": "Home",
+        "jobs": "Jobs"
+      }
+    },
+    "jobList": {
+      "description": "Description",
+      "keywords": "Keywords"
+    },
+    "articleDetail": {
+      "description": "Description",
+      "breadcrumb": {
+        "home": "Home"
+      }
+    },
+    "newsList": {
+      "title": "Title",
+      "description": "Description"
+    }
+  },
+  "news": {
+    "category": {
+      "news": "News",
+      "blog": "Blog"
+    },
+    "article": {
+      "notFoundTitle": "Not Found Title",
+      "notFoundContent": "Not Found Content",
+      "backToNews": "Back To News",
+      "backToList": "Back To List",
+      "emptyContent": "Empty Content",
+      "infoTitle": "Info Title",
+      "moreTitle": "More Title",
+      "moreDescription": "More Description",
+      "newsHomeCta": "News Home Cta"
+    },
+    "views": "Views",
+    "emptyTitle": "Empty Title",
+    "emptyContent": "Empty Content",
+    "sectionTitle": "News & Insights",
+    "sectionSubtitle": "Stay updated with the latest recruitment news and labor market trends.",
+    "handbookTitle": "News & Insights",
+    "handbookSubtitle": "Stay updated with the latest recruitment news and labor market trends.",
+    "justUpdated": "Just updated",
+    "defaultCategory": "HANDBOOK",
+    "byAuthor": "By {{author}} • {{time}}",
+    "viewMore": "View more news & insights"
+  },
+  "interviewLive": {
+    "table": {
+      "candidate": "Candidate",
+      "position": "Position",
+      "time": "Time"
+    },
+    "title": "Title",
+    "subtitle": "Subtitle",
+    "autoRefresh": {
+      "on": "On",
+      "off": "Off"
+    },
+    "updating": "Updating",
+    "activeNow": "Active Now",
+    "noData": {
+      "title": "Title",
+      "subtitle": "Subtitle"
+    }
+  },
+  "processingTitle": "Processing Title",
+  "processingBody": "Processing Body",
+  "preflight": {
+    "title": "Title",
+    "subtitle": "Subtitle",
+    "mic_ready": "Mic_ready",
+    "join": "Join"
+  },
+  "account": {
+    "pageTitle": "Page Title"
+  },
+  "onboarding": {
+    "validation": {
+      "desiredJobTitleRequired": "Desired Job Title Required",
+      "careerRequired": "Career Required",
+      "cityRequired": "City Required",
+      "skillsMin": "Skills Min",
+      "salaryRangeInvalid": "Salary Range Invalid"
+    }
+  },
+  "employerOnboarding": {
+    "validation": {
+      "companyNameRequired": "Company Name Required",
+      "recruiterNameRequired": "Recruiter Name Required"
+    }
+  },
+  "table": {
+    "rowsPerPage": "Rows per page:"
+  },
+  "editor": {
+    "toolbar": {
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Y)",
+      "templates": "Article & JD Templates",
+      "aiAssistant": "AI Writing Assistant",
+      "clearFormat": "Clear formatting",
+      "heading": "Heading",
+      "normalText": "Normal text",
+      "heading1": "Heading 1 (H1)",
+      "heading2": "Heading 2 (H2)",
+      "heading3": "Heading 3 (H3)",
+      "heading4": "Heading 4 (H4)",
+      "fontSize": "Font size",
+      "fontSmall": "Small (13px)",
+      "fontNormal": "Normal (15px)",
+      "fontMedium": "Medium (18px)",
+      "fontLarge": "Large (22px)",
+      "fontXLarge": "Extra Large (28px)",
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "underline": "Underline (Ctrl+U)",
+      "strike": "Strikethrough",
+      "code": "Inline code",
+      "textColor": "Text color",
+      "highlightColor": "Highlight color",
+      "alignLeft": "Align left",
+      "alignCenter": "Align center",
+      "alignRight": "Align right",
+      "alignJustify": "Justify",
+      "bulletList": "Bullet list",
+      "orderedList": "Numbered list",
+      "taskList": "Task checklist",
+      "blockquote": "Blockquote",
+      "codeBlock": "Code block",
+      "callout": "Callout box",
+      "table": "Insert data table",
+      "link": "Insert / Edit link (Ctrl+K)",
+      "horizontalRule": "Horizontal divider",
+      "livePreview": "Live preview",
+      "uploadImage": "Upload image",
+      "moreTools": "More tools..."
+    },
+    "colors": {
+      "default": "Default",
+      "green": "Green",
+      "rubyRed": "Ruby Red",
+      "violet": "Violet",
+      "blue": "Blue",
+      "slate": "Slate Gray",
+      "none": "None",
+      "lemonYellow": "Lemon Yellow",
+      "mintGreen": "Mint Green",
+      "skyBlue": "Sky Blue",
+      "lavender": "Lavender",
+      "peach": "Peach",
+      "customColor": "Custom color"
+    },
+    "status": {
+      "words": "{{count}} words",
+      "characters": "{{count}} characters",
+      "readingTime": "~{{minutes}} min read",
+      "richEditorReady": "Rich editor ready",
+      "markdownShortcutsSupported": "Supports Markdown shortcuts (#, *, -, 1., >)",
+      "aiReady": "AI Ready",
+      "charactersUnit": "chars",
+      "minutesRead": "min read",
+      "readingTimeEst": "Est. reading time",
+      "wordsUnit": "words"
+    },
+    "callout": {
+      "modalTitle": "Insert Callout Box",
+      "selectType": "Select callout type:",
+      "customTitle": "Custom title:",
+      "content": "Callout content:",
+      "contentPlaceholder": "Enter content to highlight...",
+      "preview": "Live preview:",
+      "cancel": "Cancel",
+      "insert": "Insert Into Document",
+      "types": {
+        "info": {
+          "label": "Additional Information (Info)",
+          "defaultTitle": "Important Note:"
+        },
+        "tip": {
+          "label": "Tips & Tricks (Tip)",
+          "defaultTitle": "Helpful Tip:"
+        },
+        "warning": {
+          "label": "Warning & Notice (Warning)",
+          "defaultTitle": "Caution:"
+        },
+        "success": {
+          "label": "Highlights & Achievements (Success)",
+          "defaultTitle": "Quality Commitment:"
+        }
+      }
+    },
+    "table": {
+      "modalTitle": "Insert Data Table",
+      "gridSize": "Dimension:",
+      "sizeReadout": "{{rows}} rows x {{cols}} columns",
+      "headerRow": "Include prominent header row",
+      "cancel": "Cancel",
+      "insertButton": "Insert Table ({{rows}}x{{cols}})",
+      "dataCell": "Data cell",
+      "headerCell": "Header cell"
+    },
+    "link": {
+      "modalTitle": "Insert Hyperlink",
+      "urlLabel": "Link URL",
+      "urlPlaceholder": "https://example.com",
+      "textLabel": "Display text",
+      "textPlaceholder": "Enter display text (optional)...",
+      "openNewTab": "Open in new tab (target=\"_blank\")",
+      "cancel": "Cancel",
+      "insert": "Insert Link"
+    },
+    "preview": {
+      "modalTitle": "Live Preview",
+      "subtitle": "Actual layout viewers will see after publication",
+      "empty": "No content to display",
+      "close": "Close"
+    },
+    "templates": {
+      "modalTitle": "Professional Article & Job Templates Library",
+      "subtitle": "Quickly jumpstart professional content with standardized structures for every industry",
+      "searchPlaceholder": "Search templates by name, description or keyword...",
+      "allCategory": "All Templates",
+      "categories": {
+        "company": "Company Profile",
+        "job": "Job Descriptions (JD)",
+        "policy": "Policies & Benefits",
+        "interview": "Process & Guides",
+        "article": "Article",
+        "email": "Email",
+        "jobReq": "Job Requirement"
+      },
+      "previewHeader": "Preview:",
+      "useTemplate": "Use this template",
+      "cancel": "Close",
+      "confirmOverwriteTitle": "Confirm apply template",
+      "confirmOverwriteDesc": "Current editor content will be replaced by the selected template. Are you sure you want to continue?",
+      "confirmOverwriteOk": "Yes, replace",
+      "confirmOverwriteCancel": "Cancel",
+      "bottomHint": "Click to apply template",
+      "previewSubtitle": "Template preview",
+      "selectToPreview": "Select template on left to preview"
+    },
+    "ai": {
+      "modalTitle": "AI Writing Assistant",
+      "subtitle": "Optimize, expand and polish professional recruitment content",
+      "tones": {
+        "label": "Writing Tone:",
+        "professional": "Professional & Formal",
+        "friendly": "Friendly & Approachable",
+        "persuasive": "Persuasive & Engaging",
+        "concise": "Concise & Direct",
+        "creative": "Creative"
+      },
+      "actions": {
+        "grammar": "Fix grammar & spelling",
+        "rewrite": "Rewrite & polish",
+        "expand": "Expand & elaborate",
+        "shorten": "Summarize & shorten",
+        "generateJd": "Generate Job Description (JD)",
+        "addBenefits": "Add attractive benefits",
+        "makeProfessional": "Make tone executive/B2B"
+      },
+      "customPromptLabel": "Or enter your custom request for AI:",
+      "customPromptPlaceholder": "E.g. Add technical requirements for Senior Frontend Engineer using ReactJS and TypeScript...",
+      "generateButton": "Generate with AI",
+      "processing": "AI is processing and generating content...",
+      "resultTitle": "AI Suggested Result:",
+      "insert": "Insert at end",
+      "replace": "Replace selected",
+      "copy": "Copy result",
+      "copied": "Copied to clipboard",
+      "close": "Close",
+      "context": {
+        "blog": "Blog post",
+        "email": "Email",
+        "general": "General",
+        "jobReq": "Job requirement"
+      },
+      "customPromptPlaceholderSecondary": "Enter custom prompt for AI...",
+      "emptyResult": "No content generated yet",
+      "emptyResultInstruction": "Select a template or enter prompt to start",
+      "footerNote": "AI generated content, please review before use.",
+      "insertCursor": "Insert at cursor",
+      "length": {
+        "detailed": "Detailed",
+        "label": "Length",
+        "medium": "Medium",
+        "short": "Short"
+      },
+      "suggestions": {
+        "ben1": "Healthcare & Insurance",
+        "ben2": "Performance bonus & 13th month salary",
+        "ben3": "Annual company trip & team building",
+        "blog1": "Hiring trends this year",
+        "blog2": "Effective interview tips",
+        "comp1": "Dynamic work environment",
+        "comp2": "Career growth opportunities",
+        "comp3": "Open and respectful culture",
+        "gen1": "Brief and impressive introduction",
+        "gen2": "Summary of key highlights",
+        "jd1": "Software engineer job description",
+        "jd2": "Sales executive job description",
+        "jd3": "Recruiter job description",
+        "mail1": "Job offer letter",
+        "mail2": "Interview invitation email",
+        "mail3": "Candidate thank-you email",
+        "mail4": "Polite candidate rejection email",
+        "req1": "Technical skill requirements",
+        "req2": "Soft skill requirements",
+        "req3": "Experience requirements"
+      },
+      "suggestionsHeader": "Content Suggestions",
+      "tabs": {
+        "changeTone": "Change Tone",
+        "changeToneDesc": "Adjust professional or friendly tone",
+        "custom": "Custom",
+        "customDesc": "Generate content with custom prompt",
+        "expandDesc": "Expand content with more details",
+        "fixSpellingDesc": "Auto fix spelling and grammar",
+        "generate": "Generate",
+        "generateDesc": "Generate new content from ideas",
+        "improve": "Improve",
+        "improveDesc": "Improve clarity and flow",
+        "shortenDesc": "Shorten and condense content",
+        "translateEn": "Translate to English",
+        "translateEnDesc": "Translate text to professional English",
+        "translateVi": "Translate to Vietnamese",
+        "translateViDesc": "Translate text to natural Vietnamese"
+      }
+    },
+    "defaultSimplePlaceholder": "Enter text content...",
+    "sampleHighlight": "Highlights",
+    "sampleText": "Sample text",
+    "uploadingImage": "Uploading image..."
+  },
+  "export": {
+    "title": "Export Data",
+    "subtitle": "Configure scope, preview and download exported data file",
+    "fileName": "Export File Name",
+    "fileNamePlaceholder": "Enter file name...",
+    "format": "File Format",
+    "excel": "Excel (.xlsx)",
+    "excelDesc": "Standard format with full column styling",
+    "csv": "CSV (.csv)",
+    "csvDesc": "Lightweight format suitable for large datasets",
+    "dataScope": "Data Scope",
+    "allData": "All records",
+    "filteredData": "Current filtered records",
+    "selectedData": "Selected records only",
+    "exportColumns": "Export Columns",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "rows": "rows",
+    "previewTitle": "Data Preview",
+    "previewFirst10": "Showing first 10 rows",
+    "totalRecords": "Total: {{count}} records",
+    "noColumnsSelected": "No columns selected for preview.",
+    "noPreviewData": "No preview data available.",
+    "preparing": "Preparing export file...",
+    "generating": "Generating file {{fileName}} ({{format}})",
+    "initializing": "Initializing export file...",
+    "successTitle": "Export Successful!",
+    "successSubtitle": "Data file is ready. Click Download to save it to your device.",
+    "ready": "Ready",
+    "errorTitle": "Failed to generate data file.",
+    "defaultErrorMessage": "An error occurred during file generation. Please try again.",
+    "exportButton": "Export Data File",
+    "download": "Download"
+  },
+  "filters": {
+    "filterButton": "Filters",
+    "filtering": "Filtering ({{count}}):",
+    "clearFilter": "Clear filter",
+    "clearAll": "Clear all",
+    "applyFilter": "Apply filters",
+    "searchKeyword": "Enter keyword...",
+    "selectCity": "Select city/province"
+  },
+  "dropzone": {
+    "dragDropResume": "Drag or drop your resume here",
+    "orYouCan": "Or you can",
+    "selectFile": "Browse file from your computer",
+    "supportPdf": "Supported format .pdf",
+    "changeFile": "Change file",
+    "dragDropImage": "Drag and drop files here or click to select",
+    "preview": "Preview",
+    "limitExceed": "Maximum upload limit is {{count}} files.",
+    "fileAdded": "File {{fileName}} was added successfully.",
+    "fileRemoved": "File {{fileName}} was removed.",
+    "titleDefault": "Title"
+  },
+  "jobHover": {
+    "companyDefault": "Hiring Enterprise",
+    "nationwide": "Nationwide",
+    "noExpRequired": "No experience required",
+    "yearsExp": "{{count}} years experience",
+    "noDegreeRequired": "No degree required",
+    "academicLevel": "Level {{level}}",
+    "activelyHiring": "Actively Hiring",
+    "saveJob": "Save job post",
+    "unsaveJob": "Unsave job post",
+    "urgentHiring": "Urgent Hiring",
+    "responseRate": "• 100% response rate",
+    "applyEarlyPrioritized": "Apply early for top consideration!",
+    "viewDetail": "View Details",
+    "applyNow": "Apply Now",
+    "jobDescription": "Job Description",
+    "jobRequirements": "Job Requirements",
+    "benefitsEnjoyed": "Benefits & Perks",
+    "moreDescLines": "+{{count}} more detail lines...",
+    "noDesc": "Detailed job description not available. Click view details to learn more.",
+    "moreReqLines": "+{{count}} more requirements...",
+    "discussInInterview": "To be discussed during interview.",
+    "standardBenefits": "Full benefits according to company policy and Labor Code."
+  },
+  "auth": {
+    "unverifiedAccount": "Unverified Account",
+    "verifiedAccount": "Verified Account",
+    "testModeHint": "Test Mode: Enter OTP",
+    "testModeInstantVerify": "for instant verification.",
+    "loginToSyncProfile": "Sign in to sync profile",
+    "loginToSyncProfileDesc": "Please sign in to auto-fill experience, education, and skills from your profile into your CV."
+  },
+  "cvBuilder": {
+    "pageTitle": "Online CV Builder & Designer | InfoHR Recruitment",
+    "defaultCvPrefix": "CV",
+    "defaultCvTitle": "Job Application CV",
+    "untitledCv": "Untitled CV",
+    "backToGallery": "Back to Template Gallery",
+    "renameHint": "Click to rename CV",
+    "guestMode": "Guest Mode",
+    "saveStatus": {
+      "saving": "Auto-saving...",
+      "saved": "Saved",
+      "savedAt": "Saved at {{time}}",
+      "idle": "Edit to auto-save"
+    },
+    "mobile": {
+      "edit": "Edit",
+      "preview": "Preview"
+    },
+    "tabs": {
+      "content": "Content",
+      "design": "Design",
+      "aiScore": "ATS Score",
+      "aiAssist": "AI Suggestions"
+    },
+    "editor": {
+      "sidebarTitle": "Edit CV Profile",
+      "syncFromProfile": "Sync from Profile"
+    },
+    "preview": {
+      "switchTemplate": "Switch Template",
+      "vietnamese": "VI",
+      "english": "EN",
+      "color": "Color:",
+      "zoomOut": "Zoom out",
+      "zoomIn": "Zoom in",
+      "zoomReset": "Default 85%"
+    },
+    "actions": {
+      "publicLink": "Online Link",
+      "exportWord": "Export Word (.doc)",
+      "backupJson": "Backup JSON",
+      "saveNow": "Save Now",
+      "downloadPdf": "Download PDF A4"
+    },
+    "toasts": {
+      "cvNotFound": "CV record not found or you don't have access.",
+      "saveSuccess": "CV saved successfully!",
+      "saveBeforeShare": "Please save your CV before generating a share link.",
+      "copyLinkSuccess": "Public CV link copied to clipboard!",
+      "syncSuccess": "Profile data synced successfully!",
+      "syncFailed": "Could not sync profile. Please try again!",
+      "applyTemplateSuccess": "New CV template applied successfully!"
+    },
+    "templateModal": {
+      "title": "Select CV Template",
+      "subtitle": "All your entered information will be 100% preserved when switching layouts.",
+      "selectedLabel": "Selected template:",
+      "apply": "Apply this template"
+    },
+    "categories": {
+      "all": "All Templates",
+      "popular": "Most Popular",
+      "modern": "Modern",
+      "simple": "Simple & ATS",
+      "executive": "Executive",
+      "professional": "Professional",
+      "creative": "Creative",
+      "tech": "IT & Tech"
+    }
   }
 }
-
-

@@ -68,7 +68,7 @@ def admin_user(db):
 @pytest.fixture
 def career(db):
     """Create a test career/industry."""
-    from common.models import Career
+    from apps.common.models import Career
     return Career.objects.create(name='IT - Phần mềm')
 
 

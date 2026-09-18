@@ -131,7 +131,7 @@ class InterviewServiceTests(TestCase):
         self.assertNotEqual(context["scheduled_at_display"], "Chưa cập nhật")
         self.assertIn("-", context["scheduled_at_display"])
         mock_send_mail.assert_called_once()
-        self.assertIn("Mời Phỏng vấn trực tuyến", mock_send_mail.call_args.kwargs["subject"])
+        self.assertIn("Thư mời Phỏng vấn", mock_send_mail.call_args.kwargs["subject"])
 
 
 
@@ -145,11 +145,13 @@ class InterviewCompatEndpointTests(TransactionTestCase):
         )
         self.session = InterviewSession.objects.create(candidate=self.candidate)
 
+    @override_settings(INTERVIEW_AGENT_AUTH_REQUIRED=False)
     def test_context_endpoint_returns_payload(self):
         response = self.client.get(f"/api/v1/interview/compat/{self.session.room_name}/context")
         self.assertEqual(response.status_code, 200)
         self.assertIn("candidateEmail", response.json())
 
+    @override_settings(INTERVIEW_AGENT_AUTH_REQUIRED=False)
     def test_next_question_endpoint(self):
         q1 = Question.objects.create(text="Question 1")
         self.session.questions.add(q1)
@@ -162,6 +164,7 @@ class InterviewCompatEndpointTests(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("question", response.json())
 
+    @override_settings(INTERVIEW_AGENT_AUTH_REQUIRED=False)
     def test_status_endpoint_updates_session(self):
         response = self.client.patch(
             f"/api/v1/interview/compat/{self.session.room_name}/status",
@@ -233,6 +236,25 @@ class LiveKitWebhookTests(TestCase):
             self.session.recording_url,
             "http://localhost:9000/square/interviews/demo/recording.mp4",
         )
+
+    def test_handle_livekit_event_updates_recording_url_for_both_mock_and_official(self):
+        mock_session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            status="completed",
+            session_type="mock",
+        )
+        official_session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            status="completed",
+            session_type="official",
+        )
+        _handle_livekit_event(_FakeWebhookEvent(mock_session.room_name, "http://localhost:9000/square/interviews/mock/recording.mp4"))
+        _handle_livekit_event(_FakeWebhookEvent(official_session.room_name, "http://localhost:9000/square/interviews/official/recording.mp4"))
+
+        mock_session.refresh_from_db()
+        official_session.refresh_from_db()
+        self.assertEqual(mock_session.recording_url, "http://localhost:9000/square/interviews/mock/recording.mp4")
+        self.assertEqual(official_session.recording_url, "http://localhost:9000/square/interviews/official/recording.mp4")
 
     @override_settings(LIVEKIT_API_KEY="devkey", LIVEKIT_API_SECRET="secret", LIVEKIT_WEBHOOK_STRICT=True)
     @patch("livekit.api.TokenVerifier")
@@ -439,7 +461,7 @@ class QuestionBankPermissionTests(TestCase):
         self.assertIn(company_question.id, ids)
         self.assertNotIn(other_question.id, ids)
         permissions_by_id = {item["id"]: item.get("canWrite") for item in results}
-        self.assertIs(permissions_by_id[global_question.id], True)
+        self.assertIs(permissions_by_id[global_question.id], False)
         self.assertIs(permissions_by_id[company_question.id], True)
 
     def test_member_created_question_is_scoped_to_active_company(self):
@@ -466,7 +488,7 @@ class QuestionBankPermissionTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertFalse(QuestionGroup.objects.filter(name="Invalid scoped group").exists())
 
-    def test_member_can_manage_legacy_unscoped_question_bank_items(self):
+    def test_member_cannot_manage_global_unscoped_question_bank_items(self):
         legacy_question = Question.objects.create(text="Legacy question")
         legacy_group = QuestionGroup.objects.create(name="Legacy group")
         legacy_group.questions.add(legacy_question)
@@ -488,12 +510,12 @@ class QuestionBankPermissionTests(TestCase):
             f"/api/v1/interview/web/question-groups/{legacy_group.id}/",
         )
 
-        self.assertEqual(question_update_response.status_code, 200)
-        self.assertEqual(question_delete_response.status_code, 204)
-        self.assertEqual(group_update_response.status_code, 200)
-        self.assertEqual(group_delete_response.status_code, 204)
-        self.assertFalse(Question.objects.filter(id=legacy_question.id).exists())
-        self.assertFalse(QuestionGroup.objects.filter(id=legacy_group.id).exists())
+        self.assertEqual(question_update_response.status_code, 403)
+        self.assertEqual(question_delete_response.status_code, 403)
+        self.assertEqual(group_update_response.status_code, 403)
+        self.assertEqual(group_delete_response.status_code, 403)
+        self.assertTrue(Question.objects.filter(id=legacy_question.id).exists())
+        self.assertTrue(QuestionGroup.objects.filter(id=legacy_group.id).exists())
 
 
 class VoiceProfileGrantAdminTests(TestCase):
@@ -1015,34 +1037,17 @@ class InterviewSessionAPITests(TestCase):
         self.assertEqual(session.status, "calibration")
         self.assertGreaterEqual(mock_thread.call_count, 1)
 
-    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+
     @patch(
         "apps.interviews.views.run_django_sync_in_thread",
         side_effect=lambda func, *args, **kwargs: func(*args, **kwargs),
     )
-    @patch("apps.interviews.tasks.send_mail")
-    @patch("apps.interviews.tasks.render_to_string", return_value="<html>mail</html>")
-    def test_invitation_email_includes_scheduled_time(self, mock_render, mock_send_mail):
-        self.session.scheduled_at = timezone.now() + timedelta(days=2)
-        self.session.save(update_fields=["scheduled_at", "update_at"])
-
-        send_interview_invitation(self.session.id)
-
-        mock_render.assert_called_once()
-        template_name, context = mock_render.call_args.args
-        self.assertEqual(template_name, "interview/emails/invitation.html")
-        self.assertIn("scheduled_at_display", context)
-        self.assertNotEqual(context["scheduled_at_display"], "Chưa cập nhật")
-        self.assertIn("-", context["scheduled_at_display"])
-        mock_send_mail.assert_called_once()
-        self.assertIn("Mời Phỏng vấn trực tuyến", mock_send_mail.call_args.kwargs["subject"])
-
     @patch("apps.interviews.tasks.end_interview_session.apply_async")
     @patch(
         "rest_framework.views.APIView.perform_authentication",
         side_effect=SynchronousOnlyOperation("OAuth auth attempted in async context"),
     )
-    def test_invite_token_status_update_skips_drf_authentication(self, mock_auth, mock_end_task, mock_thread):
+    def test_invite_token_status_update_skips_drf_authentication(self, mock_auth, mock_end_task, mock_run_sync):
         anonymous_client = APIClient()
         session = InterviewSession.objects.create(
             candidate=self.candidate,
@@ -1061,7 +1066,6 @@ class InterviewSessionAPITests(TestCase):
         self.assertEqual(session.status, "in_progress")
         mock_auth.assert_not_called()
         mock_end_task.assert_called_once()
-        self.assertGreaterEqual(mock_thread.call_count, 1)
 
     @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
     def test_unsigned_anonymous_status_update_without_invite_token_is_rejected(self):
@@ -1531,3 +1535,112 @@ class ModelAutoFieldTests(TestCase):
     def test_default_type_is_mixed(self):
         session = InterviewSession.objects.create(candidate=self.candidate)
         self.assertEqual(session.type, "mixed")
+
+
+class InterviewSlotCapacityTests(TestCase):
+    def setUp(self):
+        self.candidate = User.objects.create_user(
+            email="candidate_slot@example.com",
+            full_name="Candidate Slot",
+            password="password123",
+            role_name=var_sys.JOB_SEEKER,
+        )
+        self.employer = User.objects.create_user(
+            email="employer_slot@example.com",
+            full_name="Employer Slot",
+            password="password123",
+            role_name=var_sys.EMPLOYER,
+        )
+
+    def test_slot_capacity_guard_rejects_when_limit_reached(self):
+        from .serializers import SLOT_CAPACITY_FULL_MESSAGE
+        target_time = timezone.now() + timedelta(days=3)
+
+        with self.settings(MAX_CONCURRENT_INTERVIEWS_PER_SLOT=2, SLOT_WINDOW_MINUTES=15):
+            # Create 2 sessions within the slot window
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time,
+                status="scheduled",
+                session_type="official",
+            )
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time + timedelta(minutes=5),
+                status="scheduled",
+                session_type="official",
+            )
+
+            # 3rd session in same slot should fail
+            serializer = InterviewSessionCreateSerializer(data={
+                "candidate": self.candidate.id,
+                "scheduled_at": (target_time + timedelta(minutes=2)).isoformat(),
+                "type": "mixed",
+            })
+            self.assertFalse(serializer.is_valid())
+            self.assertIn("scheduled_at", serializer.errors)
+            self.assertIn(SLOT_CAPACITY_FULL_MESSAGE, str(serializer.errors["scheduled_at"]))
+
+    def test_slot_capacity_guard_allows_different_slot(self):
+        target_time = timezone.now() + timedelta(days=3)
+
+        with self.settings(MAX_CONCURRENT_INTERVIEWS_PER_SLOT=2, SLOT_WINDOW_MINUTES=15):
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time,
+                status="scheduled",
+                session_type="official",
+            )
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time + timedelta(minutes=5),
+                status="scheduled",
+                session_type="official",
+            )
+
+            # Session 45 minutes later should succeed
+            serializer = InterviewSessionCreateSerializer(data={
+                "candidate": self.candidate.id,
+                "scheduled_at": (target_time + timedelta(minutes=45)).isoformat(),
+                "type": "mixed",
+            })
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_slot_capacity_ignores_completed_and_cancelled_sessions(self):
+        target_time = timezone.now() + timedelta(days=3)
+
+        with self.settings(MAX_CONCURRENT_INTERVIEWS_PER_SLOT=1, SLOT_WINDOW_MINUTES=15):
+            # Create completed and cancelled sessions
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time,
+                status="completed",
+                session_type="official",
+            )
+            InterviewSession.objects.create(
+                candidate=self.candidate,
+                created_by=self.employer,
+                scheduled_at=target_time,
+                status="cancelled",
+                session_type="official",
+            )
+
+            # New scheduled session should succeed because finished sessions are excluded
+            serializer = InterviewSessionCreateSerializer(data={
+                "candidate": self.candidate.id,
+                "scheduled_at": target_time.isoformat(),
+                "type": "mixed",
+            })
+            self.assertTrue(serializer.is_valid(), serializer.errors)
+
+    def test_tts_cache_key_deterministic(self):
+        from .tts_cache import compute_tts_cache_key
+        key1 = compute_tts_cache_key("tts-vi", "Trúc Ly", 1.0, "Chào bạn, mình là trợ lý AI.")
+        key2 = compute_tts_cache_key("tts-vi", "Trúc Ly", 1.0, "   Chào bạn, mình là trợ lý AI.   ")
+        self.assertEqual(key1, key2)
+

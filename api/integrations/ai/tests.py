@@ -24,7 +24,7 @@ from shared.configs import variable_system as var_sys
 
 
 def test_http_probe_url_converts_websocket_schemes():
-assert _http_probe_url("wss://infohr.vn/livekit") == "https://infohr.vn/livekit"
+    assert _http_probe_url("wss://infohr.vn/livekit") == "https://infohr.vn/livekit"
     assert _http_probe_url("ws://livekit:7880") == "http://livekit:7880"
 
 
@@ -33,11 +33,11 @@ def test_probe_http_service_uses_http_url_for_wss(monkeypatch):
     mock_get = Mock(return_value=fake_response)
     monkeypatch.setattr("integrations.ai.views.requests.get", mock_get)
 
-result = _probe_http_service("livekit", "wss://infohr.vn/livekit", path="/")
+    result = _probe_http_service("livekit", "wss://infohr.vn/livekit", path="/")
 
     assert result["status"] == "online"
     mock_get.assert_called_once()
-assert mock_get.call_args.args[0] == "https://infohr.vn/livekit/"
+    assert mock_get.call_args.args[0] == "https://infohr.vn/livekit/"
 
 def test_tts_proxy_buffers_audio_before_returning_response(monkeypatch, settings):
     settings.AI_TTS_BASE_URL = "http://primary.test/v1"
@@ -57,7 +57,7 @@ def test_tts_proxy_buffers_audio_before_returning_response(monkeypatch, settings
 
     post_calls = []
 
-    def fake_post(url, json, stream, timeout):
+    def fake_post(url, json=None, stream=None, timeout=None, headers=None, **kwargs):
         post_calls.append({"url": url, "stream": stream, "timeout": timeout})
         return FakeUpstream()
 
@@ -75,7 +75,7 @@ def test_tts_proxy_buffers_audio_before_returning_response(monkeypatch, settings
         {
             "url": "http://primary.test/v1/audio/speech",
             "stream": False,
-            "timeout": (10, 300),
+            "timeout": (5, 30),
         }
     ]
 
@@ -112,13 +112,14 @@ def test_tts_get_returns_helpful_message(client):
     response = client.get("/api/ai/tts/")
     payload = response.json()
 
-    assert response.status_code == 200
+    assert response.status_code == 405
     assert payload["error"]["code"] == "METHOD_NOT_ALLOWED"
     assert "Use POST /api/ai/tts/" in payload["error"]["message"]
 
 
 def test_llm_candidates_keep_same_base_url_with_different_model(settings):
     settings.AI_LLM_BASE_URL = "http://llm.test/v1"
+    settings.AI_LLM_MODEL = ""
     settings.AI_LLM_API_KEY = ""
     settings.AI_LLM_LOCAL_BASE_URL = "http://llm.test/v1"
     settings.AI_LLM_LOCAL_MODEL = "gemma3:12b"
@@ -130,7 +131,7 @@ def test_llm_candidates_keep_same_base_url_with_different_model(settings):
     candidates = get_llm_candidates(default_model="qwen3-14b-interview")
 
     assert [(candidate.name, candidate.model) for candidate in candidates] == [
-        ("primary", ""),
+        ("primary", "qwen3-14b-interview"),
         ("local", "gemma3:12b"),
     ]
 

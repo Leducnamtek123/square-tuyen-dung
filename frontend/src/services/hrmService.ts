@@ -1,5 +1,5 @@
 import httpRequest from '../utils/httpRequest';
-import { unwrapDataResponse } from '../utils/apiResponse';
+import { unwrapDataResponse, normalizePaginatedResponse } from '../utils/apiResponse';
 
 export type EmployeeFromApplicationPayload = {
   applicationId: number;
@@ -37,23 +37,977 @@ export type HRMIntegrationStatus = {
   siteName?: string;
 };
 
+// Native HRM Types
+export type NativeDepartment = {
+  id: number;
+  name: string;
+  code?: string;
+  parent?: number | null;
+  parentName?: string;
+  parent_name?: string;
+  manager?: number | null;
+  managerName?: string;
+  manager_name?: string;
+  description?: string;
+  isActive?: boolean;
+  is_active?: boolean;
+  employeeCount?: number;
+  employee_count?: number;
+};
+
+export type NativeDesignation = {
+  id: number;
+  title: string;
+  code?: string;
+  description?: string;
+  isActive?: boolean;
+  is_active?: boolean;
+  employeeCount?: number;
+  employee_count?: number;
+};
+
+export type NativeEmployee = {
+  id: number;
+  employeeCode?: string;
+  employee_code?: string;
+  firstName?: string;
+  first_name?: string;
+  lastName?: string;
+  last_name?: string;
+  fullName?: string;
+  full_name?: string;
+  email: string;
+  phone?: string;
+  avatar?: string;
+  gender?: 'MALE' | 'FEMALE' | 'OTHER';
+  dateOfBirth?: string;
+  date_of_birth?: string;
+  address?: string;
+  department?: number | null;
+  departmentName?: string;
+  department_name?: string;
+  designation?: number | null;
+  designationTitle?: string;
+  designation_title?: string;
+  reportsTo?: number | null;
+  reports_to?: number | null;
+  reportsToName?: string;
+  reports_to_name?: string;
+  status: 'PROBATION' | 'ACTIVE' | 'RESIGNED' | 'TERMINATED';
+  employmentType?: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN';
+  employment_type?: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN';
+  joinDate?: string;
+  join_date?: string;
+  probationEndDate?: string;
+  probation_end_date?: string;
+  resignDate?: string;
+  resign_date?: string;
+  bankName?: string;
+  bank_name?: string;
+  bankAccountNumber?: string;
+  bank_account_number?: string;
+  bankAccountHolder?: string;
+  bank_account_holder?: string;
+  taxId?: string;
+  tax_id?: string;
+  socialInsuranceId?: string;
+  social_insurance_id?: string;
+  contracts?: NativeContract[];
+};
+
+export type NativeContract = {
+  id: number;
+  employee: number;
+  employeeName?: string;
+  employee_name?: string;
+  contractNumber?: string;
+  contract_number?: string;
+  contractType?: 'PROBATION' | 'FIXED_TERM' | 'INDEFINITE';
+  contract_type?: 'PROBATION' | 'FIXED_TERM' | 'INDEFINITE';
+  startDate?: string;
+  start_date?: string;
+  endDate?: string | null;
+  end_date?: string | null;
+  baseSalary?: number;
+  base_salary?: number;
+  allowance?: number;
+  status: 'ACTIVE' | 'EXPIRED' | 'TERMINATED';
+  notes?: string;
+};
+
+export type NativeLeaveRequest = {
+  id: number;
+  employee: number;
+  employeeName?: string;
+  employee_name?: string;
+  leaveType?: number;
+  leave_type?: number;
+  leaveTypeName?: string;
+  leave_type_name?: string;
+  startDate?: string;
+  start_date?: string;
+  endDate?: string;
+  end_date?: string;
+  totalDays?: number;
+  total_days?: number;
+  reason?: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+  approvedByName?: string;
+  approved_by_name?: string;
+  approvedAt?: string;
+  approved_at?: string;
+  rejectionReason?: string;
+  rejection_reason?: string;
+};
+
+export type NativeOrgTreeNode = {
+  id: number;
+  name: string;
+  code?: string;
+  managerName?: string;
+  manager_name?: string;
+  employeeCount?: number;
+  employee_count?: number;
+  children: NativeOrgTreeNode[];
+};
+
+export type HrmDashboardStats = {
+  activeEmployees?: number;
+  active_employees?: number;
+  probationEmployees?: number;
+  probation_employees?: number;
+  pendingLeaves?: number;
+  pending_leaves?: number;
+  expiringContracts?: number;
+  expiring_contracts?: number;
+  departmentBreakdown?: { id: number; name: string; code?: string; empCount?: number; emp_count?: number }[];
+  department_breakdown?: { id: number; name: string; code?: string; empCount?: number; emp_count?: number }[];
+};
+
+export type OnboardCandidatePayload = {
+  job_application_id?: number;
+  applicationId?: number;
+  candidate_profile_id?: number;
+  candidateProfileId?: number;
+  first_name?: string;
+  firstName?: string;
+  last_name?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  department_id?: number;
+  departmentId?: number;
+  designation_id?: number;
+  designationId?: number;
+  reports_to_id?: number;
+  reportsToId?: number;
+  join_date?: string;
+  joinDate?: string;
+  probation_end_date?: string;
+  probationEndDate?: string;
+  base_salary?: number;
+  baseSalary?: number;
+  allowance?: number;
+  employment_type?: string;
+  employmentType?: string;
+  status?: string;
+  notes?: string;
+};
+
+export type NativeLeaveBalance = {
+  id: number;
+  employee: number;
+  employeeName?: string;
+  employee_name?: string;
+  employeeCode?: string;
+  employee_code?: string;
+  leaveType?: number;
+  leave_type?: number;
+  leaveTypeName?: string;
+  leave_type_name?: string;
+  year: number;
+  allocatedDays?: number;
+  allocated_days?: number;
+  seniorityBonusDays?: number;
+  seniority_bonus_days?: number;
+  carriedOverDays?: number;
+  carried_over_days?: number;
+  usedDays?: number;
+  used_days?: number;
+  pendingDays?: number;
+  pending_days?: number;
+  totalAllowedDays?: number;
+  total_allowed_days?: number;
+  remainingDays?: number;
+  remaining_days?: number;
+};
+
+export type NativeMonthlyPayrollRecord = {
+  id: number;
+  company: number;
+  employee: number;
+  employeeName?: string;
+  employee_name?: string;
+  employeeCode?: string;
+  employee_code?: string;
+  departmentName?: string;
+  department_name?: string;
+  month: number;
+  year: number;
+  grossSalary?: number;
+  gross_salary?: number;
+  allowance: number;
+  bonus: number;
+  workingDaysActual?: number;
+  working_days_actual?: number;
+  standardWorkingDays?: number;
+  standard_working_days?: number;
+  unpaidLeaveDays?: number;
+  unpaid_leave_days?: number;
+  dependentsCount?: number;
+  dependents_count?: number;
+  totalIncome?: number;
+  total_income?: number;
+  bhxhAmount?: number;
+  bhxh_amount?: number;
+  bhytAmount?: number;
+  bhyt_amount?: number;
+  bhtnAmount?: number;
+  bhtn_amount?: number;
+  totalInsurance?: number;
+  total_insurance?: number;
+  employerBhxh?: number;
+  employer_bhxh?: number;
+  employerBhyt?: number;
+  employer_bhyt?: number;
+  employerBhtn?: number;
+  employer_bhtn?: number;
+  employerUnionFee?: number;
+  employer_union_fee?: number;
+  totalEmployerInsurance?: number;
+  total_employer_insurance?: number;
+  taxableIncome?: number;
+  taxable_income?: number;
+  personalIncomeTax?: number;
+  personal_income_tax?: number;
+  netSalary?: number;
+  net_salary?: number;
+  totalCompanyExpense?: number;
+  total_company_expense?: number;
+  status: 'DRAFT' | 'APPROVED' | 'PAID';
+  statusLabel?: string;
+  status_label?: string;
+  paymentDate?: string | null;
+  payment_date?: string | null;
+  note?: string;
+};
+
+export type NativeWorkLocation = {
+  id: number;
+  company: number;
+  name: string;
+  code?: string;
+  location_type: 'HEADQUARTERS' | 'BRANCH' | 'FACTORY' | 'WAREHOUSE' | 'RETAIL' | 'OTHER';
+  location_type_label?: string;
+  address?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+  radius_meters?: number;
+  allowed_ip_ranges?: string;
+  timezone?: string;
+  is_active: boolean;
+  device_count?: number;
+  employee_count?: number;
+  create_at?: string;
+  update_at?: string;
+};
+
+export type NativeBiometricDevice = {
+  id: number;
+  company: number;
+  location: number;
+  location_name?: string;
+  location_code?: string;
+  name: string;
+  device_code?: string;
+  protocol: 'ZKTECO_PULL' | 'ZKTECO_PUSH' | 'HIKVISION' | 'CAMERA_AI' | 'OTHER';
+  protocol_label?: string;
+  ip_or_domain: string;
+  device_port: number;
+  service_port: number;
+  comm_key: string;
+  direction: 'BOTH' | 'IN' | 'OUT';
+  direction_label?: string;
+  serial_number?: string;
+  model_name?: string;
+  status: 'ONLINE' | 'OFFLINE' | 'SYNCING' | 'ERROR';
+  status_label?: string;
+  last_ping?: string | null;
+  last_sync_time?: string | null;
+  last_error_message?: string | null;
+  total_punches_synced: number;
+  auto_sync_interval: number;
+  is_active: boolean;
+  create_at?: string;
+  update_at?: string;
+};
+
+export type PayrollSummaryKPIs = {
+  month: number;
+  year: number;
+  totalEmployees?: number;
+  total_employees?: number;
+  totalGross?: number;
+  total_gross?: number;
+  totalNet?: number;
+  total_net?: number;
+  totalPit?: number;
+  total_pit?: number;
+  totalEmpInsurance?: number;
+  total_emp_insurance?: number;
+  totalEmployerInsurance?: number;
+  total_employer_insurance?: number;
+  totalCompanyExpense?: number;
+  total_company_expense?: number;
+  draftCount?: number;
+  draft_count?: number;
+  approvedCount?: number;
+  approved_count?: number;
+  paidCount?: number;
+  paid_count?: number;
+};
+
+export type NativeTimesheetDay = {
+  day: number;
+  date: string;
+  isWeekend?: boolean;
+  is_weekend?: boolean;
+  dayOfWeek?: string;
+  day_of_week?: string;
+};
+
+export type NativeTimesheetRecord = {
+  id?: number;
+  status: 'PRESENT' | 'LATE' | 'EARLY_LEAVE' | 'ABSENT' | 'ON_LEAVE' | 'WEEKEND';
+  workingHours?: number;
+  working_hours?: number;
+  checkIn?: string | null;
+  check_in?: string | null;
+  checkOut?: string | null;
+  check_out?: string | null;
+};
+
+export type NativeTimesheetEmployee = {
+  employeeId?: number;
+  employee_id?: number;
+  employeeCode?: string;
+  employee_code?: string;
+  fullName?: string;
+  full_name?: string;
+  departmentName?: string;
+  department_name?: string;
+  designationTitle?: string;
+  designation_title?: string;
+  records: Record<number, NativeTimesheetRecord>;
+  stats: {
+    totalPresent?: number;
+    total_present?: number;
+    totalLate?: number;
+    total_late?: number;
+    totalLeave?: number;
+    total_leave?: number;
+    totalHours?: number;
+    total_hours?: number;
+  };
+};
+
+export type NativeTimesheetResponse = {
+  month: number;
+  year: number;
+  totalDays?: number;
+  total_days?: number;
+  days: NativeTimesheetDay[];
+  employees: NativeTimesheetEmployee[];
+};
+
+export type RenewContractPayload = {
+  contract_number?: string;
+  contractNumber?: string;
+  contract_type?: 'PROBATION' | 'FIXED_TERM' | 'INDEFINITE';
+  contractType?: 'PROBATION' | 'FIXED_TERM' | 'INDEFINITE';
+  start_date?: string;
+  startDate?: string;
+  end_date?: string | null;
+  endDate?: string | null;
+  base_salary?: number;
+  baseSalary?: number;
+  allowance?: number;
+  notes?: string;
+};
+
+export type QuickCheckinPayload = {
+  employee_id?: number;
+  employeeId?: number;
+  date?: string;
+  status?: 'PRESENT' | 'LATE' | 'EARLY_LEAVE' | 'ABSENT' | 'ON_LEAVE';
+  check_in?: string | null;
+  checkIn?: string | null;
+  check_out?: string | null;
+  checkOut?: string | null;
+  working_hours?: number;
+  workingHours?: number;
+  notes?: string;
+};
+
+export type MyHrmProfileResponse = {
+  employee: NativeEmployee;
+  active_contract?: NativeContract | null;
+  activeContract?: NativeContract | null;
+  leave_balances?: NativeLeaveBalance[];
+  leaveBalances?: NativeLeaveBalance[];
+  recent_payrolls?: NativeMonthlyPayrollRecord[];
+  recentPayrolls?: NativeMonthlyPayrollRecord[];
+};
+
+export type NativeWorkShift = {
+  id: number;
+  company?: number;
+  code: string;
+  name: string;
+  start_time: string;
+  end_time: string;
+  break_start?: string | null;
+  break_end?: string | null;
+  working_hours: number | string;
+  work_factor?: number | string;
+  is_overnight?: boolean;
+  grace_period_late_minutes?: number;
+  grace_period_early_minutes?: number;
+  is_active?: boolean;
+  create_at?: string;
+  update_at?: string;
+};
+
+export type NativeShiftAssignment = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  shift?: number | null;
+  shift_code?: string;
+  shift_name?: string;
+  date: string;
+  is_off_day: boolean;
+  note?: string;
+};
+
+export type BatchAssignShiftsPayload = {
+  employee_ids: number[];
+  shift_id?: number | null;
+  start_date: string;
+  end_date: string;
+  applicable_days_of_week?: number[];
+  is_off_day?: boolean;
+  note?: string;
+};
+
+export type AttendanceRequestType =
+  | 'LEAVE'
+  | 'REGULARISATION'
+  | 'BUSINESS_TRIP'
+  | 'OVERTIME'
+  | 'LATE_EARLY';
+
+export type AttendanceRequestStatus =
+  | 'PENDING_STAGE_1'
+  | 'APPROVED_STAGE_1'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'CANCELLED';
+
+export type NativeAttendanceRequest = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  request_type: AttendanceRequestType;
+  request_type_label?: string;
+  leave_type?: number | null;
+  leave_type_name?: string;
+  start_date: string;
+  end_date: string;
+  start_time?: string | null;
+  end_time?: string | null;
+  duration_hours?: number | string | null;
+  reason?: string;
+  status: AttendanceRequestStatus;
+  status_label?: string;
+  manager_reviewer?: number | null;
+  manager_reviewer_name?: string;
+  manager_approved_at?: string | null;
+  hr_reviewer?: number | null;
+  hr_reviewer_name?: string;
+  hr_approved_at?: string | null;
+  rejection_reason?: string;
+  create_at?: string;
+};
+
+export type NativeBiometricPunchLog = {
+  id: number;
+  company?: number;
+  employee?: number | null;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  device?: number | null;
+  device_title?: string;
+  location?: number | null;
+  location_name?: string;
+  biometric_id: string;
+  punch_time: string;
+  device_name?: string;
+  device_ip?: string;
+  punch_type: 'CHECK_IN' | 'CHECK_OUT' | 'AUTO' | string;
+  punch_type_label?: string;
+  source: 'ZKTECO' | 'EXCEL_IMPORT' | 'WEB_APP' | 'MANUAL' | string;
+  source_label?: string;
+  is_duplicate?: boolean;
+  create_at?: string;
+};
+
+export type NativeEmployeeCareerHistory = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  effective_date: string;
+  event_type: 'ONBOARDING' | 'PROMOTION' | 'TRANSFER' | 'SALARY_ADJUSTMENT' | 'ROLE_CHANGE' | 'DEMOTION' | 'RESIGNATION' | string;
+  event_type_label?: string;
+  old_department?: number | null;
+  old_department_name?: string;
+  new_department?: number | null;
+  new_department_name?: string;
+  old_designation?: number | null;
+  old_designation_title?: string;
+  new_designation?: number | null;
+  new_designation_title?: string;
+  old_salary?: number | string | null;
+  new_salary?: number | string | null;
+  decision_number?: string;
+  attachment?: string;
+  note?: string;
+  create_at?: string;
+};
+
+export type NativeEmployeeDocument = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  document_type: 'IDENTITY_CARD' | 'LABOR_CONTRACT' | 'DEGREE_CERTIFICATE' | 'HEALTH_CERTIFICATE' | 'TAX_DOCUMENT' | 'DECISION' | 'OTHER' | string;
+  document_type_label?: string;
+  name: string;
+  file_url: string;
+  issue_date?: string | null;
+  expiry_date?: string | null;
+  note?: string;
+  create_at?: string;
+};
+
+export type NativeMonthlyAttendanceSummary = {
+  id: number;
+  company?: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  month: number;
+  year: number;
+  standard_work_days: number | string;
+  actual_work_days: number | string;
+  paid_leave_days: number | string;
+  unpaid_leave_days: number | string;
+  overtime_hours_weekday: number | string;
+  overtime_hours_weekend: number | string;
+  overtime_hours_holiday: number | string;
+  late_occurrences: number;
+  early_occurrences: number;
+  is_locked: boolean;
+  locked_by?: number | null;
+  locked_by_name?: string;
+  locked_at?: string | null;
+  pushed_to_payroll_at?: string | null;
+};
+
+
+export type NativeLeaveType = {
+  id: number;
+  name: string;
+  code: string;
+  daysPerYear?: number;
+  days_per_year?: number;
+  isPaid?: boolean;
+  is_paid?: boolean;
+};
+
 const hrmService = {
-  createEmployeeFromApplication: (data: EmployeeFromApplicationPayload): Promise<EmployeeSyncResult> => {
-    return (httpRequest.post('hrm/web/employees/from-application/', data) as Promise<unknown>).then(
-      unwrapDataResponse<EmployeeSyncResult>,
-    );
+  // Native HRM API Endpoints
+  getDashboardStats: (): Promise<HrmDashboardStats> => {
+    return httpRequest.get('native-hrm/dashboard/stats/').then((res) => unwrapDataResponse<HrmDashboardStats>(res));
   },
 
-  provisionCurrentUser: (): Promise<{ userId: string; companyId: string }> => {
-    return (httpRequest.post('hrm/web/employees/provision-current-user/', {}) as Promise<unknown>).then(
-      unwrapDataResponse<{ userId: string; companyId: string }>,
-    );
+  getEmployees: (params?: { department?: number; status?: string; search?: string }): Promise<NativeEmployee[]> => {
+    return httpRequest.get('native-hrm/employees/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeEmployee>(res).results;
+    });
   },
 
-  getIntegrationStatus: (): Promise<HRMIntegrationStatus> => {
-    return (httpRequest.get('hrm/web/integration-status/') as Promise<unknown>).then(
-      unwrapDataResponse<HRMIntegrationStatus>,
-    );
+  getEmployeeDetail: (id: number): Promise<NativeEmployee> => {
+    return httpRequest.get(`native-hrm/employees/${id}/`).then((res) => unwrapDataResponse<NativeEmployee>(res));
+  },
+
+  createEmployee: (data: Partial<NativeEmployee>): Promise<NativeEmployee> => {
+    return httpRequest.post('native-hrm/employees/', data).then((res) => unwrapDataResponse<NativeEmployee>(res));
+  },
+
+  updateEmployee: (id: number, data: Partial<NativeEmployee>): Promise<NativeEmployee> => {
+    return httpRequest.patch(`native-hrm/employees/${id}/`, data).then((res) => unwrapDataResponse<NativeEmployee>(res));
+  },
+
+  onboardCandidate: (payload: OnboardCandidatePayload): Promise<NativeEmployee> => {
+    const normalizedPayload = {
+      ...payload,
+      job_application_id: payload.job_application_id ?? payload.applicationId,
+      candidate_profile_id: payload.candidate_profile_id ?? payload.candidateProfileId,
+      department_id: payload.department_id ?? payload.departmentId,
+      designation_id: payload.designation_id ?? payload.designationId,
+      reports_to_id: payload.reports_to_id ?? payload.reportsToId,
+      join_date: payload.join_date ?? payload.joinDate,
+      probation_end_date: payload.probation_end_date ?? payload.probationEndDate,
+      base_salary: payload.base_salary ?? payload.baseSalary,
+      employment_type: payload.employment_type ?? payload.employmentType,
+    };
+    return httpRequest
+      .post('native-hrm/employees/onboard-from-candidate/', normalizedPayload)
+      .then((res) => unwrapDataResponse<NativeEmployee>(res));
+  },
+
+  getDepartments: (): Promise<NativeDepartment[]> => {
+    return httpRequest.get('native-hrm/departments/').then((res) => {
+      return normalizePaginatedResponse<NativeDepartment>(res).results;
+    });
+  },
+
+  createDepartment: (data: { name: string; code?: string; parent?: number; description?: string }): Promise<NativeDepartment> => {
+    return httpRequest.post('native-hrm/departments/', data).then((res) => unwrapDataResponse<NativeDepartment>(res));
+  },
+
+  updateDepartment: (id: number, data: Partial<NativeDepartment>): Promise<NativeDepartment> => {
+    return httpRequest.patch(`native-hrm/departments/${id}/`, data).then((res) => unwrapDataResponse<NativeDepartment>(res));
+  },
+
+  deleteDepartment: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/departments/${id}/`).then(() => undefined);
+  },
+
+  getOrgChart: (): Promise<NativeOrgTreeNode[]> => {
+    return httpRequest.get('native-hrm/departments/org-chart/').then((res) => unwrapDataResponse<NativeOrgTreeNode[]>(res));
+  },
+
+  getDesignations: (): Promise<NativeDesignation[]> => {
+    return httpRequest.get('native-hrm/designations/').then((res) => {
+      return normalizePaginatedResponse<NativeDesignation>(res).results;
+    });
+  },
+
+  createDesignation: (data: { title: string; code?: string; description?: string }): Promise<NativeDesignation> => {
+    return httpRequest.post('native-hrm/designations/', data).then((res) => unwrapDataResponse<NativeDesignation>(res));
+  },
+
+  updateDesignation: (id: number, data: Partial<NativeDesignation>): Promise<NativeDesignation> => {
+    return httpRequest.patch(`native-hrm/designations/${id}/`, data).then((res) => unwrapDataResponse<NativeDesignation>(res));
+  },
+
+  deleteDesignation: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/designations/${id}/`).then(() => undefined);
+  },
+
+  getLeaveTypes: (): Promise<NativeLeaveType[]> => {
+    return httpRequest.get('native-hrm/leave-types/').then((res) => {
+      return normalizePaginatedResponse<NativeLeaveType>(res).results;
+    });
+  },
+
+  getLeaveRequests: (): Promise<NativeLeaveRequest[]> => {
+    return httpRequest.get('native-hrm/leave-requests/').then((res) => {
+      return normalizePaginatedResponse<NativeLeaveRequest>(res).results;
+    });
+  },
+
+  createLeaveRequest: (data: Partial<NativeLeaveRequest>): Promise<NativeLeaveRequest> => {
+    return httpRequest.post('native-hrm/leave-requests/', data).then((res) => unwrapDataResponse<NativeLeaveRequest>(res));
+  },
+
+  deleteLeaveRequest: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/leave-requests/${id}/`).then(() => undefined);
+  },
+
+  approveLeaveRequest: (id: number): Promise<NativeLeaveRequest> => {
+    return httpRequest.patch(`native-hrm/leave-requests/${id}/approve/`, {}).then((res) => unwrapDataResponse<NativeLeaveRequest>(res));
+  },
+
+  rejectLeaveRequest: (id: number, rejection_reason?: string): Promise<NativeLeaveRequest> => {
+    return httpRequest.patch(`native-hrm/leave-requests/${id}/reject/`, { rejection_reason }).then((res) => unwrapDataResponse<NativeLeaveRequest>(res));
+  },
+
+  getLeaveBalances: (params?: { employee?: number; year?: number }): Promise<NativeLeaveBalance[]> => {
+    return httpRequest.get('native-hrm/leave-balances/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeLeaveBalance>(res).results;
+    });
+  },
+
+  autoAllocateLeaveBalances: (year: number): Promise<{ message: string }> => {
+    return httpRequest.post('native-hrm/leave-balances/auto-allocate/', { year }).then((res) => unwrapDataResponse<{ message: string }>(res));
+  },
+
+  getContracts: (): Promise<NativeContract[]> => {
+    return httpRequest.get('native-hrm/contracts/').then((res) => {
+      return normalizePaginatedResponse<NativeContract>(res).results;
+    });
+  },
+
+  createContract: (data: Partial<NativeContract>): Promise<NativeContract> => {
+    return httpRequest.post('native-hrm/contracts/', data).then((res) => unwrapDataResponse<NativeContract>(res));
+  },
+
+  updateContract: (id: number, data: Partial<NativeContract>): Promise<NativeContract> => {
+    return httpRequest.patch(`native-hrm/contracts/${id}/`, data).then((res) => unwrapDataResponse<NativeContract>(res));
+  },
+
+  deleteContract: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/contracts/${id}/`).then(() => undefined);
+  },
+
+  renewContract: (contractId: number, data: RenewContractPayload): Promise<NativeContract> => {
+    return httpRequest.post(`native-hrm/contracts/${contractId}/renew/`, data).then((res) => unwrapDataResponse<NativeContract>(res));
+  },
+
+  getMonthlyTimesheet: (params: { month: number; year: number; department?: number }): Promise<NativeTimesheetResponse> => {
+    return httpRequest.get('native-hrm/attendances/timesheet/', { params }).then((res) => unwrapDataResponse<NativeTimesheetResponse>(res));
+  },
+
+  quickCheckin: (data: QuickCheckinPayload): Promise<any> => {
+    return httpRequest.post('native-hrm/attendances/quick-checkin/', data).then((res) => unwrapDataResponse<any>(res));
+  },
+
+  getMonthlyPayrollList: (params?: { month?: number; year?: number; status?: string }): Promise<NativeMonthlyPayrollRecord[]> => {
+    return httpRequest.get('native-hrm/payroll/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeMonthlyPayrollRecord>(res).results;
+    });
+  },
+
+  getPayrollSummaryKPIs: (params: { month: number; year: number }): Promise<PayrollSummaryKPIs> => {
+    return httpRequest.get('native-hrm/payroll/summary-kpis/', { params }).then((res) => unwrapDataResponse<PayrollSummaryKPIs>(res));
+  },
+
+  calculateMonthlyPayroll: (data: { month: number; year: number; standard_working_days?: number; employee_id?: number; bonus?: number }): Promise<{ message: string; records: NativeMonthlyPayrollRecord[] }> => {
+    return httpRequest.post('native-hrm/payroll/calculate/', data).then((res) => unwrapDataResponse<{ message: string; records: NativeMonthlyPayrollRecord[] }>(res));
+  },
+
+  approveAllPayroll: (data: { month: number; year: number }): Promise<{ message: string }> => {
+    return httpRequest.post('native-hrm/payroll/approve-all/', data).then((res) => unwrapDataResponse<{ message: string }>(res));
+  },
+
+  markPaidAllPayroll: (data: { month: number; year: number }): Promise<{ message: string }> => {
+    return httpRequest.post('native-hrm/payroll/mark-paid-all/', data).then((res) => unwrapDataResponse<{ message: string }>(res));
+  },
+
+  getMyHrmProfile: (): Promise<MyHrmProfileResponse> => {
+    return httpRequest.get('native-hrm/me/').then((res) => unwrapDataResponse<MyHrmProfileResponse>(res));
+  },
+
+  deleteEmployee: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/employees/${id}/`).then(() => undefined);
+  },
+
+  exportPayrollCsv: async (): Promise<Blob> => {
+    const response = await httpRequest.get('native-hrm/employees/export-payroll/', {
+      responseType: 'blob',
+    });
+    return response as unknown as Blob;
+  },
+
+  // -- Time & Attendance Methods ---------------------------
+  getWorkShifts: (params?: any): Promise<NativeWorkShift[]> => {
+    return httpRequest.get('native-hrm/work-shifts/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeWorkShift>(res).results;
+    });
+  },
+
+  createWorkShift: (data: Partial<NativeWorkShift>): Promise<NativeWorkShift> => {
+    return httpRequest.post('native-hrm/work-shifts/', data).then((res) => unwrapDataResponse<NativeWorkShift>(res));
+  },
+
+  updateWorkShift: (id: number, data: Partial<NativeWorkShift>): Promise<NativeWorkShift> => {
+    return httpRequest.patch(`native-hrm/work-shifts/${id}/`, data).then((res) => unwrapDataResponse<NativeWorkShift>(res));
+  },
+
+  deleteWorkShift: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/work-shifts/${id}/`).then(() => undefined);
+  },
+
+  getShiftAssignments: (params?: { month?: number; year?: number; employee_id?: number; department_id?: number; start_date?: string; end_date?: string }): Promise<NativeShiftAssignment[]> => {
+    return httpRequest.get('native-hrm/shift-assignments/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeShiftAssignment>(res).results;
+    });
+  },
+
+  batchAssignShifts: (data: BatchAssignShiftsPayload): Promise<{ message: string; count: number; assignments: NativeShiftAssignment[] }> => {
+    return httpRequest.post('native-hrm/shift-assignments/batch/', data).then((res) => unwrapDataResponse<{ message: string; count: number; assignments: NativeShiftAssignment[] }>(res));
+  },
+
+  deleteShiftAssignment: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/shift-assignments/${id}/`).then(() => undefined);
+  },
+
+  getAttendanceRequests: (params?: { status?: string; request_type?: string; employee_id?: number }): Promise<NativeAttendanceRequest[]> => {
+    return httpRequest.get('native-hrm/attendance-requests/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeAttendanceRequest>(res).results;
+    });
+  },
+
+  createAttendanceRequest: (data: Partial<NativeAttendanceRequest>): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post('native-hrm/attendance-requests/', data).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  approveAttendanceRequestStage1: (id: number): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post(`native-hrm/attendance-requests/${id}/approve-stage-1/`, {}).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  approveAttendanceRequestStage2: (id: number): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post(`native-hrm/attendance-requests/${id}/approve-stage-2/`, {}).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  rejectAttendanceRequest: (id: number, reason?: string): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post(`native-hrm/attendance-requests/${id}/reject/`, { reason }).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  cancelAttendanceRequest: (id: number): Promise<NativeAttendanceRequest> => {
+    return httpRequest.post(`native-hrm/attendance-requests/${id}/cancel/`, {}).then((res) => unwrapDataResponse<NativeAttendanceRequest>(res));
+  },
+
+  getBiometricPunchLogs: (params?: {
+    date?: string;
+    employee_id?: number;
+    source?: string;
+    device_id?: number;
+    location_id?: number;
+    is_duplicate?: boolean;
+  }): Promise<NativeBiometricPunchLog[]> => {
+    return httpRequest.get('native-hrm/biometric-punch-logs/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeBiometricPunchLog>(res).results;
+    });
+  },
+
+  deduplicatePunchLogs: (data?: { date?: string; window_seconds?: number }): Promise<{ message: string; duplicate_count: number }> => {
+    return httpRequest.post('native-hrm/biometric-punch-logs/deduplicate/', data || {}).then((res) => unwrapDataResponse<{ message: string; duplicate_count: number }>(res));
+  },
+
+  createBiometricPunchLog: (data: Partial<NativeBiometricPunchLog>): Promise<NativeBiometricPunchLog> => {
+    return httpRequest.post('native-hrm/biometric-punch-logs/', data).then((res) => unwrapDataResponse<NativeBiometricPunchLog>(res));
+  },
+
+  processDailyPunchLogs: (date?: string): Promise<{ message: string; count: number }> => {
+    return httpRequest.post('native-hrm/biometric-punch-logs/process-daily/', { date }).then((res) => unwrapDataResponse<{ message: string; count: number }>(res));
+  },
+
+  // Career Histories (Giai đoạn 3)
+  getCareerHistories: (params?: { employee_id?: number; event_type?: string }): Promise<NativeEmployeeCareerHistory[]> => {
+    return httpRequest.get('native-hrm/career-histories/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeEmployeeCareerHistory>(res).results;
+    });
+  },
+  createCareerHistory: (data: Partial<NativeEmployeeCareerHistory>): Promise<NativeEmployeeCareerHistory> => {
+    return httpRequest.post('native-hrm/career-histories/', data).then((res) => unwrapDataResponse<NativeEmployeeCareerHistory>(res));
+  },
+  deleteCareerHistory: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/career-histories/${id}/`).then(() => undefined);
+  },
+
+  // Employee Documents (Giai đoạn 3)
+  getEmployeeDocuments: (params?: { employee_id?: number; document_type?: string }): Promise<NativeEmployeeDocument[]> => {
+    return httpRequest.get('native-hrm/documents/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeEmployeeDocument>(res).results;
+    });
+  },
+  createEmployeeDocument: (data: Partial<NativeEmployeeDocument>): Promise<NativeEmployeeDocument> => {
+    return httpRequest.post('native-hrm/documents/', data).then((res) => unwrapDataResponse<NativeEmployeeDocument>(res));
+  },
+  deleteEmployeeDocument: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/documents/${id}/`).then(() => undefined);
+  },
+
+  getMonthlyAttendanceSummaries: (params?: { month?: number; year?: number; employee_id?: number; department_id?: number }): Promise<NativeMonthlyAttendanceSummary[]> => {
+    return httpRequest.get('native-hrm/monthly-summaries/', { params }).then((res) => {
+      return normalizePaginatedResponse<NativeMonthlyAttendanceSummary>(res).results;
+    });
+  },
+
+  recalculateMonthlyAttendanceSummary: (data: { month: number; year: number; employee_ids?: number[] }): Promise<{ message: string; count: number; summaries: NativeMonthlyAttendanceSummary[] }> => {
+    return httpRequest.post('native-hrm/monthly-summaries/recalculate/', data).then((res) => unwrapDataResponse<{ message: string; count: number; summaries: NativeMonthlyAttendanceSummary[] }>(res));
+  },
+
+  lockMonthlyAttendanceSummary: (id: number): Promise<NativeMonthlyAttendanceSummary> => {
+    return httpRequest.post(`native-hrm/monthly-summaries/${id}/lock/`, {}).then((res) => unwrapDataResponse<NativeMonthlyAttendanceSummary>(res));
+  },
+
+  unlockMonthlyAttendanceSummary: (id: number): Promise<NativeMonthlyAttendanceSummary> => {
+    return httpRequest.post(`native-hrm/monthly-summaries/${id}/unlock/`, {}).then((res) => unwrapDataResponse<NativeMonthlyAttendanceSummary>(res));
+  },
+
+  pushSummaryToPayroll: (id: number): Promise<{ message: string; payroll_id: number; summary: NativeMonthlyAttendanceSummary }> => {
+    return httpRequest.post(`native-hrm/monthly-summaries/${id}/push-to-payroll/`, {}).then((res) => unwrapDataResponse<{ message: string; payroll_id: number; summary: NativeMonthlyAttendanceSummary }>(res));
+  },
+
+  // Work Locations
+  getWorkLocations: (params?: { is_active?: boolean; location_type?: string; search?: string }): Promise<NativeWorkLocation[]> => {
+    return httpRequest.get('native-hrm/work-locations/', { params }).then((res) => normalizePaginatedResponse<NativeWorkLocation>(res).results);
+  },
+  createWorkLocation: (data: Partial<NativeWorkLocation>): Promise<NativeWorkLocation> => {
+    return httpRequest.post('native-hrm/work-locations/', data).then((res) => unwrapDataResponse<NativeWorkLocation>(res));
+  },
+  updateWorkLocation: (id: number, data: Partial<NativeWorkLocation>): Promise<NativeWorkLocation> => {
+    return httpRequest.put(`native-hrm/work-locations/${id}/`, data).then((res) => unwrapDataResponse<NativeWorkLocation>(res));
+  },
+  deleteWorkLocation: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/work-locations/${id}/`).then(() => undefined);
+  },
+
+  // Biometric Devices
+  getBiometricDevices: (params?: { location_id?: number; status?: string; protocol?: string; search?: string }): Promise<NativeBiometricDevice[]> => {
+    return httpRequest.get('native-hrm/biometric-devices/', { params }).then((res) => normalizePaginatedResponse<NativeBiometricDevice>(res).results);
+  },
+  createBiometricDevice: (data: Partial<NativeBiometricDevice>): Promise<NativeBiometricDevice> => {
+    return httpRequest.post('native-hrm/biometric-devices/', data).then((res) => unwrapDataResponse<NativeBiometricDevice>(res));
+  },
+  updateBiometricDevice: (id: number, data: Partial<NativeBiometricDevice>): Promise<NativeBiometricDevice> => {
+    return httpRequest.put(`native-hrm/biometric-devices/${id}/`, data).then((res) => unwrapDataResponse<NativeBiometricDevice>(res));
+  },
+  deleteBiometricDevice: (id: number): Promise<void> => {
+    return httpRequest.delete(`native-hrm/biometric-devices/${id}/`).then(() => undefined);
+  },
+  testDeviceConnection: (id: number): Promise<{ success: boolean; status: string; message: string; response_time_ms: number; device: NativeBiometricDevice }> => {
+    return httpRequest.post(`native-hrm/biometric-devices/${id}/test-connection/`, {}).then((res) => unwrapDataResponse(res));
+  },
+  syncDevice: (id: number): Promise<{ success: boolean; message: string; new_punches_count: number; total_punches_synced: number; device: NativeBiometricDevice }> => {
+    return httpRequest.post(`native-hrm/biometric-devices/${id}/sync/`, {}).then((res) => unwrapDataResponse(res));
   },
 };
 

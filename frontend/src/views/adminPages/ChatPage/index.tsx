@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import {
@@ -25,11 +25,11 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../components/Common/DataTable';
-import { ChatConversation } from '../../../types/models';
-import { useDataTable } from '../../../hooks';
+import DataTable from '@/components/Common/DataTable';
+import { ChatConversation } from '@/types/models';
+import { useDataTable } from '@/hooks';
 import { useChat, useChatMessages } from './hooks/useChat';
-import dayjs from '../../../configs/dayjs-config';
+import dayjs from '@/configs/dayjs-config';
 import FilterBar from '@/components/Common/FilterBar';
 import { getSafeResourceUrl } from '@/utils/safeExternalUrl';
 
@@ -76,9 +76,9 @@ const AdminChatPage = () => {
 
   const columns: ColumnDef<ChatConversation>[] = [
     {
-      header: '#',
+      header: 'STT',
       id: 'index',
-      size: 50,
+      size: 60,
       cell: (info) => info.row.index + 1,
     },
     {
@@ -121,7 +121,7 @@ const AdminChatPage = () => {
       accessorKey: 'lastMessage',
       cell: (info) => {
         const msg = info.getValue() as string | { content: string };
-        const content = typeof msg === 'string' ? msg : msg?.content || '—';
+        const content = typeof msg === 'string' ? msg : msg?.content || '-';
         return (
           <Typography
             variant="body2"
@@ -150,7 +150,7 @@ const AdminChatPage = () => {
       cell: (info) => (
         info.getValue() 
           ? dayjs(info.getValue() as string).format('DD/MM/YYYY') 
-          : '—'
+          : '-'
       ),
     },
     {
@@ -159,7 +159,7 @@ const AdminChatPage = () => {
       meta: { align: 'right' },
       cell: (info) => (
         <Tooltip title={t('chat.tooltip.viewDetail')}>
-          <IconButton size="small" color="primary" onClick={() => setSelectedConversation(info.row.original)}>
+          <IconButton aria-label="Thao tác" size="small" color="primary" onClick={() => setSelectedConversation(info.row.original)}>
             <VisibilityIcon fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -208,7 +208,7 @@ const AdminChatPage = () => {
             </Box>
             <Box>
               <Typography variant="h5" fontWeight={700} color={s.color}>
-                {isLoading ? '—' : s.value}
+                {isLoading ? '-' : s.value}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {s.label}
@@ -288,7 +288,7 @@ const AdminChatPage = () => {
                           {message.createAt ? ` · ${dayjs(message.createAt).format('DD/MM/YYYY HH:mm')}` : ''}
                         </Typography>
                         <Typography variant="body2" sx={{ mt: 0.5, whiteSpace: 'pre-wrap' }}>
-                          {message.text || message.fileName || '—'}
+                          {message.text || message.fileName || '-'}
                         </Typography>
                         {safeAttachmentUrl && (
                           <Link href={safeAttachmentUrl} target="_blank" rel="noopener noreferrer" color="inherit" underline="always">

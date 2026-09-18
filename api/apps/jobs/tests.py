@@ -24,7 +24,7 @@ from apps.jobs.exceptions import CompanyNotVerifiedError
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
 from apps.jobs.recommendation_service import get_recommended_jobs
 from apps.content.models import SystemSetting
-from common.serializers import LocationSerializer
+from apps.common.serializers import LocationSerializer
 from shared.configs import table_export, variable_system as var_sys
 
 
@@ -132,6 +132,73 @@ def test_public_job_posts_exclude_unverified_company(job_post):
     results = data.get("results", data if isinstance(data, list) else [])
     assert job_post.id not in [item["id"] for item in results]
 
+
+@pytest.mark.django_db
+def test_public_job_posts_filter_by_salary_band(employer_user, company, career, location):
+    company.is_verified = True
+    company.save(update_fields=["is_verified", "update_at"])
+
+    matching_job = JobPost.objects.create(
+        job_name="Matching Salary Job",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Salary match</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=16000000,
+        salary_max=30000000,
+        contact_person_name="HR",
+        contact_person_phone="0901234567",
+        contact_person_email="hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=employer_user,
+        company=company,
+        career=career,
+        location=location,
+    )
+    non_matching_job = JobPost.objects.create(
+        job_name="Low Salary Job",
+        deadline=timezone.now().date() + timedelta(days=30),
+        quantity=1,
+        job_description="<p>Salary miss</p>",
+        position=4,
+        type_of_workplace=1,
+        experience=2,
+        academic_level=2,
+        job_type=1,
+        salary_min=1000000,
+        salary_max=2000000,
+        contact_person_name="HR",
+        contact_person_phone="0901234567",
+        contact_person_email="hr@test.com",
+        status=var_sys.JobPostStatus.APPROVED,
+        user=employer_user,
+        company=company,
+        career=career,
+        location=location,
+    )
+
+    client = APIClient()
+    response = client.get(
+        "/api/v1/job/web/job-posts/",
+        {
+            "salaryMin": 15000000,
+            "salaryMax": 20000000,
+            "pageSize": 50,
+            "cacheBust": matching_job.id,
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    data = payload.get("data", payload)
+    results = data.get("results", data if isinstance(data, list) else [])
+    result_ids = [item["id"] for item in results]
+    assert matching_job.id in result_ids
+    assert non_matching_job.id not in result_ids
 
 @pytest.mark.django_db
 def test_salary_insight_uses_market_fallback_and_excludes_current_job(
@@ -1722,3 +1789,144 @@ class TestAIScoringFallback:
         assert 'Backend Dev' in prompt
         assert 'Senior Dev' in prompt
         assert 'Python, Django' in prompt
+
+
+@pytest.mark.django_db
+class TestAiRecommendedCandidatesAPI:
+    def test_ai_recommended_candidates_not_found_returns_404_dict(self, employer_user, company):
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        response = client.get("/api/v1/job/web/private-job-posts/non-existent-slug-9999/ai-recommended-candidates/")
+        assert response.status_code == 404
+        errors = response.data.get("errors") or response.data.get("error", {}).get("details", {})
+        assert "errorMessage" in errors
+
+    def test_ai_recommended_candidates_only_recommends_active_without_fake_data(
+        self,
+        employer_user,
+        job_post,
+        resume,
+        city,
+        career,
+    ):
+        from apps.profiles.models import JobSeekerProfile, Resume
+
+        # Create an inactive resume that matches
+        inactive_user = employer_user.__class__.objects.create_user_with_role_name(
+            email="inactive-candidate@test.com",
+            full_name="Inactive Candidate",
+            role_name=var_sys.JOB_SEEKER,
+            password="testpass123",
+            is_active=True,
+            is_verify_email=True,
+        )
+        inactive_profile = JobSeekerProfile.objects.create(
+            user=inactive_user,
+            phone="0911223344",
+        )
+        Resume.objects.create(
+            title="Inactive Senior Dev",
+            description="Inactive resume",
+            experience=3,
+            is_active=False,
+            user=inactive_user,
+            job_seeker_profile=inactive_profile,
+            career=career,
+            city=city,
+        )
+
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        response = client.get(f"/api/v1/job/web/private-job-posts/{job_post.slug}/ai-recommended-candidates/")
+        assert response.status_code == 200
+        candidates = response.data["data"]["candidates"]
+
+        # Ensure active resume is included, inactive is NOT included
+        active_ids = [c["id"] for c in candidates]
+        assert resume.id in active_ids
+        assert not any(c["title"] == "Inactive Senior Dev" for c in candidates)
+
+        # Check candidate fields are authentic (not fabricated mock strings)
+        for cand in candidates:
+            if cand["id"] == resume.id:
+                assert cand["title"] == resume.title
+                assert cand["skillsSummary"] == resume.skills_summary
+                if resume.city:
+                    assert cand["city"] == resume.city.name
+
+
+@pytest.mark.django_db
+class TestScoreJobApplication:
+    def test_score_job_application_returns_none_score_on_failure(self, job_post, job_seeker_user, resume):
+        from apps.jobs.models import JobPostActivity
+        from apps.jobs.ai_scoring_service import score_job_application
+        from unittest.mock import patch
+
+        activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=job_seeker_user,
+            resume=resume,
+            full_name='Test',
+            email='test@test.com',
+            phone='0901234567',
+        )
+
+        with patch("apps.jobs.ai_scoring_service.score_resume_job_fit", return_value=None):
+            result = score_job_application(activity)
+            assert result["score"] is None
+            assert result["summary"] == ""
+
+
+@pytest.mark.django_db
+class TestJobPostActivityResumeDelete:
+    def test_delete_resume_sets_null_on_activity(self, job_post, job_seeker_user, resume):
+        """Deleting a resume should set resume_id to NULL on JobPostActivity rather than deleting the application."""
+        activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=job_seeker_user,
+            resume=resume,
+            full_name="Nguyễn Văn A",
+            email="nguyenvana@example.com",
+            phone="0901234567",
+        )
+        activity_id = activity.id
+        resume_id = resume.id
+
+        # Delete resume
+        resume.delete()
+
+        # Reload activity
+        activity.refresh_from_db()
+        assert activity.id == activity_id
+        assert activity.resume is None
+        assert activity.user == job_seeker_user
+
+
+@pytest.mark.django_db
+class TestFlexibleApplicationStatusTransitions:
+    def test_flexible_status_transitions(self, job_post, job_seeker_user, resume):
+        """HR can transition application directly to INTERVIEWED or HIRED without being blocked."""
+        activity = JobPostActivity.objects.create(
+            job_post=job_post,
+            user=job_seeker_user,
+            resume=resume,
+            full_name="Nguyễn Văn A",
+            email="nguyenvana@example.com",
+            phone="0901234567",
+            status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        )
+
+        # Transition directly PENDING_CONFIRMATION -> INTERVIEWED
+        activity = JobActivityService.change_application_status(
+            activity, var_sys.ApplicationStatus.INTERVIEWED, notify=False
+        )
+        assert activity.status == var_sys.ApplicationStatus.INTERVIEWED
+
+        # Transition directly INTERVIEWED -> HIRED
+        activity = JobActivityService.change_application_status(
+            activity, var_sys.ApplicationStatus.HIRED, notify=False
+        )
+        assert activity.status == var_sys.ApplicationStatus.HIRED
+

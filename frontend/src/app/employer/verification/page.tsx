@@ -1,9 +1,10 @@
-﻿import VerificationPage from '@/views/employerPages/VerificationPage';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
+import VerificationPage from '@/views/employerPages/VerificationPage';
 
-export const metadata = {
-  title: 'Xác minh công ty',
-  description: 'Browse Employer Verification.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.verification');
+}
 
 export default function Page() {
   return <VerificationPage />;

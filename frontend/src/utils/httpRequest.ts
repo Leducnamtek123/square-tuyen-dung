@@ -34,7 +34,7 @@ type StoredWorkspace = {
 };
 
 // Prefix for API endpoints
-const prefix = 'api';
+const prefix = 'api/v1';
 
 // Use relative path to work with nginx proxy, allow override via env if needed
 const baseURL = process.env.NEXT_PUBLIC_API_BASE || `/${prefix}/`;
@@ -100,8 +100,8 @@ const extractApiErrorLogMessage = (data: unknown): string | null => {
 };
 
 const unwrapEnvelopeData = (payload: unknown) =>
-  isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, 'data')
-    ? payload.data
+  isRecord(payload) && 'data' in (payload as object)
+    ? (payload as Record<string, unknown>).data
     : payload;
 
 const unwrapResponse = (response: { data?: unknown }) =>
@@ -210,12 +210,37 @@ httpRequest.interceptors.request.use(
       retryConfig.params = cleanParams(retryConfig.params as ParamsRecord);
     }
 
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      if (config.headers) {
+        delete (config.headers as Record<string, unknown>)['Content-Type'];
+        delete (config.headers as Record<string, unknown>)['content-type'];
+        if (typeof (config.headers as any).delete === 'function') {
+          (config.headers as any).delete('Content-Type');
+          (config.headers as any).delete('content-type');
+        }
+      }
+    }
+
     // NOTE: Do NOT auto-convert to snake_case here.
     // The Django backend serializers use camelCase field names with explicit
-    // source= mappings (e.g. companyName â†’ source="company_name").
+    // source= mappings (e.g. companyName → source="company_name").
     // Converting to snake_case breaks the API (400 Bad Request).
 
     const accessToken = tokenService.getAccessTokenFromCookie();
+
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      config.headers = config.headers ?? {};
+      const headers = config.headers as Record<string, unknown> & {
+        set?: (name: string, value: string) => void;
+      };
+      if (!headers['X-Correlation-Id'] && !headers['x-correlation-id']) {
+        if (typeof headers.set === 'function') {
+          headers.set('X-Correlation-Id', crypto.randomUUID());
+        } else {
+          headers['X-Correlation-Id'] = crypto.randomUUID();
+        }
+      }
+    }
 
     if (accessToken && !isAuthTokenEndpoint(config.url)) {
       setAuthorizationHeader(config, accessToken);
@@ -234,7 +259,7 @@ httpRequest.interceptors.response.use(
     // Return payload directly; fall back to raw response for legacy endpoints.
     const payload = unwrapEnvelopeData(response.data);
 
-    // Auto-transform snake_case keys â†’ camelCase
+    // Auto-transform snake_case keys -> camelCase
     return camelizeKeys(payload);
   },
 
@@ -259,7 +284,8 @@ httpRequest.interceptors.response.use(
       !originalConfig._serverRetry
     ) {
       originalConfig._serverRetry = true;
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      const retryDelay = 200 + Math.floor(Math.random() * 150);
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
       return httpRequest(originalConfig);
     }
 

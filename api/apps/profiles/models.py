@@ -14,7 +14,7 @@ from apps.accounts.models import User
 
 from apps.files.models import File
 from apps.locations.models import City, Location
-from common.models import Career
+from apps.common.models import Career
 
 
 class JobSeekerProfile(CommonBaseModel):
@@ -34,8 +34,17 @@ class JobSeekerProfile(CommonBaseModel):
     contact_address = models.CharField(max_length=255, blank=True, null=True)
     emergency_contact_name = models.CharField(max_length=100, blank=True, null=True)
     emergency_contact_phone = models.CharField(max_length=20, blank=True, null=True)
+    is_seeking_job = models.BooleanField(default=True, db_index=True)
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="job_seeker_profile")
+
+    cover_image = models.ForeignKey(
+        File,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="job_seeker_cover_image",
+    )
 
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True,
 
@@ -75,7 +84,7 @@ class Resume(CommonBaseModel):
 
     is_active = models.BooleanField(default=False, db_index=True)
 
-    type = models.CharField(max_length=10, default=var_sys.CV_UPLOAD)
+    type = models.CharField(max_length=10, default=var_sys.CV_UPLOAD, db_index=True)
 
     source_platform = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     source_url = models.URLField(blank=True, null=True)
@@ -104,6 +113,7 @@ class Resume(CommonBaseModel):
         indexes = [
             models.Index(fields=['is_active', '-update_at'], name='idx_resume_active_updated'),
             models.Index(fields=['user', 'is_active'], name='idx_resume_user_active'),
+            models.Index(fields=['is_active', 'type'], name='idx_resume_active_type'),
         ]
 
     def __str__(self):
@@ -381,6 +391,27 @@ class Company(CommonBaseModel):
                                  related_name="companies")
 
     followers = models.ManyToManyField(User, through='CompanyFollowed', related_name="companies_followed")
+
+    evaluation_weights = models.JSONField(
+        default=dict,
+        blank=True,
+        null=True,
+        verbose_name="Trọng số đánh giá năng lực theo tiêu chuẩn văn hóa công ty",
+    )
+
+    def get_evaluation_weights(self) -> dict:
+        default_weights = {
+            "technical": 30,
+            "communication": 20,
+            "situational": 20,
+            "culture_fit": 20,
+            "attitude": 10,
+        }
+        if isinstance(self.evaluation_weights, dict) and self.evaluation_weights:
+            merged = default_weights.copy()
+            merged.update(self.evaluation_weights)
+            return merged
+        return default_weights
 
     class Meta:
 

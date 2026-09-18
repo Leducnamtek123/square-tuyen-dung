@@ -1,5 +1,5 @@
 /**
- * Frontend E2E Tests — Rewrite Completeness Guard
+ * Frontend E2E Tests - Rewrite Completeness Guard
  * 
  * This is THE MOST CRITICAL test file. It automatically verifies that
  * every localized route has a matching rewrite rule in next.config.mjs.
@@ -74,14 +74,14 @@ const doesPageExist = (destination: string): boolean => {
   return possiblePaths.some((p: string) => existsSync(p));
 };
 
-describe('Rewrite Completeness — Prevents 404 in Production', () => {
+describe('Rewrite Completeness - Prevents 404 in Production', () => {
   const rewrites = getRewriteRules();
 
   it('has parsed rewrite rules from next.config.mjs', () => {
     expect(rewrites.length).toBeGreaterThan(30);
   });
 
-  // ─── EMPLOYER INTERVIEW ROUTES (the ones that caused bugs) ───
+  // --- EMPLOYER INTERVIEW ROUTES (the ones that caused bugs) ---
   describe('Employer Interview Routes', () => {
     const interviewRoutes = {
       INTERVIEW_LIST: ROUTES.EMPLOYER.INTERVIEW_LIST,
@@ -111,7 +111,7 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
     }
   });
 
-  // ─── ALL EMPLOYER ROUTES ───
+  // --- ALL EMPLOYER ROUTES ---
   describe('All Employer Routes', () => {
     for (const [name, route] of Object.entries(ROUTES.EMPLOYER)) {
       it(`EMPLOYER.${name} → VI localized path has rewrite`, () => {
@@ -122,7 +122,7 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
     }
   });
 
-  // ─── ALL JOB_SEEKER ROUTES ───
+  // --- ALL JOB_SEEKER ROUTES ---
   describe('All Job Seeker Routes', () => {
     // Routes that serve directly as Next.js pages (no rewrite needed)
     const SKIP_ROUTES = new Set(['HOME']); // HOME = '' (root)
@@ -135,7 +135,7 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
         
         // If localized path equals English path, Next.js serves it directly
         if (viPath === `/${route}`) {
-          // No rewrite needed — page exists at the English path
+          // No rewrite needed - page exists at the English path
           return;
         }
         
@@ -145,7 +145,7 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
     }
   });
 
-  // ─── REWRITE DESTINATIONS RESOLVE TO PAGES ───
+  // --- REWRITE DESTINATIONS RESOLVE TO PAGES ---
   describe('Rewrite destinations point to existing pages', () => {
     // Only check employer/interview routes (most critical)
     const criticalDestinations = [
@@ -158,7 +158,7 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
       it(`${dest} has a page file in app/`, () => {
         const exists = doesPageExist(dest);
         if (!exists) {
-          console.warn(`⚠️  No page found for ${dest} — may use catch-all or layout`);
+          console.warn(`⚠️  No page found for ${dest} - may use catch-all or layout`);
         }
         // This is advisory, not a hard fail (catch-all routes are valid)
         expect(true).toBe(true);
@@ -166,7 +166,7 @@ describe('Rewrite Completeness — Prevents 404 in Production', () => {
     }
   });
 
-  // ─── SPECIFIC BUG REGRESSION TESTS ───
+  // --- SPECIFIC BUG REGRESSION TESTS ---
   describe('Regression: Previously broken routes', () => {
     it('Interview detail (/nha-tuyen-dung/danh-sach-phong-van/:id) has rewrite', () => {
       const covered = isRouteCoveredByRewrite(

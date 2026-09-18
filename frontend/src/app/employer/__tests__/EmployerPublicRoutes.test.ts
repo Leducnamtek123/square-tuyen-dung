@@ -1,4 +1,4 @@
-﻿import { readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 
 const readSource = (relativePath: string) => readFileSync(join(__dirname, relativePath), 'utf8');
@@ -18,7 +18,7 @@ describe('employer public routes', () => {
   });
 
   it('keeps public employer pages out of the employer portal detector in ClientAppRoot', () => {
-    const source = readSource('../ClientAppRoot.tsx');
+    const source = readSource('../../ClientAppRoot.tsx');
 
     expect(source).toContain("'/employer/contact'");
     expect(source).toContain("'/nha-tuyen-dung/lien-he'");

@@ -30,24 +30,30 @@ const useFirebaseFireStore = <T extends FirestoreDoc = FirestoreDoc>(
   const [docs, setDocs] = React.useState<T[]>([]);
   const hasInvalidCondition = Boolean(condition && !condition.compareValue);
 
+  const conditionField = condition?.fieldName;
+  const conditionOperator = condition?.operator;
+  const conditionValue = condition?.compareValue;
+
   React.useEffect(() => {
     if (hasInvalidCondition) {
       return;
     }
 
+    let isMounted = true;
     const collectionRef = collection(db, collectionName);
 
     let q = query(collectionRef, orderBy('createdAt', sort), fbLimit(limitNum));
 
-    if (condition) {
+    if (conditionField && conditionOperator && conditionValue !== undefined) {
       q = query(
         collectionRef,
-        where(condition.fieldName, condition.operator, condition.compareValue),
+        where(conditionField, conditionOperator, conditionValue),
         orderBy('createdAt', sort)
       );
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!isMounted) return;
       const documents = snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
@@ -56,8 +62,11 @@ const useFirebaseFireStore = <T extends FirestoreDoc = FirestoreDoc>(
       setDocs(documents);
     });
 
-    return unsubscribe;
-  }, [collectionName, condition, hasInvalidCondition, limitNum, sort]);
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, [collectionName, conditionField, conditionOperator, conditionValue, hasInvalidCondition, limitNum, sort]);
 
   return hasInvalidCondition ? [] : docs;
 };

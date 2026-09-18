@@ -1,9 +1,136 @@
-/* TailwindCSS v4 — selective import to avoid Preflight conflicting with MUI */
-/* DO NOT use @import "tailwindcss" — its CSS reset breaks MUI components */
+/* TailwindCSS v4 - selective import to avoid Preflight conflicting with MUI */
+/* DO NOT use @import "tailwindcss" - its CSS reset breaks MUI components */
 @import "tailwindcss/theme" layer(theme);
 @import "tailwindcss/utilities" layer(utilities);
 @import "tw-animate-css";
 /* @import "@livekit/components-styles"; -- loaded in interview pages only */
+
+/* Premium SaaS Global Styles */
+:root {
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-inter: var(--font-sans);
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-bg: #F8FAFC;
+  --color-border: #E5E7EB;
+  --color-text: #111827;
+  --color-text-secondary: #6B7280;
+  --color-success: #22C55E;
+  --color-danger: #EF4444;
+  --color-warning: #F59E0B;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+body, html {
+  font-family: var(--font-sans) !important;
+  background-color: var(--color-bg) !important;
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+
+
+/* Safe Area Utility Classes for Notch & Home Indicator */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.pt-safe {
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px)) !important;
+}
+
+/* Prevent iOS Safari Auto-Zoom on inputs with font-size < 16px */
+@media (max-width: 768px) {
+  input, textarea, select, .MuiInputBase-input {
+    font-size: max(16px, 1rem) !important;
+  }
+}
+
+/* Word break and overflow safety for message bubbles and mobile text */
+.break-word-safe {
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  min-width: 0 !important;
+}
+
+/* Hide scrollbar utility for horizontal scroll strips */
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Micro-animations and transitions according to specifications */
+.saas-card {
+  border-radius: 16px !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.04), 0px 1px 2px -1px rgba(0, 0, 0, 0.04) !important;
+  transition: box-shadow 150ms ease-in-out, border-color 150ms ease-in-out, transform 150ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.saas-card:hover {
+  box-shadow: 0px 6px 16px 0px rgba(15, 23, 42, 0.08) !important;
+  border-color: #D1D5DB !important;
+}
+
+.saas-card:active {
+  transform: scale(0.99) !important;
+}
+
+.saas-btn-primary {
+  background-color: #2563EB !important;
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05) !important;
+  transition: background-color 120ms ease-in-out, box-shadow 120ms ease-in-out, transform 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.saas-btn-primary:hover {
+  background-color: #1D4ED8 !important;
+  box-shadow: 0px 2px 6px rgba(37, 99, 235, 0.28) !important;
+}
+.saas-btn-primary:active {
+  transform: scale(0.98) !important;
+}
+
+.saas-btn-secondary {
+  background-color: #FFFFFF !important;
+  color: #374151 !important;
+  border: 1px solid #E5E7EB !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  transition: background-color 120ms ease-in-out, border-color 120ms ease-in-out, transform 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.saas-btn-secondary:hover {
+  background-color: #F9FAFB !important;
+  border-color: #D1D5DB !important;
+}
+.saas-btn-secondary:active {
+  transform: scale(0.98) !important;
+}
+
+.saas-btn-danger {
+  background-color: #FEF2F2 !important;
+  color: #EF4444 !important;
+  border: 1px solid #FCA5A5 !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  transition: background-color 120ms ease-in-out, transform 120ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.saas-btn-danger:hover {
+  background-color: #FEE2E2 !important;
+}
+.saas-btn-danger:active {
+  transform: scale(0.98) !important;
+}
 
 /* Swiper carousel CSS */
 @import 'swiper/css';
@@ -85,13 +212,13 @@
 @custom-variant dark (&:is(.dark *));
 
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
-  overflow-x: hidden;
-  font-family: var(--font-be-vietnam-pro), 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+  overflow-x: clip;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -103,7 +230,7 @@ code {
 }
 
 :root {
-  /* Base — InfoHR Brand Colors (white-first UI with pink accents) */
+  /* Base - InfoHR Brand Colors (white-first UI with pink accents) */
   --background: #ffffff;
   --foreground: #0f172a;
   --card: #ffffff;
@@ -140,7 +267,7 @@ code {
 }
 
 .dark {
-  /* Dark mode — InfoHR brand on dark bg */
+  /* Dark mode - InfoHR brand on dark bg */
   --background: #180812;              /* deep plum */
   --foreground: #ffeaf1;
   --card: #250d1c;
@@ -217,16 +344,6 @@ code {
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* SweetAlert2: remove default icon border for custom iconHtml */
-.swal2-icon.swal2-no-border {
-  border: none !important;
-  box-shadow: none !important;
-  margin-bottom: 0 !important;
-}
-.swal2-icon.swal2-no-border::before,
-.swal2-icon.swal2-no-border::after {
-  display: none !important;
-}
 
 /* === ENHANCED AESTHETICS & MOTION === */
 
@@ -236,7 +353,7 @@ h1, h2, h3, h4, h5, .display-text {
   letter-spacing: -0.01em;
 }
 
-/* Optimized Background Atmosphere — using fewer gradients for better perf */
+/* Optimized Background Atmosphere - using fewer gradients for better perf */
 .bg-atmosphere {
   position: fixed;
   inset: 0;
@@ -254,7 +371,7 @@ h1, h2, h3, h4, h5, .display-text {
     radial-gradient(at 100% 100%, rgba(42, 169, 225, 0.08) 0px, transparent 50%);
 }
 
-/* Rich text editor images — override inline width/height set by the editor insert dialog */
+/* Rich text editor images - override inline width/height set by the editor insert dialog */
 .rdw-editor-main img,
 .rdw-editor-main .public-DraftStyleDefault-block img,
 .rdw-editor-main .public-DraftEditor-content img {
@@ -262,17 +379,18 @@ h1, h2, h3, h4, h5, .display-text {
   max-width: 100% !important;
   width: auto !important;
   height: auto !important;
-  margin: 12px 0;
-  border-radius: 6px;
+  margin: 16px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* Figure wrapper also gets inline width — must override */
+/* Figure wrapper also gets inline width - must override */
 .rdw-editor-main figure,
 .rdw-editor-main .rdw-image-alignment {
   display: block !important;
   max-width: 100% !important;
   width: auto !important;
-  margin: 12px 0 !important;
+  margin: 16px 0 !important;
 }
 
 .rdw-editor-main .rdw-image-center {
@@ -287,12 +405,90 @@ h1, h2, h3, h4, h5, .display-text {
   justify-content: flex-end;
 }
 
+/* Modern Rich Editor canvas typography */
+.rdw-editor-main h1 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--foreground, #0f172a);
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.rdw-editor-main h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--foreground, #0f172a);
+  margin-top: 1.15rem;
+  margin-bottom: 0.65rem;
+}
+
+.rdw-editor-main h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #4f46e5;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.rdw-editor-main p {
+  margin-bottom: 0.85rem;
+  line-height: 1.75;
+  color: var(--foreground, #334155);
+}
+
+.rdw-editor-main ul,
+.rdw-editor-main ol {
+  padding-left: 1.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.rdw-editor-main li {
+  margin-bottom: 0.35rem;
+  line-height: 1.65;
+}
+
+.rdw-editor-main blockquote {
+  border-left: 4px solid #6366f1;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  background-color: rgba(99, 102, 241, 0.05);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.rdw-editor-main table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rdw-editor-main table th,
+.rdw-editor-main table td {
+  border: 1px solid #cbd5e1;
+  padding: 10px 14px;
+}
+
+.rdw-editor-main table th {
+  background-color: rgba(99, 102, 241, 0.08);
+  font-weight: 700;
+}
+
+.rdw-editor-main a {
+  color: #4f46e5;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+
 /* Removed SVG Noise Filter as it is extremely expensive for rendering */
 .bg-noise {
   display: none;
 }
 
-/* Refined Glassmorphism Cards — optimized blur intensity */
+/* Refined Glassmorphism Cards - optimized blur intensity */
 .glass-panel {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(8px);
@@ -396,3 +592,311 @@ h1, h2, h3, h4, h5, .display-text {
     animation-duration: var(--sq-loading-animation-duration, 1s) !important;
   }
 }
+
+
+
+/* ==========================================================================
+   MUI DIALOG GLOBAL OVERRIDES (Backdrop Blur & Smooth Rounded Borders)
+   ========================================================================== */
+.MuiDialog-root > .MuiBackdrop-root,
+.MuiModal-root:not(.MuiPopover-root):not(.MuiMenu-root) > .MuiBackdrop-root:not(.MuiBackdrop-invisible) {
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+.MuiBackdrop-invisible,
+.MuiPopover-root .MuiBackdrop-root,
+.MuiMenu-root .MuiBackdrop-root {
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
+  border-radius: 20px !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+@media (max-width: 600px) {
+  .MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
+    margin: 16px !important;
+    max-width: calc(100% - 32px) !important;
+    height: auto !important;
+    max-height: calc(100dvh - 32px) !important;
+    border-radius: 18px !important;
+  }
+  .MuiDialogActions-root {
+    gap: 8px !important;
+  }
+  .MuiDialogActions-root > :not(:first-of-type) {
+    margin-left: 0 !important;
+  }
+}
+
+.dark .MuiDialog-paper:not(.MuiDialog-paperFullScreen) {
+  background-color: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ==========================================================================
+   CV Builder & A4 Document PDF Print Engine
+   ========================================================================== */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+@media print {
+  /* Enforce A4 dimensions and reset page bounds */
+  html,
+  body {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Reset all Next.js and layout containers */
+  #__next,
+  [data-nextjs-scroll-focus-boundary],
+  main,
+  div {
+    overflow: visible !important;
+  }
+
+  /* Hide interactive web UI and website structural chrome */
+  header,
+  footer,
+  nav,
+  aside,
+  [role="navigation"],
+  [role="contentinfo"],
+  #common-header,
+  #common-footer,
+  .no-print,
+  .no-print-area,
+  button,
+  .toaster,
+  [data-sonner-toaster],
+  .swal2-container,
+  .MuiAppBar-root,
+  .MuiDrawer-root,
+  .MuiBackdrop-root,
+  .MuiSpeedDial-root,
+  .floating-chat,
+  #chat-widget-root,
+  [data-tour] {
+    display: none !important;
+  }
+
+  /* When CV is printed, hide any layout sibling that does not contain the CV */
+  body.cv-printing-active > *:not(:has(#cv-print-area)):not(#cv-print-area) {
+    display: none !important;
+  }
+
+  *:has(#cv-print-area) > *:not(:has(#cv-print-area)):not(#cv-print-area) {
+    display: none !important;
+  }
+
+  /* Ensure CV Print Area is isolated, centered, and exact A4 */
+  #cv-print-area {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    max-width: 210mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    position: relative !important;
+    display: block !important;
+    transform: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Cancel all zoom/transform scaling and overflow clipping on all ancestors of #cv-print-area */
+  :has(#cv-print-area),
+  main:has(#cv-print-area),
+  div:has(#cv-print-area),
+  div:has(> #cv-print-area),
+  div:has(> div > #cv-print-area) {
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  /* Reset Material UI Container padding when printing CV */
+  .MuiContainer-root:has(#cv-print-area) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    max-width: none !important;
+  }
+
+  /* Prevent awkward page break splits */
+  .cv-break-avoid,
+  .break-inside-avoid,
+  #cv-print-area .cv-item,
+  #cv-print-area .cv-section,
+  #cv-print-area h1,
+  #cv-print-area h2,
+  #cv-print-area h3 {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Ensure colors and background gradients render faithfully */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Support clean printing for Material UI Dialog modals */
+  .MuiBackdrop-root {
+    display: none !important;
+  }
+
+  .MuiDialog-root {
+    position: static !important;
+    display: block !important;
+    overflow: visible !important;
+    z-index: auto !important;
+  }
+
+  .MuiDialog-container {
+    position: static !important;
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .MuiDialog-paper {
+    position: static !important;
+    max-height: none !important;
+    max-width: 210mm !important;
+    width: 210mm !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  .MuiDialogActions-root {
+    display: none !important;
+  }
+
+  /* Prevent split on document cards and tables */
+  .MuiPaper-root,
+  .MuiCard-root,
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
+
+/* ==========================================================================
+   LEAFLET MAP ATTRIBUTION & SERVICE BADGE REMOVAL & UI/UX REFINEMENT
+   ========================================================================== */
+.leaflet-control-attribution,
+.leaflet-control-attribution *,
+.leaflet-attribution-flag,
+.leaflet-bottom.leaflet-right .leaflet-control-attribution {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+/* Prevent Tailwind's global img reset from distorting Leaflet tiles and markers */
+.leaflet-container img,
+.leaflet-container .leaflet-tile,
+.leaflet-container .leaflet-marker-icon,
+.leaflet-container .leaflet-marker-shadow {
+  max-width: none !important;
+  max-height: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Crisp rendering for modern raster map tiles */
+.leaflet-tile {
+  filter: saturate(1.05) contrast(1.02);
+}
+
+/* Clean, modern styling for Leaflet zoom control */
+.leaflet-bar {
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.leaflet-bar a {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  transition: all 0.15s ease !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: #f8fafc !important;
+  color: #2563eb !important;
+}
+
+/* ==========================================================================
+   LIVEKIT ROOM CONTAINER FULL HEIGHT STRETCH
+   ========================================================================== */
+.lk-room-container {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* ==========================================================================
+   MUI DIALOG & FORM HEADER COLLAPSE PREVENTION
+   ========================================================================== */
+.MuiDialogTitle-root + .MuiDialogContent-root:not(.p-0):not([data-no-padding='true']) {
+  padding-top: 20px !important;
+}
+
+.MuiDialogTitle-root + .MuiDialogContent-root.MuiDialogContent-dividers {
+  padding-top: 16px !important;
+}
+
+

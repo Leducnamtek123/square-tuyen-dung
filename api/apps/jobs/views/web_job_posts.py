@@ -2,6 +2,7 @@ import datetime
 
 from django.db import DatabaseError
 from django.db.models import Count, F, Prefetch, Avg, Min, Max, Q
+from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions as perms_sys, status, viewsets
 from rest_framework.decorators import action
@@ -23,6 +24,7 @@ from ..filters import AliasedOrderingFilter, JobPostFilter
 from ..exceptions import JobsDomainError
 from ..models import JobPost, JobPostActivity, SavedJobPost
 from ..serializers import JobPostSerializer
+from ..ai_scoring_service import score_resume_job_fit
 
 
 class PrivateJobPostViewSet(
@@ -64,6 +66,53 @@ class PrivateJobPostViewSet(
         ('appliedTotal', 'applied_total'),
     )
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = getattr(self.request, 'user', None)
+        if not user or not user.is_authenticated:
+            return queryset.none()
+        if (
+            getattr(user, 'is_staff', False)
+            or getattr(user, 'is_superuser', False)
+            or getattr(user, 'role_name', None) == var_sys.ADMIN
+        ):
+            return queryset
+
+        from apps.accounts.active_company import apply_active_company_from_request
+        from apps.profiles.models import Company
+        company = apply_active_company_from_request(self.request)
+        if not company:
+            company = (
+                getattr(user, 'active_company', None)
+                or getattr(user, 'company', None)
+                or Company.objects.filter(user=user).first()
+            )
+        if not company:
+            return queryset.none()
+
+        return queryset.filter(company=company)
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        val = self.kwargs.get(lookup_url_kwarg) or self.kwargs.get("pk") or self.kwargs.get("slug")
+        if not val:
+            raise Http404("No JobPost matches the given query.")
+
+        str_val = str(val).strip()
+        obj = None
+        if str_val.isdigit():
+            obj = queryset.filter(id=int(str_val)).first()
+        
+        if not obj:
+            obj = queryset.filter(slug=str_val).first()
+
+        if not obj:
+            raise Http404("No JobPost matches the given query.")
+
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     permission_action_map = {
         "get_suggested_job_posts": [perms_sys.IsAuthenticated],
     }
@@ -72,7 +121,14 @@ class PrivateJobPostViewSet(
     @action(methods=["get"], detail=False, url_path="job-posts-options", url_name="job-posts-options")
     def get_job_post_options(self, request):
         user = request.user
-        queryset = self.queryset.filter(company=user.active_company)
+        from apps.accounts.active_company import apply_active_company_from_request
+        from apps.profiles.models import Company
+        company = apply_active_company_from_request(request)
+        if not company:
+            company = getattr(user, 'company', None) or Company.objects.filter(user=user).first()
+        if not company:
+            return var_res.response_data(data=[])
+        queryset = JobPost.objects.filter(company=company).order_by("-id")
         serializer = JobPostSerializer(
             queryset,
             many=True,
@@ -83,13 +139,136 @@ class PrivateJobPostViewSet(
         )
         return var_res.response_data(data=serializer.data)
 
+    @action(methods=["get"], detail=True, url_path="ai-recommended-candidates", url_name="ai-recommended-candidates")
+    def ai_recommended_candidates(self, request, slug=None, pk=None):
+        try:
+            job_post = self.get_object()
+        except Exception:
+            return var_res.response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"errorMessage": ["Không tìm thấy bài tuyển dụng."]},
+            )
+        
+        job_career_id = job_post.career_id
+        job_city_id = job_post.location.city_id if (job_post.location and job_post.location.city) else None
+        job_title = (job_post.job_name or "").lower()
+
+        matching_qs = Resume.objects.filter(is_active=True)
+        if job_career_id:
+            matching_qs = matching_qs.filter(career_id=job_career_id)
+        if job_city_id:
+            matching_qs = matching_qs.filter(city_id=job_city_id)
+        matching_qs = matching_qs.select_related('user', 'user__avatar', 'city', 'career')
+
+        resumes = list(matching_qs[:25])
+
+        from apps.profiles.models import ResumeSaved
+        saved_resume_ids = set()
+        if request.user and request.user.is_authenticated:
+            active_comp = getattr(request.user, 'active_company', None)
+            if active_comp:
+                saved_resume_ids = set(
+                    ResumeSaved.objects.filter(company=active_comp).values_list('resume_id', flat=True)
+                )
+
+        recommendations: list[dict] = []
+        for idx, resume in enumerate(resumes):
+            user = resume.user
+            if not user or not user.is_active:
+                continue
+
+            score = None
+            reasons = []
+
+            # Only invoke live LLM evaluation on top 5 candidates to keep HTTP response under 500ms
+            if idx < 5:
+                resume_data = {
+                    "title": resume.title or "",
+                    "skills": resume.skills_summary or "",
+                    "experience": resume.experience or 0,
+                    "academic_level": getattr(resume, "academic_level", 0) or 0,
+                    "salary_min": getattr(resume, "salary_min", 0) or 0,
+                    "salary_max": getattr(resume, "salary_max", 0) or 0,
+                }
+                job_data = {
+                    "job_name": job_post.job_name or "",
+                    "description": job_post.job_description or "",
+                    "experience": job_post.experience or 0,
+                    "salary_min": job_post.salary_min or 0,
+                    "salary_max": job_post.salary_max or 0,
+                }
+
+                try:
+                    llm_result = score_resume_job_fit(resume_data, job_data, resume_id=resume.id, job_id=job_post.id)
+                    if isinstance(llm_result, dict):
+                        score_val = llm_result.get("overall_score")
+                        if score_val is not None:
+                            score = int(score_val)
+                        reasons = [r for r in llm_result.get("strengths", []) if isinstance(r, str) and r.strip()]
+                except Exception as ex:
+                    helper.print_log_error("score_resume_job_fit", ex)
+
+            if not reasons:
+                if job_career_id and resume.career_id == job_career_id:
+                    reasons.append(f"Đúng ngành {job_post.career.name if job_post.career else 'nghề'}")
+                if job_city_id and resume.city_id == job_city_id:
+                    reasons.append(f"Khu vực {resume.city.name if resume.city else ''}")
+                if job_title and any(w in (resume.title or '').lower() for w in job_title.split() if len(w) > 2):
+                    reasons.append("Chức danh phù hợp")
+
+            avatar_url = None
+            if getattr(user, 'avatar', None) and getattr(user.avatar, 'file', None):
+                try:
+                    avatar_url = helper.get_presigned_url(user.avatar.file.name)
+                except Exception:
+                    avatar_url = None
+
+            full_name = (user.full_name or user.username or "").strip()
+
+            exp_map = {
+                1: "Chưa có kinh nghiệm",
+                2: "Dưới 1 năm kinh nghiệm",
+                3: "1 năm kinh nghiệm",
+                4: "2 năm kinh nghiệm",
+                5: "3 năm kinh nghiệm",
+                6: "4 năm kinh nghiệm",
+                7: "5 năm kinh nghiệm",
+                8: "Trên 5 năm kinh nghiệm",
+            }
+            exp_display = exp_map.get(resume.experience) if resume.experience else None
+
+            recommendations.append({
+                "id": resume.id,
+                "slug": resume.slug or str(resume.id),
+                "userId": user.id,
+                "fullName": full_name,
+                "title": resume.title or None,
+                "avatarUrl": avatar_url,
+                "city": resume.city.name if resume.city else None,
+                "experience": exp_display,
+                "matchScore": score,
+                "matchReasons": reasons,
+                "skillsSummary": resume.skills_summary or None,
+                "updatedAt": resume.update_at.strftime("%d/%m/%Y") if resume.update_at else None,
+                "isSaved": resume.id in saved_resume_ids,
+            })
+
+        recommendations.sort(key=lambda x: (x["matchScore"] is not None, x["matchScore"] or 0), reverse=True)
+
+        return var_res.response_data(data={
+            "jobPostId": job_post.id,
+            "jobName": job_post.job_name,
+            "totalCount": len(recommendations),
+            "candidates": recommendations[:20]
+        })
+
     @action(methods=["get"], detail=False, url_path="suggested-job-posts", url_name="suggested-job-posts")
     def get_suggested_job_posts(self, request):
         resumes = Resume.objects.filter(user=request.user).values_list("career", "city")
-        careers_id = [x[0] for x in resumes]
-        cities_id = [x[1] for x in resumes]
+        careers_id = [x[0] for x in resumes if x[0] is not None]
+        cities_id = [x[1] for x in resumes if x[1] is not None]
 
-        queryset = (
+        base_qs = (
             JobPost.objects.select_related(
                 'company',
                 'company__logo',
@@ -104,8 +283,23 @@ class PrivateJobPostViewSet(
                 deadline__gte=datetime.datetime.now().date(),
                 company__is_verified=True,
             )
-            .filter(career__in=careers_id, location__city__in=cities_id)
-            .prefetch_related(
+        )
+
+        filter_q = Q()
+        if careers_id:
+            filter_q |= Q(career__in=careers_id)
+        if cities_id:
+            filter_q |= Q(location__city__in=cities_id)
+
+        if filter_q:
+            queryset = base_qs.filter(filter_q)
+            if not queryset.exists():
+                queryset = base_qs
+        else:
+            queryset = base_qs
+
+        queryset = (
+            queryset.prefetch_related(
                 Prefetch(
                     'savedjobpost_set',
                     queryset=SavedJobPost.objects.filter(user=request.user)
@@ -136,10 +330,18 @@ class PrivateJobPostViewSet(
                     'jobName',
                     'isHot',
                     'isUrgent',
+                    'isSaved',
+                    'isApplied',
                     'salary',
                     'city',
                     'deadline',
                     'locationDict',
+                    'experience',
+                    'academicLevel',
+                    'jobType',
+                    'jobDescription',
+                    'jobRequirement',
+                    'benefitsEnjoyed',
                 ],
             )
             return self.get_paginated_response(serializer.data)
@@ -211,6 +413,10 @@ class PrivateJobPostViewSet(
                     "isUrgent",
                     "status",
                     "isExpired",
+                    "aiRecommendedCount",
+                    "aiRecommendedAvatars",
+                    "ai_recommended_count",
+                    "ai_recommended_avatars",
                 ],
             )
             return self.get_paginated_response(serializer.data)
@@ -295,7 +501,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
         status=var_sys.JobPostStatus.APPROVED,
         deadline__gte=datetime.datetime.now().date(),
         company__is_verified=True,
-    ).order_by("-create_at", "-update_at", "-id")
+    ).order_by("-is_urgent", "-is_hot", "-create_at", "-update_at", "-id")
     serializer_class = JobPostSerializer
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
@@ -306,8 +512,25 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
 
     permission_action_map = {
         "get_job_posts_saved": [perms_sys.IsAuthenticated],
+        "get_recommended_jobs_action": [perms_sys.AllowAny],
     }
     default_permission_classes = [perms_sys.AllowAny]
+
+    @action(methods=["get"], detail=False, url_path="recommended-jobs", url_name="recommended-jobs")
+    def get_recommended_jobs_action(self, request):
+        user = request.user
+        if not user or not user.is_authenticated:
+            queryset = self.queryset[:10]
+            serializer = self.get_serializer(queryset, many=True)
+            return var_res.response_data(data=serializer.data)
+
+        from apps.jobs.recommendation_service import get_recommended_jobs
+        queryset = get_recommended_jobs(user, limit=20)
+        if not queryset.exists():
+            queryset = self.queryset[:10]
+
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
     ordering_fields = (
         ('jobName', 'job_name'),
         ('createAt', 'create_at'),
@@ -370,10 +593,18 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
                     'jobName',
                     'isHot',
                     'isUrgent',
+                    'isSaved',
+                    'isApplied',
                     'salary',
                     'city',
                     'deadline',
                     'locationDict',
+                    'experience',
+                    'academicLevel',
+                    'jobType',
+                    'jobDescription',
+                    'jobRequirement',
+                    'benefitsEnjoyed',
                 ],
             )
             paginated_response = self.get_paginated_response(serializer.data)
@@ -471,6 +702,12 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
                     'city',
                     'deadline',
                     'locationDict',
+                    'experience',
+                    'academicLevel',
+                    'jobType',
+                    'jobDescription',
+                    'jobRequirement',
+                    'benefitsEnjoyed',
                 ],
             )
             return self.get_paginated_response(serializer.data)
@@ -703,3 +940,29 @@ class AdminJobPostViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         job_post.save()
         record_audit_log(request=request, action="reject", instance=job_post)
         return var_res.response_data(data=JobPostSerializer(job_post).data)
+
+    @action(detail=False, methods=['post'], url_path='bulk-approve')
+    def bulk_approve(self, request):
+        ids = request.data.get("ids", [])
+        if not ids or not isinstance(ids, list):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"ids": ["Danh sách ID là bắt buộc."]},
+            )
+        valid_jobs = JobPost.objects.filter(id__in=ids, company__is_verified=True)
+        updated_count = valid_jobs.update(status=var_sys.JobPostStatus.APPROVED)
+        return var_res.response_data(data={"updatedCount": updated_count})
+
+    @action(detail=False, methods=['post'], url_path='bulk-reject')
+    def bulk_reject(self, request):
+        ids = request.data.get("ids", [])
+        reason = request.data.get("reason", "")
+        if not ids or not isinstance(ids, list):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"ids": ["Danh sách ID là bắt buộc."]},
+            )
+        updated_count = JobPost.objects.filter(id__in=ids).update(
+            status=var_sys.JobPostStatus.REJECTED
+        )
+        return var_res.response_data(data={"updatedCount": updated_count, "reason": reason})

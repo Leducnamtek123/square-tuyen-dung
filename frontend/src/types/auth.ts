@@ -1,4 +1,3 @@
-import type { EmployerSignUpFormData } from '../views/components/auths/EmployerSignUpForm';
 /** OAuth2 token pair returned by the Django backend.
  * NOTE: httpRequest interceptor auto-converts snake_case → camelCase,
  * so we define these with camelCase names.
@@ -17,6 +16,8 @@ export interface CheckCredsResponse {
   exists: boolean;
   email: string;
   emailVerified: boolean;
+  otherRole?: RoleName | null;
+  other_role?: RoleName | null;
 }
 
 /** Response from auth/email-exists/ */
@@ -35,6 +36,32 @@ export interface BotConfig {
   CHAT_TITLE: string;
   CHAT_ICON?: string;
   MODE?: string;
+}
+
+/** Form data for Employer registration */
+export interface EmployerSignUpFormData {
+  fullName: string;
+  phone?: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  company: {
+    companyName: string;
+    companyEmail: string;
+    companyPhone: string;
+    taxCode: string;
+    since?: Date | null;
+    fieldOperation: string;
+    employeeSize: number;
+    websiteUrl: string;
+    location: {
+      city: string | number;
+      district: string | number;
+      address: string;
+      lat: number | string | null;
+      lng: number | string | null;
+    };
+  };
 }
 
 /** Auth DTOs */
@@ -66,5 +93,77 @@ export type UserSettingsData = {
   emailNotificationActive?: boolean;
   smsNotificationActive?: boolean;
 };
+
+export interface CandidateDraft {
+  desiredJobTitle?: string;
+  careerId?: number | string;
+  cityId?: number | string;
+  typeOfWorkplace?: number;
+  address?: string;
+  lat?: number | string | null;
+  lng?: number | string | null;
+  salaryMin?: number;
+  salaryMax?: number;
+  expectedSalary?: number;
+  isSalaryNegotiable?: boolean;
+  experience?: number;
+  academicLevel?: number;
+  skills?: string[];
+  skillsSummary?: string;
+  fileId?: number | null;
+  fileName?: string;
+  fileUrl?: string;
+}
+
+export interface EmployerDraft {
+  companyName?: string;
+  logoId?: number | null;
+  logoUrl?: string;
+  taxCode?: string;
+  employeeSize?: number;
+  fieldOperation?: string;
+  cityId?: number | string;
+  districtId?: number | string;
+  address?: string;
+  websiteUrl?: string;
+  description?: string;
+  companyEmail?: string;
+  companyPhone?: string;
+  recruiterName?: string;
+  recruiterTitle?: string;
+  recruiterPhone?: string;
+  recruiterEmail?: string;
+  hiringNeeds?: string[];
+  gpkdFileId?: number | null;
+  gpkdFileName?: string;
+  gpkdFileUrl?: string;
+}
+
+export interface RecommendedJobPreview {
+  id: number;
+  jobName: string;
+  companyName: string;
+  companyLogo?: string;
+  cityName?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  slug?: string;
+}
+
+export interface OnboardingStatusResponse {
+  isOnboarded: boolean;
+  onboardingStep: number;
+  roleName: string;
+  hasCompany: boolean;
+  profileCompleteness: number;
+  candidateDraft?: CandidateDraft | null;
+  employerDraft?: EmployerDraft | null;
+  hasExistingMembership?: boolean;
+  existingCompany?: {
+    companyId: number;
+    companyName: string;
+    roleName: string;
+  } | null;
+}
 
 

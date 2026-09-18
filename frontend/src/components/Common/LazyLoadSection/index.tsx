@@ -9,15 +9,12 @@ interface LazyLoadSectionProps {
 
 const LazyLoadSection = ({ children, rootMargin = '200px', minHeight = '300px' }: LazyLoadSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const setSectionRef = useCallback((node: HTMLDivElement | null) => {
-    observerRef.current?.disconnect();
-    observerRef.current = null;
-
-    if (!node || isVisible) {
-      return;
-    }
+  React.useEffect(() => {
+    if (isVisible) return;
+    const node = containerRef.current;
+    if (!node) return;
 
     if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
       setIsVisible(true);
@@ -29,19 +26,19 @@ const LazyLoadSection = ({ children, rootMargin = '200px', minHeight = '300px' }
         if (entries[0]?.isIntersecting) {
           setIsVisible(true);
           observer.disconnect();
-          observerRef.current = null;
         }
       },
       { rootMargin }
     );
 
     observer.observe(node);
-    observerRef.current = observer;
+    return () => {
+      observer.disconnect();
+    };
   }, [isVisible, rootMargin]);
 
-  // Once visible, maintain the children without the minHeight wrapper restriction if it's dynamic
   return (
-    <div ref={setSectionRef} style={{ minHeight: isVisible ? 'auto' : minHeight }}>
+    <div ref={containerRef} style={{ minHeight: isVisible ? 'auto' : minHeight }}>
       {isVisible ? children : null}
     </div>
   );

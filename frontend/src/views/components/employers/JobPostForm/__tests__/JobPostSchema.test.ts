@@ -147,6 +147,28 @@ describe('getJobPostSchema', () => {
     );
   });
 
+  it('validates autoInterviewEnabled and minScreeningScore within [0, 100]', async () => {
+    const schema = getJobPostSchema(t as never);
+
+    await expect(schema.validateAt('autoInterviewEnabled', { autoInterviewEnabled: true })).resolves.toBe(true);
+    await expect(schema.validateAt('autoInterviewEnabled', { autoInterviewEnabled: false })).resolves.toBe(false);
+
+    await expect(schema.validateAt('minScreeningScore', { minScreeningScore: 70 })).resolves.toBe(70);
+    await expect(schema.validateAt('minScreeningScore', { minScreeningScore: 0 })).resolves.toBe(0);
+    await expect(schema.validateAt('minScreeningScore', { minScreeningScore: 100 })).resolves.toBe(100);
+    await expect(schema.validateAt('minScreeningScore', { minScreeningScore: '' })).resolves.toBe(70);
+
+    await expect(schema.validateAt('minScreeningScore', { minScreeningScore: -1 })).rejects.toThrow(
+      'jobPostForm.validation.minscoreoutofrange',
+    );
+    await expect(schema.validateAt('minScreeningScore', { minScreeningScore: 101 })).rejects.toThrow(
+      'jobPostForm.validation.minscoreoutofrange',
+    );
+    await expect(schema.validateAt('minScreeningScore', { minScreeningScore: 'not-a-number' })).rejects.toThrow(
+      'jobPostForm.validation.invalidminscore',
+    );
+  });
+
   it('allows today as an application deadline', async () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date(2026, 5, 4, 12, 0, 0).getTime());

@@ -2,7 +2,10 @@
   "appliedResume": {
     "title": "Applied Resume Management",
     "downloadList": "Download List",
-    "filters": "Filters:",
+    "filters": {
+      "selectJobPost": "Select job post",
+      "searchPlaceholder": "Search by candidate name, email, phone..."
+    },
     "allJobPosts": "All job posts",
     "allStatuses": "All recruitment statuses",
     "advancedFilter": "Advanced Filter",
@@ -23,9 +26,15 @@
       "tooltips": {
         "view": "View profile",
         "delete": "Delete profile",
-        "scheduleInterview": "Schedule interview"
+        "scheduleInterview": "Schedule interview",
+        "blindDisabled": "Action disabled in Blind Screening mode"
       },
-      "clickToDownload": "Click to download"
+      "clickToDownload": "Click to download",
+      "candidateName": "Candidate Name",
+      "jobTitle": "Applied Position",
+      "phone": "Phone Number",
+      "email": "Email",
+      "aiScore": "AI Score"
     },
     "ai": {
       "analysisStarted": "AI analysis started. Please wait a few seconds.",
@@ -72,6 +81,12 @@
       "overrideScore": "Override score",
       "reviewNote": "Review note",
       "saveReview": "Save review",
+      "reviewedAtLabel": "Reviewed: {{date}}",
+      "reviewStatus": {
+        "ai_only": "AI Only",
+        "reviewed": "Reviewed",
+        "overridden": "Score Overridden"
+      },
       "criteriaTitle": "Weighted criteria",
       "evidenceTitle": "Evidence",
       "identityWarningTitle": "CV name mismatch warning",
@@ -94,17 +109,19 @@
     },
     "status": {
       "updateTitle": "Update application status",
-      "updateConfirm": "The profile will be updated to status <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Are you sure?",
+      "updateConfirm": "The profile will be updated to status <strong>\"{{statusName}}\"</strong>. Are you sure?",
       "errorTitle": "Error occurred",
-      "errorMsg": "You are not allowed to change the application status from <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> to <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
-      "updateSuccess": "Update successful."
+      "errorMsg": "You are not allowed to change the application status from <strong>\"{{fromStatus}}\"</strong> to <strong>\"{{toStatus}}\"</strong>",
+      "updateSuccess": "Update successful.",
+      "rollbackMsg": "Could not update status. Reverted to previous state."
     },
     "delete": {
       "title": "Delete Applied Profile",
       "confirm": "This applied profile will be permanently deleted and cannot be recovered. Are you sure?",
       "success": "Candidate application deleted successfully."
     },
-    "manageSubtitle": "Manage applied resumes"
+    "manageSubtitle": "Manage applied resumes",
+    "subtitle": "Track, evaluate, and manage all candidate applications submitted for your company positions."
   },
   "savedResume": {
     "title": "Saved Resume Management",
@@ -115,7 +132,22 @@
     },
     "confirmUnsaveTitle": "Unsave Resume",
     "confirmUnsaveMessage": "Are you sure you want to unsave this resume?",
-    "manageSubtitle": "Manage saved resumes"
+    "manageSubtitle": "Manage saved resumes",
+    "table": {
+      "candidateName": "Candidate Name",
+      "jobTitle": "Job Title",
+      "savedDate": "Saved Date",
+      "phone": "Phone Number",
+      "email": "Email"
+    },
+    "subtitle": "Manage and track candidate profiles you have saved for future contact or hiring.",
+    "columns": {
+      "candidateName": "Candidate Name",
+      "jobTitle": "Job Title",
+      "experience": "Experience",
+      "city": "City / Province",
+      "savedAt": "Saved Date"
+    }
   },
   "savedResumeTable": {
     "title": {
@@ -238,7 +270,8 @@
     "candidateChart": "CANDIDATE CHART",
     "applicationChart": "RECRUITMENT & APPLICATION CHART",
     "academicChart": "RECRUITMENT BY ACADEMIC LEVEL",
-    "interviewChart": "INTERVIEW STATISTICS"
+    "interviewChart": "INTERVIEW STATISTICS",
+    "recruitmentFunnel": "Recruitment Funnel"
   },
   "jobPost": {
     "title": "Job Post Management",
@@ -252,7 +285,10 @@
       "applications": "Applications",
       "views": "Views",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "title": "Title",
+      "createdDate": "Created Date",
+      "creator": "Creator"
     },
     "urgent": "Urgent",
     "noData": "You have no job posts yet",
@@ -284,7 +320,38 @@
       "toast": "Please verify your employer profile before posting a job."
     },
     "popupTitle": "Job Post",
-    "manageSubtitle": "Manage your job postings"
+    "manageSubtitle": "Manage your job postings",
+    "editor": {
+      "createTitle": "Create New Job Post",
+      "editTitle": "Edit Job Post",
+      "createSubtitle": "Fill in position details, compensation, and AI interview parameters to attract qualified candidates quickly.",
+      "editSubtitle": "Update recruitment information, requirements, and adjust AI screening score thresholds.",
+      "backToList": "Back to List",
+      "confirmCancelTitle": "Discard changes?",
+      "confirmCancelMessage": "You have unsaved changes. Leaving this page will discard them. Are you sure you want to exit?",
+      "confirmCancelButton": "Leave page",
+      "continueEditingButton": "Keep editing",
+      "saveButton": "Publish Job Post",
+      "updateButton": "Save Changes",
+      "cancelButton": "Cancel",
+      "progressTitle": "Form Completion Progress",
+      "progressSubtitle": "A more detailed post attracts more high-caliber applicants",
+      "sectionBasic": "Basic Information",
+      "sectionSalary": "Salary & Deadline",
+      "sectionAi": "AI Interview Settings",
+      "sectionContent": "Description & Benefits",
+      "sectionLocation": "Workplace Location",
+      "sectionContact": "Contact Details",
+      "tipsTitle": "Tips for an effective job post",
+      "tip1Title": "Clear job responsibilities",
+      "tip1Desc": "List 5-7 core responsibilities and clearly outline key technologies or required skills.",
+      "tip2Title": "Transparent salary range",
+      "tip2Desc": "Posts with specific salary ranges receive up to 40% more qualified applications.",
+      "tip3Title": "Automated AI interview pipeline",
+      "tip3Desc": "Enabling auto-screening shortens response time and improves candidate experience.",
+      "policyTitle": "Job posting policy",
+      "policyDesc": "Job postings are reviewed within 2 business hours to ensure transparency and protect candidate rights."
+    }
   },
   "sendEmailComponent": {
     "label": {
@@ -351,7 +418,8 @@
       "tested": "Tested",
       "interviewed": "Interviewed",
       "notselected": "Not Selected"
-    }
+    },
+    "tooltip": "Recruitment statistics for this period"
   },
   "companyForm": {
     "title": {
@@ -385,6 +453,7 @@
       "entercompanyemail": "Enter company email",
       "entercompanyphonenumber": "Enter company phone number",
       "selectcityprovince": "Select city/province",
+      "selectCityFirst": "Please select City / Province first",
       "selectdistrict": "Select district",
       "enteraddress": "Enter address",
       "enterlatitudecoordinateonthemap": "Enter latitude coordinate on the map.",
@@ -428,7 +497,7 @@
     "label": {
       "selectjobpost": "Select job post",
       "selectcandidate": "Select candidate",
-      "selectquestiongroupoptional": "Select Question Group (Optional)",
+      "selectquestiongroupoptional": "Select Question Group",
       "selectinterviewquestions": "Select Interview Questions"
     },
     "helperText": {
@@ -523,11 +592,11 @@
       "resultLabel": "Final Result",
       "commentsPlaceholder": "Add HR notes and final assessment...",
       "comments": "Detailed Comments",
-      "proposedSalary": "Proposed Salary (VND)",
+      "proposedSalary": "Proposed Salary",
       "submitEvaluation": "Submit Final Evaluation",
       "evalSuccess": "Evaluation submitted successfully!",
-      "passed": "Accepted (Pass)",
-      "failed": "Rejected (Fail)",
+      "passed": "Qualified",
+      "failed": "Unqualified",
       "pending": "Pending Review"
     }
   },
@@ -580,7 +649,9 @@
       "contactpersonphoneexceededallowedlength": "Contact person phone exceeded allowed length.",
       "contactpersonemailisrequired": "Contact person email is required.",
       "invalidemail": "Invalid email.",
-      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length."
+      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length.",
+      "invalidminscore": "Invalid minimum score.",
+      "minscoreoutofrange": "Minimum score must be between 0 and 100."
     },
     "warning": "When you update the post, it will be pending approval!",
     "title": {
@@ -609,7 +680,14 @@
       "contactpersonphone": "Contact Person Phone",
       "contactpersonemail": "Contact Person Email",
       "urgent": "Urgent",
-      "contactinformation": "Contact Information"
+      "contactinformation": "Contact Information",
+      "autointerview": "Auto AI Interview for Qualified Candidates",
+      "autointerviewdesc": "Automatically send an AI interview invitation as soon as the candidate's CV score meets the threshold.",
+      "minscreeningscore": "Minimum CV score for auto-invitation",
+      "aiPipelineHelp": "Parallel Mode: Candidates scoring at or above this threshold will automatically receive an AI interview invitation email. Candidates below threshold or when auto-interview is turned off will be queued in pending status for manual review."
+    },
+    "tooltip": {
+      "minscreeningscore": "Score scale from 0 to 100 points."
     },
     "placeholder": {
       "enterjobtitle": "Enter job title",
@@ -624,7 +702,9 @@
       "entermaximumsalary": "Enter maximum salary",
       "selectacademiclevel": "Select academic level",
       "selectinterviewtemplate": "Select an interview template for automated preliminary assessment...",
+      "enterminscreeningscore": "Enter score between 0 and 100 (default: 70)",
       "selectcityprovince": "Select city/province",
+      "selectCityFirst": "Please select City / Province first",
       "selectdistrict": "Select district",
       "enteraddress": "Enter address",
       "enterlatitudecoordinateofthecompanyonthemap": "Enter latitude coordinate of the company on the map.",
@@ -641,6 +721,8 @@
     },
     "section": {
       "basicInfo": "Basic Information",
+      "aiPipeline": "AI Interview & Automation Pipeline",
+      "content": "Job Details & Benefits",
       "location": "Work Location",
       "contact": "Contact Information"
     }
@@ -657,6 +739,33 @@
       "updatedAt": "Updated: {{date}}",
       "viewsCount": "{{count}} views"
     },
+    "tabs": {
+      "findNewCandidates": "Find Candidates",
+      "aiSuggestedCandidates": "AI-Suggested Candidates",
+      "aiBeta": "AI Match"
+    },
+    "sort": {
+      "label": "Sort by:",
+      "mostSuitable": "Most suitable",
+      "newest": "Newest"
+    },
+    "aiMatch": {
+      "score": "AI Match: {{score}}%",
+      "badge": "{{score}}% Match",
+      "badgeText": "Match",
+      "highMatch": "Highly suitable",
+      "mediumMatch": "Suitable",
+      "jobPostSelector": "Match by job post...",
+      "allJobPosts": "All active job vacancies",
+      "insightsTitle": "AI Candidate Match Insights",
+      "insightsSubtitle": "Automated evaluation based on job post requirements and candidate profile",
+      "criteriaCareer": "Career & Position",
+      "criteriaLocation": "Location",
+      "criteriaExperience": "Experience",
+      "criteriaSalary": "Salary Expectations",
+      "matchingHighlights": "Matching Strengths",
+      "noAnalysisYet": "Candidate profile is being analyzed by AI."
+    },
     "messages": {
       "saveSuccess": "Saved successfully.",
       "unsaveSuccess": "Unsaved successfully."
@@ -665,7 +774,11 @@
       "unsave": "Unsave",
       "save": "Save",
       "viewProfile": "View Profile"
-    }
+    },
+    "matchingNeeds": "Matching Needs",
+    "positionNotUpdated": "Position not updated",
+    "unsaveCandidate": "Unsave profile",
+    "saveCandidate": "Save profile"
   },
   "profileSearch": {
     "title": {
@@ -712,6 +825,7 @@
     "table": {
       "groupName": "Question Group Name",
       "numberOfQuestions": "Number of Questions",
+      "status": "Status",
       "description": "Description",
       "na": "N/A",
       "noData": "No data"
@@ -742,12 +856,17 @@
       "updateError": "Error occurred while updating question set",
       "deleteSuccess": "Deleted question group successfully",
       "deleteError": "Error occurred while deleting question set",
-      "createSuccess": "Question group created successfully"
+      "createSuccess": "Question group created successfully",
+      "testRoomCreated": "Mock interview room created successfully!",
+      "emptyGroupWarning": "This question group does not have any questions to test."
     },
     "title": "Question Groups",
     "actions": {
       "addGroup": "Add Group",
-      "createNewQuestion": "Create New Question"
+      "createNewQuestion": "Create New Question",
+      "testWithAI": "Test with AI",
+      "testGroupTooltip": "Practice / Test interview with this question group",
+      "testInDialog": "Test question group"
     },
     "noData": "No question groups yet"
   },
@@ -781,7 +900,7 @@
   },
   "sidebar": {
     "dashboard": "Dashboard",
-    "agentAssistants": "Agent Assistants",
+    "agentAssistants": "AI Assistant AILA",
     "jobPostList": "Job Post List",
     "candidateManagement": "Candidate Management",
     "appliedApplications": "Applied Applications",
@@ -793,6 +912,7 @@
     "interviewHistory": "Video Library",
     "questionBank": "Question Bank",
     "questionSets": "Question Sets",
+    "aiSettings": "AI Interview Settings",
     "notifications": "Notifications",
     "accountManagement": "Account Management",
     "companyInfo": "Company Info",
@@ -803,8 +923,18 @@
     "hrm": "HRM",
     "hrmEmployees": "Employee records",
     "hrmRoles": "Roles & permissions",
-      "hrmMembers": "Company members",
-      "squareHrmAdmin": "Open InfoHR HRM"
+    "hrmMembers": "Company members",
+    "squareHrmAdmin": "HRM Management",
+    "hrmManagement": "HRM Management",
+    "hrmDashboard": "Hrm Dashboard",
+    "hrmEmployeesList": "Hrm Employees List",
+    "hrmOnboarding": "Hrm Onboarding",
+    "hrmDepartments": "Hrm Departments",
+    "hrmContracts": "HRM Contracts",
+    "hrmAttendances": "Attendance & Timesheet",
+    "hrmLeaves": "Leave Management",
+    "hrmPayroll": "Payroll & Expenses",
+    "hrmOrgChart": "Organization Chart"
   },
   "interviewHistory": {
     "title": "Video Library",
@@ -839,6 +969,9 @@
     },
     "updating": "Updating...",
     "activeNow": "Active Now",
+    "searchPlaceholder": "Search by candidate name, position...",
+    "noSearchMatch": "No matching live interviews found",
+    "noSearchMatchHint": "Try searching with a different keyword or clear filter",
     "noData": {
       "title": "No live sessions yet",
       "subtitle": "When a candidate turns on camera or mic, their realtime card will appear here."
@@ -876,7 +1009,7 @@
       "screenShare": "Screen share",
       "liveAudioNoVideo": "Live audio - No video",
       "waitingForMediaTracks": "Waiting for audio/video tracks...",
-      "waitingSignal": "Waiting for signal",
+      "waitingSignal": "Waiting for signal...",
       "waitingSignalHint": "When the candidate turns on camera or mic, the preview will appear here",
       "tokenError": "Unable to fetch observer token.",
       "unknownCandidate": "Unknown candidate",
@@ -891,16 +1024,16 @@
       "time": "Time",
       "endSession": "End session",
       "noConnectionDetails": "No connection details available for fullscreen.",
-      "joinPresence": "Join as Present",
+      "joinPresence": "Join Room",
       "joinPresenceLoading": "Connecting...",
-      "joinPresenceTooltip": "Join the room as Employer â€” candidate will see you",
+      "joinPresenceTooltip": "Join the room as Employer — candidate will see you",
       "presenceTitle": "Present in Room",
       "presenceSubtitle": "You are joining as Employer. The candidate can see your presence.",
       "presenceExit": "Leave room"
     }
   },
   "verification": {
-    "title": "Employer Verification",
+    "title": "Business Verification",
     "step1": {
       "title": "Step 1: Update Company Profile",
       "description": "Complete company information before submitting verification documents. Admin will review this content before granting posting rights.",
@@ -921,10 +1054,10 @@
       "statusPending": "Status: Pending Approval"
     },
     "status": {
-      "pending": "Pending review",
-      "reviewing": "Reviewing",
-      "approved": "Approved",
-      "rejected": "Rejected"
+      "pending": "Incomplete",
+      "reviewing": "Under Review",
+      "approved": "Verified",
+      "rejected": "Needs Update"
     },
     "messages": {
       "infoRecorded": "Information recorded.",
@@ -933,8 +1066,8 @@
       "saveFailed": "Could not save the verification profile. Please try again."
     },
     "summary": {
-      "companyProfile": "Company profile",
-      "legalProfile": "Legal profile",
+      "companyProfile": "Company Profile",
+      "legalProfile": "Legal Documents",
       "progress": "Completion progress",
       "canPost": "Your company has been verified and can post jobs.",
       "cannotPost": "Please complete the legal profile and wait for admin verification before posting jobs."
@@ -1013,7 +1146,7 @@
   "common": {
     "notUpdated": "Not updated",
     "present": "Present",
-    "appName": "InfoHR Tuyá»ƒn Dá»¥ng",
+    "appName": "InfoHR Tuyển Dụng",
     "search": "Search",
     "clearFilters": "Clear filters",
     "advancedFilters": "Advanced filters"
@@ -1065,7 +1198,8 @@
       "statusDisabled": "Disabled",
       "statusInvited": "Invited",
       "systemRoleLocked": "System role is locked",
-      "userId": "User ID"
+      "userId": "User ID",
+      "deleteSuccess": "Member removed successfully."
     },
     "title": "Company Information",
     "following": "Following",
@@ -1239,6 +1373,7 @@
   "blog": {
     "title": "Recruitment Blog",
     "subtitle": "Share hiring experience and recruitment tips from your company",
+    "deleteTitle": "Confirm delete article",
     "newPost": "Write new post",
     "reviewNotice": "Posts are sent to Admin for review before appearing on the website. Review usually takes up to 24 hours.",
     "filter": {
@@ -1645,6 +1780,167 @@
   "questionBank": {
     "deleteTitle": "Delete question",
     "hint": "Keep the question clear and concise."
+  },
+  "employerOnboarding": {
+    "pageTitle": "Employer Account Setup | InfoHR",
+    "steps": {
+      "companyProfile": "Company Profile",
+      "recruiterProfile": "Recruiter Profile",
+      "verification": "Business Verification",
+      "complete": "Complete"
+    },
+    "consentNotice": {
+      "text": "By continuing setup, you agree to InfoHR's",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "postPolicy": "Job Posting Regulations",
+      "ofInfoHR": "."
+    },
+    "stepCounter": "Step {{current}} of {{total}}",
+    "invitation": {
+      "title": "You have been invited to join a company",
+      "subtitle": "Your account has been invited to join this company with an assigned role.",
+      "company": "Company",
+      "role": "Role",
+      "acceptAndContinue": "Accept & Continue"
+    },
+    "step1": {
+      "title": "Company Brand Profile",
+      "subtitle": "Complete your company details to build employer branding and attract top talent",
+      "logoLabel": "Company Logo",
+      "logoUpload": "Upload Logo",
+      "logoChange": "Change Logo",
+      "logoHint": "PNG, JPG format (Max 5MB). Recommended 1:1 aspect ratio.",
+      "companyName": "Full Company / Organization Name",
+      "companyNamePlaceholder": "e.g. Square Technology Corporation...",
+      "companyNameHelper": "Enter company name as registered on business license",
+      "taxCode": "Tax Identification Number (TIN)",
+      "taxCodePlaceholder": "e.g. 0101234567",
+      "taxCodeHelper": "Business tax code (optional during initial setup)",
+      "employeeSize": "Employee Size",
+      "fieldOperation": "Primary Industry / Sector",
+      "fieldOperationPlaceholder": "e.g. Information Technology, Construction, Retail...",
+      "locationSection": "Headquarters / Hiring Office Location",
+      "city": "City / Province",
+      "cityPlaceholder": "Select City / Province...",
+      "district": "District",
+      "districtPlaceholder": "Select District...",
+      "address": "Detailed Address",
+      "addressPlaceholder": "Building, street name, number...",
+      "website": "Company Website",
+      "websitePlaceholder": "https://company.com",
+      "selectCityFirst": "Select City First",
+      "cityFirstHelper": "City First Helper"
+    },
+    "step2": {
+      "title": "Recruiter Representative Information",
+      "subtitle": "Representative info helps candidates and our platform reach out easily for hiring matters",
+      "recruiterName": "Representative Full Name",
+      "recruiterNamePlaceholder": "e.g. John Doe",
+      "recruiterTitle": "Job Title / Role",
+      "recruiterTitlePlaceholder": "e.g. Talent Acquisition Lead, HR Manager...",
+      "recruiterPhone": "Phone Number / WhatsApp",
+      "recruiterPhonePlaceholder": "e.g. 0912345678",
+      "recruiterEmail": "Notification Email for Applications",
+      "recruiterEmailPlaceholder": "recruitment@company.com",
+      "hiringNeeds": "Key Hiring Focus",
+      "hiringNeedsPlaceholder": "Type role or skill needed (e.g. Frontend, Accounting, Sales...)",
+      "hiringNeedsHelper": "Type and press Enter to add primary hiring priorities",
+      "description": "About Workplace Environment & Culture",
+      "descriptionPlaceholder": "Describe work culture, employee benefits, perks..."
+    },
+    "step3": {
+      "title": "Business License Verification",
+      "subtitle": "Verified businesses earn trust badges and attract 3x more qualified candidates",
+      "benefitsTitle": "Benefits of verifying your business license now:",
+      "benefit1": "Verified Employer blue checkmark badge",
+      "benefit2": "Priority search ranking for all your job postings",
+      "benefit3": "3x higher application rate from high-quality candidates",
+      "dropzoneTitle": "Drag and drop business license file (Image or PDF) here",
+      "dropzoneSubtitle": "Supported formats: JPG, PNG, PDF (Max 10MB)",
+      "uploading": "Uploading file...",
+      "selectFile": "Select file from computer",
+      "uploadedFile": "Uploaded business license",
+      "replaceFile": "Change file",
+      "removeFile": "Remove file",
+      "skipNotice": "You can skip this step and upload your license anytime in Company Settings."
+    },
+    "step4": {
+      "title": "Welcome to InfoHR!",
+      "subtitle": "Your company profile is now ready. You can start posting jobs and hiring talent immediately.",
+      "freeBanner": "Our platform supports unlimited job postings and candidate management for employers.",
+      "summaryTitle": "Created Company Profile",
+      "companyName": "Company",
+      "recruiter": "Representative",
+      "location": "Location",
+      "verificationStatus": "Verification Status",
+      "verifiedPending": "Pending GPKD review",
+      "notSubmitted": "Not submitted",
+      "postJob": "Post a Job Now",
+      "dashboard": "Go to Employer Dashboard"
+    },
+    "actions": {
+      "back": "Back",
+      "next": "Continue",
+      "complete": "Complete Setup",
+      "skipVerification": "Skip & Verify Later",
+      "saving": "Saving...",
+      "submitting": "Finalizing..."
+    },
+    "validation": {
+      "companyNameRequired": "Please enter your company / business name.",
+      "recruiterNameRequired": "Please enter representative's full name.",
+      "recruiterPhoneRequired": "Please enter contact phone number.",
+      "cityRequired": "Please select headquarters city / province.",
+      "saveFailed": "Failed to save company information. Please try again.",
+      "uploadFailed": "Failed to upload file. Please try again."
+    }
+  },
+  "candidateDetail": {
+    "messages": {
+      "noEmail": "Candidate has not updated email address"
+    }
+  },
+  "candidate": "Candidate",
+  "introduce": {
+    "tabTitle": "Overview & Recruitment Solutions - {{appName}}",
+    "badge": "SMART RECRUITMENT SOLUTIONS FOR BUSINESSES",
+    "industries": {
+      "construction": "Construction",
+      "realEstate": "Real Estate",
+      "architecture": "Architecture & Interior Design",
+      "mep": "Engineering & MEP Systems"
+    },
+    "stats": {
+      "screeningTime": "Reduction in Pre-screening Time",
+      "screeningTimeDesc": "Automated CV screening & AI interviews",
+      "hiringSuccess": "Boost in Hiring Success Rate",
+      "hiringSuccessDesc": "Precise candidate-job skill matching",
+      "matchAccuracy": "AI Match Score Accuracy",
+      "matchAccuracyDesc": "Standardized evaluation metrics",
+      "trustedCompanies": "Trusted Partner Businesses",
+      "trustedCompaniesDesc": "Leading corporations & partners"
+    },
+    "valueProps": {
+      "poolTitle": "Talent Pool for 4 Key Industries",
+      "poolDesc": "Deep talent pool in Construction, Real Estate, Architecture/Interior Design, and MEP with verified credentials.",
+      "aiMatchingTitle": "AI Skill Matching & Automated Interviews",
+      "aiMatchingDesc": "AILA AI analyzes CVs, calculates Match Scores, and conducts natural Voice AI interviews 24/7 without subjective bias.",
+      "pipelineTitle": "Candidate Pipeline CRM",
+      "pipelineDesc": "Track candidate lifecycles from application and interview scheduling to final onboarding on a single visual dashboard.",
+      "guaranteeTitle": "Dedicated Support & Hiring Warranty",
+      "guaranteeDesc": "24/7 consultation team, job posting optimization, and dedicated support ensuring corporate hiring success."
+    },
+    "steps": {
+      "step1Title": "Company Profile Setup & Verification",
+      "step1Desc": "Quick employer registration and instant verification with a trusted verified company badge.",
+      "step2Title": "Smart Job Posting",
+      "step2Desc": "Publish SEO-optimized job openings fast with AI-assisted professional Job Description recommendations.",
+      "step3Title": "Automated AI Screening & Interviews",
+      "step3Desc": "Automated candidate sorting, AI Match Scoring, and instant round-the-clock interview scheduling.",
+      "step4Title": "Offer Acceptance & Workforce Management",
+      "step4Desc": "Approve final candidates, issue digital contracts, and streamline new hire onboarding seamlessly."
+    }
   }
 }
-

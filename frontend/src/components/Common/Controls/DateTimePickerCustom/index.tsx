@@ -1,20 +1,13 @@
 import React from 'react';
-
-import { Control, Controller, FieldValues, Path, RegisterOptions } from 'react-hook-form';
-
+import { Control, FieldValues, Path, RegisterOptions } from 'react-hook-form';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-
 import dayjs from '@/configs/moment-config';
-
 import { Typography, Box, SxProps, Theme } from "@mui/material";
-
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import type { Dayjs } from 'dayjs';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 const EMPTY_SX: SxProps<Theme> = {};
 
@@ -53,30 +46,19 @@ const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
     };
 
     return (
-
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-
             <Box sx={{ width: fullWidth ? '100%' : 'auto', ...sx }}>
-
                 {title && (
-
                     <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: 'text.secondary' }}>
-
                         {title} {showRequired && <Box component="span" sx={{ color: 'error.main' }}>*</Box>}
-
                     </Typography>
-
                 )}
 
-                <ControllerAny
-
+                <TypedController
                     name={name as Path<T>}
-
                     control={control}
-
                     rules={rules}
-
-                    render={({ field, fieldState }: any) => (
+                    render={({ field, fieldState }) => (
 
                         <>
 

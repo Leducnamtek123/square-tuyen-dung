@@ -15,7 +15,9 @@ export type QuestionListParams = {
 
 export interface QuestionPayload {
   text: string;
-  difficulty?: string;
+  category?: string;
+  difficulty?: string | number;
+  default_duration_seconds?: number;
   career?: number | null;
 }
 

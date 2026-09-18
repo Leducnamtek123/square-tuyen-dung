@@ -1,70 +1,62 @@
-import { buildEmployeeFromApplicationPayload } from '../employeeFromApplicationDialogState';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { buildEmployeeFromApplicationPayload, EmployeeFromApplicationFormState } from '../employeeFromApplicationDialogState';
 
-const baseForm = {
-  fullName: 'Manual Candidate',
-  email: '',
-  phone: '',
-  jobTitle: 'Frontend Developer',
-  department: '',
-  startDate: '2026-06-05',
-  createHrmAccount: true,
-  sendWelcomeEmail: true,
-  hrmRoles: 'Employee, System Manager',
-  notes: '',
+const baseForm: EmployeeFromApplicationFormState = {
+  departmentId: 5,
+  designationId: 10,
+  reportsToId: 2,
+  joinDate: '2026-06-05',
+  probationEndDate: '2026-08-05',
+  baseSalary: 15000000,
+  allowance: 2000000,
+  employmentType: 'FULL_TIME',
+  status: 'PROBATION',
+  notes: 'Onboarded from application',
 };
 
 describe('buildEmployeeFromApplicationPayload', () => {
-  it('does not request HRM account creation when email is missing', () => {
+  it('builds a complete OnboardCandidatePayload from valid form state', () => {
     expect(buildEmployeeFromApplicationPayload(12, baseForm)).toEqual({
-      applicationId: 12,
-      fullName: 'Manual Candidate',
-      email: undefined,
-      phone: undefined,
-      jobTitle: 'Frontend Developer',
-      department: undefined,
-      startDate: '2026-06-05',
-      createHrmAccount: false,
-      sendWelcomeEmail: false,
-      hrmRoles: [],
-      notes: undefined,
+      job_application_id: 12,
+      department_id: 5,
+      designation_id: 10,
+      reports_to_id: 2,
+      join_date: '2026-06-05',
+      probation_end_date: '2026-08-05',
+      base_salary: 15000000,
+      allowance: 2000000,
+      employment_type: 'FULL_TIME',
+      status: 'PROBATION',
+      notes: 'Onboarded from application',
     });
   });
 
-  it('does not send free-text HRM roles when email is present', () => {
-    expect(buildEmployeeFromApplicationPayload(12, {
-      ...baseForm,
-      email: ' candidate@example.com ',
-      hrmRoles: 'Employee, Employee',
-    })).toEqual(expect.objectContaining({
-      email: 'candidate@example.com',
-      createHrmAccount: true,
-      sendWelcomeEmail: true,
-      hrmRoles: [],
-    }));
-  });
+  it('handles empty optional fields cleanly without NaN or invalid types', () => {
+    const emptyForm: EmployeeFromApplicationFormState = {
+      departmentId: '',
+      designationId: '',
+      reportsToId: null,
+      joinDate: '',
+      probationEndDate: '',
+      baseSalary: '',
+      allowance: '',
+      employmentType: '',
+      status: '',
+      notes: '   ',
+    };
 
-  it('drops unsupported free-text HRM roles so backend configured defaults are used', () => {
-    expect(buildEmployeeFromApplicationPayload(12, {
-      ...baseForm,
-      email: 'candidate@example.com',
-      hrmRoles: 'Employee, System Manager',
-    }).hrmRoles).toEqual([]);
-  });
-
-  it('does not hard-code fallback text for HRM account options', () => {
-    const source = readFileSync(join(__dirname, '../EmployeeFromApplicationDialog.tsx'), 'utf8');
-    const optionKeys = [
-      'employer:employees.hrm.convert.createHrmAccount',
-      'employer:employees.hrm.convert.sendWelcomeEmail',
-    ];
-
-    for (const key of optionKeys) {
-      const call = source.match(new RegExp(`t\\('${key.replaceAll('.', '\\.')}'[\\s\\S]*?\\)`))?.[0] || '';
-
-      expect(call).toContain(`t('${key}'`);
-      expect(call).not.toContain('defaultValue');
-    }
+    expect(buildEmployeeFromApplicationPayload(99, emptyForm)).toEqual({
+      job_application_id: 99,
+      department_id: undefined,
+      designation_id: undefined,
+      reports_to_id: undefined,
+      join_date: undefined,
+      probation_end_date: undefined,
+      base_salary: 0,
+      allowance: 0,
+      employment_type: 'FULL_TIME',
+      status: 'PROBATION',
+      notes: undefined,
+    });
   });
 });
+

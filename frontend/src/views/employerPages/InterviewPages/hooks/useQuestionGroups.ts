@@ -2,11 +2,11 @@
 
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import questionGroupService from '../../../../services/questionGroupService';
-import type { QuestionGroupListParams, QuestionGroupPayload } from '../../../../services/questionGroupService';
-import toastMessages from '../../../../utils/toastMessages';
-import type { QuestionGroup } from '../../../../types/models';
-import type { PaginatedResponse } from '../../../../types/api';
+import questionGroupService from '@/services/questionGroupService';
+import type { QuestionGroupListParams, QuestionGroupPayload } from '@/services/questionGroupService';
+import toastMessages from '@/utils/toastMessages';
+import type { QuestionGroup } from '@/types/models';
+import type { PaginatedResponse } from '@/types/api';
 
 export const useQuestionGroups = (params: QuestionGroupListParams) => {
     const { t } = useTranslation('employer');

@@ -4,7 +4,7 @@ import * as React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import NextAppDirEmotionCacheProvider from './EmotionCache';
-import defaultTheme from '../../themeConfigs/defaultTheme';
+import defaultTheme from '@/configs/theme/defaultTheme';
 import { createTheme } from '@mui/material/styles';
 import type { ThemeOptions } from '@mui/material/styles';
 
@@ -92,13 +92,17 @@ const theme = createTheme(baseTheme, {
         },
         outlined: {
           borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: 'rgba(226, 232, 240, 0.95)',
           backgroundColor: 'rgba(255, 255, 255, 0.94)',
-          boxShadow: '0 1px 0 rgba(255,255,255,0.8)',
+          boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
           '&:hover': {
             transform: 'translateY(-1px)',
             borderWidth: 1,
-            backgroundColor: 'rgba(15, 23, 42, 0.04)',
-            boxShadow: '0 8px 18px rgba(15, 23, 42, 0.06)',
+            borderStyle: 'solid',
+            backgroundColor: '#F8FAFC',
+            borderColor: '#CBD5E1',
+            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.06)',
           },
         },
         text: {
@@ -111,41 +115,47 @@ const theme = createTheme(baseTheme, {
         {
           props: { variant: 'contained', color: 'primary' },
           style: {
-            backgroundColor: '#0f172a',
+            backgroundColor: '#2563EB',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 14px rgba(37, 99, 235, 0.22)',
             '&:hover': {
-              backgroundColor: '#111827',
+              backgroundColor: '#1D4ED8',
+              boxShadow: '0 6px 20px rgba(37, 99, 235, 0.35)',
             },
           },
         },
         {
           props: { variant: 'contained', color: 'secondary' },
           style: {
-            backgroundColor: '#10b981',
-            boxShadow: '0 8px 18px rgba(16, 185, 129, 0.16)',
+            backgroundColor: '#F1F5F9',
+            color: '#0F172A',
+            boxShadow: 'none',
             '&:hover': {
-              backgroundColor: '#059669',
-              boxShadow: '0 10px 22px rgba(16, 185, 129, 0.2)',
+              backgroundColor: '#E2E8F0',
+              boxShadow: 'none',
             },
           },
         },
         {
-          props: { variant: 'contained', color: 'info' },
+          props: { variant: 'contained', color: 'error' },
           style: {
-            backgroundColor: '#0f172a',
-            boxShadow: '0 8px 18px rgba(15, 23, 42, 0.16)',
+            backgroundColor: '#DC2626',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.2)',
             '&:hover': {
-              backgroundColor: '#111827',
-              boxShadow: '0 10px 22px rgba(15, 23, 42, 0.2)',
+              backgroundColor: '#B91C1C',
+              boxShadow: '0 6px 16px rgba(220, 38, 38, 0.3)',
             },
           },
         },
         {
           props: { variant: 'outlined', color: 'primary' },
           style: {
-            borderColor: 'rgba(15, 23, 42, 0.22)',
-            color: '#0f172a',
+            borderColor: '#2563EB',
+            color: '#2563EB',
             '&:hover': {
-              borderColor: 'rgba(15, 23, 42, 0.36)',
+              borderColor: '#1D4ED8',
+              backgroundColor: '#EFF6FF',
             },
           },
         },
@@ -230,6 +240,21 @@ const theme = createTheme(baseTheme, {
             '& .MuiAlert-icon': { color: '#0f172a' },
           }),
         }),
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          '&:first-of-type': {
+            paddingTop: 20,
+          },
+          '.MuiDialogTitle-root + &': {
+            paddingTop: '20px !important',
+          },
+          '.MuiDialogTitle-root + &.MuiDialogContent-dividers': {
+            paddingTop: '16px !important',
+          },
+        },
       },
     },
   },

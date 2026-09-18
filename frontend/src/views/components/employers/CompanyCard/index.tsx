@@ -202,10 +202,10 @@ const CompanyCard = () => {
             <Typography
               variant="subtitle2"
               sx={{
-                color: 'primary.main',
-                fontSize: '0.75rem',
-                fontWeight: 900,
-                letterSpacing: 0,
+                color: '#475569',
+                fontSize: '0.8125rem',
+                fontWeight: 700,
+                letterSpacing: '0.02em',
                 textTransform: 'uppercase',
               }}
             >
@@ -245,19 +245,26 @@ const CompanyCard = () => {
                 />
               </Box>
               <Button
-                variant="contained"
-                color="secondary"
+                variant="outlined"
                 size="small"
-                startIcon={<CameraAltOutlinedIcon />}
+                startIcon={<CameraAltOutlinedIcon sx={{ fontSize: 16 }} />}
                 onClick={() => logoInputRef.current?.click()}
                 sx={{
                   minHeight: 34,
                   width: '100%',
-                  
-                  boxShadow: 'none',
-                  color: 'white',
-                  fontWeight: 800,
+                  borderColor: '#cbd5e1',
+                  color: '#0f172a',
+                  bgcolor: '#ffffff',
+                  fontWeight: 700,
                   textTransform: 'none',
+                  fontSize: '0.8125rem',
+                  borderRadius: 2,
+                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                  '&:hover': {
+                    borderColor: '#94a3b8',
+                    bgcolor: '#f8fafc',
+                    color: '#0f172a',
+                  },
                 }}
               >
                 {t('companyProfile.labels.changeLogo')}
@@ -269,10 +276,10 @@ const CompanyCard = () => {
             <Typography
               variant="subtitle2"
               sx={{
-                color: 'primary.main',
-                fontSize: '0.75rem',
-                fontWeight: 900,
-                letterSpacing: 0,
+                color: '#475569',
+                fontSize: '0.8125rem',
+                fontWeight: 700,
+                letterSpacing: '0.02em',
                 textTransform: 'uppercase',
               }}
             >
@@ -302,25 +309,33 @@ const CompanyCard = () => {
                   position: 'absolute',
                   inset: 'auto 0 0',
                   height: 72,
-                  background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.46) 100%)',
+                  background: 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%)',
                 }}
               />
               <Button
                 variant="contained"
-                color="secondary"
                 size="small"
-                startIcon={<CameraAltOutlinedIcon />}
+                startIcon={<CameraAltOutlinedIcon sx={{ fontSize: 16 }} />}
                 onClick={() => coverInputRef.current?.click()}
                 sx={{
                   position: 'absolute',
                   left: 14,
                   bottom: 14,
                   minHeight: 34,
-                  
-                  boxShadow: 'none',
-                  color: 'white',
-                  fontWeight: 800,
+                  bgcolor: 'rgba(15, 23, 42, 0.8)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  fontSize: '0.8125rem',
+                  borderRadius: 2,
                   textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: 'rgba(15, 23, 42, 0.95)',
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                    transform: 'translateY(-1px)',
+                  },
                 }}
               >
                 {t('companyProfile.labels.changeCover')}
@@ -329,7 +344,7 @@ const CompanyCard = () => {
           </Stack>
         </Box>
 
-        <Divider sx={{ borderStyle: 'dashed' }} />
+        <Divider sx={{ borderColor: '#E2E8F0', my: 1 }} />
 
         <Box>
           <CompanyForm

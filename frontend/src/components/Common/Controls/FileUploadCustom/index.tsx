@@ -1,12 +1,12 @@
 'use client';
 import React from 'react';
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { Stack, Box, Button, Typography, Chip } from "@mui/material";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import { useTranslation } from 'react-i18next';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 interface Props<T extends FieldValues = FieldValues> {
   control: Control<T>;
@@ -60,19 +60,17 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
       <Stack spacing={2} direction="column">
         <Box
           sx={{
-            border: '2px dashed',
-            borderColor: 'rgba(42, 169, 225, 0.34)',
+            border: '1.5px solid #CBD5E1',
             borderRadius: 4,
             p: 3,
             textAlign: 'center',
-            bgcolor: 'background.paper',
+            bgcolor: '#F8FAFC',
             cursor: 'pointer',
             transition: 'all 0.2s ease-in-out',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.86)',
             '&:hover': {
-              borderColor: 'primary.main',
-              bgcolor: 'rgba(42, 169, 225, 0.04)',
-              boxShadow: '0 10px 24px rgba(26, 64, 125, 0.08)',
+              borderColor: '#2563EB',
+              bgcolor: '#EFF6FF',
+              boxShadow: '0 8px 24px rgba(37, 99, 235, 0.08)',
             }
           }}
           onClick={handleInputClick}
@@ -131,10 +129,10 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
         </Box>
       </Stack>
 
-      <ControllerAny
+      <TypedController
         name={name as Path<T>}
         control={control}
-        render={({ field, fieldState }: any) => {
+        render={({ field, fieldState }) => {
           formOnChangeRef.current = field.onChange;
 
           return (

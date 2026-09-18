@@ -1,8 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useCallback, useEffect, useReducer, useRef } from 'react';
-import tokenService from '../../../../services/tokenService';
-import { useAppSelector } from '../../../../hooks/useAppStore';
+import tokenService from '@/services/tokenService';
+import { useAppSelector } from '@/hooks/useAppStore';
 
 /**
  * SSE event data types for realtime interview monitoring.
@@ -137,18 +137,11 @@ export function useInterviewSSE({
     }
   }, []);
 
-  const connect = useCallback((shouldResetState = false) => {
-    cleanup();
-    if (shouldResetState) {
-      dispatch({ type: 'reset' });
-      reconnectAttempts.current = 0;
-    }
-
+  useEffect(() => {
     if (!sessionId || !enabled) return;
 
     const base = (process.env.NEXT_PUBLIC_API_BASE || '/api').replace(/\/$/, '');
     const token = tokenService.getAccessTokenFromCookie?.() || '';
-    // SSE with auth token as query param (EventSource doesn't support headers)
     const url = buildInterviewSSEUrl({
       apiBase: base,
       sessionId,
@@ -156,63 +149,70 @@ export function useInterviewSSE({
       activeCompanyId,
     });
 
-    const es = new EventSource(url);
-    eventSourceRef.current = es;
+    dispatch({ type: 'reset' });
+    reconnectAttempts.current = 0;
 
-    es.addEventListener('connected', () => {
-      dispatch({ type: 'connected' });
-      reconnectAttempts.current = 0;
-    });
+    const MAX_RETRY_ATTEMPTS = 5;
 
-    es.addEventListener('transcript_added', (e: MessageEvent) => {
-      try {
-        const data: SSETranscriptEvent = JSON.parse(e.data);
-        dispatch({ type: 'transcriptAdded', transcript: data.transcript });
-      } catch {
-        // ignore parse errors
+    const connect = () => {
+      if (reconnectAttempts.current >= MAX_RETRY_ATTEMPTS) {
+        dispatch({ type: 'connectionLost', error: 'Kết nối máy chủ bị ngắt. Đã vượt quá số lần thử lại.' });
+        return;
       }
-    });
 
-    es.addEventListener('status_changed', (e: MessageEvent) => {
-      try {
-        const data: SSEStatusEvent = JSON.parse(e.data);
-        dispatch({ type: 'statusChanged', event: data });
-      } catch {
-        // ignore
-      }
-    });
+      const es = new EventSource(url);
+      eventSourceRef.current = es;
 
-    es.addEventListener('heartbeat', () => {
-      // Keep-alive, no action needed
-    });
+      const onConnected = () => {
+        dispatch({ type: 'connected' });
+        reconnectAttempts.current = 0;
+      };
 
-    es.addEventListener('error', () => {
-      // ignore SSE error events from server
-    });
+      const onTranscript = (e: Event) => {
+        try {
+          const data: SSETranscriptEvent = JSON.parse((e as MessageEvent).data);
+          dispatch({ type: 'transcriptAdded', transcript: data.transcript });
+        } catch {
+          // ignore parse errors
+        }
+      };
 
-    es.onerror = () => {
-      dispatch({ type: 'disconnected' });
-      es.close();
-      eventSourceRef.current = null;
+      const onStatus = (e: Event) => {
+        try {
+          const data: SSEStatusEvent = JSON.parse((e as MessageEvent).data);
+          dispatch({ type: 'statusChanged', event: data });
+        } catch {
+          // ignore
+        }
+      };
 
-      // Exponential backoff reconnect (max 30s)
-      const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
-      reconnectAttempts.current += 1;
+      es.addEventListener('connected', onConnected);
+      es.addEventListener('transcript_added', onTranscript);
+      es.addEventListener('status_changed', onStatus);
 
-      if (reconnectAttempts.current <= 10) {
-        reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
-        }, delay);
-      } else {
-        dispatch({ type: 'connectionLost', error: 'SSE connection lost. Please refresh the page.' });
-      }
+      es.onerror = () => {
+        dispatch({ type: 'disconnected' });
+        es.close();
+        eventSourceRef.current = null;
+
+        if (reconnectAttempts.current < MAX_RETRY_ATTEMPTS) {
+          const delay = Math.pow(2, reconnectAttempts.current) * 1000;
+          reconnectAttempts.current += 1;
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connect();
+          }, delay);
+        } else {
+          dispatch({ type: 'connectionLost', error: 'Mất kết nối với máy chủ.' });
+        }
+      };
     };
-  }, [sessionId, enabled, cleanup, activeCompanyId]);
 
-  useEffect(() => {
-    connect(true);
-    return cleanup;
-  }, [connect, cleanup]);
+    connect();
+
+    return () => {
+      cleanup();
+    };
+  }, [sessionId, enabled, activeCompanyId, cleanup]);
 
   return {
     liveTranscripts: state.liveTranscripts,

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { ColumnDef } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
+import DataTable from '@/components/Common/DataTable';
 
 type Question = {
     id: string | number;
@@ -64,12 +64,12 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTa
             cell: (info) => (
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <Tooltip title={t('jobPost.tooltips.update')}>
-                        <IconButton size="small" onClick={() => onEdit(info.row.original)} color="primary">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onEdit(info.row.original)} color="primary">
                             <EditIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('jobPost.tooltips.delete')}>
-                        <IconButton size="small" onClick={() => onDelete(info.row.original)} color="error">
+                        <IconButton aria-label="Thao tác" size="small" onClick={() => onDelete(info.row.original)} color="error">
                             <DeleteOutlineIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>

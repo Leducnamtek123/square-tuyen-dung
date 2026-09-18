@@ -38,11 +38,35 @@ export const openExternalUrlSafely = (
 
 export const openResourceUrlSafely = (
   value: string | null | undefined,
-  target = '_blank'
+  target = '_blank',
+  onError?: (msg: string) => void
 ): boolean => {
   const safeUrl = getSafeResourceUrl(value);
-  if (!safeUrl || typeof window === 'undefined') return false;
+  if (!safeUrl || typeof window === 'undefined') {
+    if (onError) {
+      onError('Đường dẫn xem/tải hồ sơ không hợp lệ hoặc đã hết hạn.');
+    }
+    return false;
+  }
 
   window.open(safeUrl, target, 'noopener,noreferrer');
   return true;
+};
+
+export const getSafeRedirectPath = (
+  candidatePath: string | null | undefined,
+  fallback = '/'
+): string => {
+  const trimmed = candidatePath?.trim();
+  if (!trimmed) return fallback;
+  if (
+    trimmed.startsWith('/') &&
+    !trimmed.startsWith('//') &&
+    !trimmed.startsWith('/\\') &&
+    !trimmed.includes('\\') &&
+    !trimmed.includes('://')
+  ) {
+    return trimmed;
+  }
+  return fallback;
 };

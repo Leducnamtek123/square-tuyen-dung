@@ -1,166 +1,158 @@
 'use client';
 
 import * as React from 'react';
-
-import PropTypes from 'prop-types';
-
+import { usePathname } from 'next/navigation';
 import { Box } from "@mui/material";
 
 import Header from '../components/employers/Header';
-
 import Sidebar from '../components/employers/Sidebar';
+import ManagementFooter from '../components/commons/ManagementFooter';
+import AdminCommandPalette from '@/components/Common/AdminCommandPalette';
 
 interface AdminLayoutProps {
-  window?: () => Window;
+  windowGetter?: () => unknown;
   children?: React.ReactNode;
 }
 
-
-
-const drawerWidth = 240;
+const EXPANDED_WIDTH = 260;
+const COLLAPSED_WIDTH = 64;
 
 const AdminLayout = (props: AdminLayoutProps) => {
-
-  const { window, children } = props;
-
+  const { windowGetter, children } = props;
+  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState<boolean>(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('square_sidebar_collapsed');
+      if (saved === 'true') {
+        setIsCollapsed(true);
+      }
+    }
+  }, []);
+
+  // Global Ctrl+K / Cmd+K shortcut
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const toggleCollapse = React.useCallback(() => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      return next;
+    });
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('square_sidebar_collapsed', String(!isCollapsed));
+      } catch (err) {
+        console.warn('Could not save sidebar collapsed state:', err);
+      }
+    }
+  }, [isCollapsed]);
 
   const handleDrawerToggle = () => {
-
     setMobileOpen(!mobileOpen);
-
   };
 
-  const container =
+  const currentDrawerWidth = isCollapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH;
 
-    window !== undefined ? () => window().document.body : undefined;
+  const container =
+    windowGetter !== undefined ? () => (windowGetter() as Window).document.body : undefined;
 
   return (
-
-    <Box sx={{ display: 'flex' }}>
-
+    <Box sx={{ display: 'flex', minHeight: '100dvh', backgroundColor: '#F8FAFC' }}>
       {/* Start: Header */}
-
       <Header
-
-        drawerWidth={drawerWidth}
-
+        drawerWidth={currentDrawerWidth}
         handleDrawerToggle={handleDrawerToggle}
-
       />
-
       {/* End: Header */}
 
       <Box
-
         component="nav"
-
-        sx={{ width: { xl: drawerWidth }, flexShrink: { sm: 0 } }}
-
+        sx={{
+          width: { md: currentDrawerWidth },
+          flexShrink: { md: 0 },
+          transition: 'width 150ms cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
       >
-
         {/* Start: Sidebar */}
-
-        <Sidebar drawerWidth={drawerWidth} isAdmin />
-
-        <Sidebar.MobileSidebar
-
-          drawerWidth={drawerWidth}
-
-          container={container}
-
-          mobileOpen={mobileOpen}
-
-          handleDrawerToggle={handleDrawerToggle}
-
+        <Sidebar
+          drawerWidth={currentDrawerWidth}
           isAdmin
-
+          isCollapsed={isCollapsed}
+          toggleCollapse={toggleCollapse}
         />
-
+        <Sidebar.MobileSidebar
+          drawerWidth={EXPANDED_WIDTH}
+          container={container}
+          mobileOpen={mobileOpen}
+          handleDrawerToggle={handleDrawerToggle}
+          isAdmin
+        />
         {/* End: Sidebar */}
-
       </Box>
 
       <Box
-
         component="main"
-
         sx={{
-
           flexGrow: 1,
-
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100dvh',
           width: {
-
             xs: '100%',
-
-            sm: '100%',
-
-            md: '100%',
-
-            lg: '100%',
-
-            xl: `calc(100% - ${drawerWidth}px)`,
-
+            md: `calc(100% - ${currentDrawerWidth}px)`,
           },
-
+          transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
         }}
-
       >
-
-        {/* <Toolbar /> */}
-
         <Box
-
           sx={{
-
-            p: {
-
-              xs: 1,
-
-              sm: 3,
-
-              md: 3,
-
-              lg: 3,
-
-              xl: 3,
-
-            },
-
-            mt: 7,
-
-            bgcolor: 'grey.50',
-
-            minHeight: '100vh',
-
+            flexGrow: 1,
+            mt: '60px',
+            bgcolor: '#F8FAFC',
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
           }}
-
         >
-
-          {children}
-
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: '1600px',
+              p: {
+                xs: 2, // 16px
+                sm: 3, // 24px (8pt system)
+              },
+            }}
+          >
+            {children}
+          </Box>
         </Box>
-
+        <ManagementFooter />
       </Box>
 
+      {/* Global Admin Command Palette (Ctrl+K) */}
+      <AdminCommandPalette
+        open={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+      />
     </Box>
-
   );
-
-};
-
-AdminLayout.propTypes = {
-
-  /**
-
-   * Injected by the documentation to work in an iframe.
-
-   * You won't need it on your project.
-
-   */
-
-  window: PropTypes.func,
-
 };
 
 export default AdminLayout;

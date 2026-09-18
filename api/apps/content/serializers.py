@@ -138,6 +138,26 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             'imageUrl', 'imageMobileUrl', 'create_at', 'update_at',
         )
         read_only_fields = ('id', 'create_at', 'update_at', 'imageUrl', 'imageMobileUrl')
+        extra_kwargs = {
+            'image': {'validators': []},
+            'image_mobile': {'validators': []},
+        }
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "buttonText" in payload and "button_text" not in payload:
+            payload["button_text"] = payload.get("buttonText")
+        if "buttonLink" in payload and "button_link" not in payload:
+            payload["button_link"] = payload.get("buttonLink")
+        if "isShowButton" in payload and "is_show_button" not in payload:
+            payload["is_show_button"] = payload.get("isShowButton")
+        if "descriptionLocation" in payload and "description_location" not in payload:
+            payload["description_location"] = payload.get("descriptionLocation")
+        if "isActive" in payload and "is_active" not in payload:
+            payload["is_active"] = payload.get("isActive")
+        if "imageMobile" in payload and "image_mobile" not in payload:
+            payload["image_mobile"] = payload.get("imageMobile")
+        return super().to_internal_value(payload)
 
     def validate(self, attrs):
         for bool_field in ('is_show_button', 'is_active'):
@@ -154,6 +174,24 @@ class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 'type': ['Invalid banner type.'],
             })
         return attrs
+
+    def create(self, validated_data):
+        image = validated_data.get('image')
+        image_mobile = validated_data.get('image_mobile')
+        if image:
+            Banner.objects.filter(image=image).update(image=None)
+        if image_mobile:
+            Banner.objects.filter(image_mobile=image_mobile).update(image_mobile=None)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        image = validated_data.get('image')
+        image_mobile = validated_data.get('image_mobile')
+        if image:
+            Banner.objects.filter(image=image).exclude(id=instance.id).update(image=None)
+        if image_mobile:
+            Banner.objects.filter(image_mobile=image_mobile).exclude(id=instance.id).update(image_mobile=None)
+        return super().update(instance, validated_data)
 
     def get_imageUrl(self, banner):
         if banner.image:

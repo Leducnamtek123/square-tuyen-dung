@@ -68,13 +68,26 @@ def _default_search_params(page: int = 1, per_page: int = 20) -> dict[str, str]:
     return params
 
 
-def _build_search_url(origin: str, page: int = 1, per_page: int = 20, occupation_ids: list[int] | None = None) -> str:
+def _build_search_url(
+    origin: str,
+    page: int = 1,
+    per_page: int = 20,
+    occupation_ids: list[int] | None = None,
+    province_ids: list[int] | None = None,
+    keyword: str | None = None,
+) -> str:
     from urllib.parse import urlencode
 
     params = _default_search_params(page=page, per_page=per_page)
+    if keyword and keyword.strip():
+        params["keyword"] = keyword.strip()
+        params["q"] = keyword.strip()
+
     query_parts = list(params.items())
     for occupation_id in occupation_ids or []:
         query_parts.append(("occupation_ids[]", str(occupation_id)))
+    for province_id in province_ids or []:
+        query_parts.append(("province_ids[]", str(province_id)))
     return f"{_search_api_url(origin)}?{urlencode(query_parts, doseq=True)}"
 
 
@@ -132,7 +145,16 @@ def get_vieclam24h_catalog(source_url: str | None = None) -> dict[str, Any]:
         ) from exc
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-accelerated-2d-canvas",
+                "--disable-gpu",
+            ],
+        )
         page = browser.new_page(viewport={"width": 1440, "height": 1600})
         try:
             page.goto(f"{origin}{VIECLAM24H_SEARCH_PATH}", wait_until="domcontentloaded", timeout=60000)
@@ -345,6 +367,16 @@ def _normalize_search_item(item: dict[str, Any], catalog: dict[str, Any]) -> dic
         "province_names": province_names,
         "source_ref": str(item.get("id") or item.get("seeker_id") or full_name).strip(),
         "source_url": "",
+        "min_expected_salary": item.get("min_expected_salary"),
+        "max_expected_salary": item.get("max_expected_salary"),
+        "current_salary": item.get("current_salary"),
+        "salary_range": item.get("salary_range"),
+        "experience": item.get("experience"),
+        "position": item.get("position") or item.get("current_position") or item.get("level"),
+        "level": item.get("level"),
+        "gender": seeker_info.get("gender") or item.get("gender"),
+        "birthday": seeker_info.get("birthday") or item.get("birthday") or seeker_info.get("birth_day") or seeker_info.get("year_of_birth"),
+        "marital_status": seeker_info.get("marital_status") or item.get("marital_status"),
         "search_payload": {
             "id": item.get("id"),
             "seeker_id": item.get("seeker_id"),
@@ -509,8 +541,24 @@ def _evaluate_json(
     return parsed
 
 
-def _collect_search_items(page, auth_token: str | None, origin: str, occupation_ids: list[int], page_number: int, per_page: int) -> list[dict[str, Any]]:
-    url = _build_search_url(origin, page=page_number, per_page=per_page, occupation_ids=occupation_ids)
+def _collect_search_items(
+    page,
+    auth_token: str | None,
+    origin: str,
+    occupation_ids: list[int],
+    page_number: int,
+    per_page: int,
+    province_ids: list[int] | None = None,
+    keyword: str | None = None,
+) -> list[dict[str, Any]]:
+    url = _build_search_url(
+        origin,
+        page=page_number,
+        per_page=per_page,
+        occupation_ids=occupation_ids,
+        province_ids=province_ids,
+        keyword=keyword,
+    )
     payload = _evaluate_json(page, url, auth_token, origin)
     if payload.get("code") != 200:
         message = payload.get("msg") or "Vieclam24h search failed."
@@ -734,34 +782,47 @@ def _extract_detail_html_label_value_any(html_source: str, *labels: str) -> str:
 def _try_unlock_contact_information(page) -> bool:
     import re
 
-    selectors = []
-    try:
-        selectors.append(page.get_by_role("button", name=re.compile("Mua thông tin liên hệ", re.IGNORECASE)))
-    except Exception:
-        pass
-    try:
-        selectors.append(page.get_by_text("Mua thông tin liên hệ", exact=False))
-    except Exception:
-        pass
-    try:
-        selectors.append(page.locator("button").filter(has_text="Mua thông tin liên hệ"))
-    except Exception:
-        pass
-    try:
-        selectors.append(page.locator("a").filter(has_text="Mua thông tin liên hệ"))
-    except Exception:
-        pass
+    clicked_initial = False
+    selectors = [
+        lambda: page.get_by_role("button", name=re.compile("Mua thông tin liên hệ", re.IGNORECASE)),
+        lambda: page.get_by_text("Mua thông tin liên hệ", exact=False),
+        lambda: page.locator("button").filter(has_text="Mua thông tin liên hệ"),
+        lambda: page.locator("a").filter(has_text="Mua thông tin liên hệ"),
+    ]
 
-    for locator in selectors:
+    for get_loc in selectors:
         try:
-            if locator.count() <= 0:
-                continue
-            locator.first.click(timeout=5000)
-            page.wait_for_timeout(3000)
-            return True
+            loc = get_loc()
+            if loc.count() > 0:
+                loc.first.click(timeout=5000)
+                page.wait_for_timeout(1500)
+                clicked_initial = True
+                break
         except Exception:
             continue
-    return False
+
+    if not clicked_initial:
+        return False
+
+    confirm_selectors = [
+        lambda: page.get_by_role("button", name=re.compile("^Mua hồ sơ$", re.IGNORECASE)),
+        lambda: page.get_by_text("Mua hồ sơ", exact=True),
+        lambda: page.locator("button").filter(has_text="Mua hồ sơ"),
+        lambda: page.get_by_role("button", name=re.compile("Xác nhận|Đồng ý", re.IGNORECASE)),
+    ]
+
+    for get_conf in confirm_selectors:
+        try:
+            conf_loc = get_conf()
+            if conf_loc.count() > 0:
+                conf_loc.first.click(timeout=5000)
+                page.wait_for_timeout(3000)
+                logger.info("Vieclam24h paid candidate contact unlock confirmed via 'Mua hồ sơ' button.")
+                return True
+        except Exception:
+            continue
+
+    return True
 
 def _collect_detail_page_snapshot(
     page,
@@ -772,8 +833,11 @@ def _collect_detail_page_snapshot(
     auth_token: str | None = None,
 ) -> dict[str, Any]:
     detail_url = f"{_resolve_origin(source_url)}/chi-tiet-nguoi-tim-viec?id={resume_id}"
-    page.goto(detail_url, wait_until="commit", timeout=60000)
-    page.wait_for_timeout(5000)
+    try:
+        page.goto(detail_url, wait_until="domcontentloaded", timeout=15000)
+        page.wait_for_timeout(2000)
+    except Exception as goto_err:
+        logger.warning("Page navigation skipped for detail_url=%s: %s", detail_url, goto_err)
 
     if seeker_id is None:
         raise RuntimeError("Vieclam24h detail page is missing seeker_id; cannot unlock contact information.")
@@ -782,6 +846,9 @@ def _collect_detail_page_snapshot(
     if seeker_id_int is None:
         raise RuntimeError(f"Vieclam24h detail page returned an invalid seeker_id: {seeker_id!r}")
 
+    # Unlock candidate contact via paid points modal
+    _try_unlock_contact_information(page)
+
     _collect_employer_seen_resume(page, auth_token, source_url, resume_id)
     view_token = _collect_check_view_seeker(page, auth_token, source_url, resume_id)
     _collect_resume_hidden(page, auth_token, source_url, resume_id)
@@ -789,6 +856,18 @@ def _collect_detail_page_snapshot(
 
     email = _clean_hidden_contact_value(contact_api.get("email"))
     phone = _clean_hidden_contact_value(contact_api.get("mobile") or contact_api.get("phone"))
+
+    # Fallback to reading DOM text if contact_api email/phone are empty or masked
+    if not email or not phone:
+        try:
+            body_text = page.locator("body").inner_text()
+            lines = [line.strip() for line in body_text.split("\n") if line.strip()]
+            if not email:
+                email = _clean_hidden_contact_value(_extract_detail_label_value(lines, "Email"))
+            if not phone:
+                phone = _clean_hidden_contact_value(_extract_detail_label_value(lines, "Số điện thoại"))
+        except Exception:
+            pass
     birthday_value = contact_api.get("birthday")
     birthday = ""
     if birthday_value not in (None, ""):
@@ -799,6 +878,25 @@ def _collect_detail_page_snapshot(
     gender = _map_gender_value(contact_api.get("gender")) or ""
     address = _clean_hidden_contact_value(contact_api.get("address"))
     city_name = _clean_hidden_contact_value(contact_api.get("province_name") or contact_api.get("city_name"))
+
+    cv_file_url = _clean_hidden_contact_value(
+        contact_api.get("cv_file_url")
+        or contact_api.get("file_url")
+        or contact_api.get("fileUrl")
+        or contact_api.get("resume_file_url")
+        or contact_api.get("attached_cv_url")
+    )
+    if not cv_file_url:
+        try:
+            pdf_loc = page.locator("iframe[src*='.pdf'], object[data*='.pdf'], embed[src*='.pdf'], a[href*='.pdf']")
+            if pdf_loc.count() > 0:
+                cv_file_url = (
+                    pdf_loc.first.get_attribute("src")
+                    or pdf_loc.first.get_attribute("data")
+                    or pdf_loc.first.get_attribute("href")
+                )
+        except Exception:
+            pass
 
     return {
         "detail_url": detail_url,
@@ -811,12 +909,7 @@ def _collect_detail_page_snapshot(
         "address": address,
         "province_id": contact_api.get("province_id"),
         "district_id": contact_api.get("district_id"),
-        "cv_file_url": _clean_hidden_contact_value(
-            contact_api.get("cv_file_url")
-            or contact_api.get("file_url")
-            or contact_api.get("fileUrl")
-            or contact_api.get("resume_file_url")
-        ),
+        "cv_file_url": cv_file_url,
         "avatar_url": _clean_hidden_contact_value(
             contact_api.get("avatar")
             or contact_api.get("avatar_url")
@@ -837,6 +930,31 @@ def _enrich_candidate_from_detail(candidate: dict[str, Any], detail_api: dict[st
             enriched["description"] = normalized_detail["description"]
         if normalized_detail.get("skills_summary"):
             enriched["skills_summary"] = normalized_detail["skills_summary"]
+        if detail_api.get("min_expected_salary") is not None:
+            enriched["min_expected_salary"] = detail_api["min_expected_salary"]
+        if detail_api.get("max_expected_salary") is not None:
+            enriched["max_expected_salary"] = detail_api["max_expected_salary"]
+        if detail_api.get("salary_range"):
+            enriched["salary_range"] = detail_api["salary_range"]
+        if detail_api.get("experience") is not None:
+            enriched["experience"] = detail_api["experience"]
+        if detail_api.get("position") or detail_api.get("level"):
+            enriched["position"] = detail_api.get("position") or detail_api.get("level")
+
+        cv_url_from_api = _clean_hidden_contact_value(
+            detail_api.get("cv_file_url")
+            or detail_api.get("file_url")
+            or detail_api.get("fileUrl")
+            or detail_api.get("resume_file_url")
+            or detail_api.get("attached_cv_url")
+            or (detail_api.get("attached_file") if isinstance(detail_api.get("attached_file"), str) else None)
+            or (detail_api.get("attached_file") or {}).get("url")
+            or (detail_api.get("attached_file") or {}).get("path")
+            or (detail_api.get("cv_file") or {}).get("url")
+        )
+        if cv_url_from_api:
+            enriched["cv_file_url"] = cv_url_from_api
+
         source_payload["detail_api"] = detail_api
         source_payload["detail_api_normalized"] = normalized_detail
 
@@ -853,6 +971,8 @@ def _enrich_candidate_from_detail(candidate: dict[str, Any], detail_api: dict[st
             enriched["birthday"] = detail_page["birthday"]
         if detail_page.get("gender"):
             enriched["gender"] = detail_page["gender"]
+        if detail_page.get("marital_status"):
+            enriched["marital_status"] = detail_page["marital_status"]
         if detail_page.get("address"):
             enriched["address"] = detail_page["address"]
         if detail_page.get("cv_file_url"):
@@ -990,7 +1110,17 @@ def _login_vieclam24h(page, username: str, password: str, search_url: str) -> st
     page.locator('input[name="email"]').fill(username)
     page.locator('input[name="password"]').fill(password)
     page.locator('button[type="submit"]').click()
-    page.wait_for_timeout(2500)
+    page.wait_for_timeout(3000)
+
+    try:
+        body_text = page.locator('body').inner_text()
+        if "không tồn tại" in body_text.lower() or "không chính xác" in body_text.lower() or "đăng nhập thất bại" in body_text.lower():
+            raise ValueError("Tài khoản hoặc mật khẩu Vieclam24h không chính xác. Vui lòng kiểm tra lại thông tin đăng nhập NTD.")
+    except ValueError:
+        raise
+    except Exception:
+        pass
+
     try:
         return _capture_login_token(page, search_url)
     except RuntimeError:
@@ -1091,11 +1221,8 @@ def _normalize_candidate_like(value: Any, fallback_source_url: str, catalog: dic
     skills_summary = _pick_text(source, ["skillsSummary", "skills_summary", "skills", "summary"])
     description = _pick_text(source, ["description", "bio", "summary", "about"])
 
-    if not source_ref:
-        source_ref = email or phone or full_name
-
-    if not email and not phone and not title and not skills_summary and not description:
-        return None
+    seeker_id = _pick_text(source, ["seeker_id", "seekerId", "userId", "user_id", "seeker_user_id"]) or source_ref
+    resume_id = _pick_text(source, ["resume_id", "resumeId", "id", "resume_user_id", "seeker_user_id"]) or source_ref
 
     return {
         "full_name": full_name,
@@ -1105,6 +1232,8 @@ def _normalize_candidate_like(value: Any, fallback_source_url: str, catalog: dic
         "career_name": career_name,
         "city_name": city_name,
         "source_ref": source_ref,
+        "seeker_id": seeker_id,
+        "resume_id": resume_id,
         "source_url": fallback_source_url,
         "source_payload": source,
         "skills_summary": skills_summary,
@@ -1223,14 +1352,26 @@ def _collect_candidates_from_search_api(
     occupation_ids: list[int],
     catalog: dict[str, Any],
     *,
-    max_pages: int = 5,
+    max_pages: int = 2,
     per_page: int = 20,
+    province_ids: list[int] | None = None,
+    keyword: str | None = None,
+    on_progress: Any = None,
 ) -> list[dict[str, Any]]:
     candidates: list[dict[str, Any]] = []
     seen: set[str] = set()
 
     for page_number in range(1, max_pages + 1):
-        items = _collect_search_items(page, auth_token, origin, occupation_ids, page_number, per_page)
+        items = _collect_search_items(
+            page,
+            auth_token,
+            origin,
+            occupation_ids,
+            page_number,
+            per_page,
+            province_ids=province_ids,
+            keyword=keyword,
+        )
         if not items:
             break
 
@@ -1246,11 +1387,18 @@ def _collect_candidates_from_search_api(
             seen.add(key)
             candidates.append(normalized)
 
+        if callable(on_progress):
+            try:
+                on_progress(15 + int((page_number / max_pages) * 35))
+            except Exception:
+                pass
+
         if len(items) < per_page:
             break
 
     enriched_candidates: list[dict[str, Any]] = []
-    for candidate in candidates:
+    total = len(candidates)
+    for idx, candidate in enumerate(candidates, 1):
         detail_page: dict[str, Any] = {}
         resume_id = candidate.get("resume_id")
         if resume_id is not None:
@@ -1272,16 +1420,25 @@ def _collect_candidates_from_search_api(
                 detail_page = {}
 
         enriched_candidates.append(_enrich_candidate_from_detail(candidate, {}, detail_page))
+        if callable(on_progress) and total > 0:
+            try:
+                on_progress(50 + int((idx / total) * 45))
+            except Exception:
+                pass
 
     return enriched_candidates
+
 
 def collect_vieclam24h_candidates(
     source_url: str,
     username: str,
     password: str,
     occupation_ids: list[int] | None = None,
-    max_pages: int = 5,
+    province_ids: list[int] | None = None,
+    keyword: str | None = None,
+    max_pages: int = 2,
     per_page: int = 20,
+    on_progress: Any = None,
 ) -> list[dict[str, Any]]:
     if not source_url:
         raise ValueError("SOURCE_URL is required.")
@@ -1304,13 +1461,25 @@ def collect_vieclam24h_candidates(
     selected_occupation_ids = _normalize_selected_occupation_ids(occupation_ids, catalog)
 
     candidates: list[dict[str, Any]] = []
-    seen: set[str] = set()
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-accelerated-2d-canvas",
+                "--disable-gpu",
+            ],
+        )
         page = browser.new_page(viewport={"width": 1440, "height": 1600})
         try:
+            if callable(on_progress):
+                on_progress(10)
             auth_token = _login_vieclam24h(page, username, password, search_url)
+            if callable(on_progress):
+                on_progress(20)
             candidates = _collect_candidates_from_search_api(
                 page,
                 auth_token,
@@ -1320,8 +1489,198 @@ def collect_vieclam24h_candidates(
                 catalog,
                 max_pages=max_pages,
                 per_page=per_page,
+                province_ids=province_ids,
+                keyword=keyword,
+                on_progress=on_progress,
             )
         finally:
             browser.close()
 
     return candidates
+
+
+VIECLAM24H_APPLIED_API_PATH = "/mix/fe/employer/resume-applied-history"
+
+
+def _applied_api_url(origin: str) -> str:
+    return f"{_api_origin(origin)}{VIECLAM24H_APPLIED_API_PATH}"
+
+
+def _normalize_applied_item(item: dict[str, Any], fallback_source_url: str, catalog: dict[str, Any]) -> dict[str, Any] | None:
+    seeker = item.get("seeker_info") or {}
+    resume = item.get("resume_info") or {}
+
+    full_name = (seeker.get("name") or "").strip()
+    if not full_name:
+        return None
+
+    email = (seeker.get("email") or "").strip()
+    phone = (seeker.get("mobile") or "").strip()
+    title = (resume.get("title") or "").strip() or "Ứng viên tự ứng tuyển"
+
+    avatar_raw = seeker.get("avatar") or ""
+    avatar_url = avatar_raw if avatar_raw.startswith("http") else (f"https://cdn1.vieclam24h.vn{avatar_raw}" if avatar_raw else "")
+
+    file_raw = item.get("file") or ""
+    cv_file_url = file_raw if file_raw.startswith("http") else (f"https://cdn1.vieclam24h.vn{file_raw}" if file_raw else "")
+
+    applied_id = item.get("id") or item.get("resume_id")
+    source_ref = f"applied-{applied_id}"
+
+    birthday_str = None
+    b_ts = seeker.get("birthday")
+    if isinstance(b_ts, (int, float)) and -2208988800 < b_ts < 2000000000:
+        try:
+            from datetime import datetime, timezone
+            birthday_str = datetime.fromtimestamp(b_ts, tz=timezone.utc).strftime("%Y-%m-%d")
+        except Exception:
+            pass
+
+    gender_map = {1: "M", 2: "F"}
+    gender = gender_map.get(seeker.get("gender"), "O")
+
+    marital_map = {1: "S", 2: "M"}
+    marital_status = marital_map.get(seeker.get("marital_status"), "S")
+
+    _, province_lookup = _catalog_lookup(catalog)
+    prov_id = seeker.get("province_id")
+    city_name = province_lookup.get(prov_id, {}).get("name", "") if prov_id else ""
+
+    return {
+        "full_name": full_name,
+        "email": email,
+        "phone": phone,
+        "title": title,
+        "avatar_url": avatar_url,
+        "cv_file_url": cv_file_url,
+        "birthday": birthday_str,
+        "gender": gender,
+        "marital_status": marital_status,
+        "city_name": city_name,
+        "source_ref": source_ref,
+        "source_url": fallback_source_url,
+        "source_payload": item,
+        "skills_summary": resume.get("description") or resume.get("objective") or "",
+        "description": item.get("cover_letter") or resume.get("objective") or "",
+        "source_occupation_ids": [o.get("id") for o in resume.get("occupations") or [] if isinstance(o, dict) and o.get("id")],
+        "source_occupation_names": [o.get("name") for o in resume.get("occupations") or [] if isinstance(o, dict) and o.get("name")],
+        "is_applied_cv": True,
+        "vieclam24h_job_id": item.get("job_id"),
+        "vieclam24h_applied_id": item.get("id"),
+    }
+
+
+def _collect_applied_candidates_from_api(
+    page,
+    auth_token: str | None,
+    origin: str,
+    source_url: str,
+    catalog: dict[str, Any],
+    *,
+    job_id: int | str | None = None,
+    max_pages: int = 2,
+    per_page: int = 20,
+    on_progress: Any = None,
+) -> list[dict[str, Any]]:
+    candidates: list[dict[str, Any]] = []
+    seen: set[str] = set()
+
+    for page_number in range(1, max_pages + 1):
+        headers = _build_browser_headers(auth_token, origin)
+        query_parts = [
+            ("status", "1"),
+            ("includes", "employer_note_resume_applied,tags,resume_info"),
+            ("page", str(page_number)),
+            ("per_page", str(per_page)),
+        ]
+        if job_id:
+            query_parts.append(("job_id", str(job_id)))
+
+        from urllib.parse import urlencode
+        url = f"{_applied_api_url(origin)}?{urlencode(query_parts)}"
+        try:
+            res = _evaluate_json(page, url, auth_token, origin)
+        except Exception as exc:
+            logger.warning("Failed to fetch Applied CVs page %s: %s", page_number, exc)
+            break
+        if not res or not isinstance(res, dict):
+            break
+
+        data_obj = res.get("data") or {}
+        items = data_obj.get("items") or []
+        if not isinstance(items, list) or not items:
+            break
+
+        for item in items:
+            normalized = _normalize_applied_item(item, source_url, catalog)
+            if not normalized:
+                continue
+
+            key = normalized["source_ref"]
+            if key in seen:
+                continue
+            seen.add(key)
+            candidates.append(normalized)
+
+        if len(items) < per_page:
+            break
+
+    return candidates
+
+
+def collect_vieclam24h_applied_candidates(
+    source_url: str,
+    username: str,
+    password: str,
+    job_id: int | str | None = None,
+    max_pages: int = 2,
+    per_page: int = 20,
+    on_progress: Any = None,
+) -> list[dict[str, Any]]:
+    if not source_url:
+        raise ValueError("SOURCE_URL is required.")
+    if not username:
+        raise ValueError("SOURCE_USERNAME is required.")
+    if not password:
+        raise ValueError("SOURCE_PASSWORD is required.")
+
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError as exc:
+        raise RuntimeError("Playwright is not installed in the backend environment.") from exc
+
+    origin = _resolve_origin(source_url)
+    search_url = _search_url(origin)
+    catalog = get_vieclam24h_catalog(source_url)
+
+    candidates: list[dict[str, Any]] = []
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+            ],
+        )
+        page = browser.new_page(viewport={"width": 1440, "height": 1600})
+        try:
+            auth_token = _login_vieclam24h(page, username, password, search_url)
+            candidates = _collect_applied_candidates_from_api(
+                page,
+                auth_token,
+                origin,
+                source_url,
+                catalog,
+                job_id=job_id,
+                max_pages=max_pages,
+                per_page=per_page,
+                on_progress=on_progress,
+            )
+        finally:
+            browser.close()
+
+    return candidates
+

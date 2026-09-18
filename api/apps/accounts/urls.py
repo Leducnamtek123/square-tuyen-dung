@@ -3,13 +3,19 @@ from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
 
-from . import views
+from . import views, views_onboarding
 
 router = DefaultRouter()
 
 router.register(r'users', views.UserViewSet, basename='user')
 
 urlpatterns = [
+
+    path('onboarding/status/', views_onboarding.GetOnboardingStatusView.as_view()),
+    path('onboarding/candidate/step/', views_onboarding.CandidateStepSaveView.as_view()),
+    path('onboarding/candidate/', views_onboarding.CandidateOnboardingView.as_view()),
+    path('onboarding/employer/step/', views_onboarding.EmployerStepSaveView.as_view()),
+    path('onboarding/employer/', views_onboarding.EmployerOnboardingView.as_view()),
 
     path('token/', views.CustomTokenView.as_view()),
 
@@ -26,6 +32,7 @@ urlpatterns = [
     path('check-creds/', views.check_creds),
 
     path('send-verify-email/', views.send_verify_email),
+    path('verify-email-otp/', views.verify_email_otp),
 
     path('active-email/<str:encoded_data>/<str:token>/', views.user_active),
 
@@ -36,8 +43,10 @@ urlpatterns = [
     path('change-password/', views.change_password),
 
     path('update-user/', views.update_user_account),
+    path('verify-phone/', views.verify_phone_number),
 
     path('avatar/', views.avatar),
+    path('cover/', views.cover_image),
 
     path('user-info/', views.get_user_info),
     path('user-info-basic/', views.get_user_info_basic),

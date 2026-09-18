@@ -1,5 +1,5 @@
 import React from "react";
-import InterviewSessionPage from "../../interviewPages/InterviewSessionPage";
+import InterviewSessionPage from "@/views/interviewPages/InterviewSessionPage";
 
 const InterviewRoomPage = () => <InterviewSessionPage participantRole="jobseeker" />;
 

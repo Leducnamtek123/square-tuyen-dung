@@ -1,101 +1,45 @@
 'use client';
 
-import * as React from 'react';
+import { usePathname } from 'next/navigation';
 import { Box, Container } from "@mui/material";
 import Header from '../components/commons/Header';
 import Footer from '../components/commons/Footer';
 
+const AUTH_PATHS = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/employer/login',
+  '/employer/register',
+  '/employer/forgot-password',
+  '/employer/reset-password',
+];
+
 const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
+  const pathname = usePathname() || '';
+  const isAuthPage = AUTH_PATHS.some((p) => pathname === p || pathname.endsWith(p));
 
   return (
-
-    <Box>
-
+    <Box sx={{ backgroundColor: isAuthPage ? { xs: '#FFFFFF', sm: 'inherit' } : 'inherit' }}>
       <Header />
 
       <Container
+        component="main"
         maxWidth="xl"
+        disableGutters={isAuthPage}
         sx={{
-          paddingLeft: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
-          paddingRight: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
+          paddingLeft: isAuthPage ? { xs: 0, sm: 4, md: 6, lg: 8, xl: 8 } : { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
+          paddingRight: isAuthPage ? { xs: 0, sm: 4, md: 6, lg: 8, xl: 8 } : { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
+          pb: isAuthPage ? { xs: 3, md: 4 } : { xs: 8, md: 4 },
         }}
-
       >
-
-        <section>
-
-          {children}
-
-        </section>
-
+        {children}
       </Container>
 
-      <Box
-
-        sx={{
-
-          mt: {
-
-            xs: 2,
-
-            sm: 10,
-
-            md: 10,
-
-            lg: 10,
-
-            xl: 10,
-
-          },
-
-          px: {
-
-            xs: 1,
-
-            sm: 5,
-
-            md: 8,
-
-            lg: 10,
-
-            xl: 14,
-
-          },
-
-          py: {
-
-            xs: 2,
-
-            sm: 2,
-
-            md: 2,
-
-            lg: 5,
-
-            xl: 5,
-
-          },
-
-          color: 'text.primary',
-
-          bgcolor: 'background.paper',
-
-          borderTop: '1px solid',
-
-          borderColor: 'divider',
-
-        }}
-
-      >
-
-        <Footer />
-
-      </Box>
-
+      <Footer />
     </Box>
-
   );
-
 };
 
 export default DefaultLayout;

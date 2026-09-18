@@ -18,10 +18,13 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useTranslation } from 'react-i18next';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import companyService from '@/services/companyService';
 import commonService from '@/services/commonService';
 import { IMAGES } from '@/configs/constants';
+import { useConfig } from '@/hooks/useConfig';
+import { tConfig } from '@/utils/tConfig';
 import type { Company } from '@/types/models';
 
 const DEFAULT_CATEGORIES = [
@@ -34,21 +37,23 @@ const DEFAULT_CATEGORIES = [
 ];
 
 const TopCompanyCarousel = () => {
+  const { t } = useTranslation(['public', 'common']);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { allConfig } = useConfig();
 
   const { data: dynamicCareers = [] } = useQuery({
-    queryKey: ['top-careers-carousel'],
+    queryKey: ['top-careers'],
     queryFn: async () => {
       const res = await commonService.getTop10Careers();
       return res || [];
     },
-    staleTime: 5 * 60_000,
+    staleTime: 10 * 60_000,
   });
 
   const categoriesList = dynamicCareers.length > 0
-    ? [{ id: 'all', name: 'Tất cả' }, ...dynamicCareers.map((c) => ({ id: String(c.id), name: c.name }))]
-    : DEFAULT_CATEGORIES;
+    ? [{ id: 'all', name: t('common:all', 'Tất cả') }, ...dynamicCareers.map((c) => ({ id: String(c.id), name: c.name }))]
+    : [{ id: 'all', name: t('common:all', 'Tất cả') }, ...DEFAULT_CATEGORIES.slice(1)];
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['top-companies'],
@@ -72,33 +77,37 @@ const TopCompanyCarousel = () => {
 
   const filteredCompanies = companies.filter((c: any) => {
     if (selectedCategory === 'all') return true;
-    return c.category?.toLowerCase().includes(selectedCategory.toLowerCase());
+    const activeCat = categoriesList.find((cat) => cat.id === selectedCategory);
+    const catName = activeCat?.name?.toLowerCase() || selectedCategory.toLowerCase();
+    const fieldOp = (c.fieldOperation || c.field_operation || c.category || '')?.toLowerCase();
+    const compName = (c.companyName || c.company_name || '')?.toLowerCase();
+    return fieldOp.includes(catName) || compName.includes(catName);
   });
 
-  const displayList = filteredCompanies.length > 0 ? filteredCompanies : companies;
+  const displayList = filteredCompanies;
 
   return (
     <Box id="top-company-carousel" sx={{ width: '100%', mt: 4 }}>
-      {/* ── Section Header Row ───────────────────────────────────────── */}
+      {/* -- Section Header Row ----------------------------------------- */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
         <Stack direction="row" spacing={1} alignItems="center">
           <WorkspacePremiumIcon sx={{ color: '#eab308', fontSize: 26 }} />
           <Typography variant="h5" sx={{ fontWeight: 800, color: '#0f172a', letterSpacing: '-0.01em' }}>
-            Công ty nổi bật
+            {t('public:featuredCompanies', 'Công ty nổi bật')}
           </Typography>
         </Stack>
 
         <Link href="/cong-ty" style={{ textDecoration: 'none' }}>
           <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#e11d48', cursor: 'pointer', '&:hover': { opacity: 0.85 } }}>
-            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>Xem thêm</Typography>
+            <Typography sx={{ fontWeight: 600, fontSize: '0.925rem' }}>{t('common:actions.viewMore', 'Xem thêm')}</Typography>
             <ArrowForwardIcon sx={{ fontSize: 16 }} />
           </Stack>
         </Link>
       </Stack>
 
-      {/* ── Industry Category Pills Bar ─────────────────────────────── */}
+      {/* -- Industry Category Pills Bar ------------------------------- */}
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3, width: '100%', overflow: 'hidden' }}>
-        <IconButton
+        <IconButton aria-label={t('common:actions.scrollLeft', 'Cuộn sang trái')}
           size="small"
           onClick={handleScrollLeft}
           sx={{
@@ -121,6 +130,7 @@ const TopCompanyCarousel = () => {
             overflowX: 'auto',
             scrollBehavior: 'smooth',
             py: 0.5,
+            px: 0.5,
             flex: 1,
             '&::-webkit-scrollbar': { display: 'none' },
             msOverflowStyle: 'none',
@@ -135,19 +145,22 @@ const TopCompanyCarousel = () => {
                 onClick={() => setSelectedCategory(cat.id)}
                 sx={{
                   px: 2.2,
-                  py: 0.75,
-                  borderRadius: '20px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  fontSize: '0.85rem',
+                  py: 0.85,
+                  borderRadius: '24px',
+                  border: '1px solid',
+                  borderColor: isActive ? '#e11d48' : '#e2e8f0',
+                  backgroundColor: isActive ? '#fff1f2' : '#ffffff',
+                  color: isActive ? '#e11d48' : '#475569',
                   fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#ffffff' : '#475569',
-                  backgroundColor: isActive ? '#e11d48' : '#f1f5f9',
-                  transition: 'all 0.2s ease',
+                  fontSize: '0.85rem',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
                   userSelect: 'none',
-                  flexShrink: 0,
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    backgroundColor: isActive ? '#be123c' : '#e2e8f0',
+                    borderColor: '#e11d48',
+                    backgroundColor: isActive ? '#fff1f2' : '#fff5f5',
+                    color: '#e11d48',
                   },
                 }}
               >
@@ -157,7 +170,7 @@ const TopCompanyCarousel = () => {
           })}
         </Box>
 
-        <IconButton
+        <IconButton aria-label={t('common:actions.scrollRight', 'Cuộn sang phải')}
           size="small"
           onClick={handleScrollRight}
           sx={{
@@ -173,24 +186,27 @@ const TopCompanyCarousel = () => {
         </IconButton>
       </Stack>
 
-      {/* ── Companies Grid ────────────────────────────────────────────── */}
+      {/* -- 3-Column / 2-Row Grid Carousel Container ------------------ */}
       {isLoading ? (
         <Grid container spacing={2.5}>
           {Array.from(Array(6).keys()).map((i) => (
             <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Skeleton variant="rounded" height={100} sx={{ borderRadius: '16px' }} />
+              <Skeleton variant="rounded" height={96} sx={{ borderRadius: '16px' }} />
             </Grid>
           ))}
         </Grid>
+      ) : displayList.length === 0 ? (
+        <Box sx={{ p: 4, textAlign: 'center', width: '100%', color: '#64748b' }}>
+          <Typography variant="body2">{t('common:noData', 'Không tìm thấy công ty phù hợp trong danh mục này')}</Typography>
+        </Box>
       ) : (
         <Grid container spacing={2.5}>
-          {displayList.map((company: Company & { jobPostsCount?: number; employeeSizeRange?: string; employeeSize?: any }) => {
+          {displayList.slice(0, 9).map((company: Company) => {
+            const openJobs = Number.isFinite(Number(company.jobPostNumber)) ? Number(company.jobPostNumber) : 0;
             const logo = company.companyImageUrl || company.logoUrl || IMAGES.companyLogoDefault;
-            const openJobs = company.jobPostsCount || Math.floor(Math.random() * 20) + 5;
-            const empSize =
-              typeof company.employeeSize === 'string'
-                ? company.employeeSize
-                : company.employeeSizeRange || 'Trên 300 nhân viên';
+            const employeeSizeLabel = company.employeeSize != null
+              ? tConfig(allConfig?.employeeSizeDict?.[String(company.employeeSize)])
+              : '';
 
             return (
               <Grid key={company.id} size={{ xs: 12, sm: 6, md: 4 }}>
@@ -255,14 +271,14 @@ const TopCompanyCarousel = () => {
                     <Stack direction="row" spacing={0.6} alignItems="center">
                       <WorkOutlineIcon sx={{ fontSize: 15, color: '#e11d48' }} />
                       <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, color: '#e11d48' }}>
-                        {openJobs} vị trí đang tuyển
+                        {t('public:openPositions', '{{count}} vị trí đang tuyển', { count: openJobs })}
                       </Typography>
                     </Stack>
 
                     <Stack direction="row" spacing={0.6} alignItems="center">
                       <PeopleOutlineIcon sx={{ fontSize: 15, color: '#d97706' }} />
                       <Typography sx={{ fontSize: '0.775rem', fontWeight: 500, color: '#b45309' }}>
-                        {empSize}
+                        {employeeSizeLabel || '0'}
                       </Typography>
                     </Stack>
                   </Stack>

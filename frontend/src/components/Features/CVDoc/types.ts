@@ -5,6 +5,7 @@ type ExtraData = {
 };
 
 export type CVDocExperience = {
+  id?: number | string;
   jobName?: string;
   companyName?: string;
   startDate?: string;
@@ -13,6 +14,7 @@ export type CVDocExperience = {
 };
 
 export type CVDocEducation = {
+  id?: number | string;
   degreeName?: string;
   trainingPlaceName?: string;
   major?: string;
@@ -22,16 +24,19 @@ export type CVDocEducation = {
 };
 
 export type CVDocAdvancedSkill = {
+  id?: number | string;
   name?: string;
   level?: number;
 };
 
 export type CVDocLanguageSkill = {
+  id?: number | string;
   language?: string;
   level?: string | number;
 };
 
 export type CVDocCertificate = {
+  id?: number | string;
   name?: string;
   trainingPlace?: string;
   startDate?: string;
@@ -45,13 +50,25 @@ export type ExtendedResume = Resume & {
   academicLevelChooseData?: ExtraData;
   typeOfWorkplaceChooseData?: ExtraData;
   jobTypeChooseData?: ExtraData;
+  locationChooseData?: ExtraData;
   salaryMin?: number;
   salaryMax?: number;
+  salary?: string;
+  expectedSalary?: number | null;
+  careerObjective?: string;
+  isSearchable?: boolean;
+  fileUrl?: string | null;
+  file?: {
+    id?: number;
+    name?: string;
+    url?: string;
+    fileUrl?: string;
+  } | null;
   experienceDetails?: CVDocExperience[];
   educationDetails?: CVDocEducation[];
   advancedSkills?: CVDocAdvancedSkill[];
   languageSkills?: CVDocLanguageSkill[];
-  certificateDetails?: CVDocCertificate[];
+  certificates?: CVDocCertificate[];
 };
 
 export interface CVDocProps {

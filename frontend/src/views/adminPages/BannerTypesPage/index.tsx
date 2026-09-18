@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useMemo, useReducer, useState } from 'react';
 import {
@@ -23,9 +23,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import DataTable from '../../../components/Common/DataTable';
-import { BannerType } from '../../../types/models';
-import { useDataTable, useDebounce } from '../../../hooks';
+import DataTable from '@/components/Common/DataTable';
+import { BannerType } from '@/types/models';
+import { useDataTable, useDebounce } from '@/hooks';
 import { useBannerTypes } from './hooks/useBannerTypes';
 import FilterBar from '@/components/Common/FilterBar';
 import {
@@ -214,7 +214,12 @@ const BannerTypesPage = () => {
   };
 
   const columns = useMemo<ColumnDef<BannerType>[]>(() => [
-    { accessorKey: 'id', header: t('pages.bannerTypes.table.id'), enableSorting: true },
+    {
+      id: 'index',
+      header: t('pages.bannerTypes.table.id'),
+      cell: (info) => info.row.index + 1,
+      size: 60,
+    },
     { accessorKey: 'code', header: t('pages.bannerTypes.table.code'), enableSorting: true },
     { accessorKey: 'name', header: t('pages.bannerTypes.table.name'), enableSorting: true },
     { accessorKey: 'value', header: t('pages.bannerTypes.table.value'), enableSorting: true },
@@ -244,12 +249,12 @@ const BannerTypesPage = () => {
       cell: (info) => (
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
           <Tooltip title={t('common.edit')}>
-            <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
+            <IconButton aria-label="Thao tác" size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={t('common.delete')}>
-            <IconButton size="small" color="error" onClick={() => handleDeleteRequest(info.row.original)}>
+            <IconButton aria-label="Thao tác" size="small" color="error" onClick={() => handleDeleteRequest(info.row.original)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>

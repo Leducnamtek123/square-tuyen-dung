@@ -2,11 +2,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
-import interviewService from '../../../../services/interviewService';
-import { useAppSelector } from '../../../../hooks/useAppStore';
-import tokenService from '../../../../services/tokenService';
+import interviewService from '@/services/interviewService';
+import { useAppSelector } from '@/hooks/useAppStore';
+import tokenService from '@/services/tokenService';
 
-import type { GetSessionsParams } from '../../../../services/interviewService';
+import type { GetSessionsParams } from '@/services/interviewService';
 
 interface InterviewParams extends GetSessionsParams {
     candidate?: number;

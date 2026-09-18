@@ -1,6 +1,6 @@
-import type { JobPostNotification } from '../../../types/models';
-import type { JobPostNotificationPayload } from '../../../services/adminManagementService';
-import { BACKEND_CHOICE_VALUES } from '../../../utils/backendChoiceValues';
+import type { JobPostNotification } from '@/types/models';
+import type { JobPostNotificationPayload } from '@/services/adminManagementService';
+import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 
 export type JobNotificationsDialogMode = 'add' | 'edit';
 

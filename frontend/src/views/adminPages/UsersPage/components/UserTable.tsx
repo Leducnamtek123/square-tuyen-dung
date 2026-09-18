@@ -1,15 +1,15 @@
-﻿'use client';
+'use client';
 
 import React, { useCallback, useMemo } from 'react';
 import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box, IconButton } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
-import { ROLES_NAME } from '../../../../configs/constants';
+import { ROLES_NAME } from '@/configs/constants';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
-import DataTable from '../../../../components/Common/DataTable';
-import { User as UserModel } from '../../../../types/models';
-import { RoleName } from '../../../../types/auth';
+import DataTable from '@/components/Common/DataTable';
+import { User as UserModel } from '@/types/models';
+import { RoleName } from '@/types/auth';
 
 interface UserTableProps {
     users: UserModel[];
@@ -67,9 +67,10 @@ const UserTable = ({
 
     const columns = useMemo<ColumnDef<UserModel>[]>(() => [
         {
-            accessorKey: 'id',
-            header: t('pages.users.table.id') as string,
-            enableSorting: true,
+            id: 'index',
+            header: 'STT',
+            cell: (info) => info.row.index + 1,
+            size: 60,
         },
         {
             accessorKey: 'fullName',
@@ -83,7 +84,7 @@ const UserTable = ({
                             {user.fullName?.charAt(0)}
                         </Avatar>
                         <Box>
-                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.fullName || '—'}</Typography>
+                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.fullName || '-'}</Typography>
                              <Typography variant="caption" color="text.secondary">{user.email}</Typography>
                         </Box>
                     </Box>
@@ -122,11 +123,22 @@ const UserTable = ({
             accessorKey: 'isVerifyEmail',
             header: t('pages.users.table.verification') as string,
             cell: (info) => info.getValue() ? (
-                <Tooltip title={t('pages.users.table.verified')}>
-                    <CheckCircleIcon color="success" sx={{ fontSize: '1.25rem' }} />
-                </Tooltip>
+                <Chip
+                    icon={<CheckCircleIcon sx={{ fontSize: '0.95rem !important' }} />}
+                    label={t('pages.users.table.verified')}
+                    size="small"
+                    color="success"
+                    variant="outlined"
+                    sx={{ fontWeight: 600, fontSize: '0.75rem' }}
+                />
             ) : (
-                <Typography variant="caption" color="error">{t('pages.users.table.unverified')}</Typography>
+                <Chip
+                    label={t('pages.users.table.unverified')}
+                    size="small"
+                    color="error"
+                    variant="outlined"
+                    sx={{ fontWeight: 600, fontSize: '0.75rem' }}
+                />
             ),
         },
         {

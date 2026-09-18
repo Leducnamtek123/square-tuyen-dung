@@ -1,11 +1,11 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import contactMessageService from '../../../../services/contactMessageService';
-import type { AdminListParams } from '../../../../services/adminManagementService';
-import toastMessages from '../../../../utils/toastMessages';
-import { ContactMessage } from '../../../../types/models';
-import { PaginatedResponse } from '../../../../types/api';
+import contactMessageService from '@/services/contactMessageService';
+import type { AdminListParams } from '@/services/adminManagementService';
+import toastMessages from '@/utils/toastMessages';
+import { ContactMessage } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
 import i18next from 'i18next';
 
 type UseContactMessagesResult = {

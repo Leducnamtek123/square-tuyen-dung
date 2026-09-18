@@ -11,8 +11,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import { Theme } from '@mui/material/styles';
-import TimeAgo from '../../../../components/Common/TimeAgo';
-import type { ExperienceDetail } from '../../../../types/models';
+import TimeAgo from '@/components/Common/TimeAgo';
+import type { ExperienceDetail } from '@/types/models';
 
 type Props = {
   value: ExperienceDetail;
@@ -54,6 +54,7 @@ const ExperienceDetailTimelineItem = ({ value, onEdit, onDelete, t }: Props) => 
 
         <Stack direction="row" spacing={1}>
           <IconButton
+            aria-label={t('common:actions.edit')}
             size="small"
             sx={{
               color: 'secondary.main',
@@ -69,6 +70,7 @@ const ExperienceDetailTimelineItem = ({ value, onEdit, onDelete, t }: Props) => 
           </IconButton>
 
           <IconButton
+            aria-label={t('common:actions.delete')}
             size="small"
             sx={{
               color: 'error.main',

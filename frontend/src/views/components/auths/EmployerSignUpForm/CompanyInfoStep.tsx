@@ -1,12 +1,9 @@
 import React from 'react';
-import { Box } from "@mui/material";
+import { Box, Button, FormHelperText, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
-import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
-import { DATE_OPTIONS } from '../../../../configs/constants';
-import type { Control } from 'react-hook-form';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
+import { Controller, useWatch, type Control } from 'react-hook-form';
 import type { TFunction } from 'i18next';
 import type { EmployerSignUpFormData } from './types';
 import type { SelectOption } from '@/types/models';
@@ -17,9 +14,41 @@ interface CompanyInfoStepProps {
   show: boolean;
   allConfig: { employeeSizeOptions?: SelectOption[]; cityOptions?: SelectOption[] } | null;
   districtOptions: SelectOption[];
-  locationOptions: SelectOption[];
-  handleSelectLocation: (e: React.SyntheticEvent, value: string | SelectOption | null) => void;
+  locationOptions?: SelectOption[];
+  handleSelectLocation?: (e: React.SyntheticEvent, value: string | SelectOption | null) => void;
 }
+
+const DEFAULT_EMPLOYEE_SIZES: SelectOption[] = [
+  { id: 1, name: '< 25 nhân sự' },
+  { id: 2, name: '25 - 99 nhân sự' },
+  { id: 3, name: '100 - 499 nhân sự' },
+  { id: 4, name: '500+ nhân sự' },
+];
+
+const inputStyle = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: '12px',
+    backgroundColor: '#FFFFFF',
+    border: '1px solid #E2E8F0',
+    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+    '&:hover': {
+      borderColor: '#94A3B8',
+      backgroundColor: '#FFFFFF',
+    },
+    '&.Mui-focused': {
+      borderColor: '#2563EB',
+      backgroundColor: '#FFFFFF',
+      boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.12)',
+    },
+    '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active': {
+      WebkitBoxShadow: '0 0 0 1000px #FFFFFF inset !important',
+      WebkitTextFillColor: '#0F172A !important',
+      caretColor: '#0F172A',
+      transition: 'background-color 5000s ease-in-out 0s',
+      borderRadius: 'inherit',
+    },
+  },
+};
 
 const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
   control,
@@ -27,12 +56,17 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
   show,
   allConfig,
   districtOptions,
-  locationOptions,
-  handleSelectLocation
 }) => {
+  const cityId = useWatch({ control, name: 'company.location.city' });
+
+  const employeeSizes = (allConfig?.employeeSizeOptions && allConfig.employeeSizeOptions.length > 0)
+    ? allConfig.employeeSizeOptions
+    : DEFAULT_EMPLOYEE_SIZES;
+
   return (
     <Box sx={{ mb: 2, display: show ? 'block' : 'none' }}>
-      <Grid container spacing={2.5}>
+      <Grid container spacing={2}>
+        {/* Tên doanh nghiệp */}
         <Grid size={12}>
           <TextFieldCustom
             name="company.companyName"
@@ -40,118 +74,85 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.companyName')}
             placeholder={t('form.companyNamePlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <TextFieldCustom
-            name="company.companyEmail"
-            control={control}
-            title={t('form.companyEmail')}
-            placeholder={t('form.companyEmailPlaceholder')}
-            showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 6, lg: 6, xl: 6 }}>
-          <TextFieldCustom
-            name="company.companyPhone"
-            control={control}
-            title={t('form.companyPhone')}
-            placeholder={t('form.companyPhonePlaceholder')}
-            showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 6, lg: 6, xl: 6 }}>
+
+        {/* Mã số thuế */}
+        <Grid size={12}>
           <TextFieldCustom
             name="company.taxCode"
             control={control}
             title={t('form.taxCode')}
             placeholder={t('form.taxCodePlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 4, lg: 4, xl: 4 }}>
-          <DatePickerCustom
-            name="company.since"
-            control={control}
-            title={t('form.foundedDate')}
-            maxDate={DATE_OPTIONS.today()}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 8, lg: 8, xl: 8 }}>
-          <TextFieldCustom
-            name="company.fieldOperation"
-            control={control}
-            title={t('form.fieldOperation')}
-            placeholder={t('form.fieldOperationPlaceholder')}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 4, lg: 4, xl: 4 }}>
-          <SingleSelectCustom
-            options={allConfig?.employeeSizeOptions || []}
+
+        {/* Quy mô nhân sự dạng Chip 1 chạm */}
+        <Grid size={12}>
+          <Controller
             name="company.employeeSize"
             control={control}
-            title={t('form.employeeSize')}
-            placeholder={t('form.employeeSizePlaceholder')}
-            showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            render={({ field, fieldState: { error } }) => (
+              <Box>
+                <Typography sx={{ fontSize: '13px', fontWeight: 600, color: '#334155', mb: 1 }}>
+                  {t('form.employeeSize')} <Box component="span" sx={{ color: '#EF4444' }}>*</Box>
+                </Typography>
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
+                    gap: 1.25,
+                  }}
+                >
+                  {employeeSizes.map((opt) => {
+                    const isSelected = Number(field.value) === Number(opt.id);
+                    return (
+                      <Button
+                        key={String(opt.id)}
+                        type="button"
+                        onClick={() => field.onChange(Number(opt.id))}
+                        variant="outlined"
+                        sx={{
+                          py: 1.1,
+                          px: 1,
+                          minHeight: '44px',
+                          borderRadius: '12px',
+                          border: '1.5px solid',
+                          borderColor: isSelected ? '#2563EB' : '#E2E8F0',
+                          backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                          color: isSelected ? '#1D4ED8' : '#475569',
+                          fontWeight: isSelected ? 700 : 500,
+                          fontSize: { xs: '12px', sm: '13px' },
+                          textTransform: 'none',
+                          whiteSpace: 'nowrap',
+                          boxShadow: isSelected ? '0 2px 8px rgba(37, 99, 235, 0.18)' : 'none',
+                          transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                          '&:hover': {
+                            borderColor: isSelected ? '#2563EB' : '#CBD5E1',
+                            backgroundColor: isSelected ? '#DBEAFE' : '#F8FAFC',
+                          },
+                        }}
+                      >
+                        {opt.name}
+                      </Button>
+                    );
+                  })}
+                </Box>
+                {error && (
+                  <FormHelperText error sx={{ mt: 0.75, ml: 0.5, fontSize: '12px' }}>
+                    {error.message}
+                  </FormHelperText>
+                )}
+              </Box>
+            )}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 8, lg: 8, xl: 8 }}>
-          <TextFieldCustom
-            name="company.websiteUrl"
-            control={control}
-            title={t('form.website')}
-            placeholder={t('form.websitePlaceholder')}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 8, lg: 8, xl: 8 }}>
+
+        {/* Tỉnh / Thành phố */}
+        <Grid size={{ xs: 12, sm: 6 }}>
           <SingleSelectCustom
             options={allConfig?.cityOptions || []}
             name="company.location.city"
@@ -159,46 +160,35 @@ const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({
             title={t('form.city')}
             placeholder={t('form.cityPlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 4, lg: 4, xl: 4 }}>
+
+        {/* Quận / Huyện */}
+        <Grid size={{ xs: 12, sm: 6 }}>
           <SingleSelectCustom
             options={districtOptions}
             name="company.location.district"
             control={control}
+            disabled={!cityId}
+            disabledPlaceholder={t('form.selectCityFirst', { defaultValue: 'Vui lòng chọn Tỉnh / Thành phố trước' })}
             title={t('form.district')}
             placeholder={t('form.districtPlaceholder')}
             showRequired={true}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12, xl: 12 }}>
-          <TextFieldAutoCompleteCustom
+
+        {/* Địa chỉ cụ thể */}
+        <Grid size={12}>
+          <TextFieldCustom
             name="company.location.address"
             title={t('form.address')}
             showRequired={true}
             placeholder={t('form.addressPlaceholder')}
             control={control}
-            options={locationOptions}
-            handleSelect={handleSelectLocation}
             helperText={t('form.addressHelper')}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              }
-            }}
+            sx={inputStyle}
           />
         </Grid>
       </Grid>

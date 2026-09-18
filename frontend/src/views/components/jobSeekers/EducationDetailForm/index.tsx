@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -11,13 +11,13 @@ import { Grid2 as Grid } from "@mui/material";
 
 import { useTranslation } from 'react-i18next';
 
-import { DATE_OPTIONS } from '../../../../configs/constants';
+import { DATE_OPTIONS } from '@/configs/constants';
 
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
 
-import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
+import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
 
-import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import DatePickerCustom from '@/components/Common/Controls/DatePickerCustom';
 import type { TFunction } from 'i18next';
 import type { Control as ReactHookFormControl } from 'react-hook-form';
 import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';

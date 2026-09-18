@@ -6,10 +6,10 @@ import { Grid2 as Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 
-import { typedYupResolver } from '../../../../utils/formHelpers';
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import RadioCustom from '../../../../components/Common/Controls/RadioCustom';
+import { typedYupResolver } from '@/utils/formHelpers';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '@/components/Common/Controls/SingleSelectCustom';
+import RadioCustom from '@/components/Common/Controls/RadioCustom';
 import { useConfig } from '@/hooks/useConfig';
 import type { SelectOption } from '@/types/models';
 import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';

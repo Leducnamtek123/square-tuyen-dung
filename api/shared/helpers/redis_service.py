@@ -13,27 +13,15 @@ class RedisService:
     def __init__(self):
 
         try:
-
-            self.redis_service = redis.StrictRedis(
-
+            self.redis_service = redis.Redis(
                 host=settings.SERVICE_REDIS_HOST,
-
                 port=settings.SERVICE_REDIS_PORT,
-
                 db=settings.SERVICE_REDIS_DB,
-
                 password=settings.SERVICE_REDIS_PASSWORD,
-
                 decode_responses=True,
-
                 encoding="utf-8",
-
                 socket_connect_timeout=3,
-
                 socket_timeout=3,
-
-                retry_on_timeout=False
-
             )
 
         except Exception as e:
@@ -119,14 +107,18 @@ class RedisService:
             return self.redis_response(status=False)
 
     def get_json(self, key):
-        if self.redis_service is None: return None
+        if self.redis_service is None:
+            return None
         try:
             data = self.redis_service.get(key)
             return json.loads(data) if data else None
-        except: return None
+        except Exception:
+            return None
 
     def set_json(self, key, value, seconds=300):
-        if self.redis_service is None: return False
+        if self.redis_service is None:
+            return False
         try:
             return self.redis_service.set(key, json.dumps(value), seconds)
-        except: return False
+        except Exception:
+            return False

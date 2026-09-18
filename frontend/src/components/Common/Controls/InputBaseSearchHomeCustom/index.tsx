@@ -9,7 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { Box, ClickAwayListener, List, ListItem, ListItemIcon, ListItemText, Popper, Stack, Typography, CircularProgress, IconButton, InputAdornment } from '@mui/material';
 const PopperAny = Popper as unknown as React.ComponentType<any>;
 import { useDebounce } from '@/hooks';
@@ -24,7 +24,7 @@ import {
   writeVersionedJson,
 } from '@/utils/storageKeys';
 import { localizeRoutePath } from '@/configs/routeLocalization';
-const ControllerAny = Controller as any;
+import TypedController from '../TypedController';
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -80,6 +80,52 @@ import commonService from '@/services/commonService';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
+const DEFAULT_HERO_PLACEHOLDERS = [
+  'Kỹ sư phần mềm, React, Java...',
+  'Trưởng phòng nhân sự, HR...',
+  'UI/UX Designer, Figma...',
+  'Kế toán tổng hợp, Tài chính...',
+  'Giám đốc kinh doanh, Sales B2B...',
+];
+
+function useHeroTypewriter(phrases: string[], enabled: boolean) {
+  const [currentText, setCurrentText] = React.useState(phrases[0] || '');
+  const [phraseIndex, setPhraseIndex] = React.useState(0);
+  const [charIndex, setCharIndex] = React.useState(0);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!enabled || phrases.length === 0) return;
+
+    const currentPhrase = phrases[phraseIndex % phrases.length];
+    const typingSpeed = isDeleting ? 30 : 65;
+
+    const timer = setTimeout(() => {
+      if (!isDeleting) {
+        if (charIndex < currentPhrase.length) {
+          setCurrentText(currentPhrase.substring(0, charIndex + 1));
+          setCharIndex((prev) => prev + 1);
+        } else {
+          // Pause at full text
+          setTimeout(() => setIsDeleting(true), 2000);
+        }
+      } else {
+        if (charIndex > 0) {
+          setCurrentText(currentPhrase.substring(0, charIndex - 1));
+          setCharIndex((prev) => prev - 1);
+        } else {
+          setIsDeleting(false);
+          setPhraseIndex((prev) => (prev + 1) % phrases.length);
+        }
+      }
+    }, typingSpeed);
+
+    return () => clearTimeout(timer);
+  }, [charIndex, isDeleting, phraseIndex, phrases, enabled]);
+
+  return enabled ? currentText : '';
+}
+
 const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
@@ -90,6 +136,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
 }: Props<T>) => {
   const theme = useTheme();
   const isHero = variant === 'hero';
+  const animatedHeroPlaceholder = useHeroTypewriter(DEFAULT_HERO_PLACEHOLDERS, isHero);
   const { t, i18n } = useTranslation('common');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
@@ -109,12 +156,12 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   });
 
   const { data: topCareers = [] } = useQuery({
-    queryKey: ['top-careers-popup'],
+    queryKey: ['top-careers'],
     queryFn: async () => {
       const res = await commonService.getTop10Careers();
       return res || [];
     },
-    staleTime: 5 * 60_000,
+    staleTime: 10 * 60_000,
   });
 
   React.useEffect(() => {
@@ -223,10 +270,10 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           >
             <SearchIcon fontSize="small" />
           </Box>
-          <ControllerAny
+          <TypedController
             name={name as Path<T>}
             control={control}
-            render={({ field }: any) => (
+            render={({ field }) => (
               <InputBase
                 inputRef={inputRef}
                 id={field.name}
@@ -237,7 +284,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                   '& .MuiInputBase-input': {
                     fontWeight: 600,
                     color: 'text.primary',
-                    fontSize: isHero ? 14 : undefined,
+                    fontSize: isHero ? { xs: 16, sm: 14 } : { xs: 16, sm: 14 },
                     py: isHero ? 1.4 : undefined,
                     '&::placeholder': {
                       color: isHero ? 'rgba(15, 23, 42, 0.55)' : 'text.secondary',
@@ -245,7 +292,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                     },
                   },
                 }}
-                placeholder={placeholder}
+                placeholder={isHero && animatedHeroPlaceholder ? animatedHeroPlaceholder : placeholder}
                 slotProps={{ input: { 'aria-label': 'search' } }}
                 value={field.value ?? ''}
                 onFocus={() => dispatchSearch({ type: 'show_result', value: true })}
@@ -264,7 +311,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                       visibility: field.value !== '' && field.value !== null ? 'visible' : 'hidden',
                     }}
                   >
-                    <IconButton
+                    <IconButton aria-label="Thao tác"
                       size="small"
                       onClick={() => {
                         field.onChange('');
@@ -308,7 +355,11 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           open={state.showResult}
           anchorEl={inputSearchRef.current}
           placement="bottom-start"
-          style={{ zIndex: 20, width: inputSearchRef.current?.offsetWidth || 360 }}
+          style={{
+            zIndex: 20,
+            width: inputSearchRef.current?.offsetWidth || 360,
+            maxWidth: 'calc(100vw - 32px)',
+          }}
         >
           <Box
             sx={{
@@ -320,10 +371,12 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               borderRadius: 3,
               maxHeight: '60vh',
               overflowY: 'auto',
+              boxSizing: 'border-box',
+              maxWidth: '100%',
             }}
           >
             <Stack spacing={2}>
-              {/* ── Active Search Results when typing ─────────────────── */}
+              {/* -- Active Search Results when typing ------------------- */}
               {state.searchValue.trim() !== '' ? (
                 <Box>
                   <Typography fontWeight={800} fontSize={14} color="#0f172a" sx={{ mb: 1 }}>
@@ -361,7 +414,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                   )}
                 </Box>
               ) : (
-                /* ── Default Popup when Input is Empty ──────────────────── */
+                /* -- Default Popup when Input is Empty -------------------- */
                 <>
                   {/* 1. Từ khóa phổ biến */}
                   {popularKeywords.length > 0 && (

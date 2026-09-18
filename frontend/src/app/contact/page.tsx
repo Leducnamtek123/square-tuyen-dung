@@ -1,10 +1,11 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import DefaultLayout from '@/layouts/DefaultLayout';
 import StaticInfoPage from '@/views/defaultPages/StaticInfoPage';
 
-export const metadata = {
-  title: 'BÃ¡o lá»—i & liÃªn há»‡',
-  description: 'Gá»­i bÃ¡o lá»—i, gÃ³p Ã½ hoáº·c liÃªn há»‡ vá»›i InfoHR.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('contact');
+}
 
 export default function Page() {
   return (
@@ -13,4 +14,5 @@ export default function Page() {
     </DefaultLayout>
   );
 }
+
 

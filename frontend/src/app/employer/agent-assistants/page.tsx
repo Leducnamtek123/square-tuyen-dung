@@ -1,9 +1,10 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import AgentAssistantPage from '@/views/agentAssistantPage';
 
-export const metadata = {
-  title: 'Agent Assistants',
-  description: 'Internal employer agent assistants.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('employer.agent-assistants');
+}
 
 export default function Page() {
   return <AgentAssistantPage portal="employer" />;

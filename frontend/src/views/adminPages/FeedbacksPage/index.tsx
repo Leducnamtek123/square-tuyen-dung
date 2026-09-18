@@ -2,8 +2,10 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  Avatar,
   Box,
   Button,
+
   Chip,
   Dialog,
   DialogActions,
@@ -29,13 +31,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import ImageIcon from '@mui/icons-material/Image';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
-import DataTable from '../../../components/Common/DataTable';
-import FilterBar, { filterControlSx } from '../../../components/Common/FilterBar';
-import { useDataTable } from '../../../hooks';
-import { Feedback } from '../../../types/models';
+import DataTable from '@/components/Common/DataTable';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
+import { useDataTable } from '@/hooks';
+import { Feedback } from '@/types/models';
 import { useFeedbacks } from './hooks/useFeedbacks';
-import dayjs from '../../../configs/dayjs-config';
-import toastMessages from '../../../utils/toastMessages';
+import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
+import dayjs from '@/configs/dayjs-config';
+import toastMessages from '@/utils/toastMessages';
 
 type EvidenceFilter = 'all' | 'with' | 'without';
 type StatusFilter = 'all' | 'active' | 'hidden';
@@ -90,6 +93,10 @@ const FeedbacksPage = () => {
     setPage,
   } = useDataTable({ initialPageSize: 10, initialSorting: [{ id: 'create_at', desc: true }] });
 
+  useEffect(() => {
+    setPage(0);
+  }, [userFilter, statusFilter, evidenceFilter, ratingFilter, setPage]);
+
   const {
     data,
     isLoading,
@@ -139,7 +146,7 @@ const FeedbacksPage = () => {
     setFormState({
       content: feedback.content || '',
       rating: String(feedback.rating || 5),
-      isActive: !!(feedback.isActive ?? feedback.is_active),
+      isActive: Boolean(feedback.isActive),
       userId: String(feedback.userId ?? feedback.userDict?.id ?? ''),
       evidenceImageFile: null,
       evidenceImageUrl: feedback.evidenceImageUrl || '',
@@ -167,7 +174,7 @@ const FeedbacksPage = () => {
       await updateFeedback({
         id: fb.id,
         data: {
-          isActive: !Boolean(fb.isActive ?? fb.is_active),
+          isActive: !Boolean(fb.isActive),
         },
       });
     } catch (e) {
@@ -256,8 +263,9 @@ const FeedbacksPage = () => {
   const columns = useMemo<ColumnDef<Feedback>[]>(() => [
     {
       accessorKey: 'id',
-      header: t('pages.feedbacks.table.id') as string,
-      enableSorting: true,
+      header: 'STT',
+      cell: (info) => info.row.index + 1,
+      size: 60,
     },
     {
       accessorKey: 'userDict.fullName',
@@ -267,17 +275,15 @@ const FeedbacksPage = () => {
         const user = info.row.original.userDict;
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box
-              component="img"
-              src={user?.avatarUrl || ''}
-              alt=""
-              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                e.currentTarget.style.display = 'none';
-              }}
-              sx={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', border: '1px solid', borderColor: 'divider' }}
-            />
+            <Avatar
+              src={user?.avatarUrl || undefined}
+              alt={user?.fullName || ''}
+              sx={{ width: 34, height: 34, fontSize: '0.875rem', bgcolor: '#3b82f6' }}
+            >
+              {user?.fullName?.charAt(0)?.toUpperCase() || '?'}
+            </Avatar>
             <Box>
-              <Typography variant="body2" fontWeight={600}>{user?.fullName || '—'}</Typography>
+              <Typography variant="body2" fontWeight={600}>{user?.fullName || '-'}</Typography>
               <Typography variant="caption" color="text.secondary">{user?.email || ''}</Typography>
             </Box>
           </Box>
@@ -300,7 +306,7 @@ const FeedbacksPage = () => {
         const feedback = info.row.original;
         const evidenceImageUrl = feedback.evidenceImageUrl;
         if (!evidenceImageUrl) {
-          return <Typography variant="body2" color="text.secondary">—</Typography>;
+          return <Typography variant="body2" color="text.secondary">-</Typography>;
         }
 
         return (
@@ -310,7 +316,7 @@ const FeedbacksPage = () => {
             startIcon={<ImageIcon fontSize="small" />}
             onClick={() => setEvidencePreview({
               url: evidenceImageUrl,
-              title: feedback.userDict?.fullName || `#${feedback.id}`,
+              title: feedback.userDict?.fullName || 'Người dùng',
             })}
             sx={{ textTransform: 'none' }}
           >
@@ -327,7 +333,7 @@ const FeedbacksPage = () => {
     },
     {
       id: 'is_active',
-      accessorFn: (row) => row.isActive ?? row.is_active,
+      accessorFn: (row) => row.isActive,
       header: t('pages.feedbacks.table.status') as string,
       cell: (info) => (
         <Stack direction="row" spacing={0.5} alignItems="center">
@@ -349,10 +355,10 @@ const FeedbacksPage = () => {
     },
     {
       id: 'create_at',
-      accessorFn: (row) => row.createAt || row.create_at,
+      accessorFn: (row) => row.createAt,
       header: t('pages.feedbacks.table.createdAt') as string,
       enableSorting: true,
-      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
+      cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '-',
     },
     {
       id: 'actions',
@@ -361,7 +367,7 @@ const FeedbacksPage = () => {
       cell: (info) => (
         <Stack direction="row" spacing={0.5} justifyContent="flex-end">
           <Tooltip title={t('pages.feedbacks.table.editTooltip')}>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               color="primary"
               onClick={() => openEditDialog(info.row.original)}
@@ -370,7 +376,7 @@ const FeedbacksPage = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title={t('pages.feedbacks.table.deleteTooltip')}>
-            <IconButton
+            <IconButton aria-label="Thao tác"
               size="small"
               color="error"
               onClick={() => {
@@ -403,77 +409,85 @@ const FeedbacksPage = () => {
           {t('pages.feedbacks.addBtn')}
         </Button>
       </Box>
-
-      <FilterBar
-        title={t('pages.feedbacks.filter.title')}
-        description={t('pages.feedbacks.filter.description')}
-        searchValue={searchTerm}
-        searchPlaceholder={t('pages.feedbacks.searchPlaceholder')}
-        onSearchChange={onSearchChange}
-        onReset={resetFilters}
-        resetLabel={t('pages.feedbacks.filter.reset')}
-        activeFilterCount={activeFilterCount}
-        advancedLabel={t('pages.feedbacks.filter.advanced')}
-        advancedFilters={(
-          <Stack spacing={2} sx={{ pt: 0.5 }}>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-              <TextField
-                label={t('pages.feedbacks.filter.user')}
-                value={userFilter}
-                onChange={(event) => setUserFilter(event.target.value)}
-                fullWidth
-                sx={filterControlSx}
-                placeholder={t('pages.feedbacks.filter.userPlaceholder')}
-              />
-              <FormControl fullWidth sx={filterControlSx}>
-                <InputLabel>{t('pages.feedbacks.filter.status')}</InputLabel>
-                <Select
-                  label={t('pages.feedbacks.filter.status')}
-                  value={statusFilter}
-                  onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
-                >
-                  <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
-                  <MenuItem value="active">{t('pages.feedbacks.filter.active')}</MenuItem>
-                  <MenuItem value="hidden">{t('pages.feedbacks.filter.hidden')}</MenuItem>
-                </Select>
-              </FormControl>
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2, sm: 2.5 },
+          mb: 3,
+          borderRadius: 3,
+          border: '1px solid #E2E8F0',
+          bgcolor: '#FFFFFF',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
+        }}
+      >
+        <FilterBar
+          title={t('pages.feedbacks.filter.title')}
+          description={t('pages.feedbacks.filter.description')}
+          searchValue={searchTerm}
+          searchPlaceholder={t('pages.feedbacks.searchPlaceholder')}
+          onSearchChange={onSearchChange}
+          onReset={resetFilters}
+          resetLabel={t('pages.feedbacks.filter.reset')}
+          activeFilterCount={activeFilterCount}
+          advancedLabel={t('pages.feedbacks.filter.advanced')}
+          advancedFilters={(
+            <Stack spacing={2} sx={{ pt: 0.5 }}>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                <TextField
+                  label={t('pages.feedbacks.filter.user')}
+                  value={userFilter}
+                  onChange={(event) => setUserFilter(event.target.value)}
+                  fullWidth
+                  sx={filterControlSx}
+                  placeholder={t('pages.feedbacks.filter.userPlaceholder')}
+                />
+                <FormControl fullWidth sx={filterControlSx}>
+                  <InputLabel>{t('pages.feedbacks.filter.status')}</InputLabel>
+                  <Select
+                    label={t('pages.feedbacks.filter.status')}
+                    value={statusFilter}
+                    onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
+                  >
+                    <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
+                    <MenuItem value="active">{t('pages.feedbacks.filter.active')}</MenuItem>
+                    <MenuItem value="hidden">{t('pages.feedbacks.filter.hidden')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
+              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                <FormControl fullWidth sx={filterControlSx}>
+                  <InputLabel>{t('pages.feedbacks.filter.evidence')}</InputLabel>
+                  <Select
+                    label={t('pages.feedbacks.filter.evidence')}
+                    value={evidenceFilter}
+                    onChange={(event) => setEvidenceFilter(event.target.value as EvidenceFilter)}
+                  >
+                    <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
+                    <MenuItem value="with">{t('pages.feedbacks.filter.withEvidence')}</MenuItem>
+                    <MenuItem value="without">{t('pages.feedbacks.filter.withoutEvidence')}</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth sx={filterControlSx}>
+                  <InputLabel>{t('pages.feedbacks.filter.rating')}</InputLabel>
+                  <Select
+                    label={t('pages.feedbacks.filter.rating')}
+                    value={ratingFilter}
+                    onChange={(event) => setRatingFilter(event.target.value as RatingFilter)}
+                  >
+                    <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
+                    <MenuItem value="5">5 {t('pages.feedbacks.filter.stars')}</MenuItem>
+                    <MenuItem value="4">4 {t('pages.feedbacks.filter.stars')}</MenuItem>
+                    <MenuItem value="3">3 {t('pages.feedbacks.filter.stars')}</MenuItem>
+                    <MenuItem value="2">2 {t('pages.feedbacks.filter.stars')}</MenuItem>
+                    <MenuItem value="1">1 {t('pages.feedbacks.filter.star')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
             </Stack>
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-              <FormControl fullWidth sx={filterControlSx}>
-                <InputLabel>{t('pages.feedbacks.filter.evidence')}</InputLabel>
-                <Select
-                  label={t('pages.feedbacks.filter.evidence')}
-                  value={evidenceFilter}
-                  onChange={(event) => setEvidenceFilter(event.target.value as EvidenceFilter)}
-                >
-                  <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
-                  <MenuItem value="with">{t('pages.feedbacks.filter.withEvidence')}</MenuItem>
-                  <MenuItem value="without">{t('pages.feedbacks.filter.withoutEvidence')}</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl fullWidth sx={filterControlSx}>
-                <InputLabel>{t('pages.feedbacks.filter.rating')}</InputLabel>
-                <Select
-                  label={t('pages.feedbacks.filter.rating')}
-                  value={ratingFilter}
-                  onChange={(event) => setRatingFilter(event.target.value as RatingFilter)}
-                >
-                  <MenuItem value="all">{t('pages.feedbacks.filter.all')}</MenuItem>
-                  <MenuItem value="5">5</MenuItem>
-                  <MenuItem value="4">4</MenuItem>
-                  <MenuItem value="3">3</MenuItem>
-                  <MenuItem value="2">2</MenuItem>
-                  <MenuItem value="1">1</MenuItem>
-                </Select>
-              </FormControl>
-            </Stack>
-          </Stack>
-        )}
-        advancedDefaultOpen
-        sx={{ mb: 3 }}
-      />
+          )}
+          advancedDefaultOpen
+        />
 
-      <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>
         <DataTable
           columns={columns}
           data={feedbacks}
@@ -489,7 +503,25 @@ const FeedbacksPage = () => {
         />
       </Paper>
 
-      <Dialog open={openForm} onClose={closeFormDialog} fullWidth maxWidth="md">
+      {/* Delete Confirmation Dialog */}
+      <AdminConfirmDialog
+        open={openDelete}
+        title={t('pages.feedbacks.deleteTitle')}
+        message={t('pages.feedbacks.deleteConfirm', {
+          name: current?.userDict?.fullName || 'Người dùng',
+        })}
+        variant="danger"
+        loading={isMutating}
+        onConfirm={handleDelete}
+        onClose={() => setOpenDelete(false)}
+      />
+
+      <Dialog
+        open={openForm}
+        onClose={closeFormDialog}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>
           {dialogMode === 'add' ? t('pages.feedbacks.addTitle') : t('pages.feedbacks.editTitle')}
         </DialogTitle>

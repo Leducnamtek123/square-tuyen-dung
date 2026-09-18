@@ -44,7 +44,7 @@ def record_audit_log(
 ) -> None:
     """Best-effort audit logging. Audit failures must never break user flows."""
     try:
-        from common.models import AuditLog
+        from apps.common.models import AuditLog
 
         if actor is None and request is not None:
             request_user = getattr(request, "user", None)

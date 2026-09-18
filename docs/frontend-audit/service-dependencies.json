@@ -1,0 +1,133 @@
+{
+  "services": {
+    "authService": {
+      "path": "src/services/authService.ts",
+      "consumingRoutes": [
+        "/login",
+        "/register",
+        "/forgot-password",
+        "/reset-password/[token]",
+        "/email-verification-required",
+        "/(candidate)/profile",
+        "/(candidate)/account",
+        "/employer/login",
+        "/employer/register",
+        "/employer/forgot-password",
+        "/onboarding/candidate",
+        "/onboarding/employer"
+      ],
+      "endpoints": [
+        "/api/v1/auth/creds-check/",
+        "/api/v1/auth/token/",
+        "/api/v1/auth/convert-token/",
+        "/api/v1/auth/job-seeker/register/",
+        "/api/v1/auth/employer/register/",
+        "/api/v1/auth/onboarding/status/",
+        "/api/v1/auth/onboarding/candidate/step/",
+        "/api/v1/auth/onboarding/candidate/",
+        "/api/v1/auth/onboarding/employer/step/",
+        "/api/v1/auth/onboarding/employer/",
+        "/api/v1/auth/forgot-password/",
+        "/api/v1/auth/reset-password/",
+        "/api/v1/auth/send-verify-email/",
+        "/api/v1/auth/avatar/",
+        "/api/v1/auth/user/",
+        "/api/v1/auth/change-password/"
+      ],
+      "audited": true
+    },
+    "jobService": {
+      "path": "src/services/jobService.ts",
+      "consumingRoutes": [
+        "/jobs",
+        "/jobs/[slug]",
+        "/jobs-by-career",
+        "/jobs-by-city",
+        "/jobs-by-type",
+        "/(candidate)/dashboard"
+      ],
+      "endpoints": [
+        "/api/v1/job-posts/",
+        "/api/v1/info/web/job-posts/{slug}/",
+        "/api/v1/job-posts/salary-insight/"
+      ],
+      "audited": true
+    },
+    "jobSeekerProfileService": {
+      "path": "src/services/jobSeekerProfileService.ts",
+      "consumingRoutes": [
+        "/(candidate)/dashboard",
+        "/(candidate)/profile",
+        "/(candidate)/account",
+        "/online-profile/[slug]"
+      ],
+      "endpoints": [
+        "/api/v1/job-seekers/profile/"
+      ],
+      "audited": true
+    },
+    "jobPostActivityService": {
+      "path": "src/services/jobPostActivityService.ts",
+      "consumingRoutes": [
+        "/(candidate)/dashboard",
+        "/(candidate)/my-jobs"
+      ],
+      "endpoints": [
+        "/api/v1/job-post-activities/",
+        "/api/v1/job-post-saved/"
+      ],
+      "audited": true
+    },
+    "interviewService": {
+      "path": "src/services/interviewService.ts",
+      "consumingRoutes": [
+        "/(candidate)/my-interviews",
+        "/(candidate)/dashboard",
+        "/interview-room/:id"
+      ],
+      "endpoints": [
+        "/api/v1/interviews/my-interviews/",
+        "/api/v1/interviews/sessions/{id}/"
+      ],
+      "audited": true
+    },
+    "contentService": {
+      "path": "src/services/contentService.ts",
+      "consumingRoutes": [
+        "/blog",
+        "/tin-tuc",
+        "/blog/[slug]",
+        "/tin-tuc/[slug]"
+      ],
+      "endpoints": [
+        "/api/v1/articles/",
+        "/api/v1/article-categories/"
+      ],
+      "audited": true
+    },
+    "contactMessageService": {
+      "path": "src/services/contactMessageService.ts",
+      "consumingRoutes": [
+        "/contact",
+        "/lien-he"
+      ],
+      "endpoints": [
+        "/api/v1/contact-messages/"
+      ],
+      "audited": true
+    },
+    "goongService": {
+      "path": "src/services/goongService.ts",
+      "consumingRoutes": [
+        "/employer/register",
+        "/employer/company",
+        "/onboarding/employer"
+      ],
+      "endpoints": [
+        "https://rsapi.goong.io/Place/AutoComplete",
+        "https://rsapi.goong.io/Place/Detail"
+      ],
+      "audited": true
+    }
+  }
+}

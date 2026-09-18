@@ -12,16 +12,16 @@ import {
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { Chip } from "@mui/material";
 
-import QRCodeBox from "../../../../components/Common/QRCodeBox";
-import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
-import { formatLocalizedSalaryRange } from "../../../../utils/customData";
-import { tConfig } from "../../../../utils/tConfig";
-import { ROUTES } from "../../../../configs/constants";
-import { localizeRoutePath } from "../../../../configs/routeLocalization";
-import { formatRoute } from "../../../../utils/funcUtils";
+import QRCodeBox from "@/components/Common/QRCodeBox";
+import MuiImageCustom from "@/components/Common/MuiImageCustom";
+import { formatLocalizedSalaryRange } from "@/utils/customData";
+import { tConfig } from "@/utils/tConfig";
+import { ROUTES } from "@/configs/constants";
+import { localizeRoutePath } from "@/configs/routeLocalization";
+import { formatRoute } from "@/utils/funcUtils";
 import JobDetailActions from "./JobDetailActions";
 import JobDetailInfoItem from "./JobDetailInfoItem";
-import type { JobPost, SystemConfig, User } from '../../../../types/models';
+import type { JobPost, SystemConfig, User } from '@/types/models';
 import type { Company } from '@/types/models';
 
 interface JobDetailHeaderCardProps {
@@ -52,6 +52,10 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
   onOpenReport,
 }) => {
   const { t, i18n } = useTranslation(["public"]);
+  const [currentUrl, setCurrentUrl] = React.useState('');
+  React.useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, []);
   const employeeSizeLabel = tConfig(allConfig?.employeeSizeDict?.[String(jobPostDetail?.companyDict?.employeeSize)]);
   const companyDetailHref = jobPostDetail?.companyDict?.slug
     ? localizeRoutePath(
@@ -94,33 +98,40 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
                   icon={<VerifiedIcon sx={{ fontSize: 16 }} />}
                   label={t("companyDetail.verified")}
                   size="small"
-                  color="success"
                   variant="outlined"
+                  sx={{
+                    color: '#15803d',
+                    borderColor: '#86efac',
+                    backgroundColor: '#f0fdf4',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    '& .MuiChip-icon': { color: '#16a34a' },
+                  }}
                 />
               )}
             </div>
             <p className="text-sm text-muted-foreground">
               {employeeSizeLabel || (
-                <span className="text-xs italic text-zinc-300">
+                <span className="text-xs italic text-slate-500">
                   {t("jobDetail.notUpdated")}
                 </span>
               )}
             </p>
           </div>
           <div className="hidden sm:block">
-            <QRCodeBox value={(typeof window !== 'undefined' ? window.location.href : '') || "-"} size={75} />
+            <QRCodeBox value={currentUrl || "-"} size={75} />
           </div>
         </div>
 
         <div className="h-px w-full bg-border" />
 
         <div>
-          <h2 className="text-2xl font-semibold">
+          <h1 className="text-2xl font-semibold">
             {jobPostDetail?.jobName}
-          </h2>
+          </h1>
 
-          <div className="mt-4 flex flex-wrap gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-3">
+          <div className="mt-4 flex flex-wrap gap-3 sm:gap-6 md:gap-8 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 sm:gap-3">
               <FontAwesomeIcon icon={faCalendarDay} className="text-primary" />
               <span>
                 {t("jobDetail.deadline")}: {dayjs(jobPostDetail?.deadline).format("DD/MM/YYYY")}
@@ -158,11 +169,14 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           <JobDetailInfoItem
             title={t("jobDetail.salary")}
-            value={formatLocalizedSalaryRange(
-              jobPostDetail?.salaryMin,
-              jobPostDetail?.salaryMax,
-              i18n.language
-            )}
+            value={(() => {
+              const salary = formatLocalizedSalaryRange(
+                jobPostDetail?.salaryMin,
+                jobPostDetail?.salaryMax,
+                i18n.language
+              );
+              return salary && salary !== '---' ? `${salary} VNĐ` : (salary || '---');
+            })()}
           />
           <JobDetailInfoItem
             title={t("jobDetail.experience")}

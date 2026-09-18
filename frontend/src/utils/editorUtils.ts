@@ -8,7 +8,9 @@ import {
 // @ts-expect-error No type declaration available for draftjs-to-html
 import draftToHtml from 'draftjs-to-html';
 
-const convertEditorStateToHTMLString = (editorState: EditorState): string => {
+const convertEditorStateToHTMLString = (editorState: EditorState | string | null | undefined): string => {
+  if (!editorState) return '';
+  if (typeof editorState === 'string') return editorState;
   if (!editorState?.getCurrentContent) return '';
   const rawContentState = convertToRaw(editorState.getCurrentContent());
   const markup = draftToHtml(rawContentState);

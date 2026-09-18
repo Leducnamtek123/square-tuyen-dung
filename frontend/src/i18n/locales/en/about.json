@@ -30,5 +30,81 @@
     "desc1": "Smart notification system helps you closely follow the status of your application profile.",
     "desc2": "Receive interview appointments directly from employers and respond right on the platform.",
     "desc3": "Ensure seamless communication between businesses and candidates throughout the selection process."
+  },
+  "subtitle": "Comprehensive AI Recruitment Solution under InfoHR Ecosystem: Intelligent searching & screening, multilingual Video & Voice AI interviews, competency assessment & Collaborative Hiring.",
+  "stats": {
+    "stat1Num": "80%",
+    "stat1Text": "Reduction in pre-screening & profile review time",
+    "stat2Num": "3.5x",
+    "stat2Text": "Increase in successful interview & hiring rate",
+    "stat3Num": "95%",
+    "stat3Text": "AI Match Score skill matching algorithm accuracy",
+    "stat4Num": "24/7",
+    "stat4Text": "Automated interviews without time or geographic constraints"
+  },
+  "workflowHeading": "Breakthrough Recruitment Process with AILA AI",
+  "workflowLead": "Comprehensive digital solution empowering enterprises to automate job posting, screening, interviewing, and onboarding.",
+  "steps": {
+    "step1Title": "1. Smart Search & Screening",
+    "step1Desc": "Automatically analyze CV profiles, compute AI Match Scores, and suggest top potential candidates.",
+    "step2Title": "2. Multilingual Video & Voice AI Interviews",
+    "step2Desc": "AI conducts live interviews with natural voice, analyzing tone, facial cues, and real-time transcripts.",
+    "step3Title": "3. Competency Assessment & Skill Gap Analysis",
+    "step3Desc": "Export comprehensive reports on strengths, weaknesses, and skill gaps against job requirements.",
+    "step4Title": "4. Hiring Decision & Collaborative Team Review",
+    "step4Desc": "Recruitment panels easily collaborate, submit feedback, and synchronize data with InfoHR HRM."
+  },
+  "featuresHeading": "Breakthrough Features Powered by AILA",
+  "aiVoiceTitle": "Voice AI Interview Assistant",
+  "aiVoiceDesc1": "Conduct automated screening interviews with fluid AI voices supporting Vietnamese and English.",
+  "aiVoiceDesc2": "Automated audio recording, speech-to-text transcription, and searchable transcripts for hiring managers.",
+  "aiVoiceDesc3": "Eliminate 90% of manual phone screening time for HR professionals.",
+  "aiMatchTitle": "Match Score Algorithm & Skill Analysis",
+  "aiMatchDesc1": "AI matches candidate profiles against Job Descriptions to calculate precise compatibility percentages.",
+  "aiMatchDesc2": "Identifies skill gaps and suggests targeted interview questions for each specific candidate.",
+  "aiMatchDesc3": "Enables data-driven hiring decisions while eliminating subjective human bias.",
+  "aiPipelineTitle": "Candidate Pipeline CRM",
+  "aiPipelineDesc1": "Visual Kanban pipeline from Pre-screening and Live AI Interview to Job Offer and Onboarding.",
+  "aiPipelineDesc2": "Automated notifications, interview invites, and status updates delivered instantly via email.",
+  "aiPipelineDesc3": "Seamless two-way integration with the InfoHR Human Resource Management ecosystem.",
+  "aboutUsPage": {
+    "tabTitle": "About Us - Recruitment & HRM Ecosystem {{appName}}",
+    "heroBadge": "INFOHR RECRUITMENT & HUMAN RESOURCE ECOSYSTEM",
+    "industries": {
+      "construction": "Construction",
+      "realEstate": "Real Estate",
+      "architecture": "Architecture & Interior Design",
+      "mep": "Engineering & MEP Systems"
+    },
+    "stats": {
+      "candidates": "Connected Talent Profiles",
+      "candidatesDesc": "High-skilled professionals",
+      "companies": "Partner Enterprises",
+      "companiesDesc": "Reputable corporations & firms",
+      "satisfaction": "Recruitment Satisfaction",
+      "satisfactionDesc": "Positive partner feedback",
+      "aiOperating": "AI Interview Operations",
+      "aiOperatingDesc": "24/7 round-the-clock availability"
+    },
+    "coreValues": {
+      "aiTechTitle": "Pioneering AI Technology",
+      "aiTechDesc": "Employing natural Voice AI models and objective competency algorithms, removing time constraints and hiring biases.",
+      "speedCostTitle": "Optimized Speed & Cost",
+      "speedCostDesc": "Reduce candidate pre-screening and review time by up to 80%, optimizing HR budgets for companies of any size.",
+      "fourIndustriesTitle": "Specialized Across 4 Industries",
+      "fourIndustriesDesc": "Deep domain expertise in Construction, Real Estate, Architecture/Interior Design, and MEP Engineering.",
+      "securityTitle": "Enterprise-Grade Security",
+      "securityDesc": "Candidate and corporate HR data is safeguarded with strict modern enterprise-grade security encryption standards."
+    },
+    "steps": {
+      "step1Title": "Post Jobs & Attract Talent",
+      "step1Desc": "Post smart job listings optimized for search engines, reaching thousands of verified specialized candidates.",
+      "step2Title": "AI Screening & Voice Interviews",
+      "step2Desc": "AILA AI analyzes resumes, computes Match Scores, and conducts natural automated voice screening interviews 24/7.",
+      "step3Title": "STAR Competency Assessment",
+      "step3Desc": "Hiring panels receive skill matrices, competency gap analysis, and recorded interview transcripts for confident decision-making.",
+      "step4Title": "Onboarding & HRM Integration",
+      "step4Desc": "Seamlessly sync hired talent into InfoHR HRM: digital employment contracts, org-chart mapping, and unified workforce management."
+    }
   }
 }

@@ -59,25 +59,33 @@ COMPANY_CONTACT_ADDRESS = config(
 )
 COMPANY_WORK_TIME = config("COMPANY_WORK_TIME", default="8:00 - 17:30 (Monday - Friday)")
 
-WEB_JOB_SEEKER_CLIENT_URL = config("WEB_JOB_SEEKER_CLIENT_URL", default="http://localhost:3000/")
-WEB_EMPLOYER_CLIENT_URL = config("WEB_EMPLOYER_CLIENT_URL", default="http://localhost:3000/")
+APP_ENV = config("APP_ENV", default=config("APP_ENVIRONMENT", default="development"))
+APP_ENVIRONMENT = config("APP_ENVIRONMENT", default=APP_ENV)
+IS_PRODUCTION = str(APP_ENVIRONMENT).strip().lower() == "production"
+STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=IS_PRODUCTION, cast=_to_bool)
+
+WEB_JOB_SEEKER_CLIENT_URL = config("WEB_JOB_SEEKER_CLIENT_URL", default="http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/")
+WEB_EMPLOYER_CLIENT_URL = config("WEB_EMPLOYER_CLIENT_URL", default="http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/")
 
 DOMAIN_CLIENT = {
-    "job_seeker": WEB_JOB_SEEKER_CLIENT_URL if WEB_JOB_SEEKER_CLIENT_URL else "http://127.0.0.1:3000/",
-    "employer": WEB_EMPLOYER_CLIENT_URL if WEB_EMPLOYER_CLIENT_URL else "http://localhost:3000/",
+    "job_seeker": WEB_JOB_SEEKER_CLIENT_URL if WEB_JOB_SEEKER_CLIENT_URL else ("http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/"),
+    "employer": WEB_EMPLOYER_CLIENT_URL if WEB_EMPLOYER_CLIENT_URL else ("http://localhost:3000" if not IS_PRODUCTION else "https://infohr.vn/"),
 }
 
 # Local AI (Voice) services
-AI_TTS_BASE_URL = config("AI_TTS_BASE_URL", default=config("TTS_BASE_URL", default="http://localhost:8298/v1"))
-AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default=config("TTS_VOICE", default="Ly"))
-AI_STT_BASE_URL = config("AI_STT_BASE_URL", default=config("STT_BASE_URL", default="http://localhost:11437/v1"))
-AI_STT_MODEL = config("AI_STT_MODEL", default=config("STT_MODEL", default="openai/whisper-large-v3"))
+AI_TTS_BASE_URL = config("AI_TTS_BASE_URL", default=config("TTS_BASE_URL", default="https://api.metaconnect.vn/v1"))
+AI_TTS_API_KEY = config("AI_TTS_API_KEY", default=config("TTS_API_KEY", default=""))
+AI_TTS_MODEL = config("AI_TTS_MODEL", default=config("TTS_MODEL", default="tts-vi"))
+AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default=config("TTS_VOICE", default="Trúc Ly"))
+AI_STT_BASE_URL = config("AI_STT_BASE_URL", default=config("STT_BASE_URL", default="https://api.metaconnect.vn/v1"))
+AI_STT_API_KEY = config("AI_STT_API_KEY", default=config("STT_API_KEY", default=""))
+AI_STT_MODEL = config("AI_STT_MODEL", default=config("STT_MODEL", default="asr-vi"))
 AI_STT_LANGUAGE = config("AI_STT_LANGUAGE", default=config("STT_LANGUAGE", default="vi"))
 AI_LLM_BASE_URL = config(
     "AI_LLM_BASE_URL",
     default=config(
         "LLM_BASE_URL",
-        default=config("OLLAMA_BASE_URL", default="https://token.nodelee.tech/v1"),
+        default=config("OLLAMA_BASE_URL", default=""),
     ),
 )
 AI_LLM_MODEL = config(
@@ -146,10 +154,9 @@ INTERVIEW_AGENT_AUTH_REQUIRED = config(
 )
 INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS = config("INTERVIEW_AGENT_AUTH_MAX_SKEW_SECONDS", default=300, cast=int)
 INTERVIEW_DISCONNECT_GRACE_SECONDS = config("INTERVIEW_DISCONNECT_GRACE_SECONDS", default=300, cast=int)
-APP_ENV = config("APP_ENV", default=config("APP_ENVIRONMENT", default="development"))
-APP_ENVIRONMENT = config("APP_ENVIRONMENT", default=APP_ENV)
-IS_PRODUCTION = str(APP_ENVIRONMENT).strip().lower() == "production"
-STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=False, cast=_to_bool)
+MAX_CONCURRENT_INTERVIEWS_PER_SLOT = config("MAX_CONCURRENT_INTERVIEWS_PER_SLOT", default=30, cast=int)
+SLOT_WINDOW_MINUTES = config("SLOT_WINDOW_MINUTES", default=15, cast=int)
+TTS_CACHE_DIR = config("TTS_CACHE_DIR", default="/tmp/tts_cache")
 API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=_to_bool)
 FRAPPE_HR_BASE_URL = config("FRAPPE_HR_BASE_URL", default="")
 FRAPPE_HR_PUBLIC_URL = config("FRAPPE_HR_PUBLIC_URL", default=FRAPPE_HR_BASE_URL)
@@ -181,7 +188,7 @@ FRAPPE_HR_RECRUITER_READONLY_ROLES = config(
 FRAPPE_HR_SYNC_RECRUITER_ACCOUNTS = config("FRAPPE_HR_SYNC_RECRUITER_ACCOUNTS", default=True, cast=_to_bool)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY", default="django-insecure-square-tuyen-dung-local-only")
+SECRET_KEY = config("SECRET_KEY", default="" if IS_PRODUCTION else "django-insecure-square-tuyen-dung-local-only")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=_to_bool)
@@ -193,6 +200,11 @@ CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost'
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in Debug mode
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default=','.join(CSRF_TRUSTED_ORIGINS), cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 INTERNAL_IPS = ('127.0.0.1')
+
+# Payload Size & Memory Limits (Security & DoS Protection)
+DATA_UPLOAD_MAX_MEMORY_SIZE = config("DATA_UPLOAD_MAX_MEMORY_SIZE", default=10485760, cast=int)  # 10 MB limit on request body
+FILE_UPLOAD_MAX_MEMORY_SIZE = config("FILE_UPLOAD_MAX_MEMORY_SIZE", default=20971520, cast=int)  # 20 MB limit on file uploads
+DATA_UPLOAD_MAX_NUMBER_FIELDS = config("DATA_UPLOAD_MAX_NUMBER_FIELDS", default=1000, cast=int)  # Max 1000 form fields
 
 # Application definition
 INSTALLED_APPS = [
@@ -216,7 +228,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'import_export',
     # internal apps
-    'common',
+    'apps.common',
     'apps.locations',
     'apps.files',
     'apps.accounts',
@@ -226,6 +238,10 @@ INSTALLED_APPS = [
     'apps.chatbot',
     'apps.interviews',
     'apps.agent_assistants',
+    'apps.hrm',
+    'apps.cv_builder',
+    'apps.exchange',
+    'apps.operations',
     'corsheaders',
     'django_celery_results',
     'timezone_field',
@@ -234,6 +250,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'shared.middleware.correlation_middleware.CorrelationIdMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -243,8 +261,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 
 ROOT_URLCONF = 'config.urls'
 
@@ -315,6 +334,7 @@ else:
             "PASSWORD": config("DB_PASSWORD", default=""),
             "HOST": config("DB_HOST", default=""),
             "PORT": config("DB_PORT", default=""),
+            "CONN_MAX_AGE": config("DB_CONN_MAX_AGE", default=60, cast=int),
             "OPTIONS": {
                 "charset": "utf8mb4",
                 "init_command": "SET sql_mode='STRICT_TRANS_TABLES', NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'",
@@ -361,13 +381,14 @@ REST_FRAMEWORK = {
         'drf_social_oauth2.authentication.SocialAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'NUM_PROXIES': 1,
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '300/minute',
-        'user': '600/minute',
+        'anon': '1200/minute',
+        'user': '2400/minute',
     },
 }
 
@@ -485,16 +506,17 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details'
 )
 
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'noreply@tuyendung.studio'
 
 CELERY_BROKER_URL = f"redis://{SERVICE_REDIS_USERNAME}:{SERVICE_REDIS_PASSWORD}@{SERVICE_REDIS_HOST}:{SERVICE_REDIS_PORT}/{SERVICE_REDIS_DB}"
 CELERY_RESULT_BACKEND = f"redis://{SERVICE_REDIS_USERNAME}:{SERVICE_REDIS_PASSWORD}@{SERVICE_REDIS_HOST}:{SERVICE_REDIS_PORT}/{SERVICE_REDIS_DB}"
+CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=not IS_PRODUCTION, cast=bool)
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -506,10 +528,18 @@ CELERY_TASK_REJECT_ON_WORKER_LOST = config('CELERY_TASK_REJECT_ON_WORKER_LOST', 
 CELERY_WORKER_MAX_TASKS_PER_CHILD = config('CELERY_WORKER_MAX_TASKS_PER_CHILD', default=20, cast=int)
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'scheduled_vieclam24h_data_lake_ingestion': {
+        'task': 'apps.profiles.tasks.scheduled_vieclam24h_data_lake_ingestion_task',
+        'schedule': crontab(minute=0, hour='*/6'),
+    },
+}
 
 MINIO_ENDPOINT = config('MINIO_ENDPOINT', default='minio:9000')
-MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default='admin')
-MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default='password')
+MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default='' if IS_PRODUCTION else 'admin')
+MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default='' if IS_PRODUCTION else 'password')
 MINIO_BUCKET = config('MINIO_BUCKET', default='Project-bucket')
 MINIO_SECURE = config('MINIO_SECURE', default=False, cast=bool)
 MINIO_PUBLIC_URL = config('MINIO_PUBLIC_URL', default='http://localhost:9000')
@@ -554,7 +584,7 @@ INTERVIEW_MAX_DURATION_SECONDS = int(os.getenv("INTERVIEW_MAX_DURATION_SECONDS",
 
 REDIS_JOB_TITLE_EXPIRE_SECONDS = 14400
 
-SMS_BASE_URL = "https://qy1kdr.api.infobip.com"
+SMS_BASE_URL = config('SMS_BASE_URL', default='https://api.infobip.com')
 SMS_API_KEY = config('SMS_API_KEY', default='')
 
 FIREBASE_CONFIG = {
@@ -680,3 +710,9 @@ SECURE_HSTS_PRELOAD = config("SECURE_HSTS_PRELOAD", default=IS_PRODUCTION, cast=
 # === Database Connection Persistence ===
 CONN_MAX_AGE = 600  # Keep DB connections alive for 10 minutes
 CONN_HEALTH_CHECKS = True  # Verify connections before reuse (Django 4.1+)
+
+# === NotebookLM MCP Integration ===
+NOTEBOOKLM_MCP_URL = config('NOTEBOOKLM_MCP_URL', default='http://host.docker.internal:8000/mcp')
+DEFAULT_NOTEBOOKLM_NOTEBOOK_ID = config('DEFAULT_NOTEBOOKLM_NOTEBOOK_ID', default='')
+
+

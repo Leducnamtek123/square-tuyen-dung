@@ -1,32 +1,32 @@
 import React from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 
-import jobService from '../../../../services/jobService';
-import companyFollowed from '../../../../services/companyFollowed';
-import companyService from '../../../../services/companyService';
-import resumeViewedService from '../../../../services/resumeViewedService';
-import statisticService from '../../../../services/statisticService';
-import jobSeekerProfileService from '../../../../services/jobSeekerProfileService';
-import jobPostNotificationService from '../../../../services/jobPostNotificationService';
-import authService from '../../../../services/authService';
+import jobService from '@/services/jobService';
+import companyFollowed from '@/services/companyFollowed';
+import companyService from '@/services/companyService';
+import resumeViewedService from '@/services/resumeViewedService';
+import statisticService from '@/services/statisticService';
+import jobSeekerProfileService from '@/services/jobSeekerProfileService';
+import jobPostNotificationService from '@/services/jobPostNotificationService';
+import authService from '@/services/authService';
 import { PaginatedResponse } from '@/types/api';
-import { JobPost, Company, Resume } from '../../../../types/models';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
+import { JobPost, Company, Resume } from '@/types/models';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
 import i18next from 'i18next';
-import type { UserSettingsData } from '../../../../types/auth';
+import type { UserSettingsData } from '@/types/auth';
 
-// ─── Query Helpers ──────────────────────────────────────────
+// --- Query Helpers ------------------------------------------
 import type { UseQueryResult } from '@tanstack/react-query';
-import type { JobSeekerTotalViewStats } from '../../../../services/statisticService';
-import type { GetJobPostsParams } from '../../../../services/jobService';
+import type { JobSeekerTotalViewStats } from '@/services/statisticService';
+import type { GetJobPostsParams } from '@/services/jobService';
 import type { AxiosError } from 'axios';
-import type { JobSeekerActivityStats } from '../../../../services/statisticService';
-import type { JobPostNotification } from '../../../../services/jobPostNotificationService';
-import type { ResumeViewed } from '../../../../services/resumeViewedService';
-import type { CompanyFollowedListParams } from '../../../../services/companyFollowed';
-import type { JobSeekerProfileResumeParams } from '../../../../services/jobSeekerProfileService';
-import type { JobPostNotificationListParams, JobPostNotificationPayload } from '../../../../services/jobPostNotificationService';
+import type { JobSeekerActivityStats } from '@/services/statisticService';
+import type { JobPostNotification } from '@/services/jobPostNotificationService';
+import type { ResumeViewed } from '@/services/resumeViewedService';
+import type { CompanyFollowedListParams } from '@/services/companyFollowed';
+import type { JobSeekerProfileResumeParams } from '@/services/jobSeekerProfileService';
+import type { JobPostNotificationListParams, JobPostNotificationPayload } from '@/services/jobPostNotificationService';
 import { useAppSelector } from '@/redux/hooks';
 import tokenService from '@/services/tokenService';
 
@@ -45,7 +45,7 @@ type UseResumesResult = UseQueryResult<Resume[]>;
 type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>>;
 
 
-// ─── Saved Jobs ─────────────────────────────────────────────
+// --- Saved Jobs ---------------------------------------------
 export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult => {
     const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
     const hasToken = !!tokenService.getAccessTokenFromCookie();
@@ -57,21 +57,27 @@ export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult
         },
         enabled: !!isAuthenticated && !!currentUser?.id && hasToken,
         retry: shouldRetryQuery,
+        staleTime: 60_000,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         placeholderData: keepPreviousData,
     });
 
     const queryClient = useQueryClient();
+    const page = params.page || 1;
+    const pageSize = params.pageSize || 10;
+    const totalCount = query.data?.count;
+
     React.useEffect(() => {
-        if (query.data?.count && (params.page || 1) * (params.pageSize || 10) < query.data.count) {
-            const nextParams = { ...params, page: (params.page || 1) + 1 };
+        if (totalCount && page * pageSize < totalCount) {
+            const nextParams = { ...params, page: page + 1 };
             queryClient.prefetchQuery({
                 queryKey: ['savedJobs', nextParams],
                 queryFn: () => jobService.getJobPostsSaved(nextParams),
+                staleTime: 60_000,
             });
         }
-    }, [query.data, params, queryClient]);
+    }, [totalCount, page, pageSize, queryClient]);
 
     return query;
 };
@@ -87,7 +93,7 @@ export const useToggleSaveJob = () => {
     });
 };
 
-// ─── Companies Followed ─────────────────────────────────────
+// --- Companies Followed -------------------------------------
 export const useCompaniesFollowed = (params: CompanyFollowedListParams = {}): UseCompaniesFollowedResult => {
     return useQuery({
         queryKey: ['companiesFollowed', params],
@@ -95,6 +101,9 @@ export const useCompaniesFollowed = (params: CompanyFollowedListParams = {}): Us
             const response = await companyFollowed.getCompaniesFollowed(params);
             return response;
         },
+        staleTime: 60_000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
         placeholderData: keepPreviousData,
     });
 };
@@ -110,7 +119,7 @@ export const useToggleFollowCompany = () => {
     });
 };
 
-// ─── Companies Viewed (Resume) ──────────────────────────────
+// --- Companies Viewed (Resume) ------------------------------
 export const useResumeViewed = (params: { page?: number; pageSize?: number; ordering?: string } = {}): UseResumeViewedResult => {
     return useQuery({
         queryKey: ['resumeViewed', params],
@@ -118,11 +127,14 @@ export const useResumeViewed = (params: { page?: number; pageSize?: number; orde
             const response = await resumeViewedService.getResumeViewed(params);
             return response;
         },
+        staleTime: 60_000,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
         placeholderData: keepPreviousData,
     });
 };
 
-// ─── Statistics ─────────────────────────────────────────────
+// --- Statistics ---------------------------------------------
 export const useJobSeekerTotalView = (): UseJobSeekerTotalViewResult => {
     return useQuery({
         queryKey: ['jobSeekerTotalView'],
@@ -143,7 +155,7 @@ export const useJobSeekerActivityStatistics = (): UseJobSeekerActivityStatsResul
     });
 };
 
-// ─── Job Application (Resumes) ──────────────────────────────
+// --- Job Application (Resumes) ------------------------------
 export const useResumes = (jobSeekerProfileId: string | undefined, params: JobSeekerProfileResumeParams = {}): UseResumesResult => {
     const { isAuthenticated } = useAppSelector((state) => state.user);
     const hasToken = !!tokenService.getAccessTokenFromCookie();
@@ -160,7 +172,7 @@ export const useResumes = (jobSeekerProfileId: string | undefined, params: JobSe
     });
 };
 
-// ─── Job Post Notifications ─────────────────────────────────
+// --- Job Post Notifications ---------------------------------
 export const useJobPostNotifications = (params: JobPostNotificationListParams = {}): UseJobPostNotificationsResult => {
     return useQuery({
         queryKey: ['jobPostNotifications', params],
@@ -202,7 +214,7 @@ export const useJobPostNotificationMutations = () => {
     return { addMutation, updateMutation, deleteMutation };
 };
 
-// ─── User Settings ──────────────────────────────────────────
+// --- User Settings ------------------------------------------
 export const useUserSettings = (enabled: boolean = true) => {
     return useQuery({
         queryKey: ['userSettings'],

@@ -6,8 +6,7 @@ describe('admin public detail links', () => {
     const source = readFileSync(join(__dirname, '../JobsPage/index.tsx'), 'utf8');
 
     expect(source).not.toContain('href={`/jobs/${job.slug}`}');
-    expect(source).toContain('localizeRoutePath');
-    expect(source).toContain('formatRoute');
+    expect(source).toContain('localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL');
     expect(source).toContain('ROUTES.JOB_SEEKER.JOB_DETAIL');
     expect(source).toContain('i18n.language');
   });

@@ -11,23 +11,23 @@ type Props = {
 };
 
 const CVDocExperienceSection = ({ title, items, styles }: Props) => {
-  if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) return <View style={{ height: 0 }} />;
 
   return (
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {items.map((exp) => (
-        <View key={`${exp?.companyName || 'company'}-${exp?.jobName || 'job'}-${exp?.startDate || 'start'}-${exp?.endDate || 'end'}`} style={styles.experienceItem}>
+        <View key={String(exp?.id)} style={styles.experienceItem}>
           <View style={styles.experienceHeader}>
             <View>
-              <Text style={styles.experienceTitle}>{exp?.jobName}</Text>
-              <Text style={styles.experienceCompany}>{exp?.companyName}</Text>
+              <Text style={styles.experienceTitle}>{exp?.jobName || ''}</Text>
+              <Text style={styles.experienceCompany}>{exp?.companyName || ''}</Text>
             </View>
             <Text style={styles.experienceDate}>
               {formatDate(exp?.startDate)} - {formatDate(exp?.endDate) || i18next.t('common:cvDoc.labels.present')}
             </Text>
           </View>
-          <Text style={styles.experienceDesc}>{exp?.description}</Text>
+          {exp?.description ? <Text style={styles.experienceDesc}>{exp.description}</Text> : <View style={{ height: 0 }} />}
         </View>
       ))}
     </View>

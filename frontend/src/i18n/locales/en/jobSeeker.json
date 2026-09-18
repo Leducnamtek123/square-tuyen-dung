@@ -1,6 +1,9 @@
 {
   "myInterviewsTitle": "My interviews",
   "noInterviewsTitle": "You have no interviews scheduled",
+  "common": {
+    "add": "Add"
+  },
   "nav": {
     "dashboard": "My Dashboard",
     "profile": "My Profile",
@@ -125,7 +128,8 @@
       "major": "Enter major",
       "trainingPlace": "Enter training institution",
       "gradeOrRank": "Enter grade or rank",
-      "certificateName": "Enter certificate name"
+      "certificateName": "Enter certificate name",
+      "selectCityFirst": "Select City First"
     },
     "validation": {
       "fullNameRequired": "Full name is required.",
@@ -296,7 +300,45 @@
     "settings": "Settings",
     "title": "Account Settings",
     "changePassword": "Change Password",
-    "deactivate": "Deactivate Account"
+    "deactivate": "Deactivate Account",
+    "security": "Account Security",
+    "email": "Email",
+    "phone": "Phone Number",
+    "password": "Password",
+    "notifications": "Notifications",
+    "emailNotify": "Receive notifications via email",
+    "smsNotify": "Receive notifications via SMS",
+    "jobAlertNotify": "Job alert notifications",
+    "other": "Other",
+    "language": "Language",
+    "logout": "Log out of account",
+    "updateEmailTitle": "Update Account Email",
+    "newEmail": "New Email Address",
+    "updatePhoneTitle": "Update Phone Number",
+    "newPhone": "New Phone Number",
+    "changePasswordTitle": "Change Account Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "selectLanguageTitle": "Select Interface Language",
+    "logoutTitle": "Log Out Account",
+    "logoutConfirm": "Are you sure you want to log out of your InfoHR account?",
+    "logoutBtn": "Log Out",
+    "verified": "Verified",
+    "notUpdated": "Not updated",
+    "vietnameseLang": "Tiếng Việt (Việt Nam)",
+    "englishLang": "English (United States)",
+    "saveChanges": "Save changes",
+    "applyLang": "Apply",
+    "cancel": "Cancel",
+    "passwordMinLength": "New password must be at least 6 characters long!",
+    "passwordMismatch": "New password confirmation does not match!",
+    "emailInvalid": "Please enter a valid email address!",
+    "phoneInvalid": "Please enter a valid phone number!",
+    "updateEmailSuccess": "Account email updated successfully!",
+    "updatePhoneSuccess": "Phone number updated successfully!",
+    "changePasswordSuccess": "Account password changed successfully!",
+    "logoutSuccess": "Logged out successfully."
   },
   "settings": {
     "toast": {
@@ -369,7 +411,41 @@
   "myInterviews": {
     "defaultRoomName": "Interview room",
     "aiInterview": "AI Interview",
-    "liveInterview": "Live Interview"
+    "liveInterview": "Live Interview",
+    "emptyTitle": "You have no interviews scheduled",
+    "emptySubtitle": "Your interviews will appear here once an employer invites you or when you practice with AI.",
+    "findJobs": "Find jobs now",
+    "jobNameFallback": "Job title",
+    "companyNameFallback": "Company",
+    "join": "Join",
+    "pageSubtitle": "Track recruitment interviews with employers and review your AI practice session history.",
+    "practiceNow": "Practice AI Interview Now",
+    "searchPlaceholder": "Search by position, company or keyword...",
+    "mockBadge": "AI Mock Practice Session",
+    "officialBadge": "Official Interview with Employer",
+    "officialCardHint": "Official live interview scheduled with employer hiring team.",
+    "mockCardHint": "Free practice session with AI Assistant - Private results, not shared with employers.",
+    "enterOfficialRoom": "Join Employer Interview",
+    "enterMockRoom": "Enter AI Practice Room",
+    "joinOfficial": "Join Employer Interview",
+    "joinMock": "Start AI Practice",
+    "aiInterviewer": "AI Assistant Ly",
+    "questionsCount": "{{count}} questions",
+    "durationMinutes": "{{minutes}} mins",
+    "scheduledTime": "Time: {{time}}",
+    "aiScore": "AI Score: {{score}}/100",
+    "viewResults": "View Results & Report",
+    "enterRoom": "Enter Interview Room",
+    "practiceAgain": "Practice Again",
+    "preflightCheck": "Device Preflight Check",
+    "calendarIcs": "Add to Calendar",
+    "tabs": {
+      "all": "All",
+      "official": "Employer Interviews",
+      "mock": "AI Practice",
+      "scheduled": "Upcoming",
+      "completed": "Completed"
+    }
   },
   "jobApplication": {
     "title": "Application Resumes",
@@ -484,5 +560,215 @@
   "form": {
     "phoneNumber": "Phone number",
     "otpCode": "OTP code"
+  },
+  "onboarding": {
+    "pageTitle": "Candidate Profile Setup | InfoHR",
+    "steps": {
+      "careerGoals": "Career Goals",
+      "skillsExperience": "Skills & Experience",
+      "resumeUpload": "Upload CV / Resume",
+      "complete": "Complete"
+    },
+    "consentNotice": {
+      "text": "By clicking complete, I agree to share my personal information with employers in accordance with InfoHR's",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "and": "and",
+      "dataPolicy": "Personal Data Policy",
+      "ofInfoHR": "."
+    },
+    "stepCounter": "Step {{current}} of {{total}}",
+    "step1": {
+      "title": "Career Goals & Preferences",
+      "subtitle": "Takes just 1 minute to set your goals and discover the best matching jobs",
+      "desiredJobTitle": "What job title are you looking for?",
+      "desiredJobTitlePlaceholder": "e.g. Marketing Specialist, Software Engineer, HR Manager...",
+      "desiredJobTitleHelper": "Enter the job title you wish to apply for",
+      "career": "Primary Industry",
+      "careerPlaceholder": "Select industry...",
+      "careerHelper": "Your primary professional field",
+      "city": "Where do you want to work?",
+      "cityPlaceholder": "Select City / Province...",
+      "cityHelper": "Your preferred working location",
+      "workplaceType": "Preferred Workplace Type",
+      "workplaceOnsite": "Office-based (Onsite)",
+      "workplaceHybrid": "Hybrid",
+      "workplaceRemote": "Remote",
+      "mapTitle": "Pin preferred work location on map",
+      "mapSubtitle": "Optional: Helps the system prioritize job recommendations closest to you",
+      "showMap": "+ Open location map",
+      "hideMap": "Hide map",
+      "mapPickerLabel": "Pin preferred work location on map"
+    },
+    "step2": {
+      "title": "Skills & Work Experience",
+      "subtitle": "Your skills and salary expectations help our AI find the most relevant opportunities",
+      "skillsLabel": "Core Skills & Strengths",
+      "skillsPlaceholder": "Type skill and press Enter (e.g. Project Management, AutoCAD, Site Supervision...)",
+      "skillsAddMorePlaceholder": "Type more skills and press Enter...",
+      "skillsHelper": "Type your professional skills (press Enter or comma to add)",
+      "experienceLabel": "Years of experience",
+      "salaryLabel": "Expected Salary (VND / month)",
+      "salaryRange": "Quick ranges",
+      "salaryBelow10": "Under 10M",
+      "salary10To15": "10 - 15M",
+      "salary15To25": "15 - 25M",
+      "salaryAbove25": "Over 25M",
+      "salaryNegotiable": "Negotiable",
+      "salaryCustom": "Enter specific salary range",
+      "salaryMin": "Minimum salary",
+      "salaryMax": "Maximum salary",
+      "salaryMinPlaceholder": "e.g. 10,000,000",
+      "salaryMaxPlaceholder": "e.g. 20,000,000",
+      "academicLevelLabel": "Highest Education Level"
+    },
+    "step3": {
+      "title": "Upload CV or Quick Setup",
+      "subtitle": "A CV helps recruiters quickly evaluate your profile and qualifications",
+      "dropzoneTitle": "Drag and drop your CV file here or click to browse",
+      "dropzoneSubtitle": "Supports PDF, DOC, DOCX (Max 10MB)",
+      "selectFile": "Choose file from computer",
+      "uploadedCv": "Attached CV",
+      "replaceCv": "Change file",
+      "removeCv": "Remove CV",
+      "uploading": "Uploading file...",
+      "optionalNotice": "* You can click 'Complete basic profile' to continue and upload your CV later."
+    },
+    "step4": {
+      "title": "Your Profile is Ready!",
+      "subtitle": "The system has analyzed your preferences and found the best matching jobs for you.",
+      "completenessScore": "Profile Completeness",
+      "summaryTitle": "Saved Career Preferences",
+      "position": "Position",
+      "career": "Industry",
+      "location": "Location",
+      "salary": "Salary",
+      "skills": "Key Skills",
+      "cvStatus": "CV Status",
+      "cvAttached": "Attached",
+      "cvNotAttached": "Not attached",
+      "recommendedJobsTitle": "Recommended Jobs for You",
+      "viewJob": "View Details",
+      "exploreJobs": "Explore Matching Jobs Now",
+      "viewDashboard": "View My Profile",
+      "profileScore": "Your profile score"
+    },
+    "actions": {
+      "back": "Back",
+      "next": "Continue",
+      "complete": "Complete basic profile",
+      "saving": "Saving...",
+      "submitting": "Finalizing...",
+      "skip": "Skip this step"
+    },
+    "validation": {
+      "desiredJobTitleRequired": "Please enter your desired job title.",
+      "careerRequired": "Please select a primary industry.",
+      "cityRequired": "Please select a preferred working location.",
+      "skillsMin": "Please enter or select at least 1 skill.",
+      "salaryRangeInvalid": "Minimum salary cannot exceed maximum salary.",
+      "fileSizeExceeded": "CV file size cannot exceed 10MB.",
+      "fileFormatInvalid": "Only PDF, DOC, and DOCX files are allowed.",
+      "saveFailed": "Failed to save information. Please try again.",
+      "uploadFailed": "Failed to upload CV file. Please try again."
+    }
+  },
+  "candidateDashboard": {
+    "kpi": {
+      "appliedTitle": "Applied Jobs",
+      "appliedSubtext": "Applications awaiting response",
+      "savedTitle": "Saved Jobs",
+      "savedSubtext": "Your bookmarked jobs",
+      "viewedTitle": "Employer CV Views",
+      "viewedSubtext": "In the last 30 days",
+      "followingTitle": "Followed Companies",
+      "followingSubtext": "Interested in you"
+    },
+    "cvHealth": {
+      "title": "Profile Health & Views",
+      "subtitle": "Measure employer interest in your CV",
+      "description": "Every profile view from employers is a great opportunity to connect and interview directly.",
+      "optimizeButton": "Optimize Profile Now"
+    },
+    "activity": {
+      "title": "Your Activity",
+      "timeframes": {
+        "7_days": "Last 7 days",
+        "30_days": "Last 30 days",
+        "90_days": "Last 90 days"
+      },
+      "emptyTitle": "No statistics yet",
+      "emptySubtitle": "Activity data will appear here once you interact.",
+      "applied": "Applied Resumes",
+      "saved": "Saved Jobs",
+      "viewed": "Employer CV Views",
+      "following": "Followed Companies"
+    },
+    "aiRecommended": {
+      "title": "AI Recommended Jobs",
+      "subtitle": "AI analyzes your profile and aspirations to suggest the best matching opportunities",
+      "viewAll": "View all"
+    }
+  },
+  "candidateProfile": {
+    "hero": {
+      "changeCover": "Change Cover",
+      "changeCoverTooltip": "Click to select and upload a new cover image",
+      "changeAvatarTooltip": "Click to update your avatar",
+      "candidateFallback": "Candidate",
+      "verified": "Verified",
+      "noTitle": "Title not updated",
+      "noLocation": "Location not updated",
+      "edit": "Edit",
+      "viewCv": "View CV",
+      "downloadCv": "Download CV PDF",
+      "seekingSwitchLabel": "Turn on open to job opportunities status",
+      "seekingActive": "Open to opportunities",
+      "seekingInactive": "Currently not looking",
+      "lastUpdated": "Profile last updated: {{date}}"
+    },
+    "skills": {
+      "title": "Professional Skills",
+      "skillsCount": "{{count}} skills",
+      "empty": "No professional skills added yet.",
+      "addSkill": "Add skill",
+      "manageModalTitle": "Manage Professional Skills",
+      "modalSubtitle": "Add your core skills and practical expertise to make your profile stand out to recruiters.",
+      "skillInputPlaceholder": "Enter skill name (e.g. AutoCAD, Revit, Quantity Surveying, Real Estate Brokerage...)",
+      "add": "Add",
+      "done": "Done",
+      "selectedSkills": "Selected Skills",
+      "clearAll": "Clear all",
+      "suggestedTitle": "Popular Skills Recommendations",
+      "categoryAll": "All",
+      "categoryConstruction": "Construction",
+      "categoryRealEstate": "Real Estate",
+      "categoryArchitecture": "Architecture",
+      "categoryInterior": "Interior Design",
+      "categorySoft": "Soft Skills",
+      "categoryTech": "Tech & Engineering",
+      "categoryDesign": "Design",
+      "categoryBusiness": "Business",
+      "saveChanges": "Save changes",
+      "cancel": "Cancel",
+      "maxSkillsReached": "Maximum 20 skills reached",
+      "duplicateSkill": "This skill has already been added"
+    }
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "profile": "My Profile",
+    "cvDesign": "CV Decorator",
+    "jobs": "Jobs",
+    "companies": "My Companies",
+    "interviews": "My Interviews",
+    "notifications": "Notifications",
+    "account": "Account & Settings"
+  },
+  "cv": {
+    "pickColorTitle": "Choose a color scheme for your CV",
+    "suggestedColors": "Suggested colors",
+    "customColor": "Custom color:",
+    "selectedColorPreview": "Selected color preview"
   }
 }

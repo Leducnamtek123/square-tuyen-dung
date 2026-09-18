@@ -1,9 +1,18 @@
-import { transformInterviewSession } from '../transformers';
+import { transformInterviewSession, parseEntityId } from '../transformers';
 
-describe('transformInterviewSession', () => {
-  it('maps snake_case interview session payloads to frontend fields', () => {
+describe('transformers ID parsing and session mapping', () => {
+  it('parseEntityId handles numbers, valid string numbers, and fallbacks', () => {
+    expect(parseEntityId(42)).toBe(42);
+    expect(parseEntityId('42')).toBe(42);
+    expect(parseEntityId('  120  ')).toBe(120);
+    expect(parseEntityId(null)).toBe(0);
+    expect(parseEntityId(undefined)).toBe(0);
+    expect(parseEntityId('not-a-number')).toBe(0);
+  });
+
+  it('maps snake_case interview session payloads to frontend fields with string id correctly parsed', () => {
     const session = transformInterviewSession({
-      id: 18,
+      id: '18',
       room_name: 'room-18',
       invite_token: 'invite-18',
       candidate_name: 'Nguyen Van A',
@@ -28,3 +37,4 @@ describe('transformInterviewSession', () => {
     expect(session?.recordingUrl).toBe('https://example.com/recording.mp4');
   });
 });
+

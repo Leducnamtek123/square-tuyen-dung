@@ -1,5 +1,5 @@
 import statisticService from '../statisticService';
-import httpRequest from '../../utils/httpRequest';
+import httpRequest from '@/utils/httpRequest';
 
 jest.mock('../../utils/httpRequest', () => ({
   get: jest.fn(),

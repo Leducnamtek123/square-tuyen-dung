@@ -1,5 +1,5 @@
 /**
- * Image assets — extracted from constants.ts to avoid polluting every import
+ * Image assets - extracted from constants.ts to avoid polluting every import
  * with 50+ static asset dependencies.
  *
  * Import only what you need:
@@ -88,13 +88,24 @@ export const ABOUT_IMAGES = {
   AI_SKILLS: imgSrc(aiSkillsImg),
 } as const;
 
+export const SOCIAL_ICONS = {
+  FACEBOOK: '/images/social/facebook.svg',
+  TIKTOK: '/images/social/tiktok.svg',
+  ZALO: '/images/social/zalo.svg',
+  INSTAGRAM: '/images/social/instagram.svg',
+  YOUTUBE: '/images/social/youtube.svg',
+  LINKEDIN: '/images/social/linkedin.svg',
+} as const;
+
 export const ICONS = {
-  INSTAGRAM: imgSrc(instagramIcon),
-  FACEBOOK: imgSrc(facebookIcon),
+  INSTAGRAM: '/images/social/instagram.svg',
+  FACEBOOK: '/images/social/facebook.svg',
+  TIKTOK: '/images/social/tiktok.svg',
+  ZALO: '/images/social/zalo.svg',
   FACEBOOK_MESSENGER: imgSrc(facebookMessengerIcon),
-  LINKEDIN: imgSrc(linkedinIcon),
+  LINKEDIN: '/images/social/linkedin.svg',
   TWITTER: imgSrc(twitterIcon),
-  YOUTUBE: imgSrc(youtubeIcon),
+  YOUTUBE: '/images/social/youtube.svg',
   WEBSITE: imgSrc(websiteIcon),
   LOCATION_MARKER: imgSrc(locationMarker),
   JOB_SEEKER_CHATBOT_ICON: imgSrc(jobSeekerChatbotIcon),

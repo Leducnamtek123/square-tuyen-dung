@@ -3,7 +3,7 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 
-import { typedYupResolver } from '../../../../utils/formHelpers';
+import { typedYupResolver } from '@/utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -12,9 +12,9 @@ import type { TFunction } from 'i18next';
 
 import { Grid2 as Grid } from "@mui/material";
 
-import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
+import TextFieldCustom from '@/components/Common/Controls/TextFieldCustom';
 
-import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
+import RatingCustom from '@/components/Common/Controls/RatingCustom';
 import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 import { BACKEND_CHOICE_VALUES } from '@/utils/backendChoiceValues';
 

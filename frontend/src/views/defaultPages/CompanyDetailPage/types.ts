@@ -1,4 +1,4 @@
-import type { Company } from "../../../types/models";
+import type { Company } from "@/types/models";
 
 type CompanyDetailLocation = {
   address?: string;

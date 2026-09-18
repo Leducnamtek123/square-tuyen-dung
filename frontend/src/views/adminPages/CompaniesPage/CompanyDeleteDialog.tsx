@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
 import { Trans } from 'react-i18next';
-import type { Company } from '../../../types/models';
+import type { Company } from '@/types/models';
 import type { TFunction } from 'i18next';
 
 type Props = {

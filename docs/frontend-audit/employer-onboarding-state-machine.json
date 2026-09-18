@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "name": "EmployerOnboardingStateMachine",
+  "version": "1.0.0",
+  "sourceOfTruth": "Django Backend Database (accounts_user.is_onboarded, accounts_user.onboarding_step, profiles_company, profiles_companymember, profiles_companyverification)",
+  "states": {
+    "NOT_REGISTERED": {
+      "description": "User has not registered an account",
+      "route": "/employer/register",
+      "transitions": {
+        "REGISTER_SUBMIT": "UNVERIFIED_EMAIL"
+      }
+    },
+    "UNVERIFIED_EMAIL": {
+      "description": "Account created in database (is_active=False, is_verify_email=False)",
+      "route": "/email-verification-required",
+      "transitions": {
+        "EMAIL_ACTIVATION_LINK_CLICKED": "AUTHENTICATED_NOT_ONBOARDED"
+      }
+    },
+    "AUTHENTICATED_NOT_ONBOARDED": {
+      "description": "User is active, authenticated, but is_onboarded=False",
+      "route": "/onboarding/employer",
+      "transitions": {
+        "STEP_1_SAVE": "DRAFT_STEP_1_SAVED",
+        "INVITATION_ACCEPT": "ONBOARDED_ACTIVE"
+      }
+    },
+    "DRAFT_STEP_1_SAVED": {
+      "description": "Company profile details saved via PATCH /api/v1/auth/onboarding/employer/step/ (onboarding_step=1)",
+      "route": "/onboarding/employer (step 1: recruiter info)",
+      "transitions": {
+        "STEP_2_SAVE": "DRAFT_STEP_2_SAVED",
+        "BACK_NAVIGATE": "AUTHENTICATED_NOT_ONBOARDED"
+      }
+    },
+    "DRAFT_STEP_2_SAVED": {
+      "description": "Recruiter profile details saved (onboarding_step=2)",
+      "route": "/onboarding/employer (step 2: GPKD verification)",
+      "transitions": {
+        "SUBMIT_WITH_GPKD": "ONBOARDED_KYC_PENDING",
+        "SKIP_GPKD": "ONBOARDED_ACTIVE",
+        "BACK_NAVIGATE": "DRAFT_STEP_1_SAVED"
+      }
+    },
+    "ONBOARDED_KYC_PENDING": {
+      "description": "Onboarding completed with GPKD upload. User is_onboarded=True, CompanyVerification.status=PENDING",
+      "route": "/employer/dashboard",
+      "permissions": ["POST_JOB", "VIEW_CANDIDATES", "MANAGE_COMPANY", "KYC_BADGE_PENDING"]
+    },
+    "ONBOARDED_ACTIVE": {
+      "description": "Onboarding completed without GPKD or after verification approval. User is_onboarded=True",
+      "route": "/employer/dashboard",
+      "permissions": ["POST_JOB", "VIEW_CANDIDATES", "MANAGE_COMPANY"]
+    }
+  }
+}

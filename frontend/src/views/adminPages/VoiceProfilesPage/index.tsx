@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -29,15 +29,15 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { ColumnDef } from '@tanstack/react-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import adminJobService from '../../../services/adminJobService';
-import adminManagementService from '../../../services/adminManagementService';
-import aiService from '../../../services/aiService';
-import voiceProfileService, { type VoiceProfilePayload } from '../../../services/voiceProfileService';
-import type { VoiceProfile } from '../../../types/models';
-import toastMessages from '../../../utils/toastMessages';
-import { useDataTable } from '../../../hooks';
-import DataTable from '../../../components/Common/DataTable';
-import FilterBar, { filterControlSx } from '../../../components/Common/FilterBar';
+import adminJobService from '@/services/adminJobService';
+import adminManagementService from '@/services/adminManagementService';
+import aiService from '@/services/aiService';
+import voiceProfileService, { type VoiceProfilePayload } from '@/services/voiceProfileService';
+import type { VoiceProfile } from '@/types/models';
+import toastMessages from '@/utils/toastMessages';
+import { useDataTable } from '@/hooks';
+import DataTable from '@/components/Common/DataTable';
+import FilterBar, { filterControlSx } from '@/components/Common/FilterBar';
 import {
   getVoiceProfileFormValidationErrors,
   type VoiceProfileFormValidationErrors,
@@ -117,6 +117,10 @@ const VoiceProfilesPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [voiceTypeFilter, setVoiceTypeFilter] = useState('all');
 
+  useEffect(() => {
+    setPage(0);
+  }, [statusFilter, voiceTypeFilter, setPage]);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin-voice-profiles', page, pageSize, debouncedSearchTerm, statusFilter, voiceTypeFilter, ordering],
     queryFn: () => voiceProfileService.getVoiceProfiles({
@@ -162,11 +166,7 @@ const VoiceProfilesPage = () => {
       : undefined
   );
 
-  const getVoiceTypeLabel = (type?: string) => {
-    if (type === 'preset') return t('pages.voiceProfiles.voiceTypes.preset');
-    if (type === 'cloned') return t('pages.voiceProfiles.voiceTypes.cloned');
-    return type || '';
-  };
+
 
   const activeFilterCount = [
     Boolean(searchTerm.trim()),
@@ -196,24 +196,30 @@ const VoiceProfilesPage = () => {
     setPage(0);
   };
 
-  const getStatusLabel = (status?: string) => {
+  const getStatusLabel = useCallback((status?: string) => {
     if (status === 'draft') return t('pages.voiceProfiles.statuses.draft');
     if (status === 'processing') return t('pages.voiceProfiles.statuses.processing');
     if (status === 'ready') return t('pages.voiceProfiles.statuses.ready');
     if (status === 'disabled') return t('pages.voiceProfiles.statuses.disabled');
     if (status === 'failed') return t('pages.voiceProfiles.statuses.failed');
     return status || '';
-  };
+  }, [t]);
+
+  const getVoiceTypeLabel = useCallback((type?: string) => {
+    if (type === 'preset') return t('pages.voiceProfiles.types.preset');
+    if (type === 'cloned') return t('pages.voiceProfiles.types.cloned');
+    return type || '';
+  }, [t]);
 
   const getProfileSampleCount = (profile?: VoiceProfile | null) => profile?.sampleCount ?? profile?.samples?.length ?? 0;
   const getProfileTotalDuration = (profile?: VoiceProfile | null) => Number(profile?.totalDurationSeconds ?? 0);
-  const getProfileReadyFlag = (profile?: VoiceProfile | null) => Boolean(
+  const getProfileReadyFlag = useCallback((profile?: VoiceProfile | null) => Boolean(
     profile?.isReadyForTts
     ?? (
       profile?.status === 'ready'
       && (getProfileType(profile as VoiceProfile) === 'preset' || getProfileSampleCount(profile) > 0)
     )
-  );
+  ), [getProfileType]);
 
   const resetCreateDialog = () => {
     setCreateOpen(false);
@@ -359,7 +365,7 @@ const VoiceProfilesPage = () => {
     });
   };
 
-  const openEditDialog = (profile: VoiceProfile) => {
+  const openEditDialog = useCallback((profile: VoiceProfile) => {
     setEditProfile(profile);
     setEditForm({
       name: profile.name || '',
@@ -371,7 +377,7 @@ const VoiceProfilesPage = () => {
       status: profile.status || 'ready',
       sampleCount: getProfileSampleCount(profile),
     });
-  };
+  }, []);
 
   const submitEdit = () => {
     if (!editProfile) return;
@@ -394,7 +400,7 @@ const VoiceProfilesPage = () => {
     });
   };
 
-  const openTestDialog = (profile: VoiceProfile) => {
+  const openTestDialog = useCallback((profile: VoiceProfile) => {
     if (!getProfileReadyFlag(profile)) {
       toastMessages.error(t('pages.voiceProfiles.validation.voiceNotReady'));
       return;
@@ -404,7 +410,7 @@ const VoiceProfilesPage = () => {
     }
     setTestAudioUrl(null);
     setTestProfile(profile);
-  };
+  }, [testAudioUrl, t, getProfileReadyFlag]);
 
   const closeTestDialog = () => {
     if (testAudioUrl) {
@@ -461,7 +467,7 @@ const VoiceProfilesPage = () => {
           <Box>
             <Typography fontWeight={700}>{profile.name}</Typography>
             <Typography variant="caption" color="text.secondary">
-              {profile.description || profile.presetVoiceId || profile.preset_voice_id || '—'}
+              {profile.description || profile.presetVoiceId || profile.preset_voice_id || '-'}
             </Typography>
           </Box>
         );

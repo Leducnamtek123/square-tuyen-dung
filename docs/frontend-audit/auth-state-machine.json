@@ -1,0 +1,172 @@
+{
+  "routes": {
+    "/login": {
+      "initialState": "INITIAL",
+      "supportedStates": [
+        "INITIAL",
+        "LOADING",
+        "SUCCESS",
+        "VALIDATION_ERROR",
+        "AUTH_ERROR",
+        "NETWORK_ERROR",
+        "RATE_LIMITED",
+        "REDIRECTING",
+        "SUCCESS_REDIRECT"
+      ],
+      "transitions": {
+        "INITIAL": [
+          "LOADING",
+          "VALIDATION_ERROR"
+        ],
+        "LOADING": [
+          "SUCCESS",
+          "AUTH_ERROR",
+          "NETWORK_ERROR",
+          "RATE_LIMITED"
+        ],
+        "VALIDATION_ERROR": [
+          "LOADING"
+        ],
+        "AUTH_ERROR": [
+          "LOADING"
+        ],
+        "RATE_LIMITED": [
+          "LOADING"
+        ],
+        "SUCCESS": [
+          "REDIRECTING",
+          "SUCCESS_REDIRECT"
+        ]
+      }
+    },
+    "/register": {
+      "initialState": "INITIAL",
+      "supportedStates": [
+        "INITIAL",
+        "LOADING",
+        "SUCCESS",
+        "VALIDATION_ERROR",
+        "ALREADY_REGISTERED_UNVERIFIED",
+        "DUPLICATE_EMAIL_ERROR",
+        "NETWORK_ERROR",
+        "RATE_LIMITED",
+        "REDIRECTING_TO_VERIFICATION"
+      ],
+      "transitions": {
+        "INITIAL": [
+          "LOADING",
+          "VALIDATION_ERROR"
+        ],
+        "LOADING": [
+          "SUCCESS",
+          "ALREADY_REGISTERED_UNVERIFIED",
+          "DUPLICATE_EMAIL_ERROR",
+          "NETWORK_ERROR"
+        ],
+        "VALIDATION_ERROR": [
+          "LOADING"
+        ],
+        "DUPLICATE_EMAIL_ERROR": [
+          "LOADING"
+        ],
+        "ALREADY_REGISTERED_UNVERIFIED": [
+          "REDIRECTING_TO_VERIFICATION"
+        ],
+        "SUCCESS": [
+          "REDIRECTING_TO_VERIFICATION"
+        ]
+      }
+    },
+    "/forgot-password": {
+      "initialState": "INITIAL",
+      "supportedStates": [
+        "INITIAL",
+        "LOADING",
+        "SUCCESS_EMAIL_SENT",
+        "VALIDATION_ERROR",
+        "NETWORK_ERROR"
+      ],
+      "transitions": {
+        "INITIAL": [
+          "LOADING",
+          "VALIDATION_ERROR"
+        ],
+        "LOADING": [
+          "SUCCESS_EMAIL_SENT",
+          "NETWORK_ERROR"
+        ],
+        "VALIDATION_ERROR": [
+          "LOADING"
+        ],
+        "NETWORK_ERROR": [
+          "LOADING"
+        ]
+      }
+    },
+    "/reset-password/[token]": {
+      "initialState": "INITIAL",
+      "supportedStates": [
+        "INITIAL",
+        "LOADING",
+        "SUCCESS",
+        "VALIDATION_ERROR",
+        "INVALID_OR_EXPIRED_TOKEN",
+        "NETWORK_ERROR",
+        "REDIRECTING_TO_LOGIN"
+      ],
+      "transitions": {
+        "INITIAL": [
+          "LOADING",
+          "VALIDATION_ERROR"
+        ],
+        "LOADING": [
+          "SUCCESS",
+          "INVALID_OR_EXPIRED_TOKEN",
+          "NETWORK_ERROR"
+        ],
+        "VALIDATION_ERROR": [
+          "LOADING"
+        ],
+        "INVALID_OR_EXPIRED_TOKEN": [
+          "LOADING"
+        ],
+        "SUCCESS": [
+          "REDIRECTING_TO_LOGIN"
+        ]
+      }
+    },
+    "/email-verification-required": {
+      "initialState": "POLLING_STATUS",
+      "supportedStates": [
+        "POLLING_STATUS",
+        "RESENDING_EMAIL",
+        "RESEND_SUCCESS",
+        "RATE_LIMITED_COOLDOWN",
+        "VERIFICATION_CONFIRMED",
+        "NETWORK_ERROR",
+        "REDIRECTING_TO_LOGIN"
+      ],
+      "transitions": {
+        "POLLING_STATUS": [
+          "VERIFICATION_CONFIRMED",
+          "NETWORK_ERROR"
+        ],
+        "RESENDING_EMAIL": [
+          "RESEND_SUCCESS",
+          "RATE_LIMITED_COOLDOWN",
+          "VERIFICATION_CONFIRMED",
+          "NETWORK_ERROR"
+        ],
+        "RATE_LIMITED_COOLDOWN": [
+          "RESENDING_EMAIL"
+        ],
+        "RESEND_SUCCESS": [
+          "POLLING_STATUS"
+        ],
+        "VERIFICATION_CONFIRMED": [
+          "REDIRECTING_TO_LOGIN"
+        ]
+      }
+    }
+  }
+}

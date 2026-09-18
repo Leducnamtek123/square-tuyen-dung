@@ -40,6 +40,7 @@ from ..filters import CompanyFilter
 
 from ..serializers import (
     CompanySerializer,
+    CompanyDetailSerializer,
     CompanyFollowedSerializer,
     LogoCompanySerializer,
     CompanyCoverImageSerializer,
@@ -104,10 +105,11 @@ class CompanyView(viewsets.ViewSet):
 
         try:
             job_post_queryset = JobPost.objects.get(pk=pk, company=company)
-
         except JobPost.DoesNotExist:
-
-            return var_res.response_data(data=None)
+            return var_res.response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": "Không tìm thấy tin tuyển dụng hoặc bạn không có quyền truy cập."}
+            )
 
         job_post_serializer = job_serializers.JobPostSerializer(
             job_post_queryset,
@@ -157,6 +159,32 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
     renderer_classes = [renderers.MyJSONRenderer]
 
+    def get_permissions(self):
+        if self.action in ["evaluation_weights_config"]:
+            return [perms_sys.IsAuthenticated()]
+        return [permission() for permission in self.permission_classes]
+
+    def perform_update(self, serializer):
+        company = serializer.instance
+        data = self.request.data or {}
+        logo_id = data.get("logoId") or data.get("logo_id")
+        if logo_id:
+            try:
+                logo_file = File.objects.get(id=int(logo_id))
+                Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+                company.logo = logo_file
+            except (File.DoesNotExist, ValueError, TypeError):
+                pass
+        cover_image_id = data.get("coverImageId") or data.get("cover_image_id")
+        if cover_image_id:
+            try:
+                cover_file = File.objects.get(id=int(cover_image_id))
+                Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+                company.cover_image = cover_file
+            except (File.DoesNotExist, ValueError, TypeError):
+                pass
+        serializer.save()
+
     @action(methods=["put"], detail=False,
 
             url_path="company-image-url", url_name="company-image-url")
@@ -203,6 +231,96 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
         company_cover_image_url_serializer.save()
         return var_res.response_data(status=status.HTTP_200_OK, data=company_cover_image_url_serializer.data)
 
+    @action(methods=["get", "put", "post"], detail=False, url_path="evaluation-weights", url_name="evaluation-weights")
+    def evaluation_weights_config(self, request):
+        user = request.user
+        company = getattr(user, "active_company", None)
+        if not company and hasattr(user, "get_active_company"):
+            company = user.get_active_company()
+        if not company and hasattr(user, "company"):
+            company = getattr(user, "company", None)
+
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "Nhà tuyển dụng chưa được liên kết với hồ sơ công ty hợp lệ."}
+            )
+
+        if request.method == "GET":
+            return var_res.response_data(
+                status=status.HTTP_200_OK,
+                data={
+                    "companyId": company.id,
+                    "companyName": company.company_name,
+                    "evaluationWeights": company.get_evaluation_weights(),
+                    "standardWeights": {
+                        "technical": 30,
+                        "communication": 20,
+                        "situational": 20,
+                        "culture_fit": 20,
+                        "attitude": 10,
+                    },
+                    "criteriaLabels": {
+                        "technical": "Chuyên môn kỹ thuật",
+                        "communication": "Khả năng giao tiếp",
+                        "situational": "Xử lý tình huống",
+                        "culture_fit": "Phù hợp văn hóa",
+                        "attitude": "Thái độ và cam kết",
+                    }
+                }
+            )
+
+        weights_data = (
+            request.data.get("evaluationWeights")
+            if isinstance(request.data.get("evaluationWeights"), dict)
+            else request.data.get("evaluation_weights")
+            if isinstance(request.data.get("evaluation_weights"), dict)
+            else request.data
+        )
+        if not isinstance(weights_data, dict):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "Dữ liệu cấu hình trọng số không hợp lệ."}
+            )
+
+        try:
+            tech = int(weights_data.get("technical", 30))
+            comm = int(weights_data.get("communication", 20))
+            sit = int(weights_data.get("situational", 20))
+            cult = int(weights_data.get("culture_fit", 20))
+            att = int(weights_data.get("attitude", 10))
+        except (ValueError, TypeError):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "Trọng số các tiêu chí phải là các số nguyên dương."}
+            )
+
+        total = tech + comm + sit + cult + att
+        if total != 100:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": f"Tổng các trọng số phải đạt đúng một trăm phần trăm, hiện tại là {total} phần trăm."}
+            )
+
+        new_weights = {
+            "technical": tech,
+            "communication": comm,
+            "situational": sit,
+            "culture_fit": cult,
+            "attitude": att,
+        }
+        company.evaluation_weights = new_weights
+        company.save(update_fields=["evaluation_weights"])
+
+        return var_res.response_data(
+            status=status.HTTP_200_OK,
+            data={
+                "message": "Cập nhật trọng số đánh giá văn hóa công ty thành công.",
+                "companyId": company.id,
+                "evaluationWeights": company.get_evaluation_weights(),
+            }
+        )
+
 
 class CompanyViewSet(viewsets.ViewSet,
 
@@ -231,7 +349,27 @@ class CompanyViewSet(viewsets.ViewSet,
     lookup_field = "slug"
 
     def get_queryset(self):
+        if getattr(self, 'action', None) == 'claim':
+            return Company.objects.select_related(
+                'user', 'logo', 'cover_image', 'location', 'location__city'
+            ).prefetch_related('company_images', 'company_images__image')
         return self.queryset.filter(is_verified=True)
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_val = self.kwargs.get(lookup_url_kwarg)
+
+        if lookup_val and str(lookup_val).isdigit():
+            obj = queryset.filter(id=int(lookup_val)).first()
+            if obj:
+                self.check_object_permissions(self.request, obj)
+                return obj
+
+        filter_kwargs = {self.lookup_field: lookup_val}
+        obj = generics.get_object_or_404(queryset, **filter_kwargs)
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     def get_permissions(self):
 
@@ -239,7 +377,38 @@ class CompanyViewSet(viewsets.ViewSet,
 
             return [perms_custom.IsJobSeekerUser()]
 
+        elif self.action in ["claim"]:
+
+            return [perms_custom.IsEmployerUser()]
+
         return [perms_sys.AllowAny()]
+
+    @action(detail=True, methods=['post'], permission_classes=[perms_custom.IsEmployerUser])
+    def claim(self, request, slug=None):
+        company = self.get_object()
+        verification, created = CompanyVerification.objects.get_or_create(
+            company=company,
+            defaults={
+                'submitted_by': request.user,
+                'status': CompanyVerification.STATUS_PENDING,
+                'legal_company_name': company.company_name or "",
+                'tax_code': getattr(company, 'tax_code', '') or "",
+            }
+        )
+        if not created and verification.submitted_by != request.user:
+            verification.submitted_by = request.user
+            verification.status = CompanyVerification.STATUS_PENDING
+            verification.save()
+
+        return var_res.response_data(
+            status=status.HTTP_201_CREATED,
+            data={
+                "id": verification.id,
+                "companyId": company.id,
+                "status": verification.status,
+                "message": "Claim request submitted successfully."
+            }
+        )
 
     def list(self, request, *args, **kwargs):
         from shared.helpers.redis_service import RedisService
@@ -298,6 +467,26 @@ class CompanyViewSet(viewsets.ViewSet,
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
 
+    @staticmethod
+    def safe_assign_logo(company, logo_file):
+        """Safely assign logo to company, unlinking other companies if necessary."""
+        if logo_file:
+            Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+            company.logo = logo_file
+        else:
+            company.logo = None
+        company.save(update_fields=['logo'])
+
+    @staticmethod
+    def safe_assign_cover_image(company, cover_file):
+        """Safely assign cover image to company, unlinking other companies if necessary."""
+        if cover_file:
+            Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+            company.cover_image = cover_file
+        else:
+            company.cover_image = None
+        company.save(update_fields=['cover_image'])
+
     def retrieve(self, request, *args, **kwargs):
 
         instance = self.get_object()
@@ -306,7 +495,7 @@ class CompanyViewSet(viewsets.ViewSet,
 
             'id', 'slug', 'taxCode', 'companyName',
 
-            'employeeSize', 'fieldOperation', 'location',
+            'employeeSize', 'fieldOperation', 'location', 'locationDict',
 
             'since', 'companyEmail', 'companyPhone',
 
@@ -315,6 +504,8 @@ class CompanyViewSet(viewsets.ViewSet,
             'linkedinUrl', 'description',
 
             'companyImageUrl', 'companyCoverImageUrl',
+
+            'cityChooseData', 'districtChooseData', 'logoDict',
 
             'followNumber', 'isFollowed', 'companyImages'
 
@@ -341,7 +532,8 @@ class CompanyViewSet(viewsets.ViewSet,
         serializer = CompanySerializer(
             queryset,
             many=True,
-            fields=['id', 'slug', 'companyName', 'companyImageUrl'],
+            fields=['id', 'slug', 'companyName', 'companyImageUrl', 'employeeSize', 'jobPostNumber', 'followNumber', 'isFollowed'],
+            context={"request": request},
         )
 
         return var_res.response_data(data=serializer.data)

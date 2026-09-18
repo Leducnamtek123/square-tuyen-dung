@@ -30,4 +30,5 @@ Disallow: /phong-van/
 Disallow: /forbidden
 
 # Sitemap location
-Sitemap: https://sqstudio.vn/sitemap.xml
+Sitemap: https://infohr.vn/sitemap.xml
+

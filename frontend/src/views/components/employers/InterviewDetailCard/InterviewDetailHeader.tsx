@@ -7,7 +7,8 @@ import StopCircleIcon from '@mui/icons-material/StopCircle';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
-import type { InterviewSession } from '../../../../types/models';
+import type { InterviewSession } from '@/types/models';
+import { ProductTourTrigger } from '@/components/Features/ProductTour';
 
 type Props = {
   session: InterviewSession;
@@ -89,7 +90,7 @@ const InterviewDetailHeader = ({
   return (
     <Box sx={{ mb: 3, pb: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-        <IconButton
+        <IconButton aria-label="Quay lại"
           onClick={onBack}
           size="small"
           sx={{
@@ -190,28 +191,19 @@ const InterviewDetailHeader = ({
           )}
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems={{ xs: 'flex-start', sm: 'center' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700 }}>
-              {t('interview:interviewDetail.label.roomCode')}
-            </Typography>
-            <Box
+            <Chip
+              label={session.isLive ? 'Phòng phỏng vấn Trực tiếp (Live)' : 'Phòng phỏng vấn AI'}
+              size="small"
               sx={{
-                fontWeight: 850,
+                fontWeight: 750,
                 color: 'primary.main',
-                bgcolor: pc.primary(0.06),
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 1.5,
-                fontSize: '0.9rem',
+                bgcolor: pc.primary(0.08),
                 border: '1px solid',
-                borderColor: pc.primary(0.14),
-                letterSpacing: 0,
+                borderColor: pc.primary(0.18),
+                borderRadius: 1.5,
+                fontSize: '0.8125rem',
               }}
-            >
-              {session.roomName}
-            </Box>
-            <Typography variant="body2" color="text.disabled" sx={{ fontWeight: 650 }}>
-              ID: <Box component="span" sx={{ color: 'text.secondary', fontWeight: 800 }}>{session.id}</Box>
-            </Typography>
+            />
           </Stack>
 
           {isInterrupted && (
@@ -221,7 +213,8 @@ const InterviewDetailHeader = ({
           )}
         </Box>
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} sx={{ width: { xs: '100%', lg: 'auto' } }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25} alignItems="center" sx={{ width: { xs: '100%', lg: 'auto' } }}>
+          <ProductTourTrigger tourKey="employer_interview_detail" variant="chip" label="Hướng dẫn báo cáo" />
           {canObserve && (
             <Tooltip title={t('interview:interviewDetail.tooltips.forceEndNow')} arrow placement="top">
               <Button

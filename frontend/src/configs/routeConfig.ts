@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * routeConfig.ts — Single source of truth for ALL application routes
+ * routeConfig.ts - Single source of truth for ALL application routes
  * ============================================================================
  *
  * Every route path (EN ↔ VI), portal prefix, and Next.js rewrite rule is
@@ -15,7 +15,7 @@
  */
 
 // ---------------------------------------------------------------------------
-// 1. Segment Map — Maps every Vietnamese slug ↔ English slug
+// 1. Segment Map - Maps every Vietnamese slug ↔ English slug
 // ---------------------------------------------------------------------------
 
 export const SEGMENT_MAP = {
@@ -26,23 +26,31 @@ export const SEGMENT_MAP = {
   'cap-nhat-mat-khau': 'reset-password',
   'xac-nhan-email': 'email-verification-required',
 
-  // Job Seeker — Public
+  // Job Seeker - Public
   'viec-lam': 'jobs',
   'cong-ty': 'companies',
   've-chung-toi': 'about-us',
   'viec-lam-theo-nganh-nghe': 'jobs-by-career',
   'viec-lam-theo-tinh-thanh': 'jobs-by-city',
   'viec-lam-theo-hinh-thuc-lam-viec': 'jobs-by-type',
+  'danh-sach-mau-cv': 'cv-templates',
+  'mau-cv': 'cv-templates',
+  'tao-cv': 'cv-builder',
 
-  // Job Seeker — Private
+  // Job Seeker - Private
   'bang-dieu-khien': 'dashboard',
   'ho-so': 'profile',
   'ho-so-tung-buoc': 'online-profile',
   'ho-so-dinh-kem': 'attached-profile',
+  'quan-ly-cv': 'my-cvs',
   'viec-lam-cua-toi': 'my-jobs',
   'cong-ty-cua-toi': 'my-company',
   'phong-van-cua-toi': 'my-interviews',
+  'luyen-phong-van': 'practice',
+  'phong-van-thu': 'practice',
+  'tra-cuu-luong': 'salary',
   'thong-bao': 'notifications',
+  'thong_bao': 'notifications',
   'tai-khoan': 'account',
   'ket-noi-voi-nha-tuyen-dung': 'chat',
   'tin-tuc': 'blog',
@@ -69,9 +77,10 @@ export const SEGMENT_MAP = {
   'phong-van-truc-tiep': 'interviews',
   'len-lich-phong-van': 'interviews/create',
   'chi-tiet-phong-van': 'interviews',
-  'sua-lich-phong-van': 'interviews/:id/edit',
+  'sua-lich-phong-van': 'interviews',
   'ngan-hang-cau-hoi': 'question-bank',
   'bo-cau-hoi': 'question-groups',
+  'cai-dat-ai': 'ai-settings',
   'xac-thuc-nha-tuyen-dung': 'verification',
 
   // Admin
@@ -98,21 +107,32 @@ export const SEGMENT_MAP = {
   'quan-ly-danh-gia': 'feedbacks',
   'tin-tuc-blog': 'articles',
   'tao-moi': 'create',
+  'chinh-sua': 'edit',
   'xac-thuc-cong-ty': 'company-verifications',
   'bao-cao-tin-cay': 'trust-reports',
   'nhat-ky-he-thong': 'audit-logs',
   'tro-ly-agent-quan-tri': 'agent-assistants',
   'xem-truoc-giao-dien-phong-van': 'interview-preview',
+  'he-thong-giao-dien': 'components',
+  'component': 'components',
 
   // Interview (candidate)
   'phong-van': 'interview',
   'room': 'room',
 
-  // Misc
+  // Misc & Legal Policies
   'lien-he': 'contact',
   'cau-hoi-thuong-gap': 'faq',
   'dieu-khoan-dich-vu': 'terms-of-service',
+  'terms-and-conditions': 'terms-of-service',
   'chinh-sach-bao-mat': 'privacy-policy',
+  'thoa-thuan-su-dung': 'thoa-thuan-su-dung',
+  'dieu-khoan-su-dung': 'terms-of-service',
+  'quy-dinh-bao-mat': 'quy-dinh-bao-mat',
+  'tuan-thu-va-su-dong-y-cua-khach-hang': 'tuan-thu-va-su-dong-y-cua-khach-hang',
+  'so-do-trang-web': 'so-do-trang-web',
+  'chinh-sach-bao-hanh': 'chinh-sach-bao-hanh',
+  'quy-dinh-dang-tin': 'quy-dinh-dang-tin',
 } as const;
 
 // Reverse map: English → Vietnamese
@@ -128,7 +148,7 @@ for (const [vi, en] of Object.entries(SEGMENT_MAP)) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. ROUTES constant — Structured route paths (English-only, canonical)
+// 2. ROUTES constant - Structured route paths (English-only, canonical)
 // ---------------------------------------------------------------------------
 
 export const ROUTES = {
@@ -161,6 +181,8 @@ export const ROUTES = {
     COMPANY: 'companies',
     COMPANY_DETAIL: 'companies/:slug',
     ABOUT_US: 'about-us',
+    CV_TEMPLATES: 'cv-templates',
+    CV_BUILDER: 'cv-builder',
     JOBS_BY_CAREER: 'jobs-by-career',
     JOBS_BY_CITY: 'jobs-by-city',
     JOBS_BY_TYPE: 'jobs-by-type',
@@ -171,8 +193,12 @@ export const ROUTES = {
     STEP_PROFILE: 'online-profile/:slug',
     ATTACHED_PROFILE: 'attached-profile/:slug',
     MY_JOB: 'my-jobs',
+    MY_CVS: 'my-cvs',
+    PUBLIC_CV: 'cv/:slug',
     MY_COMPANY: 'my-company',
     MY_INTERVIEWS: 'my-interviews',
+    PRACTICE: 'practice',
+    SALARY: 'salary',
     NOTIFICATION: 'notifications',
     ACCOUNT: 'account',
     CHAT: 'chat',
@@ -180,6 +206,10 @@ export const ROUTES = {
     FAQ: 'faq',
     TERMS_OF_SERVICE: 'terms-of-service',
     PRIVACY_POLICY: 'privacy-policy',
+    TERMS_HTML: 'thoa-thuan-su-dung.html',
+    PRIVACY_HTML: 'quy-dinh-bao-mat.html',
+    CONSENT_HTML: 'tuan-thu-va-su-dong-y-cua-khach-hang.html',
+    SITEMAP_HTML: 'so-do-trang-web.html',
   },
   EMPLOYER: {
     INTRODUCE: 'employer/introduce',
@@ -192,6 +222,8 @@ export const ROUTES = {
     DASHBOARD: 'employer/dashboard',
     AGENT_ASSISTANTS: 'employer/agent-assistants',
     JOB_POST: 'employer/job-posts',
+    JOB_POST_CREATE: 'employer/job-posts/create',
+    JOB_POST_EDIT: 'employer/job-posts/:id/edit',
     APPLIED_PROFILE: 'employer/applied-profiles',
     SAVED_PROFILE: 'employer/saved-profiles',
     PROFILE: 'employer/candidates',
@@ -210,11 +242,26 @@ export const ROUTES = {
     INTERVIEW_EDIT: 'employer/interviews/:id/edit',
     QUESTION_BANK: 'employer/question-bank',
     QUESTION_GROUPS: 'employer/question-groups',
+    AI_SETTINGS: 'employer/ai-settings',
     VERIFICATION: 'employer/verification',
     CONTACT: 'employer/contact',
     FAQ: 'employer/faq',
     TERMS_OF_SERVICE: 'employer/terms-of-service',
     PRIVACY_POLICY: 'employer/privacy-policy',
+    TERMS_HTML: 'employer/thoa-thuan-su-dung.html',
+    PRIVACY_HTML: 'employer/chinh-sach-bao-mat.html',
+    WARRANTY_HTML: 'employer/chinh-sach-bao-hanh.html',
+    POSTING_RULES_HTML: 'employer/quy-dinh-dang-tin.html',
+    HRM: 'employer/hrm',
+    HRM_DASHBOARD: 'employer/hrm/dashboard',
+    HRM_EMPLOYEES: 'employer/hrm/employees',
+    HRM_ONBOARDING: 'employer/hrm/onboarding',
+    HRM_DEPARTMENTS: 'employer/hrm/departments',
+    HRM_CONTRACTS: 'employer/hrm/contracts',
+    HRM_LEAVES: 'employer/hrm/leaves',
+    HRM_ATTENDANCES: 'employer/hrm/attendances',
+    HRM_PAYROLL: 'employer/hrm/payroll',
+    HRM_ORG_CHART: 'employer/hrm/org-chart',
   },
   JOBSEEKER_INTERVIEW: {
     LOGIN: 'interview/login',
@@ -229,6 +276,16 @@ export const ROUTES = {
   },
   ADMIN: {
     DASHBOARD: 'admin/dashboard',
+    HRM: 'admin/hrm',
+    HRM_DASHBOARD: 'admin/hrm/dashboard',
+    HRM_EMPLOYEES: 'admin/hrm/employees',
+    HRM_ONBOARDING: 'admin/hrm/onboarding',
+    HRM_DEPARTMENTS: 'admin/hrm/departments',
+    HRM_CONTRACTS: 'admin/hrm/contracts',
+    HRM_LEAVES: 'admin/hrm/leaves',
+    HRM_ATTENDANCES: 'admin/hrm/attendances',
+    HRM_PAYROLL: 'admin/hrm/payroll',
+    HRM_ORG_CHART: 'admin/hrm/org-chart',
     AGENT_ASSISTANTS: 'admin/agent-assistants',
     USERS: 'admin/users',
     JOBS: 'admin/jobs',
@@ -259,11 +316,12 @@ export const ROUTES = {
     ARTICLE_DETAIL: 'admin/articles/:id',
     PROFILE_DETAIL: 'admin/profiles/:id',
     INTERVIEW_PREVIEW: 'admin/interview-preview',
+    COMPONENTS: 'admin/components',
   },
 } as const;
 
 // ---------------------------------------------------------------------------
-// 3. Rewrite rules — Generated from SEGMENT_MAP for next.config.mjs
+// 3. Rewrite rules - Generated from SEGMENT_MAP for next.config.mjs
 // ---------------------------------------------------------------------------
 
 type RewriteRule = { source: string; destination: string };
@@ -275,7 +333,7 @@ type RewriteRule = { source: string; destination: string };
 export function generateRewrites(): RewriteRule[] {
   const rules: RewriteRule[] = [];
 
-  // ── Job Seeker (root level) ──
+  // -- Job Seeker (root level) --
   const jobSeekerRewrites: [string, string, boolean?][] = [
     // Auth
     ['/dang-nhap', '/login'],
@@ -289,6 +347,10 @@ export function generateRewrites(): RewriteRule[] {
     ['/cong-ty', '/companies'],
     ['/cong-ty/:slug', '/companies/:slug'],
     ['/ve-chung-toi', '/about-us'],
+    ['/danh-sach-mau-cv', '/cv-templates'],
+    ['/mau-cv', '/cv-templates'],
+    ['/tao-cv', '/cv-builder'],
+    ['/tao-cv/:path*', '/cv-builder/:path*'],
     ['/viec-lam-theo-nganh-nghe', '/jobs-by-career'],
     ['/viec-lam-theo-tinh-thanh', '/jobs-by-city'],
     ['/viec-lam-theo-hinh-thuc-lam-viec', '/jobs-by-type'],
@@ -298,25 +360,83 @@ export function generateRewrites(): RewriteRule[] {
     ['/ho-so-tung-buoc/:slug', '/online-profile/:slug'],
     ['/ho-so-dinh-kem/:slug', '/attached-profile/:slug'],
     ['/viec-lam-cua-toi', '/my-jobs'],
+    ['/ung-vien/viec-lam-cua-toi', '/my-jobs'],
+    ['/ung-vien/my-jobs', '/my-jobs'],
     ['/cong-ty-cua-toi', '/my-company'],
+    ['/ung-vien/cong-ty-cua-toi', '/my-company'],
+    ['/ung-vien/my-company', '/my-company'],
     ['/phong-van-cua-toi', '/my-interviews'],
+    ['/ung-vien/phong-van-cua-toi', '/my-interviews'],
+    ['/ung-vien/my-interviews', '/my-interviews'],
+    ['/luyen-phong-van', '/practice'],
+    ['/phong-van-thu', '/practice'],
+    ['/ung-vien/phong-van-thu', '/practice'],
+    ['/ung-vien/luyen-phong-van', '/practice'],
+    ['/ung-vien/practice', '/practice'],
+    ['/candidate/practice', '/practice'],
+    ['/tra-cuu-luong', '/salary'],
+    ['/ung-vien/tra-cuu-luong', '/salary'],
+    ['/ung-vien/salary', '/salary'],
+    ['/candidate/salary', '/salary'],
     ['/thong-bao', '/notifications'],
+    ['/ung-vien/thong-bao', '/notifications'],
+    ['/ung-vien/notifications', '/notifications'],
     ['/tai-khoan', '/account'],
+    ['/ung-vien/tai-khoan', '/account'],
+    ['/ung-vien/account', '/account'],
+    ['/ung-vien/bang-dieu-khien', '/dashboard'],
+    ['/ung-vien/dashboard', '/dashboard'],
+    ['/ung-vien/ho-so', '/profile'],
+    ['/ung-vien/profile', '/profile'],
+    ['/ung-vien/ho-so-tung-buoc/:slug', '/online-profile/:slug'],
+    ['/ung-vien/ho-so-dinh-kem/:slug', '/attached-profile/:slug'],
+    ['/ung-vien/tao-cv', '/cv-builder'],
+    ['/ung-vien/cv-builder', '/cv-builder'],
+    ['/ung-vien/quan-ly-cv', '/my-cvs'],
+    ['/ung-vien/cv-cua-toi', '/my-cvs'],
+    ['/ung-vien/my-cvs', '/my-cvs'],
     ['/ket-noi-voi-nha-tuyen-dung', '/chat'],
+    ['/ung-vien/ket-noi-voi-nha-tuyen-dung', '/chat'],
+    ['/ung-vien/chat', '/chat'],
     ['/tin-tuc', '/blog'],
     ['/tin-tuc/:slug', '/blog/:slug'],
     ['/lien-he', '/contact'],
     ['/cau-hoi-thuong-gap', '/faq'],
     ['/dieu-khoan-dich-vu', '/terms-of-service'],
+    ['/dieu-khoan-su-dung', '/terms-of-service'],
+    ['/terms-and-conditions', '/terms-of-service'],
+    ['/terms', '/terms-of-service'],
     ['/chinh-sach-bao-mat', '/privacy-policy'],
+    ['/quy-dinh-bao-mat', '/privacy-policy'],
+    ['/privacy', '/privacy-policy'],
+    ['/thoa-thuan-su-dung.html', '/legal/thoa-thuan-su-dung'],
+    ['/dieu-khoan-su-dung.html', '/legal/thoa-thuan-su-dung'],
+    ['/quy-dinh-bao-mat.html', '/legal/quy-dinh-bao-mat'],
+    ['/chinh-sach-bao-mat.html', '/legal/quy-dinh-bao-mat'],
+    ['/tuan-thu-va-su-dong-y-cua-khach-hang.html', '/legal/tuan-thu-va-su-dong-y-cua-khach-hang'],
+    ['/so-do-trang-web.html', '/legal/so-do-trang-web'],
+    ['/chinh-sach-bao-hanh.html', '/legal/chinh-sach-bao-hanh'],
+    ['/quy-dinh-dang-tin.html', '/legal/quy-dinh-dang-tin'],
+    ['/:slug.html', '/legal/:slug'],
   ];
 
-  // ── Employer (/nha-tuyen-dung → /employer) ──
+  // -- Employer (/nha-tuyen-dung → /employer) --
   const employerRewrites: [string, string][] = [
+    ['/nha-tuyen-dung/thoa-thuan-su-dung.html', '/employer/legal/thoa-thuan-su-dung'],
+    ['/nha-tuyen-dung/chinh-sach-bao-mat.html', '/employer/legal/quy-dinh-bao-mat'],
+    ['/nha-tuyen-dung/chinh-sach-bao-hanh.html', '/employer/legal/chinh-sach-bao-hanh'],
+    ['/nha-tuyen-dung/quy-dinh-dang-tin.html', '/employer/legal/quy-dinh-dang-tin'],
+    ['/nha-tuyen-dung/terms-and-conditions', '/employer/terms-of-service'],
+    ['/employer/terms-and-conditions', '/employer/terms-of-service'],
+    ['/employer/:slug.html', '/employer/legal/:slug'],
     ['/nha-tuyen-dung/login', '/employer/login'],
+    ['/nha-tuyen-dung/dang-nhap', '/employer/login'],
     ['/nha-tuyen-dung/register', '/employer/register'],
+    ['/nha-tuyen-dung/dang-ky', '/employer/register'],
     ['/nha-tuyen-dung/forgot-password', '/employer/forgot-password'],
+    ['/nha-tuyen-dung/quen-mat-khau', '/employer/forgot-password'],
     ['/nha-tuyen-dung/reset-password/:path*', '/employer/reset-password/:path*'],
+    ['/nha-tuyen-dung/cap-nhat-mat-khau/:path*', '/employer/reset-password/:path*'],
     ['/nha-tuyen-dung/gioi-thieu', '/employer/introduce'],
     ['/nha-tuyen-dung/dich-vu', '/employer/service'],
     ['/nha-tuyen-dung/bao-gia', '/employer/pricing'],
@@ -326,11 +446,17 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/bang-dieu-khien', '/employer/dashboard'],
     ['/nha-tuyen-dung/tro-ly-agent', '/employer/agent-assistants'],
     ['/nha-tuyen-dung/tin-tuyen-dung', '/employer/job-posts'],
+    ['/nha-tuyen-dung/tin-tuyen-dung/tao-moi', '/employer/job-posts/create'],
+    ['/nha-tuyen-dung/tin-tuyen-dung/:id/chinh-sua', '/employer/job-posts/:id/edit'],
+    ['/nha-tuyen-dung/tin-tuyen-dung/:id/sua', '/employer/job-posts/:id/edit'],
     ['/nha-tuyen-dung/ho-so-ung-tuyen', '/employer/applied-profiles'],
     ['/nha-tuyen-dung/ho-so-da-luu', '/employer/saved-profiles'],
     ['/nha-tuyen-dung/danh-sach-ung-vien', '/employer/candidates'],
     ['/nha-tuyen-dung/danh-sach-ung-vien/:slug', '/employer/candidates/:slug'],
     ['/nha-tuyen-dung/chi-tiet-ung-vien/:slug', '/employer/candidates/:slug'],
+    ['/nha-tuyen-dung/resumes', '/employer/candidates'],
+    ['/employer/resumes', '/employer/candidates'],
+    ['/nha-tuyen-dung/quan-ly-cv', '/employer/candidates'],
     ['/nha-tuyen-dung/cong-ty', '/employer/company'],
     ['/nha-tuyen-dung/thong-bao', '/employer/notifications'],
     ['/nha-tuyen-dung/tai-khoan', '/employer/account'],
@@ -341,8 +467,38 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/danh-sach-phong-van/:id/edit', '/employer/interviews/:id/edit'],
     ['/nha-tuyen-dung/thu-vien-video-phong-van', '/employer/interviews/history'],
     ['/nha-tuyen-dung/ngan-hang-cau-hoi', '/employer/question-bank'],
-    ['/nha-tuyen-dung/bo-cau-hoi', '/employer/question-groups'],
     ['/nha-tuyen-dung/xac-thuc-nha-tuyen-dung', '/employer/verification'],
+    ['/nha-tuyen-dung/hrm', '/employer/hrm/dashboard'],
+    ['/nha-tuyen-dung/hrm/dashboard', '/employer/hrm/dashboard'],
+    ['/nha-tuyen-dung/hrm/bang-dieu-khien', '/employer/hrm/dashboard'],
+    ['/nha-tuyen-dung/hrm/employees', '/employer/hrm/employees'],
+    ['/nha-tuyen-dung/hrm/ho-so-nhan-vien', '/employer/hrm/employees'],
+    ['/nha-tuyen-dung/hrm/onboarding', '/employer/hrm/onboarding'],
+    ['/nha-tuyen-dung/hrm/tiep-nhan', '/employer/hrm/onboarding'],
+    ['/nha-tuyen-dung/hrm/departments', '/employer/hrm/departments'],
+    ['/nha-tuyen-dung/hrm/phong-ban', '/employer/hrm/departments'],
+    ['/nha-tuyen-dung/hrm/contracts', '/employer/hrm/contracts'],
+    ['/nha-tuyen-dung/hrm/hop-dong', '/employer/hrm/contracts'],
+    ['/nha-tuyen-dung/hrm/leaves', '/employer/hrm/leaves'],
+    ['/nha-tuyen-dung/hrm/nghi-phep', '/employer/hrm/leaves'],
+    ['/nha-tuyen-dung/hrm/attendances', '/employer/hrm/attendances'],
+    ['/nha-tuyen-dung/hrm/cham-cong', '/employer/hrm/attendances'],
+    ['/nha-tuyen-dung/hrm/attendances/timesheets', '/employer/hrm/attendances/timesheets'],
+    ['/nha-tuyen-dung/hrm/cham-cong/chi-tiet', '/employer/hrm/attendances/timesheets'],
+    ['/nha-tuyen-dung/hrm/attendances/monthly-summary', '/employer/hrm/attendances/monthly-summary'],
+    ['/nha-tuyen-dung/hrm/cham-cong/tong-hop', '/employer/hrm/attendances/monthly-summary'],
+    ['/nha-tuyen-dung/hrm/attendances/shifts', '/employer/hrm/attendances/shifts'],
+    ['/nha-tuyen-dung/hrm/ca-lam-viec', '/employer/hrm/attendances/shifts'],
+    ['/nha-tuyen-dung/hrm/attendances/shift-assignments', '/employer/hrm/attendances/shift-assignments'],
+    ['/nha-tuyen-dung/hrm/phan-ca', '/employer/hrm/attendances/shift-assignments'],
+    ['/nha-tuyen-dung/hrm/attendances/requests', '/employer/hrm/attendances/requests'],
+    ['/nha-tuyen-dung/hrm/quan-ly-don', '/employer/hrm/attendances/requests'],
+    ['/nha-tuyen-dung/hrm/attendances/biometric-logs', '/employer/hrm/attendances/biometric-logs'],
+    ['/nha-tuyen-dung/hrm/may-cham-cong', '/employer/hrm/attendances/biometric-logs'],
+    ['/nha-tuyen-dung/hrm/payroll', '/employer/hrm/payroll'],
+    ['/nha-tuyen-dung/hrm/bang-luong', '/employer/hrm/payroll'],
+    ['/nha-tuyen-dung/hrm/org-chart', '/employer/hrm/org-chart'],
+    ['/nha-tuyen-dung/hrm/so-do-to-chuc', '/employer/hrm/org-chart'],
     ['/nha-tuyen-dung/phong-van-ung-vien-truc-tiep', '/employer/interviews/live'],
     ['/nha-tuyen-dung/phong-van-truc-tiep/:id', '/employer/interviews/:id'],
     ['/nha-tuyen-dung/len-lich-phong-van', '/employer/interviews/create'],
@@ -352,11 +508,12 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/cau-hoi-thuong-gap', '/employer/faq'],
     ['/nha-tuyen-dung/dieu-khoan-dich-vu', '/employer/terms-of-service'],
     ['/nha-tuyen-dung/chinh-sach-bao-mat', '/employer/privacy-policy'],
+    ['/nha-tuyen-dung/cai-dat-ai', '/employer/ai-settings'],
     // Catch-all for employer (must be last)
     ['/nha-tuyen-dung/:path*', '/employer/:path*'],
   ];
 
-  // ── Admin (/quan-tri → /admin) ──
+  // -- Admin (/quan-tri → /admin) --
   const adminRewrites: [string, string][] = [
     ['/admin/bang-dieu-khien', '/admin/dashboard'],
     ['/quan-tri/bang-dieu-khien', '/admin/dashboard'],
@@ -376,6 +533,11 @@ export function generateRewrites(): RewriteRule[] {
     ['/quan-tri/quan-ly-cong-ty', '/admin/companies'],
     ['/quan-tri/quan-ly-ho-so-ung-vien', '/admin/profiles'],
     ['/quan-tri/quan-ly-ho-so-ung-vien/:id', '/admin/profiles/:id'],
+    ['/quan-tri/ho-so/:id', '/admin/profiles/:id'],
+    ['/quan-tri/ho-so-ung-vien/:id', '/admin/profiles/:id'],
+    ['/quan-tri/profiles/:id', '/admin/profiles/:id'],
+    ['/quan-tri/:id(\\d+)', '/admin/profiles/:id'],
+    ['/admin/:id(\\d+)', '/admin/profiles/:id'],
     ['/quan-tri/quan-tri/quan-ly-ho-so-ung-vien', '/admin/profiles'],
     ['/quan-tri/quan-tri/quan-ly-ho-so-ung-vien/:id', '/admin/profiles/:id'],
     ['/profiles/:id', '/admin/profiles/:id'],
@@ -393,12 +555,31 @@ export function generateRewrites(): RewriteRule[] {
     ['/quan-tri/xac-thuc-cong-ty', '/admin/company-verifications'],
     ['/quan-tri/bao-cao-tin-cay', '/admin/trust-reports'],
     ['/quan-tri/nhat-ky-he-thong', '/admin/audit-logs'],
+    ['/quan-tri/hrm', '/admin/hrm/dashboard'],
+    ['/quan-tri/hrm/dashboard', '/admin/hrm/dashboard'],
+    ['/quan-tri/hrm/bang-dieu-khien', '/admin/hrm/dashboard'],
+    ['/quan-tri/hrm/employees', '/admin/hrm/employees'],
+    ['/quan-tri/hrm/ho-so-nhan-vien', '/admin/hrm/employees'],
+    ['/quan-tri/hrm/onboarding', '/admin/hrm/onboarding'],
+    ['/quan-tri/hrm/tiep-nhan', '/admin/hrm/onboarding'],
+    ['/quan-tri/hrm/departments', '/admin/hrm/departments'],
+    ['/quan-tri/hrm/phong-ban', '/admin/hrm/departments'],
+    ['/quan-tri/hrm/contracts', '/admin/hrm/contracts'],
+    ['/quan-tri/hrm/hop-dong', '/admin/hrm/contracts'],
+    ['/quan-tri/hrm/leaves', '/admin/hrm/leaves'],
+    ['/quan-tri/hrm/nghi-phep', '/admin/hrm/leaves'],
+    ['/quan-tri/hrm/attendances', '/admin/hrm/attendances'],
+    ['/quan-tri/hrm/cham-cong', '/admin/hrm/attendances'],
+    ['/quan-tri/hrm/payroll', '/admin/hrm/payroll'],
+    ['/quan-tri/hrm/bang-luong', '/admin/hrm/payroll'],
+    ['/quan-tri/hrm/org-chart', '/admin/hrm/org-chart'],
+    ['/quan-tri/hrm/so-do-to-chuc', '/admin/hrm/org-chart'],
     // Catch-all for admin
     ['/quan-tri', '/admin/dashboard'],
     ['/quan-tri/:path*', '/admin/:path*'],
   ];
 
-  // ── Candidate interview ──
+  // -- Candidate interview --
   const interviewRewrites: [string, string][] = [
     ['/phong-van/room/:id', '/interview/:id'],
     ['/phong-van/:path*', '/interview/:path*'],

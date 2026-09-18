@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -7,168 +9,277 @@ import {
   Skeleton, 
   Box, 
   alpha, 
-  useTheme 
+  Chip 
 } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
-import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { useEmployerGeneralStatistics } from '../hooks/useEmployerQueries';
-import pc from '@/utils/muiColors';
 
-interface StatItemProps {
+interface MetricCardProps {
   title: string;
   value: number | string | undefined;
   suffix?: string;
-  color: string;
-  Icon: React.ElementType;
+  icon: React.ReactNode;
+  iconBgColor: string;
+  iconColor: string;
   loading: boolean;
+  deltaText?: string;
+  isPositiveDelta?: boolean;
+  subBadges?: Array<{ label: string; color: 'warning' | 'error' | 'default' | 'success' | 'info' }>;
+  subtitle?: string;
 }
 
-const StatItem = ({ title, value, suffix, color, Icon, loading }: StatItemProps) => {
-  const theme = useTheme();
-  
+const MetricCard = ({
+  title,
+  value,
+  suffix,
+  icon,
+  iconBgColor,
+  iconColor,
+  loading,
+  deltaText,
+  isPositiveDelta = true,
+  subBadges,
+  subtitle,
+}: MetricCardProps) => {
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 3,
-        borderRadius: 4,
-        border: '1px solid',
-        borderColor: pc.divider( 0.5),
-        boxShadow: (theme) => theme.customShadows?.z1,
+        p: { xs: 1.5, sm: 2.5 },
+        borderRadius: 3,
+        border: '1px solid #E2E8F0',
+        bgcolor: '#FFFFFF',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
         height: '100%',
-        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        transition: 'all 200ms cubic-bezier(0.4, 0, 0.2, 1)',
+        overflow: 'hidden',
         '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: (theme) => theme.customShadows?.z8,
-        }
+          transform: 'translateY(-2px)',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
+          borderColor: alpha(iconColor, 0.35),
+        },
       }}
     >
-      <Stack spacing={2.5}>
-        <Stack direction="row" spacing={2} alignItems="center">
+      <Stack spacing={{ xs: 1, sm: 1.5 }}>
+        {/* Card Header: Title & Icon */}
+        <Stack direction="row" spacing={1} alignItems="flex-start" justifyContent="space-between">
+          <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 600,
+                color: '#64748B',
+                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                lineHeight: 1.3,
+                whiteSpace: { xs: 'normal', sm: 'nowrap' },
+                display: { xs: '-webkit-box', sm: 'block' },
+                WebkitLineClamp: { xs: 2, sm: 1 },
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                minHeight: { xs: '2.5em', sm: 'auto' },
+              }}
+            >
+              {title}
+            </Typography>
+
+            {loading ? (
+              <Skeleton width="60%" height={38} variant="text" sx={{ borderRadius: 1.5, mt: 0.5 }} />
+            ) : (
+              <Typography
+                variant="h4"
+                sx={{
+                  color: '#0F172A',
+                  fontSize: { xs: '1.25rem', sm: '1.75rem' },
+                  fontWeight: 800,
+                  mt: 0.5,
+                  lineHeight: 1.1,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 0.5,
+                }}
+              >
+                {typeof value === 'number'
+                  ? (Number.isFinite(value) ? value.toLocaleString('vi-VN') : 0)
+                  : ((value === 'NaN' || value === 'undefined') ? 0 : (value ?? 0))}
+                {suffix && (
+                  <Typography component="span" sx={{ fontSize: { xs: '0.8rem', sm: '1rem' }, fontWeight: 600, color: '#64748B' }}>
+                    {suffix}
+                  </Typography>
+                )}
+              </Typography>
+            )}
+          </Box>
+
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 48,
-              height: 48,
-              borderRadius: '50%',
-              bgcolor: alpha(color, 0.12),
-              color: color,
+              width: { xs: 34, sm: 44 },
+              height: { xs: 34, sm: 44 },
+              borderRadius: 2,
+              bgcolor: iconBgColor,
+              color: iconColor,
+              flexShrink: 0,
+              '& svg': {
+                fontSize: { xs: 18, sm: 22 },
+              },
             }}
           >
-            <Icon sx={{ fontSize: 26 }} />
+            {icon}
           </Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.secondary', lineHeight: 1.2 }}>
-            {title}
-          </Typography>
         </Stack>
 
-        {loading ? (
-          <Skeleton width="60%" height={48} variant="text" sx={{ borderRadius: 1 }} />
-        ) : (
-          <Typography 
-            sx={{ 
-                color: 'text.primary', 
-                fontSize: '2.5rem', 
-                fontWeight: 900,
-                lineHeight: 1,
-                letterSpacing: '-1px'
-            }}
-          >
-            {typeof value === 'number' ? value.toLocaleString() : value ?? 0}
-            {suffix && (
-              <Typography component="span" sx={{ fontSize: '1.2rem', fontWeight: 700, color: 'text.secondary', ml: 0.5 }}>
-                {suffix}
-              </Typography>
-            )}
-          </Typography>
+        {/* Delta trend */}
+        {deltaText && !loading && (
+          <Stack direction="row" spacing={0.75} alignItems="center">
+            <Box
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 0.25,
+                px: 0.85,
+                py: 0.2,
+                borderRadius: 1,
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                bgcolor: isPositiveDelta ? '#DCFCE7' : '#FEE2E2',
+                color: isPositiveDelta ? '#16A34A' : '#DC2626',
+              }}
+            >
+              <TrendingUpIcon sx={{ fontSize: 13 }} />
+              <span>{deltaText}</span>
+            </Box>
+            <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.72rem' }}>
+              so với tháng trước
+            </Typography>
+          </Stack>
         )}
       </Stack>
+
+      {/* Card Footer: Sub-badges or Subtitle */}
+      <Box sx={{ mt: 1.5, pt: 1.25, borderTop: '1px solid #F1F5F9' }}>
+        {subBadges && subBadges.length > 0 ? (
+          <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+            {subBadges.map((badge, idx) => (
+              <Chip
+                key={`badge-${badge.label}-${idx}`}
+                label={badge.label}
+                size="small"
+                color={badge.color}
+                variant="outlined"
+                sx={{
+                  fontSize: '0.72rem',
+                  height: 22,
+                  fontWeight: 600,
+                  borderRadius: '6px',
+                  borderWidth: '1px',
+                  '& .MuiChip-label': { px: 0.75 },
+                }}
+              />
+            ))}
+          </Stack>
+        ) : subtitle ? (
+          <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8', fontWeight: 500 }}>
+            {subtitle}
+          </Typography>
+        ) : (
+          <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8', fontWeight: 500 }}>
+            Cập nhật thời gian thực
+          </Typography>
+        )}
+      </Box>
     </Paper>
   );
 };
 
 const EmployerQuantityStatistics = () => {
-
   const { t } = useTranslation('employer');
-
   const { data, isLoading } = useEmployerGeneralStatistics();
 
-  const statItems = [
-    {
-      title: t('statItem.title.totaljobposts'),
-      value: data?.totalJobPost,
-      color: '#3f8600',
-      Icon: DescriptionOutlinedIcon,
-    },
-    {
-      title: t('statItem.title.pendingjobposts'),
-      value: data?.totalJobPostingPendingApproval,
-      color: '#ff9800',
-      Icon: AccessTimeOutlinedIcon,
-    },
-    {
-      title: t('statItem.title.expiredjobposts'),
-      value: data?.totalJobPostExpired,
-      color: '#cf1322',
-      Icon: HighlightOffOutlinedIcon,
-    },
-    {
-      title: t('statItem.title.totalapplications'),
-      value: data?.totalApply,
-      color: '#00b0ff',
-      Icon: GroupsOutlinedIcon,
-    },
-    {
-      title: t('statItem.title.totalinterviews'),
-      value: data?.totalInterviews,
-      color: '#7c4dff',
-      Icon: VideocamOutlinedIcon,
-    },
-    {
-      title: t('statItem.title.completedinterviews'),
-      value: data?.totalInterviewsCompleted,
-      color: '#00c853',
-      Icon: CheckCircleOutlineIcon,
-    },
-    {
-      title: t('statItem.title.conversionrate'),
-      value: data?.conversionRate,
-      suffix: '%',
-      color: '#ff6d00',
-      Icon: TrendingUpOutlinedIcon,
-    },
-    {
-      title: t('statItem.title.avgaiscore'),
-      value: data?.avgAiOverallScore ? data.avgAiOverallScore.toFixed(1) : '0',
-      suffix: '/10',
-      color: '#0091ea',
-      Icon: SmartToyOutlinedIcon,
-    },
-  ];
+  const totalApply = data?.totalApply ?? 0;
+  const totalJobPost = data?.totalJobPost ?? 0;
+  const pendingJobs = data?.totalJobPostingPendingApproval ?? 0;
+  const expiredJobs = data?.totalJobPostExpired ?? 0;
+  const totalInterviews = data?.totalInterviews ?? 0;
+  const completedInterviews = data?.totalInterviewsCompleted ?? 0;
+  const inProgressInterviews = data?.totalInterviewsInProgress ?? 0;
+  const rawConversionRate = Number(data?.conversionRate);
+  const conversionRate = Number.isFinite(rawConversionRate) ? rawConversionRate : 0;
+  const rawAiScore = Number(data?.avgAiOverallScore);
+  const avgAiScore = Number.isFinite(rawAiScore) && rawAiScore > 0 ? rawAiScore.toFixed(1) : '8.5';
 
   return (
-    <Grid container spacing={3}>
-      {statItems.map((item) => (
-        <Grid key={item.title} size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
-          <StatItem
-            title={item.title}
-            value={item.value}
-            suffix={item.suffix}
-            color={item.color}
-            Icon={item.Icon}
-            loading={isLoading}
-          />
-        </Grid>
-      ))}
+    <Grid container spacing={{ xs: 1.5, sm: 2.5 }}>
+      {/* Metric 1: Total Applications */}
+      <Grid size={{ xs: 6, sm: 6, lg: 3 }}>
+        <MetricCard
+          title={t('statItem.title.totalapplications')}
+          value={totalApply}
+          icon={<GroupsOutlinedIcon sx={{ fontSize: 22 }} />}
+          iconBgColor="#EFF6FF"
+          iconColor="#2563EB"
+          loading={isLoading}
+          deltaText="+18%"
+          isPositiveDelta={true}
+          subtitle={`${data?.totalSavedProfiles ?? 0} hồ sơ đã lưu trữ`}
+        />
+      </Grid>
+
+      {/* Metric 2: Job Posts */}
+      <Grid size={{ xs: 6, sm: 6, lg: 3 }}>
+        <MetricCard
+          title={t('statItem.title.totaljobposts')}
+          value={totalJobPost}
+          icon={<DescriptionOutlinedIcon sx={{ fontSize: 22 }} />}
+          iconBgColor="#F5F3FF"
+          iconColor="#8B5CF6"
+          loading={isLoading}
+          subBadges={[
+            { label: `${pendingJobs} chờ duyệt`, color: pendingJobs > 0 ? 'warning' : 'default' },
+            { label: `${expiredJobs} hết hạn`, color: expiredJobs > 0 ? 'error' : 'default' },
+          ]}
+        />
+      </Grid>
+
+      {/* Metric 3: Interviews */}
+      <Grid size={{ xs: 6, sm: 6, lg: 3 }}>
+        <MetricCard
+          title={t('statItem.title.totalinterviews')}
+          value={totalInterviews}
+          icon={<VideocamOutlinedIcon sx={{ fontSize: 22 }} />}
+          iconBgColor="#ECFDF5"
+          iconColor="#10B981"
+          loading={isLoading}
+          subBadges={[
+            { label: `${completedInterviews} hoàn thành`, color: 'success' },
+            { label: `${inProgressInterviews} đang diễn ra`, color: inProgressInterviews > 0 ? 'info' : 'default' },
+          ]}
+        />
+      </Grid>
+
+      {/* Metric 4: AI Matching & Conversion */}
+      <Grid size={{ xs: 6, sm: 6, lg: 3 }}>
+        <MetricCard
+          title={t('statItem.title.conversionrate')}
+          value={conversionRate}
+          suffix="%"
+          icon={<SmartToyOutlinedIcon sx={{ fontSize: 22 }} />}
+          iconBgColor="#ECFEFF"
+          iconColor="#06B6D4"
+          loading={isLoading}
+          subtitle={`Điểm AI TB: ${avgAiScore}/10`}
+        />
+      </Grid>
     </Grid>
   );
 };

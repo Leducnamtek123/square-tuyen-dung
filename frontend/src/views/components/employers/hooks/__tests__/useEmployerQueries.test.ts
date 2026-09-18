@@ -26,7 +26,7 @@ jest.mock('../../../../../services/jobService', () => ({
   },
 }));
 
-import jobService from '../../../../../services/jobService';
+import jobService from '@/services/jobService';
 import { normalizeJobPostOptions, useJobPostMutations } from '../useEmployerQueries';
 
 describe('normalizeJobPostOptions', () => {

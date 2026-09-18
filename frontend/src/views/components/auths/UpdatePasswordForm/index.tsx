@@ -12,7 +12,7 @@ import { Grid2 as Grid } from "@mui/material";
 
 import { useTranslation } from 'react-i18next';
 
-import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
+import PasswordTextFieldCustom from '@/components/Common/Controls/PasswordTextFieldCustom';
 import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface UpdatePasswordFormData {

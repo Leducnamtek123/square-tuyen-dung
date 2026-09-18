@@ -2,8 +2,8 @@
 import React from 'react';
 import { Container, Divider, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import CategoryCard from '../../components/defaults/CategoryCard';
-import useSEO from '../../../hooks/useSEO';
+import CategoryCard from '@/views/components/defaults/CategoryCard';
+import useSEO from '@/hooks/useSEO';
 import { useConfig } from '@/hooks/useConfig';
 
 
@@ -24,7 +24,7 @@ const JobsByCityPage = () => {
 
     <Container maxWidth="lg" sx={{ py: 2 }}>
 
-      <Typography variant="h4">{t("jobsByCategoryPage.cityTitle")}</Typography>
+      <Typography variant="h4" component="h1">{t("jobsByCategoryPage.cityTitle")}</Typography>
 
       <Divider sx={{ mt: 1, mb: 4 }} />
 

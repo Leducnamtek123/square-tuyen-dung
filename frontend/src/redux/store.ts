@@ -11,7 +11,7 @@ import {
 } from '@/utils/storageKeys';
 
 // ---------------------------------------------------------------------------
-// Persistence middleware — keeps side effects OUT of reducers
+// Persistence middleware - keeps side effects OUT of reducers
 // ---------------------------------------------------------------------------
 
 const persistenceMiddleware = createListenerMiddleware();
@@ -70,7 +70,7 @@ const store = configureStore({
     profile: profileReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(persistenceMiddleware.middleware),
+    getDefaultMiddleware().prepend(persistenceMiddleware.middleware as any),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

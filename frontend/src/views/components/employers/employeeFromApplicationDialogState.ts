@@ -1,38 +1,33 @@
-import type { EmployeeFromApplicationPayload } from '@/services/hrmService';
+import type { OnboardCandidatePayload } from '@/services/hrmService';
 
 export type EmployeeFromApplicationFormState = {
-  fullName: string;
-  email: string;
-  phone: string;
-  jobTitle: string;
-  department: string;
-  startDate: string;
-  createHrmAccount: boolean;
-  sendWelcomeEmail: boolean;
-  hrmRoles: string;
+  departmentId: number | '' | null;
+  designationId: number | '' | null;
+  reportsToId: number | '' | null;
+  joinDate: string;
+  probationEndDate: string;
+  baseSalary: number | '';
+  allowance: number | '';
+  employmentType: string;
+  status: string;
   notes: string;
 };
 
-export const hasEmployeeAccountEmail = (email: string): boolean => Boolean(email.trim());
-
 export const buildEmployeeFromApplicationPayload = (
   applicationId: number,
-  form: EmployeeFromApplicationFormState
-): EmployeeFromApplicationPayload => {
-  const email = form.email.trim();
-  const canCreateHrmAccount = form.createHrmAccount && hasEmployeeAccountEmail(email);
-
+  form: EmployeeFromApplicationFormState,
+): OnboardCandidatePayload => {
   return {
-    applicationId,
-    fullName: form.fullName.trim(),
-    email: email || undefined,
-    phone: form.phone.trim() || undefined,
-    jobTitle: form.jobTitle.trim(),
-    department: form.department.trim() || undefined,
-    startDate: form.startDate || null,
-    createHrmAccount: canCreateHrmAccount,
-    sendWelcomeEmail: canCreateHrmAccount && form.sendWelcomeEmail,
-    hrmRoles: [],
+    job_application_id: applicationId,
+    department_id: form.departmentId ? Number(form.departmentId) : undefined,
+    designation_id: form.designationId ? Number(form.designationId) : undefined,
+    reports_to_id: form.reportsToId ? Number(form.reportsToId) : undefined,
+    join_date: form.joinDate || undefined,
+    probation_end_date: form.probationEndDate || undefined,
+    base_salary: form.baseSalary !== '' ? Number(form.baseSalary) : 0,
+    allowance: form.allowance !== '' ? Number(form.allowance) : 0,
+    employment_type: form.employmentType || 'FULL_TIME',
+    status: form.status || 'PROBATION',
     notes: form.notes.trim() || undefined,
   };
 };

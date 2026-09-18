@@ -1,5 +1,5 @@
 import React from 'react';
-import InterviewDetailCard from '../../components/employers/InterviewDetailCard';
+import InterviewDetailCard from '@/views/components/employers/InterviewDetailCard';
 
 const InterviewDetailPage = () => {
     return (

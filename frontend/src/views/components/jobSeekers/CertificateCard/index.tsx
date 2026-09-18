@@ -16,17 +16,17 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import { Theme } from '@mui/material/styles';
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import EmptyCard from '../../../../components/Common/EmptyCard';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import EmptyCard from '@/components/Common/EmptyCard';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import CertificateForm, { FormValues as CertificateFormValues } from '../CertificateForm';
-import TimeAgo from '../../../../components/Common/TimeAgo';
-import resumeService from '../../../../services/resumeService';
-import certificateService from '../../../../services/certificateService';
-import type { Certificate } from '../../../../types/models';
+import TimeAgo from '@/components/Common/TimeAgo';
+import resumeService from '@/services/resumeService';
+import certificateService from '@/services/certificateService';
+import type { Certificate } from '@/types/models';
 
 interface CertificateCardProps {
   title: string;
@@ -128,6 +128,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
   }, [state.editData]);
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadCertificates = async (slug: string | undefined) => {
       if (!slug) return;
 
@@ -135,15 +136,21 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
         const resData = await resumeService.getCertificates(slug);
+        if (!isMounted) return;
         dispatch({ type: 'set-certificates', value: resData });
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set-loading', value: false });
+        if (isMounted) {
+          dispatch({ type: 'set-loading', value: false });
+        }
       }
     };
 
     loadCertificates(resumeSlug);
+    return () => {
+      isMounted = false;
+    };
   }, [resumeSlug, state.isSuccess]);
 
   const handleShowUpdate = (id: string | number) => {
@@ -322,7 +329,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
                           </Typography>
 
                           <Stack direction="row" spacing={1}>
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                               color="primary"
                               size="small"
                               onClick={() => handleShowUpdate(value.id)}
@@ -333,7 +340,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
                             >
                               <ModeEditOutlineOutlinedIcon fontSize="small" />
                             </IconButton>
-                            <IconButton
+                            <IconButton aria-label="Thao tác"
                               color="error"
                               size="small"
                               onClick={() => handleDeleteCertificates(value.id)}

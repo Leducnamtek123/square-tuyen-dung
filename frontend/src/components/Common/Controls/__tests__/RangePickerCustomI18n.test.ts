@@ -9,16 +9,16 @@ const readKey = (locale: Record<string, unknown>, key: string) => key.split('.')
 );
 
 describe('RangePickerCustom i18n', () => {
-  it('does not hard-code the refresh aria label', () => {
-    expect(source).not.toContain('aria-label="refresh"');
-    expect(source).toContain("t('actions.refresh')");
+  it('uses localized apply action button without hardcoded text', () => {
+    expect(source).toContain("t('actions.apply')");
+    expect(source).not.toContain("defaultValue");
   });
 
-  it('has Vietnamese and English locale entries for refresh action', () => {
+  it('has Vietnamese and English locale entries for apply action', () => {
     const vi = JSON.parse(readFileSync(join(__dirname, '../../../../i18n/locales/vi/common.json'), 'utf8'));
     const en = JSON.parse(readFileSync(join(__dirname, '../../../../i18n/locales/en/common.json'), 'utf8'));
 
-    expect(readKey(vi, 'actions.refresh')).toEqual(expect.any(String));
-    expect(readKey(en, 'actions.refresh')).toEqual(expect.any(String));
+    expect(readKey(vi, 'actions.apply')).toEqual(expect.any(String));
+    expect(readKey(en, 'actions.apply')).toEqual(expect.any(String));
   });
 });

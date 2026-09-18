@@ -10,6 +10,12 @@ export type SystemSettingsPayload = {
   ttsSpeed?: string;
   interviewQuestionGapSeconds?: string;
   interviewMinimumSilenceSeconds?: string;
+  chatbotTitle?: string;
+  chatbotSubtitle?: string;
+  chatbotEmployerGreeting?: string;
+  chatbotJobSeekerGreeting?: string;
+  chatbotEmployerSuggestions?: string;
+  chatbotJobSeekerSuggestions?: string;
 };
 
 export type SystemHealthPayload = {

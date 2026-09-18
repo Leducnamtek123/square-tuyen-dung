@@ -14,7 +14,7 @@ RETENTION_DAYS="${RETENTION_DAYS:-7}"
 DB_CONTAINER="${DB_CONTAINER:-tuyendung-studio-db}"
 DB_NAME="${DB_NAME:-square_db}"
 DB_USER="${DB_USER:-root}"
-DB_PASSWORD="${DB_PASSWORD:-secret}"
+DB_PASSWORD="${DB_PASSWORD:?DB_PASSWORD must be set in environment}"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="${BACKUP_DIR}/${DB_NAME}_${TIMESTAMP}.sql.gz"
 

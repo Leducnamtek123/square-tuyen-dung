@@ -164,7 +164,7 @@ def get_recommended_jobs(user, limit=20):
                 output_field=IntegerField(),
             ),
         )
-        .order_by('-relevance_score', '-is_hot', '-is_urgent', '-create_at')
+        .order_by('-relevance_score', '-is_urgent', '-is_hot', '-create_at')
     )
 
     # Filter to only jobs with at least some relevance

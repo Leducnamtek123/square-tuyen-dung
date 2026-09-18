@@ -72,37 +72,33 @@ const ChatProvider = ({ children }: ChatProviderProps) => {
 
     const createUserChat = async () => {
       try {
-        const isExists = await checkExists('accounts', userId);
+        let userData: ChatAccountData;
 
-        if (!isExists) {
-          let userData: ChatAccountData;
-
-          if (activeWorkspace?.type !== 'company') {
-            userData = {
-              userId,
-              name: currentUser.fullName ?? '',
-              email: currentUser.email,
-              avatarUrl: currentUser.avatarUrl ?? null,
-              company: null,
-            };
-          } else {
-            const userWithCompany = currentUser as UserWithCompany;
-            userData = {
-              userId,
-              name: currentUser.fullName ?? '',
-              email: currentUser.email,
-              avatarUrl: (userWithCompany.company?.imageUrl || currentUser.avatarUrl) ?? null,
-              company: {
-                companyId: userWithCompany.company?.id,
-                slug: userWithCompany.company?.slug,
-                companyName: userWithCompany.company?.companyName,
-                imageUrl: userWithCompany.company?.imageUrl,
-              },
-            };
-          }
-
-          await createUser('accounts', userData, userId);
+        if (activeWorkspace?.type !== 'company') {
+          userData = {
+            userId,
+            name: currentUser.fullName ?? '',
+            email: currentUser.email,
+            avatarUrl: currentUser.avatarUrl ?? null,
+            company: null,
+          };
+        } else {
+          const userWithCompany = currentUser as UserWithCompany;
+          userData = {
+            userId,
+            name: currentUser.fullName ?? '',
+            email: currentUser.email,
+            avatarUrl: (userWithCompany.company?.imageUrl || currentUser.avatarUrl) ?? null,
+            company: {
+              companyId: userWithCompany.company?.id,
+              slug: userWithCompany.company?.slug,
+              companyName: userWithCompany.company?.companyName,
+              imageUrl: userWithCompany.company?.imageUrl,
+            },
+          };
         }
+
+        await createUser('accounts', userData, userId);
 
         const userChat = (await getUserAccount('accounts', userId)) as ChatUser | null;
         if (!cancelled) {

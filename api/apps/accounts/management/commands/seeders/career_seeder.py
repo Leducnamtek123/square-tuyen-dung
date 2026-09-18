@@ -1,8 +1,8 @@
-﻿from pathlib import Path
+from pathlib import Path
 import logging
 from datetime import datetime, timezone
 
-from common.models import Career
+from apps.common.models import Career
 from apps.files.models import File
 from shared.helpers.cloudinary_service import CloudinaryService
 

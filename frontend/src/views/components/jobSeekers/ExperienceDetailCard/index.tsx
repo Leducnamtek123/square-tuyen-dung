@@ -7,16 +7,16 @@ import { Timeline, timelineItemClasses } from '@mui/lab';
 import AddIcon from '@mui/icons-material/Add';
 import { Theme } from '@mui/material/styles';
 
-import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import toastMessages from '../../../../utils/toastMessages';
-import errorHandling from '../../../../utils/errorHandling';
-import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import EmptyCard from '../../../../components/Common/EmptyCard';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import { confirmModal } from '@/utils/sweetalert2Modal';
+import toastMessages from '@/utils/toastMessages';
+import errorHandling from '@/utils/errorHandling';
+import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
+import EmptyCard from '@/components/Common/EmptyCard';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import ExperienceDetaiForm, { FormValues } from '../ExperienceDetailForm';
-import resumeService from '../../../../services/resumeService';
-import experienceDetailService from '../../../../services/experienceDetailService';
-import type { ExperienceDetail } from '../../../../types/models';
+import resumeService from '@/services/resumeService';
+import experienceDetailService from '@/services/experienceDetailService';
+import type { ExperienceDetail } from '@/types/models';
 import ExperienceDetailCardLoading from './ExperienceDetailCardLoading';
 import ExperienceDetailTimelineItem from './ExperienceDetailTimelineItem';
 
@@ -85,21 +85,28 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
   );
 
   React.useEffect(() => {
+    let isMounted = true;
     const loadExperiencesDetail = async (slug: string | undefined) => {
       if (!slug) return;
 
       dispatch({ type: 'set_loading', payload: true });
       try {
         const resData = await resumeService.getExperiencesDetail(slug);
+        if (!isMounted) return;
         setExperiencesDetail(resData);
       } catch (error: unknown) {
-        errorHandling(error);
+        if (isMounted) errorHandling(error);
       } finally {
-        dispatch({ type: 'set_loading', payload: false });
+        if (isMounted) {
+          dispatch({ type: 'set_loading', payload: false });
+        }
       }
     };
 
     loadExperiencesDetail(resumeSlug);
+    return () => {
+      isMounted = false;
+    };
   }, [resumeSlug, uiState.refreshToken]);
 
   const handleShowUpdate = (id: string | number) => {

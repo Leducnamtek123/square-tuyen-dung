@@ -1,33 +1,32 @@
 'use client';
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { Box, Button, Card, Stack } from "@mui/material";
+import { Box, Button, Card, Chip, Stack } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import SearchIcon from '@mui/icons-material/Search';
+import TuneRoundedIcon from '@mui/icons-material/TuneRounded';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
-import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
-import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
-import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import InputBaseSearchHomeCustom from '@/components/Common/Controls/InputBaseSearchHomeCustom';
+import SingleSelectSearchCustom from '@/components/Common/Controls/SingleSelectSearchCustom';
+import FormPopup from '@/components/Common/Controls/FormPopup';
 import {
   resetSearchJobPostFilter,
   searchJobPost,
   JobPostFilter,
-} from '../../../../redux/filterSlice';
-import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
-import { ROLES_NAME, ROUTES } from '../../../../configs/constants';
+} from '@/redux/filterSlice';
+import { useAppDispatch, useAppSelector } from '@/hooks/useAppStore';
+import { ROLES_NAME, ROUTES } from '@/configs/constants';
 import { useConfig } from '@/hooks/useConfig';
-import { SelectOption } from '../../../../types/models';
+import { SelectOption } from '@/types/models';
 import type { JobPostSearchFormValues } from './types';
 import { useJobPostSearchLocationOptions } from './useJobPostSearchLocationOptions';
 import JobPostSearchAdvancedFilters from './JobPostSearchAdvancedFilters';
 import JobPostNotificationForm, {
   getDefaultFrequency,
   type JobPostNotificationFormValues,
-} from '../../jobSeekers/JobPostNotificationForm';
+} from '@/views/components/jobSeekers/JobPostNotificationForm';
 import jobPostNotificationService from '@/services/jobPostNotificationService';
 import errorHandling from '@/utils/errorHandling';
 import toastMessages from '@/utils/toastMessages';
@@ -48,7 +47,7 @@ const JobPostSearch = () => {
   const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
   const [openSaveAlert, setOpenSaveAlert] = React.useState(false);
   const [saveAlertValues, setSaveAlertValues] = React.useState<Partial<JobPostNotificationFormValues> | null>(null);
-  const { control, handleSubmit, reset, getValues } = useForm<JobPostSearchFormValues>({
+  const { control, handleSubmit, reset, getValues, setValue } = useForm<JobPostSearchFormValues>({
     defaultValues: {
       kw: '',
       careerId: '',
@@ -118,6 +117,48 @@ const JobPostSearch = () => {
     name: 'districtId',
   });
 
+  const positionId = useWatch({
+    control,
+    name: 'positionId',
+  });
+
+  const experienceId = useWatch({
+    control,
+    name: 'experienceId',
+  });
+
+  const jobTypeId = useWatch({
+    control,
+    name: 'jobTypeId',
+  });
+
+  const typeOfWorkplaceId = useWatch({
+    control,
+    name: 'typeOfWorkplaceId',
+  });
+
+  const genderId = useWatch({
+    control,
+    name: 'genderId',
+  });
+
+  const wardId = useWatch({
+    control,
+    name: 'wardId',
+  });
+
+  const activeAdvancedFilterCount = React.useMemo(() => {
+    let count = 0;
+    if (districtId) count++;
+    if (wardId) count++;
+    if (positionId) count++;
+    if (experienceId) count++;
+    if (jobTypeId) count++;
+    if (typeOfWorkplaceId) count++;
+    if (genderId) count++;
+    return count;
+  }, [districtId, wardId, positionId, experienceId, jobTypeId, typeOfWorkplaceId, genderId]);
+
   const { districtOptions, wardOptions } = useJobPostSearchLocationOptions({
     cityId: cityId ?? '',
     districtId: districtId ?? '',
@@ -150,11 +191,8 @@ const JobPostSearch = () => {
   };
 
   const handleFilter = (data: Partial<JobPostFilter>) => {
-
     handleSaveKeywordLocalStorage(data?.kw);
-
-      dispatch(searchJobPost(data as JobPostFilter));
-
+    dispatch(searchJobPost(data as JobPostFilter));
   };
 
   const handleOpenSaveAlert = () => {
@@ -203,8 +241,8 @@ const JobPostSearch = () => {
         sx={{
           p: { xs: 1.5, sm: 2, md: 2.5 },
           boxShadow: '0 10px 28px rgba(15, 57, 127, 0.08)',
-          backgroundColor: 'background.paper',
-          border: '1px solid rgba(26, 64, 125, 0.1)',
+          backgroundColor: '#ffffff',
+          border: '1px solid #e2e8f0',
           borderRadius: 4,
         }}
       >
@@ -215,8 +253,9 @@ const JobPostSearch = () => {
               sm: 12,
               md: 6,
               lg: 4,
-              xl: 4
-            }}>
+              xl: 4,
+            }}
+          >
             <InputBaseSearchHomeCustom
               name="kw"
               placeholder={t('jobSearch.searchPlaceholder')}
@@ -229,8 +268,9 @@ const JobPostSearch = () => {
               sm: 6,
               md: 3,
               lg: 2,
-              xl: 2
-            }}>
+              xl: 2,
+            }}
+          >
             <SingleSelectSearchCustom
               name="careerId"
               placeholder={t('jobSearch.allCareers')}
@@ -244,8 +284,9 @@ const JobPostSearch = () => {
               sm: 6,
               md: 3,
               lg: 2,
-              xl: 2
-            }}>
+              xl: 2,
+            }}
+          >
             <SingleSelectSearchCustom
               name="cityId"
               placeholder={t('jobSearch.allCities')}
@@ -259,82 +300,268 @@ const JobPostSearch = () => {
               sm: 12,
               md: 12,
               lg: 4,
-              xl: 4
-            }}>
-            <Stack
-              spacing={2}
-              direction={{
-                xs: 'column',
-                sm: 'row',
-                md: 'row',
-                lg: 'row',
-                xl: 'row',
+              xl: 4,
+            }}
+          >
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 1.25,
+                gridTemplateColumns: {
+                  xs: 'repeat(2, 1fr)',
+                  sm: 'repeat(3, auto)',
+                },
+                justifyContent: { sm: 'flex-end', lg: 'center' },
               }}
-              justifyContent={{ sm: 'flex-end', lg: 'center' }}
             >
               <Button
                 variant="contained"
-                color="primary"
                 startIcon={<SearchIcon />}
-                sx={{
-                  whiteSpace: 'nowrap',
-                  width: { xs: '100%', sm: 'auto' },
-                  justifyContent: 'center',
-                }}
                 type="submit"
+                sx={{
+                  gridColumn: { xs: 'span 2', sm: 'auto' },
+                  whiteSpace: 'nowrap',
+                  width: '100%',
+                  minHeight: 44,
+                  justifyContent: 'center',
+                  borderRadius: '10px',
+                  backgroundColor: '#2563eb',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  px: 2.5,
+                  py: 1,
+                  boxShadow: '0 2px 8px -1px rgba(37,99,235,0.3)',
+                  '&:hover': {
+                    backgroundColor: '#1d4ed8',
+                    boxShadow: '0 4px 14px -2px rgba(37,99,235,0.4)',
+                  },
+                }}
               >
                 {t('jobSearch.searchButton')}
               </Button>
               <Button
                 variant="outlined"
-                color="primary"
                 sx={{
+                  gridColumn: { xs: 'span 1', sm: 'auto' },
                   whiteSpace: 'nowrap',
-                  width: { xs: '100%', sm: 'auto' },
+                  width: '100%',
+                  minHeight: 44,
                   justifyContent: 'center',
+                  borderRadius: '10px',
+                  borderColor: '#cbd5e1',
+                  color: '#334155',
+                  fontWeight: 700,
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                  textTransform: 'none',
+                  px: 1.5,
+                  py: 1,
+                  '&:hover': {
+                    borderColor: '#2563eb',
+                    backgroundColor: '#eff6ff',
+                    color: '#2563eb',
+                  },
                 }}
-                startIcon={<BookmarkAddIcon />}
+                startIcon={<BookmarkAddIcon sx={{ color: '#2563eb' }} />}
                 onClick={handleOpenSaveAlert}
               >
                 {t('jobSearch.saveSearch')}
               </Button>
               <Button
-                variant="contained"
+                variant="outlined"
                 sx={{
-                  color: 'white',
+                  gridColumn: { xs: 'span 1', sm: 'auto' },
                   whiteSpace: 'nowrap',
-                  width: { xs: '100%', sm: 'auto' },
+                  width: '100%',
+                  minHeight: 44,
                   justifyContent: 'center',
+                  borderRadius: '10px',
+                  borderColor: activeAdvancedFilterCount > 0 ? '#2563eb' : '#cbd5e1',
+                  backgroundColor: activeAdvancedFilterCount > 0 ? '#eff6ff' : '#ffffff',
+                  color: activeAdvancedFilterCount > 0 ? '#2563eb' : '#0f172a',
+                  fontWeight: 700,
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                  textTransform: 'none',
+                  px: 1.5,
+                  py: 1,
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#2563eb',
+                    backgroundColor: '#dbeafe',
+                  },
+                  transition: 'all 0.15s ease-in-out',
                 }}
-                startIcon={
-                  showAdvanceFilter ? <FilterAltOffIcon /> : <FilterAltIcon />
-                }
-                color="secondary"
+                startIcon={<TuneRoundedIcon sx={{ color: activeAdvancedFilterCount > 0 ? '#2563eb' : '#0f172a' }} />}
                 onClick={handleChangeShowFilter}
               >
                 {t('jobSearch.advancedFilter')}
+                {activeAdvancedFilterCount > 0 && (
+                  <Box
+                    component="span"
+                    sx={{
+                      ml: 0.75,
+                      px: 0.75,
+                      py: 0.1,
+                      borderRadius: '6px',
+                      backgroundColor: '#2563eb',
+                      color: '#ffffff',
+                      fontSize: '0.725rem',
+                      fontWeight: 800,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {activeAdvancedFilterCount}
+                  </Box>
+                )}
               </Button>
-            </Stack>
+            </Box>
           </Grid>
         </Grid>
       </Card>
-      {showAdvanceFilter ? (
-        <JobPostSearchAdvancedFilters
-          t={t}
-          control={control}
-          cityId={cityId ?? ''}
-          districtId={districtId ?? ''}
-          districtOptions={districtOptions}
-          wardOptions={wardOptions}
-          localizedJobTypeOptions={localizedJobTypeOptions}
-          localizedTypeOfWorkplaceOptions={localizedTypeOfWorkplaceOptions}
-          localizedPositionOptions={localizedPositionOptions}
-          localizedExperienceOptions={localizedExperienceOptions}
-          localizedGenderOptions={localizedGenderOptions}
-          onReset={handleReset}
-          onToggleAdvancedFilter={handleChangeShowFilter}
-        />
-      ) : null}
+
+      {/* -- Active Filters Chips Bar ------------------------------------------ */}
+      {activeAdvancedFilterCount > 0 && (
+        <Box
+          sx={{
+            mt: 1.5,
+            p: 1.25,
+            px: 2,
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            flexWrap: 'wrap',
+          }}
+        >
+          <Box component="span" sx={{ color: '#64748b', fontSize: '0.775rem', fontWeight: 700, mr: 0.5 }}>
+            Đang lọc:
+          </Box>
+
+          {districtId && (
+            <Chip
+              size="small"
+              label={`Quận/Huyện: ${districtOptions.find((d) => String(d.id) === String(districtId))?.name || districtId}`}
+              onDelete={() => {
+                setValue('districtId', '');
+                setValue('wardId', '');
+                handleSubmit(handleFilter)();
+              }}
+              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+            />
+          )}
+
+          {wardId && (
+            <Chip
+              size="small"
+              label={`Phường/Xã: ${wardOptions.find((w) => String(w.id) === String(wardId))?.name || wardId}`}
+              onDelete={() => {
+                setValue('wardId', '');
+                handleSubmit(handleFilter)();
+              }}
+              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+            />
+          )}
+
+          {positionId && (
+            <Chip
+              size="small"
+              label={`Cấp bậc: ${localizedPositionOptions.find((p) => String(p.id) === String(positionId))?.name || positionId}`}
+              onDelete={() => {
+                setValue('positionId', '');
+                handleSubmit(handleFilter)();
+              }}
+              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+            />
+          )}
+
+          {experienceId && (
+            <Chip
+              size="small"
+              label={`Kinh nghiệm: ${localizedExperienceOptions.find((e) => String(e.id) === String(experienceId))?.name || experienceId}`}
+              onDelete={() => {
+                setValue('experienceId', '');
+                handleSubmit(handleFilter)();
+              }}
+              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+            />
+          )}
+
+          {jobTypeId && (
+            <Chip
+              size="small"
+              label={`Hình thức: ${localizedJobTypeOptions.find((j) => String(j.id) === String(jobTypeId))?.name || jobTypeId}`}
+              onDelete={() => {
+                setValue('jobTypeId', '');
+                handleSubmit(handleFilter)();
+              }}
+              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+            />
+          )}
+
+          {typeOfWorkplaceId && (
+            <Chip
+              size="small"
+              label={`Nơi làm việc: ${localizedTypeOfWorkplaceOptions.find((w) => String(w.id) === String(typeOfWorkplaceId))?.name || typeOfWorkplaceId}`}
+              onDelete={() => {
+                setValue('typeOfWorkplaceId', '');
+                handleSubmit(handleFilter)();
+              }}
+              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+            />
+          )}
+
+          {genderId && (
+            <Chip
+              size="small"
+              label={`Giới tính: ${localizedGenderOptions.find((g) => String(g.id) === String(genderId))?.name || genderId}`}
+              onDelete={() => {
+                setValue('genderId', '');
+                handleSubmit(handleFilter)();
+              }}
+              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+            />
+          )}
+
+          <Button
+            size="small"
+            onClick={handleReset}
+            sx={{
+              color: '#ef4444',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              textTransform: 'none',
+              p: 0.5,
+              ml: 'auto',
+              minWidth: 0,
+              '&:hover': { backgroundColor: 'transparent', color: '#b91c1c' },
+            }}
+          >
+            Xóa tất cả
+          </Button>
+        </Box>
+      )}
+
+      {/* -- Advanced Filters Drawer ------------------------------------------ */}
+      <JobPostSearchAdvancedFilters
+        open={showAdvanceFilter}
+        t={t}
+        control={control}
+        cityId={cityId ?? ''}
+        districtId={districtId ?? ''}
+        districtOptions={districtOptions}
+        wardOptions={wardOptions}
+        localizedJobTypeOptions={localizedJobTypeOptions}
+        localizedTypeOfWorkplaceOptions={localizedTypeOfWorkplaceOptions}
+        localizedPositionOptions={localizedPositionOptions}
+        localizedExperienceOptions={localizedExperienceOptions}
+        localizedGenderOptions={localizedGenderOptions}
+        onReset={handleReset}
+        onToggleAdvancedFilter={handleChangeShowFilter}
+        onApply={handleSubmit(handleFilter)}
+        activeFilterCount={activeAdvancedFilterCount}
+      />
 
       <FormPopup
         title={t('jobSearch.saveSearch')}
@@ -354,4 +581,3 @@ const JobPostSearch = () => {
 };
 
 export default JobPostSearch;
-

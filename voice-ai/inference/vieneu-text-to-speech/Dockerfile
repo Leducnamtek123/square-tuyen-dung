@@ -25,13 +25,12 @@ WORKDIR /workspace
 
 # Create virtual environment and install packages
 # We use a single stage to ensure no path/symlink issues with the venv
-# NOTE: VieNeu fast mode uses LMDeploy Turbomind, which requires CUDA 12.8+.
+# NOTE: VieNeu v3 Turbo GPU path uses torch 2.8.0 (CUDA 12.8) and pinned transformers 4.57.6.
 RUN uv venv /opt/venv && \
     uv pip install --no-cache \
-    "torch==2.7.1" "torchaudio==2.7.1" "torchvision==0.22.1" --index-url https://download.pytorch.org/whl/cu128 && \
-    # Pin to 1.2.6 because vieneu 2.x pulls sea-g2p, which requires a Rust source build.
-    uv pip install --no-cache "accelerate>=0.30.0" "vieneu[gpu]==2.7.0" "loguru" "fastapi" "uvicorn" "pydantic" "numpy" && \
-    uv pip install --no-cache "transformers>=4.45.0" "torchao==0.12.0"
+    "torch==2.8.0" "torchaudio==2.8.0" "torchvision" --index-url https://download.pytorch.org/whl/cu128 && \
+    uv pip install --no-cache "transformers==4.57.6" "accelerate>=0.30.0" "loguru" "fastapi" "uvicorn" "pydantic" "numpy" && \
+    (uv pip install --no-cache "vieneu[cuda]" || uv pip install --no-cache "vieneu>=3.0.0")
 
 # Ensure PyTorch's bundled NCCL takes priority over the system one
 ENV LD_LIBRARY_PATH="/opt/venv/lib/python3.10/site-packages/torch/lib:${LD_LIBRARY_PATH}"

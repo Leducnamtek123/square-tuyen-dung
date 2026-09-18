@@ -1,7 +1,7 @@
 import React from 'react';
 import type { UseFormGetValues, UseFormReset } from 'react-hook-form';
-import commonService from '../../../../services/commonService';
-import type { SelectOption } from '../../../../types/models';
+import commonService from '@/services/commonService';
+import type { SelectOption } from '@/types/models';
 import type { JobPostSearchFormValues } from './types';
 
 type UseJobPostSearchLocationOptionsParams = {

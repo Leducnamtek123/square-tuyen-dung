@@ -1,11 +1,11 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../configs/constants';
+import { ROUTES } from '@/configs/constants';
 
 const VoiceAiInterviewRedirectPage = () => {
   const { id } = useParams();
@@ -25,7 +25,7 @@ const VoiceAiInterviewRedirectPage = () => {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -47,7 +47,7 @@ const VoiceAiInterviewRedirectPage = () => {
         elevation={0}
       >
         <Stack spacing={2}>
-          <Typography variant="h5" sx={{ fontWeight: 800 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: '#ffffff' }}>
             {t('redirectTitle')}
           </Typography>
           <Typography sx={{ color: '#cbd5e1' }}>
