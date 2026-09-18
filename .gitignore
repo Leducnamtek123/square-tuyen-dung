@@ -20,6 +20,7 @@ frontend/docker/nginx/certs/
 !backups/db_backup_latest.sql.gz
 backups/*
 !backups/db_backup_latest.sql.gz
+!backups/minio_media_latest.tar.gz
 !backups/README.md
 api/data/*.sql
 
