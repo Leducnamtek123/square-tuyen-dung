@@ -17,7 +17,10 @@ frontend/docker/nginx/certs/
 # Database dumps & backups
 *.sql
 *.sql.gz
-backups/
+!backups/db_backup_latest.sql.gz
+backups/*
+!backups/db_backup_latest.sql.gz
+!backups/README.md
 api/data/*.sql
 
 # Python
