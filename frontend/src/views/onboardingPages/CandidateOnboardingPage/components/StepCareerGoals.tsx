@@ -85,7 +85,7 @@ export default function StepCareerGoals({
 
       <Grid container spacing={3}>
         {/* Field 1: Desired Job Title */}
-        <Grid size={{ xs: 12 }}>
+        <Grid size={{ xs: 12, sm: 7 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('onboarding.step1.desiredJobTitle', 'Bạn đang tìm công việc gì?')} <Box component="span" sx={{ color: '#EF4444' }}>*</Box>
           </Typography>
@@ -99,6 +99,34 @@ export default function StepCareerGoals({
             slotProps={{
               formHelperText: {
                 sx: { color: errors.desiredJobTitle ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
+              },
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2.5,
+                backgroundColor: '#F8FAFC',
+                '&:hover': { backgroundColor: '#FFFFFF' },
+                '&.Mui-focused': { backgroundColor: '#FFFFFF' },
+              },
+            }}
+          />
+        </Grid>
+
+        {/* Field 1B: Contact Phone */}
+        <Grid size={{ xs: 12, sm: 5 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
+            {t('onboarding.step1.phone', 'Số điện thoại liên hệ')}
+          </Typography>
+          <TextField
+            fullWidth
+            placeholder={t('onboarding.step1.phonePlaceholder', 'VD: 0912345678')}
+            value={values.phone || ''}
+            onChange={(e) => onChange('phone', e.target.value)}
+            error={Boolean(errors.phone)}
+            helperText={errors.phone || t('onboarding.step1.phoneHelper', 'Dùng để nhà tuyển dụng liên hệ phỏng vấn')}
+            slotProps={{
+              formHelperText: {
+                sx: { color: errors.phone ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
               },
             }}
             sx={{

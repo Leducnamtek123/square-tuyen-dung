@@ -16,6 +16,7 @@ export interface User {
   phoneNumber?: string;
   roleName?: RoleName;
   avatarUrl?: string | null;
+  coverUrl?: string | null;
   hasCompany?: boolean;
   isVerifyEmail?: boolean;
   isPhoneVerified?: boolean;
@@ -27,7 +28,7 @@ export interface User {
   isActive?: boolean;
   dateJoined?: string;
   /** Job seeker profile object returned by backend (when roleName === 'JOB_SEEKER') */
-  jobSeekerProfile?: { id: number | string } | null;
+  jobSeekerProfile?: { id: number | string; coverUrl?: string | null; avatarUrl?: string | null } | null;
   /** Flat job seeker profile ID (alternative backend serialization) */
   jobSeekerProfileId?: number | string | null;
 }
@@ -385,6 +386,7 @@ export interface JobSeekerProfile {
   location?: Location | null;
   userDict?: UserDict;
   user?: number | string | null;
+  coverUrl?: string | null;
   isJobSeeking?: boolean;
   isSeekingJob?: boolean;
 }

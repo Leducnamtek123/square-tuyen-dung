@@ -35,6 +35,10 @@ interface CandidateResumePreviewModalProps {
   candidateName?: string;
   candidateEmail?: string;
   candidatePhone?: string;
+  candidateCity?: string;
+  candidateExperience?: string;
+  candidateEducation?: string;
+  candidateSkills?: string[];
   avatarUrl?: string;
 }
 
@@ -45,6 +49,10 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   candidateName = '',
   candidateEmail = '',
   candidatePhone = '',
+  candidateCity = '',
+  candidateExperience = '',
+  candidateEducation = '',
+  candidateSkills = [],
   avatarUrl,
 }) => {
   const displayName = candidateName || resume?.user?.fullName || resume?.userDict?.fullName || 'Ứng viên';
@@ -54,19 +62,23 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   const updatedAt = resume?.updateAt || resume?.createAt;
 
   const cityName =
-    typeof resume?.city === 'object' && resume.city?.name
-      ? resume.city.name
-      : resume?.locationChooseData?.name || '';
+    candidateCity ||
+    (typeof resume?.city === 'object' && resume.city?.name ? resume.city.name : '') ||
+    (resume as any)?.cityChooseData?.name ||
+    (resume as any)?.locationChooseData?.name ||
+    '';
 
   const positionName =
     resume?.positionChooseData?.name || '';
 
   const experienceLabel =
-    resume?.experienceChooseData?.name ||
+    candidateExperience ||
+    (resume as any)?.experienceChooseData?.name ||
     (resume?.experience ? `${resume.experience} năm` : '');
 
   const educationLabel =
-    resume?.academicLevelChooseData?.name ||
+    candidateEducation ||
+    (resume as any)?.academicLevelChooseData?.name ||
     (resume?.academicLevel ? String(resume.academicLevel) : '');
 
   const objectiveText = resume?.description || resume?.careerObjective || '';
@@ -95,6 +107,19 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   const educations: CVDocEducation[] = resume?.educationDetails || [];
   const advancedSkills: CVDocAdvancedSkill[] = resume?.advancedSkills || [];
   const certificates: CVDocCertificate[] = resume?.certificates || [];
+
+  const effectiveSkills: string[] = React.useMemo(() => {
+    if (advancedSkills && advancedSkills.length > 0) {
+      return advancedSkills.map((s) => s.name || String(s));
+    }
+    if (candidateSkills && candidateSkills.length > 0) {
+      return candidateSkills;
+    }
+    if ((resume as any)?.skillsSummary) {
+      return String((resume as any).skillsSummary).split(',').map((s) => s.trim()).filter(Boolean);
+    }
+    return [];
+  }, [advancedSkills, candidateSkills, resume]);
 
   const rawPdfUrl = resume?.fileUrl || resume?.file?.url || resume?.file?.fileUrl;
   const safePdfUrl = getSafeExternalOpenUrl(rawPdfUrl);
@@ -368,12 +393,12 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                     Kỹ năng & Chứng chỉ
                   </Typography>
                 </Box>
-                {advancedSkills.length > 0 || certificates.length > 0 ? (
+                {effectiveSkills.length > 0 || certificates.length > 0 ? (
                   <Stack spacing={2}>
-                    {advancedSkills.length > 0 && (
+                    {effectiveSkills.length > 0 && (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                        {advancedSkills.map((skill) => (
-                          <Chip key={String(skill.id)} label={skill.name} size="small" sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700 }} />
+                        {effectiveSkills.map((skillName, idx) => (
+                          <Chip key={`${skillName}-${idx}`} label={skillName} size="small" sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 700 }} />
                         ))}
                       </Box>
                     )}

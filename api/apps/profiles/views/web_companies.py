@@ -40,6 +40,7 @@ from ..filters import CompanyFilter
 
 from ..serializers import (
     CompanySerializer,
+    CompanyDetailSerializer,
     CompanyFollowedSerializer,
     LogoCompanySerializer,
     CompanyCoverImageSerializer,
@@ -162,6 +163,27 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
         if self.action in ["evaluation_weights_config"]:
             return [perms_sys.IsAuthenticated()]
         return [permission() for permission in self.permission_classes]
+
+    def perform_update(self, serializer):
+        company = serializer.instance
+        data = self.request.data or {}
+        logo_id = data.get("logoId") or data.get("logo_id")
+        if logo_id:
+            try:
+                logo_file = File.objects.get(id=int(logo_id))
+                Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+                company.logo = logo_file
+            except (File.DoesNotExist, ValueError, TypeError):
+                pass
+        cover_image_id = data.get("coverImageId") or data.get("cover_image_id")
+        if cover_image_id:
+            try:
+                cover_file = File.objects.get(id=int(cover_image_id))
+                Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+                company.cover_image = cover_file
+            except (File.DoesNotExist, ValueError, TypeError):
+                pass
+        serializer.save()
 
     @action(methods=["put"], detail=False,
 
@@ -445,6 +467,26 @@ class CompanyViewSet(viewsets.ViewSet,
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
 
+    @staticmethod
+    def safe_assign_logo(company, logo_file):
+        """Safely assign logo to company, unlinking other companies if necessary."""
+        if logo_file:
+            Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+            company.logo = logo_file
+        else:
+            company.logo = None
+        company.save(update_fields=['logo'])
+
+    @staticmethod
+    def safe_assign_cover_image(company, cover_file):
+        """Safely assign cover image to company, unlinking other companies if necessary."""
+        if cover_file:
+            Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+            company.cover_image = cover_file
+        else:
+            company.cover_image = None
+        company.save(update_fields=['cover_image'])
+
     def retrieve(self, request, *args, **kwargs):
 
         instance = self.get_object()
@@ -453,7 +495,7 @@ class CompanyViewSet(viewsets.ViewSet,
 
             'id', 'slug', 'taxCode', 'companyName',
 
-            'employeeSize', 'fieldOperation', 'location',
+            'employeeSize', 'fieldOperation', 'location', 'locationDict',
 
             'since', 'companyEmail', 'companyPhone',
 
@@ -462,6 +504,8 @@ class CompanyViewSet(viewsets.ViewSet,
             'linkedinUrl', 'description',
 
             'companyImageUrl', 'companyCoverImageUrl',
+
+            'cityChooseData', 'districtChooseData', 'logoDict',
 
             'followNumber', 'isFollowed', 'companyImages'
 

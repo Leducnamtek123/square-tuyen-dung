@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import authService from '@/services/authService';
 import { useConfig } from '@/hooks/useConfig';
 import { setUserInfo } from '@/redux/userSlice';
@@ -18,6 +18,7 @@ const INITIAL_FORM_VALUES: CandidateFullFormValues = {
   desiredJobTitle: '',
   careerId: '',
   cityId: '',
+  phone: '',
   typeOfWorkplace: 1,
   address: '',
   lat: null,
@@ -36,7 +37,8 @@ const INITIAL_FORM_VALUES: CandidateFullFormValues = {
 export function useCandidateOnboarding() {
   const { t } = useTranslation('jobSeeker');
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const { currentUser } = useAppSelector((state) => state.user);
   const { allConfig } = useConfig();
 
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -75,6 +77,7 @@ export function useCandidateOnboarding() {
             desiredJobTitle: draft.desiredJobTitle || prev.desiredJobTitle,
             careerId: draft.careerId || prev.careerId,
             cityId: draft.cityId || prev.cityId,
+            phone: (draft as any).phone || (currentUser as any)?.phoneNumber || (currentUser as any)?.phone || prev.phone,
             typeOfWorkplace: draft.typeOfWorkplace || prev.typeOfWorkplace,
             address: draft.address || prev.address,
             lat: draft.lat !== undefined ? draft.lat : prev.lat,
@@ -136,6 +139,7 @@ export function useCandidateOnboarding() {
         desiredJobTitle: formData.desiredJobTitle,
         careerId: formData.careerId,
         cityId: formData.cityId,
+        phone: formData.phone,
         typeOfWorkplace: formData.typeOfWorkplace,
         address: formData.address,
         lat: formData.lat,
@@ -202,6 +206,7 @@ export function useCandidateOnboarding() {
         desiredJobTitle: formData.desiredJobTitle,
         careerId: formData.careerId,
         cityId: formData.cityId,
+        phone: formData.phone,
         typeOfWorkplace: formData.typeOfWorkplace,
         address: formData.address,
         lat: formData.lat,

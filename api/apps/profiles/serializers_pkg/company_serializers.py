@@ -175,6 +175,51 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     mobileUserDict = auth_serializers.UserSerializer(source='user', read_only=True,
                                                      fields=["id", "fullName", "email"])
 
+    cityChooseData = serializers.SerializerMethodField(
+        method_name="get_city_choose_data", read_only=True)
+
+    districtChooseData = serializers.SerializerMethodField(
+        method_name="get_district_choose_data", read_only=True)
+
+    logoDict = serializers.SerializerMethodField(
+        method_name="get_logo_dict", read_only=True)
+
+    logoId = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+
+    coverImageId = serializers.IntegerField(required=False, write_only=True, allow_null=True)
+
+
+    def get_city_choose_data(self, company):
+        loc = getattr(company, 'location', None)
+        if loc and loc.city:
+            return {'id': loc.city.id, 'name': loc.city.name}
+        return None
+
+    def get_district_choose_data(self, company):
+        loc = getattr(company, 'location', None)
+        if loc and loc.district:
+            return {'id': loc.district.id, 'name': loc.district.name}
+        return None
+
+    def get_logo_dict(self, company):
+        logo = getattr(company, 'logo', None)
+        if logo:
+            name = ""
+            if hasattr(logo, 'metadata') and logo.metadata and isinstance(logo.metadata, dict):
+                name = (
+                    logo.metadata.get("name")
+                    or logo.metadata.get("filename")
+                    or logo.metadata.get("original_name")
+                    or ""
+                )
+            if not name and getattr(logo, 'public_id', None):
+                name = logo.public_id.split("/")[-1]
+            return {
+                "id": logo.id,
+                "url": logo.get_full_url(),
+                "name": name or "logo.png",
+            }
+        return None
 
     def get_company_logo_url(self, company):
         try:
@@ -230,7 +275,9 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'description',
                   'companyImageUrl', 'companyCoverImageUrl', 'locationDict', 'isVerified',
                   'followNumber', 'jobPostNumber', 'isFollowed',
-                  'companyImages', 'mobileUserDict')
+                  'companyImages', 'mobileUserDict',
+                  'cityChooseData', 'districtChooseData', 'logoDict',
+                  'logoId', 'coverImageId')
 
     def validate(self, attrs):
         request = self.context.get("request")
@@ -290,7 +337,33 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                 if not user:
                     raise serializers.ValidationError({"user": "Company owner is required."})
 
+                logo_id = validated_data.pop('logoId', None)
+                cover_image_id = validated_data.pop('coverImageId', None)
+
+                logo_file = None
+                if logo_id:
+                    try:
+                        logo_file = File.objects.get(id=int(logo_id))
+                    except (File.DoesNotExist, ValueError, TypeError):
+                        pass
+
+                cover_file = None
+                if cover_image_id:
+                    try:
+                        cover_file = File.objects.get(id=int(cover_image_id))
+                    except (File.DoesNotExist, ValueError, TypeError):
+                        pass
+
                 company = Company.objects.create(user=user, location=location_obj, **validated_data)
+                if logo_file:
+                    Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+                    company.logo = logo_file
+                    company.save(update_fields=['logo'])
+                if cover_file:
+                    Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+                    company.cover_image = cover_file
+                    company.save(update_fields=['cover_image'])
+
                 from apps.profiles.services import ensure_company_system_roles
 
                 ensure_company_system_roles(company)
@@ -301,6 +374,30 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         try:
+            logo_id = validated_data.pop('logoId', None)
+            if logo_id is not None:
+                if logo_id:
+                    try:
+                        logo_file = File.objects.get(id=int(logo_id))
+                        Company.objects.filter(logo=logo_file).exclude(id=instance.id).update(logo=None)
+                        instance.logo = logo_file
+                    except (File.DoesNotExist, ValueError, TypeError):
+                        pass
+                else:
+                    instance.logo = None
+
+            cover_image_id = validated_data.pop('coverImageId', None)
+            if cover_image_id is not None:
+                if cover_image_id:
+                    try:
+                        cover_file = File.objects.get(id=int(cover_image_id))
+                        Company.objects.filter(cover_image=cover_file).exclude(id=instance.id).update(cover_image=None)
+                        instance.cover_image = cover_file
+                    except (File.DoesNotExist, ValueError, TypeError):
+                        pass
+                else:
+                    instance.cover_image = None
+
             instance.tax_code = validated_data.get('tax_code', instance.tax_code)
             instance.company_name = validated_data.get('company_name', instance.company_name)
             instance.employee_size = validated_data.get('employee_size', instance.employee_size)
@@ -342,6 +439,15 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         except Exception as ex:
             helper.print_log_error("update company", ex)
             raise
+
+
+class CompanyDetailSerializer(CompanySerializer):
+    """
+    Detailed serializer for Company model, ensuring relational choose data
+    (cityChooseData, districtChooseData) and media dictionaries (logoDict) are serialized.
+    """
+    class Meta(CompanySerializer.Meta):
+        fields = CompanySerializer.Meta.fields
 
 
 class CompanyFollowedSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
@@ -741,11 +847,13 @@ class LogoCompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                     public_id=public_id
                 )
 
-                company.logo = File.update_or_create_file_with_cloudinary(
+                logo_file = File.update_or_create_file_with_cloudinary(
                     company.logo,
                     logo_upload_result,
                     File.LOGO_TYPE
                 )
+                Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+                company.logo = logo_file
                 company.save()
                 user_id = company.user_id
                 logo_url = company.logo.get_full_url()
@@ -789,11 +897,13 @@ class CompanyCoverImageSerializer(DynamicFieldsMixin, serializers.ModelSerialize
                     public_id=public_id
                 )
 
-                company.cover_image = File.update_or_create_file_with_cloudinary(
+                cover_file = File.update_or_create_file_with_cloudinary(
                     company.cover_image,
                     company_cover_image_upload_result,
                     File.COVER_IMAGE_TYPE
                 )
+                Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+                company.cover_image = cover_file
                 company.save()
 
             return company

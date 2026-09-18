@@ -62,8 +62,8 @@ class CreateMockSessionInputSerializer(serializers.Serializer):
 
 
 class MockSessionResponseSerializer(serializers.ModelSerializer):
-    candidate_name = serializers.CharField(source="candidate.full_name", read_only=True)
-    questions = QuestionBankItemSerializer(many=True, read_only=True)
+    candidate_name = serializers.CharField(source="candidate.full_name", read_only=True, default=None)
+    questions = serializers.SerializerMethodField()
     livekit_token = serializers.CharField(read_only=True, default="")
     interview_url = serializers.SerializerMethodField()
     session_id = serializers.IntegerField(source="id", read_only=True)
@@ -77,6 +77,14 @@ class MockSessionResponseSerializer(serializers.ModelSerializer):
             'time_limit_per_question', 'session_metadata', 'questions', 'livekit_token',
             'interview_url', 'create_at'
         ]
+
+    def get_questions(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
+        try:
+            return QuestionBankItemSerializer(obj.questions.all(), many=True).data
+        except Exception:
+            return []
 
     def get_interview_url(self, obj):
         token = obj.invite_token or obj.id

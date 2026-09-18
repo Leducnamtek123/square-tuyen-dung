@@ -40,6 +40,7 @@ from .services import (
     PasswordResetService,
     EmailVerificationService,
     AvatarService,
+    CoverImageService,
     RegistrationService,
     AccountService,
     UserNotFoundError,
@@ -79,6 +80,7 @@ USER_INFO_BASIC_FIELDS = (
     "isOnboarded",
     "onboardingStep",
     "avatarUrl",
+    "coverUrl",
     "roleName",
     "jobSeekerProfileId",
     "jobSeekerProfile",
@@ -494,6 +496,38 @@ def avatar(request):
         return response_data(
             status=status.HTTP_200_OK,
             data={"avatarUrl": avatar_url}
+        )
+
+    return response_data(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@api_view(http_method_names=["put", "delete"])
+@permission_classes(permission_classes=[IsAuthenticated])
+def cover_image(request):
+    if request.method == "PUT":
+        file = request.FILES.get("file") or request.FILES.get("cover")
+        if not file:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"file": ["No file provided."]}
+            )
+        try:
+            cover_url = CoverImageService.update_cover(request.user, file)
+            return response_data(
+                status=status.HTTP_200_OK,
+                data={"coverUrl": cover_url}
+            )
+        except Exception as ex:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": [str(ex)]}
+            )
+
+    if request.method == "DELETE":
+        cover_url = CoverImageService.delete_cover(request.user)
+        return response_data(
+            status=status.HTTP_200_OK,
+            data={"coverUrl": cover_url}
         )
 
     return response_data(status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -56,22 +56,32 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
                                                   allow_blank=True, allow_null=True, max_length=20)
     isJobSeeking = serializers.BooleanField(source='is_seeking_job', required=False, default=True)
     location = common_serializers.ProfileLocationSerializer(required=False, allow_null=True)
+    coverUrl = serializers.SerializerMethodField(method_name="get_cover_url", read_only=True)
 
-    user = auth_serializers.UserSerializer(fields=["fullName", "email", "avatarUrl"], required=False, allow_null=True)
+    user = auth_serializers.UserSerializer(fields=["fullName", "email", "avatarUrl", "coverUrl"], required=False, allow_null=True)
 
     userDict = serializers.SerializerMethodField(method_name="get_user_dict", read_only=True)
 
     old = serializers.SerializerMethodField(method_name="get_old", read_only=True)
 
+    def get_cover_url(self, profile):
+        try:
+            if profile.cover_image:
+                return profile.cover_image.get_full_url()
+        except Exception:
+            pass
+        return None
 
     def get_user_dict(self, profile):
         user = profile.user
         avatar_url = user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else None
+        cover_url = profile.cover_image.get_full_url() if getattr(profile, 'cover_image', None) else None
         return {
             "fullName": user.full_name,
             "email": user.email,
             "avatar": avatar_url,
             "avatarUrl": avatar_url,
+            "coverUrl": cover_url,
             "phone": profile.phone,
             "gender": profile.gender,
             "birthday": profile.birthday,
@@ -125,7 +135,7 @@ class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer
                   'taxCode', 'socialInsuranceNo',
                   'permanentAddress', 'contactAddress',
                   'emergencyContactName', 'emergencyContactPhone',
-                  'isJobSeeking',
+                  'isJobSeeking', 'coverUrl',
                   'location', 'user', 'userDict', 'old')
 
     def update(self, instance, validated_data):

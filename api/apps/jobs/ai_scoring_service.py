@@ -35,7 +35,7 @@ def build_scoring_prompt(resume_data, job_data):
 
 ## Vị trí tuyển dụng:
 - Tiêu đề: {job_data.get('job_name', 'N/A')}
-- Mô tả: {job_data.get('description', 'N/A')[:500]}
+- Mô tả: {str(job_data.get('description') or 'N/A')[:500]}
 - Yêu cầu kinh nghiệm: {job_data.get('experience', 'N/A')} năm
 - Mức lương: {job_data.get('salary_min', 0)} - {job_data.get('salary_max', 0)}
 
@@ -145,8 +145,15 @@ def _fallback_scoring(resume_data, job_data):
     strengths = []
 
     # Experience match (±20 points)
-    r_exp = resume_data.get('experience', 0) or 0
-    j_exp = job_data.get('experience', 0) or 0
+    try:
+        r_exp = int(resume_data.get('experience') or 0)
+    except (ValueError, TypeError):
+        r_exp = 0
+    try:
+        j_exp = int(job_data.get('experience') or 0)
+    except (ValueError, TypeError):
+        j_exp = 0
+
     if r_exp >= j_exp and j_exp > 0:
         score += 20
         strengths.append(f"Kinh nghiệm làm việc đáp ứng tốt ({r_exp} năm)")
@@ -155,10 +162,23 @@ def _fallback_scoring(resume_data, job_data):
         strengths.append(f"Kinh nghiệm tiệm cận yêu cầu vị trí ({r_exp} năm)")
 
     # Salary overlap (±15 points)
-    r_min = float(resume_data.get('salary_min', 0) or 0)
-    r_max = float(resume_data.get('salary_max', 0) or 0)
-    j_min = float(job_data.get('salary_min', 0) or 0)
-    j_max = float(job_data.get('salary_max', 0) or 0)
+    try:
+        r_min = float(resume_data.get('salary_min') or 0)
+    except (ValueError, TypeError):
+        r_min = 0.0
+    try:
+        r_max = float(resume_data.get('salary_max') or 0)
+    except (ValueError, TypeError):
+        r_max = 0.0
+    try:
+        j_min = float(job_data.get('salary_min') or 0)
+    except (ValueError, TypeError):
+        j_min = 0.0
+    try:
+        j_max = float(job_data.get('salary_max') or 0)
+    except (ValueError, TypeError):
+        j_max = 0.0
+
     if j_min <= r_max and r_min <= j_max and (r_max > 0 or j_max > 0):
         score += 15
         strengths.append("Mức lương kỳ vọng phù hợp với dải đãi ngộ")
@@ -166,8 +186,8 @@ def _fallback_scoring(resume_data, job_data):
         score -= 10
 
     # Title keyword overlap (±15 points)
-    r_title = (resume_data.get('title', '') or '').lower()
-    j_title = (job_data.get('job_name', '') or '').lower()
+    r_title = str(resume_data.get('title') or '').lower()
+    j_title = str(job_data.get('job_name') or '').lower()
     common_words = set(r_title.split()) & set(j_title.split())
     stopwords = {'và', 'the', 'a', 'an', '-', 'tại', 'cho', 'của', 'với', 'trong', 'về'}
     meaningful = common_words - stopwords
@@ -179,7 +199,7 @@ def _fallback_scoring(resume_data, job_data):
         strengths.append("Chuyên môn phù hợp ngành nghề")
 
     # Skills overlap (±10 points)
-    r_skills = (resume_data.get('skills', '') or '').lower()
+    r_skills = str(resume_data.get('skills') or '').lower()
     if r_skills and j_title:
         skill_matches = [w for w in j_title.split() if len(w) > 2 and w in r_skills]
         if skill_matches:
@@ -201,24 +221,57 @@ def _fallback_scoring(resume_data, job_data):
 
 def score_job_application(activity):
     """Convenience wrapper to score a JobPostActivity instance."""
-    resume = activity.resume
-    job = activity.job_post
+    resume = getattr(activity, "resume", None)
+    manual = getattr(activity, "manual_candidate_profile", None)
+    job = getattr(activity, "job_post", None)
+
+    title = ""
+    if resume and resume.title:
+        title = resume.title
+    elif manual and manual.title:
+        title = manual.title
+    elif getattr(activity, "full_name", None):
+        title = activity.full_name
+
+    skills = ""
+    if resume and getattr(resume, "skills_summary", None):
+        skills = resume.skills_summary
+    elif manual and getattr(manual, "skills_summary", None):
+        skills = manual.skills_summary
+
+    experience = 0
+    if resume and getattr(resume, "experience", None) is not None:
+        experience = resume.experience
+    elif manual and getattr(manual, "experience", None) is not None:
+        experience = manual.experience
+
+    academic_level = 0
+    if resume and getattr(resume, "academic_level", None) is not None:
+        academic_level = resume.academic_level
+    elif manual and getattr(manual, "academic_level", None) is not None:
+        academic_level = manual.academic_level
+
+    salary_min = getattr(resume, "salary_min", 0) if resume else 0
+    salary_max = getattr(resume, "salary_max", 0) if resume else 0
+
     resume_data = {
-        "title": resume.title if resume else activity.full_name or "",
-        "skills": getattr(resume, "skills_summary", "") if resume else "",
-        "experience": getattr(resume, "experience", 0) or 0,
-        "academic_level": getattr(resume, "academic_level", 0) or 0,
-        "salary_min": getattr(resume, "salary_min", 0) if resume else 0,
-        "salary_max": getattr(resume, "salary_max", 0) if resume else 0,
+        "title": title,
+        "skills": skills,
+        "experience": experience,
+        "academic_level": academic_level,
+        "salary_min": salary_min,
+        "salary_max": salary_max,
     }
     job_data = {
-        "job_name": getattr(job, "job_name", ""),
-        "description": getattr(job, "job_description", ""),
-        "experience": getattr(job, "experience", 0),
-        "salary_min": getattr(job, "salary_min", 0),
-        "salary_max": getattr(job, "salary_max", 0),
+        "job_name": getattr(job, "job_name", "") if job else "",
+        "description": getattr(job, "job_description", "") if job else "",
+        "experience": getattr(job, "experience", 0) if job else 0,
+        "salary_min": getattr(job, "salary_min", 0) if job else 0,
+        "salary_max": getattr(job, "salary_max", 0) if job else 0,
     }
-    res = score_resume_job_fit(resume_data, job_data, resume_id=resume.id if resume else None, job_id=job.id if job else None)
+    resume_id = getattr(resume, "id", None) if resume else None
+    job_id = getattr(job, "id", None) if job else None
+    res = score_resume_job_fit(resume_data, job_data, resume_id=resume_id, job_id=job_id)
     if isinstance(res, dict) and res.get("overall_score") is not None:
         return {
             "score": res.get("overall_score"),

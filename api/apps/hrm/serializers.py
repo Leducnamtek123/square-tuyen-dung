@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from apps.accounts.models import User
 from apps.hrm.models import (
     Department,
     Designation,
@@ -125,6 +126,12 @@ class EmploymentContractSerializer(serializers.ModelSerializer):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+        validators=[],
+    )
     department_name = serializers.CharField(source='department.name', read_only=True)
     work_location_name = serializers.CharField(source='work_location.name', read_only=True)
     designation_title = serializers.CharField(source='designation.title', read_only=True)
@@ -169,6 +176,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'dependentsCount': 'dependents_count',
             'candidateProfile': 'candidate_profile',
             'onboardedFromActivity': 'onboarded_from_activity',
+            'userId': 'user',
+            'user_id': 'user',
         }
         for camel, snake in mappings.items():
             if camel in payload and snake not in payload:
@@ -187,6 +196,15 @@ class EmployeeSerializer(serializers.ModelSerializer):
             if request:
                 from apps.hrm.views import _get_company_for_request
                 company = _get_company_for_request(request)
+
+        # Safe unlinking / verification for OneToOne user field
+        user = attrs.get('user')
+        if user:
+            conflict_emps = Employee.objects.filter(user=user)
+            if self.instance:
+                conflict_emps = conflict_emps.exclude(id=self.instance.id)
+            if conflict_emps.exists():
+                conflict_emps.update(user=None)
 
         if company:
             if department and department.company_id != company.id:
@@ -277,21 +295,43 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
 
 class AttendanceRecordSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True, default=None, allow_null=True)
+    shift_name = serializers.CharField(source='shift.name', read_only=True, default=None, allow_null=True)
+    shift_code = serializers.CharField(source='shift.code', read_only=True, default=None, allow_null=True)
+    status_label = serializers.CharField(source='get_status_display', read_only=True)
 
     class Meta:
         model = AttendanceRecord
         fields = [
-            'id', 'employee', 'employee_name', 'date', 'check_in', 'check_out',
-            'working_hours', 'status', 'notes', 'create_at', 'update_at'
+            'id', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'shift', 'shift_name', 'shift_code', 'date', 'check_in', 'check_out',
+            'scheduled_in', 'scheduled_out', 'late_minutes', 'early_minutes',
+            'working_hours', 'effective_work_hours', 'overtime_hours',
+            'status_code', 'status', 'status_label',
+            'is_manually_adjusted', 'adjustment_reason', 'is_locked',
+            'notes', 'create_at', 'update_at'
         ]
         read_only_fields = ['create_at', 'update_at']
 
     def to_internal_value(self, data):
         payload = data.copy() if hasattr(data, 'copy') else dict(data)
         mappings = {
+            'employeeId': 'employee',
+            'shiftId': 'shift',
             'checkIn': 'check_in',
             'checkOut': 'check_out',
+            'scheduledIn': 'scheduled_in',
+            'scheduledOut': 'scheduled_out',
+            'lateMinutes': 'late_minutes',
+            'earlyMinutes': 'early_minutes',
             'workingHours': 'working_hours',
+            'effectiveWorkHours': 'effective_work_hours',
+            'overtimeHours': 'overtime_hours',
+            'statusCode': 'status_code',
+            'isManuallyAdjusted': 'is_manually_adjusted',
+            'adjustmentReason': 'adjustment_reason',
+            'isLocked': 'is_locked',
         }
         for camel, snake in mappings.items():
             if camel in payload and snake not in payload:
@@ -439,14 +479,15 @@ class QuickCheckinSerializer(serializers.Serializer):
 class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_code = serializers.CharField(source='employee.employee_code', read_only=True)
-    department_name = serializers.CharField(source='employee.department.name', read_only=True)
+    department_name = serializers.CharField(source='employee.department.name', read_only=True, default=None, allow_null=True)
+    designation_title = serializers.CharField(source='employee.designation.title', read_only=True, default=None, allow_null=True)
     status_label = serializers.CharField(source='get_status_display', read_only=True)
 
     class Meta:
         from .models import MonthlyPayrollRecord
         model = MonthlyPayrollRecord
         fields = [
-            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name',
+            'id', 'company', 'employee', 'employee_name', 'employee_code', 'department_name', 'designation_title',
             'month', 'year', 'gross_salary', 'allowance', 'bonus',
             'working_days_actual', 'standard_working_days', 'unpaid_leave_days', 'dependents_count',
             'total_income',
@@ -463,11 +504,18 @@ class MonthlyPayrollRecordSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         payload = data.copy() if hasattr(data, 'copy') else dict(data)
         mappings = {
+            'employeeId': 'employee',
             'grossSalary': 'gross_salary',
             'workingDaysActual': 'working_days_actual',
             'standardWorkingDays': 'standard_working_days',
             'unpaidLeaveDays': 'unpaid_leave_days',
             'dependentsCount': 'dependents_count',
+            'totalIncome': 'total_income',
+            'totalInsurance': 'total_insurance',
+            'netSalary': 'net_salary',
+            'taxableIncome': 'taxable_income',
+            'personalIncomeTax': 'personal_income_tax',
+            'totalCompanyExpense': 'total_company_expense',
             'paymentDate': 'payment_date',
         }
         for camel, snake in mappings.items():
@@ -696,6 +744,7 @@ class BiometricPunchLogSerializer(serializers.ModelSerializer):
     location_name = serializers.CharField(source='location.name', read_only=True)
     punch_type_label = serializers.CharField(source='get_punch_type_display', read_only=True)
     source_label = serializers.CharField(source='get_source_display', read_only=True)
+    biometric_id = serializers.CharField(max_length=50, required=False, allow_blank=True)
 
     class Meta:
         from .models import BiometricPunchLog
@@ -729,6 +778,20 @@ class BiometricPunchLogSerializer(serializers.ModelSerializer):
             if camel in payload and snake not in payload:
                 payload[snake] = payload.get(camel)
         return super().to_internal_value(payload)
+
+    def validate(self, attrs):
+        from django.utils import timezone
+        if not attrs.get('biometric_id'):
+            emp = attrs.get('employee')
+            if emp:
+                attrs['biometric_id'] = getattr(emp, 'employee_code', '') or str(emp.id)
+            else:
+                attrs['biometric_id'] = 'UNKNOWN'
+
+        punch_time = attrs.get('punch_time')
+        if punch_time and timezone.is_naive(punch_time):
+            attrs['punch_time'] = timezone.make_aware(punch_time)
+        return attrs
 
 
 class MonthlyAttendanceSummarySerializer(serializers.ModelSerializer):

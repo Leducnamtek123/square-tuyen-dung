@@ -65,7 +65,9 @@ class GetOnboardingStatusView(APIView):
         if role_name == var_sys.JOB_SEEKER:
             profile = getattr(user, 'job_seeker_profile', None)
             resume = (
-                Resume.objects.select_related('file').filter(user=user, is_active=True).first()
+                Resume.objects.select_related('file').filter(user=user, type=var_sys.CV_WEBSITE, is_active=True).first()
+                or Resume.objects.select_related('file').filter(user=user, type=var_sys.CV_WEBSITE).first()
+                or Resume.objects.select_related('file').filter(user=user, is_active=True).first()
                 or Resume.objects.select_related('file').filter(user=user).first()
             )
             
@@ -91,6 +93,7 @@ class GetOnboardingStatusView(APIView):
                     "desiredJobTitle": resume.title or "",
                     "careerId": resume.career_id,
                     "cityId": resume.city_id,
+                    "phone": (profile.phone if profile else "") or user.phone_number or "",
                     "address": loc.address if loc else (profile.contact_address if profile else ""),
                     "lat": float(loc.lat) if (loc and loc.lat is not None) else None,
                     "lng": float(loc.lng) if (loc and loc.lng is not None) else None,
@@ -141,11 +144,26 @@ class GetOnboardingStatusView(APIView):
                 gpkd_file_name = ""
                 gpkd_file_url = ""
                 if verif and verif.business_license:
-                    gpkd_file_url = verif.business_license
-                    gfile = File.objects.filter(url__icontains=verif.business_license).first() if not str(verif.business_license).isdigit() else File.objects.filter(id=int(verif.business_license)).first()
+                    license_str = str(verif.business_license).strip()
+                    gfile = None
+                    if license_str.isdigit():
+                        gfile = File.objects.filter(id=int(license_str)).first()
+                    else:
+                        gfile = (
+                            File.objects.filter(public_id=license_str).first()
+                            or File.objects.filter(public_id__icontains=license_str).first()
+                        )
+                        if not gfile and "/" in license_str:
+                            tail = license_str.split("/")[-1]
+                            if tail:
+                                gfile = File.objects.filter(public_id__icontains=tail).first()
+
                     if gfile:
                         gpkd_file_id = gfile.id
                         gpkd_file_name = get_file_display_name(gfile) or "GPKD.pdf"
+                        gpkd_file_url = gfile.get_full_url()
+                    else:
+                        gpkd_file_url = verif.business_license
 
                 employer_draft = {
                     "companyName": company.company_name or "",
@@ -189,6 +207,9 @@ class CandidateStepSaveView(APIView):
     """
     permission_classes = [IsJobSeekerUser]
 
+    def post(self, request):
+        return self.patch(request)
+
     @transaction.atomic
     def patch(self, request):
         user = request.user
@@ -196,31 +217,56 @@ class CandidateStepSaveView(APIView):
         step = data.get("step", 1)
 
         profile, _ = JobSeekerProfile.objects.get_or_create(user=user)
-        resume = Resume.objects.filter(user=user).first()
+        resume = (
+            Resume.objects.filter(user=user, type=var_sys.CV_WEBSITE).first()
+            or Resume.objects.filter(user=user).first()
+        )
         if not resume:
             resume = Resume.objects.create(
                 user=user,
                 job_seeker_profile=profile,
-                title=data.get("desiredJobTitle") or f"Hồ sơ {user.full_name}",
+                type=var_sys.CV_WEBSITE,
+                title=data.get("desiredJobTitle") or data.get("title") or f"Hồ sơ {user.full_name}",
                 is_active=True
             )
+        else:
+            resume.type = var_sys.CV_WEBSITE
 
-        if "desiredJobTitle" in data:
-            resume.title = data.get("desiredJobTitle") or resume.title
-        if "careerId" in data:
-            career_id = data.get("careerId")
-            if career_id:
-                try:
-                    resume.career = Career.objects.get(id=career_id)
-                except Career.DoesNotExist:
-                    pass
-        if "cityId" in data:
-            city_id = data.get("cityId")
-            if city_id:
-                try:
-                    resume.city = City.objects.get(id=city_id)
-                except City.DoesNotExist:
-                    pass
+        full_name_val = (str(data.get("fullName") or data.get("full_name") or "")).strip()
+        if full_name_val:
+            user.full_name = full_name_val
+            user.save(update_fields=['full_name', 'update_at'])
+
+        phone_val = (str(data.get("phone") or data.get("phone_number") or "")).strip()
+        if phone_val:
+            profile.phone = phone_val
+            profile.save(update_fields=['phone'])
+            user.phone_number = phone_val
+            user.save(update_fields=['phone_number', 'update_at'])
+
+        title_val = data.get("desiredJobTitle") or data.get("title")
+        if title_val:
+            resume.title = str(title_val).strip()
+
+        career_id = data.get("careerId") or data.get("career")
+        if career_id:
+            try:
+                resume.career = Career.objects.get(id=career_id)
+            except (Career.DoesNotExist, ValueError):
+                pass
+
+        city_id = data.get("cityId") or data.get("city")
+        if city_id:
+            try:
+                resume.city = City.objects.get(id=city_id)
+            except (City.DoesNotExist, ValueError):
+                pass
+            if not profile.location:
+                profile.location = Location.objects.create(city_id=city_id)
+                profile.save(update_fields=['location'])
+            elif not profile.location.city_id:
+                profile.location.city_id = city_id
+                profile.location.save(update_fields=['city_id'])
 
         # Handle candidate precise location & address
         if "address" in data or "lat" in data or "lng" in data:
@@ -234,7 +280,7 @@ class CandidateStepSaveView(APIView):
                         address=address_val or "",
                         lat=lat_val if lat_val is not None else None,
                         lng=lng_val if lng_val is not None else None,
-                        city_id=city_id if "cityId" in data else None
+                        city_id=city_id if city_id else None
                     )
                 else:
                     if address_val is not None:
@@ -243,22 +289,26 @@ class CandidateStepSaveView(APIView):
                         profile.location.lat = lat_val
                     if lng_val is not None:
                         profile.location.lng = lng_val
-                    if "cityId" in data and data.get("cityId"):
-                        profile.location.city_id = data.get("cityId")
+                    if city_id:
+                        profile.location.city_id = city_id
                     profile.location.save()
                 if address_val:
                     profile.contact_address = address_val
                 profile.save()
 
-        if "typeOfWorkplace" in data:
-            resume.type_of_workplace = data.get("typeOfWorkplace")
+        type_of_workplace = data.get("typeOfWorkplace") or data.get("type_of_workplace")
+        if type_of_workplace is not None:
+            resume.type_of_workplace = type_of_workplace
 
-        if "salaryMin" in data:
-            resume.salary_min = data.get("salaryMin", 0)
-        if "salaryMax" in data:
-            resume.salary_max = data.get("salaryMax", 0)
-        if "expectedSalary" in data:
-            resume.expected_salary = data.get("expectedSalary")
+        salary_min = data.get("salaryMin") if "salaryMin" in data else data.get("salary_min")
+        if salary_min is not None:
+            resume.salary_min = salary_min
+        salary_max = data.get("salaryMax") if "salaryMax" in data else data.get("salary_max")
+        if salary_max is not None:
+            resume.salary_max = salary_max
+        expected_salary = data.get("expectedSalary") if "expectedSalary" in data else data.get("expected_salary")
+        if expected_salary is not None:
+            resume.expected_salary = expected_salary
 
         # Salary min <= max validation
         if resume.salary_min and resume.salary_max and resume.salary_min > resume.salary_max:
@@ -267,10 +317,12 @@ class CandidateStepSaveView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if "experience" in data:
-            resume.experience = data.get("experience")
-        if "academicLevel" in data:
-            resume.academic_level = data.get("academicLevel")
+        experience = data.get("experience")
+        if experience is not None:
+            resume.experience = experience
+        academic_level = data.get("academicLevel") if "academicLevel" in data else data.get("academic_level")
+        if academic_level is not None:
+            resume.academic_level = academic_level
 
         # Handle skills
         skills = data.get("skills")
@@ -286,22 +338,22 @@ class CandidateStepSaveView(APIView):
                         name=name_clean,
                         level=3
                     )
-        elif "skillsSummary" in data:
-            resume.skills_summary = data.get("skillsSummary")
+        elif "skillsSummary" in data or "skills_summary" in data:
+            resume.skills_summary = data.get("skillsSummary") or data.get("skills_summary")
 
         # Handle CV File
-        if "fileId" in data:
-            file_id = data.get("fileId")
+        file_id = data.get("fileId") or data.get("file_id")
+        if file_id is not None:
             if file_id:
                 try:
                     cv_file = File.objects.get(id=file_id)
+                    Resume.objects.filter(file=cv_file).exclude(id=resume.id).update(file=None)
                     resume.file = cv_file
-                    resume.type = var_sys.CV_UPLOAD
-                except File.DoesNotExist:
+                except (File.DoesNotExist, ValueError):
                     pass
             else:
                 resume.file = None
-                resume.type = var_sys.CV_WEBSITE
+            resume.type = var_sys.CV_WEBSITE
 
         resume.save()
 
@@ -326,18 +378,23 @@ class CandidateOnboardingView(APIView):
         user = request.user
         data = request.data
 
-        desired_job_title = (data.get("desiredJobTitle") or "").strip()
-        career_id = data.get("careerId")
-        city_id = data.get("cityId")
-        type_of_workplace = data.get("typeOfWorkplace", 1)
-        salary_min = data.get("salaryMin", 0)
-        salary_max = data.get("salaryMax", 0)
-        expected_salary = data.get("expectedSalary")
-        experience = data.get("experience", 1)
-        academic_level = data.get("academicLevel", 3)
+        full_name_val = (str(data.get("fullName") or data.get("full_name") or "")).strip()
+        if full_name_val:
+            user.full_name = full_name_val
+            user.save(update_fields=['full_name', 'update_at'])
+
+        desired_job_title = (data.get("desiredJobTitle") or data.get("title") or "").strip()
+        career_id = data.get("careerId") or data.get("career")
+        city_id = data.get("cityId") or data.get("city")
+        type_of_workplace = data.get("typeOfWorkplace") if "typeOfWorkplace" in data else data.get("type_of_workplace", 1)
+        salary_min = data.get("salaryMin") if "salaryMin" in data else data.get("salary_min", 0)
+        salary_max = data.get("salaryMax") if "salaryMax" in data else data.get("salary_max", 0)
+        expected_salary = data.get("expectedSalary") if "expectedSalary" in data else data.get("expected_salary")
+        experience = data.get("experience") if "experience" in data else 1
+        academic_level = data.get("academicLevel") if "academicLevel" in data else data.get("academic_level", 3)
         skills = data.get("skills", [])
-        skills_summary = data.get("skillsSummary", "")
-        file_id = data.get("fileId")
+        skills_summary = data.get("skillsSummary") or data.get("skills_summary") or ""
+        file_id = data.get("fileId") or data.get("file_id")
 
         # Validation
         errors = {}
@@ -355,9 +412,12 @@ class CandidateOnboardingView(APIView):
 
         # 1. Get or create JobSeekerProfile
         profile, _ = JobSeekerProfile.objects.get_or_create(user=user)
-        phone = data.get("phone")
+        phone = data.get("phone") or data.get("phone_number")
         if phone:
-            profile.phone = phone
+            phone_clean = str(phone).strip()
+            profile.phone = phone_clean
+            user.phone_number = phone_clean
+            user.save(update_fields=['phone_number', 'update_at'])
 
         address_val = data.get("address")
         lat_val = data.get("lat")
@@ -382,18 +442,30 @@ class CandidateOnboardingView(APIView):
                 profile.location.save()
             if address_val:
                 profile.contact_address = address_val
+        elif city_id:
+            if not profile.location:
+                profile.location = Location.objects.create(city_id=city_id)
+            elif not profile.location.city_id:
+                profile.location.city_id = city_id
+                profile.location.save(update_fields=['city_id'])
 
         profile.save()
 
-        # 2. Get or create Resume
-        resume = Resume.objects.filter(user=user).first()
+        # 2. Get or create Resume (Always ensure primary online CV is CV_WEBSITE)
+        resume = (
+            Resume.objects.filter(user=user, type=var_sys.CV_WEBSITE).first()
+            or Resume.objects.filter(user=user).first()
+        )
         if not resume:
             resume = Resume(
                 user=user,
                 job_seeker_profile=profile,
                 title=desired_job_title,
+                type=var_sys.CV_WEBSITE,
                 is_active=True
             )
+        else:
+            resume.type = var_sys.CV_WEBSITE
 
         resume.title = desired_job_title
         if career_id:
@@ -414,6 +486,9 @@ class CandidateOnboardingView(APIView):
             resume.expected_salary = expected_salary
         resume.experience = experience
         resume.academic_level = academic_level
+        resume.type = var_sys.CV_WEBSITE
+        resume.is_active = True
+        resume.save()
 
         if isinstance(skills, list) and skills:
             resume.skills_summary = ", ".join([str(s).strip() for s in skills if str(s).strip()])
@@ -432,14 +507,11 @@ class CandidateOnboardingView(APIView):
         if file_id:
             try:
                 cv_file = File.objects.get(id=file_id)
+                Resume.objects.filter(file=cv_file).exclude(id=resume.id).update(file=None)
                 resume.file = cv_file
-                resume.type = var_sys.CV_UPLOAD
             except File.DoesNotExist:
-                resume.type = var_sys.CV_WEBSITE
-        else:
-            resume.type = var_sys.CV_WEBSITE
+                pass
 
-        resume.is_active = True
         resume.save()
 
         # 3. Update User Onboarding status
@@ -452,7 +524,6 @@ class CandidateOnboardingView(APIView):
         try:
             jobs_qs = JobPost.objects.filter(
                 status=var_sys.JobPostStatus.APPROVED,
-                is_active=True,
             ).select_related('company', 'company__logo', 'location__city')
             
             # Filter by career or city
@@ -495,28 +566,40 @@ class EmployerStepSaveView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
 
+    def post(self, request):
+        return self.patch(request)
+
     @transaction.atomic
     def patch(self, request):
         user = request.user
-        data = request.data
-        step = data.get("step", 1)
+        data = request.data or {}
 
-        company_name = (data.get("companyName") or "").strip()
-        tax_code = (data.get("taxCode") or "").strip()
-        company_phone = (data.get("companyPhone") or "").strip()
-        company_email = (data.get("companyEmail") or "").strip()
-        raw_emp_size = data.get("employeeSize")
-        website_url = data.get("websiteUrl")
-        field_operation = data.get("fieldOperation")
-        description = data.get("description")
-        logo_id = data.get("logoId")
-        city_id = data.get("cityId")
-        district_id = data.get("districtId")
-        address = (data.get("address") or "").strip()
-        gpkd_file_id = data.get("gpkdFileId")
+        def _get(camel_key, snake_key, default=None):
+            if camel_key in data and data[camel_key] is not None:
+                return data[camel_key]
+            if snake_key in data and data[snake_key] is not None:
+                return data[snake_key]
+            return default
 
-        recruiter_name = (data.get("recruiterName") or "").strip()
-        recruiter_phone = (data.get("recruiterPhone") or "").strip()
+        step = _get("step", "step", 1)
+
+        company_name = (_get("companyName", "company_name", "") or "").strip()
+        tax_code = (_get("taxCode", "tax_code", "") or "").strip()
+        company_phone = (_get("companyPhone", "company_phone", "") or "").strip()
+        company_email = (_get("companyEmail", "company_email", "") or "").strip()
+        raw_emp_size = _get("employeeSize", "employee_size")
+        website_url = _get("websiteUrl", "website_url")
+        field_operation = _get("fieldOperation", "field_operation")
+        description = _get("description", "description")
+        logo_id = _get("logoId", "logo_id", _get("logo", "logo"))
+        cover_image_id = _get("coverImageId", "cover_image_id", _get("coverImage", "cover_image"))
+        city_id = _get("cityId", "city_id")
+        district_id = _get("districtId", "district_id")
+        address = (_get("address", "address", "") or "").strip()
+        gpkd_file_id = _get("gpkdFileId", "gpkd_file_id")
+
+        recruiter_name = (_get("recruiterName", "recruiter_name", "") or "").strip()
+        recruiter_phone = (_get("recruiterPhone", "recruiter_phone", "") or "").strip()
 
         if recruiter_name:
             user.full_name = recruiter_name
@@ -557,10 +640,21 @@ class EmployerStepSaveView(APIView):
                 company.tax_code = tax_code
 
         if company:
-            # Handle Logo
+            # Handle Logo (Safe-unlink to prevent MySQL 1062 IntegrityError)
             if logo_id:
                 try:
-                    company.logo = File.objects.get(id=int(logo_id))
+                    logo_file = File.objects.get(id=int(logo_id))
+                    Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+                    company.logo = logo_file
+                except (File.DoesNotExist, ValueError, TypeError):
+                    pass
+
+            # Handle Cover Image (Safe-unlink to prevent MySQL 1062 IntegrityError)
+            if cover_image_id:
+                try:
+                    cover_file = File.objects.get(id=int(cover_image_id))
+                    Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+                    company.cover_image = cover_file
                 except (File.DoesNotExist, ValueError, TypeError):
                     pass
 
@@ -623,23 +717,32 @@ class EmployerOnboardingView(APIView):
             user.role_name = var_sys.EMPLOYER
             user.save(update_fields=['role_name', 'update_at'])
 
-        data = request.data
-        company_name = (data.get("companyName") or "").strip()
-        tax_code = (data.get("taxCode") or "").strip()
-        company_phone = (data.get("companyPhone") or "").strip() or user.phone_number or ""
-        company_email = (data.get("companyEmail") or "").strip() or user.email
-        raw_emp_size = data.get("employeeSize")
-        website_url = data.get("websiteUrl")
-        field_operation = (data.get("fieldOperation") or "").strip()
-        description = data.get("description") or ""
-        logo_id = data.get("logoId")
-        city_id = data.get("cityId")
-        district_id = data.get("districtId")
-        address = (data.get("address") or "").strip()
-        gpkd_file_id = data.get("gpkdFileId")
+        data = request.data or {}
 
-        recruiter_name = (data.get("recruiterName") or "").strip()
-        recruiter_phone = (data.get("recruiterPhone") or "").strip()
+        def _get(camel_key, snake_key, default=None):
+            if camel_key in data and data[camel_key] is not None:
+                return data[camel_key]
+            if snake_key in data and data[snake_key] is not None:
+                return data[snake_key]
+            return default
+
+        company_name = (_get("companyName", "company_name", "") or "").strip()
+        tax_code = (_get("taxCode", "tax_code", "") or "").strip()
+        company_phone = (_get("companyPhone", "company_phone", "") or "").strip() or user.phone_number or ""
+        company_email = (_get("companyEmail", "company_email", "") or "").strip() or user.email
+        raw_emp_size = _get("employeeSize", "employee_size")
+        website_url = _get("websiteUrl", "website_url")
+        field_operation = (_get("fieldOperation", "field_operation", "") or "").strip()
+        description = _get("description", "description", "") or ""
+        logo_id = _get("logoId", "logo_id", _get("logo", "logo"))
+        cover_image_id = _get("coverImageId", "cover_image_id", _get("coverImage", "cover_image"))
+        city_id = _get("cityId", "city_id")
+        district_id = _get("districtId", "district_id")
+        address = (_get("address", "address", "") or "").strip()
+        gpkd_file_id = _get("gpkdFileId", "gpkd_file_id")
+
+        recruiter_name = (_get("recruiterName", "recruiter_name", "") or "").strip()
+        recruiter_phone = (_get("recruiterPhone", "recruiter_phone", "") or "").strip()
 
         # Check existing membership (Invited Recruiter)
         membership = CompanyMember.objects.filter(user=user, is_active=True).first()
@@ -755,7 +858,17 @@ class EmployerOnboardingView(APIView):
 
         if logo_id:
             try:
-                company.logo = File.objects.get(id=int(logo_id))
+                logo_file = File.objects.get(id=int(logo_id))
+                Company.objects.filter(logo=logo_file).exclude(id=company.id).update(logo=None)
+                company.logo = logo_file
+            except (File.DoesNotExist, ValueError, TypeError):
+                pass
+
+        if cover_image_id:
+            try:
+                cover_file = File.objects.get(id=int(cover_image_id))
+                Company.objects.filter(cover_image=cover_file).exclude(id=company.id).update(cover_image=None)
+                company.cover_image = cover_file
             except (File.DoesNotExist, ValueError, TypeError):
                 pass
 

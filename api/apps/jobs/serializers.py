@@ -178,6 +178,9 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     autoSourcingLimit = serializers.IntegerField(source='auto_sourcing_limit', required=False, default=10)
     autoInterviewEnabled = serializers.BooleanField(source='auto_interview_enabled', required=False, default=True)
     minScreeningScore = serializers.IntegerField(source='min_screening_score', required=False, default=70)
+    cityChooseData = serializers.SerializerMethodField(method_name="get_city_choose_data", read_only=True)
+    careerChooseData = serializers.SerializerMethodField(method_name="get_career_choose_data", read_only=True)
+    fileUrl = serializers.SerializerMethodField(method_name="get_file_url", read_only=True)
 
     def get_fields(self):
         fields = super().get_fields()
@@ -212,6 +215,21 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     def get_city(self, obj):
         return obj.location.city.name if obj.location and obj.location.city else None
+
+    def get_city_choose_data(self, job_post):
+        if job_post.location and job_post.location.city:
+            return {'id': job_post.location.city.id, 'name': job_post.location.city.name}
+        return None
+
+    def get_career_choose_data(self, job_post):
+        if job_post.career:
+            return {'id': job_post.career.id, 'name': job_post.career.name}
+        return None
+
+    def get_file_url(self, job_post):
+        if job_post.company and job_post.company.logo:
+            return job_post.company.logo.get_full_url()
+        return None
 
     def get_applied_number(self, job_post):
 
@@ -377,7 +395,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
                   'isSaved', 'isApplied', 'companyDict', 'mobileCompanyDict', 'locationDict', 'views',
 
-                  'isExpired', 'salary', 'city', 'interviewTemplate',
+                  'isExpired', 'salary', 'city', 'cityChooseData', 'careerChooseData', 'fileUrl', 'interviewTemplate',
                   'isAutoSourcingEnabled', 'autoSourcingLimit', 'autoInterviewEnabled', 'minScreeningScore',
                   'aiRecommendedCount', 'aiRecommendedAvatars', 'ai_recommended_count', 'ai_recommended_avatars')
 
@@ -445,6 +463,11 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         except Exception as ex:
             helper.print_log_error("update job post", ex)
             raise
+
+
+class JobPostDetailSerializer(JobPostSerializer):
+    """Detailed serializer for JobPost including full metadata and relations."""
+    pass
 
 
 class JobPostAroundFilterSerializer(serializers.Serializer):
@@ -556,6 +579,13 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
 
     ], read_only=True)
 
+    fileUrl = serializers.SerializerMethodField(method_name="get_file_url", read_only=True)
+
+    def get_file_url(self, activity):
+        if activity.resume and getattr(activity.resume, "file", None):
+            return activity.resume.file.get_full_url()
+        return None
+
     def to_internal_value(self, data):
         if hasattr(data, "copy"):
             data = data.copy()
@@ -564,6 +594,11 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
 
         if "jobPost" in data and "job_post" not in data:
             data["job_post"] = data.get("jobPost")
+
+        if "resumeId" in data and "resume" not in data:
+            data["resume"] = data.get("resumeId")
+        elif "resume_id" in data and "resume" not in data:
+            data["resume"] = data.get("resume_id")
 
         return super().to_internal_value(data)
 
@@ -588,7 +623,7 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
     class Meta:
         model = JobPostActivity
 
-        fields = ("id", "job_post", "resume", "fullName", "email", "phone",
+        fields = ("id", "job_post", "resume", "fullName", "email", "phone", "fileUrl",
 
                   "createAt", "updateAt", "jobPostDict", "mobileJobPostDict", "resumeDict")
 
@@ -667,6 +702,11 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
     aiAnalysisEffectiveScore = serializers.SerializerMethodField(method_name='get_ai_analysis_effective_score', read_only=True)
 
     resumeFileUrl = serializers.SerializerMethodField(method_name='get_resume_file_url', read_only=True)
+    fileUrl = serializers.SerializerMethodField(method_name='get_file_url', read_only=True)
+    cityChooseData = serializers.SerializerMethodField(method_name='get_city_choose_data', read_only=True)
+    careerChooseData = serializers.SerializerMethodField(method_name='get_career_choose_data', read_only=True)
+    resume = serializers.SerializerMethodField(method_name='get_resume', read_only=True)
+    resumeDict = serializers.SerializerMethodField(method_name='get_resume', read_only=True)
 
     def get_user_id(self, activity):
         return activity.user_id
@@ -694,11 +734,49 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
         return bool(activity.manual_candidate_profile_id)
 
     def get_resume_file_url(self, activity):
-        if activity.resume and activity.resume.file:
+        if activity.resume and getattr(activity.resume, "file", None):
             return activity.resume.file.get_full_url()
-        if activity.manual_candidate_profile and activity.manual_candidate_profile.file:
+        if activity.manual_candidate_profile and getattr(activity.manual_candidate_profile, "file", None):
             return activity.manual_candidate_profile.file.get_full_url()
         return None
+
+    def get_file_url(self, activity):
+        return self.get_resume_file_url(activity)
+
+    def get_city_choose_data(self, activity):
+        if activity.resume and activity.resume.city:
+            return {'id': activity.resume.city.id, 'name': activity.resume.city.name}
+        if activity.manual_candidate_profile and activity.manual_candidate_profile.city:
+            return {'id': activity.manual_candidate_profile.city.id, 'name': activity.manual_candidate_profile.city.name}
+        return None
+
+    def get_career_choose_data(self, activity):
+        if activity.resume and activity.resume.career:
+            return {'id': activity.resume.career.id, 'name': activity.resume.career.name}
+        if activity.manual_candidate_profile and activity.manual_candidate_profile.career:
+            return {'id': activity.manual_candidate_profile.career.id, 'name': activity.manual_candidate_profile.career.name}
+        return None
+
+    def get_resume(self, activity):
+        if not activity.resume:
+            return None
+        file_url = activity.resume.file.get_full_url() if (getattr(activity.resume, "file", None) and hasattr(activity.resume.file, 'get_full_url')) else None
+        city_data = {'id': activity.resume.city.id, 'name': activity.resume.city.name} if activity.resume.city else None
+        career_data = {'id': activity.resume.career.id, 'name': activity.resume.career.name} if activity.resume.career else None
+        return {
+            "id": activity.resume.id,
+            "slug": activity.resume.slug,
+            "title": activity.resume.title,
+            "type": activity.resume.type,
+            "fileUrl": file_url,
+            "cityChooseData": city_data,
+            "careerChooseData": career_data,
+            "skillsSummary": activity.resume.skills_summary,
+            "salaryMin": activity.resume.salary_min,
+            "salaryMax": activity.resume.salary_max,
+            "experience": activity.resume.experience,
+            "academicLevel": activity.resume.academic_level,
+        }
 
     def get_ai_analysis_reviewed_by(self, activity):
         user = getattr(activity, 'ai_analysis_reviewed_by', None)
@@ -816,7 +894,12 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                   "aiAnalysisCriteria", "aiAnalysisEvidence",
                   "aiAnalysisReviewStatus", "aiAnalysisHrOverrideScore", "aiAnalysisHrOverrideNote",
                   "aiAnalysisReviewedAt", "aiAnalysisReviewedBy", "aiAnalysisEffectiveScore",
-                  "resumeFileUrl", "userDict", "jobPostDict", "companyDict")
+                  "resumeFileUrl", "fileUrl", "cityChooseData", "careerChooseData",
+                  "resume", "resumeDict", "userDict", "jobPostDict", "companyDict")
+
+
+JobPostActivitySerializer = EmployerJobPostActivitySerializer
+
 
 class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 

@@ -38,6 +38,14 @@ class JobSeekerProfile(CommonBaseModel):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="job_seeker_profile")
 
+    cover_image = models.ForeignKey(
+        File,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="job_seeker_cover_image",
+    )
+
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True,
 
                                  related_name="job_seeker_profiles")

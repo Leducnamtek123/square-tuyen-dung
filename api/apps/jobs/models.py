@@ -306,6 +306,23 @@ class JobPostActivity(CommonBaseModel):
 
         super().save(*args, **kwargs)
 
+    @property
+    def cv_file(self):
+        if self.resume and getattr(self.resume, "file", None):
+            return self.resume.file
+        if self.manual_candidate_profile and getattr(self.manual_candidate_profile, "file", None):
+            return self.manual_candidate_profile.file
+        return None
+
+    @property
+    def file_url(self):
+        f = self.cv_file
+        return f.get_full_url() if f else None
+
+    @property
+    def fileUrl(self):
+        return self.file_url
+
 class JobPostNotification(CommonBaseModel):
 
     job_name = models.CharField(max_length=255)

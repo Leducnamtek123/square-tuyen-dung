@@ -303,6 +303,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     phoneNumber = serializers.CharField(source="phone_number", required=False, allow_null=True, allow_blank=True, max_length=20)
     phone = serializers.CharField(source="phone_number", required=False, allow_null=True, allow_blank=True, max_length=20, write_only=True)
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
+    coverUrl = serializers.SerializerMethodField(method_name="get_cover_url", read_only=True)
     isActive = serializers.BooleanField(source='is_active', read_only=True)
     isVerifyEmail = serializers.BooleanField(source='is_verify_email', read_only=True)
     isVerifyPhone = serializers.BooleanField(source='is_verify_phone', read_only=True)
@@ -327,6 +328,15 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             helper.print_log_error("UserSerializer.get_avatar_url", ex)
         return None
 
+    def get_cover_url(self, user):
+        try:
+            profile = self._get_job_seeker_profile_safe(user)
+            if profile and profile.cover_image:
+                return profile.cover_image.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_cover_url", ex)
+        return None
+
     def _get_job_seeker_profile_safe(self, user):
         if getattr(user, 'role_name', None) != var_sys.JOB_SEEKER:
             return None
@@ -337,7 +347,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         except Exception:
             cached = None
         try:
-            return JobSeekerProfile.objects.only("id", "phone").filter(user=user).first()
+            return JobSeekerProfile.objects.select_related("cover_image").filter(user=user).first()
         except Exception as ex:
             helper.print_log_error("UserSerializer._get_job_seeker_profile_safe", ex)
             return None
@@ -345,9 +355,11 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def get_job_seeker_profile(self, user):
         profile = self._get_job_seeker_profile_safe(user)
         if profile:
+            cover_url = profile.cover_image.get_full_url() if profile.cover_image else None
             return {
                 "id": profile.id,
-                "phone": profile.phone
+                "phone": profile.phone,
+                "coverUrl": cover_url
             }
         return None
 
@@ -519,7 +531,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         fields = ("id", "fullName", "email", "phoneNumber", "phone",
                   "isActive", "isVerifyEmail", "isVerifyPhone", "isPhoneVerified",
                   "isOnboarded", "onboardingStep",
-                  "avatarUrl", "roleName",
+                  "avatarUrl", "coverUrl", "roleName",
                   "jobSeekerProfileId", "jobSeekerProfile",
                   "companyId", "company",
                   "canAccessEmployerPortal", "employerRoleCode",

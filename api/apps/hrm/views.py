@@ -218,6 +218,11 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         last_name = serializer.validated_data.get('last_name', '').strip()
         full_name = f"{last_name} {first_name}".strip()
 
+        # Safe unlinking: ensure no other Employee is linked to this user
+        user = serializer.validated_data.get('user')
+        if user:
+            Employee.objects.filter(user=user).update(user=None)
+
         serializer.save(
             company=company,
             employee_code=code,
@@ -225,6 +230,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         )
 
     def perform_update(self, serializer):
+        user = serializer.validated_data.get('user')
+        if user and serializer.instance:
+            Employee.objects.filter(user=user).exclude(id=serializer.instance.id).update(user=None)
         instance = serializer.save()
         first_name = serializer.validated_data.get('first_name', instance.first_name).strip()
         last_name = serializer.validated_data.get('last_name', instance.last_name).strip()
@@ -1236,7 +1244,17 @@ class BiometricPunchLogViewSet(viewsets.ModelViewSet):
 
         date_val = self.request.query_params.get('date')
         if date_val:
-            qs = qs.filter(punch_time__date=date_val)
+            try:
+                from datetime import datetime as dt_cls, time as dt_time
+                if isinstance(date_val, str):
+                    d_obj = dt_cls.strptime(date_val, '%Y-%m-%d').date()
+                else:
+                    d_obj = date_val
+                d_start = timezone.make_aware(dt_cls.combine(d_obj, dt_time.min))
+                d_end = timezone.make_aware(dt_cls.combine(d_obj, dt_time.max))
+                qs = qs.filter(punch_time__range=(d_start, d_end))
+            except (ValueError, TypeError):
+                qs = qs.filter(punch_time__date=date_val)
 
         device_id = self.request.query_params.get('device_id')
         if device_id:
