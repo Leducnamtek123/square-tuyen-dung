@@ -212,7 +212,7 @@ def _fallback_scoring(resume_data, job_data):
         "overall_score": score,
         "skill_match": score,
         "experience_match": min(100, int((r_exp / max(j_exp, 1)) * 100)) if j_exp else 80,
-        "salary_match": 85 if (j_min <= r_max and r_min <= j_max) else 60,
+        "salary_match": 80 if (j_min <= r_max and r_min <= j_max) else 40,
         "strengths": strengths,
         "gaps": [],
         "recommendation": "Độ tương thích hồ sơ được tính toán nhanh theo tiêu chuẩn JD và dữ liệu ứng viên."

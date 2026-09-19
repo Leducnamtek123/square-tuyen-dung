@@ -262,7 +262,7 @@ export default function DashboardPage() {
           <LiveMetricCard
             title={t('dashboard.totalUsers', 'Tổng người dùng')}
             value={totalUsers}
-            subtitle={`${t('dashboard.last30Days')}: +${n(stats?.newUsers30d)}`}
+            subtitle={totalUsers === 0 ? t('dashboard.noUserData') : `${t('dashboard.last30Days')}: +${n(stats?.newUsers30d)}`}
             deltaPercent={14}
             icon={<PeopleIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#EFF6FF"

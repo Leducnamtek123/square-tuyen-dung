@@ -37,7 +37,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   };
 
   handleReload = (): void => {
-    window.location.reload();
+    if (typeof window !== 'undefined' && window.location) {
+      window.location.reload();
+    }
   };
 
   render(): React.ReactNode {
@@ -99,7 +101,12 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                     const errMsg = this.state.error?.message || i18next.t('common:errorBoundary.unknownError');
                     const errStack = this.state.error?.stack || '';
                     const compStack = this.state.componentStack || '';
-                    navigator.clipboard.writeText(`Error: ${errMsg}\n${errStack}\n\nComponent Stack:${compStack}`);
+                    const textToCopy = `Error: ${errMsg}\n${errStack}\n\nComponent Stack:${compStack}`;
+                    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+                      navigator.clipboard.writeText(textToCopy).catch((err) => {
+                        console.warn('[ErrorBoundary] Failed to copy to clipboard:', err);
+                      });
+                    }
                   }}
                 >
                   {i18next.t('common:errorBoundary.copyError')}

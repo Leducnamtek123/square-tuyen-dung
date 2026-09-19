@@ -63,8 +63,10 @@ const inputSx = {
 export default function ContractListPage() {
   TabTitle('Hợp đồng Lao động & Cấu trúc Lương | InfoHR HRM');
 
-  const { data: contracts = [], isLoading: loading, refetch } = useHrmContracts();
-  const { data: employees = [] } = useHrmEmployees();
+  const { data: rawContracts, isLoading: loading, refetch } = useHrmContracts();
+  const contracts = Array.isArray(rawContracts) ? rawContracts : [];
+  const { data: rawEmployees } = useHrmEmployees();
+  const employees = Array.isArray(rawEmployees) ? rawEmployees : [];
   const { createContract, updateContract, deleteContract, renewContract } = useHrmMutations();
 
   const [openModal, setOpenModal] = useState(false);
@@ -95,12 +97,12 @@ export default function ContractListPage() {
   });
 
   const totalContracts = contracts.length;
-  const activeContracts = contracts.filter((c) => c.status === 'ACTIVE').length;
-  const probationContracts = contracts.filter((c) => (c.contractType || c.contract_type) === 'PROBATION').length;
+  const activeContracts = contracts.filter((c) => c?.status === 'ACTIVE').length;
+  const probationContracts = contracts.filter((c) => (c?.contractType || c?.contract_type) === 'PROBATION').length;
   
   const expiringSoonCount = contracts.filter((c) => {
-    const endDate = c.endDate || c.end_date;
-    if (!endDate || c.status !== 'ACTIVE') return false;
+    const endDate = c?.endDate || c?.end_date;
+    if (!endDate || c?.status !== 'ACTIVE') return false;
     const diff = dayjs(endDate).diff(dayjs(), 'day');
     return diff >= 0 && diff <= 30;
   }).length;

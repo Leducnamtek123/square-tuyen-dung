@@ -9,8 +9,11 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.locale('vi');
 
-export const formatMessageDate = (timestamp: string | number | Date): string => {
-  return dayjs(timestamp).calendar(null, {
+export const formatMessageDate = (timestamp?: string | number | Date | null): string => {
+  if (!timestamp) return '';
+  const d = dayjs(timestamp);
+  if (!d.isValid()) return '';
+  return d.calendar(null, {
     sameDay: '[Hôm nay lúc] HH:mm',
     lastDay: '[Hôm qua lúc] HH:mm',
     lastWeek: 'DD/MM/YYYY HH:mm',
@@ -77,8 +80,11 @@ export const formatTime = (timestamp?: string | number | Date | null, locale = '
 
 /** Formats seconds into MM:SS display timer string */
 export const formatTimer = (seconds: number): string => {
+  if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) {
+    return '00:00';
+  }
   const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
+  const s = Math.floor(seconds % 60);
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 };
 

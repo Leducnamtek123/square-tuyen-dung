@@ -57,6 +57,9 @@ describe('DashboardPage i18n', () => {
     for (const key of keys) {
       const matchingLines = lines.filter((line) => line.includes(`t('${key}'`));
 
+      if (matchingLines.length === 0) {
+        console.error('MISSING DASHBOARD I18N KEY:', key);
+      }
       expect(matchingLines).not.toHaveLength(0);
       for (const line of matchingLines) {
         expect(line).not.toContain('defaultValue');

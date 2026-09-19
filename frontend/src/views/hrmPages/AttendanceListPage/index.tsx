@@ -373,7 +373,7 @@ export default function AttendanceListPage() {
                     </Typography>
                   </TableCell>
                 </TableRow>
-              ) : timesheetData?.employees?.length === 0 ? (
+              ) : (!timesheetData?.employees || timesheetData.employees.length === 0) ? (
                 <TableRow>
                   <TableCell colSpan={36} align="center" sx={{ py: 6 }}>
                     <Typography variant="body2" color="text.secondary">
@@ -396,7 +396,7 @@ export default function AttendanceListPage() {
 
                     {/* Day Cells */}
                     {timesheetData?.days?.map((d) => {
-                      const record = emp.records[d.day];
+                      const record = emp?.records?.[d.day];
                       return (
                         <TableCell
                           key={d.day}

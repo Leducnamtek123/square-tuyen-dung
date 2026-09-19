@@ -49,8 +49,10 @@ export const formatRoute = (
   value: string,
   paramKey = ':slug'
 ): string => {
+  if (!route || typeof route !== 'string') return '';
+  const safeValue = value == null ? '' : String(value);
   const regex = new RegExp(`${paramKey}`, 'g');
-  const builtRoute = route.replace(regex, value);
+  const builtRoute = route.replace(regex, safeValue);
 
   if (typeof window === 'undefined') {
     return builtRoute;
@@ -61,6 +63,9 @@ export const formatRoute = (
 };
 
 const buildURL = (hostname: string): string => {
+  if (typeof window === 'undefined' || !window.location) {
+    return `https://${hostname}`;
+  }
   const protocol = window.location.protocol;
   const port = window.location.port ? `:${window.location.port}` : '';
   return `${protocol}//${hostname}${port}`;

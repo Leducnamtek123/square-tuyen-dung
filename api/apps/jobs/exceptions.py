@@ -35,3 +35,7 @@ class DuplicateApplicationError(JobsDomainError):
 
 class InvalidApplicationStatusTransitionError(JobsDomainError):
     """Application status transition is invalid."""
+
+
+class EmployerSelfApplicationError(JobsDomainError):
+    """Employer cannot apply to jobs of their own company."""

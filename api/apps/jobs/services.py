@@ -19,6 +19,7 @@ from apps.jobs.exceptions import (
     JobPostExpiredError,
     JobPostInactiveError,
     ResumeOwnershipError,
+    EmployerSelfApplicationError,
 )
 from apps.content.system_settings import auto_approve_jobs_enabled, email_notifications_enabled
 from shared.configs import variable_system as var_sys
@@ -258,6 +259,16 @@ class JobActivityService:
         if resume and resume.user != user:
             logger.error("Apply failed: resume %s belongs to user %s, not %s", resume.id, resume.user_id, user.id)
             raise ResumeOwnershipError("CV không thuộc về bạn.")
+
+        company = getattr(job_post, 'company', None)
+        is_company_owner = company and getattr(company, 'user_id', None) == user.id
+        is_job_poster = getattr(job_post, 'user_id', None) == user.id
+        is_company_member = False
+        if company and hasattr(user, 'company_memberships'):
+            is_company_member = user.company_memberships.filter(company=company, is_active=True).exists()
+        if is_company_owner or is_job_poster or is_company_member:
+            logger.warning("Apply failed: user %s belongs to company %s of job %s", user.id, company.id if company else None, job_post.id)
+            raise EmployerSelfApplicationError("Nhà tuyển dụng không thể tự ứng tuyển vào tin tuyển dụng của công ty mình.")
 
         existing = JobPostActivity.objects.filter(
             user=user, job_post=job_post, is_deleted=False

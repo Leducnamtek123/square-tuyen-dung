@@ -34,7 +34,24 @@ class QuestionBankListView(generics.ListAPIView):
     serializer_class = QuestionBankItemSerializer
 
     def get_queryset(self):
-        qs = Question.objects.all().select_related('career').order_by('sort_order', '-create_at')
+        user = getattr(self.request, 'user', None)
+        active_company = None
+        is_admin = False
+        if user and user.is_authenticated:
+            is_admin = getattr(user, 'is_staff', False) or getattr(user, 'is_superuser', False) or (getattr(user, 'role', None) and getattr(user.role, 'name', '') == 'ADMIN')
+            if hasattr(user, 'get_active_company'):
+                try:
+                    active_company = user.get_active_company()
+                except Exception:
+                    pass
+
+        qs = Question.objects.select_related('career').order_by('sort_order', '-create_at')
+        if not is_admin:
+            if active_company:
+                qs = qs.filter(Q(company__isnull=True) | Q(company=active_company))
+            else:
+                qs = qs.filter(company__isnull=True)
+
         career_param = self.request.query_params.get('career_id') or self.request.query_params.get('career')
         if career_param:
             if str(career_param).isdigit():
@@ -88,6 +105,27 @@ class QuestionHintsDetailView(APIView):
             q = Question.objects.get(pk=pk)
         except Question.DoesNotExist:
             return Response({"detail": "Không tìm thấy câu hỏi."}, status=status.HTTP_404_NOT_FOUND)
+
+        if q.company_id is not None:
+            user = getattr(request, 'user', None)
+            if not user or not user.is_authenticated:
+                return Response(
+                    {"detail": "Không có quyền truy cập câu hỏi riêng tư của doanh nghiệp."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            is_admin = getattr(user, 'is_staff', False) or getattr(user, 'is_superuser', False) or (getattr(user, 'role', None) and getattr(user.role, 'name', '') == 'ADMIN')
+            if not is_admin:
+                active_company = None
+                if hasattr(user, 'get_active_company'):
+                    try:
+                        active_company = user.get_active_company()
+                    except Exception:
+                        pass
+                if not (active_company and active_company.id == q.company_id):
+                    return Response(
+                        {"detail": "Không có quyền truy cập câu hỏi riêng tư của doanh nghiệp khác."},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
 
         return Response({
             "id": q.id,
