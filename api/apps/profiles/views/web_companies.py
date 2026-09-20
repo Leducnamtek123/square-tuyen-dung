@@ -25,6 +25,7 @@ from rest_framework import status
 
 from apps.accounts import permissions as perms_custom
 from apps.accounts.active_company import apply_active_company_from_request
+from apps.files.models import File
 
 from ..models import (
     Company,

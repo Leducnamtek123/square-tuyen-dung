@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework import permissions as perms_sys
 
 from apps.accounts import permissions as perms_custom
+from apps.locations.models import Location
+from shared.helpers import helper
 
 from ..models import JobSeekerProfile, Resume, AdvancedSkill
 from ..serializers import JobSeekerProfileSerializer, ResumeSerializer
@@ -137,20 +139,23 @@ class JobSeekerProfileViewSet(
 
                 # Bidirectional profile synchronization
                 if resume_obj:
-                    if resume_obj.city_id and (not job_seeker_profile.location or not job_seeker_profile.location.city_id):
-                        if not job_seeker_profile.location:
-                            job_seeker_profile.location = Location.objects.create(city=resume_obj.city)
-                            job_seeker_profile.save(update_fields=['location'])
-                        else:
-                            job_seeker_profile.location.city = resume_obj.city
-                            job_seeker_profile.location.save(update_fields=['city'])
+                    try:
+                        if resume_obj.city_id and (not job_seeker_profile.location or not job_seeker_profile.location.city_id):
+                            if not job_seeker_profile.location:
+                                job_seeker_profile.location = Location.objects.create(city=resume_obj.city)
+                                job_seeker_profile.save(update_fields=['location'])
+                            else:
+                                job_seeker_profile.location.city = resume_obj.city
+                                job_seeker_profile.location.save(update_fields=['city'])
 
-                    if not job_seeker_profile.phone and job_seeker_profile.user.phone_number:
-                        job_seeker_profile.phone = job_seeker_profile.user.phone_number
-                        job_seeker_profile.save(update_fields=['phone'])
-                    elif not job_seeker_profile.user.phone_number and job_seeker_profile.phone:
-                        job_seeker_profile.user.phone_number = job_seeker_profile.phone
-                        job_seeker_profile.user.save(update_fields=['phone_number'])
+                        if not job_seeker_profile.phone and job_seeker_profile.user.phone_number:
+                            job_seeker_profile.phone = job_seeker_profile.user.phone_number
+                            job_seeker_profile.save(update_fields=['phone'])
+                        elif not job_seeker_profile.user.phone_number and job_seeker_profile.phone:
+                            job_seeker_profile.user.phone_number = job_seeker_profile.phone
+                            job_seeker_profile.user.save(update_fields=['phone_number'])
+                    except Exception as sync_err:
+                        helper.print_log_error("app_get_resumes_sync_profile", sync_err)
 
 
                 serializer = ResumeSerializer(

@@ -32,9 +32,8 @@ const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   boxShadow: 'none',
   border: 'none',
   [theme.breakpoints.up('sm')]: {
-    borderRadius: '28px',
-    boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
-    border: '1px solid #E2E8F0',
+    borderRadius: '24px',
+    boxShadow: '0 20px 60px -15px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(226, 232, 240, 0.8)',
   },
   transition: 'all 0.3s ease',
   width: '100%',
@@ -242,49 +241,58 @@ const EmployerSignUp = () => {
 
   return (
     <>
-      <Container
-        maxWidth="lg"
+      <Box
         sx={{
-          py: { xs: 2, sm: 4, md: 5 },
-          px: { xs: 1, sm: 2, md: 3 },
+          minHeight: 'calc(100vh - 80px)',
+          background: 'radial-gradient(ellipse at top left, #EFF6FF 0%, #F8FAFC 50%, #FFFFFF 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: 'calc(100vh - 120px)',
+          py: { xs: 2, sm: 3, md: 4 },
+          px: { xs: 1, sm: 2 },
         }}
       >
-        <UnifiedAuthCard>
-          <Grid
-            container
-            spacing={0}
-            alignItems="stretch"
-            sx={{
-              width: '100%',
-            }}
-          >
-            {/* Left Column: Registration Form */}
+        <Container
+          maxWidth="lg"
+          sx={{
+            p: '0 !important',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <UnifiedAuthCard>
             <Grid
-              size={{ xs: 12, md: 6 }}
+              container
+              spacing={0}
+              alignItems="stretch"
               sx={{
-                p: { xs: 3, sm: 4, md: 5 },
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                backgroundColor: '#FFFFFF',
+                width: '100%',
               }}
             >
-              <Box>
-                {/* Role and Switcher header */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: 1.5,
-                    mb: 2.5,
-                  }}
-                >
+              {/* Left Column: Registration Form */}
+              <Grid
+                size={{ xs: 12, md: 6 }}
+                sx={{
+                  p: { xs: 2.5, sm: 3.5, md: 4 },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#FFFFFF',
+                }}
+              >
+                <Box>
+                  {/* Role and Switcher header */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: 1.5,
+                      mb: 2,
+                    }}
+                  >
                   <Box
                     sx={{
                       display: 'inline-flex',
@@ -381,24 +389,24 @@ const EmployerSignUp = () => {
               </Box>
 
               {/* Card Bottom / Legal Disclaimer & Links */}
-              <Box sx={{ mt: 'auto', pt: 3 }}>
+              <Box sx={{ mt: 'auto', pt: 2 }}>
                 <Typography
                   variant="caption"
                   sx={{
                     display: 'block',
                     textAlign: 'center',
                     color: '#64748B',
-                    fontSize: '12px',
-                    lineHeight: 1.55,
-                    mb: 2,
+                    fontSize: '11.5px',
+                    lineHeight: 1.5,
+                    mb: 1.5,
                   }}
                 >
                   Bằng việc đăng ký tài khoản, quý doanh nghiệp đồng ý tuân thủ các{' '}
-                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '12px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '11.5px', color: '#2563EB' }}>
                     Điều khoản dịch vụ
                   </StyledLink>{' '}
                   và{' '}
-                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '12px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '11.5px', color: '#2563EB' }}>
                     Chính sách bảo mật
                   </StyledLink>{' '}
                   của InfoHR.
@@ -407,7 +415,7 @@ const EmployerSignUp = () => {
                 <Grid
                   container
                   sx={{
-                    pt: 2,
+                    pt: 1.5,
                     borderTop: '1px solid #F1F5F9',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -423,20 +431,19 @@ const EmployerSignUp = () => {
                   </Grid>
                 </Grid>
 
-                {/* Security Trust Indicator */}
+                {/* Security Trust Indicator (Mobile only, on desktop it's in the showcase panel) */}
                 <Box
                   sx={{
-                    mt: 2,
-                    pt: 1,
-                    display: 'flex',
+                    display: { xs: 'flex', md: 'none' },
+                    mt: 1.5,
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 0.75,
                     color: '#94A3B8',
-                    fontSize: '12px',
+                    fontSize: '11.5px',
                   }}
                 >
-                  <SecurityIcon sx={{ fontSize: 15, color: '#10B981' }} />
+                  <SecurityIcon sx={{ fontSize: 14, color: '#10B981' }} />
                   <span>Bảo mật thông tin doanh nghiệp theo tiêu chuẩn SSL 256-bit</span>
                 </Box>
               </Box>
@@ -455,6 +462,7 @@ const EmployerSignUp = () => {
           </Grid>
         </UnifiedAuthCard>
       </Container>
+    </Box>
 
       {isFullScreenLoading && <BackdropLoading />}
     </>

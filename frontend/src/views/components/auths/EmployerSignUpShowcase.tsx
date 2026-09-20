@@ -14,17 +14,17 @@ interface ValuePropItem {
 
 const VALUE_PROPS: ValuePropItem[] = [
   {
-    icon: <PeopleAltOutlinedIcon sx={{ fontSize: 22, color: '#38BDF8' }} />,
+    icon: <PeopleAltOutlinedIcon sx={{ fontSize: 20, color: '#38BDF8' }} />,
     title: 'Mạng lưới 5.000.000+ nhân tài',
     description: 'Tiếp cận ứng viên chất lượng cao đa lĩnh vực từ Junior đến Quản lý cấp cao.',
   },
   {
-    icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 22, color: '#F472B6' }} />,
+    icon: <AutoAwesomeOutlinedIcon sx={{ fontSize: 20, color: '#F472B6' }} />,
     title: 'Sàng lọc & AI Matching 98%',
-    description: 'Tự động phân tích kỹ năng, chấm điểm độ tương thích và rút ngắn 70% vòng sơ tuyển.',
+    description: 'Tự động phân tích kỹ năng, chấm điểm độ tương thích và rút ngắn thời gian sơ tuyển.',
   },
   {
-    icon: <AssessmentOutlinedIcon sx={{ fontSize: 22, color: '#34D399' }} />,
+    icon: <AssessmentOutlinedIcon sx={{ fontSize: 20, color: '#34D399' }} />,
     title: 'Hệ thống ATS tuyển dụng tập trung',
     description: 'Quản lý toàn diện ứng viên, lịch phỏng vấn AI và dữ liệu tuyển dụng trên một nền tảng.',
   },
@@ -41,15 +41,14 @@ const EmployerSignUpShowcase: React.FC = () => {
     <Box
       sx={{
         height: '100%',
-        minHeight: { md: '640px' },
         width: '100%',
-        p: { xs: 3, sm: 4, md: 5 },
+        p: { xs: 2.5, sm: 3.5, md: 4 },
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(155deg, #090E1A 0%, #0F172A 50%, #172554 100%)',
+        background: 'linear-gradient(160deg, #0B1120 0%, #0F172A 50%, #1E293B 100%)',
         color: '#FFFFFF',
       }}
     >
@@ -57,10 +56,10 @@ const EmployerSignUpShowcase: React.FC = () => {
       <Box
         sx={{
           position: 'absolute',
-          top: -80,
-          right: -80,
-          width: 280,
-          height: 280,
+          top: -60,
+          right: -60,
+          width: 240,
+          height: 240,
           borderRadius: '50%',
           background: 'radial-gradient(circle, rgba(59, 130, 246, 0.22) 0%, transparent 70%)',
           filter: 'blur(40px)',
@@ -70,12 +69,12 @@ const EmployerSignUpShowcase: React.FC = () => {
       <Box
         sx={{
           position: 'absolute',
-          bottom: -60,
-          left: -60,
-          width: 240,
-          height: 240,
+          bottom: -50,
+          left: -50,
+          width: 220,
+          height: 220,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 70%)',
           filter: 'blur(40px)',
           pointerEvents: 'none',
         }}
@@ -89,12 +88,12 @@ const EmployerSignUpShowcase: React.FC = () => {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 0.75,
-            px: 1.5,
-            py: 0.5,
+            px: 1.25,
+            py: 0.4,
             borderRadius: '999px',
             backgroundColor: 'rgba(59, 130, 246, 0.12)',
-            border: '1px solid rgba(147, 197, 253, 0.2)',
-            mb: 2,
+            border: '1px solid rgba(147, 197, 253, 0.25)',
+            mb: 1.75,
           }}
         >
           <Box
@@ -108,7 +107,7 @@ const EmployerSignUpShowcase: React.FC = () => {
           />
           <Typography
             sx={{
-              fontSize: '11.5px',
+              fontSize: '11px',
               fontWeight: 700,
               color: '#93C5FD',
               textTransform: 'uppercase',
@@ -124,11 +123,11 @@ const EmployerSignUpShowcase: React.FC = () => {
           variant="h4"
           sx={{
             fontWeight: 800,
-            fontSize: { md: '25px', lg: '27px' },
-            lineHeight: 1.3,
+            fontSize: { md: '22px', lg: '24px' },
+            lineHeight: 1.35,
             color: '#FFFFFF',
             letterSpacing: '-0.02em',
-            mb: 1.25,
+            mb: 1,
           }}
         >
           Nền tảng tuyển dụng &amp; Quản trị nhân tài thông minh
@@ -138,8 +137,8 @@ const EmployerSignUpShowcase: React.FC = () => {
         <Typography
           sx={{
             color: '#94A3B8',
-            fontSize: '14px',
-            lineHeight: 1.6,
+            fontSize: '13px',
+            lineHeight: 1.55,
           }}
         >
           Tối ưu hóa đến 70% thời gian tuyển dụng, kết nối đúng ứng viên phù hợp với chi phí hiệu quả nhất.
@@ -147,32 +146,32 @@ const EmployerSignUpShowcase: React.FC = () => {
       </Box>
 
       {/* Middle Value Props Cards */}
-      <Stack spacing={2} sx={{ my: 3.5, position: 'relative', zIndex: 1 }}>
+      <Stack spacing={1.5} sx={{ my: 2.5, position: 'relative', zIndex: 1 }}>
         {VALUE_PROPS.map((prop, idx) => (
           <Box
             key={idx}
             sx={{
               display: 'flex',
               alignItems: 'flex-start',
-              gap: 1.75,
-              p: 2,
-              borderRadius: '16px',
+              gap: 1.5,
+              p: 1.5,
+              borderRadius: '12px',
               backgroundColor: 'rgba(255, 255, 255, 0.04)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.07)',
               backdropFilter: 'blur(8px)',
               transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
               '&:hover': {
                 backgroundColor: 'rgba(255, 255, 255, 0.07)',
-                borderColor: 'rgba(255, 255, 255, 0.16)',
+                borderColor: 'rgba(255, 255, 255, 0.15)',
                 transform: 'translateX(3px)',
               },
             }}
           >
             <Box
               sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '12px',
+                width: 36,
+                height: 36,
+                borderRadius: '10px',
                 backgroundColor: 'rgba(255, 255, 255, 0.06)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 display: 'grid',
@@ -186,9 +185,9 @@ const EmployerSignUpShowcase: React.FC = () => {
               <Typography
                 sx={{
                   fontWeight: 700,
-                  fontSize: '14px',
+                  fontSize: '13.5px',
                   color: '#F8FAFC',
-                  mb: 0.35,
+                  mb: 0.25,
                 }}
               >
                 {prop.title}
@@ -196,8 +195,8 @@ const EmployerSignUpShowcase: React.FC = () => {
               <Typography
                 sx={{
                   color: '#94A3B8',
-                  fontSize: '12.5px',
-                  lineHeight: 1.5,
+                  fontSize: '12px',
+                  lineHeight: 1.45,
                 }}
               >
                 {prop.description}
@@ -212,7 +211,7 @@ const EmployerSignUpShowcase: React.FC = () => {
         sx={{
           position: 'relative',
           zIndex: 1,
-          pt: 2.5,
+          pt: 2,
           borderTop: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
@@ -221,7 +220,7 @@ const EmployerSignUpShowcase: React.FC = () => {
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 1.5,
-            mb: 2,
+            mb: 1.75,
           }}
         >
           {METRICS.map((metric, idx) => (
@@ -229,17 +228,18 @@ const EmployerSignUpShowcase: React.FC = () => {
               <Typography
                 sx={{
                   fontWeight: 800,
-                  fontSize: { md: '19px', lg: '21px' },
+                  fontSize: { md: '18px', lg: '20px' },
                   color: '#FFFFFF',
                   letterSpacing: '-0.02em',
                   fontVariantNumeric: 'tabular-nums',
+                  lineHeight: 1.2,
                 }}
               >
                 {metric.value}
               </Typography>
               <Typography
                 sx={{
-                  color: '#64748B',
+                  color: '#94A3B8',
                   fontSize: '11px',
                   fontWeight: 500,
                   mt: 0.25,
@@ -257,13 +257,13 @@ const EmployerSignUpShowcase: React.FC = () => {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
-            color: '#64748B',
-            fontSize: '11.5px',
+            gap: 0.75,
+            color: '#94A3B8',
+            fontSize: '11px',
           }}
         >
-          <VerifiedUserOutlinedIcon sx={{ fontSize: 16, color: '#10B981' }} />
-          <span>Cam kết bảo mật dữ liệu doanh nghiệp chuẩn ISO &amp; SSL 256-bit</span>
+          <VerifiedUserOutlinedIcon sx={{ fontSize: 15, color: '#10B981', flexShrink: 0 }} />
+          <span>Bảo mật dữ liệu doanh nghiệp chuẩn ISO &amp; SSL 256-bit</span>
         </Box>
       </Box>
     </Box>

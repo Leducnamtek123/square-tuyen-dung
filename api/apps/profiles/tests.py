@@ -1981,3 +1981,27 @@ class TestResumeSavedAPI:
         assert response2.data["data"]["isSaved"] is False
         assert not ResumeSaved.objects.filter(company=company, resume=resume).exists()
 
+
+@pytest.mark.django_db
+def test_job_seeker_get_resumes_website_sync_location_without_500(job_seeker_user, job_seeker_profile, city):
+    client = APIClient()
+    client.force_authenticate(user=job_seeker_user)
+    job_seeker_profile.location = None
+    job_seeker_profile.save(update_fields=['location'])
+
+    # Create website resume with city
+    Resume.objects.create(
+        user=job_seeker_user,
+        job_seeker_profile=job_seeker_profile,
+        type=var_sys.CV_WEBSITE,
+        title="Test Website Resume",
+        city=city,
+    )
+
+    response = client.get(f"/api/v1/info/web/job-seeker-profiles/{job_seeker_profile.id}/resumes/?resumeType=WEBSITE&type=WEBSITE")
+    assert response.status_code == 200
+    job_seeker_profile.refresh_from_db()
+    assert job_seeker_profile.location is not None
+    assert job_seeker_profile.location.city == city
+
+

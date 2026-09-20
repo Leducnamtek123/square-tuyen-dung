@@ -3,7 +3,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
-import { Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { useTranslation } from 'react-i18next';
@@ -48,26 +48,58 @@ const CompanyFollowButton = ({ slug, isFollowed }: CompanyFollowButtonProps) => 
   }
 
   return (
-    <Stack justifyContent="flex-end" sx={{ py: 1, px: 2, height: '100%' }}>
+    <Box sx={{ px: 2.5, pb: 2.5, pt: 0.5, mt: 'auto', width: '100%' }}>
       <LoadingButton
         fullWidth
         onClick={handleFollow}
-        startIcon={followed ? <BookmarkIcon sx={{ color: 'common.white' }} /> : <BookmarkBorderIcon />}
+        startIcon={
+          followed ? (
+            <BookmarkIcon sx={{ fontSize: 18, color: '#2563eb' }} />
+          ) : (
+            <BookmarkBorderIcon sx={{ fontSize: 18, color: '#ffffff' }} />
+          )
+        }
         loading={isLoadingFollow}
         loadingPosition="start"
-        variant={followed ? 'contained' : 'outlined'}
-        color="warning"
-        sx={{ textTransform: 'inherit' }}
+        variant={followed ? 'outlined' : 'contained'}
+        sx={{
+          height: 42,
+          borderRadius: '12px',
+          textTransform: 'none',
+          fontWeight: 600,
+          fontSize: '0.875rem',
+          letterSpacing: '-0.01em',
+          transition: 'all 0.2s ease-in-out',
+          ...(followed
+            ? {
+                bgcolor: '#eff6ff',
+                color: '#1d4ed8',
+                borderColor: '#bfdbfe',
+                boxShadow: 'none',
+                '&:hover': {
+                  bgcolor: '#dbeafe',
+                  borderColor: '#93c5fd',
+                  color: '#1e40af',
+                },
+              }
+            : {
+                bgcolor: '#2563eb',
+                color: '#ffffff',
+                border: '1px solid #2563eb',
+                boxShadow: '0 2px 8px rgba(37, 99, 235, 0.18)',
+                '&:hover': {
+                  bgcolor: '#1d4ed8',
+                  borderColor: '#1d4ed8',
+                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.28)',
+                },
+              }),
+        }}
       >
         <span>
-          {followed ? (
-            <span style={{ color: 'white' }}>{t('company.following')}</span>
-          ) : (
-            t('company.follow')
-          )}
+          {followed ? t('company.following') : t('company.follow')}
         </span>
       </LoadingButton>
-    </Stack>
+    </Box>
   );
 };
 

@@ -10,7 +10,6 @@ import {
   Stack,
   IconButton,
 } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import { useRouter, usePathname } from 'next/navigation';
@@ -82,47 +81,90 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3.5,
-          p: { xs: 2.5, sm: 3 },
+          borderRadius: '24px',
+          p: 0,
+          overflow: 'hidden',
           position: 'relative',
-          boxShadow: '0 24px 48px -12px rgba(15, 23, 42, 0.18)',
+          border: '1px solid rgba(226, 232, 240, 0.8)',
+          boxShadow: '0 24px 60px -12px rgba(15, 23, 42, 0.22)',
+          bgcolor: '#ffffff',
         },
       }}
     >
+      {/* Floating frosted glass close button */}
       <IconButton
         onClick={onClose}
         size="small"
         aria-label="Close dialog"
         sx={{
           position: 'absolute',
-          top: 12,
-          right: 12,
-          color: '#94a3b8',
-          '&:hover': { color: '#334155', bgcolor: '#f1f5f9' },
+          top: 14,
+          right: 14,
+          zIndex: 10,
+          color: '#475569',
+          bgcolor: 'rgba(255, 255, 255, 0.75)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255, 255, 255, 0.8)',
+          boxShadow: '0 2px 8px rgba(15, 23, 42, 0.08)',
+          transition: 'all 0.2s ease',
+          '&:hover': {
+            color: '#0f172a',
+            bgcolor: 'rgba(255, 255, 255, 0.95)',
+            transform: 'scale(1.08)',
+          },
         }}
       >
         <CloseRoundedIcon fontSize="small" />
       </IconButton>
 
-      <DialogContent sx={{ p: 0, textAlign: 'center' }}>
+      {/* Top illustration banner with subtle gradient blend */}
+      <Box
+        sx={{
+          position: 'relative',
+          width: '100%',
+          height: { xs: 180, sm: 200 },
+          bgcolor: '#f0f7ff',
+          overflow: 'hidden',
+        }}
+      >
+        <Box
+          component="img"
+          src="/images/auth/auth_login_prompt.jpg"
+          alt="InfoHR Authentication"
+          sx={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            transition: 'transform 0.4s ease',
+            '&:hover': {
+              transform: 'scale(1.03)',
+            },
+          }}
+        />
+        {/* Soft gradient bottom blend */}
         <Box
           sx={{
-            width: 56,
-            height: 56,
-            borderRadius: '50%',
-            bgcolor: 'rgba(37, 99, 235, 0.08)',
-            color: '#2563eb',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mx: 'auto',
-            mb: 2,
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0) 65%, #ffffff 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+      </Box>
+
+      {/* Dialog Body Content */}
+      <DialogContent sx={{ p: { xs: 2.5, sm: 3 }, pt: { xs: 1, sm: 1 }, textAlign: 'center' }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: 800,
+            color: '#0f172a',
+            fontSize: { xs: '1.25rem', sm: '1.35rem' },
+            letterSpacing: '-0.02em',
+            mb: 1,
           }}
         >
-          <LockOutlinedIcon sx={{ fontSize: 28 }} />
-        </Box>
-
-        <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', mb: 1 }}>
           {displayTitle}
         </Typography>
 
@@ -131,8 +173,9 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
           sx={{
             color: '#64748b',
             lineHeight: 1.6,
+            fontSize: '0.875rem',
             mb: 3,
-            maxWidth: 320,
+            maxWidth: 340,
             mx: 'auto',
             textWrap: 'balance',
           }}
@@ -141,23 +184,26 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
         </Typography>
 
         <Stack spacing={1.5}>
+          {/* Primary Login Button */}
           <Button
             variant="contained"
             fullWidth
             onClick={handleLoginClick}
             sx={{
               position: 'relative',
-              bgcolor: '#2563eb',
+              height: 46,
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
               color: '#ffffff',
-              py: 1.2,
-              borderRadius: 2.5,
+              borderRadius: '12px',
               fontWeight: 700,
               textTransform: 'none',
               fontSize: '0.95rem',
-              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.28)',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                bgcolor: '#1d4ed8',
-                boxShadow: '0 6px 18px rgba(37, 99, 235, 0.35)',
+                background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
+                boxShadow: '0 6px 20px rgba(37, 99, 235, 0.38)',
+                transform: 'translateY(-1px)',
               },
             }}
           >
@@ -165,36 +211,50 @@ export const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
             <ArrowForwardRoundedIcon sx={{ fontSize: 18, position: 'absolute', right: 16 }} />
           </Button>
 
+          {/* Register Link Button */}
           <Button
             variant="text"
             fullWidth
             onClick={handleRegisterClick}
             sx={{
-              color: '#2563eb',
-              py: 0.75,
-              fontWeight: 600,
+              height: 40,
+              color: '#475569',
+              borderRadius: '10px',
+              fontWeight: 500,
               textTransform: 'none',
               fontSize: '0.875rem',
-              '&:hover': { bgcolor: 'rgba(37, 99, 235, 0.04)' },
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                bgcolor: '#f8fafc',
+                color: '#0f172a',
+              },
             }}
           >
             {t('authRequired.registerPrompt')}{' '}
-            <strong style={{ marginLeft: 4, fontWeight: 700 }}>
+            <Box
+              component="span"
+              sx={{
+                color: '#2563eb',
+                fontWeight: 700,
+                ml: 0.5,
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
               {t('authRequired.registerBtn')}
-            </strong>
+            </Box>
           </Button>
 
+          {/* Dismiss Button */}
           <Button
             variant="text"
-            fullWidth
+            size="small"
             onClick={onClose}
             sx={{
               color: '#94a3b8',
-              py: 0.5,
               fontWeight: 500,
               textTransform: 'none',
               fontSize: '0.825rem',
-              '&:hover': { color: '#64748b' },
+              '&:hover': { color: '#64748b', bgcolor: 'transparent' },
             }}
           >
             {t('authRequired.closeBtn')}

@@ -234,6 +234,7 @@ class CreateMockSessionView(APIView):
                     category__in=['general', 'behavioral', 'situational']
                 ).exclude(id__in=[q.id for q in candidate_questions]).order_by('?')[:remaining]
             )
+            candidate_questions.extend(general_fallback)
         selected_questions = candidate_questions if (question_ids or question_group_obj) else candidate_questions[:question_count]
         if not question_ids and not question_group_obj:
             stage_priority = {

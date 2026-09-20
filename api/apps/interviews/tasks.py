@@ -295,11 +295,11 @@ def send_interview_report_notification(session_id):
             subject=f"[InfoHR] Báo cáo kết quả Phỏng vấn trực tuyến AI - {candidate_display_name}",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[employer.email],
+            recipient_list=[employer_email],
             html_message=html_message,
             fail_silently=False,
         )
-        logger.info("Evaluation report sent to %s for session %s", employer.email, session_id)
+        logger.info("Evaluation report sent to %s for session %s", employer_email, session_id)
     except Exception as e:
         logger.error("Error sending report email for session %s: %s", session_id, e)
 

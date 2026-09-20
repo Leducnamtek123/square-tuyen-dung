@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import date
 from django.conf import settings
-from typing import Iterable
+from typing import Iterable, Any
 from urllib.parse import urljoin
+
+logger = logging.getLogger(__name__)
 
 from django.db import transaction
 from django.utils.text import slugify

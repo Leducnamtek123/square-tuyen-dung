@@ -105,9 +105,9 @@ const CompanySearch = () => {
               size={{
                 xs: 12,
                 sm: 12,
-                md: 6,
-                lg: 6,
-                xl: 6,
+                md: 5.5,
+                lg: 5.5,
+                xl: 5.5,
               }}
             >
               <InputBaseSearchCompanyCustom
@@ -120,7 +120,7 @@ const CompanySearch = () => {
             <Grid
               size={{
                 xs: 12,
-                sm: 7,
+                sm: 6,
                 md: 3.5,
                 lg: 3.5,
                 xl: 3.5,
@@ -137,33 +137,37 @@ const CompanySearch = () => {
             <Grid
               size={{
                 xs: 12,
-                sm: 5,
-                md: 2.5,
-                lg: 2.5,
-                xl: 2.5,
+                sm: 6,
+                md: 3,
+                lg: 3,
+                xl: 3,
               }}
             >
-              <Stack direction="row" spacing={1.5} justifyContent="flex-start" alignItems="center">
+              <Stack direction="row" spacing={1.2} justifyContent="flex-end" alignItems="center" sx={{ width: '100%' }}>
                 <Button
                   variant="contained"
                   type="submit"
-                  startIcon={<SearchIcon />}
+                  startIcon={<SearchIcon sx={{ fontSize: 19 }} />}
                   sx={{
                     flex: 1,
+                    height: 48,
                     background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
                     color: 'white',
                     whiteSpace: 'nowrap',
-                    px: 3,
-                    py: 1.2,
-                    borderRadius: '14px',
+                    px: { xs: 2, sm: 2.5 },
+                    borderRadius: '999px',
                     fontWeight: 700,
                     fontSize: '0.92rem',
-                    boxShadow: '0 8px 20px rgba(37, 99, 235, 0.25)',
-                    transition: 'all 0.2s ease',
+                    textTransform: 'none',
+                    boxShadow: '0 6px 16px rgba(37, 99, 235, 0.28)',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
                       background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
                       transform: 'translateY(-1px)',
-                      boxShadow: '0 12px 24px rgba(37, 99, 235, 0.35)',
+                      boxShadow: '0 10px 22px rgba(37, 99, 235, 0.38)',
+                    },
+                    '&:active': {
+                      transform: 'scale(0.98)',
                     },
                   }}
                 >
@@ -176,22 +180,24 @@ const CompanySearch = () => {
                     aria-label={t('companySearch.openFiltersAria', { defaultValue: 'Mở bộ lọc tìm công ty' })}
                     onClick={handleToggleFilterDrawer}
                     sx={{
-                      background: activeAdvancedFilterCount > 0 ? '#dbeafe' : '#eff6ff',
-                      border: `1px solid ${activeAdvancedFilterCount > 0 ? '#93c5fd' : '#dbeafe'}`,
-                      color: '#2563eb',
-                      borderRadius: '14px',
-                      p: 1.2,
+                      width: 48,
+                      height: 48,
+                      flexShrink: 0,
+                      background: activeAdvancedFilterCount > 0 ? '#eff6ff' : '#f8fafc',
+                      border: `1px solid ${activeAdvancedFilterCount > 0 ? '#bfdbfe' : '#e2e8f0'}`,
+                      color: activeAdvancedFilterCount > 0 ? '#1d4ed8' : '#475569',
+                      borderRadius: '999px',
                       transition: 'all 0.2s ease',
-                      position: 'relative',
                       '&:hover': {
-                        background: '#dbeafe',
-                        color: '#1d4ed8',
-                        transform: 'scale(1.05)',
+                        background: '#eff6ff',
+                        color: '#2563eb',
+                        borderColor: '#93c5fd',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >
                     <Badge badgeContent={activeAdvancedFilterCount} color="primary" sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', height: 16, minWidth: 16 } }}>
-                      <FilterAltIcon fontSize="small" />
+                      <FilterAltIcon sx={{ fontSize: 20 }} />
                     </Badge>
                   </IconButton>
                 </Tooltip>
@@ -202,21 +208,23 @@ const CompanySearch = () => {
                     aria-label={t('companySearch.resetFiltersAria')}
                     onClick={handleReset}
                     sx={{
+                      width: 48,
+                      height: 48,
+                      flexShrink: 0,
                       background: '#f8fafc',
                       border: '1px solid #e2e8f0',
                       color: '#64748b',
-                      borderRadius: '14px',
-                      p: 1.2,
+                      borderRadius: '999px',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        background: '#f1f5f9',
+                        background: '#fef2f2',
                         color: '#ef4444',
                         borderColor: '#fca5a5',
-                        transform: 'scale(1.05)',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >
-                    <RestartAltRoundedIcon fontSize="small" />
+                    <RestartAltRoundedIcon sx={{ fontSize: 20 }} />
                   </IconButton>
                 </Tooltip>
               </Stack>
