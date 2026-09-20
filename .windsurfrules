@@ -1,0 +1,12 @@
+# Windsurf Rules — Square Tuyển Dụng (InfoHR)
+
+> Master Rules: Refer to [AGENTS.md](./AGENTS.md) for ecosystem architecture and core directives.
+
+## Windsurf Cascade Guidelines
+1. **Subsystem Scoping**:
+   - For `/frontend`: Consult [frontend/AGENTS.md](./frontend/AGENTS.md). Enforce Next.js 16 App Router best practices, React 19 Server Components, MUI 6 + Tailwind CSS v4 harmony, and TanStack Query v5.
+   - For `/api`: Consult [api/AGENTS.md](./api/AGENTS.md). Enforce Django 4.2+ DRF conventions, clean service layer, zero N+1 queries (`select_related`/`prefetch_related`), and Ruff linting.
+   - For `/voice-ai`: Consult [voice-ai/AGENTS.md](./voice-ai/AGENTS.md). Enforce LiveKit Agent WebRTC patterns and latency-optimized streaming.
+2. **Verification Gate**: Before marking any task as complete, verify changes with appropriate test or lint commands (`pnpm run lint` in frontend, `ruff check .` or `pytest` in api).
+3. **Vietnamese Comments**: Do not erase or translate Vietnamese technical and business comments in existing source code.
+4. **Security**: Do not edit or create files containing plaintext secrets or passwords.
