@@ -297,53 +297,104 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
           </div>
         </div>
 
-        {/* --- 1. Competency Overview Bento (Donut + Radar Chart) ----------- */}
-        <CompetencyOverviewCard
-          overallScore={score100}
-          isEvaluating={isEvaluating}
-          completedQuestionsCount={completedQuestionsCount}
-          totalQuestionsCount={totalQuestionsCount}
-          dimensions={radarDimensions}
-          noticeMessage={
-            completedQuestionsCount === 0
-              ? `Phiên phỏng vấn kết thúc sớm khi chưa hoàn thành câu hỏi, tiến độ 0/${totalQuestionsCount} câu hỏi đã hoàn thành`
-              : completedQuestionsCount < totalQuestionsCount
-              ? `Vui lòng hoàn thành tất cả câu hỏi để nhận đánh giá đầy đủ, tiến độ ${completedQuestionsCount}/${totalQuestionsCount} câu hỏi đã hoàn thành`
-              : undefined
-          }
-        />
-
-        {/* --- 2. Strengths & Weaknesses Quick Highlights (If present) ----- */}
-        {(strengthsList.length > 0 || weaknessesList.length > 0) && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {strengthsList.length > 0 && (
-              <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-4 shadow-2xs">
-                <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
-                  <CheckCircleOutlineOutlinedIcon sx={{ fontSize: 16 }} />
-                  Điểm mạnh nổi bật
-                </div>
-                <ul className="space-y-1 text-xs text-emerald-900 leading-relaxed font-medium">
-                  {strengthsList.map((item, idx) => (
-                    <li key={idx}>• {item}</li>
-                  ))}
-                </ul>
+        {/* --- 1. Competency Overview or Official Thank-You Banner ----------- */}
+        {!isMock ? (
+          /* Official Interview Candidate View: Thank You & Next Steps Card */
+          <div className="rounded-2xl border border-blue-100 bg-white p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 shrink-0">
+                <CheckCircleRoundedIcon sx={{ fontSize: 32 }} />
               </div>
-            )}
-
-            {weaknessesList.length > 0 && (
-              <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-4 shadow-2xs">
-                <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-800">
-                  <LightbulbOutlinedIcon sx={{ fontSize: 16 }} />
-                  Khu vực cần cải thiện
-                </div>
-                <ul className="space-y-1 text-xs text-amber-900 leading-relaxed font-medium">
-                  {weaknessesList.map((item, idx) => (
-                    <li key={idx}>• {item}</li>
-                  ))}
-                </ul>
+              <div className="space-y-1">
+                <h2 className="text-xl font-bold text-slate-900">
+                  Cảm ơn bạn đã hoàn thành buổi phỏng vấn!
+                </h2>
+                <p className="text-sm text-slate-600">
+                  Toàn bộ nội dung trao đổi đã được ghi nhận và chuyển trực tiếp tới Hội đồng tuyển dụng của{' '}
+                  <span className="font-semibold text-slate-800">{session?.companyName || 'Nhà tuyển dụng InfoHR'}</span>.
+                </p>
               </div>
-            )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-4 space-y-1">
+                <span className="text-xs font-medium text-slate-500">Vị trí ứng tuyển</span>
+                <p className="text-sm font-bold text-slate-800 truncate">{session?.jobName || 'Vị trí tuyển dụng'}</p>
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-4 space-y-1">
+                <span className="text-xs font-medium text-slate-500">Tiến độ câu hỏi</span>
+                <p className="text-sm font-bold text-emerald-600">{completedQuestionsCount}/{totalQuestionsCount} câu hoàn thành</p>
+              </div>
+              <div className="rounded-xl border border-slate-100 bg-slate-50/80 p-4 space-y-1">
+                <span className="text-xs font-medium text-slate-500">Trạng thái hồ sơ</span>
+                <p className="text-sm font-bold text-blue-600">Đang chờ HR xem xét</p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-xs text-blue-900 leading-relaxed space-y-1">
+              <div className="font-bold flex items-center gap-1.5 text-blue-800">
+                <ApartmentOutlinedIcon sx={{ fontSize: 16 }} />
+                <span>Quy trình tiếp theo:</span>
+              </div>
+              <p>
+                1. Bộ phận nhân sự sẽ rà soát các câu trả lời và phản hồi của bạn.
+              </p>
+              <p>
+                2. Kết quả chính thức cùng lời mời cho các vòng tiếp theo khi hồ sơ phù hợp sẽ được gửi qua email của bạn trong vòng 3–5 ngày làm việc.
+              </p>
+            </div>
           </div>
+        ) : (
+          /* Mock Interview View: Full Competency Overview Bento (Donut + Radar Chart) */
+          <>
+            <CompetencyOverviewCard
+              overallScore={score100}
+              isEvaluating={isEvaluating}
+              completedQuestionsCount={completedQuestionsCount}
+              totalQuestionsCount={totalQuestionsCount}
+              dimensions={radarDimensions}
+              noticeMessage={
+                completedQuestionsCount === 0
+                  ? `Phiên phỏng vấn kết thúc sớm khi chưa hoàn thành câu hỏi, tiến độ 0/${totalQuestionsCount} câu hỏi đã hoàn thành`
+                  : completedQuestionsCount < totalQuestionsCount
+                  ? `Vui lòng hoàn thành tất cả câu hỏi để nhận đánh giá đầy đủ, tiến độ ${completedQuestionsCount}/${totalQuestionsCount} câu hỏi đã hoàn thành`
+                  : undefined
+              }
+            />
+
+            {/* Strengths & Weaknesses Quick Highlights */}
+            {(strengthsList.length > 0 || weaknessesList.length > 0) && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {strengthsList.length > 0 && (
+                  <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-4 shadow-2xs">
+                    <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
+                      <CheckCircleOutlineOutlinedIcon sx={{ fontSize: 16 }} />
+                      Điểm mạnh nổi bật
+                    </div>
+                    <ul className="space-y-1 text-xs text-emerald-900 leading-relaxed font-medium">
+                      {strengthsList.map((item, idx) => (
+                        <li key={idx}>• {item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {weaknessesList.length > 0 && (
+                  <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-4 shadow-2xs">
+                    <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-800">
+                      <LightbulbOutlinedIcon sx={{ fontSize: 16 }} />
+                      Khu vực cần cải thiện
+                    </div>
+                    <ul className="space-y-1 text-xs text-amber-900 leading-relaxed font-medium">
+                      {weaknessesList.map((item, idx) => (
+                        <li key={idx}>• {item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
 
         {/* --- Video Recording Section (Mock & Official) ------------------ */}
@@ -394,11 +445,13 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
           </div>
         )}
 
-        {/* --- 3. Two-Column Question Review Drilldown ---------------------- */}
-        <InterviewQuestionReviewSection
-          questions={reviewQuestions}
-          onRetryQuestion={handleRetryQuestion}
-        />
+        {/* --- 3. Two-Column Question Review Drilldown (Mock Interview only) -- */}
+        {isMock && (
+          <InterviewQuestionReviewSection
+            questions={reviewQuestions}
+            onRetryQuestion={handleRetryQuestion}
+          />
+        )}
       </div>
 
       {/* --- Sticky Bottom Action Bar with Mobile Safe Area Support --- */}

@@ -58,6 +58,27 @@ def test_refusal_or_skip_classification() -> None:
         assert len(verdict.reasoning) > 0
 
 
+def test_clarification_or_hesitation_classification() -> None:
+    test_cases = [
+        "Em chưa nghe rõ câu hỏi, chị nói lại được không ạ?",
+        "Nhắc lại câu hỏi giúp em với",
+        "Đọc lại câu hỏi được không ạ?",
+        "Cho em xin phép suy nghĩ một chút",
+        "Chờ em một chút để em nhớ lại",
+        "Đợi em một tí ạ",
+        "Ý bạn là gì ạ?",
+        "Câu hỏi là gì vậy ạ?",
+        "Câu này hơi khó một chút, cho em suy nghĩ",
+    ]
+
+    engine = VoiceDecisionEngine()
+    for text in test_cases:
+        verdict = engine.classify_turn(text)
+        assert verdict.intent == TurnIntent.NEED_CLARIFICATION_OR_HESITATION, f"Failed for '{text}': got {verdict.intent}"
+        assert verdict.confidence >= 0.75, f"Low confidence for '{text}': {verdict.confidence}"
+        assert len(verdict.reasoning) > 0
+
+
 def test_question_for_interviewer_classification() -> None:
     test_cases = [
         "Cho em hỏi về chế độ bảo hiểm và đãi ngộ của công ty như thế nào ạ?",

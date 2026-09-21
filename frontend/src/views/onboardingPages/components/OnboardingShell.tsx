@@ -9,12 +9,18 @@ interface OnboardingShellProps {
   children: React.ReactNode;
   headerAppName?: string;
   maxWidth?: Breakpoint | false;
+  onSkip?: () => void;
+  isSkipping?: boolean;
+  showSkip?: boolean;
 }
 
 export default function OnboardingShell({
   children,
   headerAppName = 'InfoHR',
   maxWidth = 'md',
+  onSkip,
+  isSkipping = false,
+  showSkip = false,
 }: OnboardingShellProps) {
   return (
     <Box
@@ -52,7 +58,12 @@ export default function OnboardingShell({
 
       {/* 3. Header: Floating semi-transparent with blur so grid pattern flows naturally */}
       <Box sx={{ position: 'relative', zIndex: 10 }}>
-        <OnboardingHeader appName={headerAppName} />
+        <OnboardingHeader
+          appName={headerAppName}
+          onSkip={onSkip}
+          isSkipping={isSkipping}
+          showSkip={showSkip}
+        />
       </Box>
 
       {/* 4. Main content stage */}

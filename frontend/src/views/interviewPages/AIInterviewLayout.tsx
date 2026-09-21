@@ -57,6 +57,7 @@ import { InterviewHintsDrawer } from './components/InterviewHintsDrawer';
 import { InterviewRoadmapDrawer } from './components/InterviewRoadmapDrawer';
 import { InterviewQuestionCard } from './components/InterviewQuestionCard';
 import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
+import interviewService from '@/services/interviewService';
 
 const AI_CONTROL_TOPIC = 'square.interview.ai_control';
 const AI_TAKEOVER_TOPIC = 'square.interview.ai_takeover';
@@ -312,7 +313,7 @@ function CustomControlBar({
                 boxShadow: '0 4px 12px rgba(225,29,72,0.3)',
               }}
             >
-              {ending ? t('controls.ending', 'Đang kết thúc...') : t('controls.confirmEndAction', 'Xác nhận kết thúc')}
+              {ending ? t('controls.ending') : t('controls.confirmEndAction', 'Xác nhận kết thúc')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -1071,6 +1072,7 @@ function ChatPanel({
 }
 
 type AIInterviewLayoutProps = {
+  sessionId?: number | string;
   onEndSession?: () => Promise<void> | void;
   questions?: Question[];
   defaultDurationSeconds?: number;
@@ -1082,6 +1084,7 @@ type AIInterviewLayoutProps = {
 };
 
 export function AIInterviewLayout({
+  sessionId,
   onEndSession,
   questions: propQuestions,
   defaultDurationSeconds,
@@ -1099,6 +1102,7 @@ export function AIInterviewLayout({
   const [isTakeoverSending, setIsTakeoverSending] = useState(false);
   const [isCompactChatView, setIsCompactChatView] = useState(false);
   const [isFinishingTransition, setIsFinishingTransition] = useState(false);
+  const [tabSwitchWarning, setTabSwitchWarning] = useState<string | null>(null);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant, isCameraEnabled, isScreenShareEnabled } = useLocalParticipant();
@@ -1112,6 +1116,40 @@ export function AIInterviewLayout({
       void onEndSession?.();
     },
   });
+
+  // Proctoring: Tab Visibility / Switch Detection
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let leaveTimestamp = 0;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        leaveTimestamp = Date.now();
+        setTabSwitchWarning('Cảnh báo: Bạn đang trong buổi phỏng vấn trực tiếp, vui lòng tập trung và hạn chế chuyển tab.');
+        if (sessionId) {
+          void interviewService.recordProctoringEvent(sessionId, {
+            eventType: 'tab_hidden',
+            durationSeconds: 0,
+            details: { timestamp: new Date().toISOString() },
+          }).catch(() => {});
+        }
+      } else {
+        if (leaveTimestamp > 0 && sessionId) {
+          const durationSec = Math.round((Date.now() - leaveTimestamp) / 1000);
+          void interviewService.recordProctoringEvent(sessionId, {
+            eventType: 'tab_returned',
+            durationSeconds: durationSec,
+            details: { awayDurationSeconds: durationSec },
+          }).catch(() => {});
+        }
+        const timer = setTimeout(() => setTabSwitchWarning(null), 4500);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [sessionId]);
   const { messages, send, isSending } = useInterviewMessages();
   const { t } = useTranslation(['interview']);
   const candidateLabel = t('liveRoom.participants.candidate');
@@ -1367,6 +1405,16 @@ export function AIInterviewLayout({
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-[#f8fafc]">
+      {/* Proctoring Alert Toast */}
+      {tabSwitchWarning && (
+        <div className="absolute top-3 inset-x-0 z-50 flex justify-center px-4 pointer-events-none animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50/95 px-4 py-2 text-xs font-semibold text-amber-900 shadow-md backdrop-blur-md">
+            <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-ping shrink-0" />
+            <span>{tabSwitchWarning}</span>
+          </div>
+        </div>
+      )}
+
       {/* Left Drawer: Gợi ý trả lời & Mẹo quan trọng */}
       <InterviewHintsDrawer
         open={hud.hintsDrawerOpen}

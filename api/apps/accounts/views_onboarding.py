@@ -945,3 +945,218 @@ class EmployerOnboardingView(APIView):
             },
             "user": serializer.data
         }, status=status.HTTP_200_OK)
+
+
+class CandidateCvParseView(APIView):
+    """
+    Parse uploaded candidate CV file and extract candidate details (AI Auto-fill).
+    """
+    permission_classes = [IsJobSeekerUser]
+
+    def post(self, request):
+        file_id = request.data.get("fileId")
+        if not file_id:
+            return Response({"message": "Vui lòng cung cấp fileId"}, status=status.HTTP_400_BAD_REQUEST)
+
+        file_obj = File.objects.filter(id=file_id).first()
+        if not file_obj:
+            return Response({"message": "Không tìm thấy tệp tin"}, status=status.HTTP_404_NOT_FOUND)
+
+        from apps.profiles.services.pdf_extraction import parse_cv_text_content
+        from shared.helpers.cloudinary_service import CloudinaryService
+        from django.conf import settings
+        import fitz
+
+        client = CloudinaryService._get_client()
+        bucket = getattr(settings, "MINIO_BUCKET", "square")
+
+        text_content = ""
+        try:
+            resp = client.get_object(bucket, file_obj.public_id)
+            file_bytes = resp.read()
+            doc = fitz.open(stream=file_bytes, filetype="pdf")
+            text_content = "\n".join([page.get_text() for page in doc])
+        except Exception as err:
+            logger.warning(f"Could not read/parse PDF for file {file_id}: {err}")
+
+        parsed = parse_cv_text_content(text_content) if text_content else {}
+
+        # Match skills from text
+        matched_skills = []
+        if text_content:
+            try:
+                known_skills = list(AdvancedSkill.objects.values_list('name', flat=True)[:100])
+            except Exception:
+                known_skills = []
+            if not known_skills:
+                known_skills = [
+                    "React", "JavaScript", "TypeScript", "Node.js", "Python", "Java", "SQL",
+                    "HTML/CSS", "Figma", "UI/UX", "Git", "Docker", "DevOps", "Marketing",
+                    "Sales", "Communication", "English", "Quản lý dự án", "Kế toán", "Nhân sự"
+                ]
+
+            lower_text = text_content.lower()
+            for s in known_skills:
+                if s.lower() in lower_text:
+                    matched_skills.append(s)
+            matched_skills = matched_skills[:10]
+
+        # Match Career
+        career_id = None
+        if text_content or parsed.get("title"):
+            search_title = (parsed.get("title") or "").lower()
+            careers = Career.objects.all()
+            for c in careers:
+                if c.name and (c.name.lower() in search_title or (c.name.lower() in text_content.lower())):
+                    career_id = c.id
+                    break
+
+        # Match City
+        city_id = None
+        if parsed.get("address"):
+            addr_lower = parsed["address"].lower()
+            cities = City.objects.all()
+            for ct in cities:
+                if ct.name and ct.name.lower() in addr_lower:
+                    city_id = ct.id
+                    break
+
+        return Response({
+            "fullName": parsed.get("fullName") or "",
+            "desiredJobTitle": parsed.get("title") or "",
+            "phone": parsed.get("phone") or "",
+            "email": parsed.get("email") or "",
+            "address": parsed.get("address") or "",
+            "gender": parsed.get("gender") or "",
+            "careerId": career_id,
+            "cityId": city_id,
+            "skills": matched_skills,
+            "fileId": file_obj.id,
+            "fileName": get_file_display_name(file_obj),
+            "fileUrl": file_obj.get_full_url()
+        }, status=status.HTTP_200_OK)
+
+
+class TaxLookupView(APIView):
+    """
+    Lookup company details by Tax Code (MST) and detect duplicate registrations.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        tax_code = (request.query_params.get("tax_code") or "").strip()
+        if not tax_code:
+            return Response({"message": "Vui lòng cung cấp mã số thuế"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 1. Check if company already exists in InfoHR
+        existing_company = Company.objects.filter(tax_code=tax_code).first()
+        if existing_company:
+            logo_url = existing_company.logo.get_full_url() if existing_company.logo else ""
+            admin_email = ""
+            if existing_company.user and existing_company.user.email:
+                parts = existing_company.user.email.split("@")
+                if len(parts) == 2:
+                    name_part = parts[0]
+                    masked = name_part[:2] + "***" if len(name_part) > 2 else "***"
+                    admin_email = f"{masked}@{parts[1]}"
+
+            return Response({
+                "exists": True,
+                "company": {
+                    "id": existing_company.id,
+                    "companyName": existing_company.company_name,
+                    "logoUrl": logo_url,
+                    "address": existing_company.location.address if existing_company.location else "",
+                    "adminEmailMasked": admin_email,
+                }
+            }, status=status.HTTP_200_OK)
+
+        # 2. Try looking up from VietQR open public API
+        lookup_data = None
+        try:
+            import urllib.request
+            import json
+            req = urllib.request.Request(
+                f"https://api.vietqr.io/v2/business/{tax_code}",
+                headers={"User-Agent": "InfoHR/1.0"}
+            )
+            with urllib.request.urlopen(req, timeout=3.5) as resp:
+                if resp.status == 200:
+                    res_json = json.loads(resp.read().decode("utf-8"))
+                    if res_json.get("code") == "00" and res_json.get("data"):
+                        b_data = res_json["data"]
+                        lookup_data = {
+                            "companyName": b_data.get("name") or b_data.get("shortName") or "",
+                            "address": b_data.get("address") or "",
+                            "taxCode": tax_code,
+                        }
+        except Exception as ex:
+            logger.info(f"VietQR lookup skipped or timed out for {tax_code}: {ex}")
+
+        return Response({
+            "exists": False,
+            "company": lookup_data
+        }, status=status.HTTP_200_OK)
+
+
+class CompanyJoinRequestView(APIView):
+    """
+    Submit a join request to an existing company when duplicate tax code is detected.
+    """
+    permission_classes = [IsEmployerUser]
+
+    @transaction.atomic
+    def post(self, request):
+        user = request.user
+        company_id = request.data.get("companyId")
+        if not company_id:
+            return Response({"message": "Thiếu mã doanh nghiệp"}, status=status.HTTP_400_BAD_REQUEST)
+
+        company = Company.objects.filter(id=company_id).first()
+        if not company:
+            return Response({"message": "Không tìm thấy doanh nghiệp"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check existing membership
+        existing = CompanyMember.objects.filter(company=company, user=user).first()
+        if not existing:
+            CompanyMember.objects.create(
+                company=company,
+                user=user,
+                status=CompanyMember.STATUS_INVITED,
+                is_active=True
+            )
+
+        # Mark user as having requested join
+        user.has_company = True
+        user.is_onboarded = True
+        user.onboarding_step = 4
+        user.save(update_fields=['has_company', 'is_onboarded', 'onboarding_step', 'update_at'])
+
+        serializer = UserSerializer(user, context={'request': request})
+        return Response({
+            "message": f"Đã gửi yêu cầu tham gia vào {company.company_name}. Vui lòng chờ quản trị viên phê duyệt.",
+            "companyId": company.id,
+            "companyName": company.company_name,
+            "user": serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+class SkipOnboardingView(APIView):
+    """
+    Allow users to skip onboarding temporarily (Progressive Onboarding).
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        user.is_onboarded = True
+        if user.onboarding_step == 0:
+            user.onboarding_step = -1
+        user.save(update_fields=['is_onboarded', 'onboarding_step', 'update_at'])
+
+        serializer = UserSerializer(user, context={'request': request})
+        return Response({
+            "message": "Đã ghi nhận bỏ qua onboarding",
+            "user": serializer.data
+        }, status=status.HTTP_200_OK)
+

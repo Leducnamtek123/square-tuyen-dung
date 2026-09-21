@@ -34,9 +34,25 @@ jest.mock('swiper/modules', () => ({
 
 jest.mock('@/views/components/defaults/HomeSearch', () => () => <div data-testid="home-search" />);
 
+const mockBanner = {
+  id: 1,
+  imageUrl: '/hero.webp',
+  imageMobileUrl: '/hero-m.webp',
+  description: 'Hero Banner',
+} as any;
+
 describe('TopSlide Hero Image Performance (Senior Grade)', () => {
-  it('renders initial hero banner image with high priority and async decoding on frame 0', () => {
+  it('renders ambient placeholder without flashing default image during initial loading', () => {
     const { container } = render(<TopSlide />);
+
+    const img = container.querySelector('picture img');
+    expect(img).toBeNull();
+    const swiper = container.querySelector('.swiper-container');
+    expect(swiper).toBeNull();
+  });
+
+  it('renders hero banner image with high priority and async decoding when banner data is present', () => {
+    const { container } = render(<TopSlide initialBanners={[mockBanner]} />);
 
     const img = container.querySelector(
       'div.swiper-slide.swiper-slide-active picture img'
@@ -49,7 +65,7 @@ describe('TopSlide Hero Image Performance (Senior Grade)', () => {
   });
 
   it('provides responsive picture element with mobile source tag', () => {
-    const { container } = render(<TopSlide />);
+    const { container } = render(<TopSlide initialBanners={[mockBanner]} />);
 
     const picture = container.querySelector('div.swiper-slide.swiper-slide-active picture');
     expect(picture).toBeInTheDocument();

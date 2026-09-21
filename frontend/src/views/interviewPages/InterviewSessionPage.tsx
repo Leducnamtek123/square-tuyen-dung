@@ -328,6 +328,7 @@ function ActiveInterviewRoom({
           style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}
         >
           <AIInterviewLayout
+            sessionId={session?.id}
             onEndSession={onEndSession}
             questions={questions}
             avatarId={avatarId}

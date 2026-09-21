@@ -719,6 +719,39 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     def get_questions_count(self, obj):
         return resolve_session_questions_count(obj)
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        is_admin_or_employer = False
+        if user and not user.is_anonymous:
+            role = getattr(user, "role_name", "")
+            if role in ["ADMIN", "EMPLOYER"] or getattr(user, "is_staff", False):
+                is_admin_or_employer = True
+            elif getattr(user, "company_id", None) and instance.job_post and instance.job_post.company_id == user.company_id:
+                is_admin_or_employer = True
+            elif instance.created_by_id == user.id:
+                is_admin_or_employer = True
+
+        # Trụ cột 4: Phân tầng hiển thị báo cáo
+        # Với phiên chính thức ('official'), nếu người xem là ứng viên (hoặc xem qua token ứng viên),
+        # bảo mật các trường điểm số & phân tích chi tiết nội bộ, dành quyền thẩm định cho HR.
+        # Với phiên thử ('mock') hoặc khi người xem là HR/Admin, giữ nguyên 100% điểm số.
+        session_type = getattr(instance, "session_type", "official")
+        if session_type == "official" and not is_admin_or_employer:
+            data["ai_overall_score"] = None
+            data["ai_technical_score"] = None
+            data["ai_communication_score"] = None
+            data["ai_strengths"] = []
+            data["ai_weaknesses"] = []
+            data["ai_detailed_feedback"] = None
+            if instance.status == "completed":
+                data["ai_summary"] = "Buổi phỏng vấn đã được ghi nhận thành công. Nhà tuyển dụng sẽ xem xét hồ sơ và phản hồi kết quả đến bạn."
+            else:
+                data["ai_summary"] = None
+
+        return data
+
     def validate(self, attrs):
         attrs = super().validate(attrs)
         scheduled_at = attrs.get("scheduled_at")

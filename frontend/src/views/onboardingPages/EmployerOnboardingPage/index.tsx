@@ -36,6 +36,10 @@ export default function EmployerOnboardingPage() {
     isSaving,
     isUploading,
     setIsUploading,
+    isLookingUpTax,
+    taxLookupResult,
+    isRequestingJoin,
+    isSkipping,
     generalError,
     setGeneralError,
     hasExistingMembership,
@@ -46,6 +50,9 @@ export default function EmployerOnboardingPage() {
     handleNextStep2,
     handleCompleteEmployer,
     handleAcceptInvitation,
+    handleLookupTaxCode,
+    handleRequestJoinCompany,
+    handleSkipOnboarding,
     handleBack,
     handlePostJob,
     handleViewDashboard,
@@ -154,7 +161,12 @@ export default function EmployerOnboardingPage() {
   }
 
   return (
-    <OnboardingShell maxWidth="md">
+    <OnboardingShell
+      maxWidth="md"
+      onSkip={handleSkipOnboarding}
+      isSkipping={isSkipping}
+      showSkip={activeStep < 3}
+    >
       {/* Stepper Header */}
       <EmployerStepper activeStep={activeStep} steps={steps} />
 
@@ -186,6 +198,11 @@ export default function EmployerOnboardingPage() {
                 errors={errors}
                 citiesList={citiesList}
                 employeeSizeOptions={employeeSizeOptions}
+                onLookupTax={handleLookupTaxCode}
+                isLookingUpTax={isLookingUpTax}
+                taxLookupResult={taxLookupResult}
+                onRequestJoin={handleRequestJoinCompany}
+                isRequestingJoin={isRequestingJoin}
               />
             </div>
           </Fade>

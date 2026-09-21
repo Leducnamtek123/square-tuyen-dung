@@ -19,6 +19,9 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import type { EmployerFullFormValues } from '../schemas/employerOnboardingSchema';
 
@@ -248,6 +251,78 @@ export default function StepEmployerComplete({
             </Box>
           </Grid>
         </Grid>
+      </Card>
+
+      {/* Team Collaboration Launchpad Card */}
+      <Card
+        elevation={0}
+        sx={{
+          p: { xs: 2.5, sm: 3 },
+          mb: 3.5,
+          borderRadius: 3.5,
+          textAlign: 'left',
+          backgroundColor: '#F0FDF4',
+          border: '1px solid #BBF7D0',
+          position: 'relative',
+        }}
+      >
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          justifyContent="space-between"
+          spacing={2}
+        >
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 2.5,
+                backgroundColor: '#DCFCE7',
+                color: '#16A34A',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              <GroupAddIcon sx={{ fontSize: 26 }} />
+            </Box>
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#14532D' }}>
+                Mời thành viên phòng HR / Tuyển dụng cùng làm việc
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#15803D', maxWidth: 500, fontSize: '0.85rem' }}>
+                Cộng tác cùng đội ngũ: phân quyền quản lý tin đăng, sàng lọc hồ sơ ứng viên và theo dõi lịch phỏng vấn tập trung.
+              </Typography>
+            </Box>
+          </Stack>
+
+          <Button
+            component={Link}
+            href="/employer/hrm/team"
+            variant="outlined"
+            size="small"
+            startIcon={<GroupAddIcon />}
+            sx={{
+              borderColor: '#86EFAC',
+              color: '#15803D',
+              fontWeight: 700,
+              textTransform: 'none',
+              borderRadius: 2,
+              px: 2.5,
+              py: 1,
+              flexShrink: 0,
+              backgroundColor: '#FFFFFF',
+              '&:hover': {
+                backgroundColor: '#F0FDF4',
+                borderColor: '#4ADE80',
+              },
+            }}
+          >
+            Mời đồng nghiệp
+          </Button>
+        </Stack>
       </Card>
 
       {/* Action Buttons */}

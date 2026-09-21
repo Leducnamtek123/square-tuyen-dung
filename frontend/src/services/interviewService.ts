@@ -254,6 +254,14 @@ const interviewService = {
     return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse<MockSessionResponse>);
   },
 
+  recordProctoringEvent: (
+    sessionId: IdType,
+    data: { eventType: string; durationSeconds?: number; details?: Record<string, any> }
+  ): Promise<any> => {
+    const url = `interview/web/sessions/${sessionId}/proctoring-events/`;
+    return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse);
+  },
+
   getSSEUrl: (sessionId: IdType): string => {
     const base = (process.env.NEXT_PUBLIC_API_BASE || '/api').replace(/\/$/, '');
     return `${base}/interview/web/sessions/${sessionId}/stream/`;

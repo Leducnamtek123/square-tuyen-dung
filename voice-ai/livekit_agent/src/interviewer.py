@@ -862,7 +862,7 @@ class Interviewer(Agent):
         for attempt in range(1, max_retries + 1):
             try:
                 logger.info("Playing initial greeting (attempt %d/%d)...", attempt, max_retries)
-                await self.session.say(greeting, allow_interruptions=False)
+                await self.session.say(greeting, allow_interruptions=True)
                 logger.info("Initial greeting played successfully.")
                 break
             except Exception as exc:
@@ -985,6 +985,21 @@ class Interviewer(Agent):
             )
             self._short_answer_prompted_for = None
             return await self._advance_to_next_question_after_skip(user_text)
+
+        if (
+            verdict is not None
+            and verdict.intent == TurnIntent.NEED_CLARIFICATION_OR_HESITATION
+            and verdict.confidence >= 0.75
+        ):
+            logger.info(
+                "Candidate requested clarification or needed time for room %s: %s",
+                self._room_name,
+                user_text,
+            )
+            current_q = _clean_question_for_candidate(self._last_asked_question_text or "")
+            if current_q:
+                return f"Bạn cứ bình tĩnh suy nghĩ nhé. Mình xin nhắc lại câu hỏi: {current_q}"
+            return "Bạn cứ bình tĩnh suy nghĩ nhé, khi nào sẵn sàng thì chia sẻ câu trả lời với mình."
 
         if self._awaiting_candidate_questions:
             if not user_text:

@@ -12,6 +12,7 @@ from typing import Any
 class TurnIntent(str, Enum):
     HOSTILE_ABUSE = "HOSTILE_ABUSE"
     REFUSAL_OR_SKIP = "REFUSAL_OR_SKIP"
+    NEED_CLARIFICATION_OR_HESITATION = "NEED_CLARIFICATION_OR_HESITATION"
     SUBSTANTIVE_ANSWER = "SUBSTANTIVE_ANSWER"
     SHALLOW_ANSWER = "SHALLOW_ANSWER"
     QUESTION_FOR_INTERVIEWER = "QUESTION_FOR_INTERVIEWER"
@@ -374,6 +375,69 @@ _QUESTION_FOR_INTERVIEWER_TOPICS = (
     "overtime",
 )
 
+_CLARIFICATION_HESITATION_PHRASES = (
+    "chưa nghe rõ",
+    "chua nghe ro",
+    "chưa nghe kịp",
+    "chua nghe kip",
+    "nghe chưa rõ",
+    "nghe chua ro",
+    "nhắc lại câu hỏi",
+    "nhac lai cau hoi",
+    "đọc lại câu hỏi",
+    "doc lai cau hoi",
+    "nói lại câu hỏi",
+    "noi lai cau hoi",
+    "hỏi lại được không",
+    "hoi lai duoc khong",
+    "nhắc lại được không",
+    "nhac lai duoc khong",
+    "nói lại được không",
+    "noi lai duoc khong",
+    "cho em xin câu hỏi",
+    "cho em xin cau hoi",
+    "câu hỏi là gì",
+    "cau hoi la gi",
+    "ý bạn là sao",
+    "y ban la sao",
+    "ý bạn là gì",
+    "y ban la gi",
+    "cho em suy nghĩ",
+    "cho em suy nghi",
+    "cho mình suy nghĩ",
+    "cho minh suy nghi",
+    "cho em một chút thời gian",
+    "cho em mot chut thoi gian",
+    "cho em một phút",
+    "cho em mot phut",
+    "chờ em một chút",
+    "cho em mot chut",
+    "đợi em một chút",
+    "doi em mot chut",
+    "đợi em một tí",
+    "doi em mot ti",
+    "để em nhớ lại",
+    "de em nho lai",
+    "để mình nhớ lại",
+    "de minh nho lai",
+    "để em nghĩ xem",
+    "de em nghi xem",
+    "hơi khó một chút",
+    "hoi kho mot chut",
+    "khó quá nhỉ",
+    "kho qua nhi",
+    "suy nghĩ một chút",
+    "suy nghi mot chut",
+    "suy nghĩ một tí",
+    "suy nghi mot ti",
+    "suy nghĩ tí",
+    "suy nghi ti",
+    "xin phép suy nghĩ",
+    "xin phep suy nghi",
+    "xin thêm thời gian",
+    "xin them thoi gian",
+)
+
 _GREETING_READY_PHRASES = (
     "xin chào",
     "xin chao",
@@ -519,6 +583,7 @@ class VoiceDecisionEngine:
         logits: dict[TurnIntent, float] = {
             TurnIntent.HOSTILE_ABUSE: 0.0,
             TurnIntent.REFUSAL_OR_SKIP: 0.0,
+            TurnIntent.NEED_CLARIFICATION_OR_HESITATION: 0.0,
             TurnIntent.END_INTERVIEW: 0.0,
             TurnIntent.QUESTION_FOR_INTERVIEWER: 0.0,
             TurnIntent.GREETING_READY: 0.0,
@@ -569,7 +634,16 @@ class VoiceDecisionEngine:
                 reasons[TurnIntent.REFUSAL_OR_SKIP].append(f"Matched skip/refusal phrase '{phrase}'")
                 break
 
-        # 4. QUESTION_FOR_INTERVIEWER Detection
+        # 4. NEED_CLARIFICATION_OR_HESITATION Detection
+        for phrase in _CLARIFICATION_HESITATION_PHRASES:
+            if phrase in lowered or phrase in stripped:
+                logits[TurnIntent.NEED_CLARIFICATION_OR_HESITATION] += 7.5
+                reasons[TurnIntent.NEED_CLARIFICATION_OR_HESITATION].append(
+                    f"Matched clarification/hesitation marker '{phrase}'"
+                )
+                break
+
+        # 5. QUESTION_FOR_INTERVIEWER Detection
         has_question_prefix = any(pfx in lowered or pfx in stripped for pfx in _QUESTION_FOR_INTERVIEWER_PREFIXES)
         has_question_topic = any(top in lowered or top in stripped for top in _QUESTION_FOR_INTERVIEWER_TOPICS)
         has_interrogative_mark = "?" in raw_clean or any(
@@ -602,6 +676,7 @@ class VoiceDecisionEngine:
         control_max_logit = max(
             logits[TurnIntent.HOSTILE_ABUSE],
             logits[TurnIntent.REFUSAL_OR_SKIP],
+            logits[TurnIntent.NEED_CLARIFICATION_OR_HESITATION],
             logits[TurnIntent.END_INTERVIEW],
             logits[TurnIntent.QUESTION_FOR_INTERVIEWER],
             logits[TurnIntent.GREETING_READY],

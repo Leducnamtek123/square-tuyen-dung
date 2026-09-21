@@ -47,6 +47,9 @@ export function useCandidateOnboarding() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [isParsingCv, setIsParsingCv] = useState<boolean>(false);
+  const [cvParseSuccess, setCvParseSuccess] = useState<boolean>(false);
+  const [isSkipping, setIsSkipping] = useState<boolean>(false);
   const [generalError, setGeneralError] = useState<string>('');
   const [completeness, setCompleteness] = useState<number>(20);
   const [recommendedJobs, setRecommendedJobs] = useState<RecommendedJobPreview[]>([]);
@@ -97,6 +100,17 @@ export function useCandidateOnboarding() {
           if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
             setActiveStep(res.onboardingStep - 1);
           }
+        } else if (typeof window !== 'undefined') {
+          // LocalStorage fallback draft restore
+          try {
+            const savedDraft = localStorage.getItem('infohr_candidate_draft');
+            if (savedDraft) {
+              const parsed = JSON.parse(savedDraft);
+              setFormData((prev) => ({ ...prev, ...parsed }));
+            }
+          } catch (e) {
+            console.error('LocalStorage draft read error:', e);
+          }
         }
       } catch (err) {
         console.error('Failed to load onboarding status:', err);
@@ -110,7 +124,18 @@ export function useCandidateOnboarding() {
     return () => {
       isMounted = false;
     };
-  }, [router]);
+  }, [router, currentUser]);
+
+  // Sync formData to localStorage for resilience
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isLoading && activeStep < 3) {
+      try {
+        localStorage.setItem('infohr_candidate_draft', JSON.stringify(formData));
+      } catch (e) {
+        // quota exceeded or private mode
+      }
+    }
+  }, [formData, isLoading, activeStep]);
 
   // Update single form field
   const updateFormField = useCallback((field: keyof CandidateFullFormValues, value: any) => {
@@ -227,6 +252,9 @@ export function useCandidateOnboarding() {
         setRecommendedJobs(res.recommendedJobs);
       }
       setCompleteness(100);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('infohr_candidate_draft');
+      }
       setActiveStep(3); // Step 4 Complete
     } catch (err: any) {
       console.error('Candidate onboarding completion error:', err);
@@ -242,6 +270,63 @@ export function useCandidateOnboarding() {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // AI Auto-parse CV
+  const handleCvAutoParse = async (fileId: number, fileName: string, fileUrl: string) => {
+    setIsParsingCv(true);
+    setCvParseSuccess(false);
+    setGeneralError('');
+
+    try {
+      const parsed = await authService.parseCandidateCv(fileId);
+      setFormData((prev) => ({
+        ...prev,
+        fileId: parsed.fileId || fileId,
+        fileName: parsed.fileName || fileName,
+        fileUrl: parsed.fileUrl || fileUrl,
+        desiredJobTitle: parsed.desiredJobTitle || prev.desiredJobTitle,
+        careerId: parsed.careerId || prev.careerId,
+        cityId: parsed.cityId || prev.cityId,
+        phone: parsed.phone || prev.phone,
+        address: parsed.address || prev.address,
+        skills: parsed.skills?.length ? parsed.skills : prev.skills,
+      }));
+      setCvParseSuccess(true);
+      setCompleteness((prev) => Math.min(100, Math.max(prev, 60)));
+      return parsed;
+    } catch (err) {
+      console.error('CV Auto-parse error:', err);
+      // Soft fail: still attach the file even if parsing fails
+      setFormData((prev) => ({
+        ...prev,
+        fileId,
+        fileName,
+        fileUrl,
+      }));
+    } finally {
+      setIsParsingCv(false);
+    }
+  };
+
+  // Skip onboarding
+  const handleSkipOnboarding = async () => {
+    setIsSkipping(true);
+    try {
+      const res = await authService.skipOnboarding();
+      if (res.user) {
+        dispatch(setUserInfo(res.user));
+      }
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('infohr_onboarding_banner_dismissed_candidate', 'false');
+      }
+      router.replace('/jobs');
+    } catch (err) {
+      console.error('Error skipping onboarding:', err);
+      router.replace('/jobs');
+    } finally {
+      setIsSkipping(false);
     }
   };
 
@@ -269,6 +354,9 @@ export function useCandidateOnboarding() {
     isSaving,
     isUploading,
     setIsUploading,
+    isParsingCv,
+    cvParseSuccess,
+    isSkipping,
     generalError,
     setGeneralError,
     completeness,
@@ -278,8 +366,11 @@ export function useCandidateOnboarding() {
     handleNextStep1,
     handleNextStep2,
     handleCompleteCandidate,
+    handleCvAutoParse,
+    handleSkipOnboarding,
     handleBack,
     handleExploreJobs,
     handleViewDashboard,
   };
 }
+

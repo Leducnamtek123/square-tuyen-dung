@@ -99,8 +99,13 @@ const RenderItem = ({ item }: { item: Banner }) => {
   );
 };
 
-const TopSlide = () => {
-  const [banners, setBanners] = React.useState<Banner[]>([DEFAULT_BANNER]);
+interface TopSlideProps {
+  initialBanners?: Banner[];
+}
+
+const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
+  const [banners, setBanners] = React.useState<Banner[]>(initialBanners ?? []);
+  const [isLoading, setIsLoading] = React.useState(!initialBanners || initialBanners.length === 0);
   const heroContentRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -186,10 +191,21 @@ const TopSlide = () => {
         if (!isMounted) return;
 
         if (resData && resData.length > 0) {
-          setBanners(resData);
+          const activeList = resData.filter((b) => b.isActive !== false);
+          setBanners(activeList.length > 0 ? activeList : resData);
+        } else {
+          // Chỉ fallback sang DEFAULT_BANNER khi API trả về rỗng
+          setBanners([DEFAULT_BANNER]);
         }
       } catch {
-        // Error handled silently
+        // Chỉ fallback sang DEFAULT_BANNER khi API gặp lỗi
+        if (isMounted) {
+          setBanners([DEFAULT_BANNER]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
     getBanners();
@@ -226,24 +242,46 @@ const TopSlide = () => {
         }}
       >
         <Box sx={{ height: '100%', '& .swiper-pagination': { display: 'none' } }}>
-          <Swiper
-            spaceBetween={30}
-            preventClicks={false}
-            preventClicksPropagation={false}
-            autoplay={{
-              delay: 6000,
-              disableOnInteraction: false,
-            }}
-            modules={[Autoplay]}
-            className="mySwiper"
-            style={{ height: '100%' }}
-          >
-            {banners.map((value) => (
-              <SwiperSlide key={value.id}>
-                <RenderItem item={value} />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          {banners.length > 0 ? (
+            <Swiper
+              spaceBetween={30}
+              preventClicks={false}
+              preventClicksPropagation={false}
+              autoplay={{
+                delay: 6000,
+                disableOnInteraction: false,
+              }}
+              modules={[Autoplay]}
+              className="mySwiper"
+              style={{ height: '100%' }}
+            >
+              {banners.map((value) => (
+                <SwiperSlide key={value.id}>
+                  <RenderItem item={value} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                height: '100%',
+                bgcolor: '#0f172a',
+                background:
+                  'radial-gradient(ellipse at 70% 30%, rgba(30, 58, 138, 0.45) 0%, #0F172A 70%)',
+              }}
+            >
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  background:
+                    'linear-gradient(90deg, rgba(4, 48, 104, 0.95) 0%, rgba(15, 23, 42, 0.62) 48%, rgba(15, 23, 42, 0.12) 100%)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </Box>
+          )}
         </Box>
 
         <Box
