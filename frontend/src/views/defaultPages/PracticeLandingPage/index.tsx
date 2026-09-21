@@ -402,7 +402,7 @@ const PracticeLandingPage: React.FC = () => {
               fontSize: { xs: '14.5px', sm: '16px', md: '17px' },
               color: '#475569',
               textAlign: 'center',
-              maxWidth: '740px',
+              maxWidth: '680px',
               mx: 'auto',
               lineHeight: 1.6,
               mb: 4,
@@ -594,8 +594,10 @@ const PracticeLandingPage: React.FC = () => {
           >
             <Box
               component="img"
-              src="/images/practice/ai_mock_interview_showcase.jpg"
+              src="/images/practice/ai_mock_interview_showcase.webp"
               alt="InfoHR AI Mock Interview Studio Interface Mockup"
+              loading="lazy"
+              decoding="async"
               sx={{
                 width: '100%',
                 height: 'auto',
@@ -1312,7 +1314,7 @@ const PracticeLandingPage: React.FC = () => {
               borderRadius: { xs: '20px', md: '28px' },
               overflow: 'hidden',
               minHeight: { xs: 340, sm: 360, md: 380 },
-              backgroundImage: 'url(/images/practice/practice_cta_banner.jpg)',
+              backgroundImage: 'url(/images/practice/practice_cta_banner.webp)',
               backgroundSize: 'cover',
               backgroundPosition: { xs: '68% center', sm: 'center center' },
               boxShadow: '0 20px 45px -12px rgba(37, 99, 235, 0.28)',

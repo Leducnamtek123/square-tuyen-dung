@@ -306,13 +306,13 @@ export const SalaryIndustryTable: React.FC<SalaryIndustryTableProps> = ({
 
                 <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
                   <Stack direction="row" spacing={0.5} alignItems="center">
-                    <PeopleAltOutlinedIcon sx={{ fontSize: 14, color: '#94a3b8' }} />
+                    <PeopleAltOutlinedIcon sx={{ fontSize: 14, color: '#64748b' }} />
                     <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 500 }}>
                       {sampleSize ? `${sampleSize.toLocaleString('vi-VN')} tin tuyển dụng` : '1 tin tuyển dụng'}
                     </Typography>
                   </Stack>
                   {sourceNotes && (
-                    <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.725rem' }}>
+                    <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.725rem' }}>
                       • {sourceNotes}
                     </Typography>
                   )}

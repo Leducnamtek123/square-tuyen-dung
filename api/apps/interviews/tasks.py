@@ -101,7 +101,12 @@ def _mark_evaluation_unavailable(session: InterviewSession, reason: str):
         })
 
 
-@shared_task
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+    default_retry_delay=10,
+)
 def end_interview_session(session_id, reason="max_duration"):
     """Force-end an interview session and delete the LiveKit room."""
     session = None
@@ -150,7 +155,7 @@ def end_interview_session(session_id, reason="max_duration"):
         return
     except Exception as e:
         logger.error("Error ending interview session %s: %s", session_id, e)
-        return
+        raise
     finally:
         try:
             if session is not None and session.room_name:
@@ -221,7 +226,12 @@ def finalize_disconnected_session(session_id):
         logger.error("Failed to finalize disconnected session %s: %s", session_id, exc)
 
 
-@shared_task
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+    default_retry_delay=30,
+)
 def send_interview_invitation(session_id, initial_password=None):
     """Send interview invitation email to candidate with onboarding credentials."""
     try:
@@ -262,29 +272,51 @@ def send_interview_invitation(session_id, initial_password=None):
         )
         logger.info("Invitation email sent to %s for session %s", candidate.email, session_id)
         return True
+    except InterviewSession.DoesNotExist:
+        logger.warning("Interview session %s not found for invitation email.", session_id)
+        return False
     except Exception as e:
         logger.error("Error sending invitation email for session %s: %s", session_id, e)
-        return False
+        raise
 
 
-@shared_task
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+    default_retry_delay=30,
+)
 def send_interview_report_notification(session_id):
     """Notify employer that interview report & video are ready."""
     try:
-        session = InterviewSession.objects.select_related("candidate", "job_post", "company").get(id=session_id)
-        employer_email = session.company.email if session.company else None
+        session = InterviewSession.objects.select_related(
+            "candidate", "job_post__company__user", "created_by"
+        ).get(id=session_id)
+        employer_email = None
+        if session.job_post and getattr(session.job_post, "company", None):
+            company = session.job_post.company
+            employer_email = (
+                getattr(company, "company_email", None)
+                or (company.user.email if getattr(company, "user", None) else None)
+            )
+        if not employer_email and session.created_by and session.created_by.email:
+            employer_email = session.created_by.email
+
         if not employer_email:
+            logger.info("No employer email found for session %s report notification.", session_id)
             return False
 
         web_url = config("WEB_CLIENT_URL", default="https://infohr.vn").rstrip("/")
         report_url = f"{web_url}/employer/interviews/{session.id}"
 
         candidate_display_name = session.candidate.full_name or session.candidate.username or "Ứng viên"
+        summary_val = session.ai_summary or "Ứng viên đã hoàn tất buổi phỏng vấn trực tuyến AI."
         context = {
             "candidate_name": candidate_display_name,
             "job_title": session.job_post.job_name if session.job_post else "Vị trí tuyển dụng",
             "overall_score": session.ai_overall_score,
-            "summary": session.ai_summary,
+            "summary": summary_val,
+            "summary_text": summary_val,
             "report_url": report_url,
         }
 
@@ -300,8 +332,13 @@ def send_interview_report_notification(session_id):
             fail_silently=False,
         )
         logger.info("Evaluation report sent to %s for session %s", employer_email, session_id)
+        return True
+    except InterviewSession.DoesNotExist:
+        logger.warning("Interview session %s not found for report notification.", session_id)
+        return False
     except Exception as e:
         logger.error("Error sending report email for session %s: %s", session_id, e)
+        raise
 
 
 @shared_task(bind=True, autoretry_for=(httpx.TimeoutException, httpx.ConnectError),
@@ -590,7 +627,12 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 
     return None
 
-@shared_task
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+    default_retry_delay=15,
+)
 def auto_schedule_screening_interview(activity_id: int):
     """Automatically schedules an AI interview if the job post has a template."""
     from apps.jobs.models import JobPostActivity
@@ -635,17 +677,27 @@ def auto_schedule_screening_interview(activity_id: int):
         # Send Email
         send_interview_invitation.delay(session.id)
         logger.info(f"Auto-scheduled screening AI interview for candidate {candidate.id} on job {job_post.id}")
+    except JobPostActivity.DoesNotExist:
+        logger.warning(f"JobPostActivity {activity_id} not found for auto-schedule screening.")
+        return
     except Exception as e:
         logger.error(f"Failed to auto-schedule screening interview: {e}")
+        raise
 
 
-@shared_task
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 2},
+    default_retry_delay=5,
+)
 def start_room_recording_task(room_name: str) -> None:
     """Start LiveKit room composite egress asynchronously via Celery worker."""
     try:
         LiveKitService.start_recording(room_name)
     except Exception as exc:
         logger.warning("start_room_recording_task failed for room %s: %s", room_name, exc)
+        raise
 
 
 def synthesize_and_cache_audio(model: str, voice: str, speed: float, text: str) -> bool:
@@ -711,7 +763,12 @@ def synthesize_and_cache_audio(model: str, voice: str, speed: float, text: str) 
     return False
 
 
-@shared_task
+@shared_task(
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 2},
+    default_retry_delay=5,
+)
 def prewarm_interview_tts_task(session_id: int) -> None:
     """Pre-synthesize opening greeting and first question audio into the shared disk cache."""
     from apps.interviews.models import InterviewSession

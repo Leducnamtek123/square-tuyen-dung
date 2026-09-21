@@ -4,6 +4,13 @@ import re
 from dataclasses import dataclass
 from typing import Any, Literal
 
+from .decision_engine import (
+    DecisionVerdict,
+    TurnIntent,
+    VoiceDecisionEngine,
+    evaluate_candidate_turn,
+)
+
 
 @dataclass(frozen=True)
 class QuestionPayload:
@@ -210,7 +217,14 @@ def is_hostile_or_abusive(text: str | None) -> bool:
     if _ABUSIVE_UNACCENTED_ACRONYMS_REGEX.search(stripped):
         return True
 
-    return any(phrase in normalized or phrase in stripped for phrase in _ABUSIVE_PHRASES)
+    if any(phrase in normalized or phrase in stripped for phrase in _ABUSIVE_PHRASES):
+        return True
+
+    verdict = evaluate_candidate_turn(text)
+    if verdict.intent == TurnIntent.HOSTILE_ABUSE and verdict.confidence >= 0.80:
+        return True
+
+    return False
 
 
 _REFUSAL_OR_SKIP_PHRASES = (
@@ -284,10 +298,17 @@ def is_explicit_refusal_or_skip(text: str | None) -> bool:
         if words[0] in {"skip", "next", "chịu", "chiu"}:
             return True
 
-    return any(
+    if any(
         phrase in clean_text or phrase in stripped
         for phrase in _REFUSAL_OR_SKIP_PHRASES
-    )
+    ):
+        return True
+
+    verdict = evaluate_candidate_turn(text)
+    if verdict.intent == TurnIntent.REFUSAL_OR_SKIP and verdict.confidence >= 0.80:
+        return True
+
+    return False
 
 
 

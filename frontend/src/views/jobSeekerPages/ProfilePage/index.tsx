@@ -725,7 +725,7 @@ const ProfilePage = () => {
                             variant="subtitle2"
                             sx={{
                               fontWeight: 700,
-                              color: item.value && item.value !== 'Chưa cập nhật' ? '#0f172a' : '#94a3b8',
+                              color: item.value && item.value !== 'Chưa cập nhật' ? '#0f172a' : '#64748b',
                               fontSize: '0.875rem',
                             }}
                             noWrap
@@ -808,7 +808,7 @@ const ProfilePage = () => {
                   {profileData.bio}
                 </Typography>
               ) : (
-                <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic', fontSize: '0.875rem' }}>
+                <Typography variant="body2" sx={{ color: '#64748b', fontStyle: 'italic', fontSize: '0.875rem' }}>
                   Chưa có nội dung giới thiệu. Hãy bấm chỉnh sửa để thêm giới thiệu giúp nhà tuyển dụng hiểu hơn về bạn.
                 </Typography>
               )}

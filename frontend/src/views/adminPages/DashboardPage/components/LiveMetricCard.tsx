@@ -80,7 +80,7 @@ export default function LiveMetricCard({
           )}
 
           {subtitle && (
-            <Typography variant="caption" sx={{ color: '#94A3B8', mt: 0.25, display: 'block' }}>
+            <Typography variant="caption" sx={{ color: '#64748B', mt: 0.25, display: 'block' }}>
               {subtitle}
             </Typography>
           )}
@@ -109,7 +109,7 @@ export default function LiveMetricCard({
                 )}
                 {isPositiveDelta ? `+${deltaPercent}%` : `${deltaPercent}%`}
               </Box>
-              <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
+              <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
                 so với {deltaPeriod}
               </Typography>
             </Stack>

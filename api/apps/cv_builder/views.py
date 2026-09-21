@@ -8,6 +8,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import F, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import os
+import re
 
 from .models import CVTemplate, CandidateCV, CVSuggestion
 from .serializers import (
@@ -161,7 +165,13 @@ class CandidateCVViewSet(viewsets.ModelViewSet):
             raise ValidationError({"file": "Tệp tin PDF bị hỏng hoặc bị cắt cụt."})
 
         safe_filename = os.path.basename(raw_name)
-        cv.pdf_url = f"/media/candidate_cvs/{cv.id}/{safe_filename}"
+        file_obj.seek(0)
+        storage_path = f"candidate_cvs/{cv.id}/{safe_filename}"
+        saved_path = default_storage.save(storage_path, ContentFile(file_obj.read()))
+        try:
+            cv.pdf_url = default_storage.url(saved_path)
+        except Exception:
+            cv.pdf_url = f"/media/{saved_path}"
         cv.save(update_fields=["pdf_url", "update_at"])
 
         return Response({
@@ -215,10 +225,22 @@ class CandidateCVViewSet(viewsets.ModelViewSet):
             raise ValidationError({"file": "Tệp tin PDF bị hỏng hoặc bị cắt cụt."})
 
         safe_filename = os.path.basename(raw_name)
+        user_id = getattr(request.user, "id", "common")
+        file_obj.seek(0)
+        storage_path = f"candidate_cvs/uploads/{user_id}/{safe_filename}"
+        saved_path = default_storage.save(storage_path, ContentFile(file_obj.read()))
+        try:
+            file_url = default_storage.url(saved_path)
+        except Exception:
+            file_url = f"/media/{saved_path}"
+
         return Response({
             "detail": "Tệp tin hợp lệ.",
             "filename": safe_filename,
             "size": file_obj.size,
+            "pdf_url": file_url,
+            "file_url": file_url,
+            "storage_path": saved_path,
         }, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"], url_path="ai-review")

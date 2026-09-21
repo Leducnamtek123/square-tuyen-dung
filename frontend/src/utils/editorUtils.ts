@@ -30,6 +30,9 @@ const createEditorStateFromHTMLString = (htmlString?: string | null): EditorStat
   if (!htmlString || typeof htmlString !== 'string') {
     return EditorState.createEmpty();
   }
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return EditorState.createEmpty();
+  }
   try {
     const blocksFromHTML = convertFromHTML(htmlString);
     if (!blocksFromHTML || !blocksFromHTML.contentBlocks || blocksFromHTML.contentBlocks.length === 0) {

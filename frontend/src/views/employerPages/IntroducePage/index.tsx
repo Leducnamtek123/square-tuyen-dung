@@ -413,7 +413,8 @@ export default function IntroducePage() {
               variant="body1"
               sx={{
                 color: '#475569',
-                maxWidth: 860,
+                maxWidth: 720,
+                mx: 'auto',
                 fontSize: { xs: '0.95rem', sm: '1.05rem', md: '1.15rem' },
                 lineHeight: 1.7,
               }}
@@ -535,7 +536,7 @@ export default function IntroducePage() {
               }}
             >
               <Image
-                src="/images/employer/employer_hero_showcase.jpg"
+                src="/images/employer/employer_hero_showcase.webp"
                 alt="Trung tâm điều hành tuyển dụng số hóa 3D InfoHR"
                 fill
                 priority
@@ -736,7 +737,7 @@ export default function IntroducePage() {
             >
               <Box sx={{ position: 'relative', width: '100%', height: { xs: 200, sm: 260 } }}>
                 <Image
-                  src="/images/employer/employer_service_portal.jpg"
+                  src="/images/employer/employer_service_portal.webp"
                   alt="Cổng đăng tin tuyển dụng & tìm kiếm ứng viên InfoHR"
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
@@ -842,7 +843,7 @@ export default function IntroducePage() {
             >
               <Box sx={{ position: 'relative', width: '100%', height: { xs: 200, sm: 260 } }}>
                 <Image
-                  src="/images/employer/employer_service_aila.jpg"
+                  src="/images/employer/employer_service_aila.webp"
                   alt="AILA AI - Phỏng vấn thông minh & Đánh giá năng lực tự động"
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
@@ -1119,7 +1120,7 @@ export default function IntroducePage() {
         >
           {/* Background Image */}
           <Image
-            src="/images/employer/employer_cta_banner.jpg"
+            src="/images/employer/employer_cta_banner.webp"
             alt="Lãnh đạo và chuyên gia nhân sự hợp tác cùng InfoHR"
             fill
             sizes="(max-width: 768px) 100vw, 1200px"
@@ -1148,7 +1149,8 @@ export default function IntroducePage() {
             }}
           >
             <Chip
-              label="✨ BẮT ĐẦU TUYỂN DỤNG CÙNG INFOHR"
+              icon={<AutoAwesomeIcon sx={{ fontSize: '15px !important', color: '#FFFFFF !important' }} />}
+              label="BẮT ĐẦU TUYỂN DỤNG CÙNG INFOHR"
               sx={{
                 bgcolor: 'rgba(255, 255, 255, 0.2)',
                 backdropFilter: 'blur(8px)',

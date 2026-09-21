@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Chip, CircularProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography, alpha } from '@mui/material';
+import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography, alpha } from '@mui/material';
 import {
   BarVisualizer,
   TrackReferenceOrPlaceholder,
@@ -120,6 +120,8 @@ function CustomControlBar({
   const [camLoading, setCamLoading] = useState(false);
   const [screenLoading, setScreenLoading] = useState(false);
 
+  const [confirmEndOpen, setConfirmEndOpen] = useState(false);
+
   return (
     <div className="flex items-center justify-center px-2 sm:px-4 pt-1 sm:pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-center gap-1.5 sm:gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 sm:px-4 py-2 sm:py-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.08)] backdrop-blur-2xl ring-1 ring-slate-100 max-w-full">
@@ -233,16 +235,9 @@ function CustomControlBar({
         <div className="mx-1 sm:mx-1.5 h-6 w-px bg-slate-200 shrink-0" />
         <button
           type="button"
-          onClick={async () => {
+          onClick={() => {
             if (ending) return;
-            setEnding(true);
-            try {
-              await onEndSession?.();
-            } catch {
-              // keep disconnect flow resilient
-            } finally {
-              setEnding(false);
-            }
+            setConfirmEndOpen(true);
           }}
           disabled={ending}
           className={`flex h-10 sm:h-11 items-center gap-1.5 sm:gap-2 rounded-xl border border-rose-500/40 bg-rose-600 hover:bg-rose-700 px-3 sm:px-5 text-xs sm:text-sm font-bold text-white shadow-[0_4px_14px_rgba(225,29,72,0.35)] transition-all duration-150 active:scale-[0.98] cursor-pointer shrink-0 ${
@@ -252,6 +247,75 @@ function CustomControlBar({
           <FontAwesomeIcon icon={ending ? faSpinner : faPhoneSlash} className={ending ? 'animate-spin text-xs sm:text-sm' : 'text-xs sm:text-sm'} />
           <span>{ending ? t('controls.ending') : t('controls.end')}</span>
         </button>
+
+        {/* Confirmation Dialog before ending session */}
+        <Dialog
+          open={confirmEndOpen}
+          onClose={() => !ending && setConfirmEndOpen(false)}
+          slotProps={{
+            paper: {
+              sx: {
+                borderRadius: '20px',
+                p: 1.5,
+                maxWidth: '440px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.18)',
+              },
+            },
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 700, fontSize: '1.15rem', color: '#0f172a', pb: 1 }}>
+            {t('controls.confirmEndTitle', 'Kết thúc buổi phỏng vấn?')}
+          </DialogTitle>
+          <DialogContent sx={{ color: '#475569', fontSize: '0.925rem', py: 1 }}>
+            {t(
+              'controls.confirmEndMessage',
+              'Bạn có chắc chắn muốn kết thúc buổi phỏng vấn này? Hệ thống sẽ đóng phiên làm việc trực tuyến và tiến hành tổng hợp kết quả đánh giá.'
+            )}
+          </DialogContent>
+          <DialogActions sx={{ px: 2, pb: 1.5, pt: 1, gap: 1 }}>
+            <Button
+              variant="outlined"
+              onClick={() => setConfirmEndOpen(false)}
+              disabled={ending}
+              sx={{
+                borderRadius: '12px',
+                color: '#475569',
+                borderColor: '#cbd5e1',
+                textTransform: 'none',
+                fontWeight: 600,
+              }}
+            >
+              {t('controls.continueInterview', 'Tiếp tục phỏng vấn')}
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={async () => {
+                setEnding(true);
+                try {
+                  await onEndSession?.();
+                  setConfirmEndOpen(false);
+                } catch {
+                  // keep disconnect flow resilient
+                } finally {
+                  setEnding(false);
+                }
+              }}
+              disabled={ending}
+              startIcon={ending ? <CircularProgress size={16} color="inherit" /> : <FontAwesomeIcon icon={faPhoneSlash} />}
+              sx={{
+                borderRadius: '12px',
+                bgcolor: '#e11d48',
+                '&:hover': { bgcolor: '#be123c' },
+                textTransform: 'none',
+                fontWeight: 700,
+                boxShadow: '0 4px 12px rgba(225,29,72,0.3)',
+              }}
+            >
+              {ending ? t('controls.ending', 'Đang kết thúc...') : t('controls.confirmEndAction', 'Xác nhận kết thúc')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   );
@@ -469,8 +533,9 @@ function AIParticipantTile({
                 {isSelf ? 'Camera của bạn đang tắt' : 'Camera đang tắt'}
               </span>
               {isTakeoverActive && (
-                <span className="rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-400 animate-pulse">
-                  ⚡ Đang tiếp quản phỏng vấn
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-400 animate-pulse">
+                  <FontAwesomeIcon icon={faBolt} className="text-[10px]" />
+                  Đang tiếp quản phỏng vấn
                 </span>
               )}
             </div>

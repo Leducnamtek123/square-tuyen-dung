@@ -157,7 +157,7 @@ export default function CompanyVerificationsPage() {
         cell: (row) => {
           const safeDocUrl = getSafeExternalOpenUrl(row.businessLicense);
           if (!safeDocUrl) {
-            return <Typography variant="caption" sx={{ color: '#94A3B8' }}>Chưa đính kèm</Typography>;
+            return <Typography variant="caption" sx={{ color: '#64748B' }}>Chưa đính kèm</Typography>;
           }
           return (
             <Button
@@ -374,7 +374,7 @@ export default function CompanyVerificationsPage() {
                 if (!safeLicenseUrl) {
                   return (
                     <Box sx={{ p: 2, bgcolor: '#F8FAFC', borderRadius: 2, textAlign: 'center' }}>
-                      <Typography variant="body2" sx={{ color: '#94A3B8' }}>
+                      <Typography variant="body2" sx={{ color: '#64748B' }}>
                         Doanh nghiệp chưa tải lên bản sao giấy phép
                       </Typography>
                     </Box>

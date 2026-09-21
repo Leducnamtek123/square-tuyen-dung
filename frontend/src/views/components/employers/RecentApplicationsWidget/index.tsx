@@ -77,7 +77,7 @@ export default function RecentApplicationsWidget() {
             <Typography sx={{ fontWeight: 700, fontSize: '1.05rem', color: '#0F172A', lineHeight: 1.2 }}>
               Ứng viên mới nộp hồ sơ
             </Typography>
-            <Typography sx={{ fontSize: '0.78rem', color: '#94A3B8' }}>
+            <Typography sx={{ fontSize: '0.78rem', color: '#64748B' }}>
               Danh sách hồ sơ ứng tuyển mới nhất
             </Typography>
           </Box>
@@ -271,7 +271,7 @@ export default function RecentApplicationsWidget() {
                   ) : null}
 
                   {applyTime && (
-                    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#94A3B8' }}>
+                    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: '#64748B' }}>
                       <AccessTimeIcon sx={{ fontSize: 13 }} />
                       <Typography sx={{ fontSize: '0.72rem', fontWeight: 500 }}>
                         {applyTime}

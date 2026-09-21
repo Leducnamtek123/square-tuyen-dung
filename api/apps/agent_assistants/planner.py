@@ -9,6 +9,7 @@ from typing import Any
 
 from django.conf import settings
 
+from apps.common.decision_engine.engine import AgentRouterEngine
 from integrations.ai import client as ai_client
 
 from .models import AgentThread
@@ -188,7 +189,9 @@ def _image_url_parts_from_message_parts(parts: list[dict[str, Any]] | None) -> l
     ]
 
 
-def _recent_image_url_parts(thread: AgentThread, *, limit_messages: int = 8, limit_images: int = 3) -> list[dict[str, Any]]:
+def _recent_image_url_parts(
+    thread: AgentThread, *, limit_messages: int = 8, limit_images: int = 3
+) -> list[dict[str, Any]]:
     image_parts: list[dict[str, Any]] = []
     messages = list(thread.messages.filter(role="user").order_by("-create_at", "-id")[:limit_messages])
     for message in messages:
@@ -256,6 +259,29 @@ class AgentPlanner:
         image_parts = _image_url_parts_from_message_parts(message_parts)
         if not image_parts and _asks_about_image(user_content):
             image_parts = _recent_image_url_parts(thread)
+
+        # System 1: Fast Router (openJev Decision Engine) cho tin nhắn văn bản thuần túy
+        if not image_parts and user_content:
+            try:
+                route_verdict = AgentRouterEngine.route(user_content, allowed_tools=allowed_tools)
+                if route_verdict.confidence >= 0.85 and route_verdict.tool_name in allowed_tools:
+                    logger.info(
+                        "Fast router matched tool '%s' with confidence %.2f (source: openjev_decision_engine)",
+                        route_verdict.tool_name,
+                        route_verdict.confidence,
+                    )
+                    return AgentPlannedAction(
+                        tool_name=route_verdict.tool_name,
+                        arguments=route_verdict.arguments,
+                        assistant_text=route_verdict.assistant_text,
+                        requires_confirmation=False,
+                        raw_response={
+                            "source": "openjev_decision_engine",
+                            "confidence": route_verdict.confidence,
+                        },
+                    )
+            except Exception as exc:
+                logger.warning("AgentRouterEngine error, falling back to System 2 LLM: %s", exc)
 
         user_context = {
             "portal": thread.portal,

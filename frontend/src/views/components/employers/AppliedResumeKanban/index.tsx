@@ -775,7 +775,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                           },
                         }}
                       >
-                        {columnCount > 0 ? t('common:viewMore', 'Xem thêm') : t('employer:manualCandidate.actions.add', 'Thêm ứng viên')}
+                        {t('employer:manualCandidate.actions.add', 'Thêm ứng viên')}
                       </Button>
                     </Box>
                   )}

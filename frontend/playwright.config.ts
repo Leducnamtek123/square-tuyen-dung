@@ -12,22 +12,29 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: 1,
-  reporter: 'html',
+  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : [['list'], ['html', { open: 'never' }]],
 
   use: {
     /* Base URL is usually your local dev server */
     baseURL,
     trace: 'on-first-retry',
-    /* Anthropic Best Practice: Wait for networkidle when doing visual tests */
-    actionTimeout: 10000,
+    screenshot: 'only-on-failure',
+    actionTimeout: 15000,
+    navigationTimeout: 30000,
+    permissions: ['microphone', 'camera'],
+    launchOptions: {
+      args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
+    },
   },
 
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: process.env.PLAYWRIGHT_CHANNEL || 'chrome',
+      },
     },
-    // You can test WebKit and Firefox separately if needed
   ],
 
   /* Run local dev server before starting tests, just like the with_server.py script */

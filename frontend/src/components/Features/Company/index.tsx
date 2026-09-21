@@ -46,7 +46,7 @@ const Company = ({
         p: 0,
         width: '100%',
         height: '100%',
-        minHeight: 410,
+        minHeight: { xs: 340, sm: 350 },
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',

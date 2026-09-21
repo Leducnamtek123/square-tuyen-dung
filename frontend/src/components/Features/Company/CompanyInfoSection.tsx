@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography, Tooltip } from '@mui/material';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
@@ -42,6 +42,17 @@ const CompanyInfoSection = ({
 }: CompanyInfoSectionProps) => {
   const companyConfig = allConfig as { cityDict?: Record<string, string>; employeeSizeDict?: Record<string, string> };
 
+  const fieldTags = React.useMemo(() => {
+    if (!fieldOperation || !fieldOperation.trim()) return [];
+    return fieldOperation
+      .split(/[,;\n/]+/)
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
+  }, [fieldOperation]);
+
+  const primaryTag = fieldTags[0];
+  const remainingTags = fieldTags.slice(1);
+
   return (
     <Box
       sx={{
@@ -82,44 +93,115 @@ const CompanyInfoSection = ({
         </Typography>
       </Box>
 
-      {/* Field of Operation / Industry Badge */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-        <Typography
-          variant="caption"
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 0.75,
-            color: '#475569',
-            bgcolor: '#f1f5f9',
-            px: 1.25,
-            py: 0.4,
-            borderRadius: '6px',
-            fontSize: '0.78rem',
-            fontWeight: 500,
-            maxWidth: '100%',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
-          title={fieldOperation || t('company.notUpdated')}
-        >
-          <BusinessOutlinedIcon sx={{ fontSize: 14, color: '#64748b', flexShrink: 0 }} />
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {fieldOperation || (
-              <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>
-                {t('company.notUpdated')}
-              </span>
+      {/* Field of Operation / Industry Badges */}
+      <Box sx={{ minHeight: 28, display: 'flex', alignItems: 'center', mb: 1.5, width: '100%' }}>
+        {fieldTags.length === 0 ? (
+          <Typography
+            variant="caption"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.6,
+              color: '#94a3b8',
+              fontStyle: 'italic',
+              fontSize: '0.78rem',
+            }}
+          >
+            <BusinessOutlinedIcon sx={{ fontSize: 14, color: '#cbd5e1', flexShrink: 0 }} />
+            {t('company.notUpdated')}
+          </Typography>
+        ) : (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, maxWidth: '100%', minWidth: 0 }}>
+            <Tooltip title={fieldOperation} arrow placement="top">
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.6,
+                  color: '#334155',
+                  bgcolor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  px: 1.1,
+                  py: 0.35,
+                  borderRadius: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  maxWidth: remainingTags.length > 0 ? 'calc(100% - 46px)' : '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  cursor: 'default',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    bgcolor: '#f1f5f9',
+                    borderColor: '#cbd5e1',
+                  },
+                }}
+              >
+                <BusinessOutlinedIcon sx={{ fontSize: 13, color: '#64748b', flexShrink: 0 }} />
+                <Box
+                  component="span"
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {primaryTag}
+                </Box>
+              </Box>
+            </Tooltip>
+
+            {remainingTags.length > 0 && (
+              <Tooltip title={remainingTags.join(' • ')} arrow placement="top">
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: '#eff6ff',
+                    color: '#2563eb',
+                    border: '1px solid #dbeafe',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    px: 0.8,
+                    py: 0.3,
+                    borderRadius: '6px',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      bgcolor: '#dbeafe',
+                      borderColor: '#bfdbfe',
+                    },
+                  }}
+                >
+                  +{remainingTags.length}
+                </Box>
+              </Tooltip>
             )}
-          </span>
-        </Typography>
+          </Box>
+        )}
       </Box>
 
       {/* Location & Company Size Row */}
-      <Stack direction="row" spacing={2} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <LocationOnOutlinedIcon sx={{ fontSize: 16, color: '#64748b', flexShrink: 0 }} />
-          <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.82rem', fontWeight: 500 }}>
+      <Stack direction="row" spacing={2} sx={{ mb: 2, flexWrap: 'nowrap', gap: 1.5, minHeight: 22, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, minWidth: 0, flexShrink: 1 }}>
+          <LocationOnOutlinedIcon sx={{ fontSize: 15, color: '#64748b', flexShrink: 0 }} />
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#475569',
+              fontSize: '0.82rem',
+              fontWeight: 500,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+            title={tConfig(companyConfig.cityDict?.[city]) || ''}
+          >
             {tConfig(companyConfig.cityDict?.[city]) || (
               <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>
                 {t('company.notUpdated')}
@@ -128,9 +210,9 @@ const CompanyInfoSection = ({
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <PeopleOutlineIcon sx={{ fontSize: 16, color: '#64748b', flexShrink: 0 }} />
-          <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.82rem', fontWeight: 500 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, flexShrink: 0 }}>
+          <PeopleOutlineIcon sx={{ fontSize: 15, color: '#64748b', flexShrink: 0 }} />
+          <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.82rem', fontWeight: 500, whiteSpace: 'nowrap' }}>
             {tConfig(companyConfig.employeeSizeDict?.[employeeSize]) || (
               <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>
                 0

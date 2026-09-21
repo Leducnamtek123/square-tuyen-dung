@@ -6,10 +6,10 @@ const config = {
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.[jt]s?(x)'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-    '^query-string$': '<rootDir>/src/__mocks__/queryString.cjs',
     '\\.(css|less|scss|sass)$': 'jest-transform-stub',
-    '\\.(svg|png|jpg|jpeg|gif|webp)$': 'jest-transform-stub'
+    '\\.(svg|png|jpg|jpeg|gif|webp)$': 'jest-transform-stub',
+    '^query-string$': '<rootDir>/src/__mocks__/queryString.cjs',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
     '^.+\\.[tj]sx?$': ['ts-jest', {

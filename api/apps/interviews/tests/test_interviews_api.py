@@ -197,6 +197,56 @@ class InterviewCompatEndpointTests(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("candidateEmail", response.json())
 
+    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+    def test_agent_auth_fail_closed_when_secret_empty(self):
+        """When INTERVIEW_AGENT_AUTH_REQUIRED is True, missing secret must return 401 (fail-closed)."""
+        response = self.client.get(f"/api/v1/interview/compat/{self.session.room_name}/context")
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["detail"], "Missing agent authentication shared secret.")
+
+        # Test append-transcription also fails closed
+        response_append = self.client.post(
+            f"/api/v1/interview/compat/{self.session.room_name}/append-transcription",
+            data={"speaker_role": "ai_agent", "content": "test"},
+            format="json",
+        )
+        self.assertEqual(response_append.status_code, 401)
+
+        # Test status endpoint also fails closed
+        response_status = self.client.patch(
+            f"/api/v1/interview/compat/{self.session.room_name}/status",
+            data={"status": "in_progress"},
+            format="json",
+        )
+        self.assertEqual(response_status.status_code, 401)
+
+    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+    def test_agent_auth_rejects_invalid_signature(self):
+        path = f"/api/v1/interview/compat/{self.session.room_name}/context"
+        timestamp = str(int(time.time()))
+
+        response = self.client.get(
+            path,
+            HTTP_X_SQUARE_AGENT_TIMESTAMP=timestamp,
+            HTTP_X_SQUARE_AGENT_SIGNATURE="invalid_signature_hex",
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["detail"], "Invalid agent authentication signature.")
+
+    @override_settings(INTERVIEW_AGENT_SHARED_SECRET="agent-secret", INTERVIEW_AGENT_AUTH_REQUIRED=True)
+    def test_agent_auth_rejects_expired_timestamp(self):
+        path = f"/api/v1/interview/compat/{self.session.room_name}/context"
+        expired_timestamp = str(int(time.time()) - 400)
+        signature = build_signature("agent-secret", "GET", path, expired_timestamp, b"")
+
+        response = self.client.get(
+            path,
+            HTTP_X_SQUARE_AGENT_TIMESTAMP=expired_timestamp,
+            HTTP_X_SQUARE_AGENT_SIGNATURE=signature,
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json()["detail"], "Expired agent authentication timestamp.")
+
 
 class _FakeFileResult:
     def __init__(self, location: str):
@@ -1553,7 +1603,7 @@ class InterviewSlotCapacityTests(TestCase):
         )
 
     def test_slot_capacity_guard_rejects_when_limit_reached(self):
-        from .serializers import SLOT_CAPACITY_FULL_MESSAGE
+        from apps.interviews.serializers import SLOT_CAPACITY_FULL_MESSAGE
         target_time = timezone.now() + timedelta(days=3)
 
         with self.settings(MAX_CONCURRENT_INTERVIEWS_PER_SLOT=2, SLOT_WINDOW_MINUTES=15):
@@ -1639,7 +1689,7 @@ class InterviewSlotCapacityTests(TestCase):
             self.assertTrue(serializer.is_valid(), serializer.errors)
 
     def test_tts_cache_key_deterministic(self):
-        from .tts_cache import compute_tts_cache_key
+        from apps.interviews.tts_cache import compute_tts_cache_key
         key1 = compute_tts_cache_key("tts-vi", "Trúc Ly", 1.0, "Chào bạn, mình là trợ lý AI.")
         key2 = compute_tts_cache_key("tts-vi", "Trúc Ly", 1.0, "   Chào bạn, mình là trợ lý AI.   ")
         self.assertEqual(key1, key2)

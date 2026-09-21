@@ -47,6 +47,7 @@ import {
 import hrmService, { NativeMonthlyPayrollRecord } from '@/services/hrmService';
 import { TabTitle } from '@/utils/generalFunction';
 import toastMessages from '@/utils/toastMessages';
+import { confirmModal } from '@/utils/sweetalert2Modal';
 import pc from '@/utils/muiColors';
 
 const formatVND = (num: number | string | undefined | null) => {
@@ -113,11 +114,27 @@ export default function PayrollListPage() {
   };
 
   const handleApproveAll = () => {
-    approveAllPayroll.mutate({ month: selectedMonth, year: selectedYear });
+    confirmModal(
+      () => approveAllPayroll.mutate({ month: selectedMonth, year: selectedYear }),
+      'Xác nhận duyệt toàn bộ bảng lương?',
+      `Hành động này sẽ phê duyệt bảng lương tháng ${selectedMonth}/${selectedYear} cho tất cả nhân sự đang ở trạng thái Nháp (DRAFT).`,
+      'warning',
+      true,
+      'Duyệt toàn bộ',
+      'Hủy'
+    );
   };
 
   const handleMarkPaidAll = () => {
-    markPaidAllPayroll.mutate({ month: selectedMonth, year: selectedYear });
+    confirmModal(
+      () => markPaidAllPayroll.mutate({ month: selectedMonth, year: selectedYear }),
+      'Xác nhận đánh dấu đã chi trả?',
+      `Hành động này sẽ xác nhận hoàn tất thanh toán lương tháng ${selectedMonth}/${selectedYear} cho tất cả nhân sự đang ở trạng thái Đã duyệt (APPROVED).`,
+      'warning',
+      true,
+      'Xác nhận chi trả',
+      'Hủy'
+    );
   };
 
   const [exporting, setExporting] = useState(false);
@@ -180,22 +197,22 @@ export default function PayrollListPage() {
           <Button
             variant="contained"
             color="primary"
-            startIcon={<CheckCircleOutlineIcon />}
+            startIcon={approveAllPayroll.isPending ? <CircularProgress size={16} color="inherit" /> : <CheckCircleOutlineIcon />}
             onClick={handleApproveAll}
             disabled={approveAllPayroll.isPending || !payrollRecords.some((r) => r.status === 'DRAFT')}
             sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
           >
-            Duyệt Toàn Bộ
+            {approveAllPayroll.isPending ? 'Đang duyệt...' : 'Duyệt Toàn Bộ'}
           </Button>
           <Button
             variant="contained"
             color="success"
-            startIcon={<PaymentsOutlinedIcon />}
+            startIcon={markPaidAllPayroll.isPending ? <CircularProgress size={16} color="inherit" /> : <PaymentsOutlinedIcon />}
             onClick={handleMarkPaidAll}
             disabled={markPaidAllPayroll.isPending || !payrollRecords.some((r) => r.status === 'APPROVED')}
             sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
           >
-            Đánh Dấu Đã Chi Trả
+            {markPaidAllPayroll.isPending ? 'Đang cập nhật...' : 'Đánh Dấu Đã Chi Trả'}
           </Button>
         </Stack>
       </Box>

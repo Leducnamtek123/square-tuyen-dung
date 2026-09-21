@@ -101,6 +101,10 @@
     "lint": "eslint src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "jest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:smoke": "playwright test tests/interview-room-loop-smoke.spec.ts tests/interview-recording-smoke.spec.ts",
+    "test:e2e:live": "cross-env LIVE_RECRUITMENT_E2E=1 playwright test tests/recruitment-flow-live.spec.ts",
     "i18n:audit": "node audit_i18n.cjs",
     "doctor": "npx react-doctor@latest"
   },

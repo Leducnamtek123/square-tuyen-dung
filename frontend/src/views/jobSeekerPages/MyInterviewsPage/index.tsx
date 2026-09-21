@@ -133,7 +133,7 @@ const MyInterviewsPage = () => {
           mb: 3,
           p: { xs: 2.5, md: 3.5 },
           borderRadius: '16px',
-          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.80) 45%, rgba(15, 23, 42, 0.40) 100%), url(/images/banners/banner-interviews.jpg)`,
+          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.80) 45%, rgba(15, 23, 42, 0.40) 100%), url(/images/banners/banner-interviews.webp)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center right',
           color: '#ffffff',

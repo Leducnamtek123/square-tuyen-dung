@@ -339,6 +339,7 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       { protocol: 'https', hostname: 's3.infohr.vn' },
       { protocol: 'http', hostname: 'minio' },

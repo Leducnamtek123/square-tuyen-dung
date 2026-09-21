@@ -105,9 +105,9 @@ const CompanySearch = () => {
               size={{
                 xs: 12,
                 sm: 12,
-                md: 5.5,
-                lg: 5.5,
-                xl: 5.5,
+                md: 5,
+                lg: 5.2,
+                xl: 5.2,
               }}
             >
               <InputBaseSearchCompanyCustom
@@ -121,9 +121,9 @@ const CompanySearch = () => {
               size={{
                 xs: 12,
                 sm: 6,
-                md: 3.5,
-                lg: 3.5,
-                xl: 3.5,
+                md: 3.4,
+                lg: 3.3,
+                xl: 3.3,
               }}
             >
               <SingleSelectSearchCustom
@@ -138,26 +138,33 @@ const CompanySearch = () => {
               size={{
                 xs: 12,
                 sm: 6,
-                md: 3,
-                lg: 3,
-                xl: 3,
+                md: 3.6,
+                lg: 3.5,
+                xl: 3.5,
               }}
             >
-              <Stack direction="row" spacing={1.2} justifyContent="flex-end" alignItems="center" sx={{ width: '100%' }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                justifyContent="flex-end"
+                alignItems="center"
+                sx={{ width: '100%', flexWrap: 'nowrap' }}
+              >
                 <Button
                   variant="contained"
                   type="submit"
-                  startIcon={<SearchIcon sx={{ fontSize: 19 }} />}
+                  startIcon={<SearchIcon sx={{ fontSize: 18 }} />}
                   sx={{
                     flex: 1,
+                    minWidth: { xs: 110, sm: 125 },
                     height: 48,
                     background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
                     color: 'white',
                     whiteSpace: 'nowrap',
-                    px: { xs: 2, sm: 2.5 },
+                    px: { xs: 1.75, sm: 2 },
                     borderRadius: '999px',
                     fontWeight: 700,
-                    fontSize: '0.92rem',
+                    fontSize: { xs: '0.88rem', sm: '0.92rem' },
                     textTransform: 'none',
                     boxShadow: '0 6px 16px rgba(37, 99, 235, 0.28)',
                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',

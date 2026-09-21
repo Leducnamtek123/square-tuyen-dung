@@ -57,7 +57,7 @@ export const SalarySearchSection: React.FC<SalarySearchSectionProps> = ({
         sx={{
           borderRadius: { xs: '14px', sm: '16px' },
           p: { xs: 2.5, sm: 3.5 },
-          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.80) 50%, rgba(15, 23, 42, 0.40) 100%), url(/images/banners/banner-salary.jpg)`,
+          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.80) 50%, rgba(15, 23, 42, 0.40) 100%), url(/images/banners/banner-salary.webp)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center right',
           color: '#ffffff',

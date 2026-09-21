@@ -180,7 +180,8 @@ export default function AboutUsPage() {
               variant="body1"
               sx={{
                 color: '#475569',
-                maxWidth: 860,
+                maxWidth: 720,
+                mx: 'auto',
                 fontSize: { xs: '0.95rem', sm: '1.05rem', md: '1.15rem' },
                 lineHeight: 1.7,
               }}
@@ -305,7 +306,7 @@ export default function AboutUsPage() {
               }}
             >
               <Image
-                src="/images/about/about_hero_ecosystem.jpg"
+                src="/images/about/about_hero_ecosystem.webp"
                 alt="Mô hình 3D Hệ sinh thái Tuyển dụng & Quản trị Nhân sự InfoHR"
                 fill
                 priority
@@ -507,7 +508,7 @@ export default function AboutUsPage() {
               {/* Image Frame */}
               <Box sx={{ position: 'relative', width: '100%', height: { xs: 200, sm: 260 } }}>
                 <Image
-                  src="/images/about/about_pillar_infohr.jpg"
+                  src="/images/about/about_pillar_infohr.webp"
                   alt="Trụ cột InfoHR Tuyển dụng & Quản trị HRM"
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
@@ -615,7 +616,7 @@ export default function AboutUsPage() {
               {/* Image Frame */}
               <Box sx={{ position: 'relative', width: '100%', height: { xs: 200, sm: 260 } }}>
                 <Image
-                  src="/images/about/about_pillar_aila.jpg"
+                  src="/images/about/about_pillar_aila.webp"
                   alt="Trụ cột AILA AI Phỏng vấn tự động & Đánh giá năng lực"
                   fill
                   sizes="(max-width: 768px) 100vw, 600px"
@@ -893,7 +894,7 @@ export default function AboutUsPage() {
         >
           {/* Background Image */}
           <Image
-            src="/images/about/about_cta_banner.jpg"
+            src="/images/about/about_cta_banner.webp"
             alt="Đội ngũ nhân sự chuyên nghiệp cùng hệ thống InfoHR"
             fill
             sizes="(max-width: 768px) 100vw, 1200px"
@@ -922,7 +923,8 @@ export default function AboutUsPage() {
             }}
           >
             <Chip
-              label="✨ BẮT ĐẦU CHUYỂN ĐỔI SỐ CÙNG INFOHR"
+              icon={<AutoAwesomeIcon sx={{ fontSize: '15px !important', color: '#FFFFFF !important' }} />}
+              label="BẮT ĐẦU CHUYỂN ĐỔI SỐ CÙNG INFOHR"
               sx={{
                 bgcolor: 'rgba(255, 255, 255, 0.2)',
                 backdropFilter: 'blur(8px)',

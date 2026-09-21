@@ -110,13 +110,13 @@ export const SalaryRangeBar: React.FC<SalaryRangeBarProps> = ({
       <Stack direction="row" justifyContent="space-between" sx={{ mt: 0.5 }}>
         <Typography
           variant="caption"
-          sx={{ color: '#94a3b8', fontSize: '0.72rem', fontFamily: 'monospace' }}
+          sx={{ color: '#64748b', fontSize: '0.72rem', fontFamily: 'monospace' }}
         >
           {formatVND(numMin)}
         </Typography>
         <Typography
           variant="caption"
-          sx={{ color: '#94a3b8', fontSize: '0.72rem', fontFamily: 'monospace' }}
+          sx={{ color: '#64748b', fontSize: '0.72rem', fontFamily: 'monospace' }}
         >
           {formatVND(numMax)}
         </Typography>

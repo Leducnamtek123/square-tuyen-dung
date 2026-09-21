@@ -41,6 +41,8 @@ import authService from '@/services/authService';
 import toastMessages from '@/utils/toastMessages';
 import { useAppSelector } from '@/hooks/useAppStore';
 import { getSafeRedirectPath, getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
+import { ROLES_NAME } from '@/configs/constants';
+import type { RoleName } from '@/types/auth';
 
 const OTP_LENGTH = 6;
 const RESEND_EMAIL_COOLDOWN_SECONDS = 60;
@@ -108,7 +110,7 @@ const EmailVerificationRequiredPage = () => {
 
   TabTitle(t('verification.pageTitle', 'Xác thực Email | InfoHR'));
 
-  const { email } = useAppSelector((state) => state.auth);
+  const { email, roleName } = useAppSelector((state) => state.auth);
 
   // States
   const [otpDigits, setOtpDigits] = React.useState<string[]>(Array(OTP_LENGTH).fill(''));
@@ -123,10 +125,23 @@ const EmailVerificationRequiredPage = () => {
   const otpInputRefs = React.useRef<Array<HTMLInputElement | null>>([]);
   const resendInFlightRef = React.useRef(false);
   const redirectTriggeredRef = React.useRef(false);
+  const isInitialMountRef = React.useRef(true);
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const displayEmail = email || 'email_cua_ban@domain.com';
   const webmailInfo = getWebmailProviderInfo(displayEmail);
+
+  const getLoginUrl = React.useCallback(
+    (emailToPrefill?: string) => {
+      const isEmployer = roleName === ROLES_NAME.EMPLOYER;
+      const basePath = isEmployer ? '/employer/login' : '/dang-nhap';
+      if (emailToPrefill) {
+        return `${basePath}?email=${encodeURIComponent(emailToPrefill)}`;
+      }
+      return basePath;
+    },
+    [roleName]
+  );
 
   // Auto-focus first OTP input on mount
   React.useEffect(() => {
@@ -154,7 +169,7 @@ const EmailVerificationRequiredPage = () => {
     };
   }, [countdown]);
 
-  // Periodic background check & tab focus check
+  // Periodic background check & tab focus check (safe checkCreds polling)
   const checkVerificationStatus = React.useCallback(
     async (showLoading = false) => {
       const normalizedEmail = String(email || '').trim();
@@ -163,20 +178,41 @@ const EmailVerificationRequiredPage = () => {
       if (showLoading) setIsFullScreenLoading(true);
 
       try {
-        const res: any = await authService.sendVerifyEmail(normalizedEmail);
-        const isVerified = res?.data?.emailVerified || res?.emailVerified;
+        const res = await authService.checkCreds(
+          normalizedEmail,
+          (roleName as RoleName) || ROLES_NAME.JOB_SEEKER
+        );
+        const isVerified = Boolean(res?.emailVerified);
+
         if (isVerified && !redirectTriggeredRef.current) {
           redirectTriggeredRef.current = true;
-          toastMessages.success(t('verification.activatedSuccess', 'Tài khoản của bạn đã được kích hoạt thành công!'));
-          router.push(getSafeRedirectPath('/dang-nhap'));
+          const targetUrl = getLoginUrl(normalizedEmail);
+
+          if (isInitialMountRef.current) {
+            toastMessages.info(
+              t(
+                'verification.alreadyVerified',
+                'Tài khoản đã được xác thực trước đó. Vui lòng đăng nhập.'
+              )
+            );
+          } else {
+            toastMessages.success(
+              t(
+                'verification.activatedSuccess',
+                'Tài khoản của bạn đã được kích hoạt thành công!'
+              )
+            );
+          }
+          router.push(getSafeRedirectPath(targetUrl));
         }
       } catch {
         // Silent catch for auto-check
       } finally {
+        isInitialMountRef.current = false;
         if (showLoading) setIsFullScreenLoading(false);
       }
     },
-    [email, router, t]
+    [email, roleName, getLoginUrl, router, t]
   );
 
   React.useEffect(() => {
@@ -289,7 +325,8 @@ const EmailVerificationRequiredPage = () => {
       if (res?.emailVerified || res?.success) {
         redirectTriggeredRef.current = true;
         toastMessages.success(t('verification.activatedSuccess', 'Tài khoản của bạn đã được kích hoạt thành công!'));
-        router.push(getSafeRedirectPath('/dang-nhap?successMessage=X%C3%A1c%20th%E1%BB%B1c%20email%20th%C3%A0nh%20c%C3%B4ng.%20Vui%20l%C3%B2ng%20%C4%91%C4%83ng%20nh%E1%BA%ADp.'));
+        const targetUrl = getLoginUrl(normalizedEmail);
+        router.push(getSafeRedirectPath(targetUrl));
         return;
       }
 
@@ -332,8 +369,9 @@ const EmailVerificationRequiredPage = () => {
 
       if (isVerified) {
         redirectTriggeredRef.current = true;
-        toastMessages.success(t('verification.activatedSuccess', 'Tài khoản đã được kích hoạt thành công!'));
-        router.push(getSafeRedirectPath('/dang-nhap'));
+        toastMessages.info(t('verification.alreadyVerified', 'Tài khoản đã được xác thực trước đó. Vui lòng đăng nhập.'));
+        const targetUrl = getLoginUrl(normalizedEmail);
+        router.push(getSafeRedirectPath(targetUrl));
         return;
       }
 
@@ -736,7 +774,7 @@ const EmailVerificationRequiredPage = () => {
 
               <Button
                 component={Link}
-                href="/dang-nhap"
+                href={getLoginUrl(email)}
                 variant="text"
                 endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 15 }} />}
                 sx={{
@@ -808,7 +846,10 @@ const EmailVerificationRequiredPage = () => {
                     </li>
                     <li>
                       Nếu địa chỉ email bị sai, bạn có thể{' '}
-                      <Link href="/dang-ky" style={{ color: '#4338CA', fontWeight: 600, textDecoration: 'underline' }}>
+                      <Link
+                        href={roleName === ROLES_NAME.EMPLOYER ? '/employer/register' : '/dang-ky'}
+                        style={{ color: '#4338CA', fontWeight: 600, textDecoration: 'underline' }}
+                      >
                         đăng ký lại tài khoản mới
                       </Link>
                       .

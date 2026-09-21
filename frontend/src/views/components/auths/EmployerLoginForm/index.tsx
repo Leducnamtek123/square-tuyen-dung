@@ -3,7 +3,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { typedYupResolver } from '@/utils/formHelpers';
 import * as yup from "yup";
-import { Box, Button, Stack, styled, Divider } from "@mui/material";
+import { Box, Button, Stack, styled, Divider, CircularProgress } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,7 @@ interface EmployerLoginFormProps {
   onLogin: (data: EmployerLoginFormData) => void;
   onFacebookLogin?: (result: FacebookAuthResult) => void;
   onGoogleLogin: (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => void;
+  defaultEmail?: string;
 }
 type EmployerLoginT = ReturnType<typeof useTranslation>['t'];
 
@@ -135,18 +136,29 @@ const inputSx = {
   },
 };
 
-const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: EmployerLoginFormProps) => {
+const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin, defaultEmail }: EmployerLoginFormProps) => {
   const { t } = useTranslation('auth');
 
   const schema = React.useMemo(() => createEmployerLoginSchema(t), [t]);
 
-  const { control, handleSubmit } = useForm<EmployerLoginFormData>({
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { isSubmitting },
+  } = useForm<EmployerLoginFormData>({
     defaultValues: {
-      email: "",
+      email: defaultEmail || "",
       password: "",
     },
     resolver: typedYupResolver<EmployerLoginFormData>(schema),
   });
+
+  React.useEffect(() => {
+    if (defaultEmail) {
+      setValue("email", defaultEmail, { shouldValidate: true });
+    }
+  }, [defaultEmail, setValue]);
 
   const googleLogin = useGoogleLogin({
     onSuccess: onGoogleLogin,
@@ -186,8 +198,14 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
         />
       </Stack>
 
-      <StyledButton fullWidth variant="contained" type="submit" startIcon={<LoginIcon />}>
-        {t('actions.login', 'Đăng nhập')}
+      <StyledButton
+        fullWidth
+        variant="contained"
+        type="submit"
+        disabled={isSubmitting}
+        startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <LoginIcon />}
+      >
+        {isSubmitting ? t('actions.processing', 'Đang xử lý...') : t('actions.login', 'Đăng nhập')}
       </StyledButton>
 
       <StyledDivider>{t('social.orLoginWith', 'Hoặc')}</StyledDivider>

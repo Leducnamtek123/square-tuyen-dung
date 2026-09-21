@@ -338,7 +338,7 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
 
       if (generated) {
         applyHTMLContent(generated, 'replace');
-        setAiSuccessSnackbar('✨ Đã tối ưu hóa nội dung thành công với AI!');
+        setAiSuccessSnackbar('Đã tối ưu hóa nội dung thành công với AI!');
       }
     } catch (err) {
       console.error('Quick AI error:', err);
@@ -788,8 +788,8 @@ export const ModernRichEditor: React.FC<ModernRichEditorProps> = ({
           }}
         >
           <Box sx={{ px: 1.5, py: 1, mb: 0.5, bgcolor: '#F8FAFC', borderRadius: 1.5 }}>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: '#4F46E5', letterSpacing: 0.5, textTransform: 'uppercase' }}>
-              ✨ TRỢ LÝ AI TUYỂN DỤNG
+            <Typography variant="caption" sx={{ fontWeight: 700, color: '#4F46E5', letterSpacing: 0.5, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              <AutoAwesomeIcon sx={{ fontSize: 15 }} /> TRỢ LÝ AI TUYỂN DỤNG
             </Typography>
             <Typography variant="body2" sx={{ fontSize: '0.78rem', color: '#64748B', mt: 0.25 }}>
               {jobTitle ? `Tối ưu cho vị trí: "${jobTitle}"` : 'Tối ưu hóa nội dung thông minh với 1 chạm'}

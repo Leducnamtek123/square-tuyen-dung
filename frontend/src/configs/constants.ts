@@ -78,6 +78,7 @@ const AUTH_PROVIDER = {
 const getProjectServerClientId = () =>
   process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID ||
   process.env.VITE_PROJECT_SERVER_CLIENT_ID ||
+  process.env.NEXT_PUBLIC_CLIENT_ID ||
   process.env.CLIENT_ID ||
   '';
 

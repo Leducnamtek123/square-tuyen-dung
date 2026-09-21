@@ -615,10 +615,11 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                     sx={{
                       display: 'flex',
                       flexDirection: 'column',
-                      justify: 'space-between',
+                      justifyContent: 'space-between',
                       height: '100%',
                       minHeight: 165,
                       p: 2.5,
+                      pt: job.isUrgent ? 2.75 : 2.5,
                       backgroundColor: job.isUrgent ? '#fffaf5' : '#ffffff',
                       border: `1px solid ${job.isUrgent ? 'rgba(251, 146, 60, 0.45)' : 'rgba(226, 232, 240, 0.8)'}`,
                       borderRadius: '20px',
@@ -643,6 +644,36 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                       },
                     }}
                   >
+                    {/* Outer Card Urgent Badge: thiết kế ngoài viền card thay vì lặp bên trong */}
+                    {job.isUrgent && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: -11,
+                          left: 18,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                          color: '#ffffff',
+                          px: 1.25,
+                          py: 0.35,
+                          borderRadius: '999px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          lineHeight: 1.2,
+                          boxShadow: '0 4px 12px rgba(234, 88, 12, 0.28)',
+                          border: '2px solid #ffffff',
+                          zIndex: 3,
+                          pointerEvents: 'none',
+                          letterSpacing: '0.01em',
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faBolt} style={{ fontSize: 10 }} />
+                        <span>Tuyển gấp</span>
+                      </Box>
+                    )}
+
                     {/* Top Row: Title + Heart Icon */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 1.5 }}>
                       <Typography
@@ -662,26 +693,6 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                         {job.jobName}
                       </Typography>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        {job.isUrgent && (
-                          <Tooltip title="Việc làm tuyển gấp" placement="top">
-                            <Box
-                              sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: 24,
-                                height: 24,
-                                borderRadius: '50%',
-                                bgcolor: '#ea580c',
-                                color: '#ffffff',
-                                boxShadow: '0 6px 16px rgba(234, 88, 12, 0.25)',
-                                flexShrink: 0,
-                              }}
-                            >
-                              <FontAwesomeIcon icon={faBolt} style={{ fontSize: 12 }} />
-                            </Box>
-                          </Tooltip>
-                        )}
                         <IconButton aria-label="Thao tác"
                           size="small"
                           onClick={(e) => toggleFavorite(e, job.id, job.slug)}
@@ -717,26 +728,6 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                             backgroundColor: '#ffffff',
                           }}
                         />
-                        {job.isUrgent && (
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              top: -7,
-                              left: -7,
-                              width: 20,
-                              height: 20,
-                              borderRadius: '50%',
-                              bgcolor: '#f97316',
-                              color: '#fff',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              boxShadow: '0 6px 14px rgba(249, 115, 22, 0.28)',
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faBolt} style={{ fontSize: 10 }} />
-                          </Box>
-                        )}
                       </Box>
                       <Stack spacing={0.4} sx={{ minWidth: 0, flex: 1 }}>
                         <Typography

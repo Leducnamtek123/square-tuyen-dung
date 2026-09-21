@@ -92,6 +92,7 @@ const EmployerLogin = () => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+  const [defaultEmail, setDefaultEmail] = React.useState<string | undefined>(undefined);
   const forgotPasswordHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.FORGOT_PASSWORD}`, i18n.language);
   const registerHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
   const candidateLoginHref = localizeRoutePath(`/${ROUTES.AUTH.LOGIN}`, i18n.language);
@@ -104,7 +105,11 @@ const EmployerLogin = () => {
     const successMessageKey = params.get('successMessageKey');
     const successMsg = params.get('successMessage');
     const errorMsg = params.get('errorMessage');
+    const emailParam = params.get('email');
 
+    if (emailParam) {
+      setDefaultEmail(emailParam);
+    }
     if (successMessageKey === 'passwordResetSuccess') {
       setSuccessMessage(t('messages.passwordResetSuccess'));
     } else if (successMsg !== null) {
@@ -463,7 +468,7 @@ const EmployerLogin = () => {
                 )}
 
                 <Box sx={{ mt: 0.5 }}>
-                  <EmployerLoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />
+                  <EmployerLoginForm onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} defaultEmail={defaultEmail} />
                 </Box>
               </Box>
 
@@ -539,7 +544,7 @@ const EmployerLogin = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 0.75,
-                    color: '#94A3B8',
+                    color: '#64748B',
                     fontSize: '12px',
                   }}
                 >

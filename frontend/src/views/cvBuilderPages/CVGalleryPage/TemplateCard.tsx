@@ -281,7 +281,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onPreview 
             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.975rem' }}>
               {displayInfo.displayName}
             </Typography>
-            <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
               {template.name}
             </Typography>
           </Stack>
