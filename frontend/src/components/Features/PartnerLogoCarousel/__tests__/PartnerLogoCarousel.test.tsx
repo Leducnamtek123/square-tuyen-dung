@@ -31,7 +31,7 @@ describe('PartnerLogoCarousel Component (Minimalist Logo-Only Standard)', () => 
     expect(links.length).toBe(0);
   });
 
-  it('contains image elements with grayscale and hover transition styles', () => {
+  it('contains image elements with smooth hover transition styles', () => {
     const { container } = render(<PartnerLogoCarousel />);
     const images = container.querySelectorAll('img.partner-logo-img');
     expect(images.length).toBe(PARTNER_COMPANIES.length * 4); // Duplicated 4 times for seamless marquee

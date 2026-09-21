@@ -52,8 +52,8 @@ interface PartnerLogoCarouselProps {
  * Follows the LOGO-ONLY Social Proof standard (taste-skill & UI/UX Pro Max):
  * - Pure logos without cluttered cards, borders, URLs, or industry tags.
  * - No external links to retain user attention on the recruitment portal.
- * - Default grayscale (muted 50%) for visual harmony across varied brand palettes.
- * - Smooth hover color reveal & pause-on-hover.
+ * - Hiển thị màu sắc thương hiệu gốc trực tiếp, sống động và sắc nét.
+ * - Smooth hover zoom & pause-on-hover.
  * - Gradient fade edges on left & right.
  */
 const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
@@ -121,6 +121,7 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
           sx={{
             display: 'flex',
             alignItems: 'center',
+            flexWrap: 'nowrap',
             gap: { xs: 5, sm: 7, md: 9 }, // Khoảng cách thoáng đãng, sang trọng
             width: 'max-content',
             animation: 'partnerMarquee 26s linear infinite',
@@ -129,12 +130,7 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
               animationPlayState: 'paused',
             },
             '@media (prefers-reduced-motion: reduce)': {
-              animation: 'none',
-              overflowX: 'auto',
-              width: '100%',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              gap: 4,
+              animation: 'partnerMarquee 45s linear infinite',
             },
             '@keyframes partnerMarquee': {
               '0%': {
@@ -173,16 +169,17 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
                   width: 'auto',
                   height: 'auto',
                   objectFit: 'contain',
-                  // Trạng thái mặc định: đơn sắc tinh tế, hòa hợp màu nền
-                  filter: 'grayscale(100%) opacity(0.55)',
+                  // Trạng thái mặc định: hiển thị trọn vẹn màu sắc thương hiệu gốc, rõ ràng và sống động
+                  filter: 'none',
+                  opacity: 1,
                   transform: 'scale(1)',
                   transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
                   userSelect: 'none',
                   pointerEvents: 'auto',
-                  // Rê chuột: hiện màu thương hiệu rực rỡ và phóng to nhẹ
+                  // Rê chuột: phóng to nhẹ tạo điểm nhấn tinh tế
                   '&:hover': {
-                    filter: 'grayscale(0%) opacity(1)',
-                    transform: 'scale(1.06)',
+                    transform: 'scale(1.08)',
+                    filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08))',
                   },
                 }}
               />
