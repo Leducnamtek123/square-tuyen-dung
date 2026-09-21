@@ -1,7 +1,26 @@
 'use client';
 
-import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, keyframes } from '@mui/material';
+
+// Hiệu ứng marquee cuộn vô tận chạy qua bên phải (từ trái qua phải)
+const partnerMarqueeRight = keyframes`
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+`;
+
+// Hiệu ứng marquee cuộn vô tận chạy qua bên trái
+const partnerMarqueeLeft = keyframes`
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+`;
 
 export interface PartnerCompany {
   id: string;
@@ -44,6 +63,7 @@ export const PARTNER_COMPANIES: PartnerCompany[] = [
 
 interface PartnerLogoCarouselProps {
   label?: string;
+  direction?: 'right' | 'left';
 }
 
 /**
@@ -53,11 +73,13 @@ interface PartnerLogoCarouselProps {
  * - Pure logos without cluttered cards, borders, URLs, or industry tags.
  * - No external links to retain user attention on the recruitment portal.
  * - Hiển thị màu sắc thương hiệu gốc trực tiếp, sống động và sắc nét.
- * - Smooth hover zoom & pause-on-hover.
+ * - Tự động chạy mượt mà qua phải (direction: right).
+ * - Smooth hover zoom trên từng logo.
  * - Gradient fade edges on left & right.
  */
 const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
   label = 'ĐỒNG HÀNH CÙNG CÁC DOANH NGHIỆP TIÊN PHONG',
+  direction = 'right',
 }) => {
   // Lặp lại mảng logo để chu trình cuộn vô tận mượt mà và không đứt đoạn
   const marqueeList = [
@@ -124,22 +146,8 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
             flexWrap: 'nowrap',
             gap: { xs: 5, sm: 7, md: 9 }, // Khoảng cách thoáng đãng, sang trọng
             width: 'max-content',
-            animation: 'partnerMarquee 26s linear infinite',
+            animation: `${direction === 'right' ? partnerMarqueeRight : partnerMarqueeLeft} 28s linear infinite`,
             willChange: 'transform',
-            '&:hover': {
-              animationPlayState: 'paused',
-            },
-            '@media (prefers-reduced-motion: reduce)': {
-              animation: 'partnerMarquee 45s linear infinite',
-            },
-            '@keyframes partnerMarquee': {
-              '0%': {
-                transform: 'translate3d(0, 0, 0)',
-              },
-              '100%': {
-                transform: 'translate3d(-50%, 0, 0)',
-              },
-            },
           }}
         >
           {marqueeList.map((partner, index) => (
