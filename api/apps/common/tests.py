@@ -534,3 +534,77 @@ def test_get_popular_keywords_returns_success_list():
     assert career_item["kw"] == "Công nghệ thông tin"
 
 
+def test_file_upload_serializer_blocks_dangerous_extensions():
+    from apps.common.serializers import FileUploadSerializer
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    # Banned script/executable extensions
+    dangerous_files = [
+        ("malicious.php", b"<?php phpinfo(); ?>", File.OTHER_TYPE),
+        ("payload.svg", b"<svg onload=alert(1)></svg>", File.AVATAR_TYPE),
+        ("script.bat", b"@echo off", File.OTHER_TYPE),
+        ("exploit.html", b"<script>alert(1)</script>", File.CV_TYPE),
+    ]
+
+    for name, content, ftype in dangerous_files:
+        upload = SimpleUploadedFile(name, content, content_type="application/octet-stream")
+        serializer = FileUploadSerializer(data={"file": upload, "file_type": ftype})
+        assert not serializer.is_valid(), f"Expected {name} to fail validation"
+        assert "file" in serializer.errors
+
+
+def test_file_upload_serializer_validates_pdf_magic_bytes():
+    from apps.common.serializers import FileUploadSerializer
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    # Fake PDF without %PDF- magic bytes
+    fake_pdf = SimpleUploadedFile("fake.pdf", b"This is not a real PDF file header", content_type="application/pdf")
+    serializer = FileUploadSerializer(data={"file": fake_pdf, "file_type": File.CV_TYPE})
+    assert not serializer.is_valid()
+    assert "magic bytes" in str(serializer.errors)
+
+    # Valid PDF magic bytes
+    valid_pdf = SimpleUploadedFile("valid.pdf", b"%PDF-1.4 valid content here", content_type="application/pdf")
+    serializer_valid = FileUploadSerializer(data={"file": valid_pdf, "file_type": File.CV_TYPE})
+    assert serializer_valid.is_valid()
+
+
+def test_cloudinary_service_ssrf_prevention():
+    from shared.helpers.cloudinary_service import CloudinaryService
+
+    # Must reject local/private IP and cloud metadata hosts
+    blocked_targets = [
+        "http://127.0.0.1:8000/internal",
+        "http://localhost:9000/minio",
+        "http://169.254.169.254/latest/meta-data/",
+        "http://10.0.0.1/admin",
+        "http://192.168.1.1/secret",
+        "ftp://example.com/file.jpg",
+    ]
+
+    for url in blocked_targets:
+        assert CloudinaryService._is_safe_external_url(url) is False, f"Expected {url} to be blocked"
+
+
+def test_export_service_sanitizes_csv_formula_injection():
+    from apps.exchange.services.export_service import ExportService
+
+    formula_values = [
+        "=cmd|' /C calc'!A0",
+        "+1+2",
+        "-5+3",
+        "@SUM(A1:A10)",
+        "\tmalicious_tab",
+        "\rmalicious_cr",
+    ]
+
+    for val in formula_values:
+        sanitized = ExportService._sanitize_cell(val)
+        assert sanitized.startswith("'"), f"Expected {val} to be escaped with leading single quote"
+
+    # Benign string unchanged
+    assert ExportService._sanitize_cell("Nguyen Van A") == "Nguyen Van A"
+    assert ExportService._sanitize_cell(12345) == 12345
+
+
+

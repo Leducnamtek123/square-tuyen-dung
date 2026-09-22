@@ -129,6 +129,17 @@ class ExportService:
             return job
 
     @staticmethod
+    def _sanitize_cell(val: any) -> any:
+        """
+        Prevent Formula Injection / CSV Injection (CWE-1236).
+        If a cell begins with dangerous characters (=, +, -, @, tab, carriage return),
+        prefix with a single quote (') so spreadsheet applications treat it as raw text.
+        """
+        if isinstance(val, str) and val.startswith(("=", "+", "-", "@", "\t", "\r")):
+            return f"'{val}"
+        return val
+
+    @staticmethod
     def _generate_csv(headers: List[str], rows: List[List]) -> tuple[bytes, str, str]:
         buffer = io.StringIO()
         # UTF-8 BOM so Microsoft Excel recognizes Vietnamese characters
@@ -136,7 +147,8 @@ class ExportService:
         writer = csv.writer(buffer, quoting=csv.QUOTE_MINIMAL)
         writer.writerow(headers)
         for r in rows:
-            writer.writerow(r)
+            sanitized_row = [ExportService._sanitize_cell(val) for val in r]
+            writer.writerow(sanitized_row)
         return buffer.getvalue().encode("utf-8-sig"), "csv", "text/csv; charset=utf-8"
 
     @staticmethod
@@ -169,9 +181,10 @@ class ExportService:
 
         # Write data rows
         for row_idx, row in enumerate(rows, start=2):
-            ws.append(row)
+            sanitized_row = [ExportService._sanitize_cell(val) for val in row]
+            ws.append(sanitized_row)
             is_even = (row_idx % 2 == 0)
-            for col_idx in range(1, len(row) + 1):
+            for col_idx in range(1, len(sanitized_row) + 1):
                 cell = ws.cell(row=row_idx, column=col_idx)
                 cell.font = regular_font
                 cell.border = thin_border

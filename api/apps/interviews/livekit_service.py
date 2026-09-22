@@ -8,6 +8,7 @@ import asyncio
 import logging
 import json
 import threading
+import time
 from datetime import timedelta
 from typing import Dict, Optional
 from decouple import config
@@ -100,10 +101,32 @@ class LiveKitService:
 
             lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
             try:
-                dispatches = await lkapi.agent_dispatch.list_dispatch(room_name)
-                for dispatch in dispatches or []:
-                    if getattr(dispatch, "agent_name", "") == LIVEKIT_AGENT_NAME:
-                        return
+                # 1. Check if agent is already active in the room
+                try:
+                    participants_resp = await lkapi.room.list_participants(
+                        api.ListParticipantsRequest(room=room_name)
+                    )
+                    for p in getattr(participants_resp, "participants", []) or []:
+                        p_identity = getattr(p, "identity", "") or ""
+                        p_kind = getattr(p, "kind", None)
+                        if p_kind == 2 or p_identity.startswith("agent-"):
+                            return
+                except Exception as p_err:
+                    logger.debug("Failed checking room participants for agent presence: %s", p_err)
+
+                # 2. Check existing dispatches (skip only if fresh within 15s or mock/unspecified)
+                try:
+                    dispatches = await lkapi.agent_dispatch.list_dispatch(room_name)
+                    now_ns = int(time.time() * 1e9)
+                    for dispatch in dispatches or []:
+                        if getattr(dispatch, "agent_name", "") == LIVEKIT_AGENT_NAME:
+                            created_at_ns = getattr(getattr(dispatch, "state", None), "created_at", None)
+                            if created_at_ns and (now_ns - created_at_ns) < 15 * 1e9:
+                                return
+                            if created_at_ns is None:
+                                return
+                except Exception as d_err:
+                    logger.debug("Failed checking dispatches: %s", d_err)
 
                 await lkapi.agent_dispatch.create_dispatch(
                     api.CreateAgentDispatchRequest(

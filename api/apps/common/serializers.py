@@ -243,6 +243,60 @@ class FileUploadSerializer(serializers.Serializer):
     file = serializers.FileField(required=True)
     file_type = serializers.ChoiceField(choices=File.FILE_TYPES, default=File.OTHER_TYPE)
 
+    def validate(self, attrs):
+        file = attrs.get('file')
+        file_type = attrs.get('file_type', File.OTHER_TYPE)
+
+        if not file:
+            return attrs
+
+        name = (getattr(file, 'name', '') or '').lower()
+        size = getattr(file, 'size', 0)
+
+        # 1. Banned executable/dangerous extensions for any upload
+        dangerous_exts = (
+            '.exe', '.bat', '.sh', '.cmd', '.ps1', '.vbs', '.js',
+            '.html', '.htm', '.php', '.svg', '.jar', '.scr', '.pif', '.cgi'
+        )
+        if any(name.endswith(ext) for ext in dangerous_exts):
+            raise serializers.ValidationError({"file": "Định dạng tệp này không được phép tải lên vì lý do an toàn."})
+
+        # 2. Per-type size and extension constraints
+        if file_type in (File.AVATAR_TYPE, File.LOGO_TYPE, File.COVER_IMAGE_TYPE, File.COMPANY_IMAGE_TYPE, File.CAREER_IMAGE_TYPE):
+            max_img_size = 5 * 1024 * 1024  # 5 MB
+            if size > max_img_size:
+                raise serializers.ValidationError({"file": "Kích thước hình ảnh vượt quá giới hạn 5MB."})
+            allowed_image_exts = ('.png', '.jpg', '.jpeg', '.webp')
+            if not any(name.endswith(ext) for ext in allowed_image_exts):
+                raise serializers.ValidationError({"file": "Hình ảnh chỉ chấp nhận định dạng PNG, JPG, WEBP."})
+            try:
+                from PIL import Image
+                pos = file.tell()
+                img = Image.open(file)
+                img.verify()
+                file.seek(pos)
+            except Exception:
+                raise serializers.ValidationError({"file": "Tệp hình ảnh không hợp lệ hoặc bị lỗi."})
+
+        elif file_type in (File.CV_TYPE, File.BUSINESS_LICENSE_TYPE):
+            max_doc_size = 10 * 1024 * 1024  # 10 MB
+            if size > max_doc_size:
+                raise serializers.ValidationError({"file": "Kích thước tài liệu vượt quá giới hạn 10MB."})
+            if not name.endswith('.pdf'):
+                raise serializers.ValidationError({"file": "Hồ sơ CV hoặc giấy phép kinh doanh bắt buộc định dạng PDF."})
+            pos = file.tell()
+            header = file.read(5)
+            file.seek(pos)
+            if not header.startswith(b'%PDF-'):
+                raise serializers.ValidationError({"file": "Tệp PDF không hợp lệ (sai magic bytes)."})
+
+        else:
+            max_other_size = 15 * 1024 * 1024  # 15 MB
+            if size > max_other_size:
+                raise serializers.ValidationError({"file": "Kích thước tệp vượt quá giới hạn 15MB."})
+
+        return attrs
+
 
 class AuditLogSerializer(serializers.ModelSerializer):
     actorEmail = serializers.EmailField(source="actor_email", read_only=True)

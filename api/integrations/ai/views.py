@@ -189,6 +189,8 @@ def _tts_response_from_body(body: Dict[str, Any]):
     text = (body.get("text") or "").strip()
     if not text:
         return JsonResponse({"detail": "Missing `text`."}, status=400)
+    if len(text) > 2000:
+        return JsonResponse({"detail": "Nội dung chuyển đổi giọng nói quá dài (tối đa 2,000 ký tự)."}, status=400)
 
     voice = body.get("voice") or getattr(settings, "AI_TTS_DEFAULT_VOICE", None)
     voice_profile_id = (
@@ -292,6 +294,11 @@ def _transcribe_fn(request: HttpRequest):
     audio_file = request.FILES.get("audio")
     if not audio_file:
         return JsonResponse(data_response(errors={"detail": "Missing `audio`."}, data=None), status=400)
+    if getattr(audio_file, "size", 0) > 25 * 1024 * 1024:
+        return JsonResponse(
+            data_response(errors={"detail": "Tệp âm thanh vượt quá dung lượng cho phép (tối đa 25MB)."}, data=None),
+            status=400,
+        )
 
     model = request.POST.get("model") or getattr(settings, "AI_STT_MODEL", "openai/whisper-large-v3")
     language = request.POST.get("language") or getattr(settings, "AI_STT_LANGUAGE", "vi")
@@ -991,13 +998,16 @@ class ChatAPIView(APIView):
             message = (body.get("message") or "").strip()
             if not message:
                 return Response({"detail": "Missing `message` or `messages`."}, status=400)
-            system_prompt = (body.get("system") or "").strip()
-            messages = []
-            if system_prompt:
-                messages.append({"role": "system", "content": system_prompt})
-            messages.append({"role": "user", "content": message})
+            messages = [{"role": "user", "content": message}]
 
-        messages = _with_vietnamese_chat_instruction(messages)
+        # Security hardening: Strip client-supplied system prompts to prevent prompt injection / jailbreak
+        sanitized_messages = [
+            m for m in messages if isinstance(m, dict) and m.get("role") != "system"
+        ]
+        if not sanitized_messages:
+            return Response({"detail": "No valid user messages provided."}, status=400)
+
+        messages = _with_vietnamese_chat_instruction(sanitized_messages)
         model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "gpt-5.4-mini")
 
         manual_candidate_response = _create_manual_candidate_from_chat(request, messages)

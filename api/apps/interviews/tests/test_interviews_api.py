@@ -347,6 +347,7 @@ class LiveKitServiceTests(unittest.TestCase):
         token_builder = MagicMock()
         token_builder.with_identity.return_value = token_builder
         token_builder.with_name.return_value = token_builder
+        token_builder.with_ttl.return_value = token_builder
         token_builder.with_grants.return_value = token_builder
         token_builder.with_metadata.return_value = token_builder
         token_builder.with_attributes.return_value = token_builder
@@ -413,6 +414,34 @@ class LiveKitServiceTests(unittest.TestCase):
 
         mock_api.room.create_room.assert_not_called()
         mock_api.agent_dispatch.create_dispatch.assert_not_called()
+
+    @patch("apps.interviews.livekit_service.api.LiveKitAPI")
+    def test_ensure_room_with_agent_redispatches_when_stale_dispatch_and_no_agent_in_room(self, mock_livekit_api_cls):
+        mock_api = mock_livekit_api_cls.return_value
+        mock_api.aclose = AsyncMock()
+        mock_api.room = SimpleNamespace(
+            list_rooms=AsyncMock(return_value=SimpleNamespace(rooms=[object()])),
+            create_room=AsyncMock(),
+            delete_room=AsyncMock(),
+            list_participants=AsyncMock(return_value=SimpleNamespace(participants=[])),
+        )
+        # Stale dispatch created 60s ago
+        stale_time_ns = int((time.time() - 60) * 1e9)
+        mock_api.agent_dispatch = SimpleNamespace(
+            list_dispatch=AsyncMock(
+                return_value=[
+                    SimpleNamespace(
+                        agent_name="square-ai-interviewer",
+                        state=SimpleNamespace(created_at=stale_time_ns),
+                    )
+                ]
+            ),
+            create_dispatch=AsyncMock(),
+        )
+
+        LiveKitService.ensure_room_with_agent("interview-existing-room")
+
+        mock_api.agent_dispatch.create_dispatch.assert_awaited_once()
 
     @patch("apps.interviews.services.LiveKitService.create_hr_presence_token", return_value="fake-token")
     def test_create_hr_presence_livekit_token_includes_company_name(self, mock_create_hr_presence_token):

@@ -1,10 +1,12 @@
 
 import io
+import ipaddress
 import mimetypes
 import os
+import socket
 import uuid
 from datetime import datetime, timezone, timedelta
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 
 from PIL import Image
 import httpx
@@ -138,15 +140,71 @@ class CloudinaryService:
         return ext, resource_type
 
     @staticmethod
+    def _is_safe_external_url(url: str) -> bool:
+        """
+        Validate that the target URL is a safe public HTTP(S) endpoint to prevent SSRF.
+        Blocks local hostnames, cloud metadata addresses (169.254.169.254),
+        private networks (RFC 1918), and loopback IPs.
+        """
+        try:
+            parsed = urlsplit(url)
+            if parsed.scheme.lower() not in ("http", "https"):
+                return False
+
+            hostname = parsed.hostname
+            if not hostname:
+                return False
+
+            hostname_lower = hostname.lower()
+            blocked_hostnames = {
+                "localhost", "minio", "backend", "frontend", "redis", "mysql",
+                "elasticsearch", "livekit", "notebooklm-mcp", "host.docker.internal",
+                "metadata.google.internal"
+            }
+            if hostname_lower in blocked_hostnames or hostname_lower.endswith(".localhost"):
+                return False
+
+            # Resolve DNS to inspect resolved IP addresses
+            addr_info = socket.getaddrinfo(hostname, None)
+            for item in addr_info:
+                ip_str = item[4][0]
+                ip = ipaddress.ip_address(ip_str)
+                if (
+                    ip.is_loopback
+                    or ip.is_private
+                    or ip.is_link_local
+                    or ip.is_multicast
+                    or ip.is_reserved
+                    or ip.is_unspecified
+                ):
+                    return False
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
     def _open_file_source(file):
         if isinstance(file, (bytes, bytearray)):
             return io.BytesIO(file), len(file), None, None
         if isinstance(file, str):
             if file.startswith("http://") or file.startswith("https://"):
-                resp = httpx.get(file, timeout=30.0)
-                resp.raise_for_status()
-                data = resp.content
-                return io.BytesIO(data), len(data), None, resp.headers.get("Content-Type")
+                if not CloudinaryService._is_safe_external_url(file):
+                    raise ValueError(f"URL không an toàn hoặc không được phép tải về (SSRF protection): {file}")
+
+                with httpx.Client(follow_redirects=False, timeout=15.0) as client:
+                    resp = client.get(file)
+                    resp.raise_for_status()
+
+                    max_size = 25 * 1024 * 1024  # 25 MB max
+                    content_length = resp.headers.get("Content-Length")
+                    if content_length and int(content_length) > max_size:
+                        raise ValueError("Dung lượng tệp tải về từ URL vượt quá giới hạn 25MB.")
+
+                    data = resp.content
+                    if len(data) > max_size:
+                        raise ValueError("Dung lượng tệp tải về từ URL vượt quá giới hạn 25MB.")
+
+                    return io.BytesIO(data), len(data), None, resp.headers.get("Content-Type")
             if os.path.exists(file):
                 size = os.path.getsize(file)
                 return open(file, "rb"), size, os.path.basename(file), mimetypes.guess_type(file)[0]

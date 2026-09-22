@@ -13,7 +13,7 @@ SIGNATURE_HEADER = "HTTP_X_SQUARE_AGENT_SIGNATURE"
 
 
 def _auth_required() -> bool:
-    return bool(getattr(settings, "INTERVIEW_AGENT_AUTH_REQUIRED", False))
+    return bool(getattr(settings, "INTERVIEW_AGENT_AUTH_REQUIRED", True))
 
 
 def build_signature(secret: str, method: str, path: str, timestamp: str, body: bytes) -> str:

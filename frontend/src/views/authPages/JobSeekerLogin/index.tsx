@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 
 import { TabTitle } from '@/utils/generalFunction';
+import { getSafeRedirectPath } from '@/utils/safeExternalUrl';
 
 import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '@/configs/constants';
 
@@ -82,10 +83,8 @@ const JobSeekerLogin = () => {
     const redirectUrl = params?.get('redirect') || params?.get('redirect_url');
     if (user?.isOnboarded === false) {
       push('/onboarding/candidate');
-    } else if (redirectUrl && redirectUrl.startsWith('/')) {
-      push(redirectUrl);
     } else {
-      push('/');
+      push(getSafeRedirectPath(redirectUrl, '/'));
     }
   };
 
