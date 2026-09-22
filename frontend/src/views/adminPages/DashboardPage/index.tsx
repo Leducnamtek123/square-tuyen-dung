@@ -48,6 +48,7 @@ import AnalyticsCharts from './components/AnalyticsCharts';
 import PendingActionWidget from './components/PendingActionWidget';
 import SystemHealthWidget from './components/SystemHealthWidget';
 import AiVoiceInterviewHealthWidget from './components/AiVoiceInterviewHealthWidget';
+import TopViewedJobsWidget from './components/TopViewedJobsWidget';
 
 registerGsapPlugins();
 
@@ -428,11 +429,11 @@ export default function DashboardPage() {
 
       {/* KPI Cards Grid */}
       <Grid container spacing={{ xs: 1.5, sm: 2.5 }} sx={{ mb: 3.5 }} className="gsap-admin-kpi">
-        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2.4 }}>
+        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2 }}>
           <LiveMetricCard
-            title={t('dashboard.totalUsers', 'Tổng người dùng')}
+            title={t('dashboard.totalUsers')}
             value={totalUsers}
-            subtitle={totalUsers === 0 ? t('dashboard.noUserData') : `${days} ngày qua: +${n(stats?.newUsers ?? stats?.newUsers30d)}`}
+            subtitle={totalUsers === 0 ? t('dashboard.noUserData') : (days === 30 ? `${t('dashboard.last30Days')}: +${n(stats?.newUsers ?? stats?.newUsers30d)}` : `${days} ngày qua: +${n(stats?.newUsers ?? stats?.newUsers30d)}`)}
             deltaPercent={14}
             icon={<PeopleIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#EFF6FF"
@@ -440,11 +441,11 @@ export default function DashboardPage() {
             loading={isLoading}
           />
         </Grid>
-        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2.4 }}>
+        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2 }}>
           <LiveMetricCard
             title={t('dashboard.jobPostStatus')}
             value={totalJobPosts}
-            subtitle={`${days} ngày qua: +${n(stats?.newJobPosts ?? stats?.newJobPosts30d)}`}
+            subtitle={days === 30 ? `${t('dashboard.newJobPosts30d')}: ${n(stats?.newJobPosts ?? stats?.newJobPosts30d)}` : `${days} ngày qua: +${n(stats?.newJobPosts ?? stats?.newJobPosts30d)}`}
             deltaPercent={8}
             icon={<WorkIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#ECFDF5"
@@ -452,11 +453,23 @@ export default function DashboardPage() {
             loading={isLoading}
           />
         </Grid>
-        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2.4 }}>
+        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2 }}>
+          <LiveMetricCard
+            title={t('dashboard.jobPostViews')}
+            value={n(stats?.totalJobPostViews)}
+            subtitle={`${days} ngày qua: +${n(stats?.newJobPostViews)}`}
+            deltaPercent={18}
+            icon={<VisibilityIcon sx={{ fontSize: 24 }} />}
+            iconBgColor="#ECFEFF"
+            iconColor="#0891B2"
+            loading={isLoading}
+          />
+        </Grid>
+        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2 }}>
           <LiveMetricCard
             title={t('dashboard.applicationPipeline')}
             value={totalApplications}
-            subtitle={`${days} ngày qua: +${n(stats?.newApplications ?? stats?.newApplications30d)}`}
+            subtitle={days === 30 ? `${t('dashboard.newApplications30d')}: ${n(stats?.newApplications ?? stats?.newApplications30d)}` : `${days} ngày qua: +${n(stats?.newApplications ?? stats?.newApplications30d)}`}
             deltaPercent={22}
             icon={<DescriptionIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#FFFBEB"
@@ -464,7 +477,7 @@ export default function DashboardPage() {
             loading={isLoading}
           />
         </Grid>
-        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2.4 }}>
+        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2 }}>
           <LiveMetricCard
             title={t('dashboard.companies')}
             value={totalCompanies}
@@ -476,11 +489,11 @@ export default function DashboardPage() {
             loading={isLoading}
           />
         </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2.4 }}>
+        <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2 }}>
           <LiveMetricCard
             title={t('dashboard.interviews')}
             value={totalInterviews}
-            subtitle={`${days} ngày qua: +${n(stats?.newInterviews ?? stats?.newInterviews30d)}`}
+            subtitle={days === 30 ? `${t('dashboard.newInterviews30d')}: ${n(stats?.newInterviews ?? stats?.newInterviews30d)}` : `${days} ngày qua: +${n(stats?.newInterviews ?? stats?.newInterviews30d)}`}
             deltaPercent={35}
             icon={<SmartToyOutlinedIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#FDF2F8"
@@ -509,6 +522,11 @@ export default function DashboardPage() {
           <AiVoiceInterviewHealthWidget stats={stats} loading={isLoading} />
         </Grid>
       </Grid>
+
+      {/* Top Viewed Jobs & Conversion Funnel */}
+      <Box className="gsap-admin-panels" sx={{ mb: 3.5 }}>
+        <TopViewedJobsWidget stats={stats} loading={isLoading} />
+      </Box>
 
       {/* Breakdown Panels */}
       <Grid container spacing={3} className="gsap-admin-panels">
@@ -606,6 +624,7 @@ export default function DashboardPage() {
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Stack spacing={1.25}>
                   <InfoRow label={t('dashboard.resumeViews')} value={n(stats?.totalResumeViews).toLocaleString()} icon={<VisibilityIcon sx={{ fontSize: 16 }} />} loading={isLoading} />
+                  <InfoRow label={t('dashboard.totalJobViews')} value={n(stats?.totalJobPostViews).toLocaleString()} icon={<VisibilityIcon sx={{ fontSize: 16 }} />} loading={isLoading} />
                 </Stack>
               </Grid>
             </Grid>

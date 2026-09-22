@@ -30,6 +30,16 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     // Log to error reporting service (Sentry, etc.)
     console.error('[ErrorBoundary] Caught error:', error);
     if (stack) console.error('[ErrorBoundary] Component stack:', stack);
+
+    // Forward to Sentry if initialized
+    if (typeof window !== 'undefined') {
+      const sentryWindow = window as any;
+      if (sentryWindow.Sentry && typeof sentryWindow.Sentry.captureException === 'function') {
+        sentryWindow.Sentry.captureException(error, {
+          extra: { componentStack: stack },
+        });
+      }
+    }
   }
 
   handleReset = (): void => {

@@ -6,6 +6,7 @@ set -eu
 
 cat > /tmp/livekit.yaml <<EOF
 port: 7880
+prometheus_port: 7889
 bind_addresses:
   - "0.0.0.0"
 rtc:

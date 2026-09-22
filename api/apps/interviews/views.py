@@ -33,6 +33,7 @@ from .models import (
 from .serializers import (
     QuestionSerializer, QuestionGroupSerializer,
     InterviewSessionListSerializer, InterviewSessionDetailSerializer,
+    CandidateInviteInterviewSessionSerializer,
     InterviewSessionCreateSerializer,
     InterviewTranscriptSerializer, InterviewEvaluationSerializer,
     VoiceProfileSerializer, VoiceProfileSampleSerializer, VoiceProfileGrantSerializer,
@@ -803,7 +804,7 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 errors={"detail": ["Interview session not found."]},
             )
 
-        serializer = InterviewSessionDetailSerializer(session)
+        serializer = CandidateInviteInterviewSessionSerializer(session, context={'request': request})
         return response_data(data=serializer.data)
 
     @action(detail=False, methods=['get'], url_path='invite/(?P<invite_token>[^/.]+)/livekit-token',
@@ -833,21 +834,23 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     def warmup(self, request, identifier=None):
         """
         Làm nóng mô hình TTS và STT của AI interviewer trước khi cho phép ứng viên vào phòng.
-        Hỗ trợ identifier là invite_token, room_name, hoặc pk.
+        Chỉ cho phép tra cứu qua invite_token hoặc room_name bảo mật; chặn quét PK tuần tự.
         """
+        if identifier and str(identifier).isdigit():
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Vui lòng cung cấp invite_token hoặc room_name hợp lệ."]},
+            )
+
         filter_q = Q(invite_token=identifier) | Q(room_name=identifier)
-        if identifier and identifier.isdigit():
-            filter_q |= Q(pk=int(identifier))
 
         invite_token_param = (
             request.data.get("invite_token")
             or request.query_params.get("token")
             or request.headers.get("X-Invite-Token")
         )
-        if invite_token_param:
+        if invite_token_param and not str(invite_token_param).isdigit():
             filter_q |= Q(invite_token=invite_token_param)
-            if str(invite_token_param).isdigit():
-                filter_q |= Q(pk=int(invite_token_param))
 
         try:
             session = (
@@ -859,6 +862,12 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 return response_data(
                     status=status.HTTP_404_NOT_FOUND,
                     errors={"detail": ["Interview session not found."]},
+                )
+
+            if session.status in {"completed", "cancelled"}:
+                return response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"detail": ["Buổi phỏng vấn đã hoàn tất hoặc đã bị hủy, không thể khởi động lại."]},
                 )
         except Exception as exc:
             return response_data(

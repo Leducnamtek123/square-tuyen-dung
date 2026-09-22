@@ -823,7 +823,98 @@ def _is_public_presign_path(object_path: str) -> bool:
 
 
 def _is_private_presign_path(object_path: str) -> bool:
-    return _path_has_prefix(object_path, ("cv/", "interviews/", "chat_attachments/", "business_license/"))
+    return _path_has_prefix(
+        object_path,
+        ("cv/", "candidate_cvs/", "interviews/", "chat_attachments/", "business_license/", "exports/"),
+    )
+
+
+def _user_can_presign_business_license(user, object_path: str) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+    try:
+        from apps.profiles.models import CompanyVerification
+        company = user.get_active_company() if hasattr(user, "get_active_company") else None
+        if not company:
+            return False
+        clean_path = object_path.lstrip("/")
+        filename = clean_path.split("/")[-1]
+        return CompanyVerification.objects.filter(
+            company=company
+        ).filter(
+            Q(business_license__icontains=clean_path) | Q(business_license__icontains=filename)
+        ).exists()
+    except Exception:
+        return False
+
+
+def _user_can_presign_candidate_cv(user, object_path: str) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+    parts = object_path.strip("/").split("/")
+    if len(parts) >= 3 and parts[0] == "candidate_cvs":
+        if parts[1] == "uploads":
+            try:
+                if int(parts[2]) == user.id:
+                    return True
+            except (ValueError, TypeError):
+                pass
+        else:
+            try:
+                from apps.cv_builder.models import CandidateCV
+                cv = CandidateCV.objects.filter(id=int(parts[1])).first()
+                if cv and cv.user_id == user.id:
+                    return True
+            except (ValueError, TypeError):
+                pass
+    try:
+        company = user.get_active_company() if hasattr(user, "get_active_company") else None
+        if company and perms_custom.user_has_company_permission(user, "manage_candidates", company):
+            from apps.jobs.models import JobPostActivity
+            clean_path = object_path.strip("/")
+            return JobPostActivity.objects.filter(
+                is_deleted=False,
+                job_post__company=company,
+            ).filter(
+                Q(storage_path__icontains=clean_path) | Q(resume_url__icontains=clean_path)
+            ).exists()
+    except Exception:
+        pass
+    return False
+
+
+def _user_can_presign_chat_attachment(user, object_path: str) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+    try:
+        from apps.files.models import File
+        file_obj = File.objects.filter(public_id=object_path).first()
+        if file_obj and file_obj.user_id == user.id:
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def _user_can_presign_export_file(user, object_path: str) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+    try:
+        from apps.files.models import File
+        file_obj = File.objects.filter(public_id=object_path).first()
+        if file_obj and file_obj.user_id == user.id:
+            return True
+    except Exception:
+        pass
+    return False
 
 
 def _user_can_presign_resume_file(user, file_obj) -> bool:
@@ -925,6 +1016,9 @@ def _can_presign_object(request, object_path: str) -> bool:
     if not getattr(user, "is_authenticated", False):
         return False
 
+    if getattr(user, "role_name", None) == var_sys.ADMIN or getattr(user, "is_staff", False) or getattr(user, "is_superuser", False):
+        return True
+
     try:
         from apps.files.models import File
 
@@ -937,12 +1031,19 @@ def _can_presign_object(request, object_path: str) -> bool:
 
     if _path_has_prefix(object_path, ("cv/",)):
         return _user_can_presign_resume_file(user, file_obj) if file_obj else False
+    if _path_has_prefix(object_path, ("candidate_cvs/",)):
+        return _user_can_presign_candidate_cv(user, object_path)
     if _path_has_prefix(object_path, ("interviews/",)):
         return _user_can_presign_interview_object(user, object_path)
-    if _is_private_presign_path(object_path):
-        return True
+    if _path_has_prefix(object_path, ("business_license/",)):
+        return _user_can_presign_business_license(user, object_path)
+    if _path_has_prefix(object_path, ("chat_attachments/",)):
+        return _user_can_presign_chat_attachment(user, object_path)
+    if _path_has_prefix(object_path, ("exports/",)):
+        return _user_can_presign_export_file(user, object_path)
 
-    return True
+    # Default deny for any private or unspecified object path
+    return False
 
 
 @api_view(["POST"])

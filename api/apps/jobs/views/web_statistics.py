@@ -32,7 +32,7 @@ from apps.profiles.models import (
 from shared.configs import variable_response as var_res
 from shared.configs import variable_system as var_sys
 
-from ..models import JobPost, JobPostActivity, SavedJobPost
+from ..models import JobPost, JobPostActivity, JobPostDailyView, SavedJobPost
 from ..serializers import StatisticsSerializer
 
 
@@ -709,11 +709,19 @@ class AdminStatisticViewSet(viewsets.ViewSet):
             .values_list('d', 'count')
         )
 
+        job_views_by_date = dict(
+            JobPostDailyView.objects.filter(date__range=[start_date, end_date])
+            .values('date')
+            .annotate(total=Sum('views'))
+            .values_list('date', 'total')
+        )
+
         labels = []
         new_users = []
         new_jobs = []
         new_applies = []
         new_interviews = []
+        job_views = []
 
         curr = start_date
         while curr <= end_date:
@@ -722,6 +730,7 @@ class AdminStatisticViewSet(viewsets.ViewSet):
             new_jobs.append(jobs_by_date.get(curr, 0))
             new_applies.append(applies_by_date.get(curr, 0))
             new_interviews.append(interviews_by_date.get(curr, 0))
+            job_views.append(job_views_by_date.get(curr, 0))
             curr += timedelta(days=1)
 
         result_data = {
@@ -731,6 +740,7 @@ class AdminStatisticViewSet(viewsets.ViewSet):
             "newJobs": new_jobs,
             "newApplications": new_applies,
             "newInterviews": new_interviews,
+            "jobViews": job_views,
         }
         cache.set(cache_key, result_data, timeout=300)
         return var_res.response_data(data=result_data)
@@ -837,6 +847,35 @@ class AdminStatisticViewSet(viewsets.ViewSet):
         passed_eval = evaluations_qs.filter(result="passed").count()
         ai_recommend_hire_rate = round((passed_eval / total_eval) * 100) if total_eval > 0 else 0
 
+        total_job_post_views = job_posts_qs.aggregate(total=Sum("views")).get("total") or 0
+        new_job_post_views = (
+            JobPostDailyView.objects.filter(date__gte=today - timedelta(days=days - 1))
+            .aggregate(total=Sum("views"))
+            .get("total")
+            or 0
+        )
+
+        top_jobs_qs = (
+            job_posts_qs.select_related("company")
+            .annotate(applications_count=Count("jobpostactivity", filter=Q(jobpostactivity__is_deleted=False)))
+            .order_by("-views", "-id")[:6]
+        )
+        top_viewed_jobs = []
+        for job in top_jobs_qs:
+            apps_count = getattr(job, "applications_count", 0)
+            conv_rate = round((apps_count / job.views) * 100, 1) if job.views > 0 else 0
+            top_viewed_jobs.append({
+                "id": job.id,
+                "slug": job.slug,
+                "jobName": job.job_name,
+                "companyName": job.company.company_name if job.company else "",
+                "views": job.views,
+                "applicationsCount": apps_count,
+                "conversionRate": conv_rate,
+                "status": job.status,
+                "createAt": job.create_at.isoformat() if job.create_at else "",
+            })
+
         stats_data = {
             "days": days,
             "totalUsers": total_users,
@@ -876,6 +915,9 @@ class AdminStatisticViewSet(viewsets.ViewSet):
             "totalSavedResumes": total_saved_resumes,
             "totalCompanyFollowers": total_company_followers,
             "totalResumeViews": total_resume_views,
+            "totalJobPostViews": total_job_post_views,
+            "newJobPostViews": new_job_post_views,
+            "topViewedJobs": top_viewed_jobs,
             "totalQuestions": total_questions,
             "totalQuestionGroups": total_question_groups,
             "newUsers": new_users,

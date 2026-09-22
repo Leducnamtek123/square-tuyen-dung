@@ -76,11 +76,10 @@ export function useEmployerOnboarding() {
         const isPreview = searchParams?.get('preview') === '1';
         const isEdit = searchParams?.get('edit') === '1';
 
-        // Chỉ điều hướng nếu nhà tuyển dụng ĐÃ hoàn thành bước 4 và hồ sơ đạt 100%, không ở preview/edit
+        // Chỉ điều hướng nếu nhà tuyển dụng ĐÃ hoàn thành bước hoàn tất (onboardingStep >= 4), không ở preview/edit
         if (
           res.isOnboarded &&
-          res.onboardingStep === 4 &&
-          (res.profileCompleteness ?? 0) >= 100 &&
+          res.onboardingStep >= 4 &&
           !isPreview &&
           !isEdit
         ) {

@@ -619,11 +619,6 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        try:
-            JobPost.objects.filter(pk=instance.pk).update(views=F('views') + 1)
-            instance.refresh_from_db()
-        except DatabaseError as ex:
-            helper.print_log_error("save views", ex)
 
         serializer = self.get_serializer(
             instance,
@@ -657,6 +652,13 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
             ],
         )
         return var_res.response_data(data=serializer.data)
+
+    @action(methods=["post"], detail=True, url_path="track-view", url_name="track-view")
+    def track_view(self, request, slug=None):
+        instance = self.get_object()
+        from apps.jobs.services import JobViewService
+        counted, current_views = JobViewService.track_view(instance, request)
+        return var_res.response_data(data={"counted": counted, "views": current_views})
 
     @action(methods=["get"], detail=False, url_path="job-posts-saved", url_name="job-posts-saved")
     def get_job_posts_saved(self, request):
@@ -913,6 +915,7 @@ class AdminJobPostViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                     'createAt',
                     'deadline',
                     'locationDict',
+                    'views',
                 ],
             )
             return self.get_paginated_response(serializer.data)

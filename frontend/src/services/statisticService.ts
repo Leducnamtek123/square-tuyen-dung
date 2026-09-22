@@ -144,6 +144,21 @@ export interface AdminGeneralStats {
   avgInterviewDurationSeconds?: number;
   proctoringEventsCount?: number;
   aiRecommendHireRate?: number;
+  totalJobPostViews?: number;
+  newJobPostViews?: number;
+  topViewedJobs?: TopViewedJobItem[];
+}
+
+export interface TopViewedJobItem {
+  id: number;
+  slug: string;
+  jobName: string;
+  companyName: string;
+  views: number;
+  applicationsCount: number;
+  conversionRate: number;
+  status: number;
+  createAt: string;
 }
 
 export interface SystemHealthStatus {
@@ -167,6 +182,7 @@ export interface AdminTrendStats {
   newJobs: number[];
   newApplications: number[];
   newInterviews: number[];
+  jobViews?: number[];
 }
 
 export type EmployerStatsParams = {

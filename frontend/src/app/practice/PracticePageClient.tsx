@@ -31,7 +31,9 @@ export const PracticePageClient: React.FC = () => {
   if (isCandidate) {
     return (
       <JobSeekerLayout>
-        <CandidatePracticePage />
+        <React.Suspense fallback={null}>
+          <CandidatePracticePage />
+        </React.Suspense>
       </JobSeekerLayout>
     );
   }

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useCallback, useMemo } from 'react';
 import { Typography, Chip, Tooltip, IconButton, Stack } from "@mui/material";
@@ -94,6 +94,19 @@ const JobTable = ({
             header: t('pages.jobs.table.deadline') as string,
             enableSorting: true,
             cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
+        },
+        {
+            accessorKey: 'views',
+            header: t('pages.jobs.table.views') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Stack direction="row" spacing={0.5} alignItems="center">
+                    <VisibilityOutlinedIcon sx={{ fontSize: 16, color: '#64748B' }} />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {Number(info.getValue() ?? 0).toLocaleString()}
+                    </Typography>
+                </Stack>
+            ),
         },
         {
             accessorKey: 'status',

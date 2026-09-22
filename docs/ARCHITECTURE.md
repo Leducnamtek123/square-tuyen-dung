@@ -20,6 +20,12 @@
                                                 │ HTTPS / WSS
                                                 ▼
                                     ┌────────────────────────┐
+                                    │    waf (OWASP CRS)     │
+                                    │   (SQLi, XSS, BadBots) │
+                                    └───────────┬────────────┘
+                                                │ Clean HTTP Traffic
+                                                ▼
+                                    ┌────────────────────────┐
                                     │     Nginx Gateway      │
                                     │   (SSL & Subdomains)   │
                                     └─────┬────────────┬─────┘
@@ -58,11 +64,11 @@
 
 ## 2. 🗺️ Bản Đồ Điều Phối Tên Miền & Cổng Dịch Vụ (Domain & Port Map)
 
-Hệ thống được điều phối tập trung qua Nginx Gateway với các subdomain độc lập phục vụ từng nhóm đối tượng người dùng:
+Hệ thống được bảo vệ bởi WAF (OWASP ModSecurity CRS) tại cổng đối ngoại và điều phối tập trung qua Nginx Gateway với các subdomain độc lập phục vụ từng nhóm đối tượng người dùng:
 
 | Tên miền / URL | Dịch vụ đích | Cổng nội bộ | Vai trò chức năng chính |
 | :--- | :--- | :--- | :--- |
-| `https://infohr.vn` | `frontend` | `3000` (`:80`) | Cổng Ứng viên: Tìm kiếm việc làm, nộp CV, tạo CV online, luyện tập AI |
+| `https://infohr.vn` *(qua WAF)* | `frontend` | `3000` (`:80`) | Cổng Ứng viên: Tìm kiếm việc làm, nộp CV, tạo CV online, luyện tập AI |
 | `https://employer.infohr.vn` | `frontend` | `3000` (`:80`) | Cổng Nhà tuyển dụng: Đăng tin, quản lý hồ sơ, kịch bản phỏng vấn |
 | `https://admin.infohr.vn` | `frontend` | `3000` (`:80`) | Cổng Quản trị hệ thống: Phê duyệt tin tuyển dụng, phân quyền, cấu hình |
 | `https://aila.infohr.vn` | `frontend` + `voice-ai` | `3000` / `7880` | Phòng Phỏng vấn AI: Kết nối WebRTC âm thanh/hình ảnh thời gian thực |
@@ -71,19 +77,28 @@ Hệ thống được điều phối tập trung qua Nginx Gateway với các su
 | `https://infohr.vn/swagger/` | `backend` | `8000` | Tài liệu đặc tả OpenAPI tương tác (drf-yasg) |
 | `https://s3.infohr.vn:4433` | `minio` | `9000` | S3 API lưu trữ CV ứng viên, avatar, bản ghi âm/hình phỏng vấn |
 | `https://infohr.vn/minio-console/` | `minio-console` | `9001` | Giao diện web quản trị bucket MinIO S3 |
-| `wss://infohr.vn/livekit` | `livekit` | `7880` | WebRTC Signaling & Room Management |
+| `wss://infohr.vn/livekit` | `livekit` | `7880` | WebRTC Signaling & Room Management (Bypass deep WAF inspection) |
 
 ---
 
 ## 3. 🧩 Chi Tiết Các Phân Hệ & Khối Chức Năng (Subsystem Breakdown)
 
+### 3.0. Web Application Firewall — WAF (`waf/`)
+- **Hình ảnh**: `owasp/modsecurity-crs:nginx-alpine`.
+- **Vai trò**: Cửa ngõ bảo mật đầu tiên (Edge Shield) bảo vệ hệ thống trước các cuộc tấn công OWASP Top 10 (SQLi, XSS, RCE, LFI, Bad Bots).
+- **Cơ chế**:
+  - Đón nhận lưu lượng tại `${NGINX_PORT:-8080}:80` và chuyển tiếp lưu lượng an toàn tới `http://nginx-gateway:80`.
+  - Hỗ trợ chế độ audit log `DetectionOnly` và chế độ chặn chủ động `On`.
+  - Giới hạn payload 100MB cho upload CV/Audio (`REQ_BODY_NOFILES_LIMIT=131072`).
+  - Rule exclusions tối ưu hóa riêng cho LiveKit WebRTC WebSocket và tiếng Việt UTF-8.
+
 ### 3.1. Nginx Gateway (`nginx-gateway/`)
-- **Vai trò**: Cổng biên (Edge Gateway) duy nhất mở ra Internet.
+- **Vai trò**: Bộ định tuyến ứng dụng nội bộ (Application Gateway).
 - **Nhiệm vụ**:
-  - Chấm dứt SSL/TLS (Let's Encrypt / Wildcard Certificate).
-  - Phân luồng reverse proxy theo Header `Host` (`infohr.vn`, `employer.infohr.vn`, `admin.infohr.vn`, `hrm.infohr.vn`).
-  - Nâng cấp WebSocket/WSS an toàn cho LiveKit (`/livekit`) và Frontend HMR.
-  - Forward đầy đủ các client headers (`X-Forwarded-For`, `X-Forwarded-Proto`, `Host`).
+  - Nhận lưu lượng đã lọc từ WAF, khôi phục Real IP (`set_real_ip_from`, `real_ip_header X-Forwarded-For`).
+  - Chấm dứt SSL/TLS và phân luồng reverse proxy theo Header `Host` (`infohr.vn`, `employer.infohr.vn`, `admin.infohr.vn`, `hrm.infohr.vn`).
+  - Nâng cấp WebSocket/WSS cho LiveKit (`/livekit`) và Frontend.
+  - Rate limiting tầng ứng dụng (`limit_req_zone` cho auth endpoints).
 
 ### 3.2. Frontend Application (`frontend/`)
 - **Công nghệ**: Next.js 16, React 19, MUI 6, Tailwind CSS v4, TanStack Query v5, Redux Toolkit.

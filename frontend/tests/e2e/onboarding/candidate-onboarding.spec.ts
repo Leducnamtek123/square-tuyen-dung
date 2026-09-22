@@ -214,6 +214,6 @@ test.describe('Candidate Onboarding Flow (/onboarding/candidate)', () => {
 
     const ailaButton = page.getByRole('link', { name: /Thử phỏng vấn 5 phút/i });
     await expect(ailaButton).toBeVisible();
-    await expect(ailaButton).toHaveAttribute('href', /\/interview\?jobTitle=/);
+    await expect(ailaButton).toHaveAttribute('href', /\/(luyen-phong-van|practice)\?jobTitle=/);
   });
 });

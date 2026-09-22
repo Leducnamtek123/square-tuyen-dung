@@ -11,10 +11,10 @@ from .models import (
 
     SavedJobPost,
 
-    JobPostActivity
+    JobPostActivity,
 
+    JobPostDailyView,
 )
-
 from django_admin_listfilter_dropdown.filters import (RelatedDropdownFilter, DropdownFilter, ChoiceDropdownFilter)
 
 class JobPostAdmin(admin.ModelAdmin):
@@ -164,3 +164,4 @@ custom_admin_site.register(JobPost, JobPostAdmin)
 custom_admin_site.register(SavedJobPost, SavedJobPostAdmin)
 
 custom_admin_site.register(JobPostActivity, JobPostActivityAdmin)
+custom_admin_site.register(JobPostDailyView)

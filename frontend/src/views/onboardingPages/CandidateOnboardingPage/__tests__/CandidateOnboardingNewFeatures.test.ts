@@ -33,7 +33,7 @@ describe('Candidate Onboarding Progressive & AI Fast-Track Features', () => {
 
   it('renders AILA AI Voice Interview Launchpad card in StepCandidateComplete', () => {
     expect(stepCompleteSource).toContain('Luyện phỏng vấn thử với AI Voice (AILA)');
-    expect(stepCompleteSource).toContain('/interview?jobTitle=');
+    expect(stepCompleteSource).toContain('/luyen-phong-van?jobTitle=');
     expect(stepCompleteSource).toContain('Thử phỏng vấn 5 phút');
   });
 

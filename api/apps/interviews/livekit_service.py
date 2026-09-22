@@ -8,6 +8,7 @@ import asyncio
 import logging
 import json
 import threading
+from datetime import timedelta
 from typing import Dict, Optional
 from decouple import config
 from livekit import api
@@ -143,6 +144,7 @@ class LiveKitService:
         token_builder = (api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
             .with_identity(participant_identity)
             .with_name(participant_name)
+            .with_ttl(timedelta(minutes=60))
             .with_grants(api.VideoGrants(
                 room_join=True,
                 room=room_name,
@@ -218,6 +220,7 @@ class LiveKitService:
             api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
             .with_identity(observer_identity)
             .with_name(observer_name)
+            .with_ttl(timedelta(minutes=60))
             .with_grants(api.VideoGrants(
                 room_join=True,
                 room=room_name,
@@ -256,6 +259,7 @@ class LiveKitService:
             api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
             .with_identity(hr_identity)
             .with_name(hr_name)
+            .with_ttl(timedelta(minutes=60))
             .with_grants(api.VideoGrants(
                 room_join=True,
                 room=room_name,

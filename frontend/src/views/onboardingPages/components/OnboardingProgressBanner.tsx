@@ -64,8 +64,9 @@ export default function OnboardingProgressBanner({
     return completenessProp ?? 35;
   }, [completenessProp, onboardingStatus?.profileCompleteness]);
 
-  // Don't show if dismissed, or already 100% complete
-  if (dismissed || completeness >= 100) {
+  // Don't show if dismissed, already 100% complete, or already completed onboarding
+  const isUserOnboarded = Boolean(onboardingStatus?.isOnboarded ?? currentUser?.isOnboarded);
+  if (dismissed || completeness >= 100 || (!onboardingUrl && isUserOnboarded)) {
     return null;
   }
 

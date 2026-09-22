@@ -60,6 +60,12 @@ export default function AnalyticsCharts({ days: propDays, onPeriodChange }: Anal
         borderRadius: 4,
       },
       {
+        label: 'Lượt xem tin',
+        data: trendStats?.jobViews || [],
+        backgroundColor: '#06B6D4',
+        borderRadius: 4,
+      },
+      {
         label: 'Phỏng vấn AI',
         data: trendStats?.newInterviews || [],
         backgroundColor: '#8B5CF6',

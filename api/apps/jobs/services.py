@@ -2,14 +2,16 @@
 Service Layer for the Jobs app.
 Encapsulates business logic separate from views/serializers.
 """
+import hashlib
 import logging
 
+from django.core.cache import cache
 from django.db import transaction
-from django.db.models import Q, QuerySet, Prefetch
+from django.db.models import F, Q, QuerySet, Prefetch
 from django.utils import timezone
 from typing import Optional, Dict, Any, Union
 
-from apps.jobs.models import JobPost, JobPostActivity
+from apps.jobs.models import JobPost, JobPostActivity, JobPostDailyView
 from apps.locations.models import Location
 from apps.jobs.exceptions import (
     CompanyNotConfiguredError,
@@ -584,3 +586,99 @@ class JobActivityService:
                 is_deleted=False,
             ).count(),
         }
+
+
+BOT_USER_AGENTS = (
+    "bot",
+    "crawler",
+    "spider",
+    "slurp",
+    "mediapartners",
+    "lighthouse",
+    "curl",
+    "wget",
+    "python-requests",
+    "urllib",
+    "headlesschrome",
+    "phantomjs",
+    "facebookexternalhit",
+    "whatsapp",
+    "telegrambot",
+    "twitterbot",
+    "googlebot",
+    "bingbot",
+    "yandexbot",
+    "baiduspider",
+)
+
+VIEW_COOLDOWN_SECONDS = 7200  # 2 giờ cooldown per viewer per job
+
+
+class JobViewService:
+    @staticmethod
+    def get_client_ip(request) -> str:
+        if not request:
+            return "127.0.0.1"
+        forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        if forwarded_for:
+            return forwarded_for.split(",", 1)[0].strip() or "127.0.0.1"
+        return request.META.get("REMOTE_ADDR") or "127.0.0.1"
+
+    @staticmethod
+    def is_bot_request(request) -> bool:
+        if not request:
+            return True
+        ua = request.META.get("HTTP_USER_AGENT", "").lower()
+        if not ua:
+            return True
+        return any(bot_sig in ua for bot_sig in BOT_USER_AGENTS)
+
+    @classmethod
+    def get_viewer_identifier(cls, request) -> str:
+        user = getattr(request, "user", None)
+        if user and user.is_authenticated:
+            return f"usr_{user.id}"
+        ip = cls.get_client_ip(request)
+        ua = request.META.get("HTTP_USER_AGENT", "")
+        ua_hash = hashlib.md5(ua.encode("utf-8", errors="ignore")).hexdigest()[:10]
+        return f"anon_{ip}_{ua_hash}"
+
+    @classmethod
+    def track_view(cls, job_post: JobPost, request) -> tuple[bool, int]:
+        """
+        Ghi nhận lượt xem cho JobPost với cơ chế khử trùng lặp và lọc bot.
+        Trả về (counted: bool, current_views: int).
+        """
+        if not job_post or not job_post.pk:
+            return False, 0
+
+        # 1. Lọc bot / crawler
+        if cls.is_bot_request(request):
+            return False, job_post.views
+
+        # 2. Cooldown check qua Redis (2 giờ)
+        viewer_id = cls.get_viewer_identifier(request)
+        cache_key = f"job_view_cd_{job_post.id}_{viewer_id}"
+
+        added = cache.add(cache_key, 1, timeout=VIEW_COOLDOWN_SECONDS)
+        if not added:
+            return False, job_post.views
+
+        # 3. Tăng views trong DB và cập nhật lượt xem theo ngày
+        try:
+            today = timezone.localdate()
+            with transaction.atomic():
+                JobPost.objects.filter(pk=job_post.pk).update(views=F("views") + 1)
+                daily_view, created = JobPostDailyView.objects.get_or_create(
+                    job_post=job_post,
+                    date=today,
+                    defaults={"views": 1},
+                )
+                if not created:
+                    JobPostDailyView.objects.filter(pk=daily_view.pk).update(views=F("views") + 1)
+
+            job_post.refresh_from_db(fields=["views"])
+            return True, job_post.views
+        except Exception as e:
+            logger.error(f"Error tracking job view for JobPost #{job_post.id}: {e}")
+            return False, job_post.views

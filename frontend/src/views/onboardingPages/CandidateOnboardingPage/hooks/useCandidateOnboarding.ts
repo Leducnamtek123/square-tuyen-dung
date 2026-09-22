@@ -69,13 +69,12 @@ export function useCandidateOnboarding() {
         const isPreview = searchParams?.get('preview') === '1';
         const isEdit = searchParams?.get('edit') === '1';
 
-        // Chỉ điều hướng rời khỏi onboarding khi ứng viên ĐÃ hoàn thành bước 4 và hồ sơ đạt 100%,
+        // Chỉ điều hướng rời khỏi onboarding khi ứng viên ĐÃ hoàn thành bước hoàn tất (onboardingStep >= 3 hoặc 4),
         // và không ở chế độ preview/edit.
-        // Nếu ứng viên từng ấn Bỏ qua (onboardingStep === -1) hoặc chưa xong các bước (< 4), giữ lại để hoàn tất.
+        // Nếu ứng viên từng ấn Bỏ qua (onboardingStep === -1) hoặc chưa xong các bước (< 3), giữ lại để hoàn tất.
         if (
           res.isOnboarded &&
-          res.onboardingStep === 4 &&
-          (res.profileCompleteness ?? 0) >= 100 &&
+          (res.onboardingStep === 4 || res.onboardingStep >= 3) &&
           !isPreview &&
           !isEdit
         ) {
@@ -364,7 +363,7 @@ export function useCandidateOnboarding() {
   };
 
   const handleViewDashboard = () => {
-    router.push('/profile');
+    router.push('/bang-dieu-khien');
   };
 
   return {

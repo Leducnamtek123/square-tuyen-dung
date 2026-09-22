@@ -190,6 +190,11 @@ const jobService = {
     const url = `job/web/job-posts/${slug}/salary-insight/`;
     return (httpRequest.get(url) as Promise<unknown>).then(unwrapDataResponse<JobSalaryInsightResponse>);
   },
+
+  trackJobPostView: (slug: IdType): Promise<{ counted: boolean; views: number }> => {
+    const url = `job/web/job-posts/${slug}/track-view/`;
+    return (httpRequest.post(url) as Promise<unknown>).then(unwrapDataResponse<{ counted: boolean; views: number }>);
+  },
 };
 
 export default jobService;

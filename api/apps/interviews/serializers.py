@@ -750,7 +750,105 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             else:
                 data["ai_summary"] = None
 
+        if not is_admin_or_employer:
+            data.pop("notes", None)
+            if instance.status != "completed":
+                data.pop("evaluations", None)
+            # Sanitize questions to remove confidential recruiter guidelines
+            if "questions" in data and isinstance(data["questions"], list):
+                sanitized_questions = []
+                for q in data["questions"]:
+                    if isinstance(q, dict):
+                        safe_q = {k: v for k, v in q.items() if k not in {
+                            "answer_structure", "interviewer_intent", "important_tips", "follow_up_questions"
+                        }}
+                        sanitized_questions.append(safe_q)
+                    else:
+                        sanitized_questions.append(q)
+                data["questions"] = sanitized_questions
+
         return data
+
+
+class CandidateQuestionSerializer(serializers.ModelSerializer):
+    """Sanitized question serializer for candidates in invite/waiting room."""
+    questionText = serializers.CharField(source="text", read_only=True)
+    category_display = serializers.CharField(source="get_category_display", read_only=True)
+    difficulty_display = serializers.CharField(source="get_difficulty_display", read_only=True)
+
+    class Meta:
+        model = Question
+        fields = [
+            'id', 'title', 'text', 'questionText', 'category', 'category_display',
+            'difficulty', 'difficulty_display', 'sort_order',
+            'default_duration_seconds'
+        ]
+        read_only_fields = [
+            'id', 'title', 'text', 'questionText', 'category', 'category_display',
+            'difficulty', 'difficulty_display', 'sort_order',
+            'default_duration_seconds'
+        ]
+
+
+class CandidateInviteInterviewSessionSerializer(serializers.ModelSerializer):
+    """Safe serializer for candidate public invite endpoint - hides recruiter notes and scoring rubrics."""
+    candidate = serializers.IntegerField(source='candidate_id', read_only=True, default=None)
+    candidate_name = serializers.CharField(source='candidate.full_name', read_only=True, default=None)
+    job_post = serializers.IntegerField(source='job_post_id', read_only=True, default=None)
+    job_name = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
+    company_logo = serializers.SerializerMethodField()
+    questions_count = serializers.SerializerMethodField()
+    voice_profile_name = serializers.CharField(source='voice_profile.name', read_only=True, default=None)
+    interview_language_display = serializers.CharField(source='get_interview_language_display', read_only=True)
+    questions = serializers.SerializerMethodField()
+
+    class Meta:
+        model = InterviewSession
+        fields = [
+            'id', 'room_name', 'invite_token', 'status', 'type', 'session_type',
+            'interview_language', 'interview_language_display',
+            'candidate', 'candidate_name',
+            'job_post', 'job_name', 'company_name', 'company_logo',
+            'voice_profile_name',
+            'scheduled_at', 'start_time', 'end_time', 'duration',
+            'recording_url', 'transcript_url',
+            'questions_count', 'questions',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = [
+            'id', 'room_name', 'invite_token', 'status', 'type', 'session_type',
+            'interview_language', 'interview_language_display',
+            'candidate', 'candidate_name',
+            'job_post', 'job_name', 'company_name', 'company_logo',
+            'voice_profile_name',
+            'scheduled_at', 'start_time', 'end_time', 'duration',
+            'recording_url', 'transcript_url',
+            'questions_count', 'questions',
+            'create_at', 'update_at'
+        ]
+
+    def get_questions(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
+        from .services import get_session_questions
+        try:
+            qs = get_session_questions(obj).order_by('sort_order', 'create_at', 'id')
+            return CandidateQuestionSerializer(qs, many=True, context=self.context).data
+        except Exception:
+            return []
+
+    def get_job_name(self, obj):
+        return resolve_session_job_name(obj)
+
+    def get_company_name(self, obj):
+        return resolve_session_company_name(obj)
+
+    def get_company_logo(self, obj):
+        return resolve_session_company_logo(obj)
+
+    def get_questions_count(self, obj):
+        return resolve_session_questions_count(obj)
 
     def validate(self, attrs):
         attrs = super().validate(attrs)

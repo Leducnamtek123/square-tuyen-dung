@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   Box,
@@ -57,6 +57,8 @@ const SENIORITY_OPTIONS = [
 
 export const CandidatePracticePage: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryJobTitle = searchParams?.get('jobTitle') || searchParams?.get('keyword') || searchParams?.get('q') || '';
 
   // Auto-start practice room tour on first visit
   useTourAutoStart('practice_room', 800);
@@ -132,6 +134,16 @@ export const CandidatePracticePage: React.FC = () => {
       }
     }
   }, [resumes, isPrefilledFromResume, mockJobTitle, mockCareerId]);
+
+  // 2b. Prefill target position from search parameters (e.g. from Onboarding Step 4)
+  useEffect(() => {
+    if (queryJobTitle && queryJobTitle.trim()) {
+      const decodedTitle = queryJobTitle.trim();
+      setSearchQuery(decodedTitle);
+      setMockJobTitle(decodedTitle);
+      setShowCustomStudio(true);
+    }
+  }, [queryJobTitle]);
 
   // 3. Fetch Company Question Sets
   const fetchQuestionSets = async () => {

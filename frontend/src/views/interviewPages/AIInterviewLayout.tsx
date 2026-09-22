@@ -13,7 +13,7 @@ import {
   type AgentState,
   type ReceivedMessage,
 } from '@livekit/components-react';
-import { Track } from 'livekit-client';
+import { RoomEvent, Track } from 'livekit-client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faComment,
@@ -35,6 +35,7 @@ import {
   faHand,
   faRobot,
   faUserTie,
+  faVolumeHigh,
 } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 
@@ -1112,6 +1113,42 @@ export function AIInterviewLayout({
   const { localParticipant, isCameraEnabled, isScreenShareEnabled } = useLocalParticipant();
   const voiceAssistant = useVoiceAssistant();
   const room = useRoomContext();
+  const [canPlaybackAudio, setCanPlaybackAudio] = useState<boolean>(true);
+
+  // Auto-unlock Web Audio in browsers with strict autoplay policies
+  useEffect(() => {
+    if (!room) return;
+
+    const syncAudioState = () => {
+      setCanPlaybackAudio(room.canPlaybackAudio);
+    };
+
+    const handleUnlockAudio = () => {
+      if (!room.canPlaybackAudio) {
+        room.startAudio().then(() => {
+          setCanPlaybackAudio(true);
+        }).catch((err) => {
+          console.warn('[AIInterviewLayout] Audio auto-unlock deferred:', err);
+        });
+      }
+    };
+
+    syncAudioState();
+    handleUnlockAudio();
+
+    room.on(RoomEvent.AudioPlaybackStatusChanged, syncAudioState);
+    window.addEventListener('click', handleUnlockAudio, { passive: true });
+    window.addEventListener('touchstart', handleUnlockAudio, { passive: true });
+    window.addEventListener('keydown', handleUnlockAudio, { passive: true });
+
+    return () => {
+      room.off(RoomEvent.AudioPlaybackStatusChanged, syncAudioState);
+      window.removeEventListener('click', handleUnlockAudio);
+      window.removeEventListener('touchstart', handleUnlockAudio);
+      window.removeEventListener('keydown', handleUnlockAudio);
+    };
+  }, [room]);
+
   const hud = useInterviewQuestionHUD({
     initialQuestions: propQuestions,
     defaultDurationSeconds: defaultDurationSeconds || 120,
@@ -1473,7 +1510,23 @@ export function AIInterviewLayout({
       )}
 
       <div className={`flex flex-1 flex-col h-full min-h-0 w-full transition-all duration-300 ${chatOpen ? 'sm:pr-[374px] md:pr-[394px] lg:pr-[404px]' : ''} ${chatOpen && isCompactChatView ? 'pb-[58dvh]' : ''}`}>
-        <div className="flex flex-1 flex-col gap-1.5 sm:gap-2 min-h-0 h-full p-1.5 sm:p-2 overflow-hidden">
+        <div className="flex flex-1 flex-col gap-1.5 sm:gap-2 min-h-0 h-full p-1.5 sm:p-2 overflow-hidden relative">
+          {/* Floating Audio Unblock Pill for Browsers blocking Autoplay */}
+          {!canPlaybackAudio && (
+            <button
+              type="button"
+              onClick={() => {
+                if (room) {
+                  room.startAudio().then(() => setCanPlaybackAudio(true)).catch(() => {});
+                }
+              }}
+              className="absolute top-2 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-xl hover:bg-blue-700 animate-bounce cursor-pointer border border-white/20"
+            >
+              <FontAwesomeIcon icon={faVolumeHigh} className="text-sm" />
+              <span>Trình duyệt đang chặn âm thanh. Nhấn vào đây để bật tiếng AI</span>
+            </button>
+          )}
+
           {/* Top HUD: Question Card with live Countdown Timer */}
           {hud.currentQuestion && (
             <InterviewQuestionCard

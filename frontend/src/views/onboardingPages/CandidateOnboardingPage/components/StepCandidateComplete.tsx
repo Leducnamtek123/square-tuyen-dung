@@ -97,6 +97,31 @@ export default function StepCandidateComplete({
           borderColor: '#E2E8F0',
         }}
       >
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+          <Chip
+            icon={<CheckCircleRoundedIcon sx={{ '&&': { color: '#16A34A', fontSize: 18 } }} />}
+            label="Khởi tạo hồ sơ: 100% Hoàn tất"
+            size="small"
+            sx={{
+              backgroundColor: '#DCFCE7',
+              color: '#15803D',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              px: 0.5,
+            }}
+          />
+          <Chip
+            label="Sẵn sàng ứng tuyển"
+            size="small"
+            sx={{
+              backgroundColor: '#EFF6FF',
+              color: '#2563EB',
+              fontWeight: 600,
+              fontSize: '0.75rem',
+            }}
+          />
+        </Stack>
+
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Avatar
@@ -122,11 +147,11 @@ export default function StepCandidateComplete({
           </Stack>
 
           <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="h6" sx={{ fontWeight: 800, color: '#2563EB', lineHeight: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: completeness >= 80 ? '#16A34A' : '#2563EB', lineHeight: 1 }}>
               {completeness}%
             </Typography>
-            <Typography variant="caption" sx={{ color: '#64748B' }}>
-              {t('onboarding.step4.profileScore', 'Điểm hồ sơ')}
+            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
+              {t('onboarding.step4.profileScore', 'Độ chi tiết hồ sơ')}
             </Typography>
           </Box>
         </Stack>
@@ -144,6 +169,10 @@ export default function StepCandidateComplete({
             },
           }}
         />
+
+        <Typography variant="caption" sx={{ display: 'block', mt: 1.25, color: '#64748B', fontSize: '0.75rem', lineHeight: 1.5 }}>
+          💡 <strong>Thiết lập ban đầu thành công!</strong> Hồ sơ cơ bản đã hoàn thành. Điểm chi tiết hiện tại đạt {completeness}%, bạn có thể cập nhật thêm ảnh đại diện, kinh nghiệm và chứng chỉ tại Trang cá nhân để đạt 100%.
+        </Typography>
       </Card>
 
       {/* Career Preferences Summary */}
@@ -475,7 +504,7 @@ export default function StepCandidateComplete({
 
           <Button
             component={Link}
-            href={`/interview?jobTitle=${encodeURIComponent(formData.desiredJobTitle || 'Ứng viên')}`}
+            href={`/luyen-phong-van?jobTitle=${encodeURIComponent(formData.desiredJobTitle || 'Ứng viên')}`}
             variant="contained"
             endIcon={<ArrowForwardIcon />}
             sx={{
@@ -591,7 +620,7 @@ export default function StepCandidateComplete({
             color: '#334155',
           }}
         >
-          {t('onboarding.step4.viewDashboard', 'Xem Trang cá nhân')}
+          {t('onboarding.step4.viewDashboard', 'Về Bảng điều khiển')}
         </Button>
       </Stack>
     </Box>

@@ -877,6 +877,47 @@ class Interviewer(Agent):
         except Exception as exc:
             logger.warning("Failed to record greeting transcript: %s", exc)
 
+        # Proactively start Question 1 if candidate remains silent after greeting
+        self._create_background_task(self._auto_start_first_question_if_silent(delay_seconds=5.0))
+
+    async def _auto_start_first_question_if_silent(self, delay_seconds: float = 5.0) -> None:
+        """If candidate remains silent after greeting, proactively ask Question 1 without waiting indefinitely."""
+        await asyncio.sleep(delay_seconds)
+        if self._completed or self._employer_takeover_active:
+            return
+
+        if self._scripted_question_index == 0 and not self._last_asked_question_text:
+            logger.info("Candidate silent after greeting in room %s. Proactively asking Question 1.", self._room_name)
+            sess = self._safe_session
+            if sess is None:
+                return
+
+            backend_payload = await self._fetch_next_question_payload()
+            first_q_text = ""
+            if backend_payload is not None:
+                parsed_payload = parse_question_payload(backend_payload)
+                action = decide_next_action(parsed_payload)
+                if action.kind == "ask_question" and action.text:
+                    first_q_text = action.text
+            elif self._scripted_questions:
+                first_q_text = self._scripted_questions[0]
+
+            if first_q_text:
+                self._last_asked_question_text = first_q_text
+                self._scripted_question_index = 1
+                await self._broadcast_question_index(0)
+
+                intro = "Tuyệt vời, chúng ta cùng bắt đầu với câu hỏi đầu tiên nhé." if self._language == "vi" else "Great, let us begin with the first question."
+                first_turn = f"{intro} {first_q_text}"
+                try:
+                    await sess.say(first_turn, allow_interruptions=True)
+                except Exception as exc:
+                    logger.error("Failed to speak proactive first question: %s", exc)
+                try:
+                    await self.record_transcript("ai_agent", first_turn)
+                except Exception as exc:
+                    logger.warning("Failed to record first question transcript: %s", exc)
+
     def llm_node(self, chat_ctx, tools, model_settings):
         if self._backend_questions_available:
             return self._scripted_llm_response(chat_ctx)

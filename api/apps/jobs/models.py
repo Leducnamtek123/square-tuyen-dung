@@ -2,6 +2,7 @@
 from shared.configs import variable_system as var_sys
 
 from django.db import models
+from django.utils import timezone
 from shared.models import CommonBaseModel
 
 from ckeditor.fields import RichTextField
@@ -421,5 +422,25 @@ class JobOfferLetter(CommonBaseModel):
         return f"Offer for {self.candidate.full_name} - {self.position_title} ({self.get_status_display()})"
 
 
+class JobPostDailyView(CommonBaseModel):
+    job_post = models.ForeignKey(
+        JobPost,
+        on_delete=models.CASCADE,
+        related_name="daily_views",
+        verbose_name="Tin tuyển dụng",
+    )
+    date = models.DateField(default=timezone.localdate, db_index=True, verbose_name="Ngày thống kê")
+    views = models.PositiveIntegerField(default=1, verbose_name="Số lượt xem")
 
+    class Meta:
+        db_table = "project_job_post_daily_view"
+        unique_together = ("job_post", "date")
+        indexes = [
+            models.Index(fields=["date"]),
+            models.Index(fields=["job_post", "date"]),
+        ]
+        verbose_name = "Lượt xem tin tuyển dụng theo ngày"
+        verbose_name_plural = "Lượt xem tin tuyển dụng theo ngày"
 
+    def __str__(self):
+        return f"{self.job_post.job_name} ({self.date}): {self.views} views"

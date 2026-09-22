@@ -60,7 +60,8 @@ type JobDetailAction =
   | { type: 'close-popup' }
   | { type: 'open-share-popup'; value: boolean }
   | { type: 'mark-applied' }
-  | { type: 'mark-saved'; value: boolean };
+  | { type: 'mark-saved'; value: boolean }
+  | { type: 'update-views'; value: number };
 
 const initialJobDetailState: JobDetailState = {
   openSharePopup: false,
@@ -99,6 +100,13 @@ const jobDetailReducer = (
         ...current,
         jobPostDetail: current.jobPostDetail
           ? ({ ...current.jobPostDetail, isSaved: action.value } as ExtendedJobPost)
+          : current.jobPostDetail,
+      };
+    case 'update-views':
+      return {
+        ...current,
+        jobPostDetail: current.jobPostDetail
+          ? ({ ...current.jobPostDetail, views: action.value } as ExtendedJobPost)
           : current.jobPostDetail,
       };
     default:
@@ -199,6 +207,27 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
       isActive = false;
     };
   }, [slug, initialJob, isAuthenticated]);
+
+  // Track legitimate view on client-side mount (after 1.5s delay to avoid fast bounce)
+  React.useEffect(() => {
+    if (!slug || slug === ':slug') return;
+    const timer = setTimeout(() => {
+      jobService
+        .trackJobPostView(slug as string)
+        .then((res) => {
+          if (res?.counted && res.views !== undefined) {
+            dispatch({ type: 'update-views', value: res.views });
+          }
+        })
+        .catch(() => {
+          // Silently ignore tracking network error
+        });
+    }, 1500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [slug]);
 
   // --- Dynamic SEO ---
   const jobDescription = state.jobPostDetail?.jobDescription || '';
