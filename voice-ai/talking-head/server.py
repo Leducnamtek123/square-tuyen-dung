@@ -147,8 +147,12 @@ async def render_lipsync(req: RenderRequest) -> RenderResponse:
 
     # 2. Tìm file coords .coords_256.npy hoặc coords_256.npy
     coords_candidates = [
+        ref_video.parent / f"{base_action}.mp4.coords_256.npy",
+        ref_video.parent / f".{base_action}.mp4.coords_256.npy",
         ref_video.parent / "coords_256.npy",
         ref_video.parent / ".coords_256.npy",
+        DATA_DIR / "avatars" / avatar_id / "actions" / f"{base_action}.mp4.coords_256.npy",
+        DATA_DIR / "avatars" / avatar_id / "actions" / f".{base_action}.mp4.coords_256.npy",
         DATA_DIR / "avatars" / avatar_id / "actions" / "coords_256.npy",
         DATA_DIR / "avatars" / avatar_id / "actions" / ".coords_256.npy",
     ]

@@ -104,13 +104,13 @@ def stream_frames_to_ffmpeg(
     proc = subprocess.Popen(
         cmd,
         stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
     )
 
     frame_count = 0
     try:
-        assert proc.stdin is not None
+        byte_chunks: list[bytes] = []
         for frame in frames:
             # Kiểm tra và điều chỉnh kích thước khung hình nếu chưa khớp
             if frame.shape[0] != height or frame.shape[1] != width:
@@ -121,11 +121,11 @@ def stream_frames_to_ffmpeg(
             if not frame.flags["C_CONTIGUOUS"]:
                 frame = np.ascontiguousarray(frame)
 
-            proc.stdin.write(frame.tobytes())
+            byte_chunks.append(frame.tobytes())
             frame_count += 1
 
-        proc.stdin.close()
-        stdout, stderr = proc.communicate()
+        raw_data = b"".join(byte_chunks)
+        _, stderr = proc.communicate(input=raw_data, timeout=60)
     except Exception as e:
         proc.kill()
         logger.error("Lỗi khi stream raw frames tới FFmpeg: %s", e)
