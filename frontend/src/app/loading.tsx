@@ -1,26 +1,20 @@
 'use client';
 
-import { Box, CircularProgress, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
+import { Box, CircularProgress } from '@mui/material';
 
 export default function Loading() {
-  const { t } = useTranslation('common');
-
   return (
     <Box
       sx={{
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        minHeight: '60vh',
-        gap: 2,
+        minHeight: '120px',
+        width: '100%',
+        py: 4,
       }}
     >
-      <CircularProgress size={48} />
-      <Typography variant="body2" color="text.secondary">
-        {t('loading')}
-      </Typography>
+      <CircularProgress size={32} thickness={4} sx={{ color: '#2563eb' }} />
     </Box>
   );
 }

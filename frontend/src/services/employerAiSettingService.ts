@@ -330,6 +330,7 @@ export const DEFAULT_AVATAR_ACTIONS: Record<string, string> = {
   thinking: '/assets/avatars/ng_c_linh/actions/thinking.mp4',
   wave: '/assets/avatars/ng_c_linh/actions/wave.mp4',
   thanks_wave: '/assets/avatars/ng_c_linh/actions/thanks_wave.mp4',
+  speaking: '/assets/avatars/ng_c_linh/actions/speaking.mp4',
 };
 
 export const AVATAR_ACTION_METAS: readonly AvatarActionMeta[] = [
@@ -367,6 +368,13 @@ export const AVATAR_ACTION_METAS: readonly AvatarActionMeta[] = [
     filename: 'thanks_wave.mp4',
     descriptionVi: 'Mỉm cười cúi chào và vẫy tay cảm ơn khi kết thúc buổi phỏng vấn',
     defaultUrl: '/assets/avatars/ng_c_linh/actions/thanks_wave.mp4',
+  },
+  {
+    key: 'speaking',
+    labelVi: 'Đang nói & Đặt câu hỏi',
+    filename: 'speaking.mp4',
+    descriptionVi: 'Khẩu hình đồng bộ âm vị (Wav2Lip) và biểu cảm sinh động khi AI phỏng vấn',
+    defaultUrl: '/assets/avatars/ng_c_linh/actions/speaking.mp4',
   },
 ];
 

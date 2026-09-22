@@ -1,1 +1,1 @@
-export { default, generateMetadata } from '../salary/page';
+export { default, generateMetadata } from '../(candidate)/salary/page';

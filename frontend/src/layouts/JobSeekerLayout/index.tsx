@@ -4,6 +4,7 @@ import React from "react";
 import { Box, CircularProgress, Container, Grid2 as Grid } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import DefaultLayout from "../DefaultLayout";
 import Header from "../components/commons/Header";
 import Footer from "../components/commons/Footer";
 import CandidateSidebar from "@/views/components/jobSeekers/CandidateDashboard/CandidateSidebar";
@@ -17,6 +18,22 @@ import { canAccessJobSeekerPortal } from "@/utils/accessControl";
 import OnboardingProgressBanner from "@/views/onboardingPages/components/OnboardingProgressBanner";
 
 let hasVerifiedCandidateAuthGlobal = false;
+
+const isAdaptivePublicRoute = (path: string): boolean => {
+  const cleanPath = path.replace(/^\/(vi|en)/, '');
+  return (
+    cleanPath === '/practice' ||
+    cleanPath.startsWith('/practice/') ||
+    cleanPath === '/luyen-phong-van' ||
+    cleanPath.startsWith('/luyen-phong-van/') ||
+    cleanPath === '/phong-van-thu' ||
+    cleanPath.startsWith('/phong-van-thu/') ||
+    cleanPath === '/salary' ||
+    cleanPath.startsWith('/salary/') ||
+    cleanPath === '/tra-cuu-luong' ||
+    cleanPath.startsWith('/tra-cuu-luong/')
+  );
+};
 
 function AuthLoadingScreen() {
   return (
@@ -42,9 +59,14 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
   const { i18n } = useTranslation("common");
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
+  const isAdaptive = isAdaptivePublicRoute(pathname);
+
   const [isAllowed, setIsAllowed] = React.useState(() => {
     if (currentUser?.isOnboarded === false) {
       return false;
+    }
+    if (isAdaptive) {
+      return true;
     }
     return Boolean(
       hasVerifiedCandidateAuthGlobal ||
@@ -79,6 +101,12 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
       const loginPath = localizeRoutePath(`/${ROUTES.AUTH.LOGIN}`, i18n.language);
 
       if (!token) {
+        if (isAdaptive) {
+          if (isMounted) {
+            setIsAllowed(true);
+          }
+          return;
+        }
         redirectTo(loginPath);
         return;
       }
@@ -88,12 +116,25 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
         try {
           user = await dispatch(getUserInfo()).unwrap();
         } catch {
+          if (isAdaptive) {
+            if (isMounted) {
+              setIsAllowed(true);
+            }
+            return;
+          }
           redirectTo(loginPath);
           return;
         }
       }
 
       if (!canAccessJobSeekerPortal(user)) {
+        if (isAdaptive) {
+          if (isMounted) {
+            setIsAllowed(true);
+          }
+          return;
+        }
+
         if (user?.roleName === ROLES_NAME.ADMIN) {
           redirectTo(localizeRoutePath(`/${ROUTES.ADMIN.DASHBOARD}`, i18n.language));
           return;
@@ -131,7 +172,14 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
     return () => {
       isMounted = false;
     };
-  }, [activeWorkspace?.type, currentUser, dispatch, i18n.language, pathname]);
+  }, [activeWorkspace?.type, currentUser, dispatch, i18n.language, isAdaptive, pathname]);
+
+  const token = typeof window !== 'undefined' ? tokenService.getAccessTokenFromCookie() : null;
+  const isGuest = !token && !currentUser;
+
+  if (isAdaptive && isGuest) {
+    return <DefaultLayout>{children}</DefaultLayout>;
+  }
 
   if (!isAllowed) {
     return <AuthLoadingScreen />;

@@ -148,6 +148,9 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
             width: 'max-content',
             animation: `${direction === 'right' ? partnerMarqueeRight : partnerMarqueeLeft} 28s linear infinite`,
             willChange: 'transform',
+            '&:hover': {
+              animationPlayState: 'paused',
+            },
           }}
         >
           {marqueeList.map((partner, index) => (
@@ -158,9 +161,16 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                cursor: 'default',
-                px: 1,
-                py: 0.5,
+                cursor: 'pointer',
+                px: 1.5,
+                py: 0.75,
+                borderRadius: 1,
+                // Rê chuột vào vùng logo: kích hoạt hiển thị màu sắc đầy đủ và hiệu ứng nổi bật
+                '&:hover .partner-logo-img': {
+                  filter: 'grayscale(0%) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08))',
+                  opacity: 1,
+                  transform: 'scale(1.08)',
+                },
               }}
             >
               <Box
@@ -177,17 +187,18 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
                   width: 'auto',
                   height: 'auto',
                   objectFit: 'contain',
-                  // Trạng thái mặc định: hiển thị trọn vẹn màu sắc thương hiệu gốc, rõ ràng và sống động
-                  filter: 'none',
-                  opacity: 1,
+                  // Trạng thái mặc định: tông màu xám chuẩn thanh lịch (grayscale 100% và opacity 0.6)
+                  filter: 'grayscale(100%)',
+                  opacity: 0.6,
                   transform: 'scale(1)',
                   transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
                   userSelect: 'none',
                   pointerEvents: 'auto',
-                  // Rê chuột: phóng to nhẹ tạo điểm nhấn tinh tế
+                  // Rê chuột: bừng sáng màu sắc thương hiệu gốc sống động và phóng to nhẹ
                   '&:hover': {
+                    filter: 'grayscale(0%) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08))',
+                    opacity: 1,
                     transform: 'scale(1.08)',
-                    filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08))',
                   },
                 }}
               />

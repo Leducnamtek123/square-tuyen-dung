@@ -422,6 +422,14 @@ def _candidate_question_closing_response(user_text: str, language: str = "vi") -
     return f"{prefix}{_closing_response(language=lang)}"
 
 
+def estimate_speech_duration_seconds(text: str, words_per_second: float = 2.6, padding_seconds: float = 4.0) -> float:
+    """Ước tính thời lượng phát âm thanh (giây) cho tiếng Việt, kèm buffer an toàn."""
+    words = len(text.split())
+    if words == 0:
+        return padding_seconds
+    return max(padding_seconds + 2.0, (words / words_per_second) + padding_seconds)
+
+
 def _parse_question_gap_seconds(value: Any, default: float = 2.5) -> float:
     try:
         return max(0.0, float(value))
@@ -626,10 +634,17 @@ class Interviewer(Agent):
     async def _finalize_after_speech_or_delay(
         self,
         speech_handle: Any = None,
-        delay_seconds: float = 3.5,
+        delay_seconds: float | None = None,
+        text: str = "",
     ) -> None:
         if self._finalizing:
             return
+
+        if delay_seconds is None or delay_seconds <= 3.5:
+            if text:
+                delay_seconds = estimate_speech_duration_seconds(text)
+            else:
+                delay_seconds = 24.0
 
         if speech_handle is not None and hasattr(speech_handle, "wait_for_completion"):
             try:
@@ -637,8 +652,13 @@ class Interviewer(Agent):
             except Exception as exc:
                 logger.debug("wait_for_completion exception: %s", exc)
 
+        logger.info(
+            "Holding graceful completion buffer for room %s: %.1fs (speech playout)",
+            self._room_name,
+            delay_seconds,
+        )
         await asyncio.sleep(delay_seconds)
-        await self.finalize_completed_interview()
+        await self.finalize_completed_interview(delay_seconds=2.0)
 
     async def _generate_intelligent_question_turn(
         self,
@@ -838,6 +858,46 @@ class Interviewer(Agent):
             logger.warning("Failed to record employer instruction transcript: %s", exc)
 
         self._last_asked_question_text = clean_text
+        return clean_text
+
+    async def handle_proctoring_warning(
+        self,
+        warning_text: str | None = None,
+    ) -> str | None:
+        """Kích hoạt giọng nói cảnh báo gian lận/chuyển tab trực tiếp từ AI Agent."""
+        if self._completed or self._employer_takeover_active:
+            return None
+
+        clean_text = (
+            warning_text
+            or "Bạn đang trong buổi phỏng vấn trực tiếp, vui lòng quay lại tab và tập trung vào màn hình."
+        ).strip()
+        if not clean_text:
+            return None
+
+        logger.info(
+            "Handling proctoring warning for room %s: '%s' (takeover_active=%s)",
+            self._room_name,
+            clean_text[:60],
+            self._employer_takeover_active,
+        )
+
+        session = self._safe_session
+        if session is not None:
+            try:
+                await session.interrupt(force=True)
+            except Exception as exc:
+                logger.warning("Failed to interrupt session on proctoring warning: %s", exc)
+            try:
+                await session.say(clean_text, allow_interruptions=False)
+            except Exception as exc:
+                logger.error("Failed to speak proctoring warning: %s", exc)
+
+        try:
+            await self.record_transcript("ai_agent", f"[Cảnh báo giám sát] {clean_text}")
+        except Exception as exc:
+            logger.warning("Failed to record proctoring transcript: %s", exc)
+
         return clean_text
 
     async def on_enter(self) -> None:
@@ -1243,18 +1303,20 @@ class Interviewer(Agent):
             return "Buổi phỏng vấn đang trong quá trình kết thúc."
 
         self._mark_completed()
-        logger.info("Finishing interview for room: %s", self._room_name)
+        logger.info("Finishing interview for room: %s. Awaiting farewell speech playback...", self._room_name)
 
         def _after_playout(_: Any) -> None:
-            self._create_background_task(self.finalize_completed_interview())
+            self._create_background_task(self.finalize_completed_interview(delay_seconds=0.0))
 
         speech_handle = getattr(context, "speech_handle", None)
         if speech_handle is not None and hasattr(speech_handle, "add_done_callback"):
             speech_handle.add_done_callback(_after_playout)
         else:
-            self._create_background_task(self.finalize_completed_interview())
+            self._create_background_task(self.finalize_completed_interview(delay_seconds=0.0))
 
-        return _closing_response(language=self._language)
+        response = _closing_response(language=self._language)
+        self._last_farewell_text = response
+        return response
 
     async def transcription_node(self, text, model_settings):
         async for delta in super().transcription_node(text, model_settings):
@@ -1456,9 +1518,9 @@ class Interviewer(Agent):
                 if sess:
                     speech_handle = await sess.say(response, allow_interruptions=False)
                     if self._completed:
-                        self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
+                        self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, text=response))
                 elif self._completed:
-                    self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
+                    self._create_background_task(self._finalize_after_speech_or_delay(text=response))
                 await self.record_transcript("ai_agent", response)
                 return response
 
@@ -1481,9 +1543,9 @@ class Interviewer(Agent):
         if sess:
             speech_handle = await sess.say(response, allow_interruptions=False)
             if self._completed:
-                self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
+                self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, text=response))
         elif self._completed:
-            self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
+            self._create_background_task(self._finalize_after_speech_or_delay(text=response))
         await self.record_transcript("ai_agent", response)
         return response
 
@@ -1495,34 +1557,48 @@ class Interviewer(Agent):
         self._awaiting_candidate_questions = False
         self._mark_completed()
         response = _closing_response()
+        self._last_farewell_text = response
         sess = self._safe_session
         if sess:
             try:
                 await sess.interrupt(force=True)
                 speech_handle = await sess.say(response, allow_interruptions=False)
-                self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
+                self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, text=response))
             except Exception as exc:
                 logger.debug("Could not speak farewell: %s", exc)
-                self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
+                self._create_background_task(self._finalize_after_speech_or_delay(text=response))
         else:
-            self._create_background_task(self._finalize_after_speech_or_delay(delay_seconds=3.5))
+            self._create_background_task(self._finalize_after_speech_or_delay(text=response))
 
         await self.record_transcript("ai_agent", response)
         return response
 
-    async def finalize_completed_interview(self) -> None:
+    async def finalize_completed_interview(self, delay_seconds: float = 0.0) -> None:
         if not self._completed:
             return
         if self._finalizing:
             return
 
         self._finalizing = True
-        logger.info("Finalizing completed interview for room: %s", self._room_name)
+        logger.info(
+            "Finalizing completed interview for room: %s with %.1fs graceful audio delay",
+            self._room_name,
+            delay_seconds,
+        )
+
+        # Chờ buffer để WebRTC audio truyền trọn vẹn từng âm tiết câu chào kết thúc đến tai ứng viên
+        if delay_seconds > 0:
+            await asyncio.sleep(delay_seconds)
+
         await self._broadcast_session_completed()
         status_updated = await self._update_backend_status("completed")
         if not status_updated:
             await asyncio.sleep(0.5)
             await self._update_backend_status("completed")
+
+        # Thêm 2.0s đệm để frontend nhận event và chuyển cảnh mượt mà trước khi đóng WebRTC
+        if delay_seconds > 0:
+            await asyncio.sleep(2.0)
         await self._shutdown_session()
 
     async def _append_transcript(
@@ -1559,12 +1635,26 @@ class Interviewer(Agent):
         except Exception as exc:
             logger.warning("append_transcript failed: %s", exc)
 
+    async def _dispatch_talking_head(self, text: str) -> None:
+        try:
+            cleaned = _sanitize_output_text(text).strip()
+            if not cleaned:
+                return
+            th_url = os.getenv("TALKING_HEAD_URL", "http://talking-head:8010/human")
+            async with httpx.AsyncClient(timeout=3.0) as client:
+                await client.post(th_url, json={"text": cleaned, "type": "echo"})
+            logger.info("Dispatched prompt to talking-head (%d chars): %s...", len(cleaned), cleaned[:40])
+        except Exception as exc:
+            logger.debug("Talking head dispatch failed: %s", exc)
+
     async def record_transcript(
         self,
         speaker_role: str,
         content: str,
         speech_duration_ms: int | None = None,
     ) -> None:
+        if speaker_role == "ai_agent":
+            self._create_background_task(self._dispatch_talking_head(content))
         await self._append_transcript(
             speaker_role=speaker_role,
             content=content,

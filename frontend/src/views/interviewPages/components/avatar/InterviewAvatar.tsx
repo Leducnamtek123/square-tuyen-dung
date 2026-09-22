@@ -75,6 +75,12 @@ export function InterviewAvatar({
   const speakVideoRef = useRef<HTMLVideoElement | null>(null);
   const nodTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // LiveTalking WebRTC Engine (Chay truc tiep tren GPU RTX 4070 Ti SUPER)
+  const [isWebRtcConnected, setIsWebRtcConnected] = useState(false);
+  const liveVideoRef = useRef<HTMLVideoElement | null>(null);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
+  const liveSessionIdRef = useRef<string | null>(null);
+
   // Dong bo trang thai hien thi badge va visualizer
   const { state: canonicalState, assetSrc, isSpeaking } = useAvatarState({
     avatarId: effectiveAvatarId,
@@ -102,7 +108,7 @@ export function InterviewAvatar({
       lipsyncVideoUrl ||
       speakVideoUrl ||
       avatarActions?.speaking ||
-      resolveActionVideoUrl('idle', characterId, avatarActions)
+      resolveActionVideoUrl('speaking', characterId, avatarActions)
     );
   }, [lipsyncVideoUrl, speakVideoUrl, avatarActions, characterId]);
 
@@ -173,6 +179,97 @@ export function InterviewAvatar({
     }
   }, [hasSpeakTrigger, effectiveSpeakSrc, isSpeakActive]);
 
+  // Ket noi LiveTalking WebRTC stream truc tiep tu GPU RTX 4070 Ti SUPER
+  useEffect(() => {
+    let isMounted = true;
+    let pc: RTCPeerConnection | null = null;
+
+    async function initLiveTalkingWebRTC() {
+      if (typeof window === 'undefined' || !window.RTCPeerConnection) return;
+      try {
+        pc = new RTCPeerConnection({
+          iceServers: [
+            { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
+          ],
+        });
+        pcRef.current = pc;
+
+        pc.addTransceiver('video', { direction: 'recvonly' });
+        pc.addTransceiver('audio', { direction: 'recvonly' });
+
+        pc.ontrack = (event) => {
+          if (event.track.kind === 'video' && liveVideoRef.current) {
+            liveVideoRef.current.srcObject = event.streams[0];
+            liveVideoRef.current.play().catch(() => {});
+            if (isMounted) {
+              setIsWebRtcConnected(true);
+            }
+          }
+        };
+
+        pc.onconnectionstatechange = () => {
+          if (pc?.connectionState === 'connected' && isMounted) {
+            setIsWebRtcConnected(true);
+          } else if (
+            (pc?.connectionState === 'failed' || pc?.connectionState === 'disconnected') &&
+            isMounted
+          ) {
+            setIsWebRtcConnected(false);
+          }
+        };
+
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+
+        await new Promise<void>((resolve) => {
+          if (pc!.iceGatheringState === 'complete') {
+            resolve();
+          } else {
+            const checkState = () => {
+              if (pc!.iceGatheringState === 'complete') {
+                pc!.removeEventListener('icegatheringstatechange', checkState);
+                resolve();
+              }
+            };
+            pc!.addEventListener('icegatheringstatechange', checkState);
+            setTimeout(resolve, 1500);
+          }
+        });
+
+        const localDesc = pc.localDescription;
+        if (!localDesc || !isMounted) return;
+
+        const res = await fetch('/talking-head/offer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sdp: localDesc.sdp,
+            type: localDesc.type,
+            avatar: characterId || 'ng_c_linh',
+          }),
+        });
+
+        if (res.ok) {
+          const answer = await res.json();
+          liveSessionIdRef.current = answer.sessionid;
+          await pc.setRemoteDescription(new RTCSessionDescription(answer));
+        }
+      } catch (err) {
+        console.warn('[InterviewAvatar] WebRTC AI avatar init fallback:', err);
+      }
+    }
+
+    initLiveTalkingWebRTC();
+
+    return () => {
+      isMounted = false;
+      if (pc) {
+        pc.close();
+      }
+      pcRef.current = null;
+    };
+  }, [characterId]);
+
   // Khi video noi duoc tai du lieu khung hinh dau tien
   const handleSpeakLoadedData = useCallback(() => {
     const speakEl = speakVideoRef.current;
@@ -236,8 +333,37 @@ export function InterviewAvatar({
         }}
       />
 
-      {/* Lop A: Video Cho / Cu chi (Loop ngam) */}
+      {/* Lop Ambient Backdrop: Lam mo video goc 9:16 de lap day toan man hinh 16:9 khong bi vien den */}
       {!videoFallbackActive && !isCustomUploadedImage && (
+        <video
+          className={styles.stageBackdropVideo}
+          src={isSpeakActive ? effectiveSpeakSrc : currentIdleSrc}
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Lop Live WebRTC GPU AI (LiveTalking Engine render truc tiep tu GPU NVIDIA RTX 4070 Ti SUPER) */}
+      {!videoFallbackActive && !isCustomUploadedImage && (
+        <video
+          ref={liveVideoRef}
+          className={styles.stageLiveWebRtc}
+          style={{
+            opacity: isWebRtcConnected ? 1 : 0,
+            transition: 'opacity 0.25s ease-in-out',
+            pointerEvents: isWebRtcConnected ? 'auto' : 'none',
+          }}
+          autoPlay
+          playsInline
+          muted
+        />
+      )}
+
+      {/* Lop A: Video Cho / Cu chi (Fallback khi WebRTC dang khoi dong) */}
+      {!videoFallbackActive && !isCustomUploadedImage && !isWebRtcConnected && (
         <video
           ref={idleVideoRef}
           className={styles.stageIdle}
@@ -251,13 +377,15 @@ export function InterviewAvatar({
         />
       )}
 
-      {/* Lop B: Video Tra loi Lipsync (Fade-in 0.12s de len) */}
-      {!videoFallbackActive && !isCustomUploadedImage && (
+      {/* Lop B: Video Tra loi Lipsync (Fallback khi WebRTC dang khoi dong) */}
+      {!videoFallbackActive && !isCustomUploadedImage && !isWebRtcConnected && (
         <video
           ref={speakVideoRef}
           className={`${styles.stageSpeak} ${isSpeakActive ? styles.stageSpeakActive : ''}`}
           src={effectiveSpeakSrc}
           playsInline
+          muted
+          loop
           preload="auto"
           onLoadedData={handleSpeakLoadedData}
           onEnded={handleSpeakEnded}

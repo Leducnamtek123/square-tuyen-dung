@@ -3,6 +3,7 @@ import type { Question } from '@/types/models';
 
 export const QUESTION_CHANGE_TOPIC = 'square.interview.question_change';
 export const QUESTION_CONTROL_TOPIC = 'square.interview.question_control';
+export const PROCTORING_TOPIC = 'square.interview.proctoring';
 
 export interface QuestionHUDState {
   questions: Question[];

@@ -36,6 +36,8 @@ RENDERS_DIR = MEDIA_DIR / "renders"
 RENDERS_DIR.mkdir(parents=True, exist_ok=True)
 DATA_DIR = BASE_DIR / "data"
 
+URL_PREFIX = os.getenv("URL_PREFIX", "").rstrip("/")
+
 app = FastAPI(
     title="InfoHR Real-Time Talking Head AI Service",
     description="Wav2Lip GPU Lip-Sync & Video Synthesis Microservice for Square Tuyển Dụng",
@@ -98,7 +100,7 @@ async def get_characters() -> dict[str, list[dict[str, Any]]]:
         {
             "id": "ng_c_linh",
             "name": "Ngọc Linh HR",
-            "actions": ["idle", "nod", "thinking", "wave", "thanks_wave"],
+            "actions": ["idle", "nod", "thinking", "wave", "thanks_wave", "speaking"],
         }
     ]
 
@@ -114,7 +116,7 @@ async def get_characters() -> dict[str, list[dict[str, Any]]]:
             actions_list.append({
                 "name": act,
                 "ready": ready,
-                "url": f"/media/avatars/{char_id}/actions/{act}.mp4",
+                "url": f"{URL_PREFIX}/media/avatars/{char_id}/actions/{act}.mp4" if URL_PREFIX else f"/media/avatars/{char_id}/actions/{act}.mp4",
             })
         result.append({
             "id": char_id,
@@ -204,7 +206,7 @@ async def render_lipsync(req: RenderRequest) -> RenderResponse:
             output_path=str(output_filepath),
         )
 
-        relative_video_url = f"/media/renders/{output_filename}"
+        relative_video_url = f"{URL_PREFIX}/media/renders/{output_filename}" if URL_PREFIX else f"/media/renders/{output_filename}"
 
         return RenderResponse(
             status="success",
@@ -223,4 +225,5 @@ async def render_lipsync(req: RenderRequest) -> RenderResponse:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8001, reload=True)
+    port = int(os.getenv("PORT", "8010"))
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=True)

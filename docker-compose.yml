@@ -56,6 +56,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_started
+      talking-head:
+        condition: service_started
     restart: always
     networks:
       proxy-net:
@@ -496,6 +498,7 @@ services:
       - TTS_API_KEY=${TTS_API_KEY:?Set TTS_API_KEY in .env}
       - TTS_MODEL=${TTS_MODEL:-tts-vi}
       - TTS_VOICE=${TTS_VOICE:-Trúc Ly}
+      - TALKING_HEAD_URL=${TALKING_HEAD_URL:-http://talking-head:8010/human}
     depends_on:
       backend:
         condition: service_started
@@ -508,6 +511,52 @@ services:
     networks:
       - app-net
       - data-net
+
+  # ---------------------------------------------------------------------------
+  # Talking Head AI (Real-time Lipsync Avatar Service)
+  # ---------------------------------------------------------------------------
+  talking-head:
+    container_name: tuyendung-studio-talking-head
+    build:
+      context: ./voice-ai/talking-head
+      dockerfile: Dockerfile
+    environment:
+      - PORT=8010
+      - URL_PREFIX=/talking-head
+      - PYTHONUNBUFFERED=1
+      - TTS_BASE_URL=${TTS_BASE_URL:-https://api.metaconnect.vn/v1}
+      - TTS_API_KEY=${TTS_API_KEY:-airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8}
+      - TTS_MODEL=${TTS_MODEL:-tts-vi}
+      - TTS_VOICE=${TTS_VOICE:-Trúc Ly}
+    volumes:
+      - ./voice-ai/talking-head/media:/app/media
+      - ./voice-ai/talking-head/data:/app/data
+      - ./voice-ai/talking-head/models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    expose:
+      - "8010"
+    ports:
+      - "8010:8010"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8010/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    networks:
+      proxy-net:
+        aliases:
+          - talking-head
+      app-net:
+        aliases:
+          - talking-head
 
   # ---------------------------------------------------------------------------
   # MinIO (Object Storage)

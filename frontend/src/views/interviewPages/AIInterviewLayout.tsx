@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography, alpha } from '@mui/material';
 import {
   BarVisualizer,
@@ -53,7 +53,7 @@ import {
 } from './livekitParticipant';
 import { useInterviewMessages } from './useInterviewMessages';
 import type { Question } from '@/types/models';
-import { useInterviewQuestionHUD, QUESTION_CONTROL_TOPIC } from './useInterviewQuestionHUD';
+import { useInterviewQuestionHUD, QUESTION_CONTROL_TOPIC, PROCTORING_TOPIC } from './useInterviewQuestionHUD';
 import { InterviewHintsDrawer } from './components/InterviewHintsDrawer';
 import { InterviewRoadmapDrawer } from './components/InterviewRoadmapDrawer';
 import { InterviewQuestionCard } from './components/InterviewQuestionCard';
@@ -1158,7 +1158,11 @@ export function AIInterviewLayout({
     },
   });
 
-  // Proctoring: Tab Visibility / Switch Detection
+  // Proctoring: Tab Visibility / Switch Detection & AI Voice Warning
+  const tabViolationCountRef = useRef(0);
+  const lastWarningVoiceTimeRef = useRef(0);
+  const tabHiddenTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     let leaveTimestamp = 0;
@@ -1167,6 +1171,7 @@ export function AIInterviewLayout({
       if (document.hidden) {
         leaveTimestamp = Date.now();
         setTabSwitchWarning('Cảnh báo: Bạn đang trong buổi phỏng vấn trực tiếp, vui lòng tập trung và hạn chế chuyển tab.');
+
         if (sessionId) {
           void interviewService.recordProctoringEvent(sessionId, {
             eventType: 'tab_hidden',
@@ -1174,7 +1179,58 @@ export function AIInterviewLayout({
             details: { timestamp: new Date().toISOString() },
           }).catch(() => {});
         }
+
+        // Hủy timer cũ nếu còn tồn tại
+        if (tabHiddenTimerRef.current) {
+          clearTimeout(tabHiddenTimerRef.current);
+          tabHiddenTimerRef.current = null;
+        }
+
+        // Đặt độ trễ an toàn 2.5s: Nếu rời tab >= 2.5s thì mới kích hoạt cảnh báo giọng nói (loại trừ click nhầm)
+        tabHiddenTimerRef.current = setTimeout(() => {
+          const now = Date.now();
+          const COOLDOWN_MS = 30000; // Cooldown 30s giữa các lần AI nhắc bằng giọng nói
+          if (now - lastWarningVoiceTimeRef.current >= COOLDOWN_MS) {
+            tabViolationCountRef.current += 1;
+            lastWarningVoiceTimeRef.current = now;
+
+            const count = tabViolationCountRef.current;
+            const warningMsg = count === 1
+              ? 'Bạn đang trong buổi phỏng vấn trực tiếp, vui lòng quay lại tab và tập trung vào màn hình.'
+              : 'Cảnh báo: Hệ thống tiếp tục ghi nhận bạn rời khỏi màn hình. Việc này sẽ được lưu vào biên bản giám sát của nhà tuyển dụng.';
+
+            setTabSwitchWarning(`Cảnh báo (${count}): ${warningMsg}`);
+
+            // Gửi tín hiệu đến LiveKit Agent để AILA phát giọng nói nhắc nhở
+            if (room?.localParticipant) {
+              const payload = JSON.stringify({
+                action: 'proctoring_warning',
+                type: 'tab_switch',
+                violation_count: count,
+                message: warningMsg,
+              });
+
+              try {
+                room.localParticipant.sendText(payload, { topic: QUESTION_CONTROL_TOPIC });
+              } catch (err) {
+                console.warn('[Proctoring] Failed to broadcast proctoring_warning on QUESTION_CONTROL_TOPIC:', err);
+              }
+
+              try {
+                room.localParticipant.sendText(payload, { topic: PROCTORING_TOPIC });
+              } catch {
+                // optional fallback
+              }
+            }
+          }
+        }, 2500);
       } else {
+        // Ứng viên quay lại tab: Hủy timer cảnh báo giọng nói nếu chưa kích hoạt (< 2.5s)
+        if (tabHiddenTimerRef.current) {
+          clearTimeout(tabHiddenTimerRef.current);
+          tabHiddenTimerRef.current = null;
+        }
+
         if (leaveTimestamp > 0 && sessionId) {
           const durationSec = Math.round((Date.now() - leaveTimestamp) / 1000);
           void interviewService.recordProctoringEvent(sessionId, {
@@ -1189,8 +1245,13 @@ export function AIInterviewLayout({
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [sessionId]);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (tabHiddenTimerRef.current) {
+        clearTimeout(tabHiddenTimerRef.current);
+      }
+    };
+  }, [sessionId, room]);
   const { messages, send, isSending } = useInterviewMessages();
   const { t } = useTranslation(['interview']);
   const candidateLabel = t('liveRoom.participants.candidate');

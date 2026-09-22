@@ -14,7 +14,7 @@ export type AvatarState =
   | 'goodbye'
   | 'blink';
 
-export type AvatarAction = 'idle' | 'nod' | 'thinking' | 'wave' | 'thanks_wave';
+export type AvatarAction = 'idle' | 'nod' | 'thinking' | 'wave' | 'thanks_wave' | 'speaking';
 
 export const DEFAULT_CHARACTER_ACTIONS: Record<string, Record<AvatarAction, string>> = {
   ng_c_linh: {
@@ -23,6 +23,7 @@ export const DEFAULT_CHARACTER_ACTIONS: Record<string, Record<AvatarAction, stri
     thinking: '/assets/avatars/ng_c_linh/actions/thinking.mp4',
     wave: '/assets/avatars/ng_c_linh/actions/wave.mp4',
     thanks_wave: '/assets/avatars/ng_c_linh/actions/thanks_wave.mp4',
+    speaking: '/assets/avatars/ng_c_linh/actions/speaking.mp4',
   },
 };
 

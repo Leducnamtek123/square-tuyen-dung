@@ -43,6 +43,7 @@ AI_CONTROL_TOPIC = "square.interview.ai_control"
 AI_TAKEOVER_TOPIC = "square.interview.ai_takeover"
 QUESTION_CONTROL_TOPIC = "square.interview.question_control"
 QUESTION_CHANGE_TOPIC = "square.interview.question_change"
+PROCTORING_TOPIC = "square.interview.proctoring"
 EMPLOYER_CONTROL_ROLES = {"employer", "observer"}
 _BACKGROUND_TASKS: set[asyncio.Task[Any]] = set()
 
@@ -600,6 +601,27 @@ async def entrypoint(ctx: JobContext) -> None:
             await interviewer.handle_candidate_next_question(target_index=target_index)
         elif action in {"finish_interview", "end_session", "complete_interview"}:
             await interviewer.handle_candidate_finish_interview()
+        elif action in {"proctoring_warning", "tab_switch_warning"}:
+            warning_text = payload.get("message")
+            await interviewer.handle_proctoring_warning(warning_text=warning_text)
+
+    async def _handle_proctoring_stream(reader, participant_identity) -> None:
+        participant_identity = _participant_identity(participant_identity)
+        text = (await reader.read_all()).strip()
+        if not text:
+            return
+        try:
+            payload = json.loads(text)
+        except Exception:
+            payload = {"action": "proctoring_warning", "message": text}
+        warning_text = payload.get("message") or text
+        logger.info(
+            "Received proctoring warning event for room %s from %s: '%s'",
+            ctx.room.name,
+            participant_identity,
+            warning_text[:60],
+        )
+        await interviewer.handle_proctoring_warning(warning_text=warning_text)
 
     async def _handle_question_change_stream(reader, participant_identity) -> None:
         text = (await reader.read_all()).strip()
@@ -641,7 +663,12 @@ async def entrypoint(ctx: JobContext) -> None:
             logger.debug("Could not make generated speech uninterruptible: %s", exc)
 
         def _finalize_when_completed(_speech_handle) -> None:
-            _create_background_task(interviewer.finalize_completed_interview())
+            if interviewer.completed:
+                farewell = getattr(interviewer, "_last_farewell_text", "")
+                from .interviewer import estimate_speech_duration_seconds
+                duration = estimate_speech_duration_seconds(farewell) if farewell else 24.0
+                logger.info("Farewell speech handle ready. Awaiting %.1fs audio playout buffer before finalization...", duration)
+                _create_background_task(interviewer.finalize_completed_interview(delay_seconds=duration))
 
         try:
             speech_handle.add_done_callback(_finalize_when_completed)
@@ -671,6 +698,17 @@ async def entrypoint(ctx: JobContext) -> None:
                 or "get_interview_progress" in lowered
             ):
                 return
+
+            # Gui thong diep den LiveTalking Digital Human de GPU RTX 4070 Ti SUPER sinh lipsync realtime
+            async def _send_talking_head_prompt(text: str):
+                try:
+                    th_url = os.getenv("TALKING_HEAD_URL", "http://talking-head:8010/human")
+                    async with httpx.AsyncClient(timeout=3.0) as client:
+                        await client.post(th_url, json={"text": text, "type": "echo"})
+                except Exception as th_err:
+                    logger.debug("Talking head dispatch skipped: %s", th_err)
+
+            _create_background_task(_send_talking_head_prompt(content))
 
         role = "candidate" if role == "user" else "ai_agent"
         _create_background_task(interviewer.record_transcript(role, content))
@@ -734,6 +772,12 @@ async def entrypoint(ctx: JobContext) -> None:
         QUESTION_CHANGE_TOPIC,
         lambda reader, participant_identity: asyncio.create_task(
             _handle_question_change_stream(reader, participant_identity)
+        ),
+    )
+    ctx.room.register_text_stream_handler(
+        PROCTORING_TOPIC,
+        lambda reader, participant_identity: asyncio.create_task(
+            _handle_proctoring_stream(reader, participant_identity)
         ),
     )
 
