@@ -97,12 +97,15 @@ class CareerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             public_id=public_id
         )
 
-        instance.icon = File.update_or_create_file_with_cloudinary(
+        file_obj = File.update_or_create_file_with_cloudinary(
             instance.icon,
             upload_result,
             File.CAREER_IMAGE_TYPE
         )
-        instance.save()
+        if file_obj:
+            Career.objects.filter(icon=file_obj).exclude(id=instance.id).update(icon=None)
+            instance.icon = file_obj
+            instance.save()
         return instance
 
     def create(self, validated_data):

@@ -8,11 +8,24 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useTranslation } from 'react-i18next';
 import { IMAGES } from '@/configs/images';
 
+import LogoutIcon from '@mui/icons-material/Logout';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
+
 interface OnboardingHeaderProps {
   appName?: string;
+  onSkip?: () => void;
+  isSkipping?: boolean;
+  showSkip?: boolean;
 }
 
-export default function OnboardingHeader({ appName = 'InfoHR' }: OnboardingHeaderProps) {
+export default function OnboardingHeader({
+  appName = 'InfoHR',
+  onSkip,
+  isSkipping = false,
+  showSkip = false,
+}: OnboardingHeaderProps) {
   const { t } = useTranslation('common');
 
   return (
@@ -56,8 +69,32 @@ export default function OnboardingHeader({ appName = 'InfoHR' }: OnboardingHeade
             />
           </Box>
 
-          {/* Right Actions: Help & Language Switcher */}
+          {/* Right Actions: Skip, Help & Language Switcher */}
           <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2 }}>
+            {showSkip && onSkip && (
+              <Button
+                size="small"
+                onClick={onSkip}
+                disabled={isSkipping}
+                startIcon={isSkipping ? <CircularProgress size={14} color="inherit" /> : <ExitToAppIcon fontSize="small" />}
+                sx={{
+                  color: '#64748B',
+                  fontWeight: 600,
+                  fontSize: '0.8125rem',
+                  textTransform: 'none',
+                  borderRadius: 2,
+                  px: 1.5,
+                  py: 0.5,
+                  '&:hover': {
+                    color: '#0F172A',
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                  },
+                }}
+              >
+                {t('common.skipForNow', 'Thiết lập sau')}
+              </Button>
+            )}
+
             <Tooltip title={t('footer.support', 'Hỗ trợ')} arrow>
               <MuiLink
                 component={Link}

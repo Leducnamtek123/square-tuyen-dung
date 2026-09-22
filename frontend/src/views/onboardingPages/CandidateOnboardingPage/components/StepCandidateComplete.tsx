@@ -21,6 +21,9 @@ import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import type { CandidateFullFormValues } from '../schemas/candidateOnboardingSchema';
 import type { RecommendedJobPreview } from '@/types/auth';
@@ -407,6 +410,93 @@ export default function StepCandidateComplete({
             </Box>
           </Grid>
         </Grid>
+      </Card>
+
+      {/* AILA AI Voice Interview Practice Launchpad */}
+      <Card
+        elevation={0}
+        sx={{
+          p: { xs: 2.5, sm: 3 },
+          mb: 3.5,
+          borderRadius: 3.5,
+          textAlign: 'left',
+          background: 'linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E40AF 100%)',
+          color: '#FFFFFF',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 12px 32px rgba(49, 46, 129, 0.25)',
+        }}
+      >
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          justifyContent="space-between"
+          spacing={2.5}
+        >
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Box
+              sx={{
+                width: 52,
+                height: 52,
+                borderRadius: 3,
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                backdropFilter: 'blur(10px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#67E8F9',
+                flexShrink: 0,
+              }}
+            >
+              <RecordVoiceOverIcon sx={{ fontSize: 30 }} />
+            </Box>
+            <Box>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', fontSize: '1.05rem' }}>
+                  Luyện phỏng vấn thử với AI Voice (AILA)
+                </Typography>
+                <Chip
+                  label="Độc quyền InfoHR"
+                  size="small"
+                  sx={{
+                    height: 20,
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    backgroundColor: '#EC4899',
+                    color: '#FFFFFF',
+                  }}
+                />
+              </Stack>
+              <Typography variant="body2" sx={{ color: '#C7D2FE', maxWidth: 480, fontSize: '0.85rem' }}>
+                Thực hành trả lời câu hỏi chuyên môn thời gian thực với trợ lý AI AILA để tự tin nhận offer và tăng 2x cơ hội trúng tuyển.
+              </Typography>
+            </Box>
+          </Stack>
+
+          <Button
+            component={Link}
+            href={`/interview?jobTitle=${encodeURIComponent(formData.desiredJobTitle || 'Ứng viên')}`}
+            variant="contained"
+            endIcon={<ArrowForwardIcon />}
+            sx={{
+              backgroundColor: '#38BDF8',
+              color: '#0F172A',
+              fontWeight: 800,
+              fontSize: '0.875rem',
+              textTransform: 'none',
+              borderRadius: 2.5,
+              px: 3,
+              py: 1.2,
+              flexShrink: 0,
+              boxShadow: '0 4px 14px rgba(56, 189, 248, 0.4)',
+              '&:hover': {
+                backgroundColor: '#7DD3FC',
+              },
+            }}
+          >
+            Thử phỏng vấn 5 phút
+          </Button>
+        </Stack>
       </Card>
 
       {/* Recommended Jobs Preview (First Value) */}

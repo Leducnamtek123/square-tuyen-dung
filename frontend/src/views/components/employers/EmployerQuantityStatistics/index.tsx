@@ -216,7 +216,8 @@ const EmployerQuantityStatistics = () => {
   const rawConversionRate = Number(data?.conversionRate);
   const conversionRate = Number.isFinite(rawConversionRate) ? rawConversionRate : 0;
   const rawAiScore = Number(data?.avgAiOverallScore);
-  const avgAiScore = Number.isFinite(rawAiScore) && rawAiScore > 0 ? rawAiScore.toFixed(1) : '8.5';
+  const hasAiScore = Number.isFinite(rawAiScore) && rawAiScore > 0;
+  const avgAiScore = hasAiScore ? rawAiScore.toFixed(1) : null;
 
   return (
     <Grid container spacing={{ xs: 1.5, sm: 2.5 }}>
@@ -229,8 +230,6 @@ const EmployerQuantityStatistics = () => {
           iconBgColor="#EFF6FF"
           iconColor="#2563EB"
           loading={isLoading}
-          deltaText="+18%"
-          isPositiveDelta={true}
           subtitle={`${data?.totalSavedProfiles ?? 0} hồ sơ đã lưu trữ`}
         />
       </Grid>
@@ -277,7 +276,7 @@ const EmployerQuantityStatistics = () => {
           iconBgColor="#ECFEFF"
           iconColor="#06B6D4"
           loading={isLoading}
-          subtitle={`Điểm AI TB: ${avgAiScore}/10`}
+          subtitle={avgAiScore ? `Điểm AI TB: ${avgAiScore}/10` : 'Điểm AI TB: Chưa có dữ liệu'}
         />
       </Grid>
     </Grid>

@@ -99,9 +99,14 @@ export const CandidateEvaluationModal: React.FC<CandidateEvaluationModalProps> =
     }
   }, [initialSession]);
 
-  if (!initialSession) return null;
-
   const currentSession = session || initialSession;
+  const evalOperation = React.useMemo(
+    () => (currentSession ? adaptInterviewEvaluationOperation(currentSession) : null),
+    [currentSession]
+  );
+
+  if (!initialSession || !currentSession || !evalOperation) return null;
+
   const overallScore = currentSession.aiOverallScore ?? currentSession.ai_overall_score;
   const numOverallScore = overallScore != null ? Number(overallScore) : null;
   const technicalScore = currentSession.aiTechnicalScore != null ? Number(currentSession.aiTechnicalScore) : null;
@@ -131,10 +136,6 @@ export const CandidateEvaluationModal: React.FC<CandidateEvaluationModalProps> =
 
   const isCompleted = currentSession.status === 'completed';
   const isProcessing = currentSession.status === 'processing';
-  const evalOperation = React.useMemo(
-    () => adaptInterviewEvaluationOperation(currentSession),
-    [currentSession]
-  );
   const rawRecordingUrl = currentSession.recordingUrl || currentSession.recording_url;
   const safeRecordingUrl = getSafeResourceUrl(rawRecordingUrl);
 

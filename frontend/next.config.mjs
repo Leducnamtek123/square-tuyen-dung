@@ -339,6 +339,7 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 31536000,
     remotePatterns: [
       { protocol: 'https', hostname: 's3.infohr.vn' },
       { protocol: 'http', hostname: 'minio' },
@@ -388,6 +389,13 @@ const nextConfig = {
         ],
       },
     ];
+  },
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      canvas: false,
+    };
+    return config;
   },
 };
 

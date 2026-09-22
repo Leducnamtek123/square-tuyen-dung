@@ -19,6 +19,7 @@ import NoDataCard from "@/components/Common/NoDataCard";
 import jobService from "@/services/jobService";
 import companyService from "@/services/companyService";
 import ApplyCard from "@/components/Features/ApplyCard";
+import OnboardingRequiredDialog from "@/components/Features/OnboardingRequiredDialog";
 import JobSalaryInsightCard from "@/components/Features/JobSalaryInsightCard";
 import TrustReportDialog from "@/components/Features/TrustReportDialog";
 import SocialNetworkSharingPopup from "@/components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
@@ -117,6 +118,7 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
   const { requireAuth, AuthModal } = useRequireAuth();
   const [openReportPopup, setOpenReportPopup] = React.useState(false);
+  const [openOnboardingRequiredModal, setOpenOnboardingRequiredModal] = React.useState(false);
 
   const [state, dispatch] = React.useReducer(
     jobDetailReducer,
@@ -269,6 +271,10 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
 
   const handleShowApplyForm = () => {
     if (!requireAuth({ actionType: 'apply_job' })) return;
+    if (currentUser?.roleName === ROLES_NAME.JOB_SEEKER && currentUser?.isOnboarded === false) {
+      setOpenOnboardingRequiredModal(true);
+      return;
+    }
     dispatch({ type: 'open-popup' });
   };
 
@@ -355,6 +361,13 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
         setOpenPopup={(open) => dispatch({ type: open ? 'open-popup' : 'close-popup' })}
         setIsApplySuccess={() => dispatch({ type: 'mark-applied' })}
         onApplySuccess={() => dispatch({ type: 'mark-applied' })}
+      />
+
+      <OnboardingRequiredDialog
+        open={openOnboardingRequiredModal}
+        onClose={() => setOpenOnboardingRequiredModal(false)}
+        role="candidate"
+        returnUrl={typeof window !== 'undefined' ? `${window.location.pathname}${window.location.search}` : undefined}
       />
 
       <SocialNetworkSharingPopup

@@ -64,8 +64,17 @@ const ResetPasswordForm = ({ handleResetPassword, serverErrors = EMPTY_SERVER_ER
   });
 
   React.useEffect(() => {
+    if (!serverErrors) return;
     for (const err in serverErrors) {
-      setError(err as keyof ResetPasswordFormData, { type: 'manual', message: serverErrors[err]?.join(' ') });
+      const rawErr = serverErrors[err];
+      const message = Array.isArray(rawErr)
+        ? rawErr.join(' ')
+        : typeof rawErr === 'string'
+        ? rawErr
+        : '';
+      if (message) {
+        setError(err as keyof ResetPasswordFormData, { type: 'manual', message });
+      }
     }
   }, [serverErrors, setError]);
 

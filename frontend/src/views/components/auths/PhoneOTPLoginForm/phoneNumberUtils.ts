@@ -38,10 +38,12 @@ export const getPhoneCountryOptions = (language?: string): PhoneCountryOption[] 
 };
 
 export const formatNationalPhoneInput = (value: string, countryCode: CountryCode): string => {
+  if (!value || typeof value !== 'string') return '';
+  const safeCountryCode = countryCode || DEFAULT_PHONE_COUNTRY;
   const parsedInput = parseIncompletePhoneNumber(value);
 
   if (!parsedInput || parsedInput === '+') {
-    return parsedInput;
+    return parsedInput || '';
   }
 
   if (parsedInput.startsWith('+')) {
@@ -54,18 +56,22 @@ export const formatNationalPhoneInput = (value: string, countryCode: CountryCode
     return parsedInput;
   }
 
-  return new AsYouType(countryCode).input(parsedInput);
+  return new AsYouType(safeCountryCode).input(parsedInput);
 };
 
 export const getPhoneInputStateFromValue = (
   value: string,
   currentCountryCode: CountryCode
 ): { countryCode: CountryCode; phoneNumber: string } => {
+  const safeCountryCode = currentCountryCode || DEFAULT_PHONE_COUNTRY;
+  if (!value || typeof value !== 'string') {
+    return { countryCode: safeCountryCode, phoneNumber: '' };
+  }
   const parsedInput = parseIncompletePhoneNumber(value);
 
   if (parsedInput.startsWith('+')) {
     const parsedNumber = parsePhoneNumberFromString(parsedInput);
-    const nextCountryCode = parsedNumber?.country || currentCountryCode;
+    const nextCountryCode = parsedNumber?.country || safeCountryCode;
 
     return {
       countryCode: nextCountryCode,
@@ -76,19 +82,21 @@ export const getPhoneInputStateFromValue = (
   }
 
   return {
-    countryCode: currentCountryCode,
-    phoneNumber: formatNationalPhoneInput(parsedInput, currentCountryCode),
+    countryCode: safeCountryCode,
+    phoneNumber: formatNationalPhoneInput(parsedInput, safeCountryCode),
   };
 };
 
 export const toE164PhoneNumber = (value: string, countryCode: CountryCode): string | null => {
+  if (!value || typeof value !== 'string') return null;
+  const safeCountryCode = countryCode || DEFAULT_PHONE_COUNTRY;
   const parsedInput = parseIncompletePhoneNumber(value);
 
   if (!parsedInput || parsedInput === '+') {
     return null;
   }
 
-  const parsedNumber = parsePhoneNumberFromString(parsedInput, countryCode);
+  const parsedNumber = parsePhoneNumberFromString(parsedInput, safeCountryCode);
 
   if (!parsedNumber?.isPossible()) {
     return null;

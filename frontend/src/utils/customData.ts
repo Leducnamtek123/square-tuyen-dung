@@ -1,4 +1,7 @@
-﻿const convertMoney = (n: number): string => {
+const convertMoney = (n: number): string => {
+  if (typeof n !== 'number' || !Number.isFinite(n) || n <= 0) {
+    return '0';
+  }
   if (n >= 1000000000) {
     return `${Math.trunc(n / 1000000000)} tỷ`;
   }
@@ -56,14 +59,16 @@ const salaryString = (
   salaryFrom?: number | null,
   salaryTo?: number | null
 ): string => {
-  if (!salaryFrom && !salaryTo) return '---';
-  return `${!salaryFrom ? '?' : convertMoney(salaryFrom)} - ${
-    !salaryTo ? '?' : convertMoney(salaryTo)
+  const hasFrom = typeof salaryFrom === 'number' && Number.isFinite(salaryFrom) && salaryFrom > 0;
+  const hasTo = typeof salaryTo === 'number' && Number.isFinite(salaryTo) && salaryTo > 0;
+  if (!hasFrom && !hasTo) return '---';
+  return `${!hasFrom ? '?' : convertMoney(salaryFrom!)} - ${
+    !hasTo ? '?' : convertMoney(salaryTo!)
   }`;
 };
 
 const toSlug = (str?: string): string => {
-  if (!str) return '';
+  if (!str || typeof str !== 'string') return '';
   let value = str.toLowerCase();
   value = value.replace(/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/g, 'a');
   value = value.replace(/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/g, 'e');
@@ -81,4 +86,4 @@ const toSlug = (str?: string): string => {
 
 export default toSlug;
 
-export { convertMoney, formatLocalizedSalaryRange, salaryString };
+export { convertMoney, formatLocalizedMoney, formatLocalizedSalaryRange, salaryString };

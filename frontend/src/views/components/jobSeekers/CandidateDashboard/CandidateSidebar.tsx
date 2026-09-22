@@ -93,9 +93,17 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
       case 'my-jobs':
         return cleanPathname.includes('/my-jobs') || cleanPathname.includes('/viec-lam');
       case 'my-interviews':
-        return cleanPathname.includes('/my-interviews') || cleanPathname.includes('/phong-van');
+        return (
+          cleanPathname.includes('/my-interviews') ||
+          cleanPathname.includes('/phong-van-cua-toi') ||
+          (cleanPathname.includes('/phong-van') && !cleanPathname.includes('/phong-van-thu'))
+        );
       case 'practice':
-        return cleanPathname.includes('/practice') || cleanPathname.includes('/luyen-phong-van');
+        return (
+          cleanPathname.includes('/practice') ||
+          cleanPathname.includes('/luyen-phong-van') ||
+          cleanPathname.includes('/phong-van-thu')
+        );
       case 'salary':
         return (
           cleanPathname.includes('/tra-cuu-luong') ||

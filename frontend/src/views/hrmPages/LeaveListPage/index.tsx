@@ -74,10 +74,14 @@ export default function LeaveListPage() {
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [activeTab, setActiveTab] = useState<'REQUESTS' | 'BALANCES'>('REQUESTS');
 
-  const { data: leaveRequests = [], isLoading: loading, refetch } = useHrmLeaves();
-  const { data: leaveBalances = [], isLoading: balancesLoading } = useHrmLeaveBalances({ year: selectedYear });
-  const { data: leaveTypes = [] } = useHrmLeaveTypes();
-  const { data: employees = [] } = useHrmEmployees();
+  const { data: rawLeaves, isLoading: loading, refetch } = useHrmLeaves();
+  const leaveRequests = Array.isArray(rawLeaves) ? rawLeaves : [];
+  const { data: rawBalances, isLoading: balancesLoading } = useHrmLeaveBalances({ year: selectedYear });
+  const leaveBalances = Array.isArray(rawBalances) ? rawBalances : [];
+  const { data: rawLeaveTypes } = useHrmLeaveTypes();
+  const leaveTypes = Array.isArray(rawLeaveTypes) ? rawLeaveTypes : [];
+  const { data: rawEmployees } = useHrmEmployees();
+  const employees = Array.isArray(rawEmployees) ? rawEmployees : [];
   const { createLeaveRequest, deleteLeaveRequest, approveLeave, rejectLeave, autoAllocateLeaveBalances } = useHrmMutations();
 
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('ALL');
@@ -97,9 +101,9 @@ export default function LeaveListPage() {
   });
 
   const totalLeaves = leaveRequests.length;
-  const pendingLeaves = leaveRequests.filter((l) => l.status === 'PENDING').length;
-  const approvedLeaves = leaveRequests.filter((l) => l.status === 'APPROVED').length;
-  const rejectedLeaves = leaveRequests.filter((l) => l.status === 'REJECTED').length;
+  const pendingLeaves = leaveRequests.filter((l) => l?.status === 'PENDING').length;
+  const approvedLeaves = leaveRequests.filter((l) => l?.status === 'APPROVED').length;
+  const rejectedLeaves = leaveRequests.filter((l) => l?.status === 'REJECTED').length;
 
   const filteredLeaves = leaveRequests.filter((l) => {
     if (statusFilter === 'ALL') return true;

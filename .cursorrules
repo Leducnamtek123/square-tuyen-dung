@@ -1,0 +1,13 @@
+# Cursor Rules — Square Tuyển Dụng (InfoHR)
+
+> This repository uses a hierarchical agent rule standard.
+> Always consult the master **`AGENTS.md`** at the repository root and subsystem rules in `frontend/AGENTS.md`, `api/AGENTS.md`, and `voice-ai/AGENTS.md`.
+
+## Primary Directives for Cursor
+1. **Context First**: Before suggesting code or edits, inspect relevant files to verify existing patterns, models, and interfaces. Do not assume or hallucinate field names or endpoints.
+2. **Subsystem Rules**:
+   - For `/frontend`: Follow `frontend/AGENTS.md` (Next.js 16 App Router, React 19, RSC by default, MUI 6 + Tailwind v4 coexistence, TanStack Query v5, Sonner toast).
+   - For `/api`: Follow `api/AGENTS.md` (Django 4.2+ DRF, Thin ViewSets, Service layer, absolute ban on N+1 queries using `select_related`/`prefetch_related`, Ruff, Pytest).
+   - For `/voice-ai`: Follow `voice-ai/AGENTS.md` (LiveKit WebRTC, streaming audio pipeline, interruption handling).
+3. **Vietnamese Language & Comments**: Preserve all Vietnamese domain comments and docstrings. When writing user-facing recruitment text, maintain polite and professional Vietnamese (Chuyên nghiệp, thân thiện).
+4. **Safety & Security**: Never commit or output secret keys, `.env` values, or database credentials.

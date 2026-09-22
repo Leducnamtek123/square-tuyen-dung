@@ -9,6 +9,7 @@ import Header from '../components/employers/Header';
 import Sidebar from '../components/employers/Sidebar';
 import { useLiveInterviewCount } from '@/views/employerPages/InterviewPages/useLiveInterviewCount';
 import ManagementFooter from '../components/commons/ManagementFooter';
+import OnboardingProgressBanner from '@/views/onboardingPages/components/OnboardingProgressBanner';
 
 interface EmployerLayoutProps {
   windowGetter?: () => unknown;
@@ -117,10 +118,14 @@ function EmployerLayout(props: EmployerLayoutProps) {
             mt: '60px',
             bgcolor: '#F8FAFC',
             display: 'flex',
-            justifyContent: 'center',
+            flexDirection: 'column',
+            alignItems: 'center',
             width: '100%',
           }}
         >
+          {/* Progressive Onboarding Banner for Incomplete Employer Profile */}
+          <OnboardingProgressBanner role="employer" />
+
           <Box
             sx={{
               width: '100%',

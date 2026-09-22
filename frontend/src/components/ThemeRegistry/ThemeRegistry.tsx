@@ -58,7 +58,7 @@ const theme = createTheme(baseTheme, {
           transition:
             'transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease, border-color 180ms ease, filter 180ms ease',
           '&:focus-visible': {
-            outline: '3px solid rgba(15, 23, 42, 0.18)',
+            outline: '2px solid #2563EB',
             outlineOffset: 2,
           },
           '&:active': {
@@ -181,7 +181,7 @@ const theme = createTheme(baseTheme, {
             transform: 'translateY(-1px)',
           },
           '&:focus-visible': {
-            outline: '3px solid rgba(15, 23, 42, 0.18)',
+            outline: '2px solid #2563EB',
             outlineOffset: 2,
           },
         },

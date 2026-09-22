@@ -14,10 +14,13 @@ import {
   Button,
   CircularProgress,
   Autocomplete,
+  InputAdornment,
 } from '@mui/material';
 import BusinessIcon from '@mui/icons-material/Business';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import commonService from '@/services/commonService';
 import { useTranslation } from 'react-i18next';
 import { tConfig } from '@/utils/tConfig';
@@ -30,6 +33,11 @@ interface StepCompanyProfileProps {
   errors: Record<string, string>;
   citiesList: SelectOption[];
   employeeSizeOptions?: SelectOption[];
+  onLookupTax?: (taxCode?: string) => Promise<any>;
+  isLookingUpTax?: boolean;
+  taxLookupResult?: import('@/types/auth').TaxCodeLookupResult | null;
+  onRequestJoin?: (companyId: number) => void;
+  isRequestingJoin?: boolean;
 }
 
 export default function StepCompanyProfile({
@@ -38,6 +46,11 @@ export default function StepCompanyProfile({
   errors,
   citiesList,
   employeeSizeOptions,
+  onLookupTax,
+  isLookingUpTax = false,
+  taxLookupResult,
+  onRequestJoin,
+  isRequestingJoin = false,
 }: StepCompanyProfileProps) {
   const { t } = useTranslation('employer');
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -217,7 +230,7 @@ export default function StepCompanyProfile({
           />
         </Grid>
 
-        {/* Field: Tax Code */}
+        {/* Field: Tax Code with Auto-Lookup */}
         <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E293B', mb: 0.75 }}>
             {t('employerOnboarding.step1.taxCode', 'Mã số thuế (MST)')}
@@ -228,8 +241,32 @@ export default function StepCompanyProfile({
             value={values.taxCode || ''}
             onChange={(e) => onChange('taxCode', e.target.value)}
             error={Boolean(errors.taxCode)}
-            helperText={errors.taxCode || t('employerOnboarding.step1.taxCodeHelper', 'Mã số thuế doanh nghiệp (tuỳ chọn khi khởi tạo)')}
+            helperText={errors.taxCode || t('employerOnboarding.step1.taxCodeHelper', 'Nhập MST để tự động tra cứu tên & địa chỉ doanh nghiệp')}
             slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      size="small"
+                      disabled={isLookingUpTax || !values.taxCode}
+                      onClick={() => onLookupTax && onLookupTax(values.taxCode)}
+                      sx={{
+                        textTransform: 'none',
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        py: 0.5,
+                        px: 1.25,
+                        borderRadius: 1.5,
+                        backgroundColor: '#EFF6FF',
+                        color: '#2563EB',
+                        '&:hover': { backgroundColor: '#DBEAFE' },
+                      }}
+                    >
+                      {isLookingUpTax ? <CircularProgress size={14} color="inherit" /> : 'Tra cứu MST'}
+                    </Button>
+                  </InputAdornment>
+                ),
+              },
               formHelperText: {
                 sx: { color: errors.taxCode ? '#EF4444' : '#64748B', mx: 0, mt: 0.5 },
               },
@@ -244,6 +281,73 @@ export default function StepCompanyProfile({
             }}
           />
         </Grid>
+
+        {/* Duplicate Tax Code Alert with Join Request */}
+        {taxLookupResult?.exists && taxLookupResult.company && (
+          <Grid size={{ xs: 12 }}>
+            <Box
+              sx={{
+                p: 2.5,
+                borderRadius: 3,
+                backgroundColor: '#FFFBEB',
+                border: '1px solid #FDE68A',
+              }}
+            >
+              <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={2}>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#92400E' }}>
+                    Doanh nghiệp này đã có tài khoản trên InfoHR
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#B45309', mt: 0.5 }}>
+                    Doanh nghiệp <strong>{taxLookupResult.company.companyName}</strong> (MST: {values.taxCode}) đã được đăng ký. Bạn có thể gửi yêu cầu tham gia đội ngũ tuyển dụng của công ty này thay vì tạo mới.
+                  </Typography>
+                </Box>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => taxLookupResult.company?.id && onRequestJoin && onRequestJoin(taxLookupResult.company.id)}
+                  disabled={isRequestingJoin}
+                  startIcon={isRequestingJoin ? <CircularProgress size={16} color="inherit" /> : <GroupAddIcon />}
+                  sx={{
+                    backgroundColor: '#D97706',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    textTransform: 'none',
+                    borderRadius: 2,
+                    px: 2.5,
+                    py: 1,
+                    flexShrink: 0,
+                    '&:hover': { backgroundColor: '#B45309' },
+                  }}
+                >
+                  {isRequestingJoin ? 'Đang gửi yêu cầu...' : 'Gửi yêu cầu tham gia'}
+                </Button>
+              </Stack>
+            </Box>
+          </Grid>
+        )}
+
+        {/* Auto-filled Success Notice from VietQR */}
+        {!taxLookupResult?.exists && taxLookupResult?.company && (
+          <Grid size={{ xs: 12 }}>
+            <Box
+              sx={{
+                p: 1.5,
+                borderRadius: 2.5,
+                backgroundColor: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+              }}
+            >
+              <AutoAwesomeIcon sx={{ color: '#16A34A', fontSize: 20 }} />
+              <Typography variant="body2" sx={{ color: '#166534', fontWeight: 600 }}>
+                ✨ Đã tra cứu & điền tự động: <strong>{taxLookupResult.company.companyName}</strong>
+              </Typography>
+            </Box>
+          </Grid>
+        )}
 
         {/* Field: Employee Size */}
         <Grid size={{ xs: 12, sm: 6 }}>

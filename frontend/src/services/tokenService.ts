@@ -1,4 +1,4 @@
-﻿import Cookies from 'js-cookie';
+import Cookies from 'js-cookie';
 import { AUTH_CONFIG } from '../configs/constants';
 
 /** Cookie options -- enable `secure` only over HTTPS so local dev still works. */
@@ -7,11 +7,22 @@ const baseCookieOptions: Cookies.CookieAttributes = {
   secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
 };
 
+const isUsableTokenString = (token?: string | null): token is string => {
+  if (!token || typeof token !== 'string') return false;
+  const trimmed = token.trim();
+  return (
+    trimmed !== '' &&
+    trimmed !== 'undefined' &&
+    trimmed !== 'null' &&
+    trimmed !== '[object Object]'
+  );
+};
+
 const tokenService = {
   getAccessTokenFromCookie: (): string | null => {
     try {
       const accessToken = Cookies.get(AUTH_CONFIG.ACCESS_TOKEN_KEY);
-      return accessToken && accessToken !== 'undefined' ? accessToken : null;
+      return isUsableTokenString(accessToken) ? accessToken.trim() : null;
     } catch {
       return null;
     }
@@ -20,7 +31,7 @@ const tokenService = {
   getRefreshTokenFromCookie: (): string | null => {
     try {
       const refreshToken = Cookies.get(AUTH_CONFIG.REFRESH_TOKEN_KEY);
-      return refreshToken && refreshToken !== 'undefined' ? refreshToken : null;
+      return isUsableTokenString(refreshToken) ? refreshToken.trim() : null;
     } catch {
       return null;
     }
@@ -29,7 +40,7 @@ const tokenService = {
   getProviderFromCookie: (): string | null => {
     try {
       const provider = Cookies.get(AUTH_CONFIG.BACKEND_KEY);
-      return provider && provider !== 'undefined' ? provider : null;
+      return isUsableTokenString(provider) ? provider.trim() : null;
     } catch {
       return null;
     }

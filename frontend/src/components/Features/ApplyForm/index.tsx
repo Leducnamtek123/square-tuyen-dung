@@ -146,7 +146,8 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
       try {
         const resData = await jobSeekerProfileService.getResumes(jobSeekerProfileId);
         if (isActive) {
-          dispatch({ type: "resumesLoaded", resumes: resData.results || [] });
+          const list = Array.isArray(resData) ? resData : (resData?.results || []);
+          dispatch({ type: "resumesLoaded", resumes: Array.isArray(list) ? list : [] });
         }
       } catch (error) {
         if (isActive) {

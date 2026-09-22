@@ -96,7 +96,7 @@ const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
       </Stack>
       <Stack spacing={2}>
         {isLoading && !data ? (
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             {Array.from(Array(12).keys()).map((value) => (
               <Grid
                 key={value}
@@ -105,8 +105,10 @@ const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
                   sm: 12,
                   md: 6,
                   lg: 4,
-                  xl: 4
-                }}>
+                  xl: 4,
+                }}
+                sx={{ display: 'flex' }}
+              >
                 <Company.Loading />
               </Grid>
             ))}
@@ -118,7 +120,7 @@ const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
           />
         ) : (
           <>
-            <Grid container spacing={2}>
+            <Grid container spacing={3}>
               {companies.map((value: ModelsCompany) => (
                 <Grid
                   key={value.id}
@@ -127,8 +129,10 @@ const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
                     sm: 12,
                     md: 6,
                     lg: 4,
-                    xl: 4
-                  }}>
+                    xl: 4,
+                  }}
+                  sx={{ display: 'flex' }}
+                >
                   <Company
                     id={value.id as number}
                     slug={value.slug as string}

@@ -27,6 +27,7 @@ import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useTranslation } from 'react-i18next';
+import AdminConfirmDialog from '../AdminConfirmDialog';
 import type { FilterDef, BulkAction } from './types';
 
 interface TableToolbarProps<T> {
@@ -87,6 +88,28 @@ export default function TableToolbar<T>({
   const handleClearSearch = () => {
     setLocalSearch('');
     if (onSearchChange) onSearchChange('');
+  };
+
+  const [pendingBulkAction, setPendingBulkAction] = useState<BulkAction<T> | null>(null);
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
+
+  const handleBulkActionClick = (action: BulkAction<T>) => {
+    if (action.requiresConfirmation) {
+      setPendingBulkAction(action);
+    } else {
+      action.onClick(selectedRows);
+    }
+  };
+
+  const handleConfirmBulkAction = async () => {
+    if (!pendingBulkAction) return;
+    try {
+      setBulkActionLoading(true);
+      await pendingBulkAction.onClick(selectedRows);
+    } finally {
+      setBulkActionLoading(false);
+      setPendingBulkAction(null);
+    }
   };
 
   const handleExportClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -184,7 +207,7 @@ export default function TableToolbar<T>({
                 variant={action.variant || 'outlined'}
                 color={action.color || 'primary'}
                 startIcon={action.icon}
-                onClick={() => action.onClick(selectedRows)}
+                onClick={() => handleBulkActionClick(action)}
                 sx={{
                   textTransform: 'none',
                   fontWeight: 600,
@@ -374,6 +397,21 @@ export default function TableToolbar<T>({
           )}
         </Stack>
       </Box>
+
+      {pendingBulkAction && (
+        <AdminConfirmDialog
+          open={Boolean(pendingBulkAction)}
+          title={pendingBulkAction.confirmTitle || t('common.confirmAction', 'Xác nhận thao tác')}
+          message={
+            pendingBulkAction.confirmMessage ||
+            t('common.confirmBulkMessage', 'Bạn có chắc chắn muốn thực hiện thao tác này cho {{count}} mục đã chọn?', { count: selectedCount })
+          }
+          variant={pendingBulkAction.color === 'error' ? 'danger' : 'warning'}
+          loading={bulkActionLoading}
+          onConfirm={handleConfirmBulkAction}
+          onClose={() => setPendingBulkAction(null)}
+        />
+      )}
     </Box>
   );
 }

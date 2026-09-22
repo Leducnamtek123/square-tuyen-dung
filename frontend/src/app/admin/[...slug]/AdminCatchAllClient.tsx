@@ -19,18 +19,14 @@ export default function AdminCatchAllClient() {
 
   const rawSlug = params?.slug;
   const slugArray = Array.isArray(rawSlug) ? rawSlug : typeof rawSlug === 'string' ? [rawSlug] : [];
-  const singleSlug = slugArray[0] || '';
 
-  // 1. If single slug is a numeric candidate profile ID (e.g., '11231211')
-  if (slugArray.length === 1 && /^\d+$/.test(singleSlug)) {
-    return <ProfileDetailPage id={singleSlug} />;
-  }
-
-  // 2. If path is /profiles/:id or /quan-ly-ho-so-ung-vien/:id
+  // Render ProfileDetailPage ONLY when explicit prefix is provided:
+  // profiles, quan-ly-ho-so-ung-vien, ho-so-ung-vien, ho-so
   if (
     slugArray.length === 2 &&
     (slugArray[0] === 'profiles' ||
       slugArray[0] === 'quan-ly-ho-so-ung-vien' ||
+      slugArray[0] === 'ho-so-ung-vien' ||
       slugArray[0] === 'ho-so')
   ) {
     return <ProfileDetailPage id={slugArray[1]} />;

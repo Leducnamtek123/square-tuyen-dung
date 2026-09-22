@@ -28,12 +28,22 @@ import { useTranslation } from 'react-i18next';
 import type { CandidateStep1Values } from '../schemas/candidateOnboardingSchema';
 import type { SelectOption } from '@/types/models';
 
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
+
 interface StepCareerGoalsProps {
   values: CandidateStep1Values;
   onChange: (field: keyof CandidateStep1Values, value: any) => void;
   errors: Record<string, string>;
   careersList: SelectOption[];
   citiesList: SelectOption[];
+  onCvFileSelected?: (file: File) => void;
+  isParsingCv?: boolean;
+  fileName?: string;
+  cvParseSuccess?: boolean;
 }
 
 export default function StepCareerGoals({
@@ -42,9 +52,14 @@ export default function StepCareerGoals({
   errors,
   careersList,
   citiesList,
+  onCvFileSelected,
+  isParsingCv = false,
+  fileName = '',
+  cvParseSuccess = false,
 }: StepCareerGoalsProps) {
   const { t } = useTranslation('jobSeeker');
   const [showMap, setShowMap] = useState<boolean>(Boolean(values.address || values.lat));
+  const cvFileInputRef = React.useRef<HTMLInputElement>(null);
 
   const workplaceOptions = [
     { value: 1, label: t('onboarding.step1.workplaceOnsite', 'Tại văn phòng (Onsite)'), icon: <ApartmentIcon fontSize="small" /> },
@@ -82,6 +97,99 @@ export default function StepCareerGoals({
           {t('onboarding.step1.subtitle', 'Chỉ mất 1 phút để thiết lập mục tiêu tìm việc và nhận các cơ hội việc làm phù hợp nhất')}
         </Typography>
       </Box>
+
+      {/* Hidden file input for quick CV upload */}
+      <input
+        type="file"
+        ref={cvFileInputRef}
+        accept=".pdf,.doc,.docx"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          if (e.target.files && e.target.files.length > 0 && onCvFileSelected) {
+            onCvFileSelected(e.target.files[0]);
+          }
+        }}
+      />
+
+      {/* CV-First AI Fast Track Banner */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2.25,
+          mb: 3.5,
+          borderRadius: 3,
+          backgroundColor: fileName ? '#F0FDF4' : '#EFF6FF',
+          border: '1.5px dashed',
+          borderColor: fileName ? '#86EFAC' : '#93C5FD',
+          transition: 'all 0.2s ease',
+        }}
+      >
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          justifyContent="space-between"
+          spacing={2}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box
+              sx={{
+                width: 42,
+                height: 42,
+                borderRadius: 2.5,
+                backgroundColor: fileName ? '#DCFCE7' : '#DBEAFE',
+                color: fileName ? '#16A34A' : '#2563EB',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              {fileName ? <CheckCircleRoundedIcon /> : <AutoAwesomeIcon />}
+            </Box>
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: fileName ? '#166534' : '#1E40AF' }}>
+                {fileName
+                  ? `✨ Đã đính kèm CV: ${fileName}`
+                  : 'Tải CV lên — AI tự động trích xuất & điền hồ sơ trong 3s'}
+              </Typography>
+              <Typography variant="caption" sx={{ color: fileName ? '#15803D' : '#3B82F6', display: 'block' }}>
+                {fileName
+                  ? 'Thông tin đã được đồng bộ vào các bước. Bạn có thể thay đổi CV hoặc chỉnh sửa trực tiếp bên dưới.'
+                  : 'Hỗ trợ PDF, DOCX (tối đa 10MB). Hệ thống sẽ tự động nhận diện chức danh, kỹ năng & kinh nghiệm.'}
+              </Typography>
+            </Box>
+          </Stack>
+
+          <Button
+            variant={fileName ? 'outlined' : 'contained'}
+            size="small"
+            disabled={isParsingCv}
+            onClick={() => cvFileInputRef.current?.click()}
+            startIcon={isParsingCv ? <CircularProgress size={16} color="inherit" /> : <CloudUploadOutlinedIcon />}
+            sx={{
+              borderRadius: 2,
+              fontWeight: 700,
+              textTransform: 'none',
+              px: 2.5,
+              py: 0.8,
+              flexShrink: 0,
+              backgroundColor: fileName ? 'transparent' : '#2563EB',
+              borderColor: fileName ? '#86EFAC' : undefined,
+              color: fileName ? '#16A34A' : '#FFFFFF',
+              boxShadow: fileName ? 'none' : '0 4px 12px rgba(37, 99, 235, 0.25)',
+              '&:hover': {
+                backgroundColor: fileName ? 'rgba(22, 163, 74, 0.08)' : '#1D4ED8',
+              },
+            }}
+          >
+            {isParsingCv
+              ? 'AI Đang phân tích...'
+              : fileName
+                ? 'Đổi CV khác'
+                : 'Tải CV tự động điền'}
+          </Button>
+        </Stack>
+      </Paper>
 
       <Grid container spacing={3}>
         {/* Field 1: Desired Job Title */}

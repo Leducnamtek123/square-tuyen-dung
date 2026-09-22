@@ -45,6 +45,7 @@ type Props = {
   errorMessage: string | null;
   successMessage: string | null;
   loginMode: 'email' | 'phone';
+  defaultEmail?: string;
   isFullScreenLoading: boolean;
   onSetLoginMode: (mode: 'email' | 'phone') => void;
   onLogin: (data: { email: string; password?: string }) => void;
@@ -58,6 +59,7 @@ const JobSeekerLoginView = ({
   errorMessage,
   successMessage,
   loginMode,
+  defaultEmail,
   isFullScreenLoading,
   onSetLoginMode,
   onLogin,
@@ -285,7 +287,7 @@ const JobSeekerLoginView = ({
 
               <Box sx={{ mt: 0.5 }}>
                 {loginMode === 'email' ? (
-                  <JobSeekerLoginForm onLogin={onLogin} onGoogleLogin={onGoogleLogin} />
+                  <JobSeekerLoginForm onLogin={onLogin} onGoogleLogin={onGoogleLogin} defaultEmail={defaultEmail} />
                 ) : (
                   <PhoneOTPLoginForm onLogin={onFirebaseLogin} isLoading={isFullScreenLoading} />
                 )}
@@ -363,7 +365,7 @@ const JobSeekerLoginView = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 0.75,
-                  color: '#94A3B8',
+                  color: '#64748B',
                   fontSize: '12px',
                 }}
               >

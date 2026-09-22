@@ -1007,6 +1007,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
 
             <Button
               onClick={onJoin}
+              data-testid="join-interview-room-btn"
               disabled={starting || !audioStream || !!error}
               variant="contained"
               startIcon={hasDetectedVoice && isMock ? <AilaLogo size={16} variant="mark" /> : undefined}
@@ -1041,6 +1042,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
               <Button
                 onClick={onJoin}
+                data-testid="skip-check-and-join-btn"
                 variant="outlined"
                 color="inherit"
                 size="small"

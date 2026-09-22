@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import {
   Box,
   Button,
@@ -1181,7 +1182,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
                 </Box>
               ) : generatedResult ? (
                 previewTab === 'preview' ? (
-                  <div dangerouslySetInnerHTML={{ __html: generatedResult }} />
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generatedResult) }} />
                 ) : (
                   <Box
                     component="pre"

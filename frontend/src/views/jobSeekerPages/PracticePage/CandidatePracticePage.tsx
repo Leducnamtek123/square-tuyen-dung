@@ -631,6 +631,7 @@ export const CandidatePracticePage: React.FC = () => {
                   <Stack direction={{ xs: 'row', md: 'column' }} spacing={1.25} sx={{ width: { xs: '100%', md: 220 }, flexShrink: 0, justifyContent: 'center' }}>
                     <Button
                       variant="contained"
+                      data-testid="start-set-mock-btn"
                       onClick={() => handleStartSetMock(set)}
                       disabled={isStartingMock}
                       startIcon={<VideoCameraFrontIcon sx={{ fontSize: 18 }} />}

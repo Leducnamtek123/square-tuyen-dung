@@ -16,7 +16,10 @@ from livekit.agents.llm import function_tool
 from .backend_auth import auth_event_hook
 from .config import config
 from .interview_flow import (
+    DecisionVerdict,
+    TurnIntent,
     decide_next_action,
+    evaluate_candidate_turn,
     is_explicit_refusal_or_skip,
     is_hostile_or_abusive,
     is_substantive_answer,
@@ -859,7 +862,7 @@ class Interviewer(Agent):
         for attempt in range(1, max_retries + 1):
             try:
                 logger.info("Playing initial greeting (attempt %d/%d)...", attempt, max_retries)
-                await self.session.say(greeting, allow_interruptions=False)
+                await self.session.say(greeting, allow_interruptions=True)
                 logger.info("Initial greeting played successfully.")
                 break
             except Exception as exc:
@@ -920,7 +923,21 @@ class Interviewer(Agent):
         return True
 
     async def _build_scripted_response(self, *, user_text: str = "") -> str | None:
-        if _looks_like_end_interview_intent(user_text):
+        verdict = evaluate_candidate_turn(user_text) if user_text else None
+        if verdict:
+            logger.info(
+                "Voice Decision Engine verdict for room %s: intent=%s (conf=%.2f, reasoning='%s')",
+                self._room_name,
+                verdict.intent.value,
+                verdict.confidence,
+                verdict.reasoning,
+            )
+
+        if _looks_like_end_interview_intent(user_text) or (
+            verdict is not None
+            and verdict.intent == TurnIntent.END_INTERVIEW
+            and verdict.confidence >= 0.80
+        ):
             logger.info(
                 "Detected candidate end-interview intent for room %s: %s",
                 self._room_name,
@@ -930,7 +947,11 @@ class Interviewer(Agent):
             self._mark_completed()
             return _closing_response(language=self._language)
 
-        if is_hostile_or_abusive(user_text):
+        if is_hostile_or_abusive(user_text) or (
+            verdict is not None
+            and verdict.intent == TurnIntent.HOSTILE_ABUSE
+            and verdict.confidence >= 0.80
+        ):
             self._abusive_turn_count += 1
             logger.warning(
                 "Detected candidate abusive/hostile language for room %s (strike %s): %s",
@@ -952,7 +973,11 @@ class Interviewer(Agent):
                 "Nếu bạn muốn bỏ qua câu hỏi vừa rồi, bạn có thể nói bỏ qua để sang câu hỏi mới nhé."
             )
 
-        if is_explicit_refusal_or_skip(user_text):
+        if is_explicit_refusal_or_skip(user_text) or (
+            verdict is not None
+            and verdict.intent == TurnIntent.REFUSAL_OR_SKIP
+            and verdict.confidence >= 0.80
+        ):
             logger.info(
                 "Candidate requested to skip or refused answer for room %s: %s",
                 self._room_name,
@@ -961,10 +986,42 @@ class Interviewer(Agent):
             self._short_answer_prompted_for = None
             return await self._advance_to_next_question_after_skip(user_text)
 
+        if (
+            verdict is not None
+            and verdict.intent == TurnIntent.NEED_CLARIFICATION_OR_HESITATION
+            and verdict.confidence >= 0.75
+        ):
+            logger.info(
+                "Candidate requested clarification or needed time for room %s: %s",
+                self._room_name,
+                user_text,
+            )
+            current_q = _clean_question_for_candidate(self._last_asked_question_text or "")
+            if current_q:
+                return f"Bạn cứ bình tĩnh suy nghĩ nhé. Mình xin nhắc lại câu hỏi: {current_q}"
+            return "Bạn cứ bình tĩnh suy nghĩ nhé, khi nào sẵn sàng thì chia sẻ câu trả lời với mình."
+
         if self._awaiting_candidate_questions:
             if not user_text:
                 return None
             return await self._finish_after_candidate_question(user_text)
+
+        if (
+            verdict is not None
+            and verdict.intent == TurnIntent.QUESTION_FOR_INTERVIEWER
+            and verdict.confidence >= 0.75
+        ):
+            logger.info(
+                "Candidate asked interviewer a question during interview for room %s: %s",
+                self._room_name,
+                user_text,
+            )
+            current_q = _clean_question_for_candidate(self._last_asked_question_text or "")
+            if current_q:
+                return (
+                    f"Cảm ơn câu hỏi của bạn. Ở phần cuối buổi phỏng vấn mình sẽ giải đáp chi tiết các thắc mắc về công ty nhé. "
+                    f"Bây giờ chúng ta hãy tiếp tục câu hỏi hiện tại: {current_q}"
+                )
 
         if self._needs_more_answer_detail(user_text):
             return _format_detail_nudge(self._last_asked_question_text or "", user_text)

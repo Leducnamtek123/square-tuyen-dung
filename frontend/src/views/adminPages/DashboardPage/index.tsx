@@ -1,10 +1,27 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { Box, Typography, Paper, Stack, Divider, LinearProgress, Skeleton, Button } from "@mui/material";
+import React, { useMemo, useRef, useState } from 'react';
+import {
+  Box,
+  Typography,
+  Paper,
+  Stack,
+  Divider,
+  LinearProgress,
+  Skeleton,
+  Button,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import { Grid2 as Grid } from "@mui/material";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import {
+  GSAP_MEDIA_CONDITIONS,
+  registerGsapPlugins,
+} from "@/utils/gsapHelpers";
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 import PeopleIcon from '@mui/icons-material/People';
@@ -29,6 +46,10 @@ import { useAdminStats } from './hooks/useAdminStats';
 import LiveMetricCard from './components/LiveMetricCard';
 import AnalyticsCharts from './components/AnalyticsCharts';
 import PendingActionWidget from './components/PendingActionWidget';
+import SystemHealthWidget from './components/SystemHealthWidget';
+import AiVoiceInterviewHealthWidget from './components/AiVoiceInterviewHealthWidget';
+
+registerGsapPlugins();
 
 type ChartItem = {
   name: string;
@@ -160,7 +181,117 @@ const ProgressRow = ({ label, value, total, color, formatter, loading }: Progres
 export default function DashboardPage() {
   const { t } = useTranslation('admin');
   const theme = useTheme();
-  const { data: stats, isLoading, refetch, isFetching } = useAdminStats();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [days, setDays] = useState<number>(30);
+  const { data: stats, isLoading, refetch, isFetching } = useAdminStats(days);
+
+  const handlePeriodChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newDays: number | null
+  ) => {
+    if (newDays !== null) {
+      setDays(newDays);
+    }
+  };
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia();
+
+      // -- Desktop Breakpoint (≥769px) ---------------------------------
+      mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+        tl.fromTo(
+          ".gsap-admin-header",
+          { y: 15, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' }
+        )
+          .fromTo(
+            ".gsap-admin-kpi",
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, clearProps: 'all' },
+            "-=0.2"
+          )
+          .fromTo(
+            ".gsap-admin-health-row",
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.55, clearProps: 'all' },
+            "-=0.25"
+          )
+          .fromTo(
+            ".gsap-admin-action-row",
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.55, clearProps: 'all' },
+            "-=0.25"
+          )
+          .fromTo(
+            ".gsap-admin-panels",
+            { y: 25, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.5,
+              stagger: 0.1,
+              ease: "power2.out",
+              clearProps: 'all',
+            },
+            "-=0.25"
+          );
+      });
+
+      // -- Mobile Breakpoint (≤768px) ----------------------------------
+      mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
+        const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+        tl.fromTo(
+          ".gsap-admin-header",
+          { y: 10, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, clearProps: 'all' }
+        )
+          .fromTo(
+            ".gsap-admin-kpi",
+            { y: 12, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' },
+            "-=0.2"
+          )
+          .fromTo(
+            ".gsap-admin-health-row",
+            { y: 14, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' },
+            "-=0.2"
+          )
+          .fromTo(
+            ".gsap-admin-action-row",
+            { y: 14, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.45, clearProps: 'all' },
+            "-=0.2"
+          )
+          .fromTo(
+            ".gsap-admin-panels",
+            { y: 14, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.4,
+              stagger: 0.06,
+              ease: "power2.out",
+              clearProps: 'all',
+            },
+            "-=0.2"
+          );
+      });
+
+      // -- Reduced Motion -----------------------------------------------
+      mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
+        gsap.set(
+          ".gsap-admin-header, .gsap-admin-kpi, .gsap-admin-health-row, .gsap-admin-action-row, .gsap-admin-panels",
+          { opacity: 1, y: 0, clearProps: 'all' }
+        );
+      });
+    },
+    { scope: containerRef }
+  );
 
   const totalUsers = n(stats?.totalUsers);
   const totalJobPosts = n(stats?.totalJobPosts);
@@ -216,9 +347,10 @@ export default function DashboardPage() {
   const pieOptions = useMemo(() => createDoughnutOptions(theme), [theme]);
 
   return (
-    <Box sx={{ width: '100%', pb: 6 }}>
-      {/* Header section */}
+    <Box ref={containerRef} sx={{ width: '100%', pb: 6 }}>
+      {/* Header section with Global Period Filter & Refresh */}
       <Box
+        className="gsap-admin-header"
         sx={{
           mb: 3.5,
           display: 'flex',
@@ -233,36 +365,74 @@ export default function DashboardPage() {
             {t('dashboard.operatingStats')}
           </Typography>
           <Typography variant="body2" sx={{ color: '#64748B', mt: 0.5 }}>
-            {t('dashboard.last30Days')}
+            Toàn cảnh vận hành hệ thống, hiệu năng AI và tăng trưởng sàn thời gian thực
           </Typography>
         </Box>
 
-        <Button
-          variant="outlined"
-          startIcon={<RefreshIcon />}
-          onClick={() => refetch()}
-          disabled={isFetching}
-          sx={{
-            textTransform: 'none',
-            fontWeight: 600,
-            borderRadius: 2.5,
-            borderColor: '#E2E8F0',
-            color: '#334155',
-            bgcolor: '#FFFFFF',
-            '&:hover': { borderColor: '#CBD5E1', bgcolor: '#F8FAFC' },
-          }}
-        >
-          {isFetching ? t('dashboard.loadingChart') : 'Làm mới dữ liệu'}
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+          <ToggleButtonGroup
+            size="small"
+            value={days}
+            exclusive
+            onChange={handlePeriodChange}
+            sx={{
+              bgcolor: '#F8FAFC',
+              p: 0.5,
+              borderRadius: 2.5,
+              border: '1px solid #E2E8F0',
+              '& .MuiToggleButton-root': {
+                border: 'none',
+                borderRadius: 2,
+                px: 1.5,
+                py: 0.5,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                color: '#64748B',
+                '&.Mui-selected': {
+                  bgcolor: '#FFFFFF',
+                  color: '#2563EB',
+                  boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                },
+              },
+            }}
+          >
+            <ToggleButton value={7}>7 ngày</ToggleButton>
+            <ToggleButton value={30}>30 ngày</ToggleButton>
+            <ToggleButton value={90}>3 tháng</ToggleButton>
+            <ToggleButton value={365}>1 năm</ToggleButton>
+          </ToggleButtonGroup>
+
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={() => refetch()}
+            disabled={isFetching}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 600,
+              borderRadius: 2.5,
+              borderColor: '#E2E8F0',
+              color: '#334155',
+              bgcolor: '#FFFFFF',
+              px: 1.75,
+              py: 0.65,
+              fontSize: '0.8125rem',
+              '&:hover': { borderColor: '#CBD5E1', bgcolor: '#F8FAFC' },
+            }}
+          >
+            {isFetching ? t('dashboard.loadingChart') : 'Làm mới dữ liệu'}
+          </Button>
+        </Box>
       </Box>
 
       {/* KPI Cards Grid */}
-      <Grid container spacing={{ xs: 1.5, sm: 2.5 }} sx={{ mb: 3.5 }}>
+      <Grid container spacing={{ xs: 1.5, sm: 2.5 }} sx={{ mb: 3.5 }} className="gsap-admin-kpi">
         <Grid size={{ xs: 6, sm: 6, md: 4, lg: 2.4 }}>
           <LiveMetricCard
             title={t('dashboard.totalUsers', 'Tổng người dùng')}
             value={totalUsers}
-            subtitle={`${t('dashboard.last30Days')}: +${n(stats?.newUsers30d)}`}
+            subtitle={totalUsers === 0 ? t('dashboard.noUserData') : `${days} ngày qua: +${n(stats?.newUsers ?? stats?.newUsers30d)}`}
             deltaPercent={14}
             icon={<PeopleIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#EFF6FF"
@@ -274,7 +444,7 @@ export default function DashboardPage() {
           <LiveMetricCard
             title={t('dashboard.jobPostStatus')}
             value={totalJobPosts}
-            subtitle={`${t('dashboard.newJobPosts30d')}: ${n(stats?.newJobPosts30d)}`}
+            subtitle={`${days} ngày qua: +${n(stats?.newJobPosts ?? stats?.newJobPosts30d)}`}
             deltaPercent={8}
             icon={<WorkIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#ECFDF5"
@@ -286,7 +456,7 @@ export default function DashboardPage() {
           <LiveMetricCard
             title={t('dashboard.applicationPipeline')}
             value={totalApplications}
-            subtitle={`${t('dashboard.newApplications30d')}: ${n(stats?.newApplications30d)}`}
+            subtitle={`${days} ngày qua: +${n(stats?.newApplications ?? stats?.newApplications30d)}`}
             deltaPercent={22}
             icon={<DescriptionIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#FFFBEB"
@@ -298,7 +468,7 @@ export default function DashboardPage() {
           <LiveMetricCard
             title={t('dashboard.companies')}
             value={totalCompanies}
-            subtitle={`${t('dashboard.verifiedCompanies')}: ${totalVerifiedCompanies}`}
+            subtitle={`${t('dashboard.verifiedCompanies')}: ${totalVerifiedCompanies}/${totalCompanies}`}
             deltaPercent={12}
             icon={<BusinessIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#F5F3FF"
@@ -310,7 +480,7 @@ export default function DashboardPage() {
           <LiveMetricCard
             title={t('dashboard.interviews')}
             value={totalInterviews}
-            subtitle={`${t('dashboard.newInterviews30d')}: ${n(stats?.newInterviews30d)}`}
+            subtitle={`${days} ngày qua: +${n(stats?.newInterviews ?? stats?.newInterviews30d)}`}
             deltaPercent={35}
             icon={<SmartToyOutlinedIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#FDF2F8"
@@ -320,18 +490,28 @@ export default function DashboardPage() {
         </Grid>
       </Grid>
 
-      {/* Main Trends & Pending Actions */}
-      <Grid container spacing={3} sx={{ mb: 3.5 }}>
+      {/* Main Trends & System Health */}
+      <Grid container spacing={3} sx={{ mb: 3.5 }} className="gsap-admin-health-row">
         <Grid size={{ xs: 12, lg: 8 }}>
-          <AnalyticsCharts />
+          <AnalyticsCharts days={days} onPeriodChange={setDays} />
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
+          <SystemHealthWidget />
+        </Grid>
+      </Grid>
+
+      {/* Pending Actions & Voice AI Performance */}
+      <Grid container spacing={3} sx={{ mb: 3.5 }} className="gsap-admin-action-row">
+        <Grid size={{ xs: 12, lg: 6 }}>
           <PendingActionWidget stats={stats} loading={isLoading} />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <AiVoiceInterviewHealthWidget stats={stats} loading={isLoading} />
         </Grid>
       </Grid>
 
       {/* Breakdown Panels */}
-      <Grid container spacing={3}>
+      <Grid container spacing={3} className="gsap-admin-panels">
         {/* Job Status Distribution */}
         <Grid size={{ xs: 12, md: 6, lg: 4 }}>
           <DashboardPanel title={t('dashboard.jobPostStatus')}>

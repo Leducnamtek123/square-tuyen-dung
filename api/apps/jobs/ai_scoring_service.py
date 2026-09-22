@@ -11,6 +11,8 @@ from django.core.cache import cache
 
 import httpx
 
+from apps.common.decision_engine.engine import CvTriageEngine
+
 logger = logging.getLogger(__name__)
 
 CACHE_TTL = 3600  # 1 hour
@@ -138,84 +140,78 @@ def score_resume_job_fit(resume_data, job_data, resume_id=None, job_id=None):
 
 def _fallback_scoring(resume_data, job_data):
     """
-    Rule-based fallback scoring when AI is unavailable.
-    Uses simple heuristics to estimate match.
+    openJev System 1 calibrated fallback scoring when LLM is unavailable or circuit-broken.
+    Uses CvTriageEngine for multi-criteria skill, experience, education matching combined with salary evaluation.
     """
-    score = 55  # Base score
-    strengths = []
+    cand_summary = {
+        "title": resume_data.get("title", ""),
+        "skills": resume_data.get("skills", ""),
+        "experience_years": resume_data.get("experience", 0),
+        "education": str(resume_data.get("academic_level", "")),
+        "summary": resume_data.get("summary", ""),
+        "raw_text": f"{resume_data.get('title', '')} {resume_data.get('skills', '')}",
+    }
+    job_req = {
+        "job_title": job_data.get("job_name", ""),
+        "skills": job_data.get("skills") or job_data.get("required_skills") or job_data.get("description", ""),
+        "min_experience_years": job_data.get("experience", 0),
+        "education_level": str(job_data.get("academic_level", "")),
+    }
 
-    # Experience match (±20 points)
     try:
-        r_exp = int(resume_data.get('experience') or 0)
-    except (ValueError, TypeError):
-        r_exp = 0
-    try:
-        j_exp = int(job_data.get('experience') or 0)
-    except (ValueError, TypeError):
-        j_exp = 0
+        triage_verdict = CvTriageEngine.triage(cand_summary, job_req)
+        score = triage_verdict.score
+        strengths = list(triage_verdict.matched_criteria)
+        gaps = list(triage_verdict.missing_criteria)
+        recommendation = triage_verdict.summary
+    except Exception as exc:
+        logger.warning("CvTriageEngine triage error in fallback scoring: %s", exc)
+        score = 55.0
+        strengths = []
+        gaps = []
+        recommendation = "Độ tương thích hồ sơ được ước lượng cơ bản."
 
-    if r_exp >= j_exp and j_exp > 0:
-        score += 20
-        strengths.append(f"Kinh nghiệm làm việc đáp ứng tốt ({r_exp} năm)")
-    elif r_exp >= j_exp - 1 and j_exp > 0:
-        score += 10
-        strengths.append(f"Kinh nghiệm tiệm cận yêu cầu vị trí ({r_exp} năm)")
+    # Experience match calculation
+    try:
+        r_exp = float(resume_data.get("experience") or 0)
+    except (ValueError, TypeError):
+        r_exp = 0.0
+    try:
+        j_exp = float(job_data.get("experience") or 0)
+    except (ValueError, TypeError):
+        j_exp = 0.0
 
-    # Salary overlap (±15 points)
+    exp_match = min(100, int((r_exp / max(j_exp, 1.0)) * 100)) if j_exp > 0 else 85
+
+    # Salary overlap calculation
     try:
-        r_min = float(resume_data.get('salary_min') or 0)
+        r_min = float(resume_data.get("salary_min") or 0)
+        r_max = float(resume_data.get("salary_max") or 0)
+        j_min = float(job_data.get("salary_min") or 0)
+        j_max = float(job_data.get("salary_max") or 0)
     except (ValueError, TypeError):
-        r_min = 0.0
-    try:
-        r_max = float(resume_data.get('salary_max') or 0)
-    except (ValueError, TypeError):
-        r_max = 0.0
-    try:
-        j_min = float(job_data.get('salary_min') or 0)
-    except (ValueError, TypeError):
-        j_min = 0.0
-    try:
-        j_max = float(job_data.get('salary_max') or 0)
-    except (ValueError, TypeError):
-        j_max = 0.0
+        r_min = r_max = j_min = j_max = 0.0
 
     if j_min <= r_max and r_min <= j_max and (r_max > 0 or j_max > 0):
-        score += 15
-        strengths.append("Mức lương kỳ vọng phù hợp với dải đãi ngộ")
+        salary_match = 85
+        strengths.append("Mức lương kỳ vọng phù hợp với dải đãi ngộ công ty")
     elif r_min > j_max and j_max > 0:
-        score -= 10
+        salary_match = 40
+        gaps.append(f"Mức lương mong muốn ({r_min:,.0f}) cao hơn ngân sách vị trí ({j_max:,.0f})")
+    else:
+        salary_match = 70
 
-    # Title keyword overlap (±15 points)
-    r_title = str(resume_data.get('title') or '').lower()
-    j_title = str(job_data.get('job_name') or '').lower()
-    common_words = set(r_title.split()) & set(j_title.split())
-    stopwords = {'và', 'the', 'a', 'an', '-', 'tại', 'cho', 'của', 'với', 'trong', 'về'}
-    meaningful = common_words - stopwords
-    if len(meaningful) >= 2:
-        score += 15
-        strengths.append("Chức danh và chuyên môn khớp chặt chẽ")
-    elif len(meaningful) >= 1:
-        score += 8
-        strengths.append("Chuyên môn phù hợp ngành nghề")
-
-    # Skills overlap (±10 points)
-    r_skills = str(resume_data.get('skills') or '').lower()
-    if r_skills and j_title:
-        skill_matches = [w for w in j_title.split() if len(w) > 2 and w in r_skills]
-        if skill_matches:
-            score += 10
-            strengths.append("Bộ kỹ năng đáp ứng yêu cầu công việc")
-
-    score = max(35, min(95, score))
+    overall_score = round(score * 0.7 + exp_match * 0.15 + salary_match * 0.15, 1)
+    overall_score = max(20.0, min(98.0, overall_score))
 
     return {
-        "overall_score": score,
-        "skill_match": score,
-        "experience_match": min(100, int((r_exp / max(j_exp, 1)) * 100)) if j_exp else 80,
-        "salary_match": 85 if (j_min <= r_max and r_min <= j_max) else 60,
+        "overall_score": overall_score,
+        "skill_match": round(score, 1),
+        "experience_match": exp_match,
+        "salary_match": salary_match,
         "strengths": strengths,
-        "gaps": [],
-        "recommendation": "Độ tương thích hồ sơ được tính toán nhanh theo tiêu chuẩn JD và dữ liệu ứng viên."
+        "gaps": gaps,
+        "recommendation": recommendation,
     }
 
 

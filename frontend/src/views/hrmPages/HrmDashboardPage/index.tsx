@@ -606,9 +606,10 @@ export default function HrmDashboardPage() {
               </Stack>
 
               {leavesToday.length === 0 ? (
-                <Box sx={{ py: 5, textAlign: 'center', my: 'auto' }}>
+                <Box sx={{ py: 4, textAlign: 'center', my: 'auto' }}>
+                  <CheckCircleOutlineIcon sx={{ color: '#16a34a', fontSize: 32, mb: 1 }} />
                   <Typography variant="body2" sx={{ color: '#16a34a', fontWeight: 700 }}>
-                    Toàn bộ nhân sự đang có mặt đầy đủ hôm nay 🎉
+                    Toàn bộ nhân sự đang có mặt đầy đủ hôm nay
                   </Typography>
                   <Typography variant="caption" sx={{ color: '#64748b', mt: 0.5, display: 'block' }}>
                     Không ghi nhận đơn nghỉ phép nào trùng ngày

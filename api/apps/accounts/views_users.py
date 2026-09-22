@@ -179,8 +179,11 @@ def check_creds(request):
 
     if user:
         res_data["exists"] = True
-        if user.is_verify_email:
+        if user.is_verify_email or user.is_active:
             res_data["email_verified"] = True
+            if user.is_active and not user.is_verify_email:
+                user.is_verify_email = True
+                user.save(update_fields=["is_verify_email"])
     else:
         other_user = User.objects.filter(email__iexact=email).first()
         if other_user:
@@ -209,6 +212,9 @@ def send_verify_email(request):
         )
 
     if user.is_verify_email or user.is_active:
+        if user.is_active and not user.is_verify_email:
+            user.is_verify_email = True
+            user.save(update_fields=["is_verify_email"])
         return response_data(
             status=status.HTTP_200_OK,
             data={"emailVerified": True, "message": SUCCESS_MESSAGES["EMAIL_VERIFIED"]},

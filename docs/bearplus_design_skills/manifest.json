@@ -1,0 +1,22 @@
+{
+  "name": "bearplus-level-design-skills",
+  "version": "1.0.0",
+  "purpose": "AI-agent design system for product UX, art direction, visual design, interaction, motion, implementation and critique.",
+  "skills": [
+    "skills\\accessibility\\SKILL.md",
+    "skills\\art-direction\\SKILL.md",
+    "skills\\creative-coding\\SKILL.md",
+    "skills\\design-critique\\SKILL.md",
+    "skills\\design-director\\SKILL.md",
+    "skills\\design-system\\SKILL.md",
+    "skills\\design-training\\SKILL.md",
+    "skills\\implementation\\SKILL.md",
+    "skills\\interaction-design\\SKILL.md",
+    "skills\\motion-design\\SKILL.md",
+    "skills\\product-ux\\SKILL.md",
+    "skills\\responsive-design\\SKILL.md",
+    "skills\\reverse-engineering\\SKILL.md",
+    "skills\\visual-design\\SKILL.md",
+    "skills\\visual-qa\\SKILL.md"
+  ]
+}

@@ -327,6 +327,27 @@ class EmploymentContractViewSet(viewsets.ModelViewSet):
                 )
             serializer.save()
 
+    def destroy(self, request, *args, **kwargs):
+        contract = self.get_object()
+        if contract.status in ['TERMINATED', 'EXPIRED']:
+            raise ValidationError("Không thể xóa hợp đồng đã kết thúc hoặc hết hạn.")
+        return super().destroy(request, *args, **kwargs)
+
+    @action(detail=True, methods=['post', 'patch'], url_path='cancel')
+    def cancel(self, request, pk=None):
+        """Hủy hợp đồng lao động."""
+        contract = self.get_object()
+        company = _get_company_for_request(request)
+        if not company or contract.employee.company_id != company.id:
+            raise PermissionDenied("Không có quyền thao tác trên hợp đồng này.")
+
+        if contract.status in ['TERMINATED', 'EXPIRED']:
+            raise ValidationError("Không thể hủy hợp đồng đã ở trạng thái kết thúc/hết hạn.")
+
+        contract.status = 'TERMINATED'
+        contract.save(update_fields=['status', 'update_at'])
+        return Response(EmploymentContractSerializer(contract).data, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['post'], url_path='renew')
     def renew(self, request, pk=None):
         """Tái ký / gia hạn hợp đồng lao động mới cho nhân viên."""
@@ -334,6 +355,9 @@ class EmploymentContractViewSet(viewsets.ModelViewSet):
         company = _get_company_for_request(request)
         if not company or contract.employee.company_id != company.id:
             raise PermissionDenied("Không có quyền thao tác trên hợp đồng này.")
+
+        if contract.status in ['TERMINATED', 'EXPIRED']:
+            raise ValidationError("Không thể gia hạn hợp đồng đã kết thúc hoặc hết hạn.")
 
         serializer = RenewContractSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -485,6 +509,12 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['patch'], url_path='approve')
     def approve(self, request, pk=None):
         leave_req = self.get_object()
+        if leave_req.employee.user_id and leave_req.employee.user_id == request.user.id:
+            raise PermissionDenied("Nhân viên không thể tự phê duyệt đơn nghỉ phép của chính mình.")
+        approver = Employee.objects.filter(user=request.user, company=leave_req.employee.company).first()
+        if approver and approver.id == leave_req.employee_id:
+            raise PermissionDenied("Nhân viên không thể tự phê duyệt đơn nghỉ phép của chính mình.")
+
         if leave_req.status == 'APPROVED':
             return Response(LeaveRequestSerializer(leave_req).data)
 
@@ -1087,13 +1117,19 @@ class AttendanceRequestViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Không có quyền thực hiện.")
         attendance_request = self.get_object()
 
+        if attendance_request.employee.user_id and attendance_request.employee.user_id == request.user.id:
+            raise PermissionDenied("Nhân viên không thể tự phê duyệt đơn của chính mình.")
+
+        reviewer = Employee.objects.filter(company=company, user=request.user).first()
+        if reviewer and reviewer.id == attendance_request.employee_id:
+            raise PermissionDenied("Nhân viên không thể tự phê duyệt đơn của chính mình.")
+
         if attendance_request.status != 'PENDING_STAGE_1':
             return Response(
                 {'detail': f'Không thể duyệt cấp 1 khi đơn đang ở trạng thái {attendance_request.get_status_display()}.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        reviewer = Employee.objects.filter(company=company, user=request.user).first()
         attendance_request.status = 'APPROVED_STAGE_1'
         attendance_request.manager_reviewer = reviewer
         attendance_request.manager_approved_at = timezone.now()
@@ -1108,13 +1144,19 @@ class AttendanceRequestViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Không có quyền thực hiện.")
         attendance_request = self.get_object()
 
+        if attendance_request.employee.user_id and attendance_request.employee.user_id == request.user.id:
+            raise PermissionDenied("Nhân viên không thể tự phê duyệt đơn của chính mình.")
+
+        reviewer = Employee.objects.filter(company=company, user=request.user).first()
+        if reviewer and reviewer.id == attendance_request.employee_id:
+            raise PermissionDenied("Nhân viên không thể tự phê duyệt đơn của chính mình.")
+
         if attendance_request.status not in ['PENDING_STAGE_1', 'APPROVED_STAGE_1']:
             return Response(
                 {'detail': f'Không thể duyệt cấp 2 khi đơn đang ở trạng thái {attendance_request.get_status_display()}.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        reviewer = Employee.objects.filter(company=company, user=request.user).first()
         attendance_request.status = 'APPROVED'
         attendance_request.hr_reviewer = reviewer
         attendance_request.hr_approved_at = timezone.now()

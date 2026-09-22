@@ -78,7 +78,7 @@ export const CVGalleryPage: React.FC = () => {
         elevation={0}
         sx={{
           borderRadius: '20px',
-          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.82) 45%, rgba(15, 23, 42, 0.42) 100%), url(/images/banners/banner-cv-gallery.jpg)`,
+          background: `linear-gradient(100deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 58, 138, 0.82) 45%, rgba(15, 23, 42, 0.42) 100%), url(/images/banners/banner-cv-gallery.webp)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center right',
           color: '#ffffff',
@@ -283,7 +283,7 @@ export const CVGalleryPage: React.FC = () => {
                   }}
                 >
                   <CircularProgress size={32} thickness={4} sx={{ color: '#2563eb' }} />
-                  <Typography variant="caption" sx={{ mt: 1.5, color: '#94a3b8', fontWeight: 600 }}>
+                  <Typography variant="caption" sx={{ mt: 1.5, color: '#64748B', fontWeight: 600 }}>
                     Đang tải mẫu CV...
                   </Typography>
                 </Card>

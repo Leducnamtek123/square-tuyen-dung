@@ -29,6 +29,7 @@ interface StepResumeUploadProps {
   setIsUploading: (uploading: boolean) => void;
   errorMsg: string;
   setErrorMsg: (msg: string) => void;
+  onAutoParseCv?: (fileId: number, fileName: string, fileUrl: string) => Promise<any> | void;
 }
 
 export default function StepResumeUpload({
@@ -38,6 +39,7 @@ export default function StepResumeUpload({
   setIsUploading,
   errorMsg,
   setErrorMsg,
+  onAutoParseCv,
 }: StepResumeUploadProps) {
   const { t } = useTranslation('jobSeeker');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -64,6 +66,9 @@ export default function StepResumeUpload({
       onChange('fileId', res.id);
       onChange('fileName', file.name);
       onChange('fileUrl', res.url);
+      if (onAutoParseCv) {
+        void onAutoParseCv(res.id, file.name, res.url);
+      }
     } catch (err: unknown) {
       console.error('CV upload error:', err);
       setErrorMsg(t('onboarding.validation.uploadFailed', 'Tải file CV thất bại. Vui lòng thử lại.'));

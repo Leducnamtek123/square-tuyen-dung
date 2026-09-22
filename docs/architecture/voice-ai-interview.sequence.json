@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Voice AI Interview Real-Time Sequence",
+    "output": "voice-ai-interview.html",
+    "viewBox": [1000, 720],
+    "column_fit": "spread",
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "room-join", "label": "Room Connect & Token", "focus": ["candidate", "portal", "gateway", "backend", "livekit"], "note": "Candidate authenticates and joins the WebRTC interview room." },
+      { "id": "voice-loop", "label": "Real-time Voice Turn", "focus": ["candidate", "livekit", "agent", "cloud_ai"], "note": "Real-time speech stream processed through VAD, STT, LLM, and TTS with low TTFA." },
+      { "id": "finish-and-archive", "label": "Evaluation & S3 Archive", "focus": ["agent", "backend", "minio"], "note": "Interview session scoring submitted to Django and recordings archived to MinIO S3." }
+    ]
+  },
+  "participants": [
+    { "id": "candidate", "type": "external", "label": "Candidate", "sublabel": "Mic & Speaker" },
+    { "id": "portal", "type": "frontend", "label": "Next.js Web", "sublabel": "Interview Room" },
+    { "id": "gateway", "type": "security", "label": "Nginx", "sublabel": "SSL / WSS" },
+    { "id": "backend", "type": "backend", "label": "Django API", "sublabel": "Token & Evaluation" },
+    { "id": "livekit", "type": "backend", "label": "LiveKit SFU", "sublabel": "WebRTC Engine" },
+    { "id": "agent", "type": "backend", "label": "Voice Agent", "sublabel": "Python Worker" },
+    { "id": "cloud_ai", "type": "external", "label": "AI Services", "sublabel": "STT / LLM / TTS" },
+    { "id": "minio", "type": "cloud", "label": "MinIO S3", "sublabel": "Recordings" }
+  ],
+  "segments": [
+    { "from": 155, "to": 305, "label": "1. Authentication & WebRTC Join" },
+    { "from": 315, "to": 500, "label": "2. Real-time Dialogue Loop (TTFA < 800ms)" },
+    { "from": 510, "to": 630, "label": "3. Scoring & Recording Archive" }
+  ],
+  "messages": [
+    { "id": "m1", "from": "candidate", "to": "portal", "y": 165, "label": "Enter Interview Room", "variant": "default" },
+    { "id": "m2", "from": "portal", "to": "gateway", "y": 197, "label": "POST /api/interview/token/", "variant": "emphasis" },
+    { "id": "m3", "from": "gateway", "to": "backend", "y": 229, "label": "Generate JWT Room Token", "variant": "security" },
+    { "id": "m4", "from": "backend", "to": "portal", "y": 261, "label": "Return Room Token", "variant": "return" },
+    { "id": "m5", "from": "portal", "to": "livekit", "y": 293, "label": "Connect WebRTC PeerConnection", "variant": "emphasis" },
+    { "id": "m6", "from": "livekit", "to": "agent", "y": 328, "label": "Room Dispatch Event", "variant": "default" },
+    { "id": "m7", "from": "candidate", "to": "livekit", "y": 360, "label": "Voice Audio Stream (Opus)", "variant": "emphasis" },
+    { "id": "m8", "from": "livekit", "to": "agent", "y": 392, "label": "VAD & Audio Chunk Dispatch", "variant": "default" },
+    { "id": "m9", "from": "agent", "to": "cloud_ai", "y": 424, "label": "Stream ASR & LLM Completion", "variant": "emphasis" },
+    { "id": "m10", "from": "cloud_ai", "to": "agent", "y": 456, "label": "Synthesized TTS Audio Stream", "variant": "return" },
+    { "id": "m11", "from": "agent", "to": "candidate", "y": 488, "label": "Play AI Interviewer Voice", "variant": "emphasis" },
+    { "id": "m12", "from": "candidate", "to": "portal", "y": 523, "label": "Finish Interview Session", "variant": "default" },
+    { "id": "m13", "from": "agent", "to": "backend", "y": 555, "label": "Submit Structured Evaluation", "variant": "emphasis" },
+    { "id": "m14", "from": "livekit", "to": "minio", "y": 587, "label": "Egress Upload Recording (.mp4)", "variant": "dashed" },
+    { "id": "m15", "from": "backend", "to": "portal", "y": 619, "label": "Display Final Summary Score", "variant": "return" }
+  ],
+  "activations": [
+    { "participant": "portal", "from": 165, "to": 305, "type": "frontend" },
+    { "participant": "backend", "from": 225, "to": 268, "type": "backend" },
+    { "participant": "livekit", "from": 290, "to": 595, "type": "backend" },
+    { "participant": "agent", "from": 325, "to": 565, "type": "backend" },
+    { "participant": "cloud_ai", "from": 420, "to": 462, "type": "external" },
+    { "participant": "backend", "from": 550, "to": 625, "type": "backend" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Zero-Latency WebRTC",
+      "items": [
+        "LiveKit SFU acts as the central WebRTC media broker",
+        "Opus 48kHz audio streams directly between candidate and agent",
+        "Sub-second TTFA (<800ms) with punctuation-based TTS streaming"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Automated Evaluation",
+      "items": [
+        "Real-time Vietnamese ASR (MetaConnect) and Gemini LLM reasoning",
+        "Dynamic question branching tailored to candidate answers",
+        "Structured multi-competency scoring saved directly to Django API"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Secure Session Archive",
+      "items": [
+        "LiveKit Egress captures full audio/video stream asynchronously",
+        "Direct S3 upload to MinIO without loading backend API servers",
+        "Comprehensive audit logs and candidate score report generated"
+      ]
+    }
+  ]
+}

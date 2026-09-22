@@ -5,8 +5,8 @@ import { typedYupResolver } from '@/utils/formHelpers';
 import * as yup from 'yup';
 import { Box, Button, Typography, CircularProgress } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import HowToRegIcon from '@mui/icons-material/HowToReg';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useTranslation } from 'react-i18next';
 import { REGEX_VALIDATE } from '@/configs/constants';
 import errorHandling from '@/utils/errorHandling';
@@ -88,25 +88,35 @@ const applyEmployerServerErrors = (
 
 const inputStyle = {
   '& .MuiOutlinedInput-root': {
-    borderRadius: '12px',
+    borderRadius: '10px !important',
     backgroundColor: '#FFFFFF',
-    border: '1px solid #E2E8F0',
-    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-    '&:hover': {
+    fontSize: '0.875rem',
+    transition: 'all 0.2s ease',
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderRadius: '10px !important',
+      borderColor: '#E2E8F0',
+      transition: 'border-color 0.2s ease',
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
       borderColor: '#94A3B8',
-      backgroundColor: '#FFFFFF',
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#2563EB',
+      borderWidth: '1.5px',
     },
     '&.Mui-focused': {
-      borderColor: '#2563EB',
-      backgroundColor: '#FFFFFF',
       boxShadow: '0 0 0 3px rgba(37, 99, 235, 0.12)',
+    },
+    '& input': {
+      fontSize: '0.875rem',
+      py: 1.2,
     },
     '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active': {
       WebkitBoxShadow: '0 0 0 1000px #FFFFFF inset !important',
       WebkitTextFillColor: '#0F172A !important',
       caretColor: '#0F172A',
       transition: 'background-color 5000s ease-in-out 0s',
-      borderRadius: 'inherit',
+      borderRadius: '8px !important',
     },
   },
 };
@@ -247,9 +257,9 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
     <Box
       component="form"
       onSubmit={handleSubmit(onSubmit)}
-      sx={{ width: '100%', '& .MuiTextField-root': { borderRadius: '12px' } }}
+      sx={{ width: '100%' }}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={1.5}>
         {/* Họ và tên */}
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextFieldCustom
@@ -353,47 +363,49 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
       {/* Trust note */}
       <Box
         sx={{
-          mt: 2,
+          mt: 1.5,
           p: 1.25,
-          borderRadius: '10px',
-          backgroundColor: '#F8FAFC',
-          border: '1px solid #E2E8F0',
+          px: 1.5,
+          borderRadius: '8px',
+          backgroundColor: '#F0FDF4',
+          border: '1px solid #DCFCE7',
           display: 'flex',
           alignItems: 'center',
           gap: 1,
         }}
       >
-        <CheckCircleOutlineIcon sx={{ fontSize: 17, color: '#10B981', flexShrink: 0 }} />
-        <Typography sx={{ fontSize: '12px', color: '#64748B', lineHeight: 1.4 }}>
-          Mã số thuế &amp; Giấy phép kinh doanh sẽ được bổ sung tại bước Xác thực doanh nghiệp sau khi tạo tài khoản.
+        <InfoOutlinedIcon sx={{ fontSize: 16, color: '#16A34A', flexShrink: 0 }} />
+        <Typography sx={{ fontSize: '12px', color: '#15803D', lineHeight: 1.4, fontWeight: 500 }}>
+          Mã số thuế &amp; Giấy phép kinh doanh sẽ được bổ sung tại bước Xác thực sau khi tạo tài khoản.
         </Typography>
       </Box>
 
       {/* Action Button */}
-      <Box sx={{ mt: 2.5 }}>
+      <Box sx={{ mt: 2 }}>
         <Button
           variant="contained"
           type="submit"
           fullWidth
           disabled={isSubmitting}
-          startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <HowToRegIcon />}
+          startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : null}
+          endIcon={!isSubmitting ? <ArrowForwardRoundedIcon sx={{ fontSize: 18 }} /> : null}
           sx={{
-            minHeight: '48px',
-            borderRadius: '12px',
-            fontSize: '15px',
+            height: '46px',
+            borderRadius: '10px',
+            fontSize: '0.925rem',
             fontWeight: 700,
             textTransform: 'none',
             color: '#FFFFFF',
-            background: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 100%)',
-            boxShadow: '0 8px 20px rgba(37, 99, 235, 0.25)',
+            background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+            boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)',
             transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
             '&:hover': {
               background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
               transform: 'translateY(-1px)',
-              boxShadow: '0 12px 24px rgba(37, 99, 235, 0.32)',
+              boxShadow: '0 6px 20px rgba(37, 99, 235, 0.35)',
             },
             '&:active': {
-              transform: 'scale(0.98)',
+              transform: 'scale(0.99)',
             },
           }}
         >

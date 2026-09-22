@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import authService from '@/services/authService';
 import { useConfig } from '@/hooks/useConfig';
@@ -40,6 +41,7 @@ export function useEmployerOnboarding() {
   const { t } = useTranslation('employer');
   const router = useRouter();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const { allConfig } = useConfig();
 
@@ -49,6 +51,10 @@ export function useEmployerOnboarding() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [isLookingUpTax, setIsLookingUpTax] = useState<boolean>(false);
+  const [taxLookupResult, setTaxLookupResult] = useState<import('@/types/auth').TaxCodeLookupResult | null>(null);
+  const [isRequestingJoin, setIsRequestingJoin] = useState<boolean>(false);
+  const [isSkipping, setIsSkipping] = useState<boolean>(false);
   const [generalError, setGeneralError] = useState<string>('');
   const [hasExistingMembership, setHasExistingMembership] = useState<boolean>(false);
   const [existingCompany, setExistingCompany] = useState<{
@@ -66,8 +72,18 @@ export function useEmployerOnboarding() {
         const res = await authService.getOnboardingStatus();
         if (!isMounted) return;
 
-        const isPreview = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === '1';
-        if (res.isOnboarded && !isPreview) {
+        const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const isPreview = searchParams?.get('preview') === '1';
+        const isEdit = searchParams?.get('edit') === '1';
+
+        // Chỉ điều hướng nếu nhà tuyển dụng ĐÃ hoàn thành bước 4 và hồ sơ đạt 100%, không ở preview/edit
+        if (
+          res.isOnboarded &&
+          res.onboardingStep === 4 &&
+          (res.profileCompleteness ?? 0) >= 100 &&
+          !isPreview &&
+          !isEdit
+        ) {
           router.replace('/employer/dashboard');
           return;
         }
@@ -102,8 +118,28 @@ export function useEmployerOnboarding() {
           }));
 
           // Resume stepper position
-          if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
+          if (!isEdit && res.onboardingStep === 4) {
+            setActiveStep(3);
+          } else if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
             setActiveStep(res.onboardingStep - 1);
+          }
+        } else if (typeof window !== 'undefined') {
+          // LocalStorage fallback restore
+          try {
+            const savedDraft = localStorage.getItem('infohr_employer_draft');
+            if (savedDraft) {
+              const parsed = JSON.parse(savedDraft);
+              setFormData((prev) => ({ ...prev, ...parsed }));
+            } else if (currentUser) {
+              setFormData((prev) => ({
+                ...prev,
+                recruiterName: currentUser.fullName || prev.recruiterName,
+                recruiterPhone: currentUser.phoneNumber || prev.recruiterPhone,
+                recruiterEmail: currentUser.email || prev.recruiterEmail,
+              }));
+            }
+          } catch (e) {
+            console.error('LocalStorage draft read error:', e);
           }
         } else if (currentUser) {
           setFormData((prev) => ({
@@ -126,6 +162,17 @@ export function useEmployerOnboarding() {
       isMounted = false;
     };
   }, [router, currentUser]);
+
+  // Sync formData to localStorage for resilience
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isLoading && activeStep < 3) {
+      try {
+        localStorage.setItem('infohr_employer_draft', JSON.stringify(formData));
+      } catch (e) {
+        // quota exceeded or private mode
+      }
+    }
+  }, [formData, isLoading, activeStep]);
 
   // Update single form field
   const updateFormField = useCallback((field: keyof EmployerFullFormValues, value: any) => {
@@ -162,6 +209,7 @@ export function useEmployerOnboarding() {
         logoId: formData.logoId,
       });
 
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       setActiveStep(1);
     } catch (err: any) {
       if (err.inner) {
@@ -197,6 +245,7 @@ export function useEmployerOnboarding() {
         description: formData.description,
       });
 
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       setActiveStep(2);
     } catch (err: any) {
       if (err.inner) {
@@ -240,6 +289,10 @@ export function useEmployerOnboarding() {
       if (res.user) {
         dispatch(setUserInfo(res.user));
       }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('infohr_employer_draft');
+      }
       setActiveStep(3); // Step 4 Complete
     } catch (err: any) {
       console.error('Employer onboarding completion error:', err);
@@ -258,6 +311,93 @@ export function useEmployerOnboarding() {
     }
   };
 
+  // Tax Code Lookup (VietQR & InfoHR duplicate check)
+  const handleLookupTaxCode = async (taxCodeOverride?: string) => {
+    const code = (taxCodeOverride || formData.taxCode || '').trim();
+    if (!code) {
+      setErrors((prev) => ({ ...prev, taxCode: 'Vui lòng nhập mã số thuế để tra cứu.' }));
+      return null;
+    }
+
+    setIsLookingUpTax(true);
+    setGeneralError('');
+    try {
+      const res = await authService.lookupTaxCode(code);
+      setTaxLookupResult(res);
+
+      if (res.exists && res.company) {
+        // Duplicate company found on InfoHR
+        return res;
+      }
+
+      if (!res.exists && res.company) {
+        // Auto-fill company details from VietQR
+        setFormData((prev) => ({
+          ...prev,
+          companyName: res.company?.companyName || prev.companyName,
+          address: res.company?.address || prev.address,
+        }));
+        // clear errors for companyName
+        setErrors((prev) => {
+          const c = { ...prev };
+          delete c.companyName;
+          delete c.taxCode;
+          return c;
+        });
+      }
+      return res;
+    } catch (err) {
+      console.error('Tax code lookup error:', err);
+      // Soft fail: do not block user
+    } finally {
+      setIsLookingUpTax(false);
+    }
+  };
+
+  // Request to join existing company
+  const handleRequestJoinCompany = async (companyId: number) => {
+    setIsRequestingJoin(true);
+    setGeneralError('');
+    try {
+      const res = await authService.requestJoinCompany(companyId);
+      if (res.user) {
+        dispatch(setUserInfo(res.user));
+      }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('infohr_employer_draft');
+      }
+      router.replace('/employer/dashboard');
+    } catch (err: any) {
+      console.error('Request join company error:', err);
+      setGeneralError(err.response?.data?.message || 'Không thể gửi yêu cầu tham gia. Vui lòng thử lại.');
+    } finally {
+      setIsRequestingJoin(false);
+    }
+  };
+
+  // Skip onboarding
+  const handleSkipOnboarding = async () => {
+    setIsSkipping(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('infohr_onboarding_banner_dismissed_employer', 'false');
+    }
+    try {
+      const res = await authService.skipOnboarding();
+      if (res.user) {
+        dispatch(setUserInfo(res.user));
+      }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
+      router.replace('/employer/dashboard');
+    } catch (err) {
+      console.error('Error skipping employer onboarding:', err);
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
+      router.replace('/employer/dashboard');
+    } finally {
+      setIsSkipping(false);
+    }
+  };
+
   // Accept Invitation flow
   const handleAcceptInvitation = async () => {
     setIsSaving(true);
@@ -268,6 +408,10 @@ export function useEmployerOnboarding() {
       });
       if (res.user) {
         dispatch(setUserInfo(res.user));
+      }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('infohr_employer_draft');
       }
       router.replace('/employer/dashboard');
     } catch (err) {
@@ -302,6 +446,10 @@ export function useEmployerOnboarding() {
     isSaving,
     isUploading,
     setIsUploading,
+    isLookingUpTax,
+    taxLookupResult,
+    isRequestingJoin,
+    isSkipping,
     generalError,
     setGeneralError,
     hasExistingMembership,
@@ -312,8 +460,12 @@ export function useEmployerOnboarding() {
     handleNextStep2,
     handleCompleteEmployer,
     handleAcceptInvitation,
+    handleLookupTaxCode,
+    handleRequestJoinCompany,
+    handleSkipOnboarding,
     handleBack,
     handlePostJob,
     handleViewDashboard,
   };
 }
+

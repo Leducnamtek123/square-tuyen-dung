@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import {
   Box,
   Button,
@@ -541,7 +542,7 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
                     '& ul, & ol': { pl: 2.5, mb: 1.2 },
                     '& li': { fontSize: '0.9rem', mb: 0.6, lineHeight: 1.5 },
                   }}
-                  dangerouslySetInnerHTML={{ __html: activeTemplate.htmlContent }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(activeTemplate.htmlContent) }}
                 />
               </Box>
             ) : (

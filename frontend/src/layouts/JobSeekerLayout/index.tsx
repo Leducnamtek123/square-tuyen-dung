@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { getUserInfo, setActiveWorkspace } from "@/redux/userSlice";
 import tokenService from "@/services/tokenService";
 import { canAccessJobSeekerPortal } from "@/utils/accessControl";
+import OnboardingProgressBanner from "@/views/onboardingPages/components/OnboardingProgressBanner";
 
 let hasVerifiedCandidateAuthGlobal = false;
 
@@ -140,6 +141,9 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
     <Box sx={{ backgroundColor: '#f8fafc', minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
       {/* Persistent Header */}
       <Header />
+
+      {/* Progressive Onboarding Banner for Incomplete Profiles */}
+      <OnboardingProgressBanner role="candidate" />
 
       <Box component="main" sx={{ flexGrow: 1, py: { xs: 1, sm: 2, md: 3 } }}>
         <Container maxWidth="xl" sx={{ px: { xs: 1.5, sm: 2, md: 3, lg: 4 } }}>

@@ -40,6 +40,11 @@ type RegisterErrorPayload = {
   };
 };
 
+export interface ExistingAccountNotice {
+  email: string;
+  role: 'JOB_SEEKER' | 'EMPLOYER';
+}
+
 const SOCIAL_AUTH_COOLDOWN_MS = 2500;
 
 const JobSeekerSignUp = () => {
@@ -53,6 +58,7 @@ const JobSeekerSignUp = () => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [serverErrors, setServerErrors] = React.useState<Record<string, string[]>>({});
+  const [existingAccount, setExistingAccount] = React.useState<ExistingAccountNotice | null>(null);
   const socialAuthInFlightRef = React.useRef(false);
   const lastSocialAuthAttemptAtRef = React.useRef(0);
 
@@ -80,26 +86,39 @@ const JobSeekerSignUp = () => {
         if (res?.status === 400 && hasEmailExists) {
           try {
             const resData = await authService.checkCreds(data?.email, ROLES_NAME.JOB_SEEKER as RoleName);
-            if (resData?.exists === true && resData?.emailVerified === false) {
-              dispatch(
-                updateVerifyEmail({
-                  isAllowVerifyEmail: true,
-                  email: data?.email,
-                  roleName: roleName,
-                })
-              );
-              push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+            const otherRole = (resData as any)?.otherRole || (resData as any)?.other_role;
+            if (otherRole === ROLES_NAME.EMPLOYER) {
+              setExistingAccount({
+                email: data?.email,
+                role: 'EMPLOYER',
+              });
+              setServerErrors({
+                email: [t('signup.existingAccountEmployerBody', { email: data?.email })],
+              });
               return;
             }
-            if ((resData as any)?.otherRole === ROLES_NAME.EMPLOYER || (resData as any)?.other_role === ROLES_NAME.EMPLOYER) {
+            if (resData?.exists === true) {
+              setExistingAccount({
+                email: data?.email,
+                role: 'JOB_SEEKER',
+              });
               setServerErrors({
-                email: ['Email này đã được đăng ký cho tài khoản Nhà tuyển dụng. Vui lòng đăng nhập tại Cổng Doanh nghiệp.']
+                email: [t('signup.existingAccountCandidateBody', { email: data?.email })],
               });
               return;
             }
           } catch {
             // fall through to default error handling
           }
+
+          setExistingAccount({
+            email: data?.email,
+            role: 'JOB_SEEKER',
+          });
+          setServerErrors({
+            email: [t('signup.existingAccountCandidateBody', { email: data?.email })],
+          });
+          return;
         }
 
         errorHandling(axiosError, (errs) => setServerErrors(errs as Record<string, string[]>));
@@ -199,27 +218,26 @@ const JobSeekerSignUp = () => {
     try {
       const resData = await authService.checkCreds(email, roleName);
 
-      const { exists, emailVerified } = resData;
+      const { exists } = resData;
+      const otherRole = (resData as any)?.otherRole || (resData as any)?.other_role;
 
-      if (exists === true && emailVerified === false) {
-        dispatch(
-          updateVerifyEmail({
-            isAllowVerifyEmail: true,
-            email: email,
-            roleName: roleName,
-          })
-        );
-        push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
-        return false;
-      }
-
-      if (exists === true) {
+      if (otherRole === ROLES_NAME.EMPLOYER) {
+        setExistingAccount({ email, role: 'EMPLOYER' });
         setServerErrors({
-          email: ['Email already exists'],
+          email: [t('signup.existingAccountEmployerBody', { email })],
         });
         return false;
       }
 
+      if (exists === true) {
+        setExistingAccount({ email, role: 'JOB_SEEKER' });
+        setServerErrors({
+          email: [t('signup.existingAccountCandidateBody', { email })],
+        });
+        return false;
+      }
+
+      setExistingAccount(null);
       return true;
     } catch (error) {
       errorHandling(error);
@@ -232,6 +250,7 @@ const JobSeekerSignUp = () => {
       t={t}
       serverErrors={serverErrors}
       isFullScreenLoading={isFullScreenLoading}
+      existingAccount={existingAccount}
       onRegister={handleRegister}
       onFacebookRegister={handleFacebookRegister}
       onGoogleRegister={handleGoogleRegister}

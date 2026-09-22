@@ -8,6 +8,9 @@ import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import FormPopup from '@/components/Common/Controls/FormPopup';
+import { useRouter } from 'next/navigation';
+import { useAppSelector } from '@/hooks/useAppStore';
+import { ROLES_NAME } from '@/configs/constants';
 import ApplyForm from '@/components/Features/ApplyForm';
 import jobPostActivityService from '@/services/jobPostActivityService';
 import type { ApplyFormValues } from '@/components/Features/ApplyForm';
@@ -30,12 +33,21 @@ const ApplyCard = ({
   onApplySuccess,
 }: ApplyCardProps) => {
   const { t } = useTranslation("public");
+  const router = useRouter();
+  const { currentUser } = useAppSelector((state) => state.user);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const submitLockRef = React.useRef(false);
   const formId = `apply-form-${String(jobPostId)}`;
 
   const handleApplyJob = async (data: ApplyFormValues) => {
     if (isFullScreenLoading || submitLockRef.current) return;
+
+    if (currentUser?.roleName === ROLES_NAME.JOB_SEEKER && currentUser?.isOnboarded === false) {
+      toastMessages.warn(t("applyCard.onboardingRequired", "Vui lòng hoàn tất thiết lập hồ sơ (Onboarding) trước khi nộp CV ứng tuyển."));
+      setOpenPopup(false);
+      router.push('/onboarding/candidate');
+      return;
+    }
 
     submitLockRef.current = true;
     setIsFullScreenLoading(true);

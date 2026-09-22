@@ -39,6 +39,7 @@ import TopCompanyCarousel from '@/components/Features/TopCompanyCarousel';
 import CareerCarousel from '@/components/Features/CareerCarousel';
 import FeedbackCarousel from '@/components/Features/FeedbackCarousel';
 import CareerHandbookSection from '@/components/Features/CareerHandbookSection';
+import PartnerLogoCarousel from '@/components/Features/PartnerLogoCarousel';
 import JobByCategory from '@/views/components/defaults/JobByCategory';
 import FilterJobPostCard from '@/views/components/defaults/FilterJobPostCard';
 import SuggestedJobPostCard from '@/views/components/defaults/SuggestedJobPostCard';
@@ -360,6 +361,13 @@ export default function HomePage() {
 
       // -- Desktop Breakpoint (≥769px) ---------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
+        // 0. Partner logos marquee entrance
+        gsap.fromTo(
+          '.gsap-partner-logos',
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', clearProps: 'all' }
+        );
+
         // 1. Urgent jobs section entrance
         gsap.fromTo(
           '.gsap-urgent-jobs',
@@ -462,6 +470,12 @@ export default function HomePage() {
       // Subtle movements (y: 12-16px), earlier trigger (top 92%) and faster durations to eliminate lag
       mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
         gsap.fromTo(
+          '.gsap-partner-logos',
+          { y: 10, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', clearProps: 'all' }
+        );
+
+        gsap.fromTo(
           '.gsap-urgent-jobs',
           { y: 12, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', clearProps: 'all' }
@@ -557,7 +571,7 @@ export default function HomePage() {
       // -- Reduced Motion -----------------------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
         gsap.set(
-          '.gsap-urgent-jobs, .gsap-top-companies, .gsap-path-header, .gsap-entry-card, .gsap-feedback-section, .gsap-handbook-section',
+          '.gsap-partner-logos, .gsap-urgent-jobs, .gsap-top-companies, .gsap-path-header, .gsap-entry-card, .gsap-feedback-section, .gsap-handbook-section',
           { opacity: 1, y: 0, clearProps: 'all' }
         );
       });
@@ -567,6 +581,10 @@ export default function HomePage() {
 
   return (
     <Box ref={homeContainerRef}>
+      <Box className="gsap-partner-logos" sx={{ mt: { xs: 2.5, sm: 3.5, md: 5 } }}>
+        <PartnerLogoCarousel />
+      </Box>
+
       <Box className="gsap-urgent-jobs" sx={{ mt: { xs: 3, sm: 5, md: 7 } }}>
         <FilterJobPostCard params={{ isUrgent: true }} fallbackToAllIfEmpty hideIfEmpty />
       </Box>

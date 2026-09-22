@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Box, Card, Container, Typography, styled } from '@mui/material';
+import { Box, Card, Container, Typography, styled, Alert, Button } from '@mui/material';
 import { Grid2 as Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '@/utils/generalFunction';
@@ -22,6 +22,7 @@ import type { EmployerRegisterData } from '@/types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 import SecurityIcon from '@mui/icons-material/Security';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import EmployerSignUpShowcase from '@/views/components/auths/EmployerSignUpShowcase';
 
 const SOCIAL_AUTH_COOLDOWN_MS = 2500;
@@ -32,9 +33,8 @@ const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   boxShadow: 'none',
   border: 'none',
   [theme.breakpoints.up('sm')]: {
-    borderRadius: '28px',
-    boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
-    border: '1px solid #E2E8F0',
+    borderRadius: '24px',
+    boxShadow: '0 20px 60px -15px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(226, 232, 240, 0.8)',
   },
   transition: 'all 0.3s ease',
   width: '100%',
@@ -65,6 +65,7 @@ const EmployerSignUp = () => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [serverErrors, setServerErrors] = React.useState<Record<string, string[]>>({});
+  const [existingAccount, setExistingAccount] = React.useState<{ email: string; role: 'JOB_SEEKER' | 'EMPLOYER' } | null>(null);
   const socialAuthInFlightRef = React.useRef(false);
   const lastSocialAuthAttemptAtRef = React.useRef(0);
   const loginHref = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.LOGIN}`, i18n.language);
@@ -92,22 +93,42 @@ const EmployerSignUp = () => {
         const errors = res?.data?.errors;
         const hasEmailExists = !!errors?.email;
         if (res?.status === 400 && hasEmailExists) {
+          const emailStr = (data?.email as string) || '';
           try {
-            const resData = await authService.checkCreds((data?.email as string) || '', ROLES_NAME.EMPLOYER as RoleName) as { exists?: boolean; emailVerified?: boolean; };
-            if (resData?.exists === true && resData?.emailVerified === false) {
-              dispatch(
-                updateVerifyEmail({
-                  isAllowVerifyEmail: true,
-                  email: (data?.email as string) || '',
-                  roleName: ROLES_NAME.EMPLOYER as RoleName,
-                })
-              );
-              push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+            const resData = await authService.checkCreds(emailStr, ROLES_NAME.EMPLOYER as RoleName) as { exists?: boolean; emailVerified?: boolean; otherRole?: string; other_role?: string };
+            const detectedOtherRole = resData?.otherRole || (resData as any)?.other_role;
+            if (detectedOtherRole === ROLES_NAME.JOB_SEEKER) {
+              setExistingAccount({
+                email: emailStr,
+                role: 'JOB_SEEKER',
+              });
+              setServerErrors({
+                email: [t('signup.existingAccountJobSeekerBody', { email: emailStr })]
+              });
+              return;
+            }
+            if (resData?.exists === true) {
+              setExistingAccount({
+                email: emailStr,
+                role: 'EMPLOYER',
+              });
+              setServerErrors({
+                email: [t('signup.existingAccountEmployerBody', { email: emailStr })]
+              });
               return;
             }
           } catch {
-            // fall through to default error handling
+            // fall through to default fallback
           }
+
+          setExistingAccount({
+            email: emailStr,
+            role: 'EMPLOYER',
+          });
+          setServerErrors({
+            email: [t('signup.existingAccountEmployerBody', { email: emailStr })]
+          });
+          return;
         }
 
         errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
@@ -127,28 +148,27 @@ const EmployerSignUp = () => {
 
   const checkCreds = async (email: string, roleName: RoleName) => {
     try {
-      const resData = await authService.checkCreds(email, roleName) as { exists: boolean, emailVerified: boolean };
-      const { exists, emailVerified } = resData;
+      const resData = await authService.checkCreds(email, roleName) as { exists: boolean, emailVerified: boolean; otherRole?: string; other_role?: string };
+      const { exists } = resData;
+      const otherRole = resData?.otherRole || (resData as any)?.other_role;
 
-      if (exists === true && emailVerified === false) {
-        dispatch(
-          updateVerifyEmail({
-            isAllowVerifyEmail: true,
-            email: email,
-            roleName: roleName,
-          })
-        );
-        push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
-        return false;
-      }
-
-      if (exists === true) {
+      if (otherRole === ROLES_NAME.JOB_SEEKER) {
+        setExistingAccount({ email, role: 'JOB_SEEKER' });
         setServerErrors({
-          email: ['Email already exists'],
+          email: [t('signup.existingAccountJobSeekerBody', { email })]
         });
         return false;
       }
 
+      if (exists === true) {
+        setExistingAccount({ email, role: 'EMPLOYER' });
+        setServerErrors({
+          email: [t('signup.existingAccountEmployerBody', { email })]
+        });
+        return false;
+      }
+
+      setExistingAccount(null);
       return true;
     } catch (error) {
       errorHandling(error);
@@ -242,49 +262,58 @@ const EmployerSignUp = () => {
 
   return (
     <>
-      <Container
-        maxWidth="lg"
+      <Box
         sx={{
-          py: { xs: 2, sm: 4, md: 5 },
-          px: { xs: 1, sm: 2, md: 3 },
+          minHeight: 'calc(100vh - 80px)',
+          background: 'radial-gradient(ellipse at top left, #EFF6FF 0%, #F8FAFC 50%, #FFFFFF 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: 'calc(100vh - 120px)',
+          py: { xs: 2, sm: 3, md: 4 },
+          px: { xs: 1, sm: 2 },
         }}
       >
-        <UnifiedAuthCard>
-          <Grid
-            container
-            spacing={0}
-            alignItems="stretch"
-            sx={{
-              width: '100%',
-            }}
-          >
-            {/* Left Column: Registration Form */}
+        <Container
+          maxWidth="lg"
+          sx={{
+            p: '0 !important',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <UnifiedAuthCard>
             <Grid
-              size={{ xs: 12, md: 6 }}
+              container
+              spacing={0}
+              alignItems="stretch"
               sx={{
-                p: { xs: 3, sm: 4, md: 5 },
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                backgroundColor: '#FFFFFF',
+                width: '100%',
               }}
             >
-              <Box>
-                {/* Role and Switcher header */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: 1.5,
-                    mb: 2.5,
-                  }}
-                >
+              {/* Left Column: Registration Form */}
+              <Grid
+                size={{ xs: 12, md: 6 }}
+                sx={{
+                  p: { xs: 2.5, sm: 3.5, md: 4 },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#FFFFFF',
+                }}
+              >
+                <Box>
+                  {/* Role and Switcher header */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: 1.5,
+                      mb: 2,
+                    }}
+                  >
                   <Box
                     sx={{
                       display: 'inline-flex',
@@ -371,6 +400,68 @@ const EmployerSignUp = () => {
                   </Typography>
                 </Box>
 
+                {existingAccount && (
+                  <Alert
+                    severity="info"
+                    icon={<InfoOutlinedIcon sx={{ color: '#2563EB', mt: 0.25 }} />}
+                    sx={{
+                      mb: 2.5,
+                      borderRadius: '16px',
+                      border: '1px solid #BFDBFE',
+                      backgroundColor: '#EFF6FF',
+                      '& .MuiAlert-message': { width: '100%' },
+                    }}
+                  >
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E3A8A', mb: 0.5, fontSize: '14px' }}>
+                      {t('signup.existingAccountTitle')}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#1E40AF', fontSize: '13px', lineHeight: 1.5, mb: 1.5 }}>
+                      {existingAccount.role === 'JOB_SEEKER'
+                        ? t('signup.existingAccountJobSeekerBody', { email: existingAccount.email })
+                        : t('signup.existingAccountEmployerBody', { email: existingAccount.email })}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                      <Button
+                        component={Link}
+                        href={
+                          existingAccount.role === 'JOB_SEEKER'
+                            ? `/${ROUTES.AUTH.LOGIN}?email=${encodeURIComponent(existingAccount.email)}`
+                            : `/${ROUTES.EMPLOYER_AUTH.LOGIN}?email=${encodeURIComponent(existingAccount.email)}`
+                        }
+                        variant="contained"
+                        size="small"
+                        endIcon={<ArrowForwardIcon sx={{ fontSize: 15 }} />}
+                        sx={{
+                          textTransform: 'none',
+                          fontWeight: 700,
+                          fontSize: '13px',
+                          py: 0.75,
+                          px: 1.75,
+                          borderRadius: '10px',
+                          background: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 100%)',
+                          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                          },
+                        }}
+                      >
+                        {existingAccount.role === 'JOB_SEEKER'
+                          ? t('signup.loginCandidatePortal')
+                          : t('signup.loginNow')}
+                      </Button>
+
+                      {existingAccount.role === 'EMPLOYER' && (
+                        <StyledLink
+                          href={`/${ROUTES.EMPLOYER_AUTH.FORGOT_PASSWORD}?email=${encodeURIComponent(existingAccount.email)}`}
+                          sx={{ fontSize: '13px', fontWeight: 600, color: '#2563EB' }}
+                        >
+                          {t('signup.forgotPasswordLink')}
+                        </StyledLink>
+                      )}
+                    </Box>
+                  </Alert>
+                )}
+
                 <Box sx={{ mt: 0.5 }}>
                   <EmployerSignUpForm
                     onSignUp={handleRegister}
@@ -381,24 +472,24 @@ const EmployerSignUp = () => {
               </Box>
 
               {/* Card Bottom / Legal Disclaimer & Links */}
-              <Box sx={{ mt: 'auto', pt: 3 }}>
+              <Box sx={{ mt: 'auto', pt: 2 }}>
                 <Typography
                   variant="caption"
                   sx={{
                     display: 'block',
                     textAlign: 'center',
                     color: '#64748B',
-                    fontSize: '12px',
-                    lineHeight: 1.55,
-                    mb: 2,
+                    fontSize: '11.5px',
+                    lineHeight: 1.5,
+                    mb: 1.5,
                   }}
                 >
                   Bằng việc đăng ký tài khoản, quý doanh nghiệp đồng ý tuân thủ các{' '}
-                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '12px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '11.5px', color: '#2563EB' }}>
                     Điều khoản dịch vụ
                   </StyledLink>{' '}
                   và{' '}
-                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '12px', color: '#2563EB' }}>
+                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '11.5px', color: '#2563EB' }}>
                     Chính sách bảo mật
                   </StyledLink>{' '}
                   của InfoHR.
@@ -407,7 +498,7 @@ const EmployerSignUp = () => {
                 <Grid
                   container
                   sx={{
-                    pt: 2,
+                    pt: 1.5,
                     borderTop: '1px solid #F1F5F9',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -423,20 +514,19 @@ const EmployerSignUp = () => {
                   </Grid>
                 </Grid>
 
-                {/* Security Trust Indicator */}
+                {/* Security Trust Indicator (Mobile only, on desktop it's in the showcase panel) */}
                 <Box
                   sx={{
-                    mt: 2,
-                    pt: 1,
-                    display: 'flex',
+                    display: { xs: 'flex', md: 'none' },
+                    mt: 1.5,
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 0.75,
-                    color: '#94A3B8',
-                    fontSize: '12px',
+                    color: '#64748B',
+                    fontSize: '11.5px',
                   }}
                 >
-                  <SecurityIcon sx={{ fontSize: 15, color: '#10B981' }} />
+                  <SecurityIcon sx={{ fontSize: 14, color: '#10B981' }} />
                   <span>Bảo mật thông tin doanh nghiệp theo tiêu chuẩn SSL 256-bit</span>
                 </Box>
               </Box>
@@ -455,6 +545,7 @@ const EmployerSignUp = () => {
           </Grid>
         </UnifiedAuthCard>
       </Container>
+    </Box>
 
       {isFullScreenLoading && <BackdropLoading />}
     </>

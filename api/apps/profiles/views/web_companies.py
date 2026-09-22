@@ -25,6 +25,7 @@ from rest_framework import status
 
 from apps.accounts import permissions as perms_custom
 from apps.accounts.active_company import apply_active_company_from_request
+from apps.files.models import File
 
 from ..models import (
     Company,
@@ -813,6 +814,15 @@ class AdminCompanyVerificationViewSet(AuditLogViewSetMixin, viewsets.ModelViewSe
         status_filter = self.request.query_params.get("status")
         if status_filter:
             queryset = queryset.filter(status=status_filter)
+        kw = self.request.query_params.get("kw") or self.request.query_params.get("search")
+        if kw:
+            kw = kw.strip()
+            queryset = queryset.filter(
+                Q(company__company_name__icontains=kw)
+                | Q(legal_company_name__icontains=kw)
+                | Q(tax_code__icontains=kw)
+                | Q(company__tax_code__icontains=kw)
+            )
         return queryset
 
 

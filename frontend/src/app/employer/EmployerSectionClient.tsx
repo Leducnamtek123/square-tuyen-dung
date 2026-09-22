@@ -216,7 +216,11 @@ export default function EmployerSectionClient({
         return;
       }
 
-      if (user?.isOnboarded === false && !pathname.includes('/onboarding')) {
+      const isSkippedInSession =
+        typeof window !== 'undefined' &&
+        sessionStorage.getItem('infohr_onboarding_banner_dismissed_employer') === 'false';
+
+      if (user?.isOnboarded === false && !pathname.includes('/onboarding') && user?.onboardingStep !== -1 && !isSkippedInSession) {
         window.location.replace('/onboarding/employer');
         return;
       }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Link from 'next/link';
-import { Box, Card, Container, Typography, Grid2 as Grid, styled } from '@mui/material';
+import { Box, Card, Container, Typography, Grid2 as Grid, styled, Alert, Button } from '@mui/material';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import JobSeekerSignUpForm from '@/views/components/auths/JobSeekerSignUpForm';
 import AuthShowcasePanel from '@/views/components/auths/AuthShowcasePanel';
@@ -10,6 +10,7 @@ import type { RoleName } from '@/types/auth';
 import type { CodeResponse } from '@react-oauth/google';
 import SecurityIcon from '@mui/icons-material/Security';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   background: '#FFFFFF',
@@ -44,6 +45,7 @@ interface JobSeekerSignUpViewProps {
   t: TFunction;
   serverErrors: Record<string, string[]>;
   isFullScreenLoading: boolean;
+  existingAccount?: { email: string; role: 'JOB_SEEKER' | 'EMPLOYER' } | null;
   onRegister: (data: import('../../components/auths/JobSeekerSignUpForm').JobSeekerSignUpFormData) => void;
   onFacebookRegister: (result: { data?: { accessToken?: string } }) => void;
   onGoogleRegister: (result: Omit<CodeResponse, 'error' | 'error_description' | 'error_uri'>) => void;
@@ -54,6 +56,7 @@ const JobSeekerSignUpView = ({
   t,
   serverErrors,
   isFullScreenLoading,
+  existingAccount,
   onRegister,
   onFacebookRegister,
   onGoogleRegister,
@@ -165,6 +168,68 @@ const JobSeekerSignUpView = ({
                   </Typography>
                 </Box>
 
+                {existingAccount && (
+                  <Alert
+                    severity="info"
+                    icon={<InfoOutlinedIcon sx={{ color: '#2563EB', mt: 0.25 }} />}
+                    sx={{
+                      mb: 2.5,
+                      borderRadius: '16px',
+                      border: '1px solid #BFDBFE',
+                      backgroundColor: '#EFF6FF',
+                      '& .MuiAlert-message': { width: '100%' },
+                    }}
+                  >
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#1E3A8A', mb: 0.5, fontSize: '14px' }}>
+                      {t('signup.existingAccountTitle')}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#1E40AF', fontSize: '13px', lineHeight: 1.5, mb: 1.5 }}>
+                      {existingAccount.role === 'EMPLOYER'
+                        ? t('signup.existingAccountEmployerBody', { email: existingAccount.email })
+                        : t('signup.existingAccountCandidateBody', { email: existingAccount.email })}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                      <Button
+                        component={Link}
+                        href={
+                          existingAccount.role === 'EMPLOYER'
+                            ? `/${ROUTES.EMPLOYER_AUTH.LOGIN}?email=${encodeURIComponent(existingAccount.email)}`
+                            : `/${ROUTES.AUTH.LOGIN}?email=${encodeURIComponent(existingAccount.email)}`
+                        }
+                        variant="contained"
+                        size="small"
+                        endIcon={<ArrowForwardIcon sx={{ fontSize: 15 }} />}
+                        sx={{
+                          textTransform: 'none',
+                          fontWeight: 700,
+                          fontSize: '13px',
+                          py: 0.75,
+                          px: 1.75,
+                          borderRadius: '10px',
+                          background: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 100%)',
+                          boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                          },
+                        }}
+                      >
+                        {existingAccount.role === 'EMPLOYER'
+                          ? t('signup.loginEmployerPortal')
+                          : t('signup.loginNow')}
+                      </Button>
+
+                      {existingAccount.role !== 'EMPLOYER' && (
+                        <StyledLink
+                          href={`/${ROUTES.AUTH.FORGOT_PASSWORD}?email=${encodeURIComponent(existingAccount.email)}`}
+                          sx={{ fontSize: '13px', fontWeight: 600, color: '#2563EB' }}
+                        >
+                          {t('signup.forgotPasswordLink')}
+                        </StyledLink>
+                      )}
+                    </Box>
+                  </Alert>
+                )}
+
                 <Box sx={{ mt: 0.5 }}>
                   <JobSeekerSignUpForm
                     onRegister={onRegister}
@@ -228,7 +293,7 @@ const JobSeekerSignUpView = ({
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 0.75,
-                    color: '#94A3B8',
+                    color: '#64748B',
                     fontSize: '12px',
                   }}
                 >

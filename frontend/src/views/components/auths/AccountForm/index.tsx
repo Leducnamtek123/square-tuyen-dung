@@ -51,10 +51,18 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
   React.useEffect(() => {
     if (serverErrors !== null) {
       for (const err in serverErrors) {
-        setError(err as keyof AccountFormData, {
-          type: 'manual',
-          message: serverErrors[err]?.join(' '),
-        });
+        const rawErr = serverErrors[err];
+        const message = Array.isArray(rawErr)
+          ? rawErr.join(' ')
+          : typeof rawErr === 'string'
+          ? rawErr
+          : '';
+        if (message) {
+          setError(err as keyof AccountFormData, {
+            type: 'manual',
+            message,
+          });
+        }
       }
     } else {
       reset(undefined, { keepValues: true });

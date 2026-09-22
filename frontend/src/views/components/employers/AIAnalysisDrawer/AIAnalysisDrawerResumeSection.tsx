@@ -1,12 +1,13 @@
-import React from 'react';
-import { Box, Button, Stack, Typography, useTheme } from '@mui/material';
+import React, { Suspense, lazy } from 'react';
+import { Box, Button, CircularProgress, Stack, Typography, useTheme } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DescriptionIcon from '@mui/icons-material/Description';
-import Pdf from '@/components/Common/Pdf';
 import { SectionCard } from './SectionCard';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
 import { getSafeExternalOpenUrl, getSafeResourceUrl } from '@/utils/safeExternalUrl';
+
+const Pdf = lazy(() => import('@/components/Common/Pdf'));
 
 type Props = {
   resumeFileUrl: string;
@@ -73,29 +74,46 @@ const AIAnalysisDrawerResumeSection = ({
           boxShadow: (muiTheme) => muiTheme.customShadows?.z1,
         }}
       >
-        <Pdf
-          fileUrl={safeResumeFileUrl}
-          title={t('appliedResume.ai.resumeTitle')}
-          containerSx={{
-            height: '100%',
-            border: 0,
-            borderRadius: 0,
-            opacity: isProcessing ? 0.75 : 1,
-            transition: 'opacity 0.3s ease',
-          }}
-          toolbarSx={{
-            bgcolor: '#1e293b',
-            px: 1.25,
-            py: 0.75,
-            '& .MuiIconButton-root': { color: '#fff', p: 0.75 },
-            '& .MuiButton-root': { fontSize: '0.72rem', px: 1.25, py: 0.5 },
-          }}
-          viewerSx={{
-            height: { xs: 356, sm: 494 },
-            minHeight: 0,
-            bgcolor: '#f8fafc',
-          }}
-        />
+        <Suspense
+          fallback={
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                minHeight: 280,
+                bgcolor: '#f8fafc',
+              }}
+            >
+              <CircularProgress size={36} />
+            </Box>
+          }
+        >
+          <Pdf
+            fileUrl={safeResumeFileUrl}
+            title={t('appliedResume.ai.resumeTitle')}
+            containerSx={{
+              height: '100%',
+              border: 0,
+              borderRadius: 0,
+              opacity: isProcessing ? 0.75 : 1,
+              transition: 'opacity 0.3s ease',
+            }}
+            toolbarSx={{
+              bgcolor: '#1e293b',
+              px: 1.25,
+              py: 0.75,
+              '& .MuiIconButton-root': { color: '#fff', p: 0.75 },
+              '& .MuiButton-root': { fontSize: '0.72rem', px: 1.25, py: 0.5 },
+            }}
+            viewerSx={{
+              height: { xs: 356, sm: 494 },
+              minHeight: 0,
+              bgcolor: '#f8fafc',
+            }}
+          />
+        </Suspense>
 
         {isProcessing && (
           <Box

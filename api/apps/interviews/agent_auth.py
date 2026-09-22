@@ -13,9 +13,7 @@ SIGNATURE_HEADER = "HTTP_X_SQUARE_AGENT_SIGNATURE"
 
 
 def _auth_required() -> bool:
-    secret = str(getattr(settings, "INTERVIEW_AGENT_SHARED_SECRET", "") or "")
-    required = bool(getattr(settings, "INTERVIEW_AGENT_AUTH_REQUIRED", False))
-    return bool(secret and required)
+    return bool(getattr(settings, "INTERVIEW_AGENT_AUTH_REQUIRED", False))
 
 
 def build_signature(secret: str, method: str, path: str, timestamp: str, body: bytes) -> str:
@@ -26,13 +24,18 @@ def build_signature(secret: str, method: str, path: str, timestamp: str, body: b
 
 def verify_interview_agent_request(request):
     """Return None when the request is accepted, otherwise a 401 JsonResponse."""
-    if not _auth_required():
-        return None
-
     django_request = getattr(request, "_request", request)
-    secret = str(settings.INTERVIEW_AGENT_SHARED_SECRET)
     timestamp = django_request.META.get(TIMESTAMP_HEADER, "")
     signature = django_request.META.get(SIGNATURE_HEADER, "")
+    has_agent_headers = bool(timestamp or signature)
+
+    if not _auth_required() and not has_agent_headers:
+        return None
+
+    secret = str(getattr(settings, "INTERVIEW_AGENT_SHARED_SECRET", "") or "").strip()
+    if not secret:
+        return JsonResponse({"detail": "Missing agent authentication shared secret."}, status=401)
+
     if not timestamp or not signature:
         return JsonResponse({"detail": "Missing agent authentication headers."}, status=401)
 

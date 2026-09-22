@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Chip, CircularProgress, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography, alpha } from '@mui/material';
+import { Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Paper, Stack, ToggleButton, ToggleButtonGroup, Typography, alpha } from '@mui/material';
 import {
   BarVisualizer,
   TrackReferenceOrPlaceholder,
@@ -57,6 +57,7 @@ import { InterviewHintsDrawer } from './components/InterviewHintsDrawer';
 import { InterviewRoadmapDrawer } from './components/InterviewRoadmapDrawer';
 import { InterviewQuestionCard } from './components/InterviewQuestionCard';
 import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
+import interviewService from '@/services/interviewService';
 
 const AI_CONTROL_TOPIC = 'square.interview.ai_control';
 const AI_TAKEOVER_TOPIC = 'square.interview.ai_takeover';
@@ -120,11 +121,14 @@ function CustomControlBar({
   const [camLoading, setCamLoading] = useState(false);
   const [screenLoading, setScreenLoading] = useState(false);
 
+  const [confirmEndOpen, setConfirmEndOpen] = useState(false);
+
   return (
     <div className="flex items-center justify-center px-2 sm:px-4 pt-1 sm:pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       <div className="flex items-center justify-center gap-1.5 sm:gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 sm:px-4 py-2 sm:py-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.08)] backdrop-blur-2xl ring-1 ring-slate-100 max-w-full">
         <button
           type="button"
+          data-testid="toggle-mic-btn"
           disabled={micLoading}
           aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone') : t('controls.unmuteMicrophone')}
           onClick={async () => {
@@ -145,6 +149,7 @@ function CustomControlBar({
         </button>
         <button
           type="button"
+          data-testid="toggle-cam-btn"
           disabled={camLoading}
           aria-label={isCameraEnabled ? t('controls.turnCameraOff') : t('controls.turnCameraOn')}
           onClick={async () => {
@@ -233,16 +238,10 @@ function CustomControlBar({
         <div className="mx-1 sm:mx-1.5 h-6 w-px bg-slate-200 shrink-0" />
         <button
           type="button"
-          onClick={async () => {
+          data-testid="end-interview-btn"
+          onClick={() => {
             if (ending) return;
-            setEnding(true);
-            try {
-              await onEndSession?.();
-            } catch {
-              // keep disconnect flow resilient
-            } finally {
-              setEnding(false);
-            }
+            setConfirmEndOpen(true);
           }}
           disabled={ending}
           className={`flex h-10 sm:h-11 items-center gap-1.5 sm:gap-2 rounded-xl border border-rose-500/40 bg-rose-600 hover:bg-rose-700 px-3 sm:px-5 text-xs sm:text-sm font-bold text-white shadow-[0_4px_14px_rgba(225,29,72,0.35)] transition-all duration-150 active:scale-[0.98] cursor-pointer shrink-0 ${
@@ -252,6 +251,76 @@ function CustomControlBar({
           <FontAwesomeIcon icon={ending ? faSpinner : faPhoneSlash} className={ending ? 'animate-spin text-xs sm:text-sm' : 'text-xs sm:text-sm'} />
           <span>{ending ? t('controls.ending') : t('controls.end')}</span>
         </button>
+
+        {/* Confirmation Dialog before ending session */}
+        <Dialog
+          open={confirmEndOpen}
+          onClose={() => !ending && setConfirmEndOpen(false)}
+          slotProps={{
+            paper: {
+              sx: {
+                borderRadius: '20px',
+                p: 1.5,
+                maxWidth: '440px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.18)',
+              },
+            },
+          }}
+        >
+          <DialogTitle sx={{ fontWeight: 700, fontSize: '1.15rem', color: '#0f172a', pb: 1 }}>
+            {t('controls.confirmEndTitle', 'Kết thúc buổi phỏng vấn?')}
+          </DialogTitle>
+          <DialogContent sx={{ color: '#475569', fontSize: '0.925rem', py: 1 }}>
+            {t(
+              'controls.confirmEndMessage',
+              'Bạn có chắc chắn muốn kết thúc buổi phỏng vấn này? Hệ thống sẽ đóng phiên làm việc trực tuyến và tiến hành tổng hợp kết quả đánh giá.'
+            )}
+          </DialogContent>
+          <DialogActions sx={{ px: 2, pb: 1.5, pt: 1, gap: 1 }}>
+            <Button
+              variant="outlined"
+              onClick={() => setConfirmEndOpen(false)}
+              disabled={ending}
+              sx={{
+                borderRadius: '12px',
+                color: '#475569',
+                borderColor: '#cbd5e1',
+                textTransform: 'none',
+                fontWeight: 600,
+              }}
+            >
+              {t('controls.continueInterview', 'Tiếp tục phỏng vấn')}
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              data-testid="confirm-end-interview-btn"
+              onClick={async () => {
+                setEnding(true);
+                try {
+                  await onEndSession?.();
+                  setConfirmEndOpen(false);
+                } catch {
+                  // keep disconnect flow resilient
+                } finally {
+                  setEnding(false);
+                }
+              }}
+              disabled={ending}
+              startIcon={ending ? <CircularProgress size={16} color="inherit" /> : <FontAwesomeIcon icon={faPhoneSlash} />}
+              sx={{
+                borderRadius: '12px',
+                bgcolor: '#e11d48',
+                '&:hover': { bgcolor: '#be123c' },
+                textTransform: 'none',
+                fontWeight: 700,
+                boxShadow: '0 4px 12px rgba(225,29,72,0.3)',
+              }}
+            >
+              {ending ? t('controls.ending') : t('controls.confirmEndAction', 'Xác nhận kết thúc')}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </div>
   );
@@ -469,8 +538,9 @@ function AIParticipantTile({
                 {isSelf ? 'Camera của bạn đang tắt' : 'Camera đang tắt'}
               </span>
               {isTakeoverActive && (
-                <span className="rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-400 animate-pulse">
-                  ⚡ Đang tiếp quản phỏng vấn
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-400 animate-pulse">
+                  <FontAwesomeIcon icon={faBolt} className="text-[10px]" />
+                  Đang tiếp quản phỏng vấn
                 </span>
               )}
             </div>
@@ -1006,6 +1076,7 @@ function ChatPanel({
 }
 
 type AIInterviewLayoutProps = {
+  sessionId?: number | string;
   onEndSession?: () => Promise<void> | void;
   questions?: Question[];
   defaultDurationSeconds?: number;
@@ -1017,6 +1088,7 @@ type AIInterviewLayoutProps = {
 };
 
 export function AIInterviewLayout({
+  sessionId,
   onEndSession,
   questions: propQuestions,
   defaultDurationSeconds,
@@ -1034,6 +1106,7 @@ export function AIInterviewLayout({
   const [isTakeoverSending, setIsTakeoverSending] = useState(false);
   const [isCompactChatView, setIsCompactChatView] = useState(false);
   const [isFinishingTransition, setIsFinishingTransition] = useState(false);
+  const [tabSwitchWarning, setTabSwitchWarning] = useState<string | null>(null);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant, isCameraEnabled, isScreenShareEnabled } = useLocalParticipant();
@@ -1047,6 +1120,40 @@ export function AIInterviewLayout({
       void onEndSession?.();
     },
   });
+
+  // Proctoring: Tab Visibility / Switch Detection
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let leaveTimestamp = 0;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        leaveTimestamp = Date.now();
+        setTabSwitchWarning('Cảnh báo: Bạn đang trong buổi phỏng vấn trực tiếp, vui lòng tập trung và hạn chế chuyển tab.');
+        if (sessionId) {
+          void interviewService.recordProctoringEvent(sessionId, {
+            eventType: 'tab_hidden',
+            durationSeconds: 0,
+            details: { timestamp: new Date().toISOString() },
+          }).catch(() => {});
+        }
+      } else {
+        if (leaveTimestamp > 0 && sessionId) {
+          const durationSec = Math.round((Date.now() - leaveTimestamp) / 1000);
+          void interviewService.recordProctoringEvent(sessionId, {
+            eventType: 'tab_returned',
+            durationSeconds: durationSec,
+            details: { awayDurationSeconds: durationSec },
+          }).catch(() => {});
+        }
+        const timer = setTimeout(() => setTabSwitchWarning(null), 4500);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [sessionId]);
   const { messages, send, isSending } = useInterviewMessages();
   const { t } = useTranslation(['interview']);
   const candidateLabel = t('liveRoom.participants.candidate');
@@ -1302,6 +1409,16 @@ export function AIInterviewLayout({
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-[#f8fafc]">
+      {/* Proctoring Alert Toast */}
+      {tabSwitchWarning && (
+        <div className="absolute top-3 inset-x-0 z-50 flex justify-center px-4 pointer-events-none animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50/95 px-4 py-2 text-xs font-semibold text-amber-900 shadow-md backdrop-blur-md">
+            <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-ping shrink-0" />
+            <span>{tabSwitchWarning}</span>
+          </div>
+        </div>
+      )}
+
       {/* Left Drawer: Gợi ý trả lời & Mẹo quan trọng */}
       <InterviewHintsDrawer
         open={hud.hintsDrawerOpen}

@@ -97,18 +97,34 @@ export const getApiErrorMessage = (error: unknown, fallbackMessage: string): str
     const errObj = error as {
       response?: {
         data?: {
-          detail?: string;
-          message?: string;
-          error?: { message?: string; details?: unknown };
+          detail?: unknown;
+          message?: unknown;
+          error?: { message?: unknown; details?: unknown };
         };
       };
-      message?: string;
+      message?: unknown;
     };
     const responseData = errObj.response?.data;
     if (responseData?.error?.message && typeof responseData.error.message === 'string') {
       return responseData.error.message;
     }
-    return responseData?.detail || responseData?.message || errObj.message || fallbackMessage;
+    if (typeof responseData?.detail === 'string' && responseData.detail.trim()) {
+      return responseData.detail;
+    }
+    if (typeof responseData?.message === 'string' && responseData.message.trim()) {
+      return responseData.message;
+    }
+    if (typeof responseData?.detail === 'object' && responseData.detail !== null) {
+      try {
+        return JSON.stringify(responseData.detail);
+      } catch {
+        // ignore
+      }
+    }
+    if (typeof errObj.message === 'string' && errObj.message.trim()) {
+      return errObj.message;
+    }
+    return fallbackMessage;
   }
   return fallbackMessage;
 };

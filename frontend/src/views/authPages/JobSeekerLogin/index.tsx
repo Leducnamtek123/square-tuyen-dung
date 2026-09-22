@@ -53,6 +53,7 @@ const JobSeekerLogin = () => {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
   const [loginMode, setLoginMode] = React.useState<'email' | 'phone'>('email');
+  const [defaultEmail, setDefaultEmail] = React.useState<string | undefined>(undefined);
   const socialAuthInFlightRef = React.useRef(false);
   const lastSocialAuthAttemptAtRef = React.useRef(0);
 
@@ -62,7 +63,11 @@ const JobSeekerLogin = () => {
     const successMessageKey = params.get('successMessageKey');
     const successMsg = params.get('successMessage');
     const errorMsg = params.get('errorMessage');
+    const emailParam = params.get('email');
 
+    if (emailParam) {
+      setDefaultEmail(emailParam);
+    }
     if (successMessageKey === 'passwordResetSuccess') {
       setSuccessMessage(t('messages.passwordResetSuccess'));
     } else if (successMsg !== null) {
@@ -247,6 +252,7 @@ const JobSeekerLogin = () => {
       errorMessage={errorMessage}
       successMessage={successMessage}
       loginMode={loginMode}
+      defaultEmail={defaultEmail}
       isFullScreenLoading={isFullScreenLoading}
       onSetLoginMode={setLoginMode}
       onLogin={handleLogin}

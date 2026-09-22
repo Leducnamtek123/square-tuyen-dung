@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from '@/utils/sanitizeHtml';
 import { Box, Typography, Stack, IconButton, Tooltip, Button, Chip } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -267,14 +267,14 @@ export default function JobsPage() {
             </Tooltip>
             {row.status !== 2 && (
               <Tooltip title={t('pages.jobs.table.approveAction')}>
-                <IconButton size="small" onClick={() => handleOpenApprove(row)} sx={{ color: '#16A34A' }}>
+                <IconButton data-testid="approve-job-btn" size="small" onClick={() => handleOpenApprove(row)} sx={{ color: '#16A34A' }}>
                   <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
             )}
             {row.status !== 3 && (
               <Tooltip title={t('pages.jobs.table.rejectAction')}>
-                <IconButton size="small" onClick={() => handleOpenReject(row)} sx={{ color: '#DC2626' }}>
+                <IconButton data-testid="reject-job-btn" size="small" onClick={() => handleOpenReject(row)} sx={{ color: '#DC2626' }}>
                   <HighlightOffIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
@@ -461,7 +461,7 @@ export default function JobsPage() {
               </Typography>
               <Box
                 sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: 2, border: '1px solid #E2E8F0', fontSize: '0.875rem' }}
-                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(inspectingJob.jobDescription || '<p>Chưa có mô tả</p>') }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(inspectingJob.jobDescription || '<p>Chưa có mô tả</p>') }}
               />
             </Box>
 
@@ -472,7 +472,7 @@ export default function JobsPage() {
                 </Typography>
                 <Box
                   sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: 2, border: '1px solid #E2E8F0', fontSize: '0.875rem' }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(inspectingJob.jobRequirement) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(inspectingJob.jobRequirement) }}
                 />
               </Box>
             )}
@@ -484,7 +484,7 @@ export default function JobsPage() {
                 </Typography>
                 <Box
                   sx={{ p: 2, bgcolor: '#FFFFFF', borderRadius: 2, border: '1px solid #E2E8F0', fontSize: '0.875rem' }}
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(inspectingJob.benefitsEnjoyed) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(inspectingJob.benefitsEnjoyed) }}
                 />
               </Box>
             )}

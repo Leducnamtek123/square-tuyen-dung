@@ -25,10 +25,23 @@ registerGsapPlugins();
 const HERO_CONTAINER_MAX_WIDTH = 1280;
 const HERO_HEADER_OFFSET = { xs: '56px', sm: '64px' };
 
+const DEFAULT_BANNER: Banner = {
+  id: 0,
+  imageUrl: IMAGES.coverImageDefault,
+  description: 'InfoHR Banner',
+} as Banner;
+
 const RenderItem = ({ item }: { item: Banner }) => {
   const imageUrl = item.imageUrl || IMAGES.coverImageDefault;
   const mobileImageUrl = item.imageMobileUrl || imageUrl;
+  const imgRef = React.useRef<HTMLImageElement>(null);
   const [isLoaded, setIsLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    if (imgRef.current?.complete) {
+      setIsLoaded(true);
+    }
+  }, [imageUrl]);
 
   return (
     <Box
@@ -38,17 +51,24 @@ const RenderItem = ({ item }: { item: Banner }) => {
         position: 'relative',
         overflow: 'hidden',
         bgcolor: '#0f172a',
+        background:
+          'radial-gradient(ellipse at 70% 30%, rgba(30, 58, 138, 0.45) 0%, #0F172A 70%)',
       }}
     >
       <Box component="picture" sx={{ display: 'block', width: '100%', height: '100%' }}>
         <source media="(max-width: 599px)" srcSet={mobileImageUrl} />
+        {imageUrl.endsWith('.jpg') || imageUrl.endsWith('.png') ? (
+          <source type="image/webp" srcSet={imageUrl.replace(/\.(jpg|png)$/, '.webp')} />
+        ) : null}
         <Box
           component="img"
+          ref={imgRef}
           src={imageUrl}
           alt={item.description || 'Banner'}
           loading="eager"
           // @ts-ignore fetchPriority property
           fetchPriority="high"
+          decoding="async"
           onLoad={() => setIsLoaded(true)}
           onError={(e) => {
             (e.target as HTMLImageElement).src = IMAGES.coverImageDefault;
@@ -62,7 +82,7 @@ const RenderItem = ({ item }: { item: Banner }) => {
             objectPosition: 'center center',
             display: 'block',
             opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out',
+            transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         />
       </Box>
@@ -79,9 +99,13 @@ const RenderItem = ({ item }: { item: Banner }) => {
   );
 };
 
-const TopSlide = () => {
-  const [banners, setBanners] = React.useState<Banner[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+interface TopSlideProps {
+  initialBanners?: Banner[];
+}
+
+const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
+  const [banners, setBanners] = React.useState<Banner[]>(initialBanners ?? []);
+  const [isLoading, setIsLoading] = React.useState(!initialBanners || initialBanners.length === 0);
   const heroContentRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
@@ -167,27 +191,17 @@ const TopSlide = () => {
         if (!isMounted) return;
 
         if (resData && resData.length > 0) {
-          const preloadPromises = resData.slice(0, 2).map((banner) => {
-            return new Promise((resolve) => {
-              const url = banner.imageUrl || IMAGES.coverImageDefault;
-              const img = new Image();
-              img.src = url;
-              img.onload = resolve;
-              img.onerror = resolve;
-            });
-          });
-
-          await Promise.race([
-            Promise.all(preloadPromises),
-            new Promise((r) => setTimeout(r, 600)),
-          ]);
-        }
-
-        if (isMounted) {
-          setBanners(resData);
+          const activeList = resData.filter((b) => b.isActive !== false);
+          setBanners(activeList.length > 0 ? activeList : resData);
+        } else {
+          // Chỉ fallback sang DEFAULT_BANNER khi API trả về rỗng
+          setBanners([DEFAULT_BANNER]);
         }
       } catch {
-        // Error handled silently
+        // Chỉ fallback sang DEFAULT_BANNER khi API gặp lỗi
+        if (isMounted) {
+          setBanners([DEFAULT_BANNER]);
+        }
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -228,34 +242,46 @@ const TopSlide = () => {
         }}
       >
         <Box sx={{ height: '100%', '& .swiper-pagination': { display: 'none' } }}>
-          <Swiper
-            spaceBetween={30}
-            preventClicks={false}
-            preventClicksPropagation={false}
-            autoplay={{
-              delay: 6000,
-              disableOnInteraction: false,
-            }}
-            modules={[Autoplay]}
-            className="mySwiper"
-            style={{ height: '100%' }}
-          >
-            {isLoading ? (
-              <SwiperSlide>
-                <Skeleton variant="rectangular" width="100%" height="100%" sx={{ display: 'block', transform: 'none' }} />
-              </SwiperSlide>
-            ) : banners.length > 0 ? (
-              banners.map((value) => (
+          {banners.length > 0 ? (
+            <Swiper
+              spaceBetween={30}
+              preventClicks={false}
+              preventClicksPropagation={false}
+              autoplay={{
+                delay: 6000,
+                disableOnInteraction: false,
+              }}
+              modules={[Autoplay]}
+              className="mySwiper"
+              style={{ height: '100%' }}
+            >
+              {banners.map((value) => (
                 <SwiperSlide key={value.id}>
                   <RenderItem item={value} />
                 </SwiperSlide>
-              ))
-            ) : (
-              <SwiperSlide>
-                <RenderItem item={{ id: 0, imageUrl: IMAGES.coverImageDefault, description: 'Banner' } as Banner} />
-              </SwiperSlide>
-            )}
-          </Swiper>
+              ))}
+            </Swiper>
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                height: '100%',
+                bgcolor: '#0f172a',
+                background:
+                  'radial-gradient(ellipse at 70% 30%, rgba(30, 58, 138, 0.45) 0%, #0F172A 70%)',
+              }}
+            >
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  background:
+                    'linear-gradient(90deg, rgba(4, 48, 104, 0.95) 0%, rgba(15, 23, 42, 0.62) 48%, rgba(15, 23, 42, 0.12) 100%)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </Box>
+          )}
         </Box>
 
         <Box

@@ -1,3 +1,5 @@
+import type { User } from './models';
+
 /** OAuth2 token pair returned by the Django backend.
  * NOTE: httpRequest interceptor auto-converts snake_case → camelCase,
  * so we define these with camelCase names.
@@ -165,5 +167,40 @@ export interface OnboardingStatusResponse {
     roleName: string;
   } | null;
 }
+
+export interface CandidateCvParseResult {
+  fullName?: string;
+  desiredJobTitle?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  gender?: string;
+  careerId?: number | null;
+  cityId?: number | null;
+  skills?: string[];
+  fileId: number;
+  fileName: string;
+  fileUrl: string;
+}
+
+export interface TaxCodeLookupResult {
+  exists: boolean;
+  company?: {
+    id?: number;
+    companyName?: string;
+    logoUrl?: string;
+    address?: string;
+    adminEmailMasked?: string;
+    taxCode?: string;
+  } | null;
+}
+
+export interface CompanyJoinRequestResult {
+  message: string;
+  companyId: number;
+  companyName: string;
+  user?: User;
+}
+
 
 

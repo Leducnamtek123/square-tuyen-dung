@@ -10,6 +10,8 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from apps.cv_builder.models import CVTemplate, CandidateCV, CVSuggestion
 from apps.accounts.models import User
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.storage import default_storage
 from shared.configs import variable_system as var_sys
 
 
@@ -298,6 +300,55 @@ class TestCandidateCVAPI:
         sample_candidate_cv.refresh_from_db()
         assert sample_candidate_cv.ai_score is not None
         assert sample_candidate_cv.ai_score == data["score"]
+
+    def test_upload_pdf_success_and_file_saved(self, api_client, job_seeker_user, sample_candidate_cv):
+        api_client.force_authenticate(user=job_seeker_user)
+        pdf_content = b"%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF"
+        pdf_file = SimpleUploadedFile("candidate_cv_test.pdf", pdf_content, content_type="application/pdf")
+
+        response = api_client.post(
+            f"/api/v1/cv/candidate-cvs/{sample_candidate_cv.id}/upload-pdf/",
+            data={"file": pdf_file},
+            format="multipart",
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json().get("data", {})
+        assert data["filename"] == "candidate_cv_test.pdf"
+        assert data["pdf_url"] is not None
+
+        sample_candidate_cv.refresh_from_db()
+        assert sample_candidate_cv.pdf_url == data["pdf_url"]
+
+        # Verify file is actually saved to storage
+        storage_path = f"candidate_cvs/{sample_candidate_cv.id}/candidate_cv_test.pdf"
+        assert default_storage.exists(storage_path)
+
+        # Verify content matches
+        with default_storage.open(storage_path, "rb") as saved_file:
+            assert saved_file.read() == pdf_content
+
+        # Cleanup
+        default_storage.delete(storage_path)
+
+    def test_upload_endpoint_success_and_file_saved(self, api_client, job_seeker_user):
+        api_client.force_authenticate(user=job_seeker_user)
+        pdf_content = b"%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF"
+        pdf_file = SimpleUploadedFile("quick_upload.pdf", pdf_content, content_type="application/pdf")
+
+        response = api_client.post(
+            "/api/v1/cv/candidate-cvs/upload/",
+            data={"file": pdf_file},
+            format="multipart",
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json().get("data", {})
+        assert data["filename"] == "quick_upload.pdf"
+        assert data["pdf_url"] is not None
+        storage_path = data.get("storage_path") or f"candidate_cvs/uploads/{job_seeker_user.id}/quick_upload.pdf"
+        assert default_storage.exists(storage_path)
+
+        # Cleanup
+        default_storage.delete(storage_path)
 
 
 # ==============================================================================

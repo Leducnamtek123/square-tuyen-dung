@@ -279,6 +279,34 @@ const authService = {
     );
   },
 
+  parseCandidateCv: (fileId: number): Promise<import('../types/auth').CandidateCvParseResult> => {
+    const url = 'auth/onboarding/candidate/parse-cv/';
+    return Promise.resolve(httpRequest.post(url, { fileId })).then(
+      unwrapDataResponse<import('../types/auth').CandidateCvParseResult>,
+    );
+  },
+
+  lookupTaxCode: (taxCode: string): Promise<import('../types/auth').TaxCodeLookupResult> => {
+    const url = `auth/onboarding/tax-lookup/?tax_code=${encodeURIComponent(taxCode)}`;
+    return Promise.resolve(httpRequest.get(url)).then(
+      unwrapDataResponse<import('../types/auth').TaxCodeLookupResult>,
+    );
+  },
+
+  requestJoinCompany: (companyId: number): Promise<import('../types/auth').CompanyJoinRequestResult> => {
+    const url = 'auth/onboarding/employer/request-join/';
+    return Promise.resolve(httpRequest.post(url, { companyId })).then(
+      unwrapDataResponse<import('../types/auth').CompanyJoinRequestResult>,
+    );
+  },
+
+  skipOnboarding: (): Promise<{ message: string; user: User }> => {
+    const url = 'auth/onboarding/skip/';
+    return Promise.resolve(httpRequest.post(url, {})).then(
+      unwrapDataResponse<{ message: string; user: User }>,
+    );
+  },
+
   verifyEmailOtp: (email: string, otp: string): Promise<ActionResponse> => {
     const url = 'auth/verify-email-otp/';
     return Promise.resolve(httpRequest.post(url, { email, otp })).then(normalizeActionResponse);

@@ -282,7 +282,15 @@
   "applyCard": {
     "positionCaption": "Ứng tuyển vị trí",
     "submit": "Ứng tuyển",
-    "success": "Ứng tuyển thành công."
+    "success": "Ứng tuyển thành công.",
+    "onboardingRequired": "Vui lòng hoàn tất thiết lập hồ sơ (Onboarding) trước khi nộp CV ứng tuyển."
+  },
+  "onboardingRequired": {
+    "candidateTitle": "Cần hoàn tất hồ sơ để ứng tuyển",
+    "employerTitle": "Cần hoàn tất hồ sơ doanh nghiệp",
+    "candidateMsg": "Bạn cần hoàn thiện thông tin hồ sơ cơ bản (chức danh, kỹ năng, số điện thoại) để nhà tuyển dụng có thể đánh giá và liên hệ phỏng vấn.",
+    "employerMsg": "Vui lòng hoàn thiện hồ sơ doanh nghiệp trước khi thực hiện các nghiệp vụ tuyển dụng.",
+    "cta": "Hoàn tất hồ sơ ngay"
   },
   "company": {
     "following": "Đang theo dõi",

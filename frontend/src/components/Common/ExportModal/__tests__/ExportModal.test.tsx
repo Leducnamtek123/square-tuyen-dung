@@ -1,4 +1,8 @@
+/**
+ * @jest-environment jsdom
+ */
 import React from 'react';
+import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ExportModal } from '../ExportModal';
 import type { ExportColumn, ExportScope } from '../types';
@@ -41,7 +45,7 @@ describe('ExportModal Component', () => {
     expect(screen.getByText('Tên file xuất')).toBeInTheDocument();
     expect(screen.getByText('Định dạng file')).toBeInTheDocument();
     expect(screen.getByText('Phạm vi dữ liệu')).toBeInTheDocument();
-    expect(screen.getByText('Generate File')).toBeInTheDocument();
+    expect(screen.getByText('Xuất file dữ liệu')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(mockFetchData).toHaveBeenCalledWith('filtered');
@@ -58,10 +62,10 @@ describe('ExportModal Component', () => {
       />
     );
 
-    const selectAllBtn = screen.getByText('Select All');
+    const selectAllBtn = screen.getByText('Chọn tất cả');
     fireEvent.click(selectAllBtn);
 
-    const clearAllBtn = screen.getByText('Clear All');
+    const clearAllBtn = screen.getByText('Bỏ chọn tất cả');
     fireEvent.click(clearAllBtn);
   });
 
@@ -78,17 +82,17 @@ describe('ExportModal Component', () => {
       />
     );
 
-    const generateBtn = screen.getByText('Generate File');
+    const generateBtn = screen.getByText('Xuất file dữ liệu');
     fireEvent.click(generateBtn);
 
     await waitFor(
       () => {
-        expect(screen.getByText('Export completed successfully.')).toBeInTheDocument();
+        expect(screen.getByText('Xuất dữ liệu thành công!')).toBeInTheDocument();
       },
       { timeout: 3000 }
     );
 
-    expect(screen.getByText('Download')).toBeInTheDocument();
-    expect(screen.getByText('Close')).toBeInTheDocument();
+    expect(screen.getByText('Tải xuống')).toBeInTheDocument();
+    expect(screen.getByText('Đóng')).toBeInTheDocument();
   });
 });

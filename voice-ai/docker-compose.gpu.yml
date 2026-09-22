@@ -1,5 +1,5 @@
-# Local GPU override is disabled because inference runs on FPT GPU.
-# Uncomment this file only when intentionally running voice AI locally.
+# Local GPU override for Nvidia CUDA inference.
+# Uncomment this file only when intentionally running voice AI locally on GPU.
 #
 # services:
 #   vieneu-tts:

@@ -6,7 +6,7 @@ import { APP_CONFIG_DEFAULTS } from '@/components/Features/VoiceAssistant/app-co
 import type { AppConfig } from '@/components/Features/VoiceAssistant/app-config';
 
 export const CONFIG_ENDPOINT = process.env.NEXT_PUBLIC_APP_CONFIG_ENDPOINT;
-export const SANDBOX_ID = process.env.SANDBOX_ID;
+export const SANDBOX_ID = process.env.NEXT_PUBLIC_SANDBOX_ID ?? process.env.SANDBOX_ID;
 
 export interface SandboxConfig {
   [key: string]:

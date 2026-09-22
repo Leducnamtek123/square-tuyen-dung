@@ -22,6 +22,7 @@ import StepSkillsExperience from './components/StepSkillsExperience';
 import StepResumeUpload from './components/StepResumeUpload';
 import StepCandidateComplete from './components/StepCandidateComplete';
 import { useCandidateOnboarding } from './hooks/useCandidateOnboarding';
+import commonService from '@/services/commonService';
 
 export default function CandidateOnboardingPage() {
   const { t } = useTranslation('jobSeeker');
@@ -33,6 +34,9 @@ export default function CandidateOnboardingPage() {
     isSaving,
     isUploading,
     setIsUploading,
+    isParsingCv,
+    cvParseSuccess,
+    isSkipping,
     generalError,
     setGeneralError,
     completeness,
@@ -42,10 +46,25 @@ export default function CandidateOnboardingPage() {
     handleNextStep1,
     handleNextStep2,
     handleCompleteCandidate,
+    handleCvAutoParse,
+    handleSkipOnboarding,
     handleBack,
     handleExploreJobs,
     handleViewDashboard,
   } = useCandidateOnboarding();
+
+  const handleQuickCvUpload = async (file: File) => {
+    setIsUploading(true);
+    try {
+      const res = await commonService.uploadFile(file, 'CV');
+      await handleCvAutoParse(res.id, file.name, res.url);
+    } catch (err) {
+      console.error('Quick CV upload error:', err);
+      setGeneralError('Tải file CV thất bại. Vui lòng thử lại.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const steps = [
     t('onboarding.steps.careerGoals', 'Mục tiêu & Nguyện vọng'),
@@ -73,7 +92,12 @@ export default function CandidateOnboardingPage() {
   }
 
   return (
-    <OnboardingShell maxWidth="md">
+    <OnboardingShell
+      maxWidth="md"
+      onSkip={handleSkipOnboarding}
+      isSkipping={isSkipping}
+      showSkip={activeStep < 3}
+    >
       {/* Top Stepper */}
       <CandidateStepper activeStep={activeStep} steps={steps} />
 
@@ -93,6 +117,7 @@ export default function CandidateOnboardingPage() {
                   desiredJobTitle: formData.desiredJobTitle,
                   careerId: formData.careerId,
                   cityId: formData.cityId,
+                  phone: formData.phone,
                   typeOfWorkplace: formData.typeOfWorkplace,
                   address: formData.address,
                   lat: formData.lat,
@@ -102,6 +127,10 @@ export default function CandidateOnboardingPage() {
                 errors={errors}
                 careersList={careersList}
                 citiesList={citiesList}
+                onCvFileSelected={handleQuickCvUpload}
+                isParsingCv={isParsingCv || isUploading}
+                fileName={formData.fileName}
+                cvParseSuccess={cvParseSuccess}
               />
             </div>
           </Fade>
@@ -138,10 +167,11 @@ export default function CandidateOnboardingPage() {
                   fileUrl: formData.fileUrl,
                 }}
                 onChange={updateFormField}
-                isUploading={isUploading}
+                isUploading={isUploading || isParsingCv}
                 setIsUploading={setIsUploading}
                 errorMsg={errors.fileId || ''}
                 setErrorMsg={(msg) => updateFormField('fileId', msg ? null : formData.fileId)}
+                onAutoParseCv={handleCvAutoParse}
               />
             </div>
           </Fade>

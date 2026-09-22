@@ -36,6 +36,7 @@ export const createCandidateStep1Schema = (t: (key: any, defaultVal?: any) => an
     desiredJobTitle: yup
       .string()
       .trim()
+      .max(255, t('onboarding.validation.desiredJobTitleMax', 'Vị trí công việc không được vượt quá 255 ký tự.'))
       .required(t('onboarding.validation.desiredJobTitleRequired', 'Vui lòng nhập vị trí công việc mong muốn.')),
     phone: yup
       .string()
@@ -43,7 +44,8 @@ export const createCandidateStep1Schema = (t: (key: any, defaultVal?: any) => an
       .optional()
       .test('is-valid-phone', t('onboarding.validation.phoneInvalid', 'Số điện thoại không hợp lệ.'), (val) => {
         if (!val) return true;
-        return /^(0|\+84)[3|5|7|8|9][0-9]{8}$/.test(val.replace(/\s+/g, ''));
+        const cleaned = val.replace(/[\s.-]+/g, '');
+        return /^(0|\+84)[35789]\d{8}$/.test(cleaned);
       }),
     careerId: yup
       .mixed()
@@ -73,9 +75,14 @@ export const createCandidateStep2Schema = (t: (key: any, defaultVal?: any) => an
       .required(t('onboarding.validation.skillsMin', 'Vui lòng chọn hoặc nhập ít nhất 1 kỹ năng.')),
     experience: yup.number().default(1),
     isSalaryNegotiable: yup.boolean().default(false),
-    salaryMin: yup.number().optional().nullable(),
+    salaryMin: yup
+      .number()
+      .min(0, t('onboarding.validation.salaryInvalid', 'Lương không được là số âm.'))
+      .optional()
+      .nullable(),
     salaryMax: yup
       .number()
+      .min(0, t('onboarding.validation.salaryInvalid', 'Lương không được là số âm.'))
       .optional()
       .nullable()
       .test(

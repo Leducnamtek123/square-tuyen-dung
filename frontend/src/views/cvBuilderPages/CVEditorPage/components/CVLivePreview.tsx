@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -42,6 +42,22 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
   const [zoomLevel, setZoomLevel] = useState<number>(0.85);
   const [cvLanguage, setCvLanguage] = useState<'vi' | 'en'>('vi');
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined') {
+        const availableWidth = window.innerWidth - 32;
+        // 210mm at 96 DPI is ~794px
+        if (availableWidth < 794 * 0.85) {
+          const autoZoom = Math.max(0.42, Math.min(0.85, Number((availableWidth / 794).toFixed(2))));
+          setZoomLevel(autoZoom);
+        }
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const currentTemplate =
     CV_TEMPLATES_CATALOG.find((t) => t.id === data.templateId) || CV_TEMPLATES_CATALOG[0];
   const paletteColors = currentTemplate.defaultColors || [
@@ -58,11 +74,17 @@ export const CVLivePreview: React.FC<CVLivePreviewProps> = ({
   };
 
   const handleZoomOut = () => {
-    setZoomLevel((prev) => Math.max(prev - 0.1, 0.45));
+    setZoomLevel((prev) => Math.max(prev - 0.1, 0.42));
   };
 
   const handleResetZoom = () => {
-    setZoomLevel(0.85);
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      const availableWidth = window.innerWidth - 32;
+      const autoZoom = Math.max(0.42, Math.min(0.85, Number((availableWidth / 794).toFixed(2))));
+      setZoomLevel(autoZoom);
+    } else {
+      setZoomLevel(0.85);
+    }
   };
 
   return (

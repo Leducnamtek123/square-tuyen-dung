@@ -1,4 +1,5 @@
 import React from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import {
   Box,
   Button,
@@ -185,7 +186,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           }}
         >
           {htmlContent ? (
-            <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(htmlContent) }} />
           ) : (
             <Box sx={{ py: 8, textAlign: 'center', color: 'text.disabled' }}>
               <Typography variant="body2">{t('editor.preview.empty', 'Chưa có nội dung để hiển thị')}</Typography>

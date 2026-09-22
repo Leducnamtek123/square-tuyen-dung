@@ -16,37 +16,74 @@ type CompanyHeroProps = {
 
 const CompanyHero = ({ slug, companyName, companyImageUrl, companyCoverImageUrl, language }: CompanyHeroProps) => {
   const name = companyName || 'Doanh nghiệp';
-  return (
-    <Box sx={{ position: 'relative' }}>
-      <MuiImageCustom
-        width="100%"
-        fit="cover"
-        src={companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
-        fallbackSrc={IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
-        alt={`Ảnh bìa ${name}`}
-        sx={{
-          height: { xs: 130, sm: 160, md: 180 },
-          borderRadius: 2,
-          filter: 'brightness(0.9)',
-        }}
-        duration={1500}
-      />
 
+  return (
+    <Box sx={{ position: 'relative', width: '100%' }}>
+      {/* Cover image banner with flush rounded top corners */}
       <Box
         sx={{
-          position: 'absolute',
-          bottom: { xs: -28, sm: -36 },
-          left: 16,
-          width: { xs: 68, sm: 80 },
-          height: { xs: 68, sm: 80 },
-          transition: 'transform 0.3s ease',
-          '&:hover': {
-            transform: 'scale(1.05)',
-          },
+          height: 135,
+          width: '100%',
+          overflow: 'hidden',
+          borderTopLeftRadius: '18px',
+          borderTopRightRadius: '18px',
+          bgcolor: '#f1f5f9',
+          position: 'relative',
         }}
+      >
+        <MuiImageCustom
+          width="100%"
+          fit="cover"
+          src={companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
+          fallbackSrc={IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
+          alt={`Ảnh bìa ${name}`}
+          sx={{
+            height: '100%',
+            width: '100%',
+            filter: 'brightness(0.92)',
+            transition: 'transform 0.5s ease',
+            '&:hover': {
+              transform: 'scale(1.03)',
+            },
+          }}
+          duration={1000}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.02) 0%, rgba(15, 23, 42, 0.25) 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+      </Box>
+
+      {/* Modern floating logo badge overlapping the banner */}
+      <Box
         component={Link}
         href={localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`, language)}
         aria-label={`Chi tiết ${name}`}
+        sx={{
+          position: 'absolute',
+          bottom: -24,
+          left: 20,
+          width: 64,
+          height: 64,
+          borderRadius: '14px',
+          bgcolor: '#ffffff',
+          border: '3px solid #ffffff',
+          boxShadow: '0 6px 16px -2px rgba(15, 23, 42, 0.12), 0 2px 6px -1px rgba(15, 23, 42, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          p: 0.5,
+          zIndex: 2,
+          transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+          '&:hover': {
+            transform: 'scale(1.06)',
+            boxShadow: '0 8px 20px -2px rgba(37, 99, 235, 0.2)',
+          },
+        }}
       >
         <MuiImageCustom
           src={companyImageUrl || IMAGES.companyLogoDefault}
@@ -55,10 +92,8 @@ const CompanyHero = ({ slug, companyName, companyImageUrl, companyCoverImageUrl,
           sx={{
             width: '100%',
             height: '100%',
-            bgcolor: 'white',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            p: 0.75,
-            borderRadius: 2.5,
+            objectFit: 'contain',
+            borderRadius: '10px',
           }}
         />
       </Box>
@@ -67,4 +102,3 @@ const CompanyHero = ({ slug, companyName, companyImageUrl, companyCoverImageUrl,
 };
 
 export default CompanyHero;
-

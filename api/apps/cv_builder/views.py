@@ -2,9 +2,16 @@ from rest_framework import viewsets, permissions, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.exceptions import ValidationError
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import F, Q
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import os
+import re
 
 from .models import CVTemplate, CandidateCV, CVSuggestion
 from .serializers import (
@@ -104,6 +111,137 @@ class CandidateCVViewSet(viewsets.ModelViewSet):
         cv.is_main_cv = True
         cv.save(update_fields=["is_main_cv"])
         return Response({"detail": "Đã đặt làm CV chính thành công.", "id": cv.id})
+
+    @action(detail=True, methods=["post"], url_path="upload-pdf", parser_classes=[MultiPartParser, FormParser, JSONParser])
+    def upload_pdf(self, request, pk=None):
+        """
+        Uploads and validates a candidate CV file (PDF/DOCX).
+        Strict adversarial validation against:
+        - 0-byte empty files
+        - Files exceeding max size (10MB)
+        - Corrupted / invalid format files (magic byte inspection)
+        - Path traversal & dangerous characters in filename
+        """
+        cv = self.get_object()
+        file_obj = request.FILES.get("file") or request.FILES.get("pdf_file")
+        if not file_obj:
+            raise ValidationError({"file": "Vui lòng đính kèm tệp tin."})
+
+        # 1. 0-byte file check
+        if getattr(file_obj, "size", 0) == 0:
+            raise ValidationError({"file": "Tệp tin tải lên bị rỗng (0-byte)."})
+
+        # 2. Oversized file check (10MB limit)
+        max_size = 10 * 1024 * 1024
+        if file_obj.size > max_size:
+            raise ValidationError({"file": "Dung lượng tệp tin vượt quá 10MB cho phép."})
+
+        # 3. Path traversal & filename injection check
+        raw_name = request.data.get("filename") or getattr(file_obj, '_name', None) or file_obj.name or ""
+        import os
+        import re
+        if (
+            ".." in raw_name
+            or "/" in raw_name
+            or "\\" in raw_name
+            or "\x00" in raw_name
+            or re.search(r"[<>\";|`$*?]", raw_name)
+        ):
+            raise ValidationError({"file": "Tên tệp tin không hợp lệ hoặc chứa ký tự nguy hiểm (path traversal/injection)."})
+
+        ext = os.path.splitext(raw_name)[1].lower()
+        if ext not in [".pdf", ".docx", ".doc"]:
+            raise ValidationError({"file": "Định dạng tệp tin không được hỗ trợ (chỉ chấp nhận .pdf, .docx)."})
+
+        # 4. File corruption & magic byte validation
+        header = file_obj.read(1024)
+        file_obj.seek(0)
+        is_pdf = header.startswith(b"%PDF")
+        is_docx_zip = header.startswith(b"PK\x03\x04")
+        if not (is_pdf or is_docx_zip):
+            raise ValidationError({"file": "Tệp tin bị hỏng hoặc không đúng định dạng PDF/DOCX hợp lệ."})
+
+        if is_pdf and len(header) < 16:
+            raise ValidationError({"file": "Tệp tin PDF bị hỏng hoặc bị cắt cụt."})
+
+        safe_filename = os.path.basename(raw_name)
+        file_obj.seek(0)
+        storage_path = f"candidate_cvs/{cv.id}/{safe_filename}"
+        saved_path = default_storage.save(storage_path, ContentFile(file_obj.read()))
+        try:
+            cv.pdf_url = default_storage.url(saved_path)
+        except Exception:
+            cv.pdf_url = f"/media/{saved_path}"
+        cv.save(update_fields=["pdf_url", "update_at"])
+
+        return Response({
+            "detail": "Tải lên CV thành công.",
+            "id": cv.id,
+            "filename": safe_filename,
+            "size": file_obj.size,
+            "pdf_url": cv.pdf_url,
+        }, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"], url_path="upload", parser_classes=[MultiPartParser, FormParser, JSONParser])
+    def upload(self, request):
+        """
+        Candidate upload endpoint validating files with strict security rules.
+        """
+        file_obj = request.FILES.get("file") or request.FILES.get("pdf_file")
+        if not file_obj:
+            raise ValidationError({"file": "Vui lòng đính kèm tệp tin."})
+
+        if getattr(file_obj, "size", 0) == 0:
+            raise ValidationError({"file": "Tệp tin tải lên bị rỗng (0-byte)."})
+
+        max_size = 10 * 1024 * 1024
+        if file_obj.size > max_size:
+            raise ValidationError({"file": "Dung lượng tệp tin vượt quá 10MB cho phép."})
+
+        raw_name = request.data.get("filename") or getattr(file_obj, '_name', None) or file_obj.name or ""
+        import os
+        import re
+        if (
+            ".." in raw_name
+            or "/" in raw_name
+            or "\\" in raw_name
+            or "\x00" in raw_name
+            or re.search(r"[<>\";|`$*?]", raw_name)
+        ):
+            raise ValidationError({"file": "Tên tệp tin không hợp lệ hoặc chứa ký tự nguy hiểm (path traversal/injection)."})
+
+        ext = os.path.splitext(raw_name)[1].lower()
+        if ext not in [".pdf", ".docx", ".doc"]:
+            raise ValidationError({"file": "Định dạng tệp tin không được hỗ trợ (chỉ chấp nhận .pdf, .docx)."})
+
+        header = file_obj.read(1024)
+        file_obj.seek(0)
+        is_pdf = header.startswith(b"%PDF")
+        is_docx_zip = header.startswith(b"PK\x03\x04")
+        if not (is_pdf or is_docx_zip):
+            raise ValidationError({"file": "Tệp tin bị hỏng hoặc không đúng định dạng PDF/DOCX hợp lệ."})
+
+        if is_pdf and len(header) < 16:
+            raise ValidationError({"file": "Tệp tin PDF bị hỏng hoặc bị cắt cụt."})
+
+        safe_filename = os.path.basename(raw_name)
+        user_id = getattr(request.user, "id", "common")
+        file_obj.seek(0)
+        storage_path = f"candidate_cvs/uploads/{user_id}/{safe_filename}"
+        saved_path = default_storage.save(storage_path, ContentFile(file_obj.read()))
+        try:
+            file_url = default_storage.url(saved_path)
+        except Exception:
+            file_url = f"/media/{saved_path}"
+
+        return Response({
+            "detail": "Tệp tin hợp lệ.",
+            "filename": safe_filename,
+            "size": file_obj.size,
+            "pdf_url": file_url,
+            "file_url": file_url,
+            "storage_path": saved_path,
+        }, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"], url_path="ai-review")
     def ai_review(self, request, pk=None):

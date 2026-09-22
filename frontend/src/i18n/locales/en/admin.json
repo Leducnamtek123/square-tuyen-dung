@@ -110,7 +110,7 @@
     "recruitmentAndInterviews": "Recruitment & Interviews",
     "jobPosts": "Job Posts",
     "trustReports": "Violation Reports",
-    "activityLogs": "Activity Logs",
+    "activityLogs": "Platform Application Logs",
     "questionBank": "Question Bank",
     "interviewQuestionSets": "Interview Question Sets",
     "interviewSchedule": "Interview Schedule",
@@ -471,7 +471,8 @@
         "deleteSuccess": "Application activity deleted",
         "deleteError": "Could not delete application activity"
       },
-      "title": "Job Post Activity Log",
+      "title": "Platform Application Logs (Audit Log)",
+      "subtitle": "Application submission logs across all companies (Read-only / Audit Log)",
       "breadcrumbAdmin": "Admin",
       "breadcrumbJobs": "Jobs & Interviews",
       "breadcrumbActivity": "Job Post Activities",
@@ -1285,29 +1286,6 @@
         "checking": "Checking...",
         "database": "Database",
         "redis": "Redis"
-      },
-      "fptGpu": {
-        "title": "FPT GPU Container",
-        "controlEnabled": "Control enabled",
-        "readOnly": "Read only",
-        "notConfigured": "Add FPT_GPU_BSS_ACCESS_TOKEN or FPT_GPU_ACCESS_TOKEN on the backend to enable Start and Stop.",
-        "bootstrapNotConfigured": "Add FPT GPU SSH settings on the backend to enable bootstrap.",
-        "tenant": "Tenant",
-        "runningCost": "Running cost",
-        "stoppedDiskCost": "Stopped disk cost",
-        "startBootstrap": "Start & Bootstrap",
-        "bootstrap": "Bootstrap",
-        "start": "Start",
-        "stop": "Stop",
-        "refresh": "Refresh",
-        "openConsole": "Open FPT",
-        "toast": {
-          "startBootstrapSuccess": "FPT GPU start and bootstrap requested.",
-          "bootstrapSuccess": "FPT GPU bootstrap requested.",
-          "startSuccess": "FPT GPU start requested.",
-          "stopSuccess": "FPT GPU stop requested.",
-          "actionError": "FPT GPU action failed."
-        }
       },
       "toast": {
         "saveSuccess": "Settings saved successfully",

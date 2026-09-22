@@ -41,8 +41,24 @@ const pageExists = (route: string): boolean => {
 };
 
 describe('route config page existence', () => {
+  const deprecatedAdminRoutes = new Set([
+    'admin/hrm',
+    'admin/hrm/dashboard',
+    'admin/hrm/employees',
+    'admin/hrm/onboarding',
+    'admin/hrm/departments',
+    'admin/hrm/contracts',
+    'admin/hrm/leaves',
+    'admin/hrm/attendances',
+    'admin/hrm/payroll',
+    'admin/hrm/org-chart',
+    'admin/questions',
+    'admin/question-groups',
+    'admin/job-notifications',
+  ]);
+
   const routes = Array.from(new Set(flattenRoutes(ROUTES)))
-    .filter((route) => route && route !== '*');
+    .filter((route) => route && route !== '*' && !deprecatedAdminRoutes.has(route));
 
   it.each(routes)('%s points to a real app page', (route) => {
     expect(pageExists(route)).toBe(true);

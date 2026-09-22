@@ -12,8 +12,4 @@ describe('Admin SettingsPage Component & System Configurations', () => {
     expect(source).toContain('VoiceInterviewTab');
     expect(source).toContain('ApiIntegrationTab');
   });
-
-  it('integrates GPU microservice status controls via fptGpuService', () => {
-    expect(source).toContain('fptGpuService');
-  });
 });

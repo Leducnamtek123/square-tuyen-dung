@@ -73,8 +73,25 @@ const JobSeekerSignUpForm = ({
   });
 
   React.useEffect(() => {
+    if (!serverErrors) return;
+    const knownFields = new Set<keyof JobSeekerSignUpFormData>([
+      'fullName',
+      'email',
+      'password',
+      'confirmPassword',
+    ]);
     for (const err in serverErrors) {
-      setError(err as keyof JobSeekerSignUpFormData, { type: 'manual', message: serverErrors[err]?.join(' ') });
+      if (knownFields.has(err as keyof JobSeekerSignUpFormData)) {
+        const rawErr = serverErrors[err];
+        const message = Array.isArray(rawErr)
+          ? rawErr.join(' ')
+          : typeof rawErr === 'string'
+          ? rawErr
+          : '';
+        if (message) {
+          setError(err as keyof JobSeekerSignUpFormData, { type: 'manual', message });
+        }
+      }
     }
   }, [serverErrors, setError]);
 

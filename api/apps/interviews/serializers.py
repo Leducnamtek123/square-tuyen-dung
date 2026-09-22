@@ -439,7 +439,7 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
     attitude_score = serializers.DecimalField(
         max_digits=5,
         decimal_places=2,
-        min_value=Decimal("0"),
+        min_value=Decimal("1"),
         max_value=Decimal("10"),
         required=False,
         allow_null=True,
@@ -447,7 +447,15 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
     professional_score = serializers.DecimalField(
         max_digits=5,
         decimal_places=2,
-        min_value=Decimal("0"),
+        min_value=Decimal("1"),
+        max_value=Decimal("10"),
+        required=False,
+        allow_null=True,
+    )
+    overall_score = serializers.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        min_value=Decimal("1"),
         max_value=Decimal("10"),
         required=False,
         allow_null=True,
@@ -496,6 +504,17 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         attitude = attrs.get("attitude_score")
         professional = attrs.get("professional_score")
+        overall = attrs.get("overall_score")
+
+        for score_field, score_val in [
+            ("attitude_score", attitude),
+            ("professional_score", professional),
+            ("overall_score", overall),
+        ]:
+            if score_val is not None and (score_val < Decimal("1") or score_val > Decimal("10")):
+                raise serializers.ValidationError({
+                    score_field: "Điểm đánh giá phải nằm trong thang điểm từ 1 đến 10."
+                })
 
         if attitude is not None and professional is not None:
             attrs["overall_score"] = (attitude + professional) / 2
@@ -700,6 +719,39 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     def get_questions_count(self, obj):
         return resolve_session_questions_count(obj)
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        is_admin_or_employer = False
+        if user and not user.is_anonymous:
+            role = getattr(user, "role_name", "")
+            if role in ["ADMIN", "EMPLOYER"] or getattr(user, "is_staff", False):
+                is_admin_or_employer = True
+            elif getattr(user, "company_id", None) and instance.job_post and instance.job_post.company_id == user.company_id:
+                is_admin_or_employer = True
+            elif instance.created_by_id == user.id:
+                is_admin_or_employer = True
+
+        # Trụ cột 4: Phân tầng hiển thị báo cáo
+        # Với phiên chính thức ('official'), nếu người xem là ứng viên (hoặc xem qua token ứng viên),
+        # bảo mật các trường điểm số & phân tích chi tiết nội bộ, dành quyền thẩm định cho HR.
+        # Với phiên thử ('mock') hoặc khi người xem là HR/Admin, giữ nguyên 100% điểm số.
+        session_type = getattr(instance, "session_type", "official")
+        if session_type == "official" and not is_admin_or_employer:
+            data["ai_overall_score"] = None
+            data["ai_technical_score"] = None
+            data["ai_communication_score"] = None
+            data["ai_strengths"] = []
+            data["ai_weaknesses"] = []
+            data["ai_detailed_feedback"] = None
+            if instance.status == "completed":
+                data["ai_summary"] = "Buổi phỏng vấn đã được ghi nhận thành công. Nhà tuyển dụng sẽ xem xét hồ sơ và phản hồi kết quả đến bạn."
+            else:
+                data["ai_summary"] = None
+
+        return data
+
     def validate(self, attrs):
         attrs = super().validate(attrs)
         scheduled_at = attrs.get("scheduled_at")
@@ -802,6 +854,27 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
         if scheduled_at:
             session_type = attrs.get("session_type", "official")
             validate_interview_slot_capacity(scheduled_at, instance=self.instance, session_type=session_type)
+
+            candidate = attrs.get("candidate")
+            if candidate and session_type != "mock":
+                from datetime import timedelta
+                overlap_window = timedelta(minutes=30)
+                conflict_qs = InterviewSession.objects.filter(
+                    candidate=candidate,
+                    scheduled_at__gte=scheduled_at - overlap_window,
+                    scheduled_at__lte=scheduled_at + overlap_window,
+                ).exclude(
+                    status__in=["completed", "cancelled"]
+                ).exclude(
+                    session_type="mock"
+                )
+                if self.instance and getattr(self.instance, "pk", None):
+                    conflict_qs = conflict_qs.exclude(pk=self.instance.pk)
+                if conflict_qs.exists():
+                    raise serializers.ValidationError({
+                        "scheduled_at": "Ứng viên đã có lịch phỏng vấn khác trùng khoảng thời gian này.",
+                        "detail": "Ứng viên đã có lịch phỏng vấn khác trùng khoảng thời gian này.",
+                    })
 
         job_post = attrs.get("job_post")
         question_group = attrs.get("question_group")

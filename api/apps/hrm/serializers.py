@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework import serializers
 from apps.accounts.models import User
 from apps.hrm.models import (
@@ -47,6 +48,17 @@ class DepartmentSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"parent": "Phòng ban cha không thuộc cùng công ty."})
             if self.instance and parent.id == self.instance.id:
                 raise serializers.ValidationError({"parent": "Phòng ban không thể làm cha của chính nó."})
+            # Circular hierarchy detection
+            if self.instance:
+                curr = parent.parent
+                seen = {self.instance.id, parent.id}
+                while curr:
+                    if curr.id == self.instance.id:
+                        raise serializers.ValidationError({"parent": "Phát hiện vòng lặp phân cấp phòng ban (circular hierarchy)."})
+                    if curr.id in seen:
+                        break
+                    seen.add(curr.id)
+                    curr = curr.parent
 
         if manager:
             if company and manager.company_id != company.id:
@@ -75,13 +87,16 @@ class DesignationSerializer(serializers.ModelSerializer):
 
 class EmploymentContractSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+    probation_period_months = serializers.IntegerField(required=False, write_only=True)
+    probation_months = serializers.IntegerField(required=False, write_only=True)
 
     class Meta:
         model = EmploymentContract
         fields = [
             'id', 'employee', 'employee_name', 'contract_number',
             'contract_type', 'start_date', 'end_date', 'base_salary',
-            'allowance', 'status', 'notes', 'create_at', 'update_at'
+            'allowance', 'status', 'notes', 'probation_period_months',
+            'probation_months', 'create_at', 'update_at'
         ]
         read_only_fields = ['create_at', 'update_at']
 
@@ -93,6 +108,8 @@ class EmploymentContractSerializer(serializers.ModelSerializer):
             'startDate': 'start_date',
             'endDate': 'end_date',
             'baseSalary': 'base_salary',
+            'probationPeriodMonths': 'probation_period_months',
+            'probationMonths': 'probation_months',
         }
         for camel, snake in mappings.items():
             if camel in payload and snake not in payload:
@@ -105,6 +122,10 @@ class EmploymentContractSerializer(serializers.ModelSerializer):
         base_salary = attrs.get('base_salary') if 'base_salary' in attrs else (self.instance.base_salary if self.instance else None)
         allowance = attrs.get('allowance') if 'allowance' in attrs else (self.instance.allowance if self.instance else None)
         employee = attrs.get('employee') or (self.instance.employee if self.instance else None)
+        probation_period = attrs.get('probation_period_months') if 'probation_period_months' in attrs else attrs.get('probation_months')
+
+        if probation_period is not None and probation_period < 0:
+            raise serializers.ValidationError({"probation_period_months": "Thời gian thử việc không thể là số âm."})
 
         if start_date and end_date and end_date < start_date:
             raise serializers.ValidationError({"end_date": "Ngày kết thúc hợp đồng không thể trước ngày bắt đầu."})
@@ -114,6 +135,13 @@ class EmploymentContractSerializer(serializers.ModelSerializer):
 
         if allowance is not None and allowance < 0:
             raise serializers.ValidationError({"allowance": "Phụ cấp không thể là số âm."})
+
+        if self.instance and self.instance.status in ['TERMINATED', 'EXPIRED']:
+            new_status = attrs.get('status')
+            if new_status and new_status == 'TERMINATED' and self.instance.status == 'TERMINATED':
+                raise serializers.ValidationError({"status": "Hợp đồng đã ở trạng thái chấm dứt, không thể thao tác lại."})
+            if new_status and new_status == 'TERMINATED' and self.instance.status == 'EXPIRED':
+                raise serializers.ValidationError({"status": "Không thể hủy hợp đồng đã hết hạn."})
 
         request = self.context.get('request')
         if request and employee:
@@ -217,6 +245,15 @@ class EmployeeSerializer(serializers.ModelSerializer):
                 if self.instance and reports_to.id == self.instance.id:
                     raise serializers.ValidationError({"reports_to": "Nhân viên không thể tự báo cáo cho chính mình."})
 
+        join_date = attrs.get('join_date') or (self.instance.join_date if self.instance else None)
+        probation_end_date = attrs.get('probation_end_date') if 'probation_end_date' in attrs else (self.instance.probation_end_date if self.instance else None)
+        if join_date and probation_end_date and probation_end_date < join_date:
+            raise serializers.ValidationError({"probation_end_date": "Ngày kết thúc thử việc không thể trước ngày bắt đầu làm việc."})
+
+        work_location = attrs.get('work_location')
+        if work_location and company and work_location.company_id != company.id:
+            raise serializers.ValidationError({"work_location": "Địa điểm làm việc không thuộc công ty này."})
+
         return attrs
 
 
@@ -290,6 +327,19 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
             if req_company and employee.company_id != req_company.id:
                 raise serializers.ValidationError({"employee": "Nhân viên không thuộc công ty hiện tại."})
 
+        # Check overlapping leave requests for same employee
+        if employee and start_date and end_date:
+            overlap_qs = LeaveRequest.objects.filter(
+                employee=employee,
+                status__in=['PENDING', 'APPROVED'],
+                start_date__lte=end_date,
+                end_date__gte=start_date,
+            )
+            if self.instance:
+                overlap_qs = overlap_qs.exclude(id=self.instance.id)
+            if overlap_qs.exists():
+                raise serializers.ValidationError({"start_date": "Nhân viên đã có đơn nghỉ phép trùng với khoảng thời gian này."})
+
         return attrs
 
 
@@ -339,16 +389,46 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
         return super().to_internal_value(payload)
 
     def validate(self, attrs):
+        from django.utils import timezone
         check_in = attrs.get('check_in') if 'check_in' in attrs else (self.instance.check_in if self.instance else None)
         check_out = attrs.get('check_out') if 'check_out' in attrs else (self.instance.check_out if self.instance else None)
         working_hours = attrs.get('working_hours') if 'working_hours' in attrs else (self.instance.working_hours if self.instance else None)
+        effective_work_hours = attrs.get('effective_work_hours') if 'effective_work_hours' in attrs else (self.instance.effective_work_hours if self.instance else None)
+        overtime_hours = attrs.get('overtime_hours') if 'overtime_hours' in attrs else (self.instance.overtime_hours if self.instance else None)
+        late_minutes = attrs.get('late_minutes') if 'late_minutes' in attrs else (self.instance.late_minutes if self.instance else None)
+        early_minutes = attrs.get('early_minutes') if 'early_minutes' in attrs else (self.instance.early_minutes if self.instance else None)
         employee = attrs.get('employee') or (self.instance.employee if self.instance else None)
+        record_date = attrs.get('date') or (self.instance.date if self.instance else None)
+
+        if record_date and record_date > timezone.now().date():
+            raise serializers.ValidationError({"date": "Không thể chấm công cho ngày trong tương lai."})
+
+        if record_date and record_date == timezone.now().date():
+            now_time = timezone.now().time()
+            if check_in and check_in > now_time:
+                raise serializers.ValidationError({"check_in": "Giờ check-in không thể ở tương lai."})
 
         if check_in and check_out and check_out < check_in:
-            raise serializers.ValidationError({"check_out": "Giờ ra không thể trước giờ vào trong cùng ngày."})
+            raise serializers.ValidationError({"check_out": "Giờ ra (check-out) phải sau giờ vào (check-in) trong cùng ngày."})
 
         if working_hours is not None and working_hours < 0:
             raise serializers.ValidationError({"working_hours": "Số giờ làm việc không thể là số âm."})
+
+        if effective_work_hours is not None and effective_work_hours < 0:
+            raise serializers.ValidationError({"effective_work_hours": "Số giờ làm việc thực tế không thể là số âm."})
+
+        if overtime_hours is not None and overtime_hours < 0:
+            raise serializers.ValidationError({"overtime_hours": "Số giờ làm thêm không thể là số âm."})
+
+        if late_minutes is not None and late_minutes < 0:
+            raise serializers.ValidationError({"late_minutes": "Số phút đi muộn không thể là số âm."})
+
+        if early_minutes is not None and early_minutes < 0:
+            raise serializers.ValidationError({"early_minutes": "Số phút về sớm không thể là số âm."})
+
+        if not self.instance and employee and record_date:
+            if AttendanceRecord.objects.filter(employee=employee, date=record_date).exists():
+                raise serializers.ValidationError({"date": "Bản ghi chấm công cho ngày này đã tồn tại."})
 
         request = self.context.get('request')
         if request and employee:
@@ -407,6 +487,35 @@ class OnboardCandidateSerializer(serializers.Serializer):
             attrs['base_salary'] = attrs.get('baseSalary')
         if not attrs.get('employment_type') and attrs.get('employmentType'):
             attrs['employment_type'] = attrs.get('employmentType')
+
+        base_salary = attrs.get('base_salary')
+        if base_salary is not None and Decimal(str(base_salary)) < 0:
+            raise serializers.ValidationError({"base_salary": "Lương cơ bản không thể là số âm."})
+
+        allowance = attrs.get('allowance')
+        if allowance is not None and Decimal(str(allowance)) < 0:
+            raise serializers.ValidationError({"allowance": "Phụ cấp không thể là số âm."})
+
+        join_date = attrs.get('join_date')
+        probation_end_date = attrs.get('probation_end_date')
+        if join_date and probation_end_date and probation_end_date < join_date:
+            raise serializers.ValidationError({"probation_end_date": "Ngày kết thúc thử việc không thể trước ngày bắt đầu làm việc."})
+
+        request = self.context.get('request')
+        if request:
+            from apps.hrm.views import _get_company_for_request
+            req_company = _get_company_for_request(request)
+            if req_company:
+                dept_id = attrs.get('department_id')
+                if dept_id and not Department.objects.filter(id=dept_id, company=req_company).exists():
+                    raise serializers.ValidationError({"department_id": "Phòng ban không thuộc công ty hiện tại."})
+                desig_id = attrs.get('designation_id')
+                if desig_id and not Designation.objects.filter(id=desig_id, company=req_company).exists():
+                    raise serializers.ValidationError({"designation_id": "Chức danh không thuộc công ty hiện tại."})
+                rep_id = attrs.get('reports_to_id')
+                if rep_id and not Employee.objects.filter(id=rep_id, company=req_company).exists():
+                    raise serializers.ValidationError({"reports_to_id": "Người quản lý trực tiếp không thuộc công ty hiện tại."})
+
         return attrs
 
 
@@ -659,6 +768,29 @@ class AttendanceRequestSerializer(serializers.ModelSerializer):
             if camel in payload and snake not in payload:
                 payload[snake] = payload.get(camel)
         return super().to_internal_value(payload)
+
+    def validate(self, attrs):
+        start_date = attrs.get('start_date') or (self.instance.start_date if self.instance else None)
+        end_date = attrs.get('end_date') or (self.instance.end_date if self.instance else None)
+        start_time = attrs.get('start_time') or (self.instance.start_time if self.instance else None)
+        end_time = attrs.get('end_time') or (self.instance.end_time if self.instance else None)
+        duration_hours = attrs.get('duration_hours') if 'duration_hours' in attrs else (self.instance.duration_hours if self.instance else None)
+        employee = attrs.get('employee') or (self.instance.employee if self.instance else None)
+        leave_type = attrs.get('leave_type') or (self.instance.leave_type if self.instance else None)
+
+        if start_date and end_date and end_date < start_date:
+            raise serializers.ValidationError({"end_date": "Ngày kết thúc không thể trước ngày bắt đầu."})
+
+        if start_date and end_date and start_date == end_date and start_time and end_time and end_time < start_time:
+            raise serializers.ValidationError({"end_time": "Giờ kết thúc không thể trước giờ bắt đầu trong cùng ngày."})
+
+        if duration_hours is not None and duration_hours <= 0:
+            raise serializers.ValidationError({"duration_hours": "Thời lượng đề nghị phải lớn hơn 0."})
+
+        if employee and leave_type and leave_type.company_id != employee.company_id:
+            raise serializers.ValidationError({"leave_type": "Loại nghỉ phép không thuộc công ty của nhân viên này."})
+
+        return attrs
 
 
 class WorkLocationSerializer(serializers.ModelSerializer):

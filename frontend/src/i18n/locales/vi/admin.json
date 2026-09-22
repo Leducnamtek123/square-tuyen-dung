@@ -110,7 +110,7 @@
     "recruitmentAndInterviews": "Tuyển dụng",
     "jobPosts": "Tin tuyển dụng",
     "trustReports": "Báo cáo vi phạm",
-    "activityLogs": "Lịch sử hoạt động",
+    "activityLogs": "Nhật ký ứng tuyển sàn",
     "questionBank": "Ngân hàng câu hỏi",
     "interviewQuestionSets": "Bộ câu hỏi",
     "interviewSchedule": "Lịch phỏng vấn",
@@ -471,7 +471,8 @@
         "deleteSuccess": "Đã xóa hoạt động ứng tuyển",
         "deleteError": "Không thể xóa hoạt động ứng tuyển"
       },
-      "title": "Lịch sử Ứng tuyển Tuyển dụng",
+      "title": "Nhật ký ứng tuyển toàn sàn (Read-only Audit Log)",
+      "subtitle": "Nhật ký lưu trữ dữ liệu nộp đơn ứng tuyển của các công ty (Chỉ xem / Audit Log)",
       "breadcrumbAdmin": "Admin",
       "breadcrumbJobs": "Việc làm & Phỏng vấn",
       "breadcrumbActivity": "Hoạt động Ứng tuyển",
@@ -1234,29 +1235,6 @@
         "checking": "Đang kiểm tra...",
         "database": "Cơ sở dữ liệu",
         "redis": "Redis"
-      },
-      "fptGpu": {
-        "title": "Container FPT GPU",
-        "controlEnabled": "Đã bật điều khiển",
-        "readOnly": "Chỉ xem",
-        "notConfigured": "Thêm FPT_GPU_BSS_ACCESS_TOKEN hoặc FPT_GPU_ACCESS_TOKEN ở backend để bật Start và Stop.",
-        "bootstrapNotConfigured": "Thêm cấu hình SSH FPT GPU ở backend để bật bootstrap.",
-        "tenant": "Tenant",
-        "runningCost": "Chi phí khi chạy",
-        "stoppedDiskCost": "Chi phí ổ đĩa khi dừng",
-        "startBootstrap": "Bật & chạy AI",
-        "bootstrap": "Chạy AI",
-        "start": "Khởi động",
-        "stop": "Dừng",
-        "refresh": "Làm mới",
-        "openConsole": "Mở FPT",
-        "toast": {
-          "startBootstrapSuccess": "Đã gửi yêu cầu khởi động và chạy AI trên FPT GPU.",
-          "bootstrapSuccess": "Đã gửi yêu cầu chạy AI trên FPT GPU.",
-          "startSuccess": "Đã gửi yêu cầu khởi động FPT GPU.",
-          "stopSuccess": "Đã gửi yêu cầu dừng FPT GPU.",
-          "actionError": "Thao tác FPT GPU thất bại."
-        }
       },
       "toast": {
         "saveSuccess": "Cài đặt đã được lưu thành công",

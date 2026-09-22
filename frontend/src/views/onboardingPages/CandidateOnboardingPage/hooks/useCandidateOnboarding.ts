@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import authService from '@/services/authService';
 import { useConfig } from '@/hooks/useConfig';
@@ -38,6 +39,7 @@ export function useCandidateOnboarding() {
   const { t } = useTranslation('jobSeeker');
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const { currentUser } = useAppSelector((state) => state.user);
   const { allConfig } = useConfig();
 
@@ -47,6 +49,9 @@ export function useCandidateOnboarding() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [isParsingCv, setIsParsingCv] = useState<boolean>(false);
+  const [cvParseSuccess, setCvParseSuccess] = useState<boolean>(false);
+  const [isSkipping, setIsSkipping] = useState<boolean>(false);
   const [generalError, setGeneralError] = useState<string>('');
   const [completeness, setCompleteness] = useState<number>(20);
   const [recommendedJobs, setRecommendedJobs] = useState<RecommendedJobPreview[]>([]);
@@ -60,9 +65,21 @@ export function useCandidateOnboarding() {
         const res = await authService.getOnboardingStatus();
         if (!isMounted) return;
 
-        const isPreview = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === '1';
-        if (res.isOnboarded && !isPreview) {
-          router.replace('/jobs');
+        const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const isPreview = searchParams?.get('preview') === '1';
+        const isEdit = searchParams?.get('edit') === '1';
+
+        // Chỉ điều hướng rời khỏi onboarding khi ứng viên ĐÃ hoàn thành bước 4 và hồ sơ đạt 100%,
+        // và không ở chế độ preview/edit.
+        // Nếu ứng viên từng ấn Bỏ qua (onboardingStep === -1) hoặc chưa xong các bước (< 4), giữ lại để hoàn tất.
+        if (
+          res.isOnboarded &&
+          res.onboardingStep === 4 &&
+          (res.profileCompleteness ?? 0) >= 100 &&
+          !isPreview &&
+          !isEdit
+        ) {
+          router.replace('/bang-dieu-khien');
           return;
         }
 
@@ -94,8 +111,21 @@ export function useCandidateOnboarding() {
           }));
 
           // Resume stepper position
-          if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
+          if (!isEdit && res.onboardingStep === 4) {
+            setActiveStep(3);
+          } else if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
             setActiveStep(res.onboardingStep - 1);
+          }
+        } else if (typeof window !== 'undefined') {
+          // LocalStorage fallback draft restore
+          try {
+            const savedDraft = localStorage.getItem('infohr_candidate_draft');
+            if (savedDraft) {
+              const parsed = JSON.parse(savedDraft);
+              setFormData((prev) => ({ ...prev, ...parsed }));
+            }
+          } catch (e) {
+            console.error('LocalStorage draft read error:', e);
           }
         }
       } catch (err) {
@@ -110,7 +140,18 @@ export function useCandidateOnboarding() {
     return () => {
       isMounted = false;
     };
-  }, [router]);
+  }, [router, currentUser]);
+
+  // Sync formData to localStorage for resilience
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isLoading && activeStep < 3) {
+      try {
+        localStorage.setItem('infohr_candidate_draft', JSON.stringify(formData));
+      } catch (e) {
+        // quota exceeded or private mode
+      }
+    }
+  }, [formData, isLoading, activeStep]);
 
   // Update single form field
   const updateFormField = useCallback((field: keyof CandidateFullFormValues, value: any) => {
@@ -146,6 +187,7 @@ export function useCandidateOnboarding() {
         lng: formData.lng,
       });
 
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       setActiveStep(1);
     } catch (err: any) {
       if (err.inner) {
@@ -180,6 +222,7 @@ export function useCandidateOnboarding() {
         salaryMax: formData.isSalaryNegotiable ? 0 : formData.salaryMax,
       });
 
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       setActiveStep(2);
     } catch (err: any) {
       if (err.inner) {
@@ -227,6 +270,10 @@ export function useCandidateOnboarding() {
         setRecommendedJobs(res.recommendedJobs);
       }
       setCompleteness(100);
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('infohr_candidate_draft');
+      }
       setActiveStep(3); // Step 4 Complete
     } catch (err: any) {
       console.error('Candidate onboarding completion error:', err);
@@ -242,6 +289,65 @@ export function useCandidateOnboarding() {
       }
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // AI Auto-parse CV
+  const handleCvAutoParse = async (fileId: number, fileName: string, fileUrl: string) => {
+    setIsParsingCv(true);
+    setCvParseSuccess(false);
+    setGeneralError('');
+
+    try {
+      const parsed = await authService.parseCandidateCv(fileId);
+      setFormData((prev) => ({
+        ...prev,
+        fileId: parsed.fileId || fileId,
+        fileName: parsed.fileName || fileName,
+        fileUrl: parsed.fileUrl || fileUrl,
+        desiredJobTitle: parsed.desiredJobTitle || prev.desiredJobTitle,
+        careerId: parsed.careerId || prev.careerId,
+        cityId: parsed.cityId || prev.cityId,
+        phone: parsed.phone || prev.phone,
+        address: parsed.address || prev.address,
+        skills: parsed.skills?.length ? parsed.skills : prev.skills,
+      }));
+      setCvParseSuccess(true);
+      setCompleteness((prev) => Math.min(100, Math.max(prev, 60)));
+      return parsed;
+    } catch (err) {
+      console.error('CV Auto-parse error:', err);
+      // Soft fail: still attach the file even if parsing fails
+      setFormData((prev) => ({
+        ...prev,
+        fileId,
+        fileName,
+        fileUrl,
+      }));
+    } finally {
+      setIsParsingCv(false);
+    }
+  };
+
+  // Skip onboarding
+  const handleSkipOnboarding = async () => {
+    setIsSkipping(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('infohr_onboarding_banner_dismissed_candidate', 'false');
+    }
+    try {
+      const res = await authService.skipOnboarding();
+      if (res.user) {
+        dispatch(setUserInfo(res.user));
+      }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
+      router.replace('/jobs');
+    } catch (err) {
+      console.error('Error skipping onboarding:', err);
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
+      router.replace('/jobs');
+    } finally {
+      setIsSkipping(false);
     }
   };
 
@@ -269,6 +375,9 @@ export function useCandidateOnboarding() {
     isSaving,
     isUploading,
     setIsUploading,
+    isParsingCv,
+    cvParseSuccess,
+    isSkipping,
     generalError,
     setGeneralError,
     completeness,
@@ -278,8 +387,11 @@ export function useCandidateOnboarding() {
     handleNextStep1,
     handleNextStep2,
     handleCompleteCandidate,
+    handleCvAutoParse,
+    handleSkipOnboarding,
     handleBack,
     handleExploreJobs,
     handleViewDashboard,
   };
 }
+

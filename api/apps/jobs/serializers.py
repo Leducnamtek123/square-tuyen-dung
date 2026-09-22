@@ -607,6 +607,14 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
         if phone and not PHONE_PATTERN.fullmatch(str(phone).strip()):
             raise serializers.ValidationError({"phone": "Invalid phone number."})
 
+        request = self.context.get('request')
+        user = getattr(request, 'user', None) if request else None
+
+        resume = attrs.get('resume')
+        if resume and user and user.is_authenticated:
+            if getattr(resume, 'user_id', None) != user.id:
+                raise serializers.ValidationError({"resume": "Không có quyền sử dụng hồ sơ của ứng viên khác."})
+
         job_post = attrs.get('job_post')
         if job_post:
             if job_post.status != var_sys.JobPostStatus.APPROVED:
@@ -617,6 +625,26 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
 
             if not job_post.company.is_verified:
                 raise serializers.ValidationError({"job_post": "Công ty của tin tuyển dụng chưa được xác thực."})
+
+            if user and user.is_authenticated:
+                company = getattr(job_post, 'company', None)
+                is_company_owner = company and getattr(company, 'user_id', None) == user.id
+                is_job_poster = getattr(job_post, 'user_id', None) == user.id
+                is_company_member = False
+                if company and hasattr(user, 'company_memberships'):
+                    is_company_member = user.company_memberships.filter(company=company, is_active=True).exists()
+                if is_company_owner or is_job_poster or is_company_member:
+                    raise serializers.ValidationError({"job_post": "Nhà tuyển dụng không thể tự ứng tuyển vào tin tuyển dụng của công ty mình."})
+
+        initial = getattr(self, 'initial_data', {}) or {}
+        for sal_key in ['expected_salary', 'expectedSalary', 'salary', 'salary_min', 'salaryMin', 'proposed_salary', 'proposedSalary']:
+            val = attrs.get(sal_key) or (initial.get(sal_key) if isinstance(initial, dict) else None)
+            if val is not None:
+                try:
+                    if float(val) < 0:
+                        raise serializers.ValidationError({sal_key: "Mức lương không được là số âm."})
+                except (ValueError, TypeError):
+                    pass
 
         return attrs
 

@@ -86,7 +86,7 @@ export const InterviewQuestionCard: React.FC<InterviewQuestionCardProps> = ({
         </div>
 
         {/* Main Question Card - Mobile optimized compact padding */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200 bg-white/95 p-3 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
+        <div data-testid="interview-question-card" className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200 bg-white/95 p-3 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
           {/* Top Progress Bar */}
           <div className="absolute top-0 inset-x-0 h-1 bg-slate-100">
             <div
@@ -159,35 +159,37 @@ export const InterviewQuestionCard: React.FC<InterviewQuestionCardProps> = ({
           </div>
 
           {/* Question Text */}
-          <p className="mt-2 text-xs sm:text-sm md:text-base font-semibold leading-snug sm:leading-relaxed text-slate-900">
+          <p data-testid="interview-question-text" className="mt-2 text-xs sm:text-sm md:text-base font-semibold leading-snug sm:leading-relaxed text-slate-900">
             {question.text}
           </p>
 
           {/* Action Controls Footer */}
           <div className="mt-2.5 sm:mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-2 sm:pt-3">
             <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 min-w-0">
-              <span className="inline-block h-2 w-2 rounded-full bg-sky-500 animate-pulse shrink-0" />
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               <span className="text-[10px] sm:text-[11px] font-medium text-slate-600 truncate">
-                <span className="sm:hidden">Ghi nhận qua micro</span>
-                <span className="hidden sm:inline">Trả lời qua micro • Hệ thống tự động ghi nhận</span>
+                <span className="sm:hidden">Đàm thoại tự nhiên</span>
+                <span className="hidden sm:inline">Đàm thoại giọng nói tự nhiên • AI tự lắng nghe & chuyển câu</span>
               </span>
             </div>
 
-            {/* Next / Finish Answer Button */}
+            {/* Next / Finish Answer Button (Secondary action in Pure Voice mode) */}
             <button
               type="button"
               onClick={onNextQuestion}
-              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold text-white shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer shrink-0"
+              title="Chuyển câu hỏi thủ công nếu muốn"
+              aria-label="Chuyển câu hỏi"
+              className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-slate-700 shadow-2xs hover:shadow-xs transition-all active:scale-[0.98] cursor-pointer shrink-0"
             >
               {currentIndex < totalQuestions - 1 ? (
                 <>
-                  <span>Xong câu này</span>
-                  <FontAwesomeIcon icon={faForwardStep} className="text-[10px] sm:text-[11px]" />
+                  <span>Chuyển câu</span>
+                  <FontAwesomeIcon icon={faForwardStep} className="text-[10px] sm:text-[11px] text-slate-400" />
                 </>
               ) : (
                 <>
                   <span>Hoàn thành</span>
-                  <FontAwesomeIcon icon={faCheck} className="text-[10px] sm:text-[11px]" />
+                  <FontAwesomeIcon icon={faCheck} className="text-[10px] sm:text-[11px] text-emerald-600" />
                 </>
               )}
             </button>

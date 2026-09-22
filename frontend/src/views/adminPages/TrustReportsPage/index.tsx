@@ -230,7 +230,7 @@ export default function TrustReportsPage() {
               </Tooltip>
               {row.status !== 'resolved' && (
                 <Tooltip title="Duyệt xử lý">
-                  <IconButton size="small" onClick={() => handleOpenResolve(row)} sx={{ color: '#16A34A' }}>
+                  <IconButton data-testid="resolve-trust-report-btn" size="small" onClick={() => handleOpenResolve(row)} sx={{ color: '#16A34A' }}>
                     <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </Tooltip>

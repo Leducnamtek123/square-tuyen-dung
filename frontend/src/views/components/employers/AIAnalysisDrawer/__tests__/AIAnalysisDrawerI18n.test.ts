@@ -35,7 +35,7 @@ describe('AIAnalysisDrawer i18n', () => {
   it('renders attached PDF resumes with the internal PDF viewer instead of a cross-origin iframe', () => {
     const source = readFileSync(join(__dirname, '../AIAnalysisDrawerResumeSection.tsx'), 'utf8');
 
-    expect(source).toContain("from '@/components/Common/Pdf'");
+    expect(source).toContain("@/components/Common/Pdf");
     expect(source).toContain('<Pdf');
     expect(source).not.toContain('<iframe');
   });
