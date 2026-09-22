@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import authService from '@/services/authService';
 import { useConfig } from '@/hooks/useConfig';
@@ -40,6 +41,7 @@ export function useEmployerOnboarding() {
   const { t } = useTranslation('employer');
   const router = useRouter();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const { allConfig } = useConfig();
 
@@ -70,8 +72,18 @@ export function useEmployerOnboarding() {
         const res = await authService.getOnboardingStatus();
         if (!isMounted) return;
 
-        const isPreview = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === '1';
-        if (res.isOnboarded && !isPreview) {
+        const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const isPreview = searchParams?.get('preview') === '1';
+        const isEdit = searchParams?.get('edit') === '1';
+
+        // Chỉ điều hướng nếu nhà tuyển dụng ĐÃ hoàn thành bước 4 và hồ sơ đạt 100%, không ở preview/edit
+        if (
+          res.isOnboarded &&
+          res.onboardingStep === 4 &&
+          (res.profileCompleteness ?? 0) >= 100 &&
+          !isPreview &&
+          !isEdit
+        ) {
           router.replace('/employer/dashboard');
           return;
         }
@@ -106,7 +118,9 @@ export function useEmployerOnboarding() {
           }));
 
           // Resume stepper position
-          if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
+          if (!isEdit && res.onboardingStep === 4) {
+            setActiveStep(3);
+          } else if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
             setActiveStep(res.onboardingStep - 1);
           }
         } else if (typeof window !== 'undefined') {
@@ -195,6 +209,7 @@ export function useEmployerOnboarding() {
         logoId: formData.logoId,
       });
 
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       setActiveStep(1);
     } catch (err: any) {
       if (err.inner) {
@@ -230,6 +245,7 @@ export function useEmployerOnboarding() {
         description: formData.description,
       });
 
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       setActiveStep(2);
     } catch (err: any) {
       if (err.inner) {
@@ -273,6 +289,7 @@ export function useEmployerOnboarding() {
       if (res.user) {
         dispatch(setUserInfo(res.user));
       }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       if (typeof window !== 'undefined') {
         localStorage.removeItem('infohr_employer_draft');
       }
@@ -346,6 +363,7 @@ export function useEmployerOnboarding() {
       if (res.user) {
         dispatch(setUserInfo(res.user));
       }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       if (typeof window !== 'undefined') {
         localStorage.removeItem('infohr_employer_draft');
       }
@@ -369,9 +387,11 @@ export function useEmployerOnboarding() {
       if (res.user) {
         dispatch(setUserInfo(res.user));
       }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       router.replace('/employer/dashboard');
     } catch (err) {
       console.error('Error skipping employer onboarding:', err);
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       router.replace('/employer/dashboard');
     } finally {
       setIsSkipping(false);
@@ -389,6 +409,7 @@ export function useEmployerOnboarding() {
       if (res.user) {
         dispatch(setUserInfo(res.user));
       }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       if (typeof window !== 'undefined') {
         localStorage.removeItem('infohr_employer_draft');
       }

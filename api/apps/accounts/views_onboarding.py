@@ -72,13 +72,13 @@ class GetOnboardingStatusView(APIView):
             )
             
             score = 20
-            if profile and profile.phone:
+            if (profile and profile.phone) or getattr(user, 'phone_number', None):
                 score += 20
             if resume and resume.career_id:
                 score += 20
             if resume and (resume.advanced_skills.exists() or resume.skills_summary):
                 score += 20
-            if resume and resume.file_id:
+            if resume and (resume.file_id or getattr(resume, 'file', None)):
                 score += 20
             completeness = min(score, 100)
 

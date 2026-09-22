@@ -15,6 +15,10 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CloseIcon from '@mui/icons-material/Close';
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import authService from '@/services/authService';
+import { useAppSelector } from '@/redux/hooks';
+import { ROLES_NAME } from '@/configs/constants';
 
 interface OnboardingProgressBannerProps {
   role: 'candidate' | 'employer';
@@ -24,10 +28,21 @@ interface OnboardingProgressBannerProps {
 
 export default function OnboardingProgressBanner({
   role,
-  completeness = 35,
+  completeness: completenessProp,
   onboardingUrl,
 }: OnboardingProgressBannerProps) {
   const [dismissed, setDismissed] = useState(false);
+  const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
+
+  // Fetch real onboarding status and profile completeness from Backend Django API
+  const { data: onboardingStatus } = useQuery({
+    queryKey: ['onboardingStatus'],
+    queryFn: () => authService.getOnboardingStatus(),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    enabled: Boolean(isAuthenticated || currentUser),
+  });
 
   useEffect(() => {
     // Check session storage to see if dismissed for this session
@@ -38,8 +53,30 @@ export default function OnboardingProgressBanner({
     }
   }, [role]);
 
+  // Compute completeness score: prefer backend profileCompleteness, fallback to completenessProp or default
+  const completeness = React.useMemo(() => {
+    if (typeof completenessProp === 'number' && completenessProp > 0) {
+      return completenessProp;
+    }
+    if (typeof onboardingStatus?.profileCompleteness === 'number') {
+      return onboardingStatus.profileCompleteness;
+    }
+    return completenessProp ?? 35;
+  }, [completenessProp, onboardingStatus?.profileCompleteness]);
+
+  // Don't show if dismissed, or already 100% complete
   if (dismissed || completeness >= 100) {
     return null;
+  }
+
+  // Also check role consistency: don't show candidate banner to employer and vice versa
+  if (currentUser?.roleName) {
+    if (role === 'candidate' && currentUser.roleName !== ROLES_NAME.JOB_SEEKER) {
+      return null;
+    }
+    if (role === 'employer' && currentUser.roleName !== ROLES_NAME.EMPLOYER) {
+      return null;
+    }
   }
 
   const targetUrl = onboardingUrl || (role === 'employer' ? '/onboarding/employer' : '/onboarding/candidate');

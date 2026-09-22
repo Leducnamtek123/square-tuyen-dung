@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import authService from '@/services/authService';
 import { useConfig } from '@/hooks/useConfig';
@@ -38,6 +39,7 @@ export function useCandidateOnboarding() {
   const { t } = useTranslation('jobSeeker');
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
   const { currentUser } = useAppSelector((state) => state.user);
   const { allConfig } = useConfig();
 
@@ -63,9 +65,21 @@ export function useCandidateOnboarding() {
         const res = await authService.getOnboardingStatus();
         if (!isMounted) return;
 
-        const isPreview = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('preview') === '1';
-        if (res.isOnboarded && !isPreview) {
-          router.replace('/jobs');
+        const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+        const isPreview = searchParams?.get('preview') === '1';
+        const isEdit = searchParams?.get('edit') === '1';
+
+        // Chỉ điều hướng rời khỏi onboarding khi ứng viên ĐÃ hoàn thành bước 4 và hồ sơ đạt 100%,
+        // và không ở chế độ preview/edit.
+        // Nếu ứng viên từng ấn Bỏ qua (onboardingStep === -1) hoặc chưa xong các bước (< 4), giữ lại để hoàn tất.
+        if (
+          res.isOnboarded &&
+          res.onboardingStep === 4 &&
+          (res.profileCompleteness ?? 0) >= 100 &&
+          !isPreview &&
+          !isEdit
+        ) {
+          router.replace('/bang-dieu-khien');
           return;
         }
 
@@ -97,7 +111,9 @@ export function useCandidateOnboarding() {
           }));
 
           // Resume stepper position
-          if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
+          if (!isEdit && res.onboardingStep === 4) {
+            setActiveStep(3);
+          } else if (res.onboardingStep && res.onboardingStep > 1 && res.onboardingStep < 4) {
             setActiveStep(res.onboardingStep - 1);
           }
         } else if (typeof window !== 'undefined') {
@@ -171,6 +187,7 @@ export function useCandidateOnboarding() {
         lng: formData.lng,
       });
 
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       setActiveStep(1);
     } catch (err: any) {
       if (err.inner) {
@@ -205,6 +222,7 @@ export function useCandidateOnboarding() {
         salaryMax: formData.isSalaryNegotiable ? 0 : formData.salaryMax,
       });
 
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       setActiveStep(2);
     } catch (err: any) {
       if (err.inner) {
@@ -252,6 +270,7 @@ export function useCandidateOnboarding() {
         setRecommendedJobs(res.recommendedJobs);
       }
       setCompleteness(100);
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       if (typeof window !== 'undefined') {
         localStorage.removeItem('infohr_candidate_draft');
       }
@@ -321,9 +340,11 @@ export function useCandidateOnboarding() {
       if (res.user) {
         dispatch(setUserInfo(res.user));
       }
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       router.replace('/jobs');
     } catch (err) {
       console.error('Error skipping onboarding:', err);
+      void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
       router.replace('/jobs');
     } finally {
       setIsSkipping(false);
