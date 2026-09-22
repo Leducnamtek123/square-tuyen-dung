@@ -14,13 +14,11 @@ import {
 } from '@mui/material';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import { useTranslation } from 'react-i18next';
-import FPTGpuControlCard from '../index'; // Will pass or import properly
 import type { SystemSettings } from '../hooks/useSystemSettings';
 
 interface VoiceInterviewTabProps {
   formData: SystemSettings;
   onChange: (name: keyof SystemSettings, value: unknown) => void;
-  FPTGpuControlCardComponent?: React.ReactNode;
 }
 
 const INTERVIEW_PACING_PRESETS = [
@@ -67,7 +65,6 @@ const resolveInterviewPacingPreset = (formData: SystemSettings): string => {
 export const VoiceInterviewTab: React.FC<VoiceInterviewTabProps> = ({
   formData,
   onChange,
-  FPTGpuControlCardComponent,
 }) => {
   const { t } = useTranslation('admin');
   const currentPreset = resolveInterviewPacingPreset(formData);
@@ -163,8 +160,6 @@ export const VoiceInterviewTab: React.FC<VoiceInterviewTabProps> = ({
           </Stack>
         </CardContent>
       </Card>
-
-      {FPTGpuControlCardComponent}
     </Stack>
   );
 };

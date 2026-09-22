@@ -30,6 +30,7 @@ def job_seeker_user(db):
         password='testpass123',
         is_active=True,
         is_verify_email=True,
+        is_onboarded=True,
     )
 
 

@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field, ValidationError
 from integrations.ai.client import post_chat_completion_httpx
 from apps.operations.services import OperationTracker
 from apps.operations.models import AsyncOperation
+from apps.common.decision_engine.engine import TranscriptEvaluationEngine
 from decimal import Decimal
 from .livekit_service import LiveKitService
 from .models import InterviewSession
@@ -614,16 +615,54 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
         if tracker:
             tracker.fail(str(e)[:500], code="EVALUATION_FAILED")
 
-    # If we caught an error (other than DoesNotExist), revert to completed so frontend doesn't hang
+    # If we caught an error (other than DoesNotExist), attempt System 1 fallback using TranscriptEvaluationEngine
     try:
-        session = InterviewSession.objects.get(id=session_id)
+        session = InterviewSession.objects.prefetch_related("transcripts", "job_post").get(id=session_id)
         if session.status == "processing":
-            _mark_evaluation_unavailable(
-                session,
-                "AI evaluation failed before producing a valid report. Please check AI service logs.",
-            )
+            transcripts = list(session.transcripts.all().order_by("create_at"))
+            cand_transcripts = [t for t in transcripts if t.speaker_role in ("candidate", "jobseeker", "user")]
+            total_cand_words = sum(len(t.content.strip().split()) for t in cand_transcripts)
+            if cand_transcripts and total_cand_words >= 5:
+                job_context = {
+                    "job_title": session.job_post.job_name if session.job_post else "",
+                    "skills": getattr(session.job_post, "skills", "") if session.job_post else "",
+                    "rubric": getattr(session.job_post, "evaluation_rubric", None) if session.job_post else None,
+                }
+                transcript_payloads = [{"speaker_role": t.speaker_role, "content": t.content} for t in transcripts]
+                system1_verdict = TranscriptEvaluationEngine.evaluate(transcript_payloads, job_context)
+
+                session.ai_technical_score = system1_verdict.technical_score
+                session.ai_communication_score = system1_verdict.communication_score
+                session.ai_overall_score = system1_verdict.overall_score
+                session.ai_summary = f"[Đánh giá dự phòng System 1]: {system1_verdict.summary}"
+                session.ai_strengths = system1_verdict.strengths
+                session.ai_weaknesses = system1_verdict.weaknesses
+                session.ai_detailed_feedback = system1_verdict.detailed_feedback
+                session.status = "completed"
+                session.save(update_fields=[
+                    "status", "ai_overall_score", "ai_technical_score", "ai_communication_score",
+                    "ai_summary", "ai_strengths", "ai_weaknesses", "ai_detailed_feedback", "update_at"
+                ])
+                logger.info(
+                    "Recovered interview evaluation using openJev TranscriptEvaluationEngine for session %s (overall=%.1f)",
+                    session_id,
+                    system1_verdict.overall_score,
+                )
+                broadcast_interview_event(session.id, "status_changed", {
+                    "sessionId": session.id,
+                    "oldStatus": "processing",
+                    "newStatus": "completed",
+                    "startTime": session.start_time.isoformat() if session.start_time else None,
+                    "endTime": session.end_time.isoformat() if session.end_time else None,
+                    "duration": session.duration,
+                })
+            else:
+                _mark_evaluation_unavailable(
+                    session,
+                    "AI evaluation failed before producing a valid report. Please check AI service logs.",
+                )
     except Exception as e2:
-        logger.error("Failed to revert session %s status to completed: %s", session_id, e2)
+        logger.error("Failed to recover session %s status to completed: %s", session_id, e2)
 
     return None
 

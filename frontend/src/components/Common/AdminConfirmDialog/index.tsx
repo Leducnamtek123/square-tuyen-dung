@@ -151,6 +151,7 @@ export default function AdminConfirmDialog({
             fullWidth
             multiline
             rows={3}
+            data-testid="admin-reason-input"
             label={resolvedReasonLabel}
             placeholder={resolvedReasonPlaceholder}
             value={reason}
@@ -173,6 +174,7 @@ export default function AdminConfirmDialog({
         <Button
           variant="outlined"
           color="inherit"
+          data-testid="admin-cancel-btn"
           disabled={loading}
           onClick={handleClose}
           sx={{
@@ -188,6 +190,7 @@ export default function AdminConfirmDialog({
         <Button
           variant="contained"
           color={styles.btnColor}
+          data-testid="admin-confirm-btn"
           disabled={loading}
           onClick={handleConfirm}
           startIcon={loading ? <CircularProgress size={16} color="inherit" /> : null}

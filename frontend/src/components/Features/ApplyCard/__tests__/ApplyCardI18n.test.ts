@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-const applyCardKeys = ['positionCaption', 'submit', 'success'];
+const applyCardKeys = ['positionCaption', 'submit', 'success', 'onboardingRequired'];
 const hardCodedCopy = ['Applied successfully.', 'Ứng tuyển vị trí', 'Ứng tuyển'];
 
 describe('ApplyCard i18n', () => {

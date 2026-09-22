@@ -20,6 +20,7 @@ from apps.jobs.exceptions import (
     JobPostInactiveError,
     ResumeOwnershipError,
     EmployerSelfApplicationError,
+    OnboardingRequiredError,
 )
 from apps.content.system_settings import auto_approve_jobs_enabled, email_notifications_enabled
 from shared.configs import variable_system as var_sys
@@ -233,7 +234,12 @@ class JobActivityService:
                 or Resume.objects.filter(user=user).order_by('-update_at', '-create_at').first()
             )
 
-        logger.info("Apply attempt: user=%s, job=%s, resume=%s", user.email, job_post.id if job_post else None, resume.id if resume else None)
+        logger.info("Apply attempt: user=%s, job=%s, resume=%s", getattr(user, 'email', None), job_post.id if job_post else None, resume.id if resume else None)
+
+        if user and getattr(user, 'is_authenticated', False):
+            if not getattr(user, 'is_onboarded', True):
+                logger.warning("Apply failed: user %s has not completed onboarding", getattr(user, 'email', 'unknown'))
+                raise OnboardingRequiredError("Vui lòng hoàn tất thiết lập hồ sơ (Onboarding) trước khi nộp CV ứng tuyển.")
 
         if not job_post:
              logger.error("Apply failed: job_post is missing")

@@ -79,12 +79,6 @@ services:
     env_file:
       - .env
     volumes:
-      - type: bind
-        source: ${FPT_GPU_SSH_KEY_SOURCE:-./.secrets/fpt_gpu_ssh_key}
-        target: /run/secrets/fpt_gpu_ssh_key
-        read_only: true
-        bind:
-          create_host_path: false
       - tts-cache:/tmp/tts_cache
     expose:
       - "8000"

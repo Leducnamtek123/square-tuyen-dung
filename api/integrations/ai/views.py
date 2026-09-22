@@ -504,18 +504,6 @@ class AIHealthAPIView(APIView):
 
 health = AIHealthAPIView.as_view()
 
-# Re-export decoupled GPU control views and helpers for backward compatibility
-from .views_gpu_control import (
-    FPTGPUControlStatusAPIView,
-    FPTGPUControlActionAPIView,
-    gpu_control_status,
-    gpu_control_action,
-    _fpt_gpu_request,
-    _run_fpt_gpu_bootstrap_ssh,
-    _wait_for_tcp_port,
-)
-
-
 
 # ---------------------------------------------------------------------------
 # Helper for tool calls (used by ChatAPIView)

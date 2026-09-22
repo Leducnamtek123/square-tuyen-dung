@@ -97,10 +97,12 @@ const UserTable = ({
             enableSorting: true,
             cell: (info) => (
                 <Select
+                    data-testid="user-role-select"
                     value={info.getValue() as string || ''}
                     size="small"
                     variant="standard"
                     disableUnderline
+                    inputProps={{ 'data-testid': 'user-role-select-input' }}
                     onChange={(event: SelectChangeEvent<string>) => onRoleChange(info.row.original, event.target.value as RoleName)}
                     disabled={disableRoleActions || info.row.original.id === currentUserId}
                     renderValue={(value) => (
@@ -166,6 +168,7 @@ const UserTable = ({
                             onChange={() => onToggleStatus(info.row.original)}
                             color="primary"
                             size="small"
+                            inputProps={{ 'data-testid': 'toggle-user-active-switch' } as any}
                             disabled={disableRoleActions || info.row.original.id === currentUserId}
                         />
                     </Tooltip>

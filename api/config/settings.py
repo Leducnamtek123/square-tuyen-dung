@@ -116,32 +116,6 @@ LIVEKIT_URL = config("LIVEKIT_URL", default="http://livekit:7880")
 LIVEKIT_API_KEY = config("LIVEKIT_API_KEY", default="")
 LIVEKIT_API_SECRET = config("LIVEKIT_API_SECRET", default="")
 
-# FPT GPU Container control-plane settings. These are intentionally backend-only
-# because the FPT BSS token can start/stop billable infrastructure.
-FPT_GPU_CONTROL_BASE_URL = config("FPT_GPU_CONTROL_BASE_URL", default="https://console-api.fptcloud.com")
-FPT_GPU_BSS_TOKEN_EXCHANGE_URL = config(
-    "FPT_GPU_BSS_TOKEN_EXCHANGE_URL",
-    default="https://ai-api.fptcloud.com/v1/login-callback/cloud_access_token",
-)
-FPT_GPU_TENANT_ID = config("FPT_GPU_TENANT_ID", default="")
-FPT_GPU_REGION = config("FPT_GPU_REGION", default="hanoi-2-vn")
-FPT_GPU_CONTAINER_ID = config("FPT_GPU_CONTAINER_ID", default="")
-FPT_GPU_CONTAINER_NAME = config("FPT_GPU_CONTAINER_NAME", default="")
-FPT_GPU_CONSOLE_URL = config("FPT_GPU_CONSOLE_URL", default="")
-FPT_GPU_BSS_ACCESS_TOKEN = config("FPT_GPU_BSS_ACCESS_TOKEN", default="")
-FPT_GPU_ACCESS_TOKEN = config("FPT_GPU_ACCESS_TOKEN", default="")
-FPT_GPU_RUNNING_HOURLY_COST_VND = config("FPT_GPU_RUNNING_HOURLY_COST_VND", default=0, cast=int)
-FPT_GPU_STOPPED_HOURLY_COST_VND = config("FPT_GPU_STOPPED_HOURLY_COST_VND", default=0, cast=int)
-FPT_GPU_SSH_HOST = config("FPT_GPU_SSH_HOST", default="")
-FPT_GPU_SSH_PORT = config("FPT_GPU_SSH_PORT", default=22, cast=int)
-FPT_GPU_SSH_USER = config("FPT_GPU_SSH_USER", default="root")
-FPT_GPU_SSH_KEY_PATH = config("FPT_GPU_SSH_KEY_PATH", default="")
-FPT_GPU_BOOTSTRAP_COMMAND = config(
-    "FPT_GPU_BOOTSTRAP_COMMAND",
-    default="source /models/square-ai/bootstrap-env.sh && bash /models/bootstrap-square-ai.sh",
-)
-FPT_GPU_BOOTSTRAP_TCP_WAIT_SECONDS = config("FPT_GPU_BOOTSTRAP_TCP_WAIT_SECONDS", default=240, cast=int)
-FPT_GPU_BOOTSTRAP_TIMEOUT_SECONDS = config("FPT_GPU_BOOTSTRAP_TIMEOUT_SECONDS", default=900, cast=int)
 API_VERSION = config("API_VERSION", default="v1")
 SUPPORT_CONTACT_EMAIL = config("SUPPORT_CONTACT_EMAIL", default="support@squaregroup.vn")
 LIVEKIT_WEBHOOK_TOKEN = config("LIVEKIT_WEBHOOK_TOKEN", default="")

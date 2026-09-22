@@ -63,6 +63,7 @@ const TextFieldCustom = <T extends FieldValues = FieldValues>({
 
               size="small"
               id={field.name}
+              name={field.name}
               placeholder={placeholder}
               value={formatDisplay(field.value) ?? ''}
               onChange={(e) => {

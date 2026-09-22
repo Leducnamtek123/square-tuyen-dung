@@ -89,6 +89,7 @@ export interface EmployerInterviewStats {
 
 // --- INTERFACES: Admin Statistics ---
 export interface AdminGeneralStats {
+  days?: number;
   totalUsers: number;
   totalEmployers: number;
   totalJobSeekers: number;
@@ -128,12 +129,35 @@ export interface AdminGeneralStats {
   totalResumeViews?: number;
   totalQuestions?: number;
   totalQuestionGroups?: number;
+  newUsers?: number;
+  newEmployers?: number;
+  newJobSeekers?: number;
+  newJobPosts?: number;
+  newApplications?: number;
+  newInterviews?: number;
   newUsers30d?: number;
   newEmployers30d?: number;
   newJobSeekers30d?: number;
   newJobPosts30d?: number;
   newApplications30d?: number;
   newInterviews30d?: number;
+  avgInterviewDurationSeconds?: number;
+  proctoringEventsCount?: number;
+  aiRecommendHireRate?: number;
+}
+
+export interface SystemHealthStatus {
+  status: 'healthy' | 'degraded' | 'down';
+  services: {
+    api: string;
+    database: string;
+    redis: string;
+    storage: string;
+    celery: string;
+  };
+  runningOperationsCount?: number;
+  failedOperations1hCount?: number;
+  checkedAt: string;
 }
 
 export interface AdminTrendStats {
@@ -208,9 +232,9 @@ const statisticService = {
       .then(unwrapDataResponse<JobSeekerActivityStats>);
   },
 
-  adminGeneralStatistics: (): Promise<AdminGeneralStats> => {
+  adminGeneralStatistics: (days: number = 30): Promise<AdminGeneralStats> => {
     const url = 'job/web/statistics/admin/';
-    return (httpRequest.get(url, { params: { type: 'general' } }) as Promise<unknown>)
+    return (httpRequest.get(url, { params: { type: 'general', days } }) as Promise<unknown>)
       .then(unwrapDataResponse<AdminGeneralStats>);
   },
 
@@ -218,6 +242,12 @@ const statisticService = {
     const url = 'job/web/statistics/admin/';
     return (httpRequest.get(url, { params: { type: 'trend', days } }) as Promise<unknown>)
       .then(unwrapDataResponse<AdminTrendStats>);
+  },
+
+  systemHealthStatistics: (): Promise<SystemHealthStatus> => {
+    const url = 'job/web/statistics/admin/';
+    return (httpRequest.get(url, { params: { type: 'health' } }) as Promise<unknown>)
+      .then(unwrapDataResponse<SystemHealthStatus>);
   },
 };
 

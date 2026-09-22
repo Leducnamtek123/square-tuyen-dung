@@ -60,6 +60,8 @@ square-tuyen-dung/
 │
 ├── nginx-gateway/                    # Reverse proxy, SSL termination, subdomain routing
 ├── docs/                             # Architecture specifications, audits, and deployment guides
+│   ├── ARCHITECTURE.md               # 📖 Master System Architecture Guide & Archify Blueprints
+│   └── architecture/                 # 🌐 Interactive Archify HTML & JSON models
 └── docker-compose.yml                # Full local & staging orchestration
 ```
 

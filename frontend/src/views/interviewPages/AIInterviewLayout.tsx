@@ -128,6 +128,7 @@ function CustomControlBar({
       <div className="flex items-center justify-center gap-1.5 sm:gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 sm:px-4 py-2 sm:py-2.5 shadow-[0_12px_32px_rgba(0,0,0,0.08)] backdrop-blur-2xl ring-1 ring-slate-100 max-w-full">
         <button
           type="button"
+          data-testid="toggle-mic-btn"
           disabled={micLoading}
           aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone') : t('controls.unmuteMicrophone')}
           onClick={async () => {
@@ -148,6 +149,7 @@ function CustomControlBar({
         </button>
         <button
           type="button"
+          data-testid="toggle-cam-btn"
           disabled={camLoading}
           aria-label={isCameraEnabled ? t('controls.turnCameraOff') : t('controls.turnCameraOn')}
           onClick={async () => {
@@ -236,6 +238,7 @@ function CustomControlBar({
         <div className="mx-1 sm:mx-1.5 h-6 w-px bg-slate-200 shrink-0" />
         <button
           type="button"
+          data-testid="end-interview-btn"
           onClick={() => {
             if (ending) return;
             setConfirmEndOpen(true);
@@ -291,6 +294,7 @@ function CustomControlBar({
             <Button
               variant="contained"
               color="error"
+              data-testid="confirm-end-interview-btn"
               onClick={async () => {
                 setEnding(true);
                 try {

@@ -5,6 +5,7 @@ from datetime import timedelta
 import pandas as pd
 import pytz
 from django.core.cache import cache
+from django.db import connection
 from django.db.models import Avg, Count, F, Q, Sum
 from django.db.models.functions import ExtractMonth, ExtractYear, TruncDate, TruncMonth
 from django.utils import timezone
@@ -12,7 +13,13 @@ from rest_framework import status, viewsets
 
 from apps.accounts import permissions as perms_custom
 from apps.accounts.models import User
-from apps.interviews.models import InterviewEvaluation, InterviewSession, Question, QuestionGroup
+from apps.interviews.models import (
+    InterviewEvaluation,
+    InterviewProctoringEvent,
+    InterviewSession,
+    Question,
+    QuestionGroup,
+)
 from apps.profiles.models import (
     Company,
     CompanyFollowed,
@@ -642,6 +649,8 @@ class AdminStatisticViewSet(viewsets.ViewSet):
             return self.general_statistics(request)
         elif stat_type in ["trend", "growth"]:
             return self.trend_statistics(request)
+        elif stat_type in ["health", "system-health"]:
+            return self.system_health_statistics(request)
         else:
             return var_res.response_data(
                 status=status.HTTP_400_BAD_REQUEST,
@@ -727,13 +736,20 @@ class AdminStatisticViewSet(viewsets.ViewSet):
         return var_res.response_data(data=result_data)
 
     def general_statistics(self, request):
-        cache_key = "admin_summary_general_stats"
+        try:
+            days = int(request.query_params.get("days", 30))
+            if days not in [7, 14, 30, 60, 90, 365]:
+                days = 30
+        except (TypeError, ValueError):
+            days = 30
+
+        cache_key = f"admin_summary_general_stats_{days}"
         cached_data = cache.get(cache_key)
         if cached_data is not None:
             return var_res.response_data(data=cached_data)
 
         today = timezone.localdate()
-        recent_start = timezone.now() - timedelta(days=30)
+        recent_start = timezone.now() - timedelta(days=days)
 
         users_qs = User.objects.all()
         job_posts_qs = JobPost.objects.all()
@@ -802,14 +818,27 @@ class AdminStatisticViewSet(viewsets.ViewSet):
         total_questions = Question.objects.count()
         total_question_groups = QuestionGroup.objects.count()
 
-        new_users_30d = users_qs.filter(create_at__gte=recent_start).count()
-        new_employers_30d = users_qs.filter(role_name=var_sys.EMPLOYER, create_at__gte=recent_start).count()
-        new_job_seekers_30d = users_qs.filter(role_name=var_sys.JOB_SEEKER, create_at__gte=recent_start).count()
-        new_job_posts_30d = job_posts_qs.filter(create_at__gte=recent_start).count()
-        new_applications_30d = applications_qs.filter(create_at__gte=recent_start).count()
-        new_interviews_30d = interviews_qs.filter(create_at__gte=recent_start).count()
+        new_users = users_qs.filter(create_at__gte=recent_start).count()
+        new_employers = users_qs.filter(role_name=var_sys.EMPLOYER, create_at__gte=recent_start).count()
+        new_job_seekers = users_qs.filter(role_name=var_sys.JOB_SEEKER, create_at__gte=recent_start).count()
+        new_job_posts = job_posts_qs.filter(create_at__gte=recent_start).count()
+        new_applications = applications_qs.filter(create_at__gte=recent_start).count()
+        new_interviews = interviews_qs.filter(create_at__gte=recent_start).count()
+
+        # AI Voice & Interview Quality Metrics
+        completed_sessions = interviews_qs.filter(status="completed")
+        avg_dur_dict = completed_sessions.filter(duration__isnull=False).aggregate(avg_dur=Avg("duration"))
+        avg_interview_duration = round(avg_dur_dict.get("avg_dur") or 0)
+
+        proctoring_events_count = InterviewProctoringEvent.objects.filter(create_at__gte=recent_start).count()
+
+        evaluations_qs = InterviewEvaluation.objects.filter(create_at__gte=recent_start)
+        total_eval = evaluations_qs.count()
+        passed_eval = evaluations_qs.filter(result="passed").count()
+        ai_recommend_hire_rate = round((passed_eval / total_eval) * 100) if total_eval > 0 else 0
 
         stats_data = {
+            "days": days,
             "totalUsers": total_users,
             "totalEmployers": total_employers,
             "totalJobSeekers": total_job_seekers,
@@ -849,12 +878,83 @@ class AdminStatisticViewSet(viewsets.ViewSet):
             "totalResumeViews": total_resume_views,
             "totalQuestions": total_questions,
             "totalQuestionGroups": total_question_groups,
-            "newUsers30d": new_users_30d,
-            "newEmployers30d": new_employers_30d,
-            "newJobSeekers30d": new_job_seekers_30d,
-            "newJobPosts30d": new_job_posts_30d,
-            "newApplications30d": new_applications_30d,
-            "newInterviews30d": new_interviews_30d,
+            "newUsers": new_users,
+            "newEmployers": new_employers,
+            "newJobSeekers": new_job_seekers,
+            "newJobPosts": new_job_posts,
+            "newApplications": new_applications,
+            "newInterviews": new_interviews,
+            "newUsers30d": new_users,
+            "newEmployers30d": new_employers,
+            "newJobSeekers30d": new_job_seekers,
+            "newJobPosts30d": new_job_posts,
+            "newApplications30d": new_applications,
+            "newInterviews30d": new_interviews,
+            "avgInterviewDurationSeconds": avg_interview_duration,
+            "proctoringEventsCount": proctoring_events_count,
+            "aiRecommendHireRate": ai_recommend_hire_rate,
         }
         cache.set(cache_key, stats_data, timeout=300)
         return var_res.response_data(data=stats_data)
+
+    def system_health_statistics(self, request):
+        services = {
+            "api": "up",
+            "database": "unknown",
+            "redis": "unknown",
+            "storage": "up",
+            "celery": "up",
+        }
+
+        # Check DB
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+                row = cursor.fetchone()
+                if row and row[0] == 1:
+                    services["database"] = "up"
+        except Exception:
+            services["database"] = "down"
+
+        # Check Redis
+        try:
+            cache.set("__health_ping__", 1, timeout=10)
+            if cache.get("__health_ping__") == 1:
+                services["redis"] = "up"
+            else:
+                services["redis"] = "degraded"
+        except Exception:
+            services["redis"] = "down"
+
+        # Check Active Operations (Celery / Background tasks)
+        running_ops = 0
+        failed_ops = 0
+        try:
+            from apps.operations.models import AsyncOperation
+            running_ops = AsyncOperation.objects.filter(status="running").count()
+            failed_ops = AsyncOperation.objects.filter(
+                status="failed",
+                created_at__gte=timezone.now() - timedelta(hours=1),
+            ).count()
+            if failed_ops > 5:
+                services["celery"] = "degraded"
+            else:
+                services["celery"] = "up"
+        except Exception:
+            pass
+
+        overall_status = "healthy"
+        if any(v == "down" for v in services.values()):
+            overall_status = "down"
+        elif any(v == "degraded" for v in services.values()):
+            overall_status = "degraded"
+
+        return var_res.response_data(
+            data={
+                "status": overall_status,
+                "services": services,
+                "runningOperationsCount": running_ops,
+                "failedOperations1hCount": failed_ops,
+                "checkedAt": timezone.now().isoformat(),
+            }
+        )

@@ -282,7 +282,15 @@
   "applyCard": {
     "positionCaption": "Apply for position",
     "submit": "Apply",
-    "success": "Applied successfully."
+    "success": "Applied successfully.",
+    "onboardingRequired": "Please complete your profile setup (onboarding) before applying."
+  },
+  "onboardingRequired": {
+    "candidateTitle": "Profile setup required to apply",
+    "employerTitle": "Company profile setup required",
+    "candidateMsg": "Please complete your basic profile information (desired job title, skills, contact phone) so recruiters can review and contact you.",
+    "employerMsg": "Please complete your company profile before conducting recruitment operations.",
+    "cta": "Complete profile now"
   },
   "company": {
     "following": "Following",

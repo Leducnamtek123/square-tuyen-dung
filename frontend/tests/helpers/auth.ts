@@ -9,6 +9,7 @@ export interface UserSessionOptions {
   role?: UserRole;
   companyId?: number;
   companyName?: string;
+  isOnboarded?: boolean;
 }
 
 export const DEFAULT_CANDIDATE: UserSessionOptions = {
@@ -16,6 +17,15 @@ export const DEFAULT_CANDIDATE: UserSessionOptions = {
   email: 'candidate.e2e@infohr.vn',
   fullName: 'Nguyen Van Ung Vien',
   role: 'JOB_SEEKER',
+  isOnboarded: true,
+};
+
+export const NON_ONBOARDED_CANDIDATE: UserSessionOptions = {
+  id: 102,
+  email: 'candidate.new@infohr.vn',
+  fullName: 'Ung Vien Moi',
+  role: 'JOB_SEEKER',
+  isOnboarded: false,
 };
 
 export const DEFAULT_EMPLOYER: UserSessionOptions = {
@@ -25,6 +35,15 @@ export const DEFAULT_EMPLOYER: UserSessionOptions = {
   role: 'EMPLOYER',
   companyId: 10,
   companyName: 'Cong ty Co phan InfoHR Vietnam',
+  isOnboarded: true,
+};
+
+export const NON_ONBOARDED_EMPLOYER: UserSessionOptions = {
+  id: 203,
+  email: 'employer.new@infohr.vn',
+  fullName: 'NTD Moi',
+  role: 'EMPLOYER',
+  isOnboarded: false,
 };
 
 export const DEFAULT_ADMIN: UserSessionOptions = {
@@ -32,6 +51,7 @@ export const DEFAULT_ADMIN: UserSessionOptions = {
   email: 'admin.e2e@infohr.vn',
   fullName: 'He Thong Quan Tri',
   role: 'ADMIN',
+  isOnboarded: true,
 };
 
 /**
@@ -40,23 +60,37 @@ export const DEFAULT_ADMIN: UserSessionOptions = {
 export async function injectSession(
   context: BrowserContext,
   options: UserSessionOptions = DEFAULT_CANDIDATE,
-  domain = 'localhost'
+  domain?: string
 ) {
   const token = `e2e-${options.role?.toLowerCase() || 'candidate'}-token`;
-  await context.addCookies([
-    {
-      name: 'access_token',
-      value: token,
-      domain,
-      path: '/',
-    },
-    {
-      name: 'refresh_token',
-      value: `refresh-${token}`,
-      domain,
-      path: '/',
-    },
-  ]);
+  const domains = new Set<string>(['localhost', '127.0.0.1']);
+  if (domain) domains.add(domain);
+  if (process.env.PLAYWRIGHT_BASE_URL) {
+    try {
+      domains.add(new URL(process.env.PLAYWRIGHT_BASE_URL).hostname);
+    } catch {
+      // ignore
+    }
+  }
+
+  const cookies: { name: string; value: string; domain: string; path: string }[] = [];
+  for (const d of domains) {
+    cookies.push(
+      {
+        name: 'access_token',
+        value: token,
+        domain: d,
+        path: '/',
+      },
+      {
+        name: 'refresh_token',
+        value: `refresh-${token}`,
+        domain: d,
+        path: '/',
+      }
+    );
+  }
+  await context.addCookies(cookies);
 }
 
 /**

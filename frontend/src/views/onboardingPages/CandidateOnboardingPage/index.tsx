@@ -117,6 +117,7 @@ export default function CandidateOnboardingPage() {
                   desiredJobTitle: formData.desiredJobTitle,
                   careerId: formData.careerId,
                   cityId: formData.cityId,
+                  phone: formData.phone,
                   typeOfWorkplace: formData.typeOfWorkplace,
                   address: formData.address,
                   lat: formData.lat,

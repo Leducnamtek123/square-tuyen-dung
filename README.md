@@ -216,7 +216,6 @@ square-tuyen-dung/
 ├── backups/                     # Thư mục lưu trữ các file backup DB tự động (.sql.gz)
 ├── docs/                        # Tài liệu hệ thống chi tiết
 │   ├── ENVIRONMENT_AUDIT.md     # Báo cáo kiểm định biến môi trường
-│   ├── FPT_GPU_DEPLOYMENT.md    # Hướng dẫn triển khai cụm GPU FPT
 │   ├── MIGRATIONS.md            # Hướng dẫn xử lý migration cơ sở dữ liệu
 │   └── START_GUIDE.md           # Hướng dẫn khởi động nhanh cho lập trình viên
 ├── docker-compose.yml           # File điều phối chính toàn bộ hệ thống (Single Source of Truth)
@@ -442,7 +441,6 @@ docker compose logs -f nginx-gateway
 - 💻 [Tài liệu Frontend Next.js chi tiết](frontend/README.md)
 - 🎙️ [Tài liệu Kiến trúc Voice AI](voice-ai/README.md)
 - 🔍 [Báo cáo Kiểm định Biến Môi Trường (Environment Audit)](docs/ENVIRONMENT_AUDIT.md)
-- 🚀 [Hướng dẫn Triển khai Cụm GPU FPT](docs/FPT_GPU_DEPLOYMENT.md)
 - 🗃️ [Quy trình Quản lý Migration DB](docs/MIGRATIONS.md)
 - 🧭 [Hướng dẫn Bắt đầu Nhanh (Start Guide)](docs/START_GUIDE.md)
 

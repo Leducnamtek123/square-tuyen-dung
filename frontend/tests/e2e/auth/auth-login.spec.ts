@@ -52,7 +52,7 @@ test.describe('Authentication & Authorization E2E', () => {
     await page.goto('/login');
 
     const [response] = await Promise.all([
-      page.waitForResponse((res) => res.url().includes('/api/auth/token/') && res.status() === 200),
+      page.waitForResponse((res) => res.url().includes('/auth/token/') && res.status() === 200),
       submitLoginForm(page, {
         email: 'candidate.success@infohr.vn',
         password: 'CorrectPassword123!',

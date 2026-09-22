@@ -44,7 +44,8 @@ export const createCandidateStep1Schema = (t: (key: any, defaultVal?: any) => an
       .optional()
       .test('is-valid-phone', t('onboarding.validation.phoneInvalid', 'Số điện thoại không hợp lệ.'), (val) => {
         if (!val) return true;
-        return /^(0|\+84)[3|5|7|8|9][0-9]{8}$/.test(val.replace(/\s+/g, ''));
+        const cleaned = val.replace(/[\s.-]+/g, '');
+        return /^(0|\+84)[35789]\d{8}$/.test(cleaned);
       }),
     careerId: yup
       .mixed()

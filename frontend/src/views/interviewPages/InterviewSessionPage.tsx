@@ -496,6 +496,7 @@ function InterviewWaitingRoom({
                     <Button
                       variant="default"
                       size="lg"
+                      data-testid="start-interview-btn"
                       onClick={actions.onShowPreflight}
                       disabled={viewState.starting}
                       className="w-full max-w-[300px] h-12 rounded-xl bg-blue-600 font-bold text-white shadow-[0_10px_25px_-5px_rgba(37,99,235,0.4)] hover:bg-blue-700 active:scale-[0.98] border-0"

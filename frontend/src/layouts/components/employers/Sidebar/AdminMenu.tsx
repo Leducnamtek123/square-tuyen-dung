@@ -6,11 +6,11 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import { ROUTES } from '@/configs/constants';
 import { getLocalizedRouteVariants, localizeRoutePath } from '@/configs/routeLocalization';
 import { useQuery } from '@tanstack/react-query';
 import adminManagementService from '@/services/adminManagementService';
+import adminJobService from '@/services/adminJobService';
 import contactMessageService from '@/services/contactMessageService';
 import MenuItem from './MenuItem';
 
@@ -53,9 +53,16 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
     staleTime: 60000,
   });
 
+  const { data: pendingJobsData } = useQuery({
+    queryKey: ['admin-pending-jobs-count'],
+    queryFn: () => adminJobService.getAllJobs({ page: 1, pageSize: 1, statusId: '1' }),
+    staleTime: 60000,
+  });
+
   const pendingVerificationsCount = verificationsData?.count || 0;
   const pendingReportsCount = trustReportsData?.count || 0;
   const unreadContactCount = contactMessagesData?.count || 0;
+  const pendingJobsCount = pendingJobsData?.count || 0;
 
   return (
     <>
@@ -90,43 +97,6 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
         </Collapse>
       )}
 
-      <ListItem disablePadding>
-        <MenuItem
-          icon={BadgeOutlinedIcon}
-          text={t('employer:sidebar.hrmManagement')}
-          kind="group"
-          isCollapsed={isCollapsed}
-          state={{ expanded: expandedItems.hrm }}
-          onClick={() => handleExpand('hrm')}
-          subItems={[
-            { text: t('employer:sidebar.hrmDashboard'), to: routePath(ROUTES.ADMIN.HRM_DASHBOARD), isSelected: isSelected(ROUTES.ADMIN.HRM_DASHBOARD) },
-            { text: t('employer:sidebar.hrmEmployeesList'), to: routePath(ROUTES.ADMIN.HRM_EMPLOYEES), isSelected: isSelected(ROUTES.ADMIN.HRM_EMPLOYEES) },
-            { text: t('employer:sidebar.hrmOnboarding'), to: routePath(ROUTES.ADMIN.HRM_ONBOARDING), isSelected: isSelected(ROUTES.ADMIN.HRM_ONBOARDING) },
-            { text: t('employer:sidebar.hrmDepartments'), to: routePath(ROUTES.ADMIN.HRM_DEPARTMENTS), isSelected: isSelected(ROUTES.ADMIN.HRM_DEPARTMENTS) },
-            { text: t('employer:sidebar.hrmContracts'), to: routePath(ROUTES.ADMIN.HRM_CONTRACTS), isSelected: isSelected(ROUTES.ADMIN.HRM_CONTRACTS) },
-            { text: t('employer:sidebar.hrmAttendances'), to: routePath(ROUTES.ADMIN.HRM_ATTENDANCES), isSelected: isSelected(ROUTES.ADMIN.HRM_ATTENDANCES) },
-            { text: t('employer:sidebar.hrmLeaves'), to: routePath(ROUTES.ADMIN.HRM_LEAVES), isSelected: isSelected(ROUTES.ADMIN.HRM_LEAVES) },
-            { text: t('employer:sidebar.hrmPayroll'), to: routePath(ROUTES.ADMIN.HRM_PAYROLL), isSelected: isSelected(ROUTES.ADMIN.HRM_PAYROLL) },
-            { text: t('employer:sidebar.hrmOrgChart'), to: routePath(ROUTES.ADMIN.HRM_ORG_CHART), isSelected: isSelected(ROUTES.ADMIN.HRM_ORG_CHART) },
-          ]}
-        />
-      </ListItem>
-      {!isCollapsed && (
-        <Collapse in={expandedItems.hrm} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <MenuItem text={t('employer:sidebar.hrmDashboard')} to={routePath(ROUTES.ADMIN.HRM_DASHBOARD)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_DASHBOARD) }} />
-            <MenuItem text={t('employer:sidebar.hrmEmployeesList')} to={routePath(ROUTES.ADMIN.HRM_EMPLOYEES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_EMPLOYEES) }} />
-            <MenuItem text={t('employer:sidebar.hrmOnboarding')} to={routePath(ROUTES.ADMIN.HRM_ONBOARDING)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_ONBOARDING) }} />
-            <MenuItem text={t('employer:sidebar.hrmDepartments')} to={routePath(ROUTES.ADMIN.HRM_DEPARTMENTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_DEPARTMENTS) }} />
-            <MenuItem text={t('employer:sidebar.hrmContracts')} to={routePath(ROUTES.ADMIN.HRM_CONTRACTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_CONTRACTS) }} />
-            <MenuItem text={t('employer:sidebar.hrmAttendances')} to={routePath(ROUTES.ADMIN.HRM_ATTENDANCES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_ATTENDANCES) }} />
-            <MenuItem text={t('employer:sidebar.hrmLeaves')} to={routePath(ROUTES.ADMIN.HRM_LEAVES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_LEAVES) }} />
-            <MenuItem text={t('employer:sidebar.hrmPayroll')} to={routePath(ROUTES.ADMIN.HRM_PAYROLL)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_PAYROLL) }} />
-            <MenuItem text={t('employer:sidebar.hrmOrgChart')} to={routePath(ROUTES.ADMIN.HRM_ORG_CHART)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.HRM_ORG_CHART) }} />
-          </List>
-        </Collapse>
-      )}
-      
       <ListItem disablePadding>
         <MenuItem
           icon={CategoryOutlinedIcon}
@@ -221,14 +191,11 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
           state={{ expanded: expandedItems.recruitment }}
           onClick={() => handleExpand('recruitment')}
           subItems={[
-            { text: t('admin:sidebar.jobPosts'), to: routePath(ROUTES.ADMIN.JOBS), isSelected: isSelected(ROUTES.ADMIN.JOBS) },
-            { text: t('admin:sidebar.questionBank'), to: routePath(ROUTES.ADMIN.QUESTIONS), isSelected: isSelected(ROUTES.ADMIN.QUESTIONS) },
-            { text: t('admin:sidebar.interviewQuestionSets'), to: routePath(ROUTES.ADMIN.QUESTION_GROUPS), isSelected: isSelected(ROUTES.ADMIN.QUESTION_GROUPS) },
+            { text: t('admin:sidebar.jobPosts'), to: routePath(ROUTES.ADMIN.JOBS), isSelected: isSelected(ROUTES.ADMIN.JOBS), badgeContent: pendingJobsCount },
             { text: t('admin:sidebar.trustReports'), to: routePath(ROUTES.ADMIN.TRUST_REPORTS), isSelected: isSelected(ROUTES.ADMIN.TRUST_REPORTS), badgeContent: pendingReportsCount },
             { text: t('admin:sidebar.activityLogs'), to: routePath(ROUTES.ADMIN.JOB_ACTIVITY), isSelected: isSelected(ROUTES.ADMIN.JOB_ACTIVITY) },
             { text: t('admin:sidebar.interviewSchedule'), to: routePath(ROUTES.ADMIN.INTERVIEWS), isSelected: isSelected(ROUTES.ADMIN.INTERVIEWS) },
             { text: t('admin:sidebar.voiceProfiles'), to: routePath(ROUTES.ADMIN.VOICE_PROFILES), isSelected: isSelected(ROUTES.ADMIN.VOICE_PROFILES) },
-            { text: t('admin:sidebar.jobNotifications'), to: routePath(ROUTES.ADMIN.JOB_NOTIFICATIONS), isSelected: isSelected(ROUTES.ADMIN.JOB_NOTIFICATIONS) },
             { text: t('admin:sidebar.interviewPreview'), to: routePath(ROUTES.ADMIN.INTERVIEW_PREVIEW), isSelected: isSelected(ROUTES.ADMIN.INTERVIEW_PREVIEW) },
           ]}
         />
@@ -236,14 +203,11 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isColla
       {!isCollapsed && (
         <Collapse in={expandedItems.recruitment} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            <MenuItem text={t('admin:sidebar.jobPosts')} to={routePath(ROUTES.ADMIN.JOBS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.JOBS) }} />
-            <MenuItem text={t('admin:sidebar.questionBank')} to={routePath(ROUTES.ADMIN.QUESTIONS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.QUESTIONS) }} />
-            <MenuItem text={t('admin:sidebar.interviewQuestionSets')} to={routePath(ROUTES.ADMIN.QUESTION_GROUPS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.QUESTION_GROUPS) }} />
+            <MenuItem text={t('admin:sidebar.jobPosts')} to={routePath(ROUTES.ADMIN.JOBS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.JOBS) }} badgeContent={pendingJobsCount} />
             <MenuItem text={t('admin:sidebar.trustReports')} to={routePath(ROUTES.ADMIN.TRUST_REPORTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.TRUST_REPORTS) }} badgeContent={pendingReportsCount} />
             <MenuItem text={t('admin:sidebar.activityLogs')} to={routePath(ROUTES.ADMIN.JOB_ACTIVITY)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.JOB_ACTIVITY) }} />
             <MenuItem text={t('admin:sidebar.interviewSchedule')} to={routePath(ROUTES.ADMIN.INTERVIEWS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.INTERVIEWS) }} />
             <MenuItem text={t('admin:sidebar.voiceProfiles')} to={routePath(ROUTES.ADMIN.VOICE_PROFILES)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.VOICE_PROFILES) }} />
-            <MenuItem text={t('admin:sidebar.jobNotifications')} to={routePath(ROUTES.ADMIN.JOB_NOTIFICATIONS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.JOB_NOTIFICATIONS) }} />
             <MenuItem text={t('admin:sidebar.interviewPreview')} to={routePath(ROUTES.ADMIN.INTERVIEW_PREVIEW)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.ADMIN.INTERVIEW_PREVIEW) }} />
           </List>
         </Collapse>

@@ -1006,6 +1006,23 @@ class Interviewer(Agent):
                 return None
             return await self._finish_after_candidate_question(user_text)
 
+        if (
+            verdict is not None
+            and verdict.intent == TurnIntent.QUESTION_FOR_INTERVIEWER
+            and verdict.confidence >= 0.75
+        ):
+            logger.info(
+                "Candidate asked interviewer a question during interview for room %s: %s",
+                self._room_name,
+                user_text,
+            )
+            current_q = _clean_question_for_candidate(self._last_asked_question_text or "")
+            if current_q:
+                return (
+                    f"Cảm ơn câu hỏi của bạn. Ở phần cuối buổi phỏng vấn mình sẽ giải đáp chi tiết các thắc mắc về công ty nhé. "
+                    f"Bây giờ chúng ta hãy tiếp tục câu hỏi hiện tại: {current_q}"
+                )
+
         if self._needs_more_answer_detail(user_text):
             return _format_detail_nudge(self._last_asked_question_text or "", user_text)
 

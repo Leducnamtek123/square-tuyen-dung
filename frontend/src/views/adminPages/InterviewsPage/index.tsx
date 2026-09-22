@@ -144,7 +144,7 @@ const InterviewsPage = () => {
         return (
           <Stack direction="row" spacing={0.5} justifyContent="flex-end">
             <Tooltip title={t('pages.interviews.table.view')}>
-              <IconButton aria-label="Thao tác" size="small" color="info" onClick={() => setSelectedInterview(interview)}>
+              <IconButton data-testid="view-interview-btn" aria-label="Thao tác" size="small" color="info" onClick={() => setSelectedInterview(interview)}>
                 <VisibilityIcon fontSize="small" />
               </IconButton>
             </Tooltip>

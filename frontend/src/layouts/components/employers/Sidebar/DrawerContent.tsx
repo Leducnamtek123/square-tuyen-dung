@@ -46,10 +46,8 @@ const getInitialExpandedItems = (pathname: string | null, isAdmin?: boolean) => 
       initial.content = true;
     } else if (pathname.includes('/admin/companies') || pathname.includes('/admin/company-verifications') || pathname.includes('/admin/profiles') || pathname.includes('/admin/resumes')) {
       initial.profiles = true;
-    } else if (pathname.includes('/admin/jobs') || pathname.includes('/admin/questions') || pathname.includes('/admin/question-groups') || pathname.includes('/admin/trust-reports') || pathname.includes('/admin/job-activity') || pathname.includes('/admin/interviews') || pathname.includes('/admin/voice-profiles') || pathname.includes('/admin/job-notifications') || pathname.includes('/admin/interview-preview')) {
+    } else if (pathname.includes('/admin/jobs') || pathname.includes('/admin/trust-reports') || pathname.includes('/admin/job-activity') || pathname.includes('/admin/interviews') || pathname.includes('/admin/voice-profiles') || pathname.includes('/admin/interview-preview')) {
       initial.recruitment = true;
-    } else if (pathname.includes('/admin/hrm')) {
-      initial.hrm = true;
     }
   } else {
     if (pathname.includes('/employer/applied-profiles') || pathname.includes('/employer/saved-profiles') || pathname.includes('/employer/candidates') || pathname.includes('/employer/profiles') || pathname.includes('ung-vien')) {

@@ -27,14 +27,14 @@ export default function OnboardingProgressBanner({
   completeness = 35,
   onboardingUrl,
 }: OnboardingProgressBannerProps) {
-  const [dismissed, setDismissed] = useState(true);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     // Check session storage to see if dismissed for this session
     const sessionKey = `infohr_onboarding_banner_dismissed_${role}`;
     const isDismissed = sessionStorage.getItem(sessionKey);
-    if (!isDismissed) {
-      setDismissed(false);
+    if (isDismissed === 'true') {
+      setDismissed(true);
     }
   }, [role]);
 

@@ -600,7 +600,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                   : job.locationDict?.cityName) ||
                 (typeof (job.location as any)?.city === 'number'
                   ? allConfig?.cityDict?.[(job.location as any).city]
-                  : (job.location as any)?.cityName || (job.location as any)?.city) ||
+                  : (job.location as any)?.cityName || (typeof (job.location as any)?.city === 'object' ? (job.location as any)?.city?.name : (job.location as any)?.city)) ||
                 'Toàn quốc';
               const daysText = getDaysLeft(job.deadline);
               const salaryDisplay = formatSalary(job.salaryMin, job.salaryMax);
@@ -629,7 +629,8 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                       boxShadow: job.isUrgent
                         ? '0 10px 25px -5px rgba(249, 115, 22, 0.08), 0 1px 3px rgba(0,0,0,0.02)'
                         : '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0,0,0,0.02)',
-                      transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, border-color 180ms ease',
+                      transition: 'transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1), border-color 280ms ease, background-color 280ms ease',
+                      willChange: 'transform, box-shadow',
                       animation: 'fadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards',
                       animationDelay: `${(idx % 12) * 40}ms`,
                       '&:hover': {

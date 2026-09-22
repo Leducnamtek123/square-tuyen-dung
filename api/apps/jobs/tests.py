@@ -20,7 +20,7 @@ from apps.jobs.serializers import (
     JobSeekerJobPostActivitySerializer,
 )
 from apps.jobs.services import JobPostService, JobActivityService
-from apps.jobs.exceptions import CompanyNotVerifiedError
+from apps.jobs.exceptions import CompanyNotVerifiedError, OnboardingRequiredError
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
 from apps.jobs.recommendation_service import get_recommended_jobs
 from apps.content.models import SystemSetting
@@ -1509,6 +1509,25 @@ class TestJobService:
         assert activity is not None
         assert activity.user == job_seeker_user
         assert activity.job_post == job_post
+
+    def test_apply_to_job_requires_onboarding(self, job_seeker_user, job_post, resume):
+        """User who has not completed onboarding should be rejected when applying."""
+        job_seeker_user.is_onboarded = False
+        job_seeker_user.save(update_fields=['is_onboarded'])
+
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+        with pytest.raises(OnboardingRequiredError) as exc_info:
+            JobActivityService.apply_to_job(
+                user=job_seeker_user,
+                validated_data=validated_data,
+            )
+        assert "Onboarding" in str(exc_info.value)
+
 
     def test_apply_serializer_accepts_camel_case_job_post(self, job_post, resume):
         serializer = JobSeekerJobPostActivitySerializer(data={

@@ -10,8 +10,12 @@ from apps.agent_assistants.models import AgentThread
 from apps.agent_assistants.planner import AgentPlannedAction, AgentPlanner, AgentPlannerUnavailable
 from apps.common.decision_engine import (
     AgentRouterEngine,
+    ComplianceVerdict,
     CvTriageEngine,
+    JobComplianceEngine,
     RouteVerdict,
+    TranscriptEvaluationEngine,
+    TranscriptEvaluationVerdict,
     TriageVerdict,
 )
 from apps.interviews.triage_service import triage_candidate_application
@@ -98,6 +102,65 @@ class TestAgentRouterEngine(SimpleTestCase):
         self.assertEqual(v3.tool_name, "list_interviews")
         self.assertGreaterEqual(v3.confidence, 0.85)
         self.assertTrue(v3.arguments.get("liveOnly"))
+
+    def test_list_applications_routing(self):
+        v1 = AgentRouterEngine.route("danh sách đơn ứng tuyển")
+        self.assertEqual(v1.tool_name, "list_applications")
+        self.assertGreaterEqual(v1.confidence, 0.85)
+
+        v2 = AgentRouterEngine.route("hồ sơ ứng tuyển tin 15")
+        self.assertEqual(v2.tool_name, "list_applications")
+        self.assertEqual(v2.arguments.get("jobPostId"), 15)
+
+        v3 = AgentRouterEngine.route("ai đã nộp đơn vào tin tuyển dụng React")
+        self.assertEqual(v3.tool_name, "list_applications")
+        self.assertEqual(v3.arguments.get("query"), "React")
+
+    def test_update_application_status_routing(self):
+        v1 = AgentRouterEngine.route("chuyển trạng thái hồ sơ 45 sang trúng tuyển")
+        self.assertEqual(v1.tool_name, "update_application_status")
+        self.assertEqual(v1.arguments.get("applicationId"), 45)
+        self.assertEqual(v1.arguments.get("status"), 5)
+
+        v2 = AgentRouterEngine.route("đánh rớt ứng viên 78")
+        self.assertEqual(v2.tool_name, "update_application_status")
+        self.assertEqual(v2.arguments.get("applicationId"), 78)
+        self.assertEqual(v2.arguments.get("status"), 6)
+
+        v3 = AgentRouterEngine.route("đổi trạng thái ứng viên 23 sang đã phỏng vấn")
+        self.assertEqual(v3.tool_name, "update_application_status")
+        self.assertEqual(v3.arguments.get("applicationId"), 23)
+        self.assertEqual(v3.arguments.get("status"), 4)
+
+    def test_list_companies_routing(self):
+        v1 = AgentRouterEngine.route("danh sách công ty")
+        self.assertEqual(v1.tool_name, "list_companies")
+        self.assertGreaterEqual(v1.confidence, 0.85)
+
+        v2 = AgentRouterEngine.route("tìm công ty FPT")
+        self.assertEqual(v2.tool_name, "list_companies")
+        self.assertEqual(v2.arguments.get("query"), "FPT")
+
+        v3 = AgentRouterEngine.route("danh sách công ty chờ duyệt")
+        self.assertEqual(v3.tool_name, "list_companies")
+        self.assertFalse(v3.arguments.get("verified"))
+
+    def test_review_job_post_routing(self):
+        v1 = AgentRouterEngine.route("duyệt tin tuyển dụng 101")
+        self.assertEqual(v1.tool_name, "review_job_post")
+        self.assertEqual(v1.arguments.get("action"), "approve")
+        self.assertEqual(v1.arguments.get("jobPostId"), 101)
+
+        v2 = AgentRouterEngine.route("từ chối tin tuyển dụng 202")
+        self.assertEqual(v2.tool_name, "review_job_post")
+        self.assertEqual(v2.arguments.get("action"), "reject")
+        self.assertEqual(v2.arguments.get("jobPostId"), 202)
+
+    def test_evaluate_cv_with_notebook_routing(self):
+        v1 = AgentRouterEngine.route("đánh giá cv này với notebook")
+        self.assertEqual(v1.tool_name, "evaluate_cv_with_notebook")
+        self.assertGreaterEqual(v1.confidence, 0.85)
+
 
     def test_notebook_knowledge_routing(self):
         queries = [
@@ -374,3 +437,106 @@ class TestAgentPlannerIntegration(SimpleTestCase):
             # Vì có ảnh đính kèm nên phải gọi LLM vision thay vì fast router
             mock_post.assert_called_once()
             self.assertEqual(planned.raw_response.get("candidate"), "vision_llm")
+
+
+class TestJobComplianceEngine(SimpleTestCase):
+    """Kiểm tra JobComplianceEngine phát hiện vi phạm và gian lận trong JD."""
+
+    def test_compliant_job_post_auto_approved(self):
+        job_data = {
+            "job_name": "Senior Python Backend Engineer",
+            "description": "Phát triển hệ thống microservices phân tán chịu tải cao, tối ưu hóa database MySQL và Redis.",
+            "requirements": "Ít nhất 4 năm kinh nghiệm với Python, Django/FastAPI, thành thạo Docker và CI/CD.",
+            "benefits": "Lương tháng 13, bảo hiểm sức khỏe toàn diện, thưởng hiệu suất hàng quý, môi trường năng động.",
+            "salary_min": 25000000,
+            "salary_max": 45000000,
+        }
+        verdict = JobComplianceEngine.check_compliance(job_data)
+        self.assertTrue(verdict.is_compliant)
+        self.assertEqual(verdict.recommendation, "AUTO_APPROVE")
+        self.assertGreaterEqual(verdict.score, 85.0)
+        self.assertEqual(len(verdict.flags), 0)
+
+    def test_discriminatory_job_post_flagged(self):
+        job_data = {
+            "job_name": "Nhân viên Kế toán Tổng hợp",
+            "description": "Thực hiện báo cáo thuế, quản lý chứng từ sổ sách. Chỉ tuyển nữ, yêu cầu độc thân chưa lập gia đình.",
+            "requirements": "Tốt nghiệp đại học chuyên ngành tài chính kế toán, có 2 năm kinh nghiệm.",
+            "benefits": "Đầy đủ chế độ theo luật.",
+        }
+        verdict = JobComplianceEngine.check_compliance(job_data)
+        self.assertIn(verdict.recommendation, ("FLAG_FOR_REVIEW", "REJECT"))
+        self.assertTrue(any("DISCRIMINATION" in f for f in verdict.flags))
+
+    def test_scam_job_post_rejected(self):
+        job_data = {
+            "job_name": "Việc làm online tại nhà",
+            "description": "Việc nhẹ lương cao 500k/ngày, like dạo và xem video kiếm tiền. Yêu cầu đặt cọc tiền đồng phục 200k. Inbox telegram kín @kiemtien.",
+        }
+        verdict = JobComplianceEngine.check_compliance(job_data)
+        self.assertFalse(verdict.is_compliant)
+        self.assertEqual(verdict.recommendation, "REJECT")
+        self.assertTrue(any("SCAM_ALERT" in f for f in verdict.flags))
+
+    def test_compliance_engine_latency_under_5ms(self):
+        job_data = {
+            "job_name": "Frontend Developer",
+            "description": "Lập trình giao diện Next.js, TailwindCSS và React Query cho hệ thống tuyển dụng.",
+            "requirements": "2 năm kinh nghiệm Frontend.",
+        }
+        start = time.perf_counter()
+        for _ in range(50):
+            JobComplianceEngine.check_compliance(job_data)
+        avg_ms = ((time.perf_counter() - start) * 1000) / 50
+        self.assertLess(avg_ms, 5.0, f"Avg latency {avg_ms:.2f}ms exceeds 5ms")
+
+
+class TestTranscriptEvaluationEngine(SimpleTestCase):
+    """Kiểm tra TranscriptEvaluationEngine đánh giá dự phòng hội thoại phỏng vấn."""
+
+    def test_substantive_transcript_evaluation(self):
+        transcripts = [
+            {"speaker_role": "ai_agent", "content": "Bạn hãy giới thiệu về các dự án Python bạn từng triển khai?"},
+            {
+                "speaker_role": "candidate",
+                "content": "Tôi từng phát triển hệ thống backend Python xử lý thanh toán với Django, PostgreSQL và Redis. Hệ thống chạy trên kiến trúc microservices với Docker và Kubernetes, chịu tải 1000 req/s.",
+            },
+            {"speaker_role": "ai_agent", "content": "Bạn xử lý xung đột trong nhóm làm việc thế nào?"},
+            {
+                "speaker_role": "candidate",
+                "content": "Tôi luôn chủ động lắng nghe, trao đổi thẳng thắn và phối hợp với đồng nghiệp để tìm giải pháp tối ưu nhất cho sản phẩm.",
+            },
+        ]
+        context = {
+            "job_title": "Backend Python Developer",
+            "skills": "Python, Django, PostgreSQL, Docker, Microservices",
+        }
+        verdict = TranscriptEvaluationEngine.evaluate(transcripts, context)
+        self.assertGreaterEqual(verdict.overall_score, 7.0)
+        self.assertGreaterEqual(verdict.technical_score, 7.0)
+        self.assertGreaterEqual(verdict.communication_score, 7.0)
+        self.assertTrue(len(verdict.strengths) > 0)
+        self.assertTrue(any("python" in s.lower() for s in verdict.strengths))
+
+    def test_shallow_transcript_evaluation(self):
+        transcripts = [
+            {"speaker_role": "ai_agent", "content": "Bạn có kinh nghiệm với React không?"},
+            {"speaker_role": "candidate", "content": "Không rõ."},
+            {"speaker_role": "ai_agent", "content": "Bạn đã làm việc với Docker chưa?"},
+            {"speaker_role": "candidate", "content": "Bỏ qua câu này."},
+        ]
+        verdict = TranscriptEvaluationEngine.evaluate(transcripts)
+        self.assertLessEqual(verdict.overall_score, 6.0)
+        self.assertTrue(len(verdict.weaknesses) > 0)
+
+    def test_transcript_evaluation_latency_under_5ms(self):
+        transcripts = [
+            {"speaker_role": "ai_agent", "content": "Chào bạn."},
+            {"speaker_role": "candidate", "content": "Tôi có kinh nghiệm làm việc với Python và Django."},
+        ]
+        start = time.perf_counter()
+        for _ in range(50):
+            TranscriptEvaluationEngine.evaluate(transcripts)
+        avg_ms = ((time.perf_counter() - start) * 1000) / 50
+        self.assertLess(avg_ms, 5.0, f"Avg latency {avg_ms:.2f}ms exceeds 5ms")
+

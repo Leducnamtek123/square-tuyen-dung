@@ -14,17 +14,27 @@ import BarChartClient from '@/components/Common/Charts/BarChartClient';
 import { useAdminTrendStats } from '../hooks/useAdminStats';
 import { createCartesianOptions } from '@/components/Common/Charts/chartDesign';
 
-export default function AnalyticsCharts() {
-  const [days, setDays] = useState<number>(30);
+interface AnalyticsChartsProps {
+  days?: number;
+  onPeriodChange?: (newDays: number) => void;
+}
+
+export default function AnalyticsCharts({ days: propDays, onPeriodChange }: AnalyticsChartsProps = {}) {
+  const [internalDays, setInternalDays] = useState<number>(30);
+  const activeDays = propDays ?? internalDays;
   const theme = useTheme();
-  const { data: trendStats, isLoading } = useAdminTrendStats(days);
+  const { data: trendStats, isLoading } = useAdminTrendStats(activeDays);
 
   const handlePeriodChange = (
     _event: React.MouseEvent<HTMLElement>,
     newDays: number | null
   ) => {
     if (newDays !== null) {
-      setDays(newDays);
+      if (onPeriodChange) {
+        onPeriodChange(newDays);
+      } else {
+        setInternalDays(newDays);
+      }
     }
   };
 
@@ -94,7 +104,7 @@ export default function AnalyticsCharts() {
 
         <ToggleButtonGroup
           size="small"
-          value={days}
+          value={activeDays}
           exclusive
           onChange={handlePeriodChange}
           sx={{

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Square Tuyển Dụng (InfoHR) — System Architecture",
+    "subtitle": "Smart Recruitment & Real-Time WebRTC Voice AI Interview Platform",
+    "output": "system-architecture.html",
+    "visual_preset": "blueprint",
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "recruitment-portal",
+        "label": "Recruitment & HRM Flow",
+        "focus": ["clients", "gateway", "frontend", "backend", "mysql"],
+        "note": "Candidate portal, employer dashboard, and HRM operations routed to Django API and MySQL."
+      },
+      {
+        "id": "voice-ai-engine",
+        "label": "Real-time Voice AI Interview",
+        "focus": ["clients", "gateway", "livekit", "ai_agent", "ai_cloud"],
+        "note": "WebRTC audio room dispatched to Python Voice Agent with STT/TTS and LLM evaluation."
+      },
+      {
+        "id": "async-and-storage",
+        "label": "Async Workers & Storage",
+        "focus": ["backend", "redis", "celery", "mysql", "search", "minio"],
+        "note": "Celery asynchronous queue, Elasticsearch indexing, and MinIO S3 media archives."
+      }
+    ]
+  },
+  "components": [
+    { "id": "clients", "type": "external", "label": "Job Seekers & HR", "sublabel": "Web & Mobile", "pos": [40, 260], "size": [130, 64] },
+    { "id": "gateway", "type": "security", "label": "Nginx Gateway", "sublabel": "SSL & Reverse Proxy", "pos": [250, 260], "size": [130, 64] },
+    { "id": "frontend", "type": "frontend", "label": "Next.js 16 Web", "sublabel": "Portals & App Router", "brand": "next-js", "pos": [470, 260], "size": [140, 64] },
+    { "id": "backend", "type": "backend", "label": "Django REST API", "sublabel": "Gunicorn / DRF :8000", "brand": "django", "pos": [700, 260], "size": [140, 64] },
+    { "id": "mysql", "type": "database", "label": "MySQL 8.0", "sublabel": "Primary Relational DB", "brand": "mysql", "pos": [930, 260], "size": [130, 64] },
+    { "id": "redis", "type": "database", "label": "Redis 7", "sublabel": "Cache & Task Broker", "brand": "redis", "pos": [700, 110], "size": [140, 60] },
+    { "id": "search", "type": "database", "label": "Elasticsearch 7", "sublabel": "Job & CV Search Index", "brand": "elasticsearch", "pos": [930, 110], "size": [130, 60] },
+    { "id": "livekit", "type": "backend", "label": "LiveKit SFU", "sublabel": "WebRTC Media Server", "pos": [250, 420], "size": [130, 64] },
+    { "id": "ai_agent", "type": "backend", "label": "Voice AI Agent", "sublabel": "Python Interview Worker", "brand": "python", "pos": [470, 420], "size": [140, 64] },
+    { "id": "ai_cloud", "type": "external", "label": "Voice & LLM Cloud", "sublabel": "MetaConnect / Gemini", "brand": "google-gemini", "pos": [470, 560], "size": [140, 64] },
+    { "id": "celery", "type": "backend", "label": "Celery Worker", "sublabel": "Async Tasks & Beat", "brand": "python", "pos": [700, 420], "size": [140, 64] },
+    { "id": "minio", "type": "cloud", "label": "MinIO S3", "sublabel": "Object Storage :9000", "pos": [930, 420], "size": [130, 64] }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Docker Monorepo Infrastructure (proxy-net / app-net / data-net)",
+      "wraps": ["gateway", "frontend", "backend", "mysql", "redis", "search", "livekit", "ai_agent", "celery", "minio"]
+    }
+  ],
+  "connections": [
+    { "id": "clients-gateway", "from": "clients", "to": "gateway", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "gateway-frontend", "from": "gateway", "to": "frontend", "label": "proxy" },
+    { "id": "frontend-backend", "from": "frontend", "to": "backend", "label": "REST API", "variant": "emphasis" },
+    { "id": "backend-mysql", "from": "backend", "to": "mysql", "label": "SQL", "labelDx": 25 },
+    { "id": "backend-redis", "from": "backend", "to": "redis", "label": "cache", "fromSide": "top", "toSide": "bottom" },
+    { "id": "backend-search", "from": "backend", "to": "search", "label": "index", "route": "orthogonal-h", "labelAt": [900, 130] },
+    { "id": "gateway-livekit", "from": "gateway", "to": "livekit", "label": "WebRTC", "fromSide": "bottom", "toSide": "top", "labelDy": 36 },
+    { "id": "livekit-agent", "from": "livekit", "to": "ai_agent", "label": "stream" },
+    { "id": "agent-cloud", "from": "ai_agent", "to": "ai_cloud", "label": "STT/TTS", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelDy": 36 },
+    { "id": "backend-celery", "from": "backend", "to": "celery", "label": "queue", "fromSide": "bottom", "toSide": "top", "labelDy": 36 },
+    { "id": "celery-minio", "from": "celery", "to": "minio", "label": "upload" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Portal & Core API",
+      "items": [
+        "Next.js 16 multi-tenant web portals (Seeker, Employer, Admin, HRM)",
+        "Nginx gateway terminates SSL and proxies subdomains",
+        "Django 4.2 REST API with JWT authentication and service layers"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "LiveKit Voice AI Interview",
+      "items": [
+        "LiveKit WebRTC SFU coordinates real-time audio and video sessions",
+        "Python LiveKit Agent connects to candidate rooms automatically",
+        "MetaConnect Vietnamese STT/TTS & Gemini LLM for real-time interview evaluation"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Data & Persistence",
+      "items": [
+        "MySQL 8.0 primary transactional database with automated daily backups",
+        "Redis 7 for fast session caching and Celery message broker",
+        "MinIO S3 storage for candidate resumes, avatars, and interview recordings"
+      ]
+    }
+  ]
+}

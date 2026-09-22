@@ -198,9 +198,10 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
           border: '1px solid #e2e8f0',
           boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.05)',
           overflow: 'hidden',
-          animation: 'jobPreviewFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          willChange: 'opacity, transform',
+          animation: 'jobPreviewFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards',
           '@keyframes jobPreviewFadeIn': {
-            '0%': { opacity: 0, transform: 'scale(0.96) translateY(6px)' },
+            '0%': { opacity: 0, transform: 'scale(0.97) translateY(8px)' },
             '100%': { opacity: 1, transform: 'scale(1) translateY(0)' },
           },
         }}

@@ -29,6 +29,7 @@ import toastMessages from '@/utils/toastMessages';
 import type { CompanyVerification } from '@/types/models';
 import dayjs from '@/configs/dayjs-config';
 import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
+import { useDebounce } from '@/hooks';
 
 type VerificationStatus = NonNullable<CompanyVerification['status']>;
 
@@ -40,6 +41,7 @@ export default function CompanyVerificationsPage() {
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const debouncedSearch = useDebounce(searchTerm, 400);
 
   const [inspectingVerification, setInspectingVerification] = useState<CompanyVerification | null>(null);
   const [actionDialog, setActionDialog] = useState<{
@@ -54,8 +56,13 @@ export default function CompanyVerificationsPage() {
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin-company-verifications', page, pageSize],
-    queryFn: () => adminManagementService.getCompanyVerifications({ page, pageSize }),
+    queryKey: ['admin-company-verifications', page, pageSize, statusFilter, debouncedSearch],
+    queryFn: () => adminManagementService.getCompanyVerifications({
+      page,
+      pageSize,
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      kw: debouncedSearch.trim() || undefined,
+    }),
   });
 
   const updateMutation = useMutation({
@@ -69,24 +76,8 @@ export default function CompanyVerificationsPage() {
     onError: () => toastMessages.error(t('pages.companyVerifications.toast.updateError', { defaultValue: 'Lỗi cập nhật trạng thái xác thực' })),
   });
 
-  const rawRows = useMemo(() => data?.results || [], [data?.results]);
+  const rows = useMemo(() => data?.results || [], [data?.results]);
   const totalRows = data?.count || 0;
-
-  // Filter client-side if needed
-  const filteredRows = useMemo(() => {
-    return rawRows.filter((row) => {
-      if (statusFilter !== 'all' && (row.status || 'pending') !== statusFilter) {
-        return false;
-      }
-      if (searchTerm.trim()) {
-        const q = searchTerm.toLowerCase();
-        const companyName = row.companyName?.toLowerCase() || '';
-        const taxCode = row.taxCode?.toLowerCase() || '';
-        return companyName.includes(q) || taxCode.includes(q);
-      }
-      return true;
-    });
-  }, [rawRows, statusFilter, searchTerm]);
 
   const handleOpenApprove = (v: CompanyVerification) => {
     setActionDialog({
@@ -220,14 +211,14 @@ export default function CompanyVerificationsPage() {
             </Tooltip>
             {row.status !== 'approved' && (
               <Tooltip title="Phê duyệt xác thực">
-                <IconButton size="small" onClick={() => handleOpenApprove(row)} sx={{ color: '#16A34A' }}>
+                <IconButton data-testid="approve-verification-btn" size="small" onClick={() => handleOpenApprove(row)} sx={{ color: '#16A34A' }}>
                   <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
             )}
             {row.status !== 'rejected' && (
               <Tooltip title="Từ chối">
-                <IconButton size="small" onClick={() => handleOpenReject(row)} sx={{ color: '#DC2626' }}>
+                <IconButton data-testid="reject-verification-btn" size="small" onClick={() => handleOpenReject(row)} sx={{ color: '#DC2626' }}>
                   <HighlightOffIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
@@ -269,8 +260,8 @@ export default function CompanyVerificationsPage() {
       {/* Main Table */}
       <AdminDataGrid<CompanyVerification>
         columns={columns}
-        data={filteredRows}
-        totalCount={totalRows || filteredRows.length}
+        data={rows}
+        totalCount={totalRows}
         page={page}
         pageSize={pageSize}
         onPageChange={(p) => setPage(p)}

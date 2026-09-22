@@ -3,7 +3,15 @@
 import React, { useState, useRef, useCallback } from 'react';
 import type { JobHoverPreviewData } from './JobHoverPreviewCard';
 
-export const useJobHoverPreview = () => {
+export interface UseJobHoverPreviewOptions {
+  openDelay?: number;
+  closeDelay?: number;
+}
+
+export const useJobHoverPreview = (options?: UseJobHoverPreviewOptions) => {
+  const openDelay = options?.openDelay ?? 350;
+  const closeDelay = options?.closeDelay ?? 220;
+
   const [hoveredJob, setHoveredJob] = useState<JobHoverPreviewData | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -26,23 +34,23 @@ export const useJobHoverPreview = () => {
     clearTimers();
     const target = event.currentTarget;
 
-    // Small delay (140ms) to prevent flicker during fast scrolling
+    // Intentional delay (350ms) to ensure smooth, gradual display and prevent flicker during fast movement
     openTimerRef.current = setTimeout(() => {
       setAnchorEl(target);
       setHoveredJob(job);
       setIsOpen(true);
-    }, 140);
-  }, []);
+    }, openDelay);
+  }, [openDelay]);
 
   const handleCardMouseLeave = useCallback(() => {
     clearTimers();
-    // Grace period (220ms) so user can move cursor to the Popper safely
+    // Grace period so user can move cursor to the Popper safely
     closeTimerRef.current = setTimeout(() => {
       setIsOpen(false);
       setHoveredJob(null);
       setAnchorEl(null);
-    }, 220);
-  }, []);
+    }, closeDelay);
+  }, [closeDelay]);
 
   const handlePopperMouseEnter = useCallback(() => {
     clearTimers();

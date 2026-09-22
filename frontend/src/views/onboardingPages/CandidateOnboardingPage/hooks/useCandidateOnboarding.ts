@@ -313,13 +313,13 @@ export function useCandidateOnboarding() {
   // Skip onboarding
   const handleSkipOnboarding = async () => {
     setIsSkipping(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('infohr_onboarding_banner_dismissed_candidate', 'false');
+    }
     try {
       const res = await authService.skipOnboarding();
       if (res.user) {
         dispatch(setUserInfo(res.user));
-      }
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('infohr_onboarding_banner_dismissed_candidate', 'false');
       }
       router.replace('/jobs');
     } catch (err) {

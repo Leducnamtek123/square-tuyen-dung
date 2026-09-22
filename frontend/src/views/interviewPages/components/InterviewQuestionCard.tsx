@@ -86,7 +86,7 @@ export const InterviewQuestionCard: React.FC<InterviewQuestionCardProps> = ({
         </div>
 
         {/* Main Question Card - Mobile optimized compact padding */}
-        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200 bg-white/95 p-3 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
+        <div data-testid="interview-question-card" className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200 bg-white/95 p-3 sm:p-5 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
           {/* Top Progress Bar */}
           <div className="absolute top-0 inset-x-0 h-1 bg-slate-100">
             <div
@@ -159,7 +159,7 @@ export const InterviewQuestionCard: React.FC<InterviewQuestionCardProps> = ({
           </div>
 
           {/* Question Text */}
-          <p className="mt-2 text-xs sm:text-sm md:text-base font-semibold leading-snug sm:leading-relaxed text-slate-900">
+          <p data-testid="interview-question-text" className="mt-2 text-xs sm:text-sm md:text-base font-semibold leading-snug sm:leading-relaxed text-slate-900">
             {question.text}
           </p>
 
