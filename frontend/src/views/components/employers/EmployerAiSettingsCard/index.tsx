@@ -27,6 +27,8 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
@@ -60,10 +62,14 @@ import commonService from '@/services/commonService';
 import aiService from '@/services/aiService';
 import toastMessages from '@/utils/toastMessages';
 import { InterviewAvatar } from '@/views/interviewPages/components/avatar/InterviewAvatar';
+import { ActionVideosManager } from './ActionVideosManager';
+import { HrPersonaSelector } from './HrPersonaSelector';
 
 export default function EmployerAiSettingsCard() {
   const [settings, setSettings] = useState<EmployerAiSettings>(DEFAULT_EMPLOYER_AI_SETTINGS);
+  const [activeTab, setActiveTab] = useState(0);
   const [isSpeakingTest, setIsSpeakingTest] = useState(false);
+  const [testedAction, setTestedAction] = useState<string>('idle');
   const [uploadingBg, setUploadingBg] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -302,11 +308,14 @@ export default function EmployerAiSettingsCard() {
                   avatarImageUrl={activeAvatarUrl}
                   isSpeakingHint={isSpeakingTest}
                   avatarBackdrop={settings.selectedBackgroundId}
+                  avatarActions={settings.avatarActions}
+                  characterId={settings.activeCharacterId}
+                  actionHint={testedAction}
                 />
               </Box>
 
               {/* Bảng điều khiển thử nghiệm nhép môi và trạng thái */}
-              <Stack direction="row" spacing={1.5} sx={{ mt: 2.5 }} alignItems="center">
+              <Stack direction="row" spacing={1.5} sx={{ mt: 2.5 }} alignItems="center" flexWrap="wrap">
                 <Button
                   variant={isSpeakingTest ? 'contained' : 'outlined'}
                   color="primary"
@@ -321,6 +330,27 @@ export default function EmployerAiSettingsCard() {
                   {isSpeakingTest ? 'Đang mô phỏng nói chuyện' : 'Nhấp để kiểm tra cử động nhép môi'}
                 </Typography>
               </Stack>
+
+              {/* Thử nghiệm cử chỉ video */}
+              <Box sx={{ mt: 2, p: 1.5, borderRadius: 2.5, bgcolor: '#f1f5f9' }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, display: 'block', mb: 1 }}>
+                  Thử nghiệm cử chỉ người ảo:
+                </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 0.75 }}>
+                  {['wave', 'idle', 'nod', 'thinking', 'thanks_wave'].map((actionKey) => (
+                    <Chip
+                      key={actionKey}
+                      label={actionKey}
+                      size="small"
+                      clickable
+                      color={testedAction === actionKey ? 'primary' : 'default'}
+                      variant={testedAction === actionKey ? 'filled' : 'outlined'}
+                      onClick={() => setTestedAction(actionKey)}
+                      sx={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.72rem' }}
+                    />
+                  ))}
+                </Stack>
+              </Box>
 
               {/* Thông tin tóm tắt cấu hình đang áp dụng */}
               <Box sx={{ mt: 2.5, p: 2, borderRadius: 2.5, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
@@ -342,6 +372,14 @@ export default function EmployerAiSettingsCard() {
                     </Typography>
                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>
                       {settings.interviewerTitle || 'Chuyên viên tuyển dụng'}
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      Phong thái HR
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                      {settings.hrPersonaPreset === 'friendly' ? 'Thân thiện' : settings.hrPersonaPreset === 'challenger' ? 'Thử thách' : 'Chuyên nghiệp'}
                     </Typography>
                   </Stack>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -382,62 +420,527 @@ export default function EmployerAiSettingsCard() {
           </Card>
         </Grid>
 
-        {/* Cột phải: Các khối tùy chỉnh */}
+        {/* Cột phải: Các khối tùy chỉnh phân theo Tab */}
         <Grid item xs={12} lg={7}>
+          {/* Thanh chuyển đổi Tab */}
+          <Box sx={{ borderBottom: '1px solid #e2e8f0', mb: 3 }}>
+            <Tabs
+              value={activeTab}
+              onChange={(_, val) => setActiveTab(val)}
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                '& .MuiTab-root': {
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  minHeight: 48,
+                },
+              }}
+            >
+              <Tab label="Diện mạo & Video cử chỉ" />
+              <Tab label="Giọng đọc & Tốc độ" />
+              <Tab label="Phong thái & Kịch bản HR" />
+            </Tabs>
+          </Box>
+
           <Stack spacing={3}>
-            {/* Khối 1: Tùy chọn hình nền */}
-            <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-              <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Stack direction="row" alignItems="center" spacing={1.5}>
-                  <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <PhotoCameraBackOutlinedIcon sx={{ fontSize: 20 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                      Hình nền phòng phỏng vấn
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                      Chọn một trong các không gian studio phông trống hoặc tải ảnh văn phòng thương hiệu riêng
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Box>
+            {/* TAB 0: DIỆN MẠO & VIDEO HÀNH ĐỘNG */}
+            {activeTab === 0 && (
+              <>
+                {/* Khối Quản lý Video cử chỉ Full HD */}
+                <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                  <CardContent sx={{ p: 2.5 }}>
+                    <ActionVideosManager
+                      actions={settings.avatarActions}
+                      characterId={settings.activeCharacterId || 'ng_c_linh'}
+                      onPreviewAction={(actionKey) => setTestedAction(actionKey)}
+                    />
+                  </CardContent>
+                </Card>
 
-              <CardContent sx={{ p: 2.5 }}>
-                <RadioGroup
-                  row
-                  value={settings.backgroundType}
-                  onChange={(e) => setSettings((prev) => ({ ...prev, backgroundType: e.target.value as 'preset' | 'custom' }))}
-                  sx={{ mb: 2 }}
-                >
-                  <FormControlLabel
-                    value="preset"
-                    control={<Radio size="small" />}
-                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Phông nền mẫu tiêu chuẩn</Typography>}
-                  />
-                  <FormControlLabel
-                    value="custom"
-                    control={<Radio size="small" />}
-                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Tải ảnh nền thương hiệu</Typography>}
-                  />
-                </RadioGroup>
+                {/* Khối Tùy chọn hình nền */}
+                <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                  <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                      <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <PhotoCameraBackOutlinedIcon sx={{ fontSize: 20 }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                          Hình nền phòng phỏng vấn
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                          Chọn một trong các không gian studio phông trống hoặc tải ảnh văn phòng thương hiệu riêng
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
 
-                {settings.backgroundType === 'preset' ? (
-                  <Grid container spacing={2}>
-                    {PRESET_BACKGROUNDS.map((item) => {
-                      const isSelected = settings.selectedBackgroundId === item.id;
-                      return (
-                        <Grid item xs={12} sm={6} key={item.id}>
+                  <CardContent sx={{ p: 2.5 }}>
+                    <RadioGroup
+                      row
+                      value={settings.backgroundType}
+                      onChange={(e) => setSettings((prev) => ({ ...prev, backgroundType: e.target.value as 'preset' | 'custom' }))}
+                      sx={{ mb: 2 }}
+                    >
+                      <FormControlLabel
+                        value="preset"
+                        control={<Radio size="small" />}
+                        label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Phông nền mẫu tiêu chuẩn</Typography>}
+                      />
+                      <FormControlLabel
+                        value="custom"
+                        control={<Radio size="small" />}
+                        label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Tải ảnh nền thương hiệu</Typography>}
+                      />
+                    </RadioGroup>
+
+                    {settings.backgroundType === 'preset' ? (
+                      <Grid container spacing={2}>
+                        {PRESET_BACKGROUNDS.map((item) => {
+                          const isSelected = settings.selectedBackgroundId === item.id;
+                          return (
+                            <Grid item xs={12} sm={6} key={item.id}>
+                              <Box
+                                onClick={() => setSettings((prev) => ({ ...prev, selectedBackgroundId: item.id }))}
+                                sx={{
+                                  p: 1.5,
+                                  borderRadius: 3,
+                                  border: '2px solid',
+                                  borderColor: isSelected ? 'primary.main' : '#e2e8f0',
+                                  bgcolor: isSelected ? '#eff6ff' : '#ffffff',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  position: 'relative',
+                                  '&:hover': {
+                                    borderColor: 'primary.light',
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                                  },
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: '100%',
+                                    aspectRatio: '16/9',
+                                    borderRadius: 2,
+                                    overflow: 'hidden',
+                                    backgroundImage: `url("${item.url}")`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    mb: 1.5,
+                                    position: 'relative',
+                                  }}
+                                >
+                                  <Chip
+                                    label={item.badge}
+                                    size="small"
+                                    sx={{
+                                      position: 'absolute',
+                                      top: 8,
+                                      left: 8,
+                                      height: 20,
+                                      fontSize: '0.68rem',
+                                      fontWeight: 700,
+                                      bgcolor: 'rgba(15, 23, 42, 0.75)',
+                                      color: '#ffffff',
+                                      backdropFilter: 'blur(4px)',
+                                    }}
+                                  />
+                                  {isSelected && (
+                                    <Box
+                                      sx={{
+                                        position: 'absolute',
+                                        bottom: 8,
+                                        right: 8,
+                                        color: 'primary.main',
+                                        bgcolor: '#ffffff',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                      }}
+                                    >
+                                      <CheckCircleRoundedIcon sx={{ fontSize: 22 }} />
+                                    </Box>
+                                  )}
+                                </Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                  {item.nameVi}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5, lineHeight: 1.4 }}>
+                                  {item.descriptionVi}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          );
+                        })}
+                      </Grid>
+                    ) : (
+                      <Box>
+                        <input
+                          ref={bgInputRef}
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          style={{ display: 'none' }}
+                          onChange={handleUploadBg}
+                        />
+
+                        {settings.customBackgroundUrl ? (
+                          <Box sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, bgcolor: '#f8fafc' }}>
+                            <Box
+                              sx={{
+                                width: '100%',
+                                aspectRatio: '16/9',
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                backgroundImage: `url("${settings.customBackgroundUrl}")`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                mb: 2,
+                              }}
+                            />
+                            <Stack direction="row" spacing={1.5} justifyContent="flex-end">
+                              <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                onClick={() => bgInputRef.current?.click()}
+                                disabled={uploadingBg}
+                                startIcon={<CloudUploadOutlinedIcon />}
+                                sx={{ textTransform: 'none', fontWeight: 700 }}
+                              >
+                                Thay đổi ảnh khác
+                              </Button>
+                              <Button
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                onClick={() => setSettings((prev) => ({ ...prev, customBackgroundUrl: null }))}
+                                startIcon={<DeleteOutlineOutlinedIcon />}
+                                sx={{ textTransform: 'none', fontWeight: 700 }}
+                              >
+                                Xóa ảnh
+                              </Button>
+                            </Stack>
+                          </Box>
+                        ) : (
                           <Box
-                            onClick={() => setSettings((prev) => ({ ...prev, selectedBackgroundId: item.id }))}
+                            onClick={() => bgInputRef.current?.click()}
                             sx={{
-                              p: 1.5,
+                              p: 4,
+                              border: '2px dashed #cbd5e1',
+                              borderRadius: 3,
+                              bgcolor: '#f8fafc',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              '&:hover': {
+                                borderColor: 'primary.main',
+                                bgcolor: '#eff6ff',
+                              },
+                            }}
+                          >
+                            {uploadingBg ? (
+                              <CircularProgress size={32} />
+                            ) : (
+                              <>
+                                <CloudUploadOutlinedIcon sx={{ fontSize: 44, color: 'text.secondary', mb: 1 }} />
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                  Nhấp để tải lên hình nền thương hiệu Nhà tuyển dụng
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
+                                  Hỗ trợ định dạng JPG, PNG hoặc WebP tỷ lệ 16:9 độ phân giải tiêu chuẩn 1920x1080
+                                </Typography>
+                              </>
+                            )}
+                          </Box>
+                        )}
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Khối Tùy chọn nhân vật AI WebP và Tài liệu chuẩn cấu trúc */}
+                <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                  <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ sm: 'center' }} justifyContent="space-between" spacing={1.5}>
+                      <Stack direction="row" alignItems="center" spacing={1.5}>
+                        <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#fdf2f8', color: '#db2777', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <FaceRetouchingNaturalOutlinedIcon sx={{ fontSize: 20 }} />
+                        </Box>
+                        <Box>
+                          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                            Nhân vật AI phỏng vấn
+                          </Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                            Chọn nhân vật AI cử động nhép môi WebP hoặc tải bộ ảnh tùy biến riêng
+                          </Typography>
+                        </Box>
+                      </Stack>
+
+                      {/* Cụm nút công cụ: Xuất gói mẫu và Hướng dẫn */}
+                      <Stack direction="row" spacing={1}>
+                        <Button
+                          component="a"
+                          href="/downloads/ai-avatar-sample-pack.zip"
+                          download="ai-avatar-sample-pack.zip"
+                          variant="outlined"
+                          color="primary"
+                          size="small"
+                          startIcon={<DownloadOutlinedIcon />}
+                          sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, fontSize: '0.8rem' }}
+                        >
+                          Xuất gói mẫu chuẩn
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="inherit"
+                          size="small"
+                          onClick={() => setGuideOpen(true)}
+                          startIcon={<MenuBookOutlinedIcon />}
+                          sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, fontSize: '0.8rem', color: 'text.secondary', borderColor: '#cbd5e1' }}
+                        >
+                          Hướng dẫn cấu trúc
+                        </Button>
+                      </Stack>
+                    </Stack>
+                  </Box>
+
+                  <CardContent sx={{ p: 2.5 }}>
+                    <RadioGroup
+                      row
+                      value={settings.avatarType}
+                      onChange={(e) => setSettings((prev) => ({ ...prev, avatarType: e.target.value as 'preset' | 'custom' }))}
+                      sx={{ mb: 2 }}
+                    >
+                      <FormControlLabel
+                        value="preset"
+                        control={<Radio size="small" />}
+                        label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Nhân vật AI tiêu chuẩn</Typography>}
+                      />
+                      <FormControlLabel
+                        value="custom"
+                        control={<Radio size="small" />}
+                        label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Tải ảnh hoặc gói nhân vật riêng</Typography>}
+                      />
+                    </RadioGroup>
+
+                    {settings.avatarType === 'preset' ? (
+                      <Grid container spacing={2}>
+                        {PRESET_AVATARS.map((item) => {
+                          const isSelected = settings.selectedAvatarId === item.id;
+                          return (
+                            <Grid item xs={12} sm={6} key={item.id}>
+                              <Box
+                                onClick={() => {
+                                  const isMale = item.id === 'expert_male' || item.id.startsWith('male_');
+                                  const currentVoice = employerAiSettingService.getPresetVoice(settings.ttsVoice);
+                                  const currentIsMale = currentVoice?.gender === 'male';
+                                  let newVoice = settings.ttsVoice;
+                                  if (isMale && !currentIsMale) {
+                                    newVoice = 'Mạnh Dũng';
+                                  } else if (!isMale && currentIsMale) {
+                                    newVoice = 'Trúc Ly';
+                                  }
+                                  setSettings((prev) => ({
+                                    ...prev,
+                                    selectedAvatarId: item.id,
+                                    ttsVoice: newVoice,
+                                  }));
+                                }}
+                                sx={{
+                                  p: 1.5,
+                                  borderRadius: 3,
+                                  border: '2px solid',
+                                  borderColor: isSelected ? 'primary.main' : '#e2e8f0',
+                                  bgcolor: isSelected ? '#eff6ff' : '#ffffff',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 2,
+                                  '&:hover': {
+                                    borderColor: 'primary.light',
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                                  },
+                                }}
+                              >
+                                <Box
+                                  component="img"
+                                  src={item.previewUrl}
+                                  alt={item.name}
+                                  sx={{
+                                    width: 80,
+                                    height: 80,
+                                    objectFit: 'contain',
+                                    borderRadius: 2.5,
+                                    bgcolor: '#0f172a',
+                                    p: 0.5,
+                                  }}
+                                />
+                                <Box sx={{ flex: 1 }}>
+                                  <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                      {item.name}
+                                    </Typography>
+                                    {isSelected && <CheckCircleRoundedIcon color="primary" sx={{ fontSize: 20 }} />}
+                                  </Stack>
+                                  <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, display: 'block' }}>
+                                    {item.titleVi}
+                                  </Typography>
+                                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5, lineHeight: 1.3 }}>
+                                    {item.descriptionVi}
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Grid>
+                          );
+                        })}
+                      </Grid>
+                    ) : (
+                      <Box>
+                        <input
+                          ref={avatarInputRef}
+                          type="file"
+                          accept="image/webp,image/png,image/jpeg"
+                          style={{ display: 'none' }}
+                          onChange={handleUploadAvatar}
+                        />
+
+                        {settings.customAvatarUrl ? (
+                          <Box sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, bgcolor: '#f8fafc', display: 'flex', alignItems: 'center', gap: 3 }}>
+                            <Box
+                              component="img"
+                              src={settings.customAvatarUrl}
+                              alt="Ảnh AI tùy chỉnh"
+                              sx={{
+                                width: 100,
+                                height: 100,
+                                objectFit: 'contain',
+                                borderRadius: 2.5,
+                                bgcolor: '#0f172a',
+                                p: 1,
+                              }}
+                            />
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                Ảnh AI WebP Nhà tuyển dụng đã tải lên
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5, mb: 1.5 }}>
+                                Ảnh nhân vật đang được sử dụng trong các phiên phỏng vấn
+                              </Typography>
+                              <Stack direction="row" spacing={1.5}>
+                                <Button
+                                  variant="outlined"
+                                  color="primary"
+                                  size="small"
+                                  onClick={() => avatarInputRef.current?.click()}
+                                  disabled={uploadingAvatar}
+                                  startIcon={<CloudUploadOutlinedIcon />}
+                                  sx={{ textTransform: 'none', fontWeight: 700 }}
+                                >
+                                  Đổi ảnh khác
+                                </Button>
+                                <Button
+                                  variant="outlined"
+                                  color="error"
+                                  size="small"
+                                  onClick={() => setSettings((prev) => ({ ...prev, customAvatarUrl: null }))}
+                                  startIcon={<DeleteOutlineOutlinedIcon />}
+                                  sx={{ textTransform: 'none', fontWeight: 700 }}
+                                >
+                                  Xóa ảnh
+                                </Button>
+                              </Stack>
+                            </Box>
+                          </Box>
+                        ) : (
+                          <Box
+                            onClick={() => avatarInputRef.current?.click()}
+                            sx={{
+                              p: 4,
+                              border: '2px dashed #cbd5e1',
+                              borderRadius: 3,
+                              bgcolor: '#f8fafc',
+                              textAlign: 'center',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              '&:hover': {
+                                borderColor: 'primary.main',
+                                bgcolor: '#eff6ff',
+                              },
+                            }}
+                          >
+                            {uploadingAvatar ? (
+                              <CircularProgress size={32} />
+                            ) : (
+                              <>
+                                <FaceRetouchingNaturalOutlinedIcon sx={{ fontSize: 44, color: 'text.secondary', mb: 1 }} />
+                                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+                                  Nhấp để tải lên ảnh nhân vật AI WebP hoặc PNG tách nền
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
+                                  Khuyên dùng tệp WebP hoặc PNG trong suốt chuẩn 1024x1024 để hiển thị sắc nét nhất
+                                </Typography>
+                              </>
+                            )}
+                          </Box>
+                        )}
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            {/* TAB 1: GIỌNG ĐỌC & TỐC ĐỘ */}
+            {activeTab === 1 && (
+              <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                  <Stack direction="row" alignItems="center" spacing={1.5}>
+                    <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#faf5ff', color: '#9333ea', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <GraphicEqIcon sx={{ fontSize: 20 }} />
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                        Giọng đọc và âm điệu AI
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                        Tùy biến chất giọng ba miền Bắc Trung Nam và nhịp điệu phát âm tự nhiên của AI phỏng vấn
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Box>
+
+                <CardContent sx={{ p: 2.5 }}>
+                  {/* Lưới các giọng đọc tiêu chuẩn */}
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5 }}>
+                    Chất giọng phỏng vấn tiêu chuẩn
+                  </Typography>
+
+                  <Grid container spacing={2} sx={{ mb: 3 }}>
+                    {PRESET_VOICES.map((v) => {
+                      const isSelected = (settings.ttsVoice === v.id || settings.ttsVoice === v.name);
+                      const isPlaying = playingVoiceId === v.id;
+                      const isLoading = loadingVoiceId === v.id;
+
+                      return (
+                        <Grid item xs={12} sm={6} key={v.id}>
+                          <Box
+                            onClick={() => setSettings((prev) => ({ ...prev, ttsVoice: v.name }))}
+                            sx={{
+                              p: 2,
                               borderRadius: 3,
                               border: '2px solid',
                               borderColor: isSelected ? 'primary.main' : '#e2e8f0',
                               bgcolor: isSelected ? '#eff6ff' : '#ffffff',
                               cursor: 'pointer',
                               transition: 'all 0.2s ease',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              justifyContent: 'space-between',
+                              height: '100%',
                               position: 'relative',
                               '&:hover': {
                                 borderColor: 'primary.light',
@@ -446,605 +949,208 @@ export default function EmployerAiSettingsCard() {
                               },
                             }}
                           >
-                            <Box
-                              sx={{
-                                width: '100%',
-                                aspectRatio: '16/9',
-                                borderRadius: 2,
-                                overflow: 'hidden',
-                                backgroundImage: `url("${item.url}")`,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                                mb: 1.5,
-                                position: 'relative',
-                              }}
-                            >
-                              <Chip
-                                label={item.badge}
+                            <Box>
+                              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1rem' }}>
+                                    {v.name}
+                                  </Typography>
+                                  <Chip
+                                    label={`${v.genderVi} - ${v.regionVi}`}
+                                    size="small"
+                                    sx={{
+                                      height: 22,
+                                      fontSize: '0.7rem',
+                                      fontWeight: 700,
+                                      bgcolor: v.gender === 'female' ? '#fdf2f8' : '#eff6ff',
+                                      color: v.gender === 'female' ? '#db2777' : '#2563eb',
+                                      border: '1px solid',
+                                      borderColor: v.gender === 'female' ? '#fbcfe8' : '#bfdbfe',
+                                    }}
+                                  />
+                                </Stack>
+                                {isSelected ? (
+                                  <CheckCircleRoundedIcon color="primary" sx={{ fontSize: 22 }} />
+                                ) : v.badge ? (
+                                  <Chip
+                                    label={v.badge}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, color: 'text.secondary' }}
+                                  />
+                                ) : null}
+                              </Stack>
+
+                              <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, display: 'block', mb: 0.5 }}>
+                                {v.toneVi}
+                              </Typography>
+
+                              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.4, mb: 1.5 }}>
+                                {v.descriptionVi}
+                              </Typography>
+                            </Box>
+
+                            <Box sx={{ pt: 1, borderTop: '1px dashed #e2e8f0' }}>
+                              <Button
                                 size="small"
-                                sx={{
-                                  position: 'absolute',
-                                  top: 8,
-                                  left: 8,
-                                  height: 20,
-                                  fontSize: '0.68rem',
-                                  fontWeight: 700,
-                                  bgcolor: 'rgba(15, 23, 42, 0.75)',
-                                  color: '#ffffff',
-                                  backdropFilter: 'blur(4px)',
+                                variant={isPlaying ? 'contained' : 'outlined'}
+                                color={isPlaying ? 'primary' : 'inherit'}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePlayVoiceSample(v);
                                 }}
-                              />
-                              {isSelected && (
-                                <Box
-                                  sx={{
-                                    position: 'absolute',
-                                    bottom: 8,
-                                    right: 8,
-                                    color: 'primary.main',
-                                    bgcolor: '#ffffff',
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                  }}
-                                >
-                                  <CheckCircleRoundedIcon sx={{ fontSize: 22 }} />
-                                </Box>
-                              )}
+                                disabled={isLoading}
+                                startIcon={
+                                  isLoading ? (
+                                    <CircularProgress size={14} color="inherit" />
+                                  ) : isPlaying ? (
+                                    <StopRoundedIcon sx={{ fontSize: 16 }} />
+                                  ) : (
+                                    <PlayArrowRoundedIcon sx={{ fontSize: 16 }} />
+                                  )
+                                }
+                                sx={{
+                                  textTransform: 'none',
+                                  fontWeight: 700,
+                                  fontSize: '0.75rem',
+                                  borderRadius: 2,
+                                  py: 0.4,
+                                  px: 1.5,
+                                  color: isPlaying ? '#ffffff' : 'text.primary',
+                                  borderColor: isPlaying ? 'transparent' : '#cbd5e1',
+                                }}
+                              >
+                                {isLoading ? 'Đang tải mẫu...' : isPlaying ? 'Dừng phát' : 'Nghe thử giọng mẫu'}
+                              </Button>
                             </Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                              {item.nameVi}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5, lineHeight: 1.4 }}>
-                              {item.descriptionVi}
-                            </Typography>
                           </Box>
                         </Grid>
                       );
                     })}
                   </Grid>
-                ) : (
-                  <Box>
-                    <input
-                      ref={bgInputRef}
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      style={{ display: 'none' }}
-                      onChange={handleUploadBg}
-                    />
 
-                    {settings.customBackgroundUrl ? (
-                      <Box sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, bgcolor: '#f8fafc' }}>
-                        <Box
-                          sx={{
-                            width: '100%',
-                            aspectRatio: '16/9',
-                            borderRadius: 2,
-                            overflow: 'hidden',
-                            backgroundImage: `url("${settings.customBackgroundUrl}")`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            mb: 2,
-                          }}
-                        />
-                        <Stack direction="row" spacing={1.5} justifyContent="flex-end">
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            size="small"
-                            onClick={() => bgInputRef.current?.click()}
-                            disabled={uploadingBg}
-                            startIcon={<CloudUploadOutlinedIcon />}
-                            sx={{ textTransform: 'none', fontWeight: 700 }}
-                          >
-                            Thay đổi ảnh khác
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            size="small"
-                            onClick={() => setSettings((prev) => ({ ...prev, customBackgroundUrl: null }))}
-                            startIcon={<DeleteOutlineOutlinedIcon />}
-                            sx={{ textTransform: 'none', fontWeight: 700 }}
-                          >
-                            Xóa ảnh
-                          </Button>
-                        </Stack>
-                      </Box>
-                    ) : (
-                      <Box
-                        onClick={() => bgInputRef.current?.click()}
-                        sx={{
-                          p: 4,
-                          border: '2px dashed #cbd5e1',
-                          borderRadius: 3,
-                          bgcolor: '#f8fafc',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            bgcolor: '#eff6ff',
-                          },
-                        }}
-                      >
-                        {uploadingBg ? (
-                          <CircularProgress size={32} />
-                        ) : (
-                          <>
-                            <CloudUploadOutlinedIcon sx={{ fontSize: 44, color: 'text.secondary', mb: 1 }} />
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                              Nhấp để tải lên hình nền thương hiệu Nhà tuyển dụng
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
-                              Hỗ trợ định dạng JPG, PNG hoặc WebP tỷ lệ 16:9 độ phân giải tiêu chuẩn 1920x1080
-                            </Typography>
-                          </>
-                        )}
-                      </Box>
-                    )}
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Khối 2: Tùy chọn nhân vật AI WebP và Tài liệu chuẩn cấu trúc */}
-            <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-              <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ sm: 'center' }} justifyContent="space-between" spacing={1.5}>
-                  <Stack direction="row" alignItems="center" spacing={1.5}>
-                    <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#fdf2f8', color: '#db2777', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <FaceRetouchingNaturalOutlinedIcon sx={{ fontSize: 20 }} />
-                    </Box>
-                    <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                        Nhân vật AI phỏng vấn
+                  {/* Bộ điều chỉnh tốc độ phát âm */}
+                  <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+                      <SpeedOutlinedIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                        Tốc độ và nhịp điệu phát âm
                       </Typography>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                        Chọn nhân vật AI cử động nhép môi WebP hoặc tải bộ ảnh tùy biến riêng
-                      </Typography>
-                    </Box>
-                  </Stack>
+                    </Stack>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 2 }}>
+                      Tùy chỉnh nhịp nói của AI để câu hỏi được truyền tải tự nhiên, rõ ràng và mạch lạc nhất
+                    </Typography>
 
-                  {/* Cụm nút công cụ: Xuất gói mẫu và Hướng dẫn */}
-                  <Stack direction="row" spacing={1}>
-                    <Button
-                      component="a"
-                      href="/downloads/ai-avatar-sample-pack.zip"
-                      download="ai-avatar-sample-pack.zip"
-                      variant="outlined"
-                      color="primary"
-                      size="small"
-                      startIcon={<DownloadOutlinedIcon />}
-                      sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, fontSize: '0.8rem' }}
-                    >
-                      Xuất gói mẫu chuẩn
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="inherit"
-                      size="small"
-                      onClick={() => setGuideOpen(true)}
-                      startIcon={<MenuBookOutlinedIcon />}
-                      sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2, fontSize: '0.8rem', color: 'text.secondary', borderColor: '#cbd5e1' }}
-                    >
-                      Hướng dẫn cấu trúc
-                    </Button>
-                  </Stack>
-                </Stack>
-              </Box>
-
-              <CardContent sx={{ p: 2.5 }}>
-                <RadioGroup
-                  row
-                  value={settings.avatarType}
-                  onChange={(e) => setSettings((prev) => ({ ...prev, avatarType: e.target.value as 'preset' | 'custom' }))}
-                  sx={{ mb: 2 }}
-                >
-                  <FormControlLabel
-                    value="preset"
-                    control={<Radio size="small" />}
-                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Nhân vật AI tiêu chuẩn</Typography>}
-                  />
-                  <FormControlLabel
-                    value="custom"
-                    control={<Radio size="small" />}
-                    label={<Typography variant="body2" sx={{ fontWeight: 700 }}>Tải ảnh hoặc gói nhân vật riêng</Typography>}
-                  />
-                </RadioGroup>
-
-                {settings.avatarType === 'preset' ? (
-                  <Grid container spacing={2}>
-                    {PRESET_AVATARS.map((item) => {
-                      const isSelected = settings.selectedAvatarId === item.id;
-                      return (
-                        <Grid item xs={12} sm={6} key={item.id}>
-                          <Box
-                            onClick={() => {
-                              const isMale = item.id === 'expert_male' || item.id.startsWith('male_');
-                              const currentVoice = employerAiSettingService.getPresetVoice(settings.ttsVoice);
-                              const currentIsMale = currentVoice?.gender === 'male';
-                              let newVoice = settings.ttsVoice;
-                              if (isMale && !currentIsMale) {
-                                newVoice = 'Mạnh Dũng';
-                              } else if (!isMale && currentIsMale) {
-                                newVoice = 'Trúc Ly';
-                              }
-                              setSettings((prev) => ({
-                                ...prev,
-                                selectedAvatarId: item.id,
-                                ttsVoice: newVoice,
-                              }));
-                            }}
-                            sx={{
-                              p: 1.5,
-                              borderRadius: 3,
-                              border: '2px solid',
-                              borderColor: isSelected ? 'primary.main' : '#e2e8f0',
-                              bgcolor: isSelected ? '#eff6ff' : '#ffffff',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 2,
-                              '&:hover': {
-                                borderColor: 'primary.light',
-                                transform: 'translateY(-2px)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
-                              },
-                            }}
-                          >
+                    <Grid container spacing={1.5}>
+                      {PRESET_SPEEDS.map((sp) => {
+                        const isSelected = (settings.ttsSpeed ?? 1.0) === sp.value;
+                        return (
+                          <Grid item xs={6} sm={3} key={sp.value}>
                             <Box
-                              component="img"
-                              src={item.previewUrl}
-                              alt={item.name}
+                              onClick={() => setSettings((prev) => ({ ...prev, ttsSpeed: sp.value }))}
                               sx={{
-                                width: 80,
-                                height: 80,
-                                objectFit: 'contain',
-                                borderRadius: 2.5,
-                                bgcolor: '#0f172a',
-                                p: 0.5,
+                                p: 1.5,
+                                borderRadius: 2,
+                                border: '2px solid',
+                                borderColor: isSelected ? 'primary.main' : '#e2e8f0',
+                                bgcolor: isSelected ? '#eff6ff' : '#ffffff',
+                                cursor: 'pointer',
+                                textAlign: 'center',
+                                transition: 'all 0.15s ease',
+                                '&:hover': {
+                                  borderColor: 'primary.light',
+                                },
                               }}
-                            />
-                            <Box sx={{ flex: 1 }}>
-                              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                                  {item.name}
-                                </Typography>
-                                {isSelected && <CheckCircleRoundedIcon color="primary" sx={{ fontSize: 20 }} />}
-                              </Stack>
-                              <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, display: 'block' }}>
-                                {item.titleVi}
+                            >
+                              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: isSelected ? 'primary.main' : 'text.primary' }}>
+                                {sp.label}
                               </Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5, lineHeight: 1.3 }}>
-                                {item.descriptionVi}
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'block', mt: 0.25 }}>
+                                {sp.descriptionVi}
                               </Typography>
                             </Box>
-                          </Box>
-                        </Grid>
-                      );
-                    })}
-                  </Grid>
-                ) : (
-                  <Box>
-                    <input
-                      ref={avatarInputRef}
-                      type="file"
-                      accept="image/webp,image/png,image/jpeg"
-                      style={{ display: 'none' }}
-                      onChange={handleUploadAvatar}
-                    />
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
 
-                    {settings.customAvatarUrl ? (
-                      <Box sx={{ p: 2, border: '1px solid #e2e8f0', borderRadius: 3, bgcolor: '#f8fafc', display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <Box
-                          component="img"
-                          src={settings.customAvatarUrl}
-                          alt="Ảnh AI tùy chỉnh"
-                          sx={{
-                            width: 100,
-                            height: 100,
-                            objectFit: 'contain',
-                            borderRadius: 2.5,
-                            bgcolor: '#0f172a',
-                            p: 1,
-                          }}
+            {/* TAB 2: PHONG THÁI & KỊCH BẢN HR */}
+            {activeTab === 2 && (
+              <>
+                {/* Khối HrPersonaSelector */}
+                <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                  <CardContent sx={{ p: 2.5 }}>
+                    <HrPersonaSelector
+                      selectedPresetId={settings.hrPersonaPreset}
+                      systemPrompt={settings.customSystemPrompt}
+                      onPresetChange={(presetId, newPrompt) => {
+                        setSettings((prev) => ({
+                          ...prev,
+                          hrPersonaPreset: presetId,
+                          customSystemPrompt: newPrompt ?? prev.customSystemPrompt,
+                        }));
+                      }}
+                      onPromptChange={(newPrompt) => {
+                        setSettings((prev) => ({
+                          ...prev,
+                          customSystemPrompt: newPrompt,
+                        }));
+                      }}
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Khối Danh xưng và chức vụ người phỏng vấn */}
+                <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+                  <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
+                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                      <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <BadgeOutlinedIcon sx={{ fontSize: 20 }} />
+                      </Box>
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                          Danh xưng và thông tin trợ lý AI
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                          Hiển thị trực tiếp trên huy hiệu người phỏng vấn khi ứng viên bước vào phòng
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
+
+                  <CardContent sx={{ p: 2.5 }}>
+                    <Grid container spacing={2.5}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Tên hiển thị người phỏng vấn AI"
+                          value={settings.interviewerName}
+                          onChange={(e) => setSettings((prev) => ({ ...prev, interviewerName: e.target.value }))}
+                          placeholder="Ví dụ: Trợ lý AI AILA"
+                          size="small"
+                          helperText="Tên sẽ được xướng âm và hiển thị trong phòng phỏng vấn"
                         />
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                            Ảnh AI WebP Nhà tuyển dụng đã tải lên
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5, mb: 1.5 }}>
-                            Ảnh nhân vật đang được sử dụng trong các phiên phỏng vấn
-                          </Typography>
-                          <Stack direction="row" spacing={1.5}>
-                            <Button
-                              variant="outlined"
-                              color="primary"
-                              size="small"
-                              onClick={() => avatarInputRef.current?.click()}
-                              disabled={uploadingAvatar}
-                              startIcon={<CloudUploadOutlinedIcon />}
-                              sx={{ textTransform: 'none', fontWeight: 700 }}
-                            >
-                              Đổi ảnh khác
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              color="error"
-                              size="small"
-                              onClick={() => setSettings((prev) => ({ ...prev, customAvatarUrl: null }))}
-                              startIcon={<DeleteOutlineOutlinedIcon />}
-                              sx={{ textTransform: 'none', fontWeight: 700 }}
-                            >
-                              Xóa ảnh
-                            </Button>
-                          </Stack>
-                        </Box>
-                      </Box>
-                    ) : (
-                      <Box
-                        onClick={() => avatarInputRef.current?.click()}
-                        sx={{
-                          p: 4,
-                          border: '2px dashed #cbd5e1',
-                          borderRadius: 3,
-                          bgcolor: '#f8fafc',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            bgcolor: '#eff6ff',
-                          },
-                        }}
-                      >
-                        {uploadingAvatar ? (
-                          <CircularProgress size={32} />
-                        ) : (
-                          <>
-                            <FaceRetouchingNaturalOutlinedIcon sx={{ fontSize: 44, color: 'text.secondary', mb: 1 }} />
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
-                              Nhấp để tải lên ảnh nhân vật AI WebP hoặc PNG tách nền
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
-                              Khuyên dùng tệp WebP hoặc PNG trong suốt chuẩn 1024x1024 để hiển thị sắc nét nhất
-                            </Typography>
-                          </>
-                        )}
-                      </Box>
-                    )}
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Khối 3: Tùy chọn Giọng đọc và Âm điệu AI */}
-            <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-              <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Stack direction="row" alignItems="center" spacing={1.5}>
-                  <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#faf5ff', color: '#9333ea', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <GraphicEqIcon sx={{ fontSize: 20 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                      Giọng đọc và âm điệu AI
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                      Tùy biến chất giọng ba miền Bắc Trung Nam và nhịp điệu phát âm tự nhiên của AI phỏng vấn
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Box>
-
-              <CardContent sx={{ p: 2.5 }}>
-                {/* Lưới các giọng đọc tiêu chuẩn */}
-                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', mb: 1.5 }}>
-                  Chất giọng phỏng vấn tiêu chuẩn
-                </Typography>
-
-                <Grid container spacing={2} sx={{ mb: 3 }}>
-                  {PRESET_VOICES.map((v) => {
-                    const isSelected = (settings.ttsVoice === v.id || settings.ttsVoice === v.name);
-                    const isPlaying = playingVoiceId === v.id;
-                    const isLoading = loadingVoiceId === v.id;
-
-                    return (
-                      <Grid item xs={12} sm={6} key={v.id}>
-                        <Box
-                          onClick={() => setSettings((prev) => ({ ...prev, ttsVoice: v.name }))}
-                          sx={{
-                            p: 2,
-                            borderRadius: 3,
-                            border: '2px solid',
-                            borderColor: isSelected ? 'primary.main' : '#e2e8f0',
-                            bgcolor: isSelected ? '#eff6ff' : '#ffffff',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            height: '100%',
-                            position: 'relative',
-                            '&:hover': {
-                              borderColor: 'primary.light',
-                              transform: 'translateY(-2px)',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
-                            },
-                          }}
-                        >
-                          <Box>
-                            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-                              <Stack direction="row" alignItems="center" spacing={1}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', fontSize: '1rem' }}>
-                                  {v.name}
-                                </Typography>
-                                <Chip
-                                  label={`${v.genderVi} - ${v.regionVi}`}
-                                  size="small"
-                                  sx={{
-                                    height: 22,
-                                    fontSize: '0.7rem',
-                                    fontWeight: 700,
-                                    bgcolor: v.gender === 'female' ? '#fdf2f8' : '#eff6ff',
-                                    color: v.gender === 'female' ? '#db2777' : '#2563eb',
-                                    border: '1px solid',
-                                    borderColor: v.gender === 'female' ? '#fbcfe8' : '#bfdbfe',
-                                  }}
-                                />
-                              </Stack>
-                              {isSelected ? (
-                                <CheckCircleRoundedIcon color="primary" sx={{ fontSize: 22 }} />
-                              ) : v.badge ? (
-                                <Chip
-                                  label={v.badge}
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700, color: 'text.secondary' }}
-                                />
-                              ) : null}
-                            </Stack>
-
-                            <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 700, display: 'block', mb: 0.5 }}>
-                              {v.toneVi}
-                            </Typography>
-
-                            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.4, mb: 1.5 }}>
-                              {v.descriptionVi}
-                            </Typography>
-                          </Box>
-
-                          <Box sx={{ pt: 1, borderTop: '1px dashed #e2e8f0' }}>
-                            <Button
-                              size="small"
-                              variant={isPlaying ? 'contained' : 'outlined'}
-                              color={isPlaying ? 'primary' : 'inherit'}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePlayVoiceSample(v);
-                              }}
-                              disabled={isLoading}
-                              startIcon={
-                                isLoading ? (
-                                  <CircularProgress size={14} color="inherit" />
-                                ) : isPlaying ? (
-                                  <StopRoundedIcon sx={{ fontSize: 16 }} />
-                                ) : (
-                                  <PlayArrowRoundedIcon sx={{ fontSize: 16 }} />
-                                )
-                              }
-                              sx={{
-                                textTransform: 'none',
-                                fontWeight: 700,
-                                fontSize: '0.75rem',
-                                borderRadius: 2,
-                                py: 0.4,
-                                px: 1.5,
-                                color: isPlaying ? '#ffffff' : 'text.primary',
-                                borderColor: isPlaying ? 'transparent' : '#cbd5e1',
-                              }}
-                            >
-                              {isLoading ? 'Đang tải mẫu...' : isPlaying ? 'Dừng phát' : 'Nghe thử giọng mẫu'}
-                            </Button>
-                          </Box>
-                        </Box>
                       </Grid>
-                    );
-                  })}
-                </Grid>
-
-                {/* Bộ điều chỉnh tốc độ phát âm */}
-                <Box sx={{ p: 2, borderRadius: 2.5, bgcolor: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-                    <SpeedOutlinedIcon sx={{ fontSize: 18, color: 'warning.main' }} />
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                      Tốc độ và nhịp điệu phát âm
-                    </Typography>
-                  </Stack>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mb: 2 }}>
-                    Tùy chỉnh nhịp nói của AI để câu hỏi được truyền tải tự nhiên, rõ ràng và mạch lạc nhất
-                  </Typography>
-
-                  <Grid container spacing={1.5}>
-                    {PRESET_SPEEDS.map((sp) => {
-                      const isSelected = (settings.ttsSpeed ?? 1.0) === sp.value;
-                      return (
-                        <Grid item xs={6} sm={3} key={sp.value}>
-                          <Box
-                            onClick={() => setSettings((prev) => ({ ...prev, ttsSpeed: sp.value }))}
-                            sx={{
-                              p: 1.5,
-                              borderRadius: 2,
-                              border: '2px solid',
-                              borderColor: isSelected ? 'primary.main' : '#e2e8f0',
-                              bgcolor: isSelected ? '#eff6ff' : '#ffffff',
-                              cursor: 'pointer',
-                              textAlign: 'center',
-                              transition: 'all 0.15s ease',
-                              '&:hover': {
-                                borderColor: 'primary.light',
-                              },
-                            }}
-                          >
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: isSelected ? 'primary.main' : 'text.primary' }}>
-                              {sp.label}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'block', mt: 0.25 }}>
-                              {sp.descriptionVi}
-                            </Typography>
-                          </Box>
-                        </Grid>
-                      );
-                    })}
-                  </Grid>
-                </Box>
-              </CardContent>
-            </Card>
-
-            {/* Khối 4: Tên và chức vụ trợ lý AI */}
-            <Card elevation={0} sx={{ borderRadius: 3.5, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-              <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Stack direction="row" alignItems="center" spacing={1.5}>
-                  <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <BadgeOutlinedIcon sx={{ fontSize: 20 }} />
-                  </Box>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                      Danh xưng và thông tin trợ lý AI
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                      Hiển thị trực tiếp trên huy hiệu người phỏng vấn khi ứng viên bước vào phòng
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Box>
-
-              <CardContent sx={{ p: 2.5 }}>
-                <Grid container spacing={2.5}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Tên hiển thị người phỏng vấn AI"
-                      value={settings.interviewerName}
-                      onChange={(e) => setSettings((prev) => ({ ...prev, interviewerName: e.target.value }))}
-                      placeholder="Ví dụ: Trợ lý AI AILA"
-                      size="small"
-                      helperText="Tên sẽ được xướng âm và hiển thị trong phòng phỏng vấn"
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      fullWidth
-                      label="Chức danh chuyên môn"
-                      value={settings.interviewerTitle}
-                      onChange={(e) => setSettings((prev) => ({ ...prev, interviewerTitle: e.target.value }))}
-                      placeholder="Ví dụ: Chuyên viên tuyển dụng thông minh"
-                      size="small"
-                      helperText="Vị trí đảm nhiệm trong hội đồng phỏng vấn"
-                    />
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Chức danh chuyên môn"
+                          value={settings.interviewerTitle}
+                          onChange={(e) => setSettings((prev) => ({ ...prev, interviewerTitle: e.target.value }))}
+                          placeholder="Ví dụ: Chuyên viên tuyển dụng thông minh"
+                          size="small"
+                          helperText="Vị trí đảm nhiệm trong hội đồng phỏng vấn"
+                        />
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </>
+            )}
 
             {/* Khối hành động lưu cấu hình */}
             <Alert

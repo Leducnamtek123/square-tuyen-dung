@@ -14,7 +14,32 @@ export type AvatarState =
   | 'goodbye'
   | 'blink';
 
+export type AvatarAction = 'idle' | 'nod' | 'thinking' | 'wave' | 'thanks_wave';
+
+export const DEFAULT_CHARACTER_ACTIONS: Record<string, Record<AvatarAction, string>> = {
+  ng_c_linh: {
+    idle: '/assets/avatars/ng_c_linh/actions/idle.mp4',
+    nod: '/assets/avatars/ng_c_linh/actions/nod.mp4',
+    thinking: '/assets/avatars/ng_c_linh/actions/thinking.mp4',
+    wave: '/assets/avatars/ng_c_linh/actions/wave.mp4',
+    thanks_wave: '/assets/avatars/ng_c_linh/actions/thanks_wave.mp4',
+  },
+};
+
+export function resolveActionVideoUrl(
+  action: AvatarAction,
+  characterId = 'ng_c_linh',
+  customActions?: Record<string, string>
+): string {
+  if (customActions && customActions[action]) {
+    return customActions[action];
+  }
+  const characterActions = DEFAULT_CHARACTER_ACTIONS[characterId] || DEFAULT_CHARACTER_ACTIONS.ng_c_linh;
+  return characterActions[action] || `/assets/avatars/${characterId}/actions/${action}.mp4`;
+}
+
 export const AVATAR_ASSET_BASE_PATH = '/assets/images/avatar/hr';
+
 
 export function resolveAvatarBasePath(avatarId?: string): string {
   if (avatarId === 'expert_male' || avatarId === 'male_03') {

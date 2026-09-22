@@ -36,6 +36,26 @@ export interface PresetSpeed {
   descriptionVi: string;
 }
 
+export type HrPersonaPresetId = 'friendly' | 'professional' | 'challenger';
+
+export interface HrPersonaPreset {
+  id: HrPersonaPresetId;
+  nameVi: string;
+  taglineVi: string;
+  descriptionVi: string;
+  targetCandidateVi: string;
+  badge: string;
+  systemPromptTemplate: string;
+}
+
+export interface AvatarActionMeta {
+  key: string;
+  labelVi: string;
+  filename: string;
+  descriptionVi: string;
+  defaultUrl: string;
+}
+
 export interface EmployerAiSettings {
   backgroundType: 'preset' | 'custom';
   selectedBackgroundId: string;
@@ -48,7 +68,13 @@ export interface EmployerAiSettings {
   ttsVoice: string;
   ttsSpeed: number;
   updatedAt: string;
+
+  avatarActions?: Record<string, string>;
+  activeCharacterId?: string;
+  hrPersonaPreset?: HrPersonaPresetId;
+  customSystemPrompt?: string;
 }
+
 
 export const PRESET_BACKGROUNDS: readonly PresetBackground[] = [
   {
@@ -298,6 +324,100 @@ export const PRESET_SPEEDS: readonly PresetSpeed[] = [
   },
 ];
 
+export const DEFAULT_AVATAR_ACTIONS: Record<string, string> = {
+  idle: '/assets/avatars/ng_c_linh/actions/idle.mp4',
+  nod: '/assets/avatars/ng_c_linh/actions/nod.mp4',
+  thinking: '/assets/avatars/ng_c_linh/actions/thinking.mp4',
+  wave: '/assets/avatars/ng_c_linh/actions/wave.mp4',
+  thanks_wave: '/assets/avatars/ng_c_linh/actions/thanks_wave.mp4',
+};
+
+export const AVATAR_ACTION_METAS: readonly AvatarActionMeta[] = [
+  {
+    key: 'idle',
+    labelVi: 'Chờ & Lắng nghe',
+    filename: 'idle.mp4',
+    descriptionVi: 'Cử động thở nhẹ và chớp mắt tự nhiên trong lúc lắng nghe ứng viên',
+    defaultUrl: '/assets/avatars/ng_c_linh/actions/idle.mp4',
+  },
+  {
+    key: 'nod',
+    labelVi: 'Gật đầu tán đồng',
+    filename: 'nod.mp4',
+    descriptionVi: 'Gật đầu ghi nhận và khuyến khích ứng viên tiếp tục trình bày',
+    defaultUrl: '/assets/avatars/ng_c_linh/actions/nod.mp4',
+  },
+  {
+    key: 'thinking',
+    labelVi: 'Suy nghĩ & Phân tích',
+    filename: 'thinking.mp4',
+    descriptionVi: 'Nghiêng đầu tập trung xử lý dữ liệu khi chờ kết quả từ AI',
+    defaultUrl: '/assets/avatars/ng_c_linh/actions/thinking.mp4',
+  },
+  {
+    key: 'wave',
+    labelVi: 'Vẫy tay chào đón',
+    filename: 'wave.mp4',
+    descriptionVi: 'Cử chỉ vẫy tay chào tươi tắn khi ứng viên vừa vào phòng phỏng vấn',
+    defaultUrl: '/assets/avatars/ng_c_linh/actions/wave.mp4',
+  },
+  {
+    key: 'thanks_wave',
+    labelVi: 'Cảm ơn & Chào tạm biệt',
+    filename: 'thanks_wave.mp4',
+    descriptionVi: 'Mỉm cười cúi chào và vẫy tay cảm ơn khi kết thúc buổi phỏng vấn',
+    defaultUrl: '/assets/avatars/ng_c_linh/actions/thanks_wave.mp4',
+  },
+];
+
+export const PRESET_HR_PERSONAS: readonly HrPersonaPreset[] = [
+  {
+    id: 'friendly',
+    nameVi: 'Thân thiện & Khích lệ',
+    taglineVi: 'Tạo không khí cởi mở, giảm bớt căng thẳng cho ứng viên',
+    descriptionVi: 'Phong thái nhẹ nhàng, ngôn từ ấm áp, câu hỏi gợi mở, giúp ứng viên tự tin thể hiện tiềm năng tốt nhất.',
+    targetCandidateVi: 'Phù hợp phỏng vấn Thực tập sinh, Fresher và các vị trí Junior',
+    badge: 'Khuyên dùng cho Fresher',
+    systemPromptTemplate: `Bạn là {interviewer_name}, {interviewer_title} tại công ty.
+Phong thái phỏng vấn: Thân thiện, ấm áp, kiên nhẫn và luôn khích lệ ứng viên.
+Vị trí ứng tuyển: {job_title}. Ứng viên: {candidate_name}.
+Quy tắc ứng xử:
+1. Luôn mở đầu ngắn gọn, động viên tinh thần trước khi đặt câu hỏi tiếp theo.
+2. Đặt câu hỏi gợi mở, nhẹ nhàng nếu ứng viên gặp khó khăn.
+3. Câu trả lời và câu hỏi của bạn bắt buộc ngắn gọn, súc tích dưới 25 từ mỗi lượt trao đổi.`,
+  },
+  {
+    id: 'professional',
+    nameVi: 'Chuyên nghiệp & Chuẩn mực STAR',
+    taglineVi: 'Đánh giá cấu trúc logic và kết quả thực tế qua phương pháp STAR',
+    descriptionVi: 'Phong thái đĩnh đạc, khách quan, đào sâu vào Tình huống - Nhiệm vụ - Hành động - Kết quả thực tế.',
+    targetCandidateVi: 'Phù hợp phỏng vấn Chuyên viên Mid-level, Kỹ sư Senior và Chuyên viên dự án',
+    badge: 'Tiêu chuẩn ngành nhân sự',
+    systemPromptTemplate: `Bạn là {interviewer_name}, {interviewer_title} tại công ty.
+Phong thái phỏng vấn: Chuyên nghiệp, đĩnh đạc, khách quan và bám sát thực tế.
+Vị trí ứng tuyển: {job_title}. Ứng viên: {candidate_name}.
+Quy tắc ứng xử:
+1. Sử dụng phương pháp STAR gồm Tình huống, Nhiệm vụ, Hành động, Kết quả để khai thác sâu kinh nghiệm thực tế.
+2. Yêu cầu số liệu, dẫn chứng thực tế cho các dự án đã triển khai.
+3. Câu nói của bạn bắt buộc súc tích, chuyên nghiệp và dưới 25 từ mỗi lượt trao đổi.`,
+  },
+  {
+    id: 'challenger',
+    nameVi: 'Thử thách & Đào sâu kỹ thuật',
+    taglineVi: 'Phản biện logic, tình huống căng thẳng và kiến trúc hệ thống',
+    descriptionVi: 'Phong thái sắc sảo, truy vấn sâu vào tư duy giải quyết vấn đề, kiến trúc hệ thống và khả năng xử lý áp lực.',
+    targetCandidateVi: 'Phù hợp phỏng vấn Trưởng nhóm Team Lead, Kỹ sư trưởng và Cấp Quản lý',
+    badge: 'Nâng cao cho Quản lý',
+    systemPromptTemplate: `Bạn là {interviewer_name}, {interviewer_title} tại công ty.
+Phong thái phỏng vấn: Thử thách, sắc sảo, phản biện logic và đánh giá tư duy xử lý áp lực.
+Vị trí ứng tuyển: {job_title}. Ứng viên: {candidate_name}.
+Quy tắc ứng xử:
+1. Đặt các câu hỏi tình huống phức tạp, đào sâu vào các phương án đánh đổi kỹ thuật và tư duy hệ thống.
+2. Phản biện các quyết định của ứng viên để kiểm tra độ vững vàng chuyên môn.
+3. Câu hỏi và nhận xét bắt buộc đanh thép, súc tích dưới 30 từ mỗi lượt trao đổi.`,
+  },
+];
+
 export const DEFAULT_EMPLOYER_AI_SETTINGS: EmployerAiSettings = {
   backgroundType: 'preset',
   selectedBackgroundId: 'modern_office',
@@ -310,6 +430,11 @@ export const DEFAULT_EMPLOYER_AI_SETTINGS: EmployerAiSettings = {
   ttsVoice: 'Trúc Ly',
   ttsSpeed: 1.0,
   updatedAt: new Date().toISOString(),
+
+  activeCharacterId: 'ng_c_linh',
+  avatarActions: { ...DEFAULT_AVATAR_ACTIONS },
+  hrPersonaPreset: 'professional',
+  customSystemPrompt: PRESET_HR_PERSONAS[1].systemPromptTemplate,
 };
 
 const STORAGE_KEY = 'sq_employer_ai_custom_settings';
@@ -417,6 +542,24 @@ export const employerAiSettingService = {
   suggestVoiceForAvatar: (avatarId: string): string => {
     const isMale = avatarId === 'expert_male' || avatarId.startsWith('male_');
     return isMale ? 'Mạnh Dũng' : 'Trúc Ly';
+  },
+
+  resolveActiveCharacterId: (settings?: EmployerAiSettings): string => {
+    const s = settings || employerAiSettingService.getSettings();
+    return s.activeCharacterId || 'ng_c_linh';
+  },
+
+  resolveAvatarActionUrl: (actionKey: string, settings?: EmployerAiSettings): string => {
+    const s = settings || employerAiSettingService.getSettings();
+    if (s.avatarActions && s.avatarActions[actionKey]) {
+      return s.avatarActions[actionKey];
+    }
+    return DEFAULT_AVATAR_ACTIONS[actionKey] || `/assets/avatars/ng_c_linh/actions/${actionKey}.mp4`;
+  },
+
+  getHrPersonaPreset: (id?: string): HrPersonaPreset | undefined => {
+    if (!id) return PRESET_HR_PERSONAS[1];
+    return PRESET_HR_PERSONAS.find((p) => p.id === id);
   },
 };
 
