@@ -8,6 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -662,6 +663,33 @@ class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return response_data(data={"count": 0, "results": []})
 
 
+class InterviewScriptFilter(filters.FilterSet):
+    tab = filters.CharFilter(method='filter_tab')
+    scenario_type = filters.CharFilter(method='filter_scenario_type')
+    hr_persona = filters.CharFilter(method='filter_hr_persona')
+
+    class Meta:
+        model = InterviewScript
+        fields = ['scenario_type', 'hr_persona', 'is_system_preset', 'is_active', 'company', 'tab']
+
+    def filter_tab(self, queryset, name, value):
+        if value == 'company':
+            return queryset.filter(is_system_preset=False)
+        elif value == 'system':
+            return queryset.filter(is_system_preset=True)
+        return queryset
+
+    def filter_scenario_type(self, queryset, name, value):
+        if not value or value == 'all':
+            return queryset
+        return queryset.filter(scenario_type=value)
+
+    def filter_hr_persona(self, queryset, name, value):
+        if not value or value == 'all':
+            return queryset
+        return queryset.filter(hr_persona=value)
+
+
 class InterviewScriptViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     """
     Kịch bản phỏng vấn AI (Interview Script / Scenario Management).
@@ -675,10 +703,11 @@ class InterviewScriptViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     serializer_class = InterviewScriptSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['scenario_type', 'hr_persona', 'is_system_preset', 'is_active', 'company']
+    filterset_class = InterviewScriptFilter
     search_fields = ['name', 'description', 'slug']
     ordering_fields = ['create_at', 'name', 'scenario_type', 'time_limit_per_question']
     ordering = ['-is_system_preset', '-create_at']
+
 
     def _resolve_company(self, user):
         return _resolve_active_company(user, self.request)

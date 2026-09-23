@@ -370,6 +370,29 @@ class InterviewScriptViewSetTests(BaseInterviewScriptTestCase):
         self.assertEqual(cloned.evaluation_rubric, {"pass_score": 80})
         self.assertEqual(list(cloned.questions.values_list("id", flat=True)), [q.id])
 
+    def test_filter_tab_and_choices_gracefully(self):
+        self.client.force_authenticate(user=self.owner_a)
+        # Verify query with all-filters returns 200 without validation errors
+        resp = self.client.get("/api/v1/interview/web/scripts/?tab=all&scenario_type=all&hr_persona=all")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # Verify filtering by tab=company returns only company scripts
+        resp_co = self.client.get("/api/v1/interview/web/scripts/?tab=company")
+        self.assertEqual(resp_co.status_code, status.HTTP_200_OK)
+        results = resp_co.data.get("results", resp_co.data)
+        ids = [item["id"] for item in results]
+        self.assertIn(self.script_a.id, ids)
+        self.assertNotIn(self.preset_script.id, ids)
+
+        # Verify filtering by tab=system returns only presets
+        resp_sys = self.client.get("/api/v1/interview/web/scripts/?tab=system")
+        self.assertEqual(resp_sys.status_code, status.HTTP_200_OK)
+        results_sys = resp_sys.data.get("results", resp_sys.data)
+        ids_sys = [item["id"] for item in results_sys]
+        self.assertIn(self.preset_script.id, ids_sys)
+        self.assertNotIn(self.script_a.id, ids_sys)
+
+
 
 class InterviewContextAndSeedCommandTests(BaseInterviewScriptTestCase):
     def setUp(self):

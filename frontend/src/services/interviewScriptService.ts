@@ -242,10 +242,16 @@ export const interviewScriptService = {
   async getScripts(params: GetScriptsParams = {}): Promise<InterviewScript[]> {
     const { search, scenario_type, hr_persona, tab } = params;
 
+    const cleanParams: Record<string, unknown> = {};
+    if (search && search.trim()) cleanParams.search = search.trim();
+    if (scenario_type && scenario_type !== 'all') cleanParams.scenario_type = scenario_type;
+    if (hr_persona && hr_persona !== 'all') cleanParams.hr_persona = hr_persona;
+    if (tab && tab !== 'all') cleanParams.tab = tab;
+
     let apiScripts: InterviewScript[] | null = null;
     try {
       // Primary REST API call: /api/v1/interview/web/scripts/
-      const res = await httpRequest.get('interview/web/scripts/', { params });
+      const res = await httpRequest.get('interview/web/scripts/', { params: cleanParams });
       if (res && Array.isArray(res.data)) {
         apiScripts = res.data;
       } else if (res && Array.isArray(res.results)) {
