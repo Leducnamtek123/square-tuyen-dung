@@ -17,6 +17,10 @@ from apps.hrm.models import (
     Designation,
     Employee,
     EmploymentContract,
+    EmployeeDocument,
+    EmployeeCareerHistory,
+    EmployeeOnboardingProcess,
+    OnboardingTaskItem,
 )
 from shared.configs import variable_system as var_sys
 
@@ -306,10 +310,16 @@ class CandidateToEmployeeConverter:
                 notes=f"Hợp đồng khởi tạo từ tiếp nhận ứng viên tuyển dụng #{activity.id if activity else 'direct'}",
             )
 
-        # Update Recruitment Application Status to HIRED
-        if activity:
-            activity.status = var_sys.ApplicationStatus.HIRED
-            activity.save(update_fields=["status", "update_at"])
+        # Initialize Onboarding Process & Standard Checklist Tasks
+        try:
+            offer_letter = getattr(activity, 'offer_letter', None) if activity else None
+            initialize_onboarding_process(
+                employee=employee,
+                offer_letter=offer_letter,
+                application=activity,
+            )
+        except Exception as exc:
+            logger.warning("Failed to initialize onboarding process for Employee %s: %s", employee.id, exc)
 
         logger.info(
             "Successfully onboarded candidate %s as Employee %s (%s) for company %s",
@@ -603,3 +613,433 @@ def process_punch_logs_for_date(company: Company, target_date: date) -> int:
         updated_count += 1
 
     return updated_count
+
+
+# ==============================================================================
+# ONBOARDING LIFECYCLE & STATE MACHINE SERVICES
+# ==============================================================================
+
+STANDARD_ONBOARDING_TASKS = [
+    # Chặng 2: Hồ sơ số Pre-boarding
+    {
+        'stage': 'PREBOARDING_DOCS',
+        'code': 'UPLOAD_ID_CARD',
+        'title': 'Tải ảnh Căn cước công dân (CCCD 2 mặt)',
+        'description': 'Tải ảnh chụp rõ nét mặt trước và mặt sau CCCD để làm thủ tục nhân sự',
+        'assigned_role': 'CANDIDATE',
+        'is_required': True,
+        'order': 1,
+    },
+    {
+        'stage': 'PREBOARDING_DOCS',
+        'code': 'UPLOAD_DEGREE',
+        'title': 'Tải ảnh Bằng tốt nghiệp / Chứng chỉ chuyên môn',
+        'description': 'Bằng cấp cao nhất hoặc chứng chỉ nghiệp vụ theo yêu cầu công việc',
+        'assigned_role': 'CANDIDATE',
+        'is_required': False,
+        'order': 2,
+    },
+    {
+        'stage': 'PREBOARDING_DOCS',
+        'code': 'BANK_ACCOUNT',
+        'title': 'Cung cấp Số tài khoản Ngân hàng',
+        'description': 'Thông tin tài khoản chính chủ để chi trả lương và các khoản phụ cấp',
+        'assigned_role': 'CANDIDATE',
+        'is_required': True,
+        'order': 3,
+    },
+    {
+        'stage': 'PREBOARDING_DOCS',
+        'code': 'TAX_INFO',
+        'title': 'Cung cấp Mã số thuế & Giảm trừ gia cảnh',
+        'description': 'Mã số thuế thu nhập cá nhân và hồ sơ người phụ thuộc (nếu có)',
+        'assigned_role': 'CANDIDATE',
+        'is_required': False,
+        'order': 4,
+    },
+    # Chặng 3: Chuẩn bị nội bộ
+    {
+        'stage': 'INTERNAL_PREP',
+        'code': 'PROVISION_EMAIL',
+        'title': 'Cấp tài khoản Email Doanh nghiệp',
+        'description': 'Khởi tạo hòm thư điện tử @company.com cho nhân sự mới',
+        'assigned_role': 'IT',
+        'is_required': True,
+        'order': 5,
+    },
+    {
+        'stage': 'INTERNAL_PREP',
+        'code': 'PROVISION_HARDWARE',
+        'title': 'Chuẩn bị Máy tính & Chỗ ngồi làm việc',
+        'description': 'Bàn giao laptop/máy bàn, màn hình phụ, bàn ghế và văn phòng phẩm',
+        'assigned_role': 'IT',
+        'is_required': True,
+        'order': 6,
+    },
+    {
+        'stage': 'INTERNAL_PREP',
+        'code': 'ENROLL_BIOMETRIC',
+        'title': 'Đăng ký Mã chấm công Sinh trắc học',
+        'description': 'Lấy dấu vân tay / khuôn mặt và gán mã ID trên máy chấm công chi nhánh',
+        'assigned_role': 'HR',
+        'is_required': True,
+        'order': 7,
+    },
+    # Chặng 4: Ngày đầu nhận việc (Day 1)
+    {
+        'stage': 'DAY_ONE_WELCOME',
+        'code': 'CONFIRM_ATTENDANCE',
+        'title': 'Xác nhận có mặt ngày đầu nhận việc',
+        'description': 'Xác nhận nhân viên đã có mặt thực tế tại văn phòng',
+        'assigned_role': 'HR',
+        'is_required': True,
+        'order': 8,
+    },
+    {
+        'stage': 'DAY_ONE_WELCOME',
+        'code': 'SIGN_LABOR_CONTRACT',
+        'title': 'Ký kết Hợp đồng Lao động Thử việc',
+        'description': 'Hoàn tất ký hợp đồng thử việc giữa đại diện công ty và nhân sự mới',
+        'assigned_role': 'HR',
+        'is_required': True,
+        'order': 9,
+    },
+    {
+        'stage': 'DAY_ONE_WELCOME',
+        'code': 'HANDOVER_ASSETS',
+        'title': 'Ký Biên bản bàn giao tài sản',
+        'description': 'Xác nhận ký biên bản tiếp nhận trang thiết bị làm việc',
+        'assigned_role': 'HR',
+        'is_required': False,
+        'order': 10,
+    },
+    # Chặng 5: Đánh giá thử việc
+    {
+        'stage': 'PROBATION_EVALUATION',
+        'code': 'CHECKIN_30_DAYS',
+        'title': 'Trao đổi đánh giá tiến độ sau 30 ngày',
+        'description': 'Quản lý trực tiếp gặp gỡ lắng nghe và định hướng sau 1 tháng làm việc',
+        'assigned_role': 'MANAGER',
+        'is_required': False,
+        'order': 11,
+    },
+    {
+        'stage': 'PROBATION_EVALUATION',
+        'code': 'FINAL_PROBATION_REVIEW',
+        'title': 'Đánh giá tổng kết Thử việc (60 ngày)',
+        'description': 'Đánh giá toàn diện năng lực và quyết định ký hợp đồng chính thức',
+        'assigned_role': 'HR',
+        'is_required': True,
+        'order': 12,
+    },
+]
+
+
+def initialize_onboarding_process(
+    employee: Employee,
+    offer_letter=None,
+    application=None,
+) -> EmployeeOnboardingProcess:
+    """
+    Idempotent initialization of the Onboarding process and standard tasks
+    for an employee.
+    """
+    target_start = employee.join_date
+    if offer_letter and getattr(offer_letter, 'start_date', None):
+        target_start = offer_letter.start_date
+
+    probation_end = employee.probation_end_date
+    if not probation_end and target_start:
+        probation_end = target_start + timedelta(days=60)
+
+    process, created = EmployeeOnboardingProcess.objects.get_or_create(
+        employee=employee,
+        defaults={
+            'company': employee.company,
+            'offer_letter': offer_letter,
+            'application': application,
+            'stage': 'PREBOARDING_DOCS',
+            'target_start_date': target_start,
+            'probation_end_date': probation_end,
+            'progress_percent': 0,
+        }
+    )
+
+    if not created:
+        if offer_letter and not process.offer_letter:
+            process.offer_letter = offer_letter
+        if application and not process.application:
+            process.application = application
+        if target_start and not process.target_start_date:
+            process.target_start_date = target_start
+        if probation_end and not process.probation_end_date:
+            process.probation_end_date = probation_end
+        process.save()
+
+    # Generate standard tasks if none exist
+    existing_codes = set(process.tasks.values_list('code', flat=True))
+    new_tasks = []
+    for item in STANDARD_ONBOARDING_TASKS:
+        if item['code'] not in existing_codes:
+            new_tasks.append(
+                OnboardingTaskItem(
+                    process=process,
+                    stage=item['stage'],
+                    code=item['code'],
+                    title=item['title'],
+                    description=item['description'],
+                    assigned_role=item['assigned_role'],
+                    is_required=item['is_required'],
+                    order=item['order'],
+                )
+            )
+
+    if new_tasks:
+        OnboardingTaskItem.objects.bulk_create(new_tasks)
+
+    process.recalculate_progress()
+    return process
+
+
+def approve_preboarding_document(
+    task_id: int,
+    actor: User,
+    file_url: Optional[str] = None,
+    document_type: str = 'IDENTITY_CARD',
+    name: Optional[str] = None,
+) -> OnboardingTaskItem:
+    """
+    HR approves a preboarding document uploaded by candidate.
+    Creates or links an EmployeeDocument and recalculates process progress.
+    Advances to INTERNAL_PREP if all required preboarding tasks are done.
+    """
+    task = OnboardingTaskItem.objects.select_related('process', 'process__employee', 'process__company').filter(id=task_id).first()
+    if not task:
+        raise ValidationError({'task_id': ['Nhiệm vụ không tồn tại.']})
+
+    process = task.process
+    employee = process.employee
+    company = process.company
+
+    if file_url:
+        doc = EmployeeDocument.objects.create(
+            company=company,
+            employee=employee,
+            document_type=document_type,
+            name=name or task.title,
+            file_url=file_url,
+        )
+        task.document = doc
+
+    task.is_completed = True
+    task.completed_at = timezone.now()
+    task.completed_by = actor
+    task.rejection_note = ""
+    task.save(update_fields=['is_completed', 'completed_at', 'completed_by', 'document', 'rejection_note', 'update_at'])
+
+    # Check if all required tasks in PREBOARDING_DOCS are completed
+    uncompleted_required = process.tasks.filter(
+        stage='PREBOARDING_DOCS',
+        is_required=True,
+        is_completed=False,
+    ).exists()
+
+    if not uncompleted_required and process.stage == 'PREBOARDING_DOCS':
+        process.stage = 'INTERNAL_PREP'
+        process.save(update_fields=['stage', 'update_at'])
+
+    process.recalculate_progress()
+    return task
+
+
+def reject_preboarding_document(
+    task_id: int,
+    reason: str,
+    actor: User,
+) -> OnboardingTaskItem:
+    """
+    HR requests candidate to re-upload a document with a specific rejection note.
+    """
+    task = OnboardingTaskItem.objects.select_related('process').filter(id=task_id).first()
+    if not task:
+        raise ValidationError({'task_id': ['Nhiệm vụ không tồn tại.']})
+
+    task.is_completed = False
+    task.rejection_note = reason.strip() if reason else "Hồ sơ chưa đạt yêu cầu, vui lòng nộp lại."
+    task.save(update_fields=['is_completed', 'rejection_note', 'update_at'])
+
+    process = task.process
+    if process.stage == 'INTERNAL_PREP':
+        process.stage = 'PREBOARDING_DOCS'
+        process.save(update_fields=['stage', 'update_at'])
+
+    process.recalculate_progress()
+    return task
+
+
+def complete_task_item(
+    task_id: int,
+    actor: User,
+    note: Optional[str] = None,
+) -> OnboardingTaskItem:
+    """
+    Marks a generic onboarding task completed.
+    """
+    task = OnboardingTaskItem.objects.select_related('process').filter(id=task_id).first()
+    if not task:
+        raise ValidationError({'task_id': ['Nhiệm vụ không tồn tại.']})
+
+    task.is_completed = True
+    task.completed_at = timezone.now()
+    task.completed_by = actor
+    task.save(update_fields=['is_completed', 'completed_at', 'completed_by', 'update_at'])
+
+    task.process.recalculate_progress()
+    return task
+
+
+def confirm_day_one_attendance(
+    process_id: int,
+    actor: User,
+) -> EmployeeOnboardingProcess:
+    """
+    Confirms candidate's first day at office:
+    - Sets actual_start_date = today
+    - Activates employment contract
+    - Moves stage to PROBATION_EVALUATION
+    - Records EmployeeCareerHistory (ONBOARDING)
+    """
+    process = EmployeeOnboardingProcess.objects.select_related('employee', 'company').filter(id=process_id).first()
+    if not process:
+        raise ValidationError({'process_id': ['Quy trình Onboarding không tồn tại.']})
+
+    today = timezone.now().date()
+    process.actual_start_date = today
+    process.stage = 'DAY_ONE_WELCOME'
+
+    # Complete Day 1 attendance task
+    day_one_task = process.tasks.filter(code='CONFIRM_ATTENDANCE').first()
+    if day_one_task:
+        day_one_task.is_completed = True
+        day_one_task.completed_at = timezone.now()
+        day_one_task.completed_by = actor
+        day_one_task.save(update_fields=['is_completed', 'completed_at', 'completed_by', 'update_at'])
+
+    # Activate contract if any
+    contract = process.employee.contracts.filter(status__in=['ACTIVE', 'EXPIRED']).first() or process.employee.contracts.first()
+    if contract and contract.status != 'ACTIVE':
+        contract.status = 'ACTIVE'
+        contract.save(update_fields=['status', 'update_at'])
+
+    # Transition to PROBATION_EVALUATION
+    process.stage = 'PROBATION_EVALUATION'
+    process.save(update_fields=['actual_start_date', 'stage', 'update_at'])
+    process.recalculate_progress()
+
+    # Record career history
+    EmployeeCareerHistory.objects.create(
+        company=process.company,
+        employee=process.employee,
+        effective_date=today,
+        event_type='ONBOARDING',
+        new_department=process.employee.department,
+        new_designation=process.employee.designation,
+        new_salary=contract.base_salary if contract else None,
+        note='Nhân viên chính thức có mặt nhận việc và bắt đầu giai đoạn thử việc.',
+    )
+
+    return process
+
+
+def submit_probation_evaluation(
+    process_id: int,
+    result: str,
+    notes: str,
+    actor: User,
+    extension_days: int = 30,
+) -> EmployeeOnboardingProcess:
+    """
+    Evaluates probation period:
+    - PASSED: Employee becomes ACTIVE, stage COMPLETED, career history recorded.
+    - EXTENDED: Extends probation end date.
+    - FAILED: Employee TERMINATED, stage CANCELLED.
+    """
+    process = EmployeeOnboardingProcess.objects.select_related('employee', 'company').filter(id=process_id).first()
+    if not process:
+        raise ValidationError({'process_id': ['Quy trình Onboarding không tồn tại.']})
+
+    employee = process.employee
+    today = timezone.now().date()
+
+    if result == 'PASSED':
+        employee.status = 'ACTIVE'
+        employee.save(update_fields=['status', 'update_at'])
+
+        process.stage = 'COMPLETED'
+        process.save(update_fields=['stage', 'update_at'])
+
+        # Mark final review task complete
+        review_task = process.tasks.filter(code='FINAL_PROBATION_REVIEW').first()
+        if review_task:
+            review_task.is_completed = True
+            review_task.completed_at = timezone.now()
+            review_task.completed_by = actor
+            review_task.save(update_fields=['is_completed', 'completed_at', 'completed_by', 'update_at'])
+
+        EmployeeCareerHistory.objects.create(
+            company=process.company,
+            employee=employee,
+            effective_date=today,
+            event_type='PROMOTION',
+            new_department=employee.department,
+            new_designation=employee.designation,
+            note=f'Đạt đánh giá thử việc: Trở thành Nhân viên chính thức. Nhận xét: {notes}',
+        )
+
+    elif result == 'EXTENDED':
+        current_end = process.probation_end_date or today
+        new_end = current_end + timedelta(days=extension_days)
+        process.probation_end_date = new_end
+        process.save(update_fields=['probation_end_date', 'update_at'])
+
+        employee.probation_end_date = new_end
+        employee.save(update_fields=['probation_end_date', 'update_at'])
+
+    elif result == 'FAILED':
+        employee.status = 'TERMINATED'
+        employee.save(update_fields=['status', 'update_at'])
+
+        process.stage = 'CANCELLED'
+        process.cancel_reason = f'Không đạt thử việc: {notes}'
+        process.cancelled_at = timezone.now()
+        process.cancelled_by = actor
+        process.save(update_fields=['stage', 'cancel_reason', 'cancelled_at', 'cancelled_by', 'update_at'])
+
+    process.recalculate_progress()
+    return process
+
+
+def cancel_onboarding_process(
+    process_id: int,
+    reason: str,
+    actor: User,
+) -> EmployeeOnboardingProcess:
+    """
+    Cancels an active onboarding process (e.g. ghost offer or early candidate withdrawal).
+    """
+    process = EmployeeOnboardingProcess.objects.select_related('employee').filter(id=process_id).first()
+    if not process:
+        raise ValidationError({'process_id': ['Quy trình Onboarding không tồn tại.']})
+
+    process.stage = 'CANCELLED'
+    process.cancel_reason = reason
+    process.cancelled_at = timezone.now()
+    process.cancelled_by = actor
+    process.save(update_fields=['stage', 'cancel_reason', 'cancelled_at', 'cancelled_by', 'update_at'])
+
+    employee = process.employee
+    employee.status = 'RESIGNED'
+    employee.save(update_fields=['status', 'update_at'])
+
+    return process
+
