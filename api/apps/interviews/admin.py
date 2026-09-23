@@ -4,7 +4,7 @@ Interview Module — Django Admin Registration
 
 from django.contrib import admin
 from .models import (
-    Question, QuestionGroup,
+    Question, QuestionGroup, InterviewScript,
     InterviewSession, InterviewTranscript, InterviewEvaluation,
     VoiceProfile, VoiceProfileSample, VoiceProfileGrant
 )
@@ -94,3 +94,11 @@ class InterviewTranscriptAdmin(admin.ModelAdmin):
 class InterviewEvaluationAdmin(admin.ModelAdmin):
     list_display = ['id', 'interview', 'evaluator', 'overall_score', 'result', 'create_at']
     list_filter = ['result']
+
+
+@admin.register(InterviewScript)
+class InterviewScriptAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'scenario_type', 'hr_persona', 'is_system_preset', 'is_active', 'company', 'create_at']
+    list_filter = ['scenario_type', 'hr_persona', 'is_system_preset', 'is_active']
+    search_fields = ['name', 'description', 'slug']
+    filter_horizontal = ['questions']

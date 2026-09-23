@@ -28,12 +28,20 @@ class SessionNotJoinableError(ValueError):
 
 
 def get_session_questions(session: InterviewSession) -> Iterable[Question]:
+    script = getattr(session, "interview_script", None) or getattr(getattr(session, "job_post", None), "interview_script", None)
+
     if not getattr(session, "pk", None):
         if session.question_group_id and session.question_group:
             return session.question_group.questions.all()
         if session.job_post_id and getattr(session.job_post, "interview_template_id", None):
             return session.job_post.interview_template.questions.all()
+        if script:
+            if script.questions.exists():
+                return script.questions.all()
+            if script.question_group_id and script.question_group:
+                return script.question_group.questions.all()
         return Question.objects.none()
+
     questions = session.questions.all()
     if questions.exists():
         return questions
@@ -41,6 +49,11 @@ def get_session_questions(session: InterviewSession) -> Iterable[Question]:
         return session.question_group.questions.all()
     if session.job_post_id and getattr(session.job_post, "interview_template_id", None):
         return session.job_post.interview_template.questions.all()
+    if script:
+        if script.questions.exists():
+            return script.questions.all()
+        if script.question_group_id and script.question_group:
+            return script.question_group.questions.all()
     return questions
 
 
@@ -320,12 +333,53 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     question_group_description = _truncate_text(_clean_text(getattr(question_group, "description", "")), 900)
     notes = _truncate_text(_clean_text(session.notes), 500)
     session_meta = session.session_metadata if isinstance(session.session_metadata, dict) else {}
-    avatar_image_url = session_meta.get("avatar_image_url") or session_meta.get("avatarImageUrl")
-    avatar_backdrop = session_meta.get("avatar_backdrop") or session_meta.get("avatarBackdrop") or "modern_office"
-    avatar_background_url = session_meta.get("avatar_background_url") or session_meta.get("avatarBackgroundUrl")
-    interviewer_name = session_meta.get("interviewer_name") or session_meta.get("interviewerName") or "Trợ lý AI Ly"
-    custom_speed = session_meta.get("ai_speed") or session_meta.get("ttsSpeed")
-    custom_voice = session_meta.get("ai_voice") or session_meta.get("ttsVoice")
+
+    company = (
+        getattr(session, "company", None)
+        or getattr(getattr(session, "job_post", None), "company", None)
+        or getattr(getattr(session, "interview_script", None), "company", None)
+    )
+    ai_settings = {}
+    if company and hasattr(company, "get_ai_settings"):
+        try:
+            ai_settings = company.get_ai_settings() or {}
+        except Exception:
+            ai_settings = {}
+
+    avatar_image_url = (
+        session_meta.get("avatar_image_url")
+        or session_meta.get("avatarImageUrl")
+        or ai_settings.get("custom_avatar_url")
+    )
+    avatar_backdrop = (
+        session_meta.get("avatar_backdrop")
+        or session_meta.get("avatarBackdrop")
+        or ai_settings.get("selected_background_id")
+        or "modern_office"
+    )
+    avatar_background_url = (
+        session_meta.get("avatar_background_url")
+        or session_meta.get("avatarBackgroundUrl")
+        or ai_settings.get("custom_background_url")
+    )
+    interviewer_name = (
+        session_meta.get("interviewer_name")
+        or session_meta.get("interviewerName")
+        or ai_settings.get("interviewer_name")
+        or "Trợ lý AI Ly"
+    )
+    custom_speed = (
+        session_meta.get("ai_speed")
+        or session_meta.get("ttsSpeed")
+        or session_meta.get("tts_speed")
+        or ai_settings.get("tts_speed")
+    )
+    custom_voice = (
+        session_meta.get("ai_voice")
+        or session_meta.get("ttsVoice")
+        or session_meta.get("tts_voice")
+        or ai_settings.get("tts_voice")
+    )
     voice_aliases = {
         "vi-VN-Standard-A": "Trúc Ly",
         "vi-VN-Standard-B": "Mạnh Dũng",
@@ -340,7 +394,7 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
         custom_voice = voice_aliases[custom_voice]
 
     speed_value = get_tts_speed()
-    if custom_speed:
+    if custom_speed is not None:
         try:
             speed_value = float(custom_speed)
         except (ValueError, TypeError):
@@ -357,11 +411,14 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
         or f"candidate-{candidate_id}"
     )
     candidate_email = getattr(candidate, "email", None) or ""
+    company_name = getattr(company, "company_name", None) if company else None
 
     payload = {
         "participantIdentity": f"candidate-{candidate_id}",
         "candidateName": str(candidate_name).strip() or f"candidate-{candidate_id}",
         "candidateEmail": candidate_email,
+        "companyName": company_name,
+        "company_name": company_name,
         "jobTitle": session.job_post.job_name if session.job_post else None,
         "jobDescription": job_description or None,
         "jobRequirement": job_requirement or None,
@@ -385,12 +442,20 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
         "interviewType": session.type,
         "interviewLanguage": getattr(session, "interview_language", "vi") or "vi",
         "ttsSpeed": speed_value,
+        "tts_speed": speed_value,
         "interviewQuestionGapSeconds": get_interview_question_gap_seconds(),
         "interviewMinimumSilenceSeconds": get_interview_minimum_silence_seconds(),
         "avatarImageUrl": avatar_image_url,
+        "avatar_image_url": avatar_image_url,
         "avatarBackdrop": avatar_backdrop,
+        "avatar_backdrop": avatar_backdrop,
         "avatarBackgroundUrl": avatar_background_url,
+        "avatar_background_url": avatar_background_url,
         "interviewerName": interviewer_name,
+        "interviewer_name": interviewer_name,
+        "status": session.status,
+        "questionCursor": getattr(session, "question_cursor", 0),
+        "hasTranscripts": session.transcripts.exists() if hasattr(session, "transcripts") else False,
     }
     payload.update(_get_candidate_resume_summary(session))
     voice_profile_payload = (
@@ -400,9 +465,69 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     )
     if voice_profile_payload:
         payload["ttsVoice"] = f"profile:{voice_profile_payload['id']}"
+        payload["tts_voice"] = payload["ttsVoice"]
         payload["ttsVoiceProfile"] = voice_profile_payload
     elif custom_voice:
         payload["ttsVoice"] = custom_voice
+        payload["tts_voice"] = custom_voice
+
+    script = getattr(session, "interview_script", None) or getattr(getattr(session, "job_post", None), "interview_script", None)
+    if script:
+        payload.update({
+            "script_id": script.id,
+            "script_name": script.name,
+            "scenario_type": script.scenario_type,
+            "hr_persona": script.hr_persona,
+            "system_prompt": script.system_prompt,
+            "greeting_message": script.greeting_message,
+            "closing_message": script.closing_message,
+            "time_limit_per_question": script.time_limit_per_question,
+            "allow_ai_followup": script.allow_ai_followup,
+            "max_followup_questions": script.max_followup_questions,
+            "scriptId": script.id,
+            "scriptName": script.name,
+            "scenarioType": script.scenario_type,
+            "hrPersona": script.hr_persona,
+            "systemPrompt": script.system_prompt,
+            "greetingMessage": script.greeting_message,
+            "closingMessage": script.closing_message,
+            "timeLimitPerQuestion": script.time_limit_per_question,
+            "allowAiFollowup": script.allow_ai_followup,
+            "maxFollowupQuestions": script.max_followup_questions,
+            "characterId": script.character_id,
+            "voiceName": script.voice_name,
+            "evaluationRubric": script.evaluation_rubric,
+        })
+        if not payload.get("ttsVoice") and script.voice_name:
+            payload["ttsVoice"] = script.voice_name
+            payload["tts_voice"] = script.voice_name
+        if not custom_speed and script.voice_speed:
+            payload["ttsSpeed"] = float(script.voice_speed)
+            payload["tts_speed"] = float(script.voice_speed)
+    else:
+        sys_prompt = session_meta.get("system_prompt") or session_meta.get("systemPrompt") or ""
+        greet_msg = session_meta.get("greeting_message") or session_meta.get("greetingMessage") or ""
+        close_msg = session_meta.get("closing_message") or session_meta.get("closingMessage") or ""
+        allow_followup = session_meta.get("allow_ai_followup")
+        if allow_followup is None:
+            allow_followup = session_meta.get("allowAiFollowup", True)
+        max_followup = session_meta.get("max_followup_questions")
+        if max_followup is None:
+            max_followup = session_meta.get("maxFollowupQuestions", 2)
+
+        payload.update({
+            "system_prompt": sys_prompt,
+            "systemPrompt": sys_prompt,
+            "greeting_message": greet_msg,
+            "greetingMessage": greet_msg,
+            "closing_message": close_msg,
+            "closingMessage": close_msg,
+            "allow_ai_followup": allow_followup,
+            "allowAiFollowup": allow_followup,
+            "max_followup_questions": max_followup,
+            "maxFollowupQuestions": max_followup,
+        })
+
     return payload
 
 
@@ -419,6 +544,11 @@ def _build_public_livekit_url(request) -> str:
 
 def create_livekit_participant_token(session: InterviewSession, request) -> Dict[str, str]:
     # Security: only allow when the session is joinable.
+    # Cho phép mock session (luyện tập phỏng vấn) tự động reset về scheduled khi ứng viên vào lại phòng
+    if session.session_type == InterviewSession.SESSION_TYPE_MOCK and (session.status or "").lower() in {"completed", "cancelled"}:
+        session.status = "scheduled"
+        session.save(update_fields=["status"])
+
     allowed_statuses = ("scheduled", "calibration", "in_progress", "interrupted")
     if (session.status or "").lower() not in allowed_statuses:
         raise SessionNotJoinableError(

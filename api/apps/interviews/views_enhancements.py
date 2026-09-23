@@ -265,6 +265,7 @@ class CreateMockSessionView(APIView):
             candidate=candidate,
             created_by=request.user if request.user and request.user.is_authenticated else None,
             job_post=job_post_obj,
+            interview_script=(getattr(job_post_obj, 'interview_script', None) if job_post_obj else None),
             question_group=question_group_obj,
             voice_profile=voice_profile_obj,
             session_type=InterviewSession.SESSION_TYPE_MOCK,

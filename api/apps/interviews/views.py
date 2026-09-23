@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db import transaction
 from django.db.models import Count, Q
 from django.core.exceptions import ObjectDoesNotExist, ValidationError as DjangoValidationError
 import logging
@@ -26,12 +27,12 @@ from config.django_threading import run_django_sync_in_thread
 from .agent_auth import SIGNATURE_HEADER, TIMESTAMP_HEADER, verify_interview_agent_request
 
 from .models import (
-    Question, QuestionGroup,
+    Question, QuestionGroup, InterviewScript,
     InterviewSession, InterviewEvaluation,
     VoiceProfile, VoiceProfileSample, VoiceProfileGrant
 )
 from .serializers import (
-    QuestionSerializer, QuestionGroupSerializer,
+    QuestionSerializer, QuestionGroupSerializer, InterviewScriptSerializer,
     InterviewSessionListSerializer, InterviewSessionDetailSerializer,
     CandidateInviteInterviewSessionSerializer,
     InterviewSessionCreateSerializer,
@@ -661,6 +662,138 @@ class QuestionGroupViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
             return response_data(data={"count": 0, "results": []})
 
 
+class InterviewScriptViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
+    """
+    Kịch bản phỏng vấn AI (Interview Script / Scenario Management).
+    Cung cấp đầy đủ CRUD kịch bản và API nhân bản (clone) kịch bản mẫu hệ thống.
+    """
+    queryset = InterviewScript.objects.select_related(
+        'company', 'author', 'question_group'
+    ).prefetch_related(
+        'questions', 'questions__career', 'questions__career__icon'
+    ).all()
+    serializer_class = InterviewScriptSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['scenario_type', 'hr_persona', 'is_system_preset', 'is_active', 'company']
+    search_fields = ['name', 'description', 'slug']
+    ordering_fields = ['create_at', 'name', 'scenario_type', 'time_limit_per_question']
+    ordering = ['-is_system_preset', '-create_at']
+
+    def _resolve_company(self, user):
+        return _resolve_active_company(user, self.request)
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+        if not getattr(user, "is_authenticated", False):
+            return qs.filter(is_system_preset=True, is_active=True)
+
+        if _is_admin_user(user):
+            return qs
+
+        company = self._resolve_company(user)
+        if company:
+            return qs.filter(Q(company=company) | Q(is_system_preset=True))
+        return qs.filter(is_system_preset=True)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        company = self._resolve_company(user)
+
+        if _is_admin_user(user):
+            is_system_preset = serializer.validated_data.get('is_system_preset', False)
+            script = serializer.save(author=user, company=company, is_system_preset=is_system_preset)
+        elif company:
+            if not perms_custom.user_has_company_permission(user, "manage_interviews", company):
+                if not perms_custom.user_has_company_permission(user, "manage_question_bank", company):
+                    raise PermissionDenied("Bạn không có quyền quản lý kịch bản phỏng vấn của doanh nghiệp.")
+            script = serializer.save(author=user, company=company, is_system_preset=False)
+        else:
+            raise PermissionDenied("Bạn cần thuộc về một doanh nghiệp đang hoạt động để tạo kịch bản phỏng vấn.")
+
+        self._audit_instance("create", script)
+
+    def _ensure_can_write_script(self, script):
+        user = self.request.user
+        if _is_admin_user(user):
+            return
+        if script.is_system_preset:
+            raise PermissionDenied("Không thể sửa hoặc xóa kịch bản mẫu của hệ thống. Bạn có thể sử dụng tính năng 'Nhân bản' (Clone) để tạo kịch bản riêng.")
+        company = self._resolve_company(user)
+        if not (
+            company
+            and script.company_id == company.id
+            and (
+                perms_custom.user_has_company_permission(user, "manage_interviews", company)
+                or perms_custom.user_has_company_permission(user, "manage_question_bank", company)
+            )
+        ):
+            raise PermissionDenied("Bạn chỉ có quyền sửa hoặc xóa kịch bản của công ty mình.")
+
+    def perform_update(self, serializer):
+        self._ensure_can_write_script(serializer.instance)
+        user = self.request.user
+        if not _is_admin_user(user):
+            script = serializer.save(is_system_preset=False)
+        else:
+            script = serializer.save()
+        self._audit_instance("update", script)
+
+    def perform_destroy(self, instance):
+        self._ensure_can_write_script(instance)
+        self._audit_instance("delete", instance)
+        instance.delete()
+
+    @action(detail=True, methods=['post'])
+    def clone(self, request, pk=None):
+        """
+        Tạo bản sao kịch bản cho company của user hiện tại với tên f"Bản sao - {script.name}",
+        gán is_system_preset=False, sao chép toàn bộ thuộc tính, rubric và danh sách questions.
+        """
+        script = self.get_object()
+        user = request.user
+        company = self._resolve_company(user)
+
+        if not company and not _is_admin_user(user):
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Vui lòng chọn công ty đang hoạt động trước khi nhân bản kịch bản."]}
+            )
+
+        with transaction.atomic():
+            cloned_script = InterviewScript.objects.create(
+                name=f"Bản sao - {script.name}",
+                slug="",
+                description=script.description,
+                scenario_type=script.scenario_type,
+                hr_persona=script.hr_persona,
+                system_prompt=script.system_prompt,
+                greeting_message=script.greeting_message,
+                closing_message=script.closing_message,
+                time_limit_per_question=script.time_limit_per_question,
+                allow_ai_followup=script.allow_ai_followup,
+                max_followup_questions=script.max_followup_questions,
+                question_group=script.question_group,
+                character_id=script.character_id,
+                voice_name=script.voice_name,
+                voice_speed=script.voice_speed,
+                evaluation_rubric=script.evaluation_rubric,
+                is_system_preset=False,
+                is_active=True,
+                company=company,
+                author=user,
+            )
+            cloned_script.questions.set(script.questions.all())
+
+        self._audit_instance("create", cloned_script)
+        serializer = self.get_serializer(cloned_script)
+        return response_data(
+            status=status.HTTP_201_CREATED,
+            data=serializer.data
+        )
+
+
 class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -736,9 +869,9 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         return base_qs.none()
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action in ["create", "update", "partial_update"]:
             return InterviewSessionCreateSerializer
-        if self.action in ['list']:
+        if self.action in ["list"]:
             return InterviewSessionListSerializer
         return InterviewSessionDetailSerializer
 
@@ -865,10 +998,16 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
                 )
 
             if session.status in {"completed", "cancelled"}:
-                return response_data(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    errors={"detail": ["Buổi phỏng vấn đã hoàn tất hoặc đã bị hủy, không thể khởi động lại."]},
-                )
+                # Với phỏng vấn thử (mock) hoặc khi có cờ reset: cho phép đặt lại 'scheduled' để ứng viên luyện tập lại
+                if session.session_type == InterviewSession.SESSION_TYPE_MOCK or request.data.get("reset") or request.query_params.get("reset"):
+                    session.status = "scheduled"
+                    session.save(update_fields=["status"])
+                    logger.info("Reset mock session %s status from %s to scheduled during warmup", session.id, session.status)
+                else:
+                    return response_data(
+                        status=status.HTTP_400_BAD_REQUEST,
+                        errors={"detail": ["Buổi phỏng vấn đã hoàn tất hoặc đã bị hủy, không thể khởi động lại."]},
+                    )
         except Exception as exc:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,

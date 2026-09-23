@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+import os
 import re
+import time
 from collections.abc import Awaitable
 from enum import Enum, auto
 from typing import Any
@@ -16,23 +19,23 @@ from livekit.agents.llm import function_tool
 from .backend_auth import auth_event_hook
 from .config import config
 from .interview_flow import (
-    DecisionVerdict,
     TurnIntent,
     decide_next_action,
     evaluate_candidate_turn,
     is_explicit_refusal_or_skip,
     is_hostile_or_abusive,
+    is_proctoring_acknowledgment,
     is_substantive_answer,
+    is_whisper_hallucination,
     parse_question_payload,
     redact_question_progress_labels,
     strip_punctuation_for_tts,
 )
 from .prompts import (
     INTERVIEWER_INSTRUCTIONS,
-    LANGUAGE_GREETINGS,
-    LANGUAGE_PROMPT_CONSTRAINTS,
     LANGUAGE_CANDIDATE_QUESTION_PROMPTS,
     LANGUAGE_CLOSINGS,
+    LANGUAGE_PROMPT_CONSTRAINTS,
 )
 
 logger = logging.getLogger("interviewer")
@@ -137,6 +140,39 @@ def _looks_like_greeting_or_ready(text: str) -> bool:
     if not normalized or len(normalized) > 48:
         return False
 
+    greeting_phrases = (
+        "tín hiệu rõ",
+        "tin hieu ro",
+        "tương hiệu rõ",
+        "tuong hieu ro",
+        "tín hiệu tốt",
+        "tin hieu tot",
+        "nghe rõ",
+        "nghe ro",
+        "nghe được",
+        "nghe duoc",
+        "nghe thấy",
+        "nghe thay",
+        "có nghe",
+        "co nghe",
+        "dạ rõ",
+        "da ro",
+        "vâng rõ",
+        "vang ro",
+        "rõ rồi",
+        "ro roi",
+        "rõ ạ",
+        "ro a",
+        "sẵn sàng",
+        "san sang",
+        "bắt đầu",
+        "bat dau",
+        "rất rõ",
+        "rat ro",
+    )
+    if any(p in normalized for p in greeting_phrases):
+        return True
+
     words = set(re.findall(r"[\wÀ-ỹ]+", normalized, flags=re.IGNORECASE))
     return bool(
         words
@@ -155,6 +191,8 @@ def _looks_like_greeting_or_ready(text: str) -> bool:
             "sẵn",
             "san",
             "ready",
+            "rõ",
+            "ro",
         }
     )
 
@@ -400,7 +438,9 @@ def _candidate_question_prompt(language: str = "vi") -> str:
     return LANGUAGE_CANDIDATE_QUESTION_PROMPTS.get(lang, LANGUAGE_CANDIDATE_QUESTION_PROMPTS["vi"])
 
 
-def _closing_response(language: str = "vi") -> str:
+def _closing_response(language: str = "vi", custom_closing: str = "") -> str:
+    if custom_closing and custom_closing.strip():
+        return custom_closing.strip()
     lang = (language or "vi").lower()
     return LANGUAGE_CLOSINGS.get(lang, LANGUAGE_CLOSINGS["vi"])
 
@@ -480,9 +520,10 @@ def _format_employer_instruction_response(instruction: str) -> str:
 
 
 class Interviewer(Agent):
-    def __init__(self, context: dict[str, Any] | None = None) -> None:
+    def __init__(self, context: dict[str, Any] | None = None, room: Any = None) -> None:
         instructions = INTERVIEWER_INSTRUCTIONS
         self._context = context or {}
+        self._room = room
         self._language = str(self._context.get("interviewLanguage") or "vi").lower()
         self._backend_api_url = self._context.get("backendApiUrl")
         self._room_name = self._context.get("roomName")
@@ -521,6 +562,31 @@ class Interviewer(Agent):
             self._question_gap_seconds,
             self._minimum_silence_seconds,
         )
+        self._last_dispatched_lipsync_text: str = ""
+        self._last_dispatched_time: float = 0.0
+        self._last_dispatched_video_url: str | None = None
+        self._greeting_dispatched: bool = False
+        self._last_proctoring_warning_time: float = 0.0
+
+        raw_allow_followup = self._context.get("allow_ai_followup")
+        if raw_allow_followup is None:
+            raw_allow_followup = self._context.get("allowAiFollowup")
+        if raw_allow_followup is None:
+            self._allow_ai_followup = True
+        elif isinstance(raw_allow_followup, str):
+            self._allow_ai_followup = raw_allow_followup.strip().lower() not in ("false", "0", "no")
+        else:
+            self._allow_ai_followup = bool(raw_allow_followup)
+
+        raw_max_followup = self._context.get("max_followup_questions")
+        if raw_max_followup is None:
+            raw_max_followup = self._context.get("maxFollowupQuestions")
+        try:
+            self._max_followup_questions = int(raw_max_followup) if raw_max_followup is not None else 2
+        except (ValueError, TypeError):
+            self._max_followup_questions = 2
+
+        self._followup_count_for_current_question = 0
 
         candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
         job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
@@ -606,6 +672,17 @@ class Interviewer(Agent):
         lang_constraint = LANGUAGE_PROMPT_CONSTRAINTS.get(self._language, LANGUAGE_PROMPT_CONSTRAINTS["vi"])
         instructions += f"\n{lang_constraint}"
 
+        custom_prompt = str(self._context.get("system_prompt") or self._context.get("systemPrompt") or "").strip()
+        if custom_prompt:
+            interpolated_prompt = (
+                custom_prompt
+                .replace("{candidate_name}", candidate_name)
+                .replace("{job_title}", job_title)
+                .replace("{company_name}", str(self._context.get("companyName") or self._context.get("company_name") or "công ty"))
+                .replace("{interviewer_name}", str(self._context.get("interviewerName") or self._context.get("interviewer_name") or "Trợ lý AI"))
+            )
+            instructions += f"\n\nChỉ dẫn chuyên sâu tùy chỉnh (Custom System Prompt):\n{interpolated_prompt}\n"
+
         self._candidate_name = candidate_name
         self._job_title = job_title
         try:
@@ -625,9 +702,182 @@ class Interviewer(Agent):
             self._llm_client = None
 
         super().__init__(instructions=instructions)
+        # Khởi động render GPU lipsync ngầm để phản hồi tức thì trong phòng phỏng vấn
+        self._create_background_task(self._prewarm_scripted_lipsync())
+
+    def _get_opening_greeting(self) -> str:
+        candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
+        job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
+        has_cv = bool(
+            self._context.get("candidateCvTitle")
+            or self._context.get("candidateCvSkills")
+            or self._context.get("candidateCvExperience")
+        )
+        custom_greeting = str(self._context.get("greetingMessage") or self._context.get("greeting_message") or "").strip()
+        if custom_greeting:
+            return (
+                custom_greeting
+                .replace("{candidate_name}", candidate_name)
+                .replace("{job_title}", job_title)
+                .replace("{company_name}", str(self._context.get("companyName") or "công ty"))
+                .replace("{interviewer_name}", str(self._context.get("interviewerName") or "Trợ lý AI"))
+            )
+        return _format_opening_greeting(
+            candidate_name,
+            job_title,
+            language=self._language,
+            has_cv=has_cv,
+        )
+
+    async def _prewarm_scripted_lipsync(self) -> None:
+        """Render trước video lipsync trên GPU trong nền để khi AI nói, cache hit chỉ mất 1ms."""
+        try:
+            await asyncio.sleep(2.0)
+            if self._completed:
+                return
+
+            texts_to_warm: list[str] = []
+
+            # 1. Lời chào mở đầu
+            greeting = self._get_opening_greeting()
+            if greeting:
+                texts_to_warm.append(greeting)
+
+            # 2. Câu hỏi 1 mở đầu (cả trường hợp ứng viên phản hồi mic và im lặng)
+            if self._scripted_questions:
+                first_q = self._scripted_questions[0]
+                clean_first = _clean_question_for_candidate(first_q)
+                intro = (
+                    "Tuyệt vời, chúng ta cùng bắt đầu với câu hỏi đầu tiên nhé."
+                    if self._language == "vi"
+                    else "Great, let us begin with the first question."
+                )
+                texts_to_warm.append(
+                    f"Chào bạn, rất vui được gặp bạn hôm nay. Chúng ta cùng bắt đầu với câu hỏi đầu tiên nhé: {clean_first}"
+                )
+                texts_to_warm.append(f"{intro} {clean_first}")
+                texts_to_warm.append(f"Tuyệt vời, chúng ta cùng bắt đầu nhé. {clean_first}")
+
+            # 3. Các câu hỏi theo kịch bản và câu hỏi chuyển tiếp
+            for idx, q in enumerate(self._scripted_questions):
+                clean_q = _clean_question_for_candidate(q)
+                if clean_q:
+                    texts_to_warm.append(clean_q)
+                    turn_text = _format_question_prompt(
+                        clean_q,
+                        index=idx,
+                        total=len(self._scripted_questions),
+                        user_text="",
+                        language=self._language,
+                    )
+                    if turn_text and turn_text != clean_q:
+                        texts_to_warm.append(turn_text)
+                    texts_to_warm.append(
+                        f"Đã hết thời gian cho câu hỏi này, chúng ta cùng chuyển sang câu tiếp theo nhé. {clean_q}"
+                    )
+                    texts_to_warm.append(
+                        f"Cảm ơn bạn, mình chuyển sang câu tiếp theo nhé. {clean_q}"
+                    )
+
+            # 4. Lời kết thúc phỏng vấn
+            closing = _closing_response()
+            if closing:
+                texts_to_warm.append(closing)
+
+            th_render_url = os.getenv(
+                "TALKING_HEAD_RENDER_URL",
+                "http://talking-head:8010/api/v1/avatar/lipsync/render",
+            )
+            voice = self._context.get("ttsVoice") or "Trúc Ly"
+            avatar_id = self._context.get("avatarId") or "ng_c_linh"
+
+            async with httpx.AsyncClient(timeout=45.0) as client:
+                for text in texts_to_warm:
+                    if self._completed:
+                        break
+                    try:
+                        clean_item = _sanitize_output_text(text).strip()
+                        if not clean_item:
+                            continue
+                        payload = {
+                            "text": clean_item,
+                            "voice": voice,
+                            "avatar_id": avatar_id,
+                            "action": "speaking",
+                        }
+                        resp = await client.post(th_render_url, json=payload)
+                        if resp.status_code == 200:
+                            logger.info("Prewarmed GPU lipsync for: '%s'", clean_item[:40])
+                    except Exception as err:
+                        logger.debug("Prewarm failed for item: %s", err)
+                    await asyncio.sleep(0.3)
+        except Exception as exc:
+            logger.warning("Lipsync prewarm task encountered error: %s", exc)
+
+    async def _publish_ai_chat_message(self, text: str) -> None:
+        clean = _sanitize_output_text(text).strip()
+        if not clean:
+            return
+        room = getattr(self, "_room", None)
+        if room is None:
+            try:
+                job_ctx = get_job_context()
+                if job_ctx and hasattr(job_ctx, "room"):
+                    room = job_ctx.room
+            except Exception:
+                pass
+        if room and getattr(room, "local_participant", None):
+            try:
+                await room.local_participant.send_text(clean, topic="lk.chat")
+                logger.info("Published AI message to lk.chat: '%s'", clean[:60])
+            except Exception as chat_err:
+                logger.warning("Failed to publish AI chat message: %s", chat_err)
+
+    async def _speak_and_dispatch(
+        self,
+        sess: Any,
+        text: str,
+        allow_interruptions: bool = False,
+    ) -> Any:
+        """Kích hoạt đồng thời video lipsync talking-head trên LiveKit và phát âm thanh qua TTS."""
+        clean_text = _sanitize_output_text(text).strip()
+        if not clean_text:
+            return None
+
+        # 1. Chờ talking-head sinh/lấy video lipsync trước (1ms nếu cache hit)
+        video_url = await self._dispatch_talking_head(clean_text)
+
+        # 2. Phát câu nói của AI vào khung chat qua topic lk.chat
+        # ĐỒNG BỘ với thời điểm dispatch lipsync video (tránh tình trạng text xuất hiện trước 8s rồi AI mới nói)
+        await self._publish_ai_chat_message(clean_text)
+
+        if video_url:
+            logger.info(
+                "Lipsync video dispatched (%s), omitting WebRTC sess.say to prevent dual audio / loop (opc007 alignment)",
+                video_url,
+            )
+            return None
+
+        # Fallback: Chỉ phát qua WebRTC sess.say khi talking-head không trả về video lipsync
+        speech_handle = None
+        try:
+            speech_handle = await sess.say(clean_text or text, allow_interruptions=allow_interruptions)
+        except Exception as exc:
+            logger.error("Failed to speak text via session.say: %s", exc)
+        return speech_handle
 
     def _create_background_task(self, coro: Awaitable[Any]) -> None:
-        task = asyncio.create_task(coro)
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            # Không có event loop đang chạy (ví dụ môi trường unit test đồng bộ)
+            if hasattr(coro, "close"):
+                try:
+                    coro.close()
+                except Exception:
+                    pass
+            return
+        task = loop.create_task(coro)
         self._background_tasks.add(task)
         task.add_done_callback(self._background_tasks.discard)
 
@@ -668,6 +918,7 @@ class Interviewer(Agent):
         total: int | None = None,
         user_text: str = "",
     ) -> str:
+        self._followup_count_for_current_question = 0
         question_text = _clean_question_for_candidate(question)
         if not question_text:
             return ""
@@ -687,10 +938,20 @@ class Interviewer(Agent):
         clean_user = _normalize_text(user_text).strip()
         if clean_user and len(clean_user) >= 10 and self._llm_client and config.LLM_BASE_URL:
             try:
-                system_prompt = (
-                    "Bạn là Nhà tuyển dụng chuyên nghiệp của Square đang phỏng vấn ứng viên trực tiếp. "
-                    "Hãy giao tiếp tự nhiên, ấm áp, thông minh, không theo khuôn mẫu."
-                )
+                custom_prompt = str(self._context.get("system_prompt") or self._context.get("systemPrompt") or "").strip()
+                if custom_prompt:
+                    system_prompt = (
+                        custom_prompt
+                        .replace("{candidate_name}", self._candidate_name)
+                        .replace("{job_title}", self._job_title)
+                        .replace("{company_name}", str(self._context.get("companyName") or self._context.get("company_name") or "công ty"))
+                        .replace("{interviewer_name}", str(self._context.get("interviewerName") or self._context.get("interviewer_name") or "Trợ lý AI"))
+                    )
+                else:
+                    system_prompt = (
+                        "Bạn là Nhà tuyển dụng chuyên nghiệp của Square đang phỏng vấn ứng viên trực tiếp. "
+                        "Hãy giao tiếp tự nhiên, ấm áp, thông minh, không theo khuôn mẫu."
+                    )
                 user_prompt = (
                     f"Vị trí phỏng vấn: {self._job_title or 'chuyên môn'}\n"
                     f"Ứng viên vừa trả lời câu trước: \"{_brief_text(clean_user, 280)}\"\n"
@@ -746,7 +1007,17 @@ class Interviewer(Agent):
 
         if clean_user and len(clean_user) >= 6 and self._llm_client and config.LLM_BASE_URL:
             try:
-                system_prompt = "Bạn là Nhà tuyển dụng chuyên nghiệp của Square."
+                custom_prompt = str(self._context.get("system_prompt") or self._context.get("systemPrompt") or "").strip()
+                if custom_prompt:
+                    system_prompt = (
+                        custom_prompt
+                        .replace("{candidate_name}", self._candidate_name)
+                        .replace("{job_title}", self._job_title)
+                        .replace("{company_name}", str(self._context.get("companyName") or self._context.get("company_name") or "công ty"))
+                        .replace("{interviewer_name}", str(self._context.get("interviewerName") or self._context.get("interviewer_name") or "Trợ lý AI"))
+                    )
+                else:
+                    system_prompt = "Bạn là Nhà tuyển dụng chuyên nghiệp của Square."
                 user_prompt = (
                     f"Ứng viên đặt câu hỏi cho bạn: \"{_brief_text(clean_user, 260)}\"\n"
                     "Hãy trả lời câu hỏi của ứng viên một cách thiện chí, súc tích và ấm áp trong 1 đến 2 câu ngắn dưới 35 từ. "
@@ -847,10 +1118,7 @@ class Interviewer(Agent):
                 await session.interrupt(force=True)
             except Exception as exc:
                 logger.warning("Failed to interrupt session on employer instruction: %s", exc)
-            try:
-                await session.say(clean_text, allow_interruptions=False)
-            except Exception as exc:
-                logger.error("Failed to speak employer instruction: %s", exc)
+            await self._speak_and_dispatch(session, clean_text, allow_interruptions=False)
 
         try:
             await self.record_transcript("ai_agent", clean_text)
@@ -868,6 +1136,17 @@ class Interviewer(Agent):
         if self._completed or self._employer_takeover_active:
             return None
 
+        now = time.time()
+        time_since_last = now - getattr(self, "_last_proctoring_warning_time", 0.0)
+        if time_since_last < 5.0:
+            logger.info(
+                "Ignoring duplicate proctoring warning within debounce window (%.1fs < 5.0s) for room %s",
+                time_since_last,
+                self._room_name,
+            )
+            return None
+        self._last_proctoring_warning_time = now
+
         clean_text = (
             warning_text
             or "Bạn đang trong buổi phỏng vấn trực tiếp, vui lòng quay lại tab và tập trung vào màn hình."
@@ -882,16 +1161,15 @@ class Interviewer(Agent):
             self._employer_takeover_active,
         )
 
+        self._proctoring_warning_active = True
+
         session = self._safe_session
         if session is not None:
             try:
                 await session.interrupt(force=True)
             except Exception as exc:
                 logger.warning("Failed to interrupt session on proctoring warning: %s", exc)
-            try:
-                await session.say(clean_text, allow_interruptions=False)
-            except Exception as exc:
-                logger.error("Failed to speak proctoring warning: %s", exc)
+            await self._speak_and_dispatch(session, clean_text, allow_interruptions=False)
 
         try:
             await self.record_transcript("ai_agent", f"[Cảnh báo giám sát] {clean_text}")
@@ -900,29 +1178,81 @@ class Interviewer(Agent):
 
         return clean_text
 
+    async def handle_candidate_tab_returned(
+        self,
+        duration_seconds: float = 0.0,
+    ) -> str | None:
+        """Đón nhận sự kiện ứng viên quay lại màn hình phỏng vấn sau khi bị cảnh báo."""
+        if self._completed or self._employer_takeover_active:
+            return None
+
+        # Chỉ phát biểu nối tiếp nếu trước đó đang có trạng thái cảnh báo giám sát hoạt động
+        if not getattr(self, "_proctoring_warning_active", False):
+            logger.info("Candidate returned to room %s, but no active proctoring warning. No-op.", self._room_name)
+            return None
+
+        self._proctoring_warning_active = False
+        self._short_answer_prompted_for = None
+
+        logger.info(
+            "Candidate returned to room %s after away duration %.1fs. Resuming interview question.",
+            self._room_name,
+            duration_seconds,
+        )
+
+        session = self._safe_session
+        if session is not None:
+            try:
+                await asyncio.sleep(0.6)
+            except Exception:
+                pass
+
+        current_q = _clean_question_for_candidate(self._last_asked_question_text or "")
+        if current_q:
+            resume_text = f"Chào mừng bạn đã quay lại màn hình. Chúng ta cùng tiếp tục câu hỏi: {current_q} nhé."
+        else:
+            resume_text = "Chào mừng bạn đã quay lại màn hình. Mời bạn tiếp tục trả lời nhé."
+
+        if session is not None:
+            await self._speak_and_dispatch(session, resume_text, allow_interruptions=True)
+
+        try:
+            await self.record_transcript("ai_agent", resume_text)
+        except Exception as exc:
+            logger.warning("Failed to record proctoring resumption transcript: %s", exc)
+
+        return resume_text
+
     async def on_enter(self) -> None:
         """Called when the agent joins the session."""
+        if self._greeting_dispatched:
+            logger.info("Greeting already dispatched for room %s. Skipping on_enter greeting.", self._room_name)
+            return
+
+        initial_status = str(self._context.get("status") or "").lower()
+        question_cursor = int(self._context.get("questionCursor") or 0)
+        has_transcripts = bool(self._context.get("hasTranscripts", False))
+        if initial_status in ("in_progress", "interrupted") or question_cursor > 0 or has_transcripts:
+            logger.info(
+                "Interview session %s is resumed/in-progress (status=%s, cursor=%d, hasTranscripts=%s). Skipping initial greeting.",
+                self._room_name,
+                initial_status,
+                question_cursor,
+                has_transcripts,
+            )
+            self._greeting_dispatched = True
+            return
+
+        self._greeting_dispatched = True
         logger.info("Interviewer agent entered session. Generating initial greeting...")
-        candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
-        job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
-        has_cv = bool(
-            self._context.get("candidateCvTitle")
-            or self._context.get("candidateCvSkills")
-            or self._context.get("candidateCvExperience")
-        )
-        greeting = _format_opening_greeting(
-            candidate_name,
-            job_title,
-            language=self._language,
-            has_cv=has_cv,
-        )
+        greeting = self._get_opening_greeting()
 
         # Keep the bootstrap greeting short and resilient with retry loop to withstand cold starts or transient TTS delays
         max_retries = 3
         for attempt in range(1, max_retries + 1):
             try:
                 logger.info("Playing initial greeting (attempt %d/%d)...", attempt, max_retries)
-                await self.session.say(greeting, allow_interruptions=True)
+                await self._speak_and_dispatch(self.session, greeting, allow_interruptions=True)
                 logger.info("Initial greeting played successfully.")
                 break
             except Exception as exc:
@@ -937,13 +1267,21 @@ class Interviewer(Agent):
         except Exception as exc:
             logger.warning("Failed to record greeting transcript: %s", exc)
 
-        # Proactively start Question 1 if candidate remains silent after greeting
-        self._create_background_task(self._auto_start_first_question_if_silent(delay_seconds=5.0))
+        # Proactively start Question 1 if candidate remains silent after greeting (18s allows greeting playout + candidate pause)
+        self._create_background_task(self._auto_start_first_question_if_silent(delay_seconds=18.0))
 
-    async def _auto_start_first_question_if_silent(self, delay_seconds: float = 5.0) -> None:
+    async def _auto_start_first_question_if_silent(self, delay_seconds: float = 18.0) -> None:
         """If candidate remains silent after greeting, proactively ask Question 1 without waiting indefinitely."""
         await asyncio.sleep(delay_seconds)
         if self._completed or self._employer_takeover_active:
+            return
+
+        # Không tự động hỏi lại Câu 1 nếu phiên đã bắt đầu hoặc câu hỏi đã tiến tới vị trí khác
+        if int(self._context.get("questionCursor") or 0) > 0:
+            return
+
+        # Không hỏi nếu ứng viên đã phản hồi hoặc câu 1 đã được hỏi
+        if self._scripted_question_index > 0 or self._last_asked_question_text:
             return
 
         if self._scripted_question_index == 0 and not self._last_asked_question_text:
@@ -969,10 +1307,7 @@ class Interviewer(Agent):
 
                 intro = "Tuyệt vời, chúng ta cùng bắt đầu với câu hỏi đầu tiên nhé." if self._language == "vi" else "Great, let us begin with the first question."
                 first_turn = f"{intro} {first_q_text}"
-                try:
-                    await sess.say(first_turn, allow_interruptions=True)
-                except Exception as exc:
-                    logger.error("Failed to speak proactive first question: %s", exc)
+                await self._speak_and_dispatch(sess, first_turn, allow_interruptions=True)
                 try:
                     await self.record_transcript("ai_agent", first_turn)
                 except Exception as exc:
@@ -991,6 +1326,12 @@ class Interviewer(Agent):
             return None
 
         user_turn_id, user_text = _latest_user_turn(chat_ctx)
+        if user_text and is_whisper_hallucination(user_text):
+            logger.warning("Filtered out Whisper hallucination from LLM turn for room %s: '%s'", self._room_name, user_text)
+            if user_turn_id:
+                self._last_handled_user_turn_id = user_turn_id
+            return None
+
         if user_turn_id and user_turn_id == self._last_handled_user_turn_id:
             logger.info("Skipping duplicate user turn for room %s", self._room_name)
             return None
@@ -1005,9 +1346,21 @@ class Interviewer(Agent):
         return response
 
     def _needs_more_answer_detail(self, user_text: str) -> bool:
+        if not self._allow_ai_followup or self._max_followup_questions <= 0:
+            return False
+        if getattr(self, "_followup_count_for_current_question", 0) >= self._max_followup_questions:
+            return False
         if not user_text:
             return False
         if not self._last_asked_question_text:
+            return False
+        if self._scripted_question_index == 0:
+            return False
+        if _looks_like_greeting_or_ready(user_text):
+            return False
+        if is_proctoring_acknowledgment(user_text):
+            return False
+        if getattr(self, "_proctoring_warning_active", False):
             return False
         if self._short_answer_prompted_for == self._last_asked_question_text:
             self._short_answer_prompted_for = None
@@ -1021,6 +1374,9 @@ class Interviewer(Agent):
             return False
 
         self._short_answer_prompted_for = self._last_asked_question_text
+        self._followup_count_for_current_question = (
+            getattr(self, "_followup_count_for_current_question", 0) + 1
+        )
         return True
 
     async def _build_scripted_response(self, *, user_text: str = "") -> str | None:
@@ -1033,6 +1389,14 @@ class Interviewer(Agent):
                 verdict.confidence,
                 verdict.reasoning,
             )
+            if verdict.intent == TurnIntent.WHISPER_HALLUCINATION:
+                logger.warning(
+                    "Dropping Whisper hallucination turn in scripted response for room %s: '%s'",
+                    self._room_name,
+                    user_text,
+                )
+                return None
+
 
         if _looks_like_end_interview_intent(user_text) or (
             verdict is not None
@@ -1124,6 +1488,26 @@ class Interviewer(Agent):
                     f"Bây giờ chúng ta hãy tiếp tục câu hỏi hiện tại: {current_q}"
                 )
 
+        if (
+            (verdict is not None and verdict.intent == TurnIntent.PROCTORING_ACKNOWLEDGMENT)
+            or is_proctoring_acknowledgment(user_text)
+            or (
+                getattr(self, "_proctoring_warning_active", False)
+                and (is_proctoring_acknowledgment(user_text) or _looks_like_greeting_or_ready(user_text))
+            )
+        ):
+            logger.info(
+                "Candidate acknowledged proctoring warning or resumed for room %s: '%s'",
+                self._room_name,
+                user_text,
+            )
+            self._proctoring_warning_active = False
+            self._short_answer_prompted_for = None
+            current_q = _clean_question_for_candidate(self._last_asked_question_text or "")
+            if current_q:
+                return f"Không sao đâu bạn, chúng ta cùng tiếp tục câu hỏi: {current_q} nhé."
+            return "Không sao đâu bạn, bạn hãy tiếp tục phần trả lời của mình nhé."
+
         if self._needs_more_answer_detail(user_text):
             return _format_detail_nudge(self._last_asked_question_text or "", user_text)
 
@@ -1172,6 +1556,7 @@ class Interviewer(Agent):
         return self._offer_pending_followup_or_candidate_question()
 
     async def _advance_to_next_question_after_skip(self, user_text: str = "") -> str:
+        self._followup_count_for_current_question = 0
         del user_text
         if self._reply_delay_seconds > 0:
             await asyncio.sleep(min(self._reply_delay_seconds, 1.0))
@@ -1314,7 +1699,18 @@ class Interviewer(Agent):
         else:
             self._create_background_task(self.finalize_completed_interview(delay_seconds=0.0))
 
-        response = _closing_response(language=self._language)
+        custom_closing = str(self._context.get("closingMessage") or self._context.get("closing_message") or "").strip()
+        if custom_closing:
+            cand_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
+            j_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
+            custom_closing = (
+                custom_closing
+                .replace("{candidate_name}", cand_name)
+                .replace("{job_title}", j_title)
+                .replace("{company_name}", str(self._context.get("companyName") or "công ty"))
+                .replace("{interviewer_name}", str(self._context.get("interviewerName") or "Trợ lý AI"))
+            )
+        response = _closing_response(language=self._language, custom_closing=custom_closing)
         self._last_farewell_text = response
         return response
 
@@ -1328,15 +1724,34 @@ class Interviewer(Agent):
                 yield delta
 
     def tts_node(self, text, model_settings):
-        async def cleaned_text():
+        async def synced_text():
+            chunks = []
             async for chunk in text:
-                if not isinstance(chunk, str):
-                    continue
-                cleaned = strip_punctuation_for_tts(_sanitize_output_text(chunk))
-                if cleaned:
-                    yield cleaned
+                if isinstance(chunk, str):
+                    chunks.append(chunk)
 
-        return Agent.default.tts_node(self, cleaned_text(), model_settings)
+            full_text = "".join(chunks)
+            cleaned = strip_punctuation_for_tts(_sanitize_output_text(full_text)).strip()
+            if not cleaned:
+                return
+
+            now = time.time()
+            video_url = None
+            if cleaned != self._last_dispatched_lipsync_text or (now - self._last_dispatched_time) >= 4.0:
+                video_url = await self._dispatch_talking_head(cleaned)
+            else:
+                video_url = self._last_dispatched_video_url
+
+            # Luôn gửi text lên topic lk.chat để hiển thị vào khung chat của phòng phỏng vấn
+            await self._publish_ai_chat_message(cleaned)
+
+            # Bám sát source opc007/ai-digital-human 100%:
+            # Nếu đã dispatch video lipsync thành công, không yield text sang WebRTC TTS nữa.
+            # Client sẽ phát video MP4 kèm âm thanh đồng bộ 100%.
+            if not video_url:
+                yield cleaned
+
+        return Agent.default.tts_node(self, synced_text(), model_settings)
 
     async def _shutdown_session(self) -> None:
         try:
@@ -1423,7 +1838,7 @@ class Interviewer(Agent):
                 self._scripted_question_index = parsed_payload.index + 1
                 response = f"Đã hết thời gian cho câu hỏi này, chúng ta cùng chuyển sang câu tiếp theo nhé. {action.text}"
                 if sess:
-                    await sess.say(response, allow_interruptions=False)
+                    await self._speak_and_dispatch(sess, response, allow_interruptions=False)
                 await self.record_transcript("ai_agent", response)
                 await self._broadcast_question_index(parsed_payload.index)
                 return response
@@ -1435,14 +1850,14 @@ class Interviewer(Agent):
                     self._short_answer_prompted_for = None
                     response = f"Đã hết thời gian cho câu hỏi này, chúng ta cùng chuyển sang câu tiếp theo nhé. {question}"
                     if sess:
-                        await sess.say(response, allow_interruptions=False)
+                        await self._speak_and_dispatch(sess, response, allow_interruptions=False)
                     await self.record_transcript("ai_agent", response)
                     await self._broadcast_question_index(self._scripted_question_index - 1)
                     return response
                 closing_turn = self._offer_pending_followup_or_candidate_question()
                 response = f"Đã hết thời gian cho câu hỏi này. {closing_turn}"
                 if sess:
-                    speech_handle = await sess.say(response, allow_interruptions=False)
+                    speech_handle = await self._speak_and_dispatch(sess, response, allow_interruptions=False)
                     if self._completed:
                         self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
                 elif self._completed:
@@ -1460,7 +1875,7 @@ class Interviewer(Agent):
             self._short_answer_prompted_for = None
             response = f"Đã hết thời gian cho câu hỏi này, chúng ta cùng chuyển sang câu tiếp theo nhé. {question}"
             if sess:
-                await sess.say(response, allow_interruptions=False)
+                await self._speak_and_dispatch(sess, response, allow_interruptions=False)
             await self.record_transcript("ai_agent", response)
             await self._broadcast_question_index(self._scripted_question_index - 1)
             return response
@@ -1468,7 +1883,7 @@ class Interviewer(Agent):
         closing_turn = self._offer_pending_followup_or_candidate_question()
         response = f"Đã hết thời gian cho câu hỏi này. {closing_turn}"
         if sess:
-            speech_handle = await sess.say(response, allow_interruptions=False)
+            speech_handle = await self._speak_and_dispatch(sess, response, allow_interruptions=False)
             if self._completed:
                 self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, delay_seconds=3.5))
         elif self._completed:
@@ -1498,7 +1913,7 @@ class Interviewer(Agent):
                 self._scripted_question_index = parsed_payload.index + 1
                 response = f"Cảm ơn bạn, mình chuyển sang câu tiếp theo nhé. {action.text}"
                 if sess:
-                    await sess.say(response, allow_interruptions=False)
+                    await self._speak_and_dispatch(sess, response, allow_interruptions=False)
                 await self.record_transcript("ai_agent", response)
                 await self._broadcast_question_index(parsed_payload.index)
                 return response
@@ -1510,13 +1925,13 @@ class Interviewer(Agent):
                     self._short_answer_prompted_for = None
                     response = f"Cảm ơn bạn, mình chuyển sang câu tiếp theo nhé. {question}"
                     if sess:
-                        await sess.say(response, allow_interruptions=False)
+                        await self._speak_and_dispatch(sess, response, allow_interruptions=False)
                     await self.record_transcript("ai_agent", response)
                     await self._broadcast_question_index(self._scripted_question_index - 1)
                     return response
                 response = self._offer_pending_followup_or_candidate_question()
                 if sess:
-                    speech_handle = await sess.say(response, allow_interruptions=False)
+                    speech_handle = await self._speak_and_dispatch(sess, response, allow_interruptions=False)
                     if self._completed:
                         self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, text=response))
                 elif self._completed:
@@ -1534,14 +1949,14 @@ class Interviewer(Agent):
             self._short_answer_prompted_for = None
             response = f"Cảm ơn bạn, mình chuyển sang câu tiếp theo nhé. {question}"
             if sess:
-                await sess.say(response, allow_interruptions=False)
+                await self._speak_and_dispatch(sess, response, allow_interruptions=False)
             await self.record_transcript("ai_agent", response)
             await self._broadcast_question_index(self._scripted_question_index - 1)
             return response
 
         response = self._offer_pending_followup_or_candidate_question()
         if sess:
-            speech_handle = await sess.say(response, allow_interruptions=False)
+            speech_handle = await self._speak_and_dispatch(sess, response, allow_interruptions=False)
             if self._completed:
                 self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, text=response))
         elif self._completed:
@@ -1562,7 +1977,7 @@ class Interviewer(Agent):
         if sess:
             try:
                 await sess.interrupt(force=True)
-                speech_handle = await sess.say(response, allow_interruptions=False)
+                speech_handle = await self._speak_and_dispatch(sess, response, allow_interruptions=False)
                 self._create_background_task(self._finalize_after_speech_or_delay(speech_handle=speech_handle, text=response))
             except Exception as exc:
                 logger.debug("Could not speak farewell: %s", exc)
@@ -1635,17 +2050,95 @@ class Interviewer(Agent):
         except Exception as exc:
             logger.warning("append_transcript failed: %s", exc)
 
-    async def _dispatch_talking_head(self, text: str) -> None:
+    def set_room(self, room: Any) -> None:
+        """Cập nhật LiveKit Room cho interviewer."""
+        self._room = room
+
+    async def _dispatch_talking_head(self, text: str) -> str | None:
         try:
             cleaned = _sanitize_output_text(text).strip()
             if not cleaned:
-                return
-            th_url = os.getenv("TALKING_HEAD_URL", "http://talking-head:8010/human")
-            async with httpx.AsyncClient(timeout=3.0) as client:
-                await client.post(th_url, json={"text": cleaned, "type": "echo"})
-            logger.info("Dispatched prompt to talking-head (%d chars): %s...", len(cleaned), cleaned[:40])
+                return None
+
+            now = time.time()
+            if cleaned == self._last_dispatched_lipsync_text and (now - self._last_dispatched_time) < 4.0:
+                return self._last_dispatched_video_url
+            self._last_dispatched_lipsync_text = cleaned
+            self._last_dispatched_time = now
+
+            th_render_url = os.getenv(
+                "TALKING_HEAD_RENDER_URL",
+                "http://talking-head:8010/api/v1/avatar/lipsync/render"
+            )
+            th_human_url = os.getenv(
+                "TALKING_HEAD_URL",
+                "http://talking-head:8010/human"
+            )
+            render_payload = {
+                "text": cleaned,
+                "voice": self._context.get("ttsVoice") or "Trúc Ly",
+                "avatar_id": self._context.get("avatarId") or "ng_c_linh",
+                "action": "speaking",
+            }
+
+            video_url = None
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                try:
+                    resp = await client.post(th_render_url, json=render_payload)
+                    if resp.status_code == 200:
+                        res_json = resp.json()
+                        video_url = res_json.get("video_url") or (res_json.get("data") or {}).get("video_url")
+                        logger.info(
+                            "Talking head render succeeded: video_url=%s (duration: %s, cached: %s)",
+                            video_url,
+                            res_json.get("duration"),
+                            res_json.get("cached", False),
+                        )
+                    else:
+                        logger.warning("Talking head render returned HTTP %s: %s", resp.status_code, resp.text[:120])
+                except Exception as render_err:
+                    logger.warning("Talking head render failed: %s, falling back to /human", render_err)
+
+                # Đồng thời gửi tới /human nếu có session WebRTC đang chạy
+                try:
+                    await client.post(th_human_url, json={"text": cleaned, "type": "echo"}, timeout=2.0)
+                except Exception:
+                    pass
+
+            self._last_dispatched_video_url = video_url
+
+            # Publish data packet qua LiveKit Room (topic: interview_avatar_event)
+            if video_url:
+                room = self._room
+                if room is None:
+                    try:
+                        job_ctx = get_job_context()
+                        if job_ctx and hasattr(job_ctx, "room"):
+                            room = job_ctx.room
+                    except Exception:
+                        pass
+
+                if room and getattr(room, "local_participant", None):
+                    avatar_event = {
+                        "type": "lipsync_video",
+                        "video_url": video_url,
+                        "text": cleaned,
+                    }
+                    payload_bytes = json.dumps(avatar_event).encode("utf-8")
+                    await room.local_participant.publish_data(
+                        payload=payload_bytes,
+                        reliable=True,
+                        topic="interview_avatar_event",
+                    )
+                    logger.info(
+                        "Published lipsync_video event to LiveKit room %s (topic: interview_avatar_event): %s",
+                        self._room_name,
+                        video_url,
+                    )
+            return video_url
         except Exception as exc:
-            logger.debug("Talking head dispatch failed: %s", exc)
+            logger.warning("Talking head dispatch failed: %s", exc)
+            return None
 
     async def record_transcript(
         self,
@@ -1653,8 +2146,6 @@ class Interviewer(Agent):
         content: str,
         speech_duration_ms: int | None = None,
     ) -> None:
-        if speaker_role == "ai_agent":
-            self._create_background_task(self._dispatch_talking_head(content))
         await self._append_transcript(
             speaker_role=speaker_role,
             content=content,

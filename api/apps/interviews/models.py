@@ -267,6 +267,104 @@ class VoiceProfileGrant(CommonBaseModel):
         return f"{self.profile.name} grant"
 
 
+class InterviewScript(CommonBaseModel):
+    """
+    Kịch bản phỏng vấn AI (Interview Script / Scenario Management).
+    Cho phép cấu hình mục tiêu, phong thái HR, prompt, thời gian, câu hỏi và tiêu chí đánh giá.
+    """
+
+    SCENARIO_TYPE_CHOICES = [
+        ('technical', 'Kỹ thuật chuyên môn'),
+        ('behavioral', 'Hành vi & Văn hóa (STAR)'),
+        ('sales', 'Kinh doanh & CSKH'),
+        ('fresher', 'Fresher / Thực tập sinh'),
+        ('leadership', 'Lãnh đạo & Quản lý'),
+        ('situational', 'Xử lý tình huống'),
+        ('custom', 'Tùy chỉnh riêng'),
+    ]
+
+    HR_PERSONA_CHOICES = [
+        ('friendly', 'Thân thiện & Khích lệ'),
+        ('professional', 'Chuyên nghiệp & Chuẩn mực STAR'),
+        ('challenger', 'Thử thách & Đào sâu kỹ thuật'),
+    ]
+
+    name = models.CharField(max_length=255, verbose_name="Tên kịch bản")
+    slug = models.CharField(max_length=255, blank=True, default="", verbose_name="Slug")
+    description = models.TextField(blank=True, default="", verbose_name="Mô tả mục tiêu")
+    scenario_type = models.CharField(
+        max_length=32,
+        choices=SCENARIO_TYPE_CHOICES,
+        default='technical',
+        db_index=True,
+        verbose_name="Loại kịch bản"
+    )
+    hr_persona = models.CharField(
+        max_length=32,
+        choices=HR_PERSONA_CHOICES,
+        default='professional',
+        verbose_name="Phong thái HR"
+    )
+    system_prompt = models.TextField(blank=True, default="", verbose_name="Chỉ dẫn AI chuyên sâu")
+    greeting_message = models.TextField(blank=True, default="", verbose_name="Lời chào mở đầu")
+    closing_message = models.TextField(blank=True, default="", verbose_name="Lời cảm ơn kết thúc")
+    time_limit_per_question = models.IntegerField(default=120, verbose_name="Thời gian trả lời mỗi câu (giây)")
+    allow_ai_followup = models.BooleanField(default=True, verbose_name="Cho phép AI hỏi đào sâu")
+    max_followup_questions = models.IntegerField(default=2, verbose_name="Số câu hỏi phụ tối đa")
+    question_group = models.ForeignKey(
+        QuestionGroup,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='interview_scripts',
+        verbose_name="Bộ câu hỏi mặc định"
+    )
+    questions = models.ManyToManyField(
+        Question,
+        blank=True,
+        related_name='interview_scripts',
+        verbose_name="Danh sách câu hỏi"
+    )
+    character_id = models.CharField(max_length=64, default='ng_c_linh', verbose_name="Mã nhân vật ảo")
+    voice_name = models.CharField(max_length=64, default='Trúc Ly', verbose_name="Tên giọng đọc TTS")
+    voice_speed = models.DecimalField(max_digits=3, decimal_places=2, default=1.0, verbose_name="Tốc độ giọng đọc")
+    evaluation_rubric = models.JSONField(blank=True, null=True, verbose_name="Tiêu chuẩn chấm điểm Rubric")
+    is_system_preset = models.BooleanField(default=False, db_index=True, verbose_name="Mẫu hệ thống")
+    is_active = models.BooleanField(default=True, db_index=True, verbose_name="Đang kích hoạt")
+    company = models.ForeignKey(
+        'info.Company',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='interview_scripts',
+        verbose_name="Thuộc công ty"
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_interview_scripts',
+        verbose_name="Người tạo"
+    )
+
+    class Meta:
+        db_table = "project_interview_script"
+        ordering = ['-create_at']
+        verbose_name = "Interview Script"
+        verbose_name_plural = "Interview Scripts"
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name:
+            from django.utils.text import slugify
+            base_slug = slugify(self.name)
+            self.slug = base_slug[:255] if base_slug else f"script-{uuid.uuid4().hex[:8]}"
+        super().save(*args, **kwargs)
+
+
 class InterviewSession(CommonBaseModel):
     """Buổi Phỏng vấn trực tuyến."""
 
@@ -287,7 +385,7 @@ class InterviewSession(CommonBaseModel):
         'calibration': {'in_progress', 'cancelled'},
         'in_progress': {'completed', 'interrupted', 'processing'},
         'processing': {'completed', 'interrupted'},
-        'interrupted': {'processing', 'completed', 'in_progress', 'cancelled'},
+        'interrupted': {'processing', 'completed', 'in_progress', 'cancelled', 'scheduled'},
         'completed': {'processing'},
         'cancelled': set(),
     }
@@ -458,6 +556,13 @@ class InterviewSession(CommonBaseModel):
         related_name='interview_sessions',
         verbose_name="Voice profile"
     )
+    interview_script = models.ForeignKey(
+        InterviewScript,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='interview_sessions',
+        verbose_name="Kịch bản phỏng vấn"
+    )
     question_cursor = models.IntegerField(
         default=0,
         verbose_name="Chỉ số câu hỏi hiện tại"
@@ -495,8 +600,9 @@ class InterviewSession(CommonBaseModel):
         if self.pk and (update_fields is None or "status" in update_fields):
             old_status = InterviewSession.objects.filter(pk=self.pk).values_list("status", flat=True).first()
             if old_status and old_status != self.status:
+                is_mock_reset = self.session_type == self.SESSION_TYPE_MOCK and self.status in {"scheduled", "calibration"}
                 allowed_next_states = self.VALID_TRANSITIONS.get(old_status, set())
-                if self.status not in allowed_next_states:
+                if not is_mock_reset and self.status not in allowed_next_states:
                     raise ValidationError(
                         f"Chuyển trạng thái phỏng vấn không hợp lệ: từ '{old_status}' sang '{self.status}'"
                     )
@@ -610,11 +716,15 @@ class InterviewProctoringEvent(CommonBaseModel):
     """Sự kiện giám sát chống gian lận trong buổi phỏng vấn AI/LiveKit."""
 
     EVENT_TAB_SWITCH = 'tab_switch'
+    EVENT_TAB_HIDDEN = 'tab_hidden'
+    EVENT_TAB_RETURNED = 'tab_returned'
     EVENT_NO_FACE = 'no_face_detected'
     EVENT_MULTIPLE_FACES = 'multiple_faces_detected'
     EVENT_AUDIO_ANOMALY = 'audio_anomaly'
     EVENT_CHOICES = [
-        (EVENT_TAB_SWITCH, 'Chuyển tab'),
+        (EVENT_TAB_SWITCH, 'Cảnh báo chuyển tab'),
+        (EVENT_TAB_HIDDEN, 'Rời khỏi tab'),
+        (EVENT_TAB_RETURNED, 'Quay lại tab'),
         (EVENT_NO_FACE, 'Mất nhận diện khuôn mặt'),
         (EVENT_MULTIPLE_FACES, 'Phát hiện nhiều khuôn mặt'),
         (EVENT_AUDIO_ANOMALY, 'Âm thanh bất thường'),

@@ -11,7 +11,7 @@ from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 from .models import (
-    Question, QuestionGroup,
+    Question, QuestionGroup, InterviewScript,
     InterviewSession, InterviewTranscript, InterviewEvaluation,
     VoiceProfile, VoiceProfileSample, VoiceProfileGrant
 )
@@ -37,6 +37,8 @@ def _request_active_company(request):
 
 
 def _visible_questions_queryset(request):
+    if request is None:
+        return Question.objects.all()
     user = getattr(request, "user", None)
     if user and getattr(user, "is_authenticated", False) and _is_admin_user(user):
         return Question.objects.all()
@@ -48,6 +50,8 @@ def _visible_questions_queryset(request):
 
 
 def _visible_question_groups_queryset(request):
+    if request is None:
+        return QuestionGroup.objects.all()
     user = getattr(request, "user", None)
     if user and getattr(user, "is_authenticated", False) and _is_admin_user(user):
         return QuestionGroup.objects.all()
@@ -56,6 +60,19 @@ def _visible_question_groups_queryset(request):
     if not company:
         return QuestionGroup.objects.none()
     return QuestionGroup.objects.filter(Q(company__isnull=True) | Q(company=company))
+
+
+def _visible_interview_scripts_queryset(request):
+    if request is None:
+        return InterviewScript.objects.all()
+    user = getattr(request, "user", None)
+    if user and getattr(user, "is_authenticated", False) and _is_admin_user(user):
+        return InterviewScript.objects.all()
+
+    company = _request_active_company(request)
+    if not company:
+        return InterviewScript.objects.filter(is_system_preset=True)
+    return InterviewScript.objects.filter(Q(company=company) | Q(is_system_preset=True))
 
 
 def _set_related_queryset(field, queryset):
@@ -210,6 +227,133 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
             instance.evaluation_rubric = rubric
             instance.save(update_fields=["evaluation_rubric", "update_at"])
 
+        raw_question_ids = self.initial_data.get("question_ids")
+        if raw_question_ids and isinstance(raw_question_ids, list):
+            for idx, q_id in enumerate(raw_question_ids):
+                try:
+                    Question.objects.filter(id=q_id).update(sort_order=idx + 1)
+                except Exception:
+                    pass
+        return instance
+
+
+class InterviewScriptSerializer(serializers.ModelSerializer):
+    questions_count = serializers.SerializerMethodField()
+    canWrite = serializers.SerializerMethodField()
+    scenario_type_display = serializers.SerializerMethodField()
+    hr_persona_display = serializers.SerializerMethodField()
+    questions_detail = serializers.SerializerMethodField()
+    question_details = serializers.SerializerMethodField()
+    question_group_name = serializers.CharField(source='question_group.name', read_only=True, allow_null=True, default=None)
+    company_name = serializers.CharField(source='company.company_name', read_only=True, default=None)
+    author_name = serializers.CharField(source='author.full_name', read_only=True, default=None)
+    questions = serializers.PrimaryKeyRelatedField(
+        queryset=Question.objects.all(),
+        many=True,
+        required=False,
+    )
+    question_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Question.objects.all(),
+        many=True,
+        write_only=True,
+        required=False,
+        source='questions',
+    )
+
+    class Meta:
+        model = InterviewScript
+        fields = [
+            'id', 'name', 'slug', 'description',
+            'scenario_type', 'scenario_type_display',
+            'hr_persona', 'hr_persona_display',
+            'system_prompt', 'greeting_message', 'closing_message',
+            'time_limit_per_question', 'allow_ai_followup', 'max_followup_questions',
+            'question_group', 'question_group_name',
+            'questions', 'question_ids', 'questions_detail', 'question_details', 'questions_count',
+            'character_id', 'voice_name', 'voice_speed',
+            'evaluation_rubric',
+            'is_system_preset', 'is_active',
+            'company', 'company_name',
+            'author', 'author_name',
+            'canWrite',
+            'create_at', 'update_at',
+        ]
+        read_only_fields = ['id', 'is_system_preset', 'author', 'company', 'create_at', 'update_at']
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        _set_related_queryset(fields["questions"], _visible_questions_queryset(request))
+        _set_related_queryset(fields["question_ids"], _visible_questions_queryset(request))
+        _set_related_queryset(fields["question_group"], _visible_question_groups_queryset(request))
+        return fields
+
+    def get_questions_count(self, obj) -> int:
+        if not getattr(obj, "pk", None):
+            return 0
+        if hasattr(obj, "_prefetched_objects_cache") and "questions" in obj._prefetched_objects_cache:
+            count = len(obj.questions.all())
+        else:
+            try:
+                count = obj.questions.count()
+            except Exception:
+                count = 0
+        if count > 0:
+            return count
+        if obj.question_group_id and obj.question_group:
+            try:
+                return obj.question_group.questions.count()
+            except Exception:
+                return 0
+        return 0
+
+    def get_canWrite(self, obj) -> bool:
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if not user or not getattr(user, "is_authenticated", False):
+            return False
+        if _is_admin_user(user):
+            return True
+        if obj.is_system_preset:
+            return False
+        company = _request_active_company(request)
+        if not company:
+            return False
+        return obj.company_id is not None and obj.company_id == company.id
+
+    def get_scenario_type_display(self, obj) -> str:
+        return obj.get_scenario_type_display() if hasattr(obj, "get_scenario_type_display") else str(obj.scenario_type or "")
+
+    def get_hr_persona_display(self, obj) -> str:
+        return obj.get_hr_persona_display() if hasattr(obj, "get_hr_persona_display") else str(obj.hr_persona or "")
+
+    def get_questions_detail(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
+        try:
+            qs = obj.questions.all().order_by('sort_order', 'create_at', 'id')
+            if not qs.exists() and obj.question_group_id and obj.question_group:
+                qs = obj.question_group.questions.all().order_by('sort_order', 'create_at', 'id')
+            return QuestionSerializer(qs, many=True, context=self.context).data
+        except Exception:
+            return []
+
+    def get_question_details(self, obj):
+        return self.get_questions_detail(obj)
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        raw_question_ids = self.initial_data.get("question_ids")
+        if raw_question_ids and isinstance(raw_question_ids, list):
+            for idx, q_id in enumerate(raw_question_ids):
+                try:
+                    Question.objects.filter(id=q_id).update(sort_order=idx + 1)
+                except Exception:
+                    pass
+        return instance
+
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
         raw_question_ids = self.initial_data.get("question_ids")
         if raw_question_ids and isinstance(raw_question_ids, list):
             for idx, q_id in enumerate(raw_question_ids):
@@ -590,8 +734,12 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
     company_logo = serializers.SerializerMethodField()
     voice_profile = serializers.IntegerField(source='voice_profile_id', read_only=True, default=None)
     voice_profile_name = serializers.CharField(source='voice_profile.name', read_only=True, default=None)
+    interview_script = serializers.IntegerField(source='interview_script_id', read_only=True, default=None)
+    interview_script_name = serializers.CharField(source='interview_script.name', read_only=True, default=None)
     evaluations_count = serializers.SerializerMethodField()
     questions_count = serializers.SerializerMethodField()
+    proctoring_violation_count = serializers.SerializerMethodField()
+    proctoringViolationCount = serializers.SerializerMethodField()
     interview_language_display = serializers.CharField(source='get_interview_language_display', read_only=True)
 
     class Meta:
@@ -601,9 +749,11 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
             'candidate', 'candidate_name', 'candidate_email',
             'job_post', 'job_name', 'company_name', 'company_logo',
             'voice_profile', 'voice_profile_name',
+            'interview_script', 'interview_script_name',
             'scheduled_at', 'start_time', 'end_time', 'duration',
             'ai_overall_score', 'ai_technical_score', 'ai_communication_score',
             'ai_summary', 'ai_strengths', 'ai_weaknesses', 'session_metadata', 'questions_count', 'evaluations_count',
+            'proctoring_violation_count', 'proctoringViolationCount',
             'recording_url', 'notes',
             'create_at', 'update_at'
         ]
@@ -619,6 +769,21 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
 
     def get_questions_count(self, obj):
         return resolve_session_questions_count(obj)
+
+    def get_proctoring_violation_count(self, obj):
+        if not getattr(obj, "pk", None):
+            return 0
+        if hasattr(obj, "proctoring_events_count"):
+            return obj.proctoring_events_count
+        if hasattr(obj, "_prefetched_objects_cache") and "proctoring_events" in obj._prefetched_objects_cache:
+            return len(obj.proctoring_events.all())
+        try:
+            return obj.proctoring_events.count()
+        except Exception:
+            return 0
+
+    def get_proctoringViolationCount(self, obj):
+        return self.get_proctoring_violation_count(obj)
 
     def get_evaluations_count(self, obj):
         if not getattr(obj, "pk", None):
@@ -651,9 +816,20 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
         allow_null=True,
     )
     voice_profile_name = serializers.CharField(source='voice_profile.name', read_only=True, default=None)
+    interview_script = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewScript.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    interview_script_name = serializers.CharField(source='interview_script.name', read_only=True, default=None)
+    interview_script_detail = serializers.SerializerMethodField()
     questions = serializers.SerializerMethodField()
     transcripts = serializers.SerializerMethodField()
     evaluations = serializers.SerializerMethodField()
+    proctoring_events = serializers.SerializerMethodField()
+    proctoringEvents = serializers.SerializerMethodField()
+    proctoring_violation_count = serializers.SerializerMethodField()
+    proctoringViolationCount = serializers.SerializerMethodField()
     interview_language_display = serializers.CharField(source='get_interview_language_display', read_only=True)
 
     class Meta:
@@ -663,6 +839,7 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             'candidate', 'candidate_name', 'candidate_email',
             'job_post', 'job_name', 'company_name', 'company_logo',
             'voice_profile', 'voice_profile_name',
+            'interview_script', 'interview_script_name', 'interview_script_detail',
             'scheduled_at', 'start_time', 'end_time', 'duration',
             'recording_url', 'transcript_url', 'notes',
             'ai_overall_score', 'ai_technical_score', 'ai_communication_score',
@@ -670,12 +847,22 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             'session_metadata', 'questions_count',
             'created_by', 'question_group',
             'questions', 'transcripts', 'evaluations',
+            'proctoring_events', 'proctoringEvents',
+            'proctoring_violation_count', 'proctoringViolationCount',
             'create_at', 'update_at'
         ]
         read_only_fields = [
             'id', 'room_name', 'invite_token',
             'created_by', 'create_at', 'update_at'
         ]
+
+    def get_interview_script_detail(self, obj):
+        if not getattr(obj, "pk", None) or not obj.interview_script:
+            return None
+        try:
+            return InterviewScriptSerializer(obj.interview_script, context=self.context).data
+        except Exception:
+            return None
 
     def get_questions(self, obj):
         if not getattr(obj, "pk", None):
@@ -719,6 +906,36 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     def get_questions_count(self, obj):
         return resolve_session_questions_count(obj)
 
+    def get_proctoring_events(self, obj):
+        if not getattr(obj, "pk", None):
+            return []
+        try:
+            if hasattr(obj, "_prefetched_objects_cache") and "proctoring_events" in obj._prefetched_objects_cache:
+                events = obj.proctoring_events.all()
+            else:
+                events = obj.proctoring_events.all()[:100]
+            return InterviewProctoringEventSerializer(events, many=True, context=self.context).data
+        except Exception:
+            return []
+
+    def get_proctoringEvents(self, obj):
+        return self.get_proctoring_events(obj)
+
+    def get_proctoring_violation_count(self, obj):
+        if not getattr(obj, "pk", None):
+            return 0
+        if hasattr(obj, "proctoring_events_count"):
+            return obj.proctoring_events_count
+        if hasattr(obj, "_prefetched_objects_cache") and "proctoring_events" in obj._prefetched_objects_cache:
+            return len(obj.proctoring_events.all())
+        try:
+            return obj.proctoring_events.count()
+        except Exception:
+            return 0
+
+    def get_proctoringViolationCount(self, obj):
+        return self.get_proctoring_violation_count(obj)
+
     def to_representation(self, instance):
         data = super().to_representation(instance)
         request = self.context.get("request")
@@ -752,6 +969,10 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
 
         if not is_admin_or_employer:
             data.pop("notes", None)
+            data.pop("proctoring_events", None)
+            data.pop("proctoringEvents", None)
+            data.pop("proctoring_violation_count", None)
+            data.pop("proctoringViolationCount", None)
             if instance.status != "completed":
                 data.pop("evaluations", None)
             # Sanitize questions to remove confidential recruiter guidelines
@@ -914,6 +1135,7 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
             'candidate', 'job_post', 'type', 'interview_language',
             'scheduled_at', 'notes',
             'question_group', 'question_ids', 'voice_profile',
+            'interview_script',
             'session_metadata',
         ]
 
@@ -931,6 +1153,8 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
             payload["question_group"] = payload.get("questionGroup")
         if "voiceProfile" in payload and "voice_profile" not in payload:
             payload["voice_profile"] = payload.get("voiceProfile")
+        if "interviewScript" in payload and "interview_script" not in payload:
+            payload["interview_script"] = payload.get("interviewScript")
         if "sessionMetadata" in payload and "session_metadata" not in payload:
             payload["session_metadata"] = payload.get("sessionMetadata")
         return super().to_internal_value(payload)
@@ -940,6 +1164,8 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         _set_related_queryset(fields["question_ids"], _visible_questions_queryset(request))
         _set_related_queryset(fields["question_group"], _visible_question_groups_queryset(request))
+        if "interview_script" in fields:
+            _set_related_queryset(fields["interview_script"], _visible_interview_scripts_queryset(request))
         return fields
 
     def validate_candidate(self, candidate):
@@ -1025,6 +1251,15 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
 
         return session
 
+    def update(self, instance, validated_data):
+        question_ids = validated_data.pop('question_ids', None)
+        session = super().update(instance, validated_data)
+        if question_ids is not None:
+            session.questions.set(question_ids)
+        elif 'question_group' in validated_data and session.question_group:
+            session.questions.set(session.question_group.questions.all())
+        return session
+
 class InterviewContextSerializer(serializers.Serializer):
     """Context cho AI Agent khi join room (follow SquareAI)."""
     candidateName = serializers.CharField(required=False, allow_blank=True, allow_null=True)
@@ -1055,14 +1290,18 @@ class UpdateStatusSerializer(serializers.Serializer):
 
 
 class InterviewProctoringEventSerializer(serializers.ModelSerializer):
+    eventType = serializers.CharField(source="event_type", read_only=True)
     eventTypeLabel = serializers.CharField(source="get_event_type_display", read_only=True)
+    durationSeconds = serializers.FloatField(source="duration_seconds", read_only=True)
+    createAt = serializers.DateTimeField(source="create_at", read_only=True)
 
     class Meta:
         from .models import InterviewProctoringEvent
         model = InterviewProctoringEvent
         fields = [
-            'id', 'session', 'event_type', 'eventTypeLabel',
-            'timestamp', 'duration_seconds', 'details', 'create_at'
+            'id', 'session', 'event_type', 'eventType', 'eventTypeLabel',
+            'timestamp', 'duration_seconds', 'durationSeconds', 'details',
+            'create_at', 'createAt'
         ]
         read_only_fields = ['id', 'create_at', 'timestamp']
 

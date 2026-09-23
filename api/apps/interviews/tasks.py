@@ -673,23 +673,27 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
     default_retry_delay=15,
 )
 def auto_schedule_screening_interview(activity_id: int):
-    """Automatically schedules an AI interview if the job post has a template."""
+    """Automatically schedules an AI interview if the job post has an interview script or template."""
     from apps.jobs.models import JobPostActivity
     from apps.interviews.models import InterviewSession
-    
+
     try:
-        activity = JobPostActivity.objects.select_related('user', 'job_post', 'job_post__interview_template').get(id=activity_id)
+        activity = JobPostActivity.objects.select_related(
+            'user', 'job_post', 'job_post__interview_template', 'job_post__interview_script'
+        ).get(id=activity_id)
         job_post = activity.job_post
         candidate = activity.user
-        
-        # Check if template exists
-        if not job_post.interview_template:
+
+        # Check if either interview_script or interview_template exists
+        script = getattr(job_post, 'interview_script', None)
+        template = getattr(job_post, 'interview_template', None)
+        if not script and not template:
             return
-            
+
         # Check if session already exists
         if InterviewSession.objects.filter(candidate=candidate, job_post=job_post).exists():
             return
-            
+
         # Create Session
         from django.utils import timezone
         # Schedule it loosely starting now
@@ -699,20 +703,23 @@ def auto_schedule_screening_interview(activity_id: int):
             type='mixed', # Mixed AI screening
             status='scheduled',
             scheduled_at=timezone.now(),
-            question_group=job_post.interview_template,
+            interview_script=script,
+            question_group=template,
             created_by=job_post.user, # The actual Employer
         )
-        
-        # Add questions from group
-        session.questions.set(job_post.interview_template.questions.all())
-        
-        # Move pipeline to "Tested" to indicate an assessment was sent? Or leave in Pending
-        # Let's move it to "Contacted" (2) since we contacted them with an assessment
+
+        # Add questions from script (preferred) or group
+        if script and script.questions.exists():
+            session.questions.set(script.questions.all())
+        elif template and template.questions.exists():
+            session.questions.set(template.questions.all())
+
+        # Move pipeline to "Contacted" (2) since we contacted them with an assessment
         from shared.configs.variable_system import ApplicationStatus
         if activity.status == ApplicationStatus.PENDING_CONFIRMATION:
             activity.status = ApplicationStatus.CONTACTED
             activity.save(update_fields=['status', 'update_at'])
-        
+
         # Send Email
         send_interview_invitation.delay(session.id)
         logger.info(f"Auto-scheduled screening AI interview for candidate {candidate.id} on job {job_post.id}")

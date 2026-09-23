@@ -1723,3 +1723,66 @@ class InterviewSlotCapacityTests(TestCase):
         key2 = compute_tts_cache_key("tts-vi", "Trúc Ly", 1.0, "   Chào bạn, mình là trợ lý AI.   ")
         self.assertEqual(key1, key2)
 
+
+class InterviewSessionViewSetSerializerTests(TestCase):
+    def test_get_serializer_class_actions(self):
+        from apps.interviews.views import InterviewSessionViewSet
+        from apps.interviews.serializers import (
+            InterviewSessionCreateSerializer,
+            InterviewSessionListSerializer,
+            InterviewSessionDetailSerializer,
+        )
+
+        viewset = InterviewSessionViewSet()
+        viewset.action = "create"
+        self.assertIs(viewset.get_serializer_class(), InterviewSessionCreateSerializer)
+
+        viewset.action = "update"
+        self.assertIs(viewset.get_serializer_class(), InterviewSessionCreateSerializer)
+
+        viewset.action = "partial_update"
+        self.assertIs(viewset.get_serializer_class(), InterviewSessionCreateSerializer)
+
+        viewset.action = "list"
+        self.assertIs(viewset.get_serializer_class(), InterviewSessionListSerializer)
+
+        viewset.action = "retrieve"
+        self.assertIs(viewset.get_serializer_class(), InterviewSessionDetailSerializer)
+
+    def test_create_serializer_handles_update_with_question_ids(self):
+        from apps.interviews.serializers import InterviewSessionCreateSerializer
+
+        admin_user = User.objects.create_user_with_role_name(
+            email="admin-update@example.com",
+            full_name="Admin Update",
+            role_name=var_sys.ADMIN,
+            password="password123",
+            is_staff=True,
+            is_superuser=True,
+        )
+        request = RequestFactory().patch("/")
+        request.user = admin_user
+
+        candidate = User.objects.create_user_with_role_name(
+            email="candidate-update@example.com",
+            full_name="Candidate Update",
+            role_name=var_sys.JOB_SEEKER,
+            password="password123",
+        )
+        session = InterviewSession.objects.create(candidate=candidate, notes="Initial note")
+        q1 = Question.objects.create(text="Question Alpha")
+        q2 = Question.objects.create(text="Question Beta")
+
+        serializer = InterviewSessionCreateSerializer(
+            instance=session,
+            data={"notes": "Updated note", "question_ids": [q1.id, q2.id]},
+            partial=True,
+            context={"request": request},
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        updated_session = serializer.save()
+
+        self.assertEqual(updated_session.notes, "Updated note")
+        self.assertEqual(set(updated_session.questions.values_list("id", flat=True)), {q1.id, q2.id})
+
+
