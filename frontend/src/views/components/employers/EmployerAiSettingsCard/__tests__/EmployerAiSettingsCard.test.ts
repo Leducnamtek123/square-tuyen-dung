@@ -7,6 +7,8 @@ import {
 } from '@/services/employerAiSettingService';
 
 describe('EmployerAiSettingsCard and AI Settings Suite', () => {
+  const vietnameseCharRegex = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i;
+
   it('contains valid preset configurations', () => {
     expect(PRESET_BACKGROUNDS.length).toBeGreaterThanOrEqual(4);
     expect(PRESET_AVATARS.length).toBeGreaterThanOrEqual(2);
@@ -28,10 +30,8 @@ describe('EmployerAiSettingsCard and AI Settings Suite', () => {
     expect(source).not.toContain('linear-gradient');
     expect(source).not.toContain('bg-gradient');
 
-    // Extract all string literals (single, double, template)
+    // Extract all string literals
     const stringLiterals = source.match(/(["'`])(?:(?=(\\?))\2[\s\S])*?\1/g) || [];
-    const vietnameseCharRegex = /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i;
-
     const vietnameseStringsWithParentheses = stringLiterals.filter(
       (str) => vietnameseCharRegex.test(str) && /[()]/.test(str)
     );
@@ -43,5 +43,89 @@ describe('EmployerAiSettingsCard and AI Settings Suite', () => {
       (comment) => vietnameseCharRegex.test(comment) && /[()]/.test(comment)
     );
     expect(vietnameseCommentsWithParentheses).toEqual([]);
+  });
+
+  it('ensures modular subcomponents comply with typography and constraint standards', () => {
+    const subcomponents = [
+      'AiStudioPreview.tsx',
+      'AiIdentityCard.tsx',
+      'AiVoiceSelector.tsx',
+      'AiSpaceCard.tsx',
+      'AiActionBar.tsx',
+    ];
+
+    for (const filename of subcomponents) {
+      const filePath = join(__dirname, '..', filename);
+      const source = readFileSync(filePath, 'utf8');
+
+      // Check no gradient
+      expect(source).not.toContain('linear-gradient');
+      expect(source).not.toContain('bg-gradient');
+
+      // Check no parentheses in Vietnamese prose
+      const stringLiterals = source.match(/(["'`])(?:(?=(\\?))\2[\s\S])*?\1/g) || [];
+      const badStrings = stringLiterals.filter(
+        (str) => vietnameseCharRegex.test(str) && /[()]/.test(str)
+      );
+      expect(badStrings).toEqual([]);
+
+      // Check no parentheses in Vietnamese comments
+      const commentLines = source.split('\n').filter((line) => line.trim().startsWith('//') || line.trim().startsWith('{/*'));
+      const badComments = commentLines.filter(
+        (comment) => vietnameseCharRegex.test(comment) && /[()]/.test(comment)
+      );
+      expect(badComments).toEqual([]);
+    }
+  });
+
+  it('verifies AiStudioPreview live lipsync contract and gesture testing', () => {
+    const previewPath = join(__dirname, '../AiStudioPreview.tsx');
+    const source = readFileSync(previewPath, 'utf8');
+
+    expect(source).toContain('InterviewAvatar');
+    expect(source).toContain('speakVideoUrl');
+    expect(source).toContain('isSpeakingTest');
+    expect(source).toContain('actionHint');
+    expect(source).toContain('wave');
+    expect(source).toContain('thanks_wave');
+  });
+
+  it('verifies AiIdentityCard interviewer character and persona configuration', () => {
+    const identityPath = join(__dirname, '../AiIdentityCard.tsx');
+    const source = readFileSync(identityPath, 'utf8');
+
+    expect(source).toContain('interviewerName');
+    expect(source).toContain('interviewerTitle');
+    expect(source).toContain('ng_c_linh');
+    expect(source).toContain('minh_tri');
+    expect(source).toContain('HrPersonaSelector');
+  });
+
+  it('verifies AiVoiceSelector tts playback and live speaking state callback', () => {
+    const voicePath = join(__dirname, '../AiVoiceSelector.tsx');
+    const source = readFileSync(voicePath, 'utf8');
+
+    expect(source).toContain('PRESET_VOICES');
+    expect(source).toContain('aiService.tts');
+    expect(source).toContain('onSpeakingStateChange');
+    expect(source).toContain('onplay');
+    expect(source).toContain('onended');
+  });
+
+  it('verifies AiSpaceCard background presets and upload file handling', () => {
+    const spacePath = join(__dirname, '../AiSpaceCard.tsx');
+    const source = readFileSync(spacePath, 'utf8');
+
+    expect(source).toContain('PRESET_BACKGROUNDS');
+    expect(source).toContain('commonService.uploadFile');
+  });
+
+  it('verifies AiActionBar save and reset triggers', () => {
+    const barPath = join(__dirname, '../AiActionBar.tsx');
+    const source = readFileSync(barPath, 'utf8');
+
+    expect(source).toContain('onSave');
+    expect(source).toContain('onReset');
+    expect(source).toContain('isDirty');
   });
 });
