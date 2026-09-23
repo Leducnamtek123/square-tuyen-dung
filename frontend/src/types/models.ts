@@ -665,6 +665,8 @@ export interface QuestionGroup {
   company?: number;
   evaluation_rubric?: InterviewEvaluationRubric | null;
   questions?: Question[];
+  questions_count?: number;
+  questionsCount?: number;
   questionIds?: number[];
   question_ids?: number[]; // Raw API payload field
   canWrite?: boolean;

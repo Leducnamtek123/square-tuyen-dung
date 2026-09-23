@@ -49,6 +49,8 @@ export interface InterviewScript {
   questions?: ScriptQuestion[] | number[];
   question_details?: ScriptQuestion[];
   questions_count?: number;
+  question_ids?: number[];
+  questionIds?: number[];
   character_id: string; // e.g. 'ng_c_linh', 'minh_tri'
   voice_name: string; // e.g. 'Trúc Ly', 'Mạnh Dũng'
   voice_speed: number; // default 1.0
@@ -58,6 +60,9 @@ export interface InterviewScript {
   canWrite?: boolean;
   company?: number | null | { id: number; name: string };
   author?: number | null | { id: number; username: string; full_name?: string };
+  inherit_company_identity?: boolean;
+  inheritCompanyIdentity?: boolean;
+  questions_detail?: ScriptQuestion[];
   create_at?: string;
   update_at?: string;
 
@@ -103,6 +108,8 @@ export interface InterviewScriptInput {
   voice_name?: string;
   voice_speed?: number;
   evaluation_rubric?: EvaluationCriterion[] | Record<string, unknown>;
+  inherit_company_identity?: boolean;
+  inheritCompanyIdentity?: boolean;
   is_active?: boolean;
 
   // CamelCase accessors
