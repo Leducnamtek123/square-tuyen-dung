@@ -1,25 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
-  Card,
   Button,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
-  MenuItem,
-  CircularProgress,
-  Avatar,
   Stack,
-  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -27,23 +13,29 @@ import {
   Stepper,
   Step,
   StepLabel,
+  TextField,
+  MenuItem,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
-import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 
 import {
-  useHrmEmployees,
+  useHrmOnboardingProcesses,
+  useHrmOnboardingStats,
   useHrmDepartments,
   useHrmDesignations,
   useHrmMutations,
 } from '../hooks/useHrmQueries';
 import { TabTitle } from '@/utils/generalFunction';
 import pc from '@/utils/muiColors';
+
+import { OnboardingKpiCards } from './components/OnboardingKpiCards';
+import { OnboardingFilters } from './components/OnboardingFilters';
+import { OnboardingTableView } from './components/OnboardingTableView';
+import { OnboardingKanbanView } from './components/OnboardingKanbanView';
+import { OnboardingDetailDrawer } from './components/OnboardingDetailDrawer';
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
@@ -65,16 +57,35 @@ const inputSx = {
   },
 };
 
-const STEPS = ['Hồ sơ Cá nhân', 'Phòng ban & Vị trí', 'Đãi ngộ & Ký kết'];
+const MANUAL_STEPS = ['Hồ sơ Cá nhân', 'Phòng ban & Vị trí', 'Đãi ngộ & Ký kết'];
 
 export default function OnboardingPage() {
   TabTitle('Tiếp nhận & Onboarding Nhân viên | InfoHR HRM');
 
-  const { data: employees = [], isLoading: loading, refetch } = useHrmEmployees();
+  // Filter and view states
+  const [search, setSearch] = useState('');
+  const [stageFilter, setStageFilter] = useState('');
+  const [deptFilter, setDeptFilter] = useState<string | number>('');
+  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
+  const [selectedProcessId, setSelectedProcessId] = useState<number | null>(null);
+
+  // Queries
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useHrmOnboardingStats();
+  const {
+    data: processes = [],
+    isLoading: processesLoading,
+    refetch: refetchProcesses,
+  } = useHrmOnboardingProcesses({
+    stage: stageFilter || undefined,
+    department: deptFilter || undefined,
+    search: search || undefined,
+  });
+
   const { data: departments = [] } = useHrmDepartments();
   const { data: designations = [] } = useHrmDesignations();
   const { onboardCandidate } = useHrmMutations();
 
+  // Manual Onboard Modal state
   const [openModal, setOpenModal] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
 
@@ -91,28 +102,26 @@ export default function OnboardingPage() {
     employment_type: 'FULL_TIME',
   });
 
-  const sixtyDaysAgo = new Date();
-  sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+  const handleRefresh = () => {
+    refetchStats();
+    refetchProcesses();
+  };
 
-  const onboardingEmployees = employees.filter((e) => {
-    if (e.status === 'PROBATION') return true;
-    const joinDateStr = e.joinDate || e.join_date;
-    if (joinDateStr) {
-      const joinDate = new Date(joinDateStr);
-      return joinDate >= sixtyDaysAgo;
-    }
-    return false;
-  });
+  const handleResetFilters = () => {
+    setSearch('');
+    setStageFilter('');
+    setDeptFilter('');
+  };
 
-  const handleNext = () => {
+  const handleNextStep = () => {
     setActiveStep((prev) => prev + 1);
   };
 
-  const handleBack = () => {
+  const handleBackStep = () => {
     setActiveStep((prev) => prev - 1);
   };
 
-  const handleOnboardSubmit = async () => {
+  const handleManualOnboardSubmit = async () => {
     onboardCandidate.mutate(
       {
         first_name: form.first_name,
@@ -142,37 +151,76 @@ export default function OnboardingPage() {
             base_salary: 15000000,
             employment_type: 'FULL_TIME',
           });
+          handleRefresh();
         },
       }
     );
   };
 
+  // Client-side text filtering if search term entered
+  const filteredProcesses = useMemo(() => {
+    if (!search.trim()) return processes;
+    const q = search.trim().toLowerCase();
+    return processes.filter((proc) => {
+      const emp = proc.employee_detail;
+      const fullName = (emp?.full_name || emp?.fullName || '').toLowerCase();
+      const code = (emp?.employee_code || emp?.employeeCode || '').toLowerCase();
+      const email = (emp?.email || '').toLowerCase();
+      const dept = (emp?.department_name || emp?.departmentName || '').toLowerCase();
+      const pos = (emp?.designation_title || emp?.designationTitle || '').toLowerCase();
+      return (
+        fullName.includes(q) ||
+        code.includes(q) ||
+        email.includes(q) ||
+        dept.includes(q) ||
+        pos.includes(q)
+      );
+    });
+  }, [processes, search]);
+
   return (
-    <Box sx={{ width: '100%', maxWidth: 1400, mx: 'auto', p: { xs: 2, sm: 3 } }}>
-      <Stack spacing={3.5}>
+    <Box sx={{ width: '100%', maxWidth: 1440, mx: 'auto', p: { xs: 2, sm: 3 } }}>
+      <Stack spacing={3}>
         {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 2,
+          }}
+        >
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Box
               sx={{
-                width: 44,
-                height: 44,
-                borderRadius: '12px',
-                bgcolor: '#f0fdf4',
-                color: '#16a34a',
+                width: 46,
+                height: 46,
+                borderRadius: '14px',
+                bgcolor: '#eff6ff',
+                color: '#2563eb',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                border: '1.5px solid #dbeafe',
               }}
             >
-              <RocketLaunchIcon sx={{ fontSize: 24 }} />
+              <RocketLaunchIcon sx={{ fontSize: 26 }} />
             </Box>
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f172a', fontSize: { xs: '1.25rem', md: '1.5rem' }, letterSpacing: '-0.02em' }}>
-                Tiếp nhận & Onboarding Nhân sự
+              <Typography
+                variant="h5"
+                sx={{
+                  fontWeight: 900,
+                  color: '#0f172a',
+                  fontSize: { xs: '1.25rem', md: '1.5rem' },
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Trung tâm Tiếp nhận & Onboarding Nhân sự
               </Typography>
               <Typography variant="body2" sx={{ color: '#64748b', fontWeight: 500, fontSize: '0.875rem' }}>
-                Quy trình tiếp nhận ứng viên trúng tuyển, thiết lập hồ sơ và chuẩn bị hợp đồng thử việc
+                Quản trị quy trình tiếp nhận ứng viên trúng tuyển từ nộp hồ sơ số, hậu cần nội bộ đến kết thúc thử việc
               </Typography>
             </Box>
           </Stack>
@@ -182,7 +230,7 @@ export default function OnboardingPage() {
               variant="outlined"
               size="small"
               startIcon={<RefreshIcon sx={{ fontSize: 16 }} />}
-              onClick={() => refetch()}
+              onClick={handleRefresh}
               sx={{
                 borderRadius: 2,
                 textTransform: 'none',
@@ -212,153 +260,76 @@ export default function OnboardingPage() {
                 '&:hover': { bgcolor: '#15803d' },
               }}
             >
-              Tiếp nhận Nhân sự Mới
+              Tiếp nhận Trực tiếp
             </Button>
           </Stack>
         </Box>
 
-        {/* 3 Step Workflow Overview Banner */}
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
-              <Stack direction="row" spacing={1.5} alignItems="center">
-                <Box sx={{ width: 36, height: 36, borderRadius: '10px', bgcolor: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <AssignmentIndOutlinedIcon sx={{ fontSize: 20 }} />
-                </Box>
-                <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>1. Khởi tạo Hồ sơ</Typography>
-                  <Typography variant="caption" sx={{ color: '#64748b' }}>Đồng bộ thông tin từ ứng viên trúng tuyển</Typography>
-                </Box>
-              </Stack>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
-              <Stack direction="row" spacing={1.5} alignItems="center">
-                <Box sx={{ width: 36, height: 36, borderRadius: '10px', bgcolor: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <RocketLaunchIcon sx={{ fontSize: 20 }} />
-                </Box>
-                <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>2. Bàn giao & Định danh</Typography>
-                  <Typography variant="caption" sx={{ color: '#64748b' }}>Phân bổ phòng ban, chức danh & thiết bị</Typography>
-                </Box>
-              </Stack>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #e2e8f0', bgcolor: '#ffffff' }}>
-              <Stack direction="row" spacing={1.5} alignItems="center">
-                <Box sx={{ width: 36, height: 36, borderRadius: '10px', bgcolor: '#fffbeb', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <AttachMoneyOutlinedIcon sx={{ fontSize: 20 }} />
-                </Box>
-                <Box>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>3. Ký kết Thử việc</Typography>
-                  <Typography variant="caption" sx={{ color: '#64748b' }}>Kích hoạt hợp đồng và tài khoản nhân sự</Typography>
-                </Box>
-              </Stack>
-            </Paper>
-          </Grid>
-        </Grid>
+        {/* KPI Summary Cards */}
+        <OnboardingKpiCards
+          stats={stats}
+          loading={statsLoading}
+          selectedFilterStage={stageFilter}
+          onFilterClick={(stage) => {
+            setStageFilter((prev) => (prev === stage ? '' : stage));
+          }}
+        />
 
-        {/* Onboarding List Table */}
-        <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid #e2e8f0', overflow: 'hidden', bgcolor: '#ffffff' }}>
-          <TableContainer sx={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-            <Table size="medium" sx={{ minWidth: 650 }}>
-              <TableHead sx={{ bgcolor: '#f8fafc' }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Mã NV & Họ tên</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Phòng ban & Vị trí</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Ngày vào làm</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Hạn thử việc</TableCell>
-                  <TableCell sx={{ fontWeight: 800, color: '#475569', fontSize: '0.8125rem' }}>Trạng thái</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                      <CircularProgress size={28} />
-                    </TableCell>
-                  </TableRow>
-                ) : onboardingEmployees.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center" sx={{ py: 6, color: '#64748b' }}>
-                      Chưa có nhân sự nào trong danh sách tiếp nhận.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  onboardingEmployees.map((emp) => (
-                    <TableRow key={emp.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
-                      <TableCell>
-                        <Stack direction="row" spacing={1.5} alignItems="center">
-                          <Avatar
-                            src={emp.avatar}
-                            sx={{ width: 38, height: 38, bgcolor: '#f0fdf4', color: '#16a34a', fontWeight: 800, fontSize: '0.875rem' }}
-                          >
-                            {(emp.fullName || emp.full_name)?.charAt(0)?.toUpperCase() || 'E'}
-                          </Avatar>
-                          <Box>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                              {emp.fullName || emp.full_name}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                              {emp.employeeCode || emp.employee_code}
-                            </Typography>
-                          </Box>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 700, color: '#1e293b' }}>
-                          {emp.designationTitle || emp.designation_title || 'Chưa gán'}
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: '#64748b' }}>
-                          {emp.departmentName || emp.department_name || 'Chưa phân phòng'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#475569' }}>
-                        {emp.joinDate || emp.join_date || '---'}
-                      </TableCell>
-                      <TableCell sx={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: '#d97706', fontWeight: 700 }}>
-                        {emp.probationEndDate || emp.probation_end_date || '---'}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={emp.status === 'PROBATION' ? 'Đang thử việc' : 'Đã chính thức'}
-                          size="small"
-                          sx={{
-                            fontWeight: 800,
-                            fontSize: '0.725rem',
-                            bgcolor: emp.status === 'PROBATION' ? '#fffbeb' : '#f0fdf4',
-                            color: emp.status === 'PROBATION' ? '#d97706' : '#16a34a',
-                            borderRadius: 1.5,
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
+        {/* Toolbar & Filters */}
+        <OnboardingFilters
+          search={search}
+          onSearchChange={setSearch}
+          stage={stageFilter}
+          onStageChange={setStageFilter}
+          department={deptFilter}
+          onDepartmentChange={setDeptFilter}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          departments={departments}
+          onReset={handleResetFilters}
+        />
+
+        {/* View Mode Content: Table vs Kanban */}
+        {viewMode === 'table' ? (
+          <OnboardingTableView
+            processes={filteredProcesses}
+            loading={processesLoading}
+            onSelectProcess={(proc) => setSelectedProcessId(proc.id)}
+          />
+        ) : (
+          <OnboardingKanbanView
+            processes={filteredProcesses}
+            loading={processesLoading}
+            onSelectProcess={(proc) => setSelectedProcessId(proc.id)}
+          />
+        )}
       </Stack>
 
-      {/* Onboarding Multi-Step Dialog */}
+      {/* 5-Stage Interactive Onboarding Drawer */}
+      <OnboardingDetailDrawer
+        open={Boolean(selectedProcessId)}
+        onClose={() => setSelectedProcessId(null)}
+        processId={selectedProcessId}
+      />
+
+      {/* Manual Onboarding Modal (For direct HR entry) */}
       <Dialog
         open={openModal}
         onClose={() => setOpenModal(false)}
         fullWidth
         maxWidth="sm"
-        PaperProps={{ sx: { borderRadius: 3 } }}
+        slotProps={{ paper: { sx: { borderRadius: 3 } } }}
       >
         <DialogTitle sx={{ fontWeight: 900, color: '#0f172a', borderBottom: '1px solid #e2e8f0', p: 2.5 }}>
-          Tiếp nhận & Onboarding Nhân viên Mới
+          Tiếp nhận & Khởi tạo Nhân sự Mới
         </DialogTitle>
         <DialogContent sx={{ p: 2.5, pt: '24px !important' }}>
           <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3.5 }}>
-            {STEPS.map((label) => (
+            {MANUAL_STEPS.map((label) => (
               <Step key={label}>
-                <StepLabel sx={{ '& .MuiStepLabel-label': { fontWeight: 700, fontSize: '0.775rem' } }}>{label}</StepLabel>
+                <StepLabel sx={{ '& .MuiStepLabel-label': { fontWeight: 700, fontSize: '0.775rem' } }}>
+                  {label}
+                </StepLabel>
               </Step>
             ))}
           </Stepper>
@@ -415,7 +386,9 @@ export default function OnboardingPage() {
               >
                 <MenuItem value="">-- Chọn phòng ban --</MenuItem>
                 {departments.map((d) => (
-                  <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>
+                  <MenuItem key={d.id} value={d.id}>
+                    {d.name}
+                  </MenuItem>
                 ))}
               </TextField>
               <TextField
@@ -428,7 +401,9 @@ export default function OnboardingPage() {
               >
                 <MenuItem value="">-- Chọn chức danh --</MenuItem>
                 {designations.map((d) => (
-                  <MenuItem key={d.id} value={d.id}>{d.title}</MenuItem>
+                  <MenuItem key={d.id} value={d.id}>
+                    {d.title}
+                  </MenuItem>
                 ))}
               </TextField>
               <TextField
@@ -487,17 +462,17 @@ export default function OnboardingPage() {
         <DialogActions sx={{ p: 2.5, borderTop: '1px solid #e2e8f0', justifyContent: 'space-between' }}>
           <Button
             disabled={activeStep === 0}
-            onClick={handleBack}
+            onClick={handleBackStep}
             sx={{ fontWeight: 700, color: '#64748b', textTransform: 'none' }}
           >
             Quay lại
           </Button>
 
-          {activeStep < STEPS.length - 1 ? (
+          {activeStep < MANUAL_STEPS.length - 1 ? (
             <Button
               variant="contained"
               disabled={activeStep === 0 && (!form.first_name || !form.last_name || !form.email)}
-              onClick={handleNext}
+              onClick={handleNextStep}
               sx={{ fontWeight: 800, borderRadius: 2, textTransform: 'none', bgcolor: '#2563eb' }}
             >
               Tiếp tục
@@ -506,7 +481,7 @@ export default function OnboardingPage() {
             <Button
               variant="contained"
               disabled={onboardCandidate.isPending}
-              onClick={handleOnboardSubmit}
+              onClick={handleManualOnboardSubmit}
               sx={{ fontWeight: 800, borderRadius: 2, textTransform: 'none', bgcolor: '#16a34a' }}
             >
               {onboardCandidate.isPending ? 'Đang hoàn tất...' : 'Hoàn tất Tiếp nhận'}
