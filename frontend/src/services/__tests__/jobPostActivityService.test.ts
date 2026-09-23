@@ -22,7 +22,14 @@ describe('jobPostActivityService', () => {
   it('normalizes empty successful send email responses', async () => {
     (httpRequest.post as jest.Mock).mockResolvedValueOnce(null);
 
-    await expect(jobPostActivityService.sendEmail(12, { subject: 'Interview' })).resolves.toEqual({
+    await expect(
+      jobPostActivityService.sendEmail(12, {
+        fullName: 'Test',
+        title: 'Test Title',
+        content: 'Test Content',
+        email: 'test@example.com',
+      })
+    ).resolves.toEqual({
       success: true,
     });
   });

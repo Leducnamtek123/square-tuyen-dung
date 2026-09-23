@@ -1,4 +1,5 @@
 import type { RoleName } from './auth';
+import type { InterviewScript } from './interviewScript';
 
 /* Job Post Status: Canonical source is backend var_sys.JobPostStatus */
 export enum JobPostStatus {
@@ -18,6 +19,9 @@ export interface User {
   avatarUrl?: string | null;
   coverUrl?: string | null;
   hasCompany?: boolean;
+  companyId?: number | null;
+  company?: { id?: number; slug?: string; companyName?: string; imageUrl?: string | null } | null;
+  employerRoleCode?: string | null;
   isVerifyEmail?: boolean;
   isPhoneVerified?: boolean;
   isVerifyPhone?: boolean;
@@ -28,7 +32,7 @@ export interface User {
   isActive?: boolean;
   dateJoined?: string;
   /** Job seeker profile object returned by backend (when roleName === 'JOB_SEEKER') */
-  jobSeekerProfile?: { id: number | string; coverUrl?: string | null; avatarUrl?: string | null } | null;
+  jobSeekerProfile?: { id: number | string; phone?: string; coverUrl?: string | null; avatarUrl?: string | null } | null;
   /** Flat job seeker profile ID (alternative backend serialization) */
   jobSeekerProfileId?: number | string | null;
 }
@@ -197,7 +201,9 @@ export interface JobPost {
   contactPersonName?: string;
   contactPersonPhone?: string;
   contactPersonEmail?: string;
-  career?: Career | null;
+  career?: number | Career | null;
+  careerChooseData?: { id: number; name: string } | null;
+  cityChooseData?: { id: number; name: string } | null;
   company?: Company | null;
   location?: Location | null;
   createAt?: string;
@@ -207,6 +213,8 @@ export interface JobPost {
   aiRecommendedCount?: number;
   aiRecommendedAvatars?: Array<{ name: string; initial: string; avatarUrl?: string | null }>;
   interviewTemplate?: number | null;
+  interviewScript?: number | null;
+  interviewScriptDetail?: InterviewScript | null;
   autoInterviewEnabled?: boolean;
   minScreeningScore?: number;
 }
@@ -313,8 +321,10 @@ export interface Resume {
     url?: string;
     fileUrl?: string;
   } | null;
-  city?: City | null;
-  career?: Career | null;
+  city?: number | City | null;
+  career?: number | Career | null;
+  cityChooseData?: { id: number; name: string } | null;
+  careerChooseData?: { id: number; name: string } | null;
   sourcePlatform?: string | null;
   sourceUrl?: string | null;
   sourceAccount?: string | null;
@@ -398,6 +408,7 @@ export interface EducationDetail {
   trainingPlaceName?: string;
   startDate?: string;
   completedDate?: string | null;
+  gradeOrRank?: string | null;
   description?: string | null;
 }
 
@@ -755,6 +766,25 @@ export interface InterviewSession {
   interview_language?: 'vi' | 'en' | 'ja' | 'ko' | string;
   interviewLanguageDisplay?: string;
   interview_language_display?: string;
+  proctoringEvents?: InterviewProctoringEvent[];
+  proctoring_events?: InterviewProctoringEvent[];
+  proctoringViolationCount?: number;
+  proctoring_violation_count?: number;
+}
+
+export interface InterviewProctoringEvent {
+  id: number;
+  session?: number;
+  eventType?: string;
+  event_type?: string;
+  eventTypeLabel?: string;
+  event_type_label?: string;
+  timestamp?: string;
+  durationSeconds?: number;
+  duration_seconds?: number;
+  details?: Record<string, any> | null;
+  createAt?: string;
+  create_at?: string;
 }
 
 export interface InterviewTranscript {
@@ -867,6 +897,7 @@ export interface JobPostNotification {
   isActive?: boolean;
   career?: number | null;
   city?: number | null;
+  createAt?: string;
 }
 
 /* Chat */

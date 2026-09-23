@@ -167,7 +167,7 @@ const authService = {
     return resData;
   },
 
-  verifyPhone: async (data: { phone: string }): Promise<{ success: boolean; phoneNumber: string; isVerifyPhone: boolean; isPhoneVerified: boolean; user?: User }> => {
+  verifyPhone: async (data: { phone: string; otp?: string; idToken?: string; code?: string }): Promise<{ success: boolean; phoneNumber: string; isVerifyPhone: boolean; isPhoneVerified: boolean; user?: User }> => {
     const url = 'auth/verify-phone/';
     const resData = unwrapDataResponse<{ success: boolean; phoneNumber: string; isVerifyPhone: boolean; isPhoneVerified: boolean; user?: User }>(
       await httpRequest.post(url, data)

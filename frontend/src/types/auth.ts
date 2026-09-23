@@ -58,7 +58,7 @@ export interface EmployerSignUpFormData {
     websiteUrl: string;
     location: {
       city: string | number;
-      district: string | number;
+      district: string | number | null;
       address: string;
       lat: number | string | null;
       lng: number | string | null;
@@ -68,27 +68,28 @@ export interface EmployerSignUpFormData {
 
 /** Auth DTOs */
 export type JobSeekerRegisterData = {
-  email: string;
   fullName: string;
-  password?: string;
-  platform?: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  platform: string;
 };
 
-export interface EmployerRegisterData extends Omit<EmployerSignUpFormData, 'confirmPassword'> {
-  platform?: string;
+export interface EmployerRegisterData extends EmployerSignUpFormData {
+  platform: string;
 }
 
 export interface ResetPasswordData {
-  token?: string | string[];
+  token?: string;
   newPassword: string;
   confirmPassword: string;
   platform?: string;
 }
 
 export interface ChangePasswordData {
-  oldPassword?: string;
-  newPassword?: string;
-  confirmPassword?: string;
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export type UserSettingsData = {

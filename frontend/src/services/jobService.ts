@@ -29,6 +29,7 @@ export type GetJobPostsParams = {
   isUrgent?: boolean;
   isHot?: boolean;
   status?: number | string;
+  statusId?: number | string;
 };
 
 export interface JobPostInput {

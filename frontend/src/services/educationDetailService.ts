@@ -11,6 +11,7 @@ interface EducationDetailInput {
   trainingPlaceName?: string;
   startDate?: string | Date | null;
   completedDate?: string | Date | null;
+  gradeOrRank?: string | null;
   description?: string | null;
   resumeSlug?: string;
   resume?: string;

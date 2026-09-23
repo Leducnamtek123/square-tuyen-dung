@@ -1,79 +1,33 @@
-export interface PresetBackground {
-  id: string;
-  nameVi: string;
-  nameEn: string;
-  url: string;
-  descriptionVi: string;
-  badge: string;
-}
+import httpRequest from '../utils/httpRequest';
+import type {
+  PresetBackground,
+  PresetAvatar,
+  AilaCharacter,
+  DigitalHumanCharacter,
+  PresetVoice,
+  PresetSpeed,
+  HrPersonaPresetId,
+  HrPersonaPreset,
+  AvatarActionMeta,
+  BackgroundType,
+  AvatarType,
+  EmployerAiSettings,
+} from '../types/employerAiSetting';
 
-export interface PresetAvatar {
-  id: string;
-  name: string;
-  titleVi: string;
-  previewUrl: string;
-  descriptionVi: string;
-  isFullWebpAnimation: boolean;
-}
-
-export interface PresetVoice {
-  id: string;
-  name: string;
-  voiceCode: string;
-  gender: 'female' | 'male';
-  genderVi: string;
-  region: 'south' | 'north' | 'central';
-  regionVi: string;
-  toneVi: string;
-  descriptionVi: string;
-  sampleText: string;
-  badge?: string;
-}
-
-export interface PresetSpeed {
-  value: number;
-  label: string;
-  descriptionVi: string;
-}
-
-export type HrPersonaPresetId = 'friendly' | 'professional' | 'challenger';
-
-export interface HrPersonaPreset {
-  id: HrPersonaPresetId;
-  nameVi: string;
-  taglineVi: string;
-  descriptionVi: string;
-  targetCandidateVi: string;
-  badge: string;
-  systemPromptTemplate: string;
-}
-
-export interface AvatarActionMeta {
-  key: string;
-  labelVi: string;
-  filename: string;
-  descriptionVi: string;
-  defaultUrl: string;
-}
-
-export interface EmployerAiSettings {
-  backgroundType: 'preset' | 'custom';
-  selectedBackgroundId: string;
-  customBackgroundUrl: string | null;
-  avatarType: 'preset' | 'custom';
-  selectedAvatarId: string;
-  customAvatarUrl: string | null;
-  interviewerName: string;
-  interviewerTitle: string;
-  ttsVoice: string;
-  ttsSpeed: number;
-  updatedAt: string;
-
-  avatarActions?: Record<string, string>;
-  activeCharacterId?: string;
-  hrPersonaPreset?: HrPersonaPresetId;
-  customSystemPrompt?: string;
-}
+export type {
+  PresetBackground,
+  PresetAvatar,
+  AilaCharacter,
+  DigitalHumanCharacter,
+  PresetVoice,
+  PresetSpeed,
+  HrPersonaPresetId,
+  HrPersonaPreset,
+  AvatarActionMeta,
+  BackgroundType,
+  AvatarType,
+  EmployerAiSettings,
+};
 
 
 export const PRESET_BACKGROUNDS: readonly PresetBackground[] = [
@@ -193,6 +147,63 @@ export const PRESET_AVATARS: readonly PresetAvatar[] = [
     isFullWebpAnimation: true,
   },
 ];
+
+export const AILA_CHARACTERS: readonly AilaCharacter[] = [
+  {
+    id: 'ng_c_linh',
+    name: 'Ngọc Linh AI',
+    titleVi: 'Nữ chuyên viên tuyển dụng cao cấp (Aila)',
+    gender: 'female',
+    genderVi: 'Nữ',
+    avatarId: 'aila_recruiter',
+    defaultVoice: 'Trúc Ly',
+    techBadges: ['Aila Realtime Lipsync', 'Full HD 60fps'],
+    posterUrl: '/assets/avatars/ng_c_linh/actions/portrait.jpg',
+    previewUrl: '/assets/avatars/ng_c_linh/actions/idle.mp4',
+    descriptionVi: 'Trợ lý AI Aila chuẩn studio, biểu cảm gương mặt tinh tế, tự nhiên và phong thái chuyên nghiệp',
+  },
+  {
+    id: 'expert_male',
+    name: 'Minh Trí AI',
+    titleVi: 'Nam trưởng nhóm tuyển dụng cấp cao',
+    gender: 'male',
+    genderVi: 'Nam',
+    avatarId: 'expert_male',
+    defaultVoice: 'Mạnh Dũng',
+    techBadges: ['GPU Realtime Lipsync', 'Full HD 60fps'],
+    posterUrl: '/assets/images/avatar/expert_male/idle.webp?v=20260913_photoreal_v7',
+    previewUrl: '/assets/avatars/ng_c_linh/actions/idle.mp4',
+    descriptionVi: 'Phong thái đĩnh đạc, chững chạc, vest lịch lãm, phù hợp phỏng vấn chuyên viên cấp cao và quản lý',
+  },
+  {
+    id: 'mai_linh',
+    name: 'Mai Linh AI',
+    titleVi: 'Nữ chuyên viên nhân sự quốc tế',
+    gender: 'female',
+    genderVi: 'Nữ',
+    avatarId: 'female_02',
+    defaultVoice: 'Thùy Dung',
+    techBadges: ['GPU Realtime Lipsync', 'Full HD 60fps'],
+    posterUrl: '/assets/images/avatar/female_02/idle.webp?v=20260913_photoreal_v7',
+    previewUrl: '/assets/avatars/ng_c_linh/actions/idle.mp4',
+    descriptionVi: 'Phong thái duyên dáng, hòa nhã, chất giọng miền Nam thanh lịch, tạo cảm giác thoải mái cho ứng viên',
+  },
+  {
+    id: 'quang_huy',
+    name: 'Quang Huy AI',
+    titleVi: 'Nam hội đồng phỏng vấn công nghệ',
+    gender: 'male',
+    genderVi: 'Nam',
+    avatarId: 'male_04',
+    defaultVoice: 'Minh Triết',
+    techBadges: ['GPU Realtime Lipsync', 'Full HD 60fps'],
+    posterUrl: '/assets/images/avatar/male_04/idle.webp?v=20260913_photoreal_v7',
+    previewUrl: '/assets/avatars/ng_c_linh/actions/idle.mp4',
+    descriptionVi: 'Phong thái trí thức, điềm đạm, chuyên sâu phản biện logic hệ thống và phương pháp tư duy',
+  },
+];
+
+export const DIGITAL_HUMAN_CHARACTERS = AILA_CHARACTERS;
 
 export const PRESET_VOICES: readonly PresetVoice[] = [
   {
@@ -330,7 +341,6 @@ export const DEFAULT_AVATAR_ACTIONS: Record<string, string> = {
   thinking: '/assets/avatars/ng_c_linh/actions/thinking.mp4',
   wave: '/assets/avatars/ng_c_linh/actions/wave.mp4',
   thanks_wave: '/assets/avatars/ng_c_linh/actions/thanks_wave.mp4',
-  speaking: '/assets/avatars/ng_c_linh/actions/speaking.mp4',
 };
 
 export const AVATAR_ACTION_METAS: readonly AvatarActionMeta[] = [
@@ -368,13 +378,6 @@ export const AVATAR_ACTION_METAS: readonly AvatarActionMeta[] = [
     filename: 'thanks_wave.mp4',
     descriptionVi: 'Mỉm cười cúi chào và vẫy tay cảm ơn khi kết thúc buổi phỏng vấn',
     defaultUrl: '/assets/avatars/ng_c_linh/actions/thanks_wave.mp4',
-  },
-  {
-    key: 'speaking',
-    labelVi: 'Đang nói & Đặt câu hỏi',
-    filename: 'speaking.mp4',
-    descriptionVi: 'Khẩu hình đồng bộ âm vị (Wav2Lip) và biểu cảm sinh động khi AI phỏng vấn',
-    defaultUrl: '/assets/avatars/ng_c_linh/actions/speaking.mp4',
   },
 ];
 
@@ -443,9 +446,144 @@ export const DEFAULT_EMPLOYER_AI_SETTINGS: EmployerAiSettings = {
   avatarActions: { ...DEFAULT_AVATAR_ACTIONS },
   hrPersonaPreset: 'professional',
   customSystemPrompt: PRESET_HR_PERSONAS[1].systemPromptTemplate,
+  defaultScriptId: 1,
+
+  background_type: 'preset',
+  selected_background_id: 'modern_office',
+  custom_background_url: null,
+  avatar_type: 'preset',
+  selected_avatar_id: 'aila_recruiter',
+  custom_avatar_url: null,
+  interviewer_name: 'Trợ lý AI AILA',
+  interviewer_title: 'Chuyên viên tuyển dụng thông minh',
+  tts_voice: 'Trúc Ly',
+  tts_speed: 1.0,
+  active_character_id: 'ng_c_linh',
+  default_script_id: 1,
+  system_prompt: PRESET_HR_PERSONAS[1].systemPromptTemplate,
 };
 
 const STORAGE_KEY = 'sq_employer_ai_custom_settings';
+
+export function mapBackendToSettings(raw: unknown, current: EmployerAiSettings): EmployerAiSettings {
+  if (!raw || typeof raw !== 'object') return current;
+  const data = raw as Record<string, unknown>;
+
+  const backgroundType = ((data.background_type ?? data.backgroundType) || current.backgroundType) as EmployerAiSettings['backgroundType'];
+  const selectedBackgroundId = data.selected_background_id !== undefined && data.selected_background_id !== null
+    ? String(data.selected_background_id)
+    : (data.selectedBackgroundId !== undefined && data.selectedBackgroundId !== null
+      ? String(data.selectedBackgroundId)
+      : current.selectedBackgroundId);
+  const customBackgroundUrl = data.custom_background_url !== undefined
+    ? (data.custom_background_url as string | null)
+    : (data.customBackgroundUrl !== undefined
+      ? (data.customBackgroundUrl as string | null)
+      : current.customBackgroundUrl);
+  const avatarType = ((data.avatar_type ?? data.avatarType) || current.avatarType) as EmployerAiSettings['avatarType'];
+  const selectedAvatarId = data.selected_avatar_id !== undefined && data.selected_avatar_id !== null
+    ? String(data.selected_avatar_id)
+    : (data.selectedAvatarId !== undefined && data.selectedAvatarId !== null
+      ? String(data.selectedAvatarId)
+      : current.selectedAvatarId);
+  const customAvatarUrl = data.custom_avatar_url !== undefined
+    ? (data.custom_avatar_url as string | null)
+    : (data.customAvatarUrl !== undefined
+      ? (data.customAvatarUrl as string | null)
+      : current.customAvatarUrl);
+  const interviewerName = String((data.interviewer_name ?? data.interviewerName) || current.interviewerName);
+  const interviewerTitle = String((data.interviewer_title ?? data.interviewerTitle) || current.interviewerTitle);
+  const ttsVoice = String((data.tts_voice ?? data.ttsVoice) || current.ttsVoice);
+  const ttsSpeed = typeof (data.tts_speed ?? data.ttsSpeed) === 'number'
+    ? Number(data.tts_speed ?? data.ttsSpeed)
+    : current.ttsSpeed;
+  const activeCharacterId = (data.active_character_id ?? data.activeCharacterId ?? current.activeCharacterId) as string | undefined;
+  const defaultScriptId = (data.default_script_id !== undefined ? data.default_script_id : (data.defaultScriptId !== undefined ? data.defaultScriptId : current.defaultScriptId)) as number | string | null | undefined;
+  const customSystemPrompt = (data.system_prompt ?? data.custom_system_prompt ?? data.customSystemPrompt ?? data.systemPrompt ?? current.customSystemPrompt) as string | undefined;
+  const hrPersonaPreset = (data.hr_persona_preset ?? data.hrPersonaPreset ?? current.hrPersonaPreset) as EmployerAiSettings['hrPersonaPreset'];
+  const avatarActions = (data.avatar_actions ?? data.avatarActions ?? current.avatarActions) as Record<string, string> | undefined;
+  const updatedAt = String(data.updated_at ?? data.updatedAt ?? new Date().toISOString());
+
+  return {
+    ...current,
+    backgroundType,
+    selectedBackgroundId,
+    customBackgroundUrl,
+    avatarType,
+    selectedAvatarId,
+    customAvatarUrl,
+    interviewerName,
+    interviewerTitle,
+    ttsVoice,
+    ttsSpeed,
+    activeCharacterId,
+    defaultScriptId,
+    customSystemPrompt,
+    hrPersonaPreset,
+    avatarActions,
+    updatedAt,
+
+    background_type: backgroundType,
+    selected_background_id: selectedBackgroundId,
+    custom_background_url: customBackgroundUrl,
+    avatar_type: avatarType,
+    selected_avatar_id: selectedAvatarId,
+    custom_avatar_url: customAvatarUrl,
+    interviewer_name: interviewerName,
+    interviewer_title: interviewerTitle,
+    tts_voice: ttsVoice,
+    tts_speed: ttsSpeed,
+    active_character_id: activeCharacterId,
+    default_script_id: defaultScriptId,
+    system_prompt: customSystemPrompt,
+    updated_at: updatedAt,
+  };
+}
+
+export function mapSettingsToBackendPayload(partial: Partial<EmployerAiSettings>): Record<string, unknown> {
+  const payload: Record<string, unknown> = {};
+
+  if (partial.interviewerName !== undefined) payload.interviewer_name = partial.interviewerName;
+  else if (partial.interviewer_name !== undefined) payload.interviewer_name = partial.interviewer_name;
+
+  if (partial.interviewerTitle !== undefined) payload.interviewer_title = partial.interviewerTitle;
+  else if (partial.interviewer_title !== undefined) payload.interviewer_title = partial.interviewer_title;
+
+  if (partial.backgroundType !== undefined) payload.background_type = partial.backgroundType;
+  else if (partial.background_type !== undefined) payload.background_type = partial.background_type;
+
+  if (partial.selectedBackgroundId !== undefined) payload.selected_background_id = partial.selectedBackgroundId;
+  else if (partial.selected_background_id !== undefined) payload.selected_background_id = partial.selected_background_id;
+
+  if (partial.customBackgroundUrl !== undefined) payload.custom_background_url = partial.customBackgroundUrl;
+  else if (partial.custom_background_url !== undefined) payload.custom_background_url = partial.custom_background_url;
+
+  if (partial.avatarType !== undefined) payload.avatar_type = partial.avatarType;
+  else if (partial.avatar_type !== undefined) payload.avatar_type = partial.avatar_type;
+
+  if (partial.activeCharacterId !== undefined) payload.active_character_id = partial.activeCharacterId;
+  else if (partial.active_character_id !== undefined) payload.active_character_id = partial.active_character_id;
+
+  if (partial.selectedAvatarId !== undefined) payload.selected_avatar_id = partial.selectedAvatarId;
+  else if (partial.selected_avatar_id !== undefined) payload.selected_avatar_id = partial.selected_avatar_id;
+
+  if (partial.customAvatarUrl !== undefined) payload.custom_avatar_url = partial.customAvatarUrl;
+  else if (partial.custom_avatar_url !== undefined) payload.custom_avatar_url = partial.custom_avatar_url;
+
+  if (partial.ttsVoice !== undefined) payload.tts_voice = partial.ttsVoice;
+  else if (partial.tts_voice !== undefined) payload.tts_voice = partial.tts_voice;
+
+  if (partial.ttsSpeed !== undefined) payload.tts_speed = partial.ttsSpeed;
+  else if (partial.tts_speed !== undefined) payload.tts_speed = partial.tts_speed;
+
+  if (partial.customSystemPrompt !== undefined) payload.system_prompt = partial.customSystemPrompt;
+  else if (partial.system_prompt !== undefined) payload.system_prompt = partial.system_prompt;
+
+  if (partial.defaultScriptId !== undefined) payload.default_script_id = partial.defaultScriptId;
+  else if (partial.default_script_id !== undefined) payload.default_script_id = partial.default_script_id;
+
+  return payload;
+}
 
 export const employerAiSettingService = {
   getSettings: (): EmployerAiSettings => {
@@ -464,6 +602,23 @@ export const employerAiSettingService = {
     }
   },
 
+  getSettingsAsync: async (): Promise<EmployerAiSettings> => {
+    try {
+      const response = await httpRequest.get('profiles/company/ai-settings/');
+      const current = employerAiSettingService.getSettings();
+      const rawData =
+        response && typeof response === 'object' && 'data' in response && response.data && typeof response.data === 'object' && !('backgroundType' in response) && !('background_type' in response)
+          ? response.data
+          : response;
+      const merged = mapBackendToSettings(rawData, current);
+      employerAiSettingService.saveSettings(merged);
+      return merged;
+    } catch (error) {
+      console.warn('Không thể tải cấu hình AI từ máy chủ, sử dụng dữ liệu ngoại tuyến:', error);
+      return employerAiSettingService.getSettings();
+    }
+  },
+
   saveSettings: (settings: Partial<EmployerAiSettings>): EmployerAiSettings => {
     if (typeof window === 'undefined') return DEFAULT_EMPLOYER_AI_SETTINGS;
 
@@ -474,6 +629,20 @@ export const employerAiSettingService = {
       updatedAt: new Date().toISOString(),
     };
 
+    if (settings.backgroundType !== undefined) updated.background_type = settings.backgroundType;
+    if (settings.selectedBackgroundId !== undefined) updated.selected_background_id = settings.selectedBackgroundId;
+    if (settings.customBackgroundUrl !== undefined) updated.custom_background_url = settings.customBackgroundUrl;
+    if (settings.avatarType !== undefined) updated.avatar_type = settings.avatarType;
+    if (settings.selectedAvatarId !== undefined) updated.selected_avatar_id = settings.selectedAvatarId;
+    if (settings.customAvatarUrl !== undefined) updated.custom_avatar_url = settings.customAvatarUrl;
+    if (settings.interviewerName !== undefined) updated.interviewer_name = settings.interviewerName;
+    if (settings.interviewerTitle !== undefined) updated.interviewer_title = settings.interviewerTitle;
+    if (settings.ttsVoice !== undefined) updated.tts_voice = settings.ttsVoice;
+    if (settings.ttsSpeed !== undefined) updated.tts_speed = settings.ttsSpeed;
+    if (settings.customSystemPrompt !== undefined) updated.system_prompt = settings.customSystemPrompt;
+    if (settings.defaultScriptId !== undefined) updated.default_script_id = settings.defaultScriptId;
+    if (settings.activeCharacterId !== undefined) updated.active_character_id = settings.activeCharacterId;
+
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       window.dispatchEvent(new CustomEvent('sq-ai-settings-updated', { detail: updated }));
@@ -482,6 +651,30 @@ export const employerAiSettingService = {
     }
 
     return updated;
+  },
+
+  saveSettingsAsync: async (partial: Partial<EmployerAiSettings>): Promise<EmployerAiSettings> => {
+    // 1. Optimistic update to localStorage
+    const optimistic = employerAiSettingService.saveSettings(partial);
+
+    // 2. Dispatch patch to backend API
+    try {
+      const payload = mapSettingsToBackendPayload(partial);
+      const response = await httpRequest.patch('profiles/company/ai-settings/', payload);
+      if (response) {
+        const rawData =
+          response && typeof response === 'object' && 'data' in response && response.data && typeof response.data === 'object' && !('backgroundType' in response) && !('background_type' in response)
+            ? response.data
+            : response;
+        const merged = mapBackendToSettings(rawData, optimistic);
+        employerAiSettingService.saveSettings(merged);
+        return merged;
+      }
+    } catch (error) {
+      console.warn('Không thể lưu cấu hình AI lên máy chủ, sử dụng cấu hình ngoại tuyến:', error);
+    }
+
+    return optimistic;
   },
 
   resetSettings: (): EmployerAiSettings => {

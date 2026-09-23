@@ -31,9 +31,12 @@ export type JobPostActivityListParams = {
   blind?: boolean | string;
 };
 
-interface SendEmailPayload {
-  subject?: string;
-  content?: string;
+export interface SendEmailPayload {
+  fullName: string;
+  title: string;
+  content: string;
+  email: string;
+  isSendMe?: boolean;
 }
 
 interface ChangeApplicationStatusPayload {
