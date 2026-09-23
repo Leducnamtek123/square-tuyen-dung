@@ -576,3 +576,82 @@ class EmployeeDocument(CommonBaseModel):
         return f"{self.employee.full_name} - {self.name} ({self.get_document_type_display()})"
 
 
+class EmployeeOnboardingProcess(CommonBaseModel):
+    STAGE_CHOICES = (
+        ('OFFER_ACCEPTED', 'Đã ký Offer Letter'),
+        ('PREBOARDING_DOCS', 'Thu thập hồ sơ số'),
+        ('INTERNAL_PREP', 'Chuẩn bị nội bộ'),
+        ('DAY_ONE_WELCOME', 'Chào đón Ngày đầu (Day 1)'),
+        ('PROBATION_EVALUATION', 'Đang thử việc & Đánh giá'),
+        ('COMPLETED', 'Tiếp nhận thành công (Chính thức)'),
+        ('CANCELLED', 'Hủy tiếp nhận'),
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="onboarding_processes")
+    employee = models.OneToOneField(Employee, on_delete=models.CASCADE, related_name="onboarding_process")
+    offer_letter = models.OneToOneField('job.JobOfferLetter', on_delete=models.SET_NULL, null=True, blank=True, related_name="onboarding_process")
+    application = models.ForeignKey('job.JobPostActivity', on_delete=models.SET_NULL, null=True, blank=True, related_name="onboarding_processes")
+
+    stage = models.CharField(max_length=30, choices=STAGE_CHOICES, default='PREBOARDING_DOCS', db_index=True, verbose_name="Chặng quy trình")
+    target_start_date = models.DateField(null=True, blank=True, verbose_name="Ngày nhận việc dự kiến")
+    actual_start_date = models.DateField(null=True, blank=True, verbose_name="Ngày nhận việc thực tế")
+    probation_end_date = models.DateField(null=True, blank=True, verbose_name="Hạn kết thúc thử việc")
+
+    progress_percent = models.PositiveSmallIntegerField(default=0, verbose_name="Tiến độ hoàn thành %")
+    cancel_reason = models.TextField(blank=True, default="", verbose_name="Lý do hủy tiếp nhận")
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    cancelled_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+
+    class Meta:
+        ordering = ['-create_at']
+        verbose_name = "Quy trình Onboarding"
+        verbose_name_plural = "Các quy trình Onboarding"
+
+    def __str__(self):
+        return f"Onboarding - {self.employee.full_name} ({self.get_stage_display()})"
+
+    def recalculate_progress(self):
+        tasks = self.tasks.all()
+        total = tasks.count()
+        if total == 0:
+            self.progress_percent = 0
+        else:
+            completed = tasks.filter(is_completed=True).count()
+            self.progress_percent = int((completed / total) * 100)
+        self.save(update_fields=['progress_percent', 'update_at'])
+
+
+class OnboardingTaskItem(CommonBaseModel):
+    ASSIGNED_ROLE_CHOICES = (
+        ('CANDIDATE', 'Ứng viên / Nhân viên mới'),
+        ('HR', 'Quản trị nhân sự (HR)'),
+        ('IT', 'Kỹ thuật / IT Support'),
+        ('MANAGER', 'Quản lý trực tiếp'),
+    )
+
+    process = models.ForeignKey(EmployeeOnboardingProcess, on_delete=models.CASCADE, related_name="tasks")
+    stage = models.CharField(max_length=30, choices=EmployeeOnboardingProcess.STAGE_CHOICES, verbose_name="Thuộc chặng")
+    code = models.CharField(max_length=50, db_index=True, verbose_name="Mã công việc")
+    title = models.CharField(max_length=255, verbose_name="Tiêu đề công việc")
+    description = models.TextField(blank=True, default="", verbose_name="Mô tả công việc")
+
+    assigned_role = models.CharField(max_length=20, choices=ASSIGNED_ROLE_CHOICES, default='HR', verbose_name="Vai trò phụ trách")
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_onboarding_tasks")
+
+    is_required = models.BooleanField(default=True, verbose_name="Bắt buộc")
+    is_completed = models.BooleanField(default=False, db_index=True, verbose_name="Đã hoàn thành")
+    completed_at = models.DateTimeField(null=True, blank=True, verbose_name="Thời điểm hoàn thành")
+    completed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="completed_onboarding_tasks")
+
+    document = models.ForeignKey(EmployeeDocument, on_delete=models.SET_NULL, null=True, blank=True, related_name="+", verbose_name="Tài liệu liên kết")
+    rejection_note = models.TextField(blank=True, default="", verbose_name="Ghi chú yêu cầu nộp lại")
+    order = models.PositiveSmallIntegerField(default=0, verbose_name="Thứ tự hiển thị")
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = "Nhiệm vụ Onboarding"
+        verbose_name_plural = "Các nhiệm vụ Onboarding"
+
+    def __str__(self):
+        status_str = "✓" if self.is_completed else "○"
+        return f"[{status_str}] {self.title} ({self.process.employee.full_name})"

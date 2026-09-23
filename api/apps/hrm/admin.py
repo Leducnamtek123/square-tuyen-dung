@@ -9,6 +9,8 @@ from apps.hrm.models import (
     LeaveType,
     LeaveRequest,
     AttendanceRecord,
+    EmployeeOnboardingProcess,
+    OnboardingTaskItem,
 )
 
 
@@ -67,3 +69,19 @@ class LeaveRequestAdmin(admin.ModelAdmin):
 class AttendanceRecordAdmin(admin.ModelAdmin):
     list_display = ('id', 'employee', 'date', 'check_in', 'check_out', 'status')
     list_filter = ('status', 'date')
+
+
+class OnboardingTaskItemInline(admin.TabularInline):
+    from apps.hrm.models import OnboardingTaskItem
+    model = OnboardingTaskItem
+    extra = 0
+    fields = ('order', 'stage', 'code', 'title', 'assigned_role', 'is_completed', 'completed_at')
+
+
+@admin.register(EmployeeOnboardingProcess)
+class EmployeeOnboardingProcessAdmin(admin.ModelAdmin):
+    list_display = ('id', 'employee', 'company', 'stage', 'progress_percent', 'target_start_date', 'actual_start_date', 'create_at')
+    list_filter = ('stage', 'company')
+    search_fields = ('employee__full_name', 'employee__employee_code', 'employee__email')
+    inlines = [OnboardingTaskItemInline]
+
