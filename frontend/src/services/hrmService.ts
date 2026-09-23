@@ -214,6 +214,130 @@ export type OnboardCandidatePayload = {
   notes?: string;
 };
 
+export type OnboardingStage =
+  | 'OFFER_ACCEPTED'
+  | 'PREBOARDING_DOCS'
+  | 'INTERNAL_PREP'
+  | 'DAY_ONE_WELCOME'
+  | 'PROBATION_EVALUATION'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
+export interface NativeOnboardingTaskItem {
+  id: number;
+  process: number;
+  stage: OnboardingStage;
+  stage_label?: string;
+  stageLabel?: string;
+  code: string;
+  title: string;
+  description?: string;
+  assigned_role?: 'CANDIDATE' | 'HR' | 'IT' | 'MANAGER';
+  assignedRole?: 'CANDIDATE' | 'HR' | 'IT' | 'MANAGER';
+  assigned_role_label?: string;
+  assignedRoleLabel?: string;
+  assigned_to?: number | null;
+  assignedTo?: number | null;
+  assigned_to_name?: string | null;
+  assignedToName?: string | null;
+  is_required?: boolean;
+  isRequired?: boolean;
+  is_completed: boolean;
+  isCompleted?: boolean;
+  completed_at?: string | null;
+  completedAt?: string | null;
+  completed_by?: number | null;
+  completedBy?: number | null;
+  completed_by_name?: string | null;
+  completedByName?: string | null;
+  document?: number | null;
+  document_url?: string | null;
+  documentUrl?: string | null;
+  document_name?: string | null;
+  documentName?: string | null;
+  rejection_note?: string;
+  rejectionNote?: string;
+  order: number;
+}
+
+export interface NativeEmployeeOnboardingProcess {
+  id: number;
+  company: number;
+  employee: number;
+  employee_detail?: {
+    id: number;
+    employee_code: string;
+    employeeCode?: string;
+    full_name: string;
+    fullName?: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+    department_id?: number;
+    departmentId?: number;
+    department_name?: string;
+    departmentName?: string;
+    designation_id?: number;
+    designationId?: number;
+    designation_title?: string;
+    designationTitle?: string;
+    reports_to_name?: string;
+    reportsToName?: string;
+    status: string;
+    join_date?: string;
+    joinDate?: string;
+    probation_end_date?: string;
+    probationEndDate?: string;
+  };
+  offer_letter?: number | null;
+  offerLetter?: number | null;
+  offer_detail?: {
+    id: number;
+    position_title: string;
+    positionTitle?: string;
+    salary_offered: number | string;
+    salaryOffered?: number | string;
+    allowance?: number | string;
+    start_date?: string;
+    startDate?: string;
+    status?: string;
+    candidate_signed_at?: string;
+    candidateSignedAt?: string;
+  };
+  application?: number | null;
+  stage: OnboardingStage;
+  stage_label?: string;
+  stageLabel?: string;
+  target_start_date?: string | null;
+  targetStartDate?: string | null;
+  actual_start_date?: string | null;
+  actualStartDate?: string | null;
+  probation_end_date?: string | null;
+  probationEndDate?: string | null;
+  progress_percent: number;
+  progressPercent?: number;
+  cancel_reason?: string;
+  cancelReason?: string;
+  cancelled_at?: string | null;
+  cancelledAt?: string | null;
+  tasks?: NativeOnboardingTaskItem[];
+  create_at?: string;
+  createAt?: string;
+  update_at?: string;
+  updateAt?: string;
+}
+
+export interface OnboardingStatsResponse {
+  total_onboarding: number;
+  totalOnboarding?: number;
+  pending_preboarding_docs: number;
+  pendingPreboardingDocs?: number;
+  upcoming_day_one_7d: number;
+  upcomingDayOne7d?: number;
+  probation_due_15d: number;
+  probationDue15d?: number;
+}
+
 export type NativeLeaveBalance = {
   id: number;
   employee: number;
@@ -1008,6 +1132,35 @@ const hrmService = {
   },
   syncDevice: (id: number): Promise<{ success: boolean; message: string; new_punches_count: number; total_punches_synced: number; device: NativeBiometricDevice }> => {
     return httpRequest.post(`native-hrm/biometric-devices/${id}/sync/`, {}).then((res) => unwrapDataResponse(res));
+  },
+
+  // Onboarding Hub
+  getOnboardingProcesses: (params?: { stage?: string; department?: number | string; search?: string }): Promise<NativeEmployeeOnboardingProcess[]> => {
+    return httpRequest.get('native-hrm/onboarding-processes/', { params }).then((res) => normalizePaginatedResponse<NativeEmployeeOnboardingProcess>(res).results);
+  },
+  getOnboardingStats: (): Promise<OnboardingStatsResponse> => {
+    return httpRequest.get('native-hrm/onboarding-processes/stats/').then((res) => unwrapDataResponse<OnboardingStatsResponse>(res));
+  },
+  getOnboardingProcessDetail: (id: number): Promise<NativeEmployeeOnboardingProcess> => {
+    return httpRequest.get(`native-hrm/onboarding-processes/${id}/`).then((res) => unwrapDataResponse<NativeEmployeeOnboardingProcess>(res));
+  },
+  approveTaskDocument: (processId: number, taskId: number, payload?: { file_url?: string; document_type?: string; name?: string }): Promise<NativeOnboardingTaskItem> => {
+    return httpRequest.post(`native-hrm/onboarding-processes/${processId}/tasks/${taskId}/approve-document/`, payload || {}).then((res) => unwrapDataResponse<NativeOnboardingTaskItem>(res));
+  },
+  rejectTaskDocument: (processId: number, taskId: number, reason: string): Promise<NativeOnboardingTaskItem> => {
+    return httpRequest.post(`native-hrm/onboarding-processes/${processId}/tasks/${taskId}/reject-document/`, { reason }).then((res) => unwrapDataResponse<NativeOnboardingTaskItem>(res));
+  },
+  completeTaskItem: (processId: number, taskId: number): Promise<NativeOnboardingTaskItem> => {
+    return httpRequest.post(`native-hrm/onboarding-processes/${processId}/tasks/${taskId}/complete/`, {}).then((res) => unwrapDataResponse<NativeOnboardingTaskItem>(res));
+  },
+  confirmDayOne: (processId: number): Promise<NativeEmployeeOnboardingProcess> => {
+    return httpRequest.post(`native-hrm/onboarding-processes/${processId}/confirm-day-one/`, {}).then((res) => unwrapDataResponse<NativeEmployeeOnboardingProcess>(res));
+  },
+  evaluateProbation: (processId: number, payload: { result: 'PASSED' | 'EXTENDED' | 'FAILED'; notes?: string; extension_days?: number }): Promise<NativeEmployeeOnboardingProcess> => {
+    return httpRequest.post(`native-hrm/onboarding-processes/${processId}/probation-evaluation/`, payload).then((res) => unwrapDataResponse<NativeEmployeeOnboardingProcess>(res));
+  },
+  cancelOnboarding: (processId: number, reason: string): Promise<NativeEmployeeOnboardingProcess> => {
+    return httpRequest.post(`native-hrm/onboarding-processes/${processId}/cancel/`, { reason }).then((res) => unwrapDataResponse<NativeEmployeeOnboardingProcess>(res));
   },
 };
 

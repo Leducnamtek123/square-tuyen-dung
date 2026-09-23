@@ -18,6 +18,9 @@ import hrmService, {
   NativeBiometricDevice,
   NativeEmployeeCareerHistory,
   NativeEmployeeDocument,
+  NativeEmployeeOnboardingProcess,
+  NativeOnboardingTaskItem,
+  OnboardingStatsResponse,
 } from '@/services/hrmService';
 import toastMessages from '@/utils/toastMessages';
 
@@ -45,6 +48,9 @@ export const HRM_QUERY_KEYS = {
   payrollKPIs: ['hrm-payroll-kpis'] as const,
   myProfile: ['hrm-my-profile'] as const,
   orgChart: ['hrm-org-chart'] as const,
+  onboardingProcesses: ['hrm-onboarding-processes'] as const,
+  onboardingStats: ['hrm-onboarding-stats'] as const,
+  onboardingDetail: (id: number) => ['hrm-onboarding-detail', id] as const,
 };
 
 // -- Queries ----------------------------------------------------------------
@@ -258,6 +264,31 @@ export const useHrmBiometricDevices = (params?: {
   return useQuery<NativeBiometricDevice[]>({
     queryKey: [...HRM_QUERY_KEYS.biometricDevices, params],
     queryFn: () => hrmService.getBiometricDevices(params),
+    staleTime: 15 * 1000,
+  });
+};
+
+export const useHrmOnboardingProcesses = (params?: { stage?: string; department?: number | string; search?: string }) => {
+  return useQuery<NativeEmployeeOnboardingProcess[]>({
+    queryKey: [...HRM_QUERY_KEYS.onboardingProcesses, params],
+    queryFn: () => hrmService.getOnboardingProcesses(params),
+    staleTime: 15 * 1000,
+  });
+};
+
+export const useHrmOnboardingStats = () => {
+  return useQuery<OnboardingStatsResponse>({
+    queryKey: HRM_QUERY_KEYS.onboardingStats,
+    queryFn: () => hrmService.getOnboardingStats(),
+    staleTime: 15 * 1000,
+  });
+};
+
+export const useHrmOnboardingDetail = (id?: number) => {
+  return useQuery<NativeEmployeeOnboardingProcess>({
+    queryKey: id ? HRM_QUERY_KEYS.onboardingDetail(id) : ['hrm-onboarding-detail-empty'],
+    queryFn: () => (id ? hrmService.getOnboardingProcessDetail(id) : Promise.reject('No ID')),
+    enabled: Boolean(id),
     staleTime: 15 * 1000,
   });
 };
@@ -904,6 +935,96 @@ export const useHrmMutations = () => {
     },
   });
 
+  const approveTaskDocument = useMutation({
+    mutationFn: ({ processId, taskId, payload }: { processId: number; taskId: number; payload?: { file_url?: string; document_type?: string; name?: string } }) =>
+      hrmService.approveTaskDocument(processId, taskId, payload),
+    onSuccess: (_, variables) => {
+      toastMessages.success('Đã duyệt tài liệu thành công!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingProcesses });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingStats });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingDetail(variables.processId) });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.documents });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể phê duyệt tài liệu.');
+    },
+  });
+
+  const rejectTaskDocument = useMutation({
+    mutationFn: ({ processId, taskId, reason }: { processId: number; taskId: number; reason: string }) =>
+      hrmService.rejectTaskDocument(processId, taskId, reason),
+    onSuccess: (_, variables) => {
+      toastMessages.info('Đã gửi yêu cầu nộp lại tài liệu.');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingProcesses });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingStats });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingDetail(variables.processId) });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể từ chối tài liệu.');
+    },
+  });
+
+  const completeTaskItem = useMutation({
+    mutationFn: ({ processId, taskId }: { processId: number; taskId: number }) =>
+      hrmService.completeTaskItem(processId, taskId),
+    onSuccess: (_, variables) => {
+      toastMessages.success('Đã cập nhật hoàn thành công việc!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingProcesses });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingStats });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingDetail(variables.processId) });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể hoàn thành công việc.');
+    },
+  });
+
+  const confirmDayOne = useMutation({
+    mutationFn: (processId: number) => hrmService.confirmDayOne(processId),
+    onSuccess: (_, processId) => {
+      toastMessages.success('Đã xác nhận nhân viên có mặt ngày đầu nhận việc!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingProcesses });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingStats });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingDetail(processId) });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.employees });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.contracts });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.careerHistories });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể xác nhận ngày đầu.');
+    },
+  });
+
+  const evaluateProbation = useMutation({
+    mutationFn: ({ processId, payload }: { processId: number; payload: { result: 'PASSED' | 'EXTENDED' | 'FAILED'; notes?: string; extension_days?: number } }) =>
+      hrmService.evaluateProbation(processId, payload),
+    onSuccess: (_, variables) => {
+      toastMessages.success('Đã hoàn tất đánh giá thử việc!');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingProcesses });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingStats });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingDetail(variables.processId) });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.employees });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.careerHistories });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể đánh giá thử việc.');
+    },
+  });
+
+  const cancelOnboarding = useMutation({
+    mutationFn: ({ processId, reason }: { processId: number; reason: string }) =>
+      hrmService.cancelOnboarding(processId, reason),
+    onSuccess: (_, variables) => {
+      toastMessages.warn('Đã hủy quy trình tiếp nhận nhân sự.');
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingProcesses });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingStats });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.onboardingDetail(variables.processId) });
+      queryClient.invalidateQueries({ queryKey: HRM_QUERY_KEYS.employees });
+    },
+    onError: (err: any) => {
+      toastMessages.error(err?.response?.data?.message || err?.message || 'Không thể hủy tiếp nhận.');
+    },
+  });
+
   return {
     createDepartment,
     updateDepartment,
@@ -957,5 +1078,11 @@ export const useHrmMutations = () => {
     deleteCareerHistory,
     createEmployeeDocument,
     deleteEmployeeDocument,
+    approveTaskDocument,
+    rejectTaskDocument,
+    completeTaskItem,
+    confirmDayOne,
+    evaluateProbation,
+    cancelOnboarding,
   };
 };
