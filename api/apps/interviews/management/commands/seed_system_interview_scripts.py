@@ -263,8 +263,18 @@ SYSTEM_PRESET_SCRIPTS = [
 class Command(BaseCommand):
     help = "Khởi tạo 5 Kịch bản phỏng vấn mẫu hệ thống (System Presets) chuẩn nghiệp vụ HR"
 
+    def _safe_write(self, msg, style_func=None):
+        text = style_func(msg) if style_func else msg
+        try:
+            self.stdout.write(text)
+        except (UnicodeEncodeError, Exception):
+            try:
+                self.stdout.write(text.encode("ascii", "replace").decode("ascii"))
+            except Exception:
+                pass
+
     def handle(self, *args, **options):
-        self.stdout.write(self.style.NOTICE("==> Đang khởi tạo 5 Kịch bản phỏng vấn mẫu hệ thống InfoHR..."))
+        self._safe_write("==> Đang khởi tạo 5 Kịch bản phỏng vấn mẫu hệ thống InfoHR...", self.style.NOTICE)
 
         total_created = 0
         total_updated = 0
@@ -300,10 +310,10 @@ class Command(BaseCommand):
 
                 if created:
                     total_created += 1
-                    self.stdout.write(self.style.SUCCESS(f"  [+] Đã tạo mới: {name}"))
+                    self._safe_write(f"  [+] Đã tạo mới: {name}", self.style.SUCCESS)
                 else:
                     total_updated += 1
-                    self.stdout.write(self.style.WARNING(f"  [*] Đã cập nhật: {name}"))
+                    self._safe_write(f"  [*] Đã cập nhật: {name}", self.style.WARNING)
 
                 # Seed sample questions for this preset
                 linked_questions = []
@@ -325,8 +335,7 @@ class Command(BaseCommand):
                 if linked_questions:
                     script.questions.set(linked_questions)
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"\n==> Hoàn tất nạp kịch bản mẫu: {total_created} tạo mới, {total_updated} cập nhật thành công!"
-            )
+        self._safe_write(
+            f"\n==> Hoàn tất nạp kịch bản mẫu: {total_created} tạo mới, {total_updated} cập nhật thành công!",
+            self.style.SUCCESS,
         )
