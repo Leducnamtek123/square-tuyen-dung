@@ -843,7 +843,7 @@ export const InterviewScriptDrawer: React.FC<InterviewScriptDrawerProps> = ({
               />
 
               <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.75, display: 'block' }}>
-                Hệ thống LiveKit Voice AI sẽ tự động thay thế các biến số theo hồ sơ ứng viên và tin tuyển dụng khi mở phòng phỏng vấn.
+                Hệ thống Trí tuệ Nhân tạo AILA sẽ tự động thay thế các biến số theo hồ sơ ứng viên và tin tuyển dụng khi mở phòng phỏng vấn.
               </Typography>
             </Box>
 

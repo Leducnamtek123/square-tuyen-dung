@@ -282,10 +282,10 @@ export function AiStudioPreview({
             </Stack>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Công nghệ lõi
+                Nền tảng xử lý
               </Typography>
               <Chip
-                label="LiveKit và GPU Wav2Lip"
+                label="Công nghệ AI AILA"
                 size="small"
                 color="success"
                 variant="outlined"

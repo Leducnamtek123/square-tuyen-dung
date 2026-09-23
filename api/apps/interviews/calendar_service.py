@@ -50,7 +50,7 @@ def generate_interview_ics(
         description += f"Người phỏng vấn: {interviewer_name}\\n"
     description += "\\nTrân trọng,\\nĐội ngũ Tuyển dụng Square"
 
-    location = room_url or "Square AI LiveKit Interview Room"
+    location = room_url or "Phòng phỏng vấn AI InfoHR"
 
     lines = [
         "BEGIN:VCALENDAR",

@@ -196,7 +196,7 @@ export const InterviewScriptsManager: React.FC = () => {
                 </Typography>
                 <Chip
                   icon={<AutoAwesomeOutlinedIcon sx={{ fontSize: '13px !important' }} />}
-                  label="LiveKit Voice AI"
+                  label="Trí tuệ nhân tạo AILA"
                   size="small"
                   color="primary"
                   variant="outlined"
@@ -204,7 +204,7 @@ export const InterviewScriptsManager: React.FC = () => {
                 />
               </Stack>
               <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontWeight: 500 }}>
-                Chuẩn hóa các kịch bản phỏng vấn theo vị trí (Kỹ thuật, STAR, B2B, Fresher, Quản lý) và cá nhân hóa phong thái AI
+                Chuẩn hóa các kịch bản phỏng vấn theo vị trí chuyên môn và cá nhân hóa phong thái AI
               </Typography>
             </Box>
           </Stack>

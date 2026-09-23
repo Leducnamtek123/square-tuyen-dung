@@ -128,4 +128,30 @@ describe('EmployerAiSettingsCard and AI Settings Suite', () => {
     expect(source).toContain('onReset');
     expect(source).toContain('isDirty');
   });
+
+  it('guarantees proprietary branding without leaking internal technology names in UI', () => {
+    const filesToAudit = [
+      join(__dirname, '../index.tsx'),
+      join(__dirname, '../AiStudioPreview.tsx'),
+      join(__dirname, '../../InterviewScripts/InterviewScriptsManager.tsx'),
+      join(__dirname, '../../InterviewScripts/InterviewScriptDrawer.tsx'),
+    ];
+
+    for (const filePath of filesToAudit) {
+      const source = readFileSync(filePath, 'utf8');
+      expect(source).not.toContain('LiveKit');
+      expect(source).not.toContain('Wav2Lip');
+    }
+  });
+
+  it('verifies interviewScripts menu item in EmployerMenu has no custom icon and uses standard bullet dot', () => {
+    const menuPath = join(__dirname, '../../../../../layouts/components/employers/Sidebar/EmployerMenu.tsx');
+    const source = readFileSync(menuPath, 'utf8');
+
+    expect(source).not.toContain('PsychologyOutlinedIcon');
+    // Ensure interviewScripts MenuItem does not specify an icon prop
+    const match = source.match(/<MenuItem[^>]*text=\{t\('employer:sidebar\.interviewScripts'\)\}[^>]*\/>/);
+    expect(match).not.toBeNull();
+    expect(match![0]).not.toContain('icon=');
+  });
 });

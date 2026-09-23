@@ -1,4 +1,4 @@
-﻿from typing import Optional
+from typing import Optional
 from django.db import models
 from apps.exchange.base import BaseExchangeDefinition, ExportField
 from apps.exchange.registry import exchange_registry
@@ -88,7 +88,7 @@ class InterviewExchangeDefinition(BaseExchangeDefinition):
             formatter=lambda obj, k: str(obj.ai_communication_score) if obj.ai_communication_score is not None else "",
         ),
         "aiSummary": ExportField(key="aiSummary", label="Nhận xét AI", model_field="ai_summary"),
-        "roomName": ExportField(key="roomName", label="Phòng LiveKit", model_field="room_name"),
+        "roomName": ExportField(key="roomName", label="Phòng phỏng vấn AI", model_field="room_name"),
         "notes": ExportField(key="notes", label="Ghi chú", model_field="notes"),
     }
 

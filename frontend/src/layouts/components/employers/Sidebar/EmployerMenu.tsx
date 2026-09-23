@@ -100,6 +100,7 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
             { text: t('employer:sidebar.interviewLive'), to: routePath(ROUTES.EMPLOYER.INTERVIEW_LIVE), badgeContent: liveInterviewCount, isSelected: isSelected(ROUTES.EMPLOYER.INTERVIEW_LIVE) },
             { text: t('employer:sidebar.questionBank'), to: routePath(ROUTES.EMPLOYER.QUESTION_BANK), isSelected: isSelected(ROUTES.EMPLOYER.QUESTION_BANK) },
             { text: t('employer:sidebar.questionSets'), to: routePath(ROUTES.EMPLOYER.QUESTION_GROUPS), isSelected: isSelected(ROUTES.EMPLOYER.QUESTION_GROUPS) },
+            { text: t('employer:sidebar.interviewScripts'), to: routePath(ROUTES.EMPLOYER.INTERVIEW_SCRIPTS), isSelected: isSelected(ROUTES.EMPLOYER.INTERVIEW_SCRIPTS) },
             { text: t('employer:sidebar.aiSettings'), to: routePath(ROUTES.EMPLOYER.AI_SETTINGS), isSelected: isSelected(ROUTES.EMPLOYER.AI_SETTINGS) },
           ]}
         />
@@ -111,6 +112,7 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
             <MenuItem text={t('employer:sidebar.interviewLive')} to={routePath(ROUTES.EMPLOYER.INTERVIEW_LIVE)} kind="child" badgeContent={liveInterviewCount} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.INTERVIEW_LIVE) }} />
             <MenuItem text={t('employer:sidebar.questionBank')} to={routePath(ROUTES.EMPLOYER.QUESTION_BANK)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.QUESTION_BANK) }} />
             <MenuItem text={t('employer:sidebar.questionSets')} to={routePath(ROUTES.EMPLOYER.QUESTION_GROUPS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.QUESTION_GROUPS) }} />
+            <MenuItem text={t('employer:sidebar.interviewScripts')} to={routePath(ROUTES.EMPLOYER.INTERVIEW_SCRIPTS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.INTERVIEW_SCRIPTS) }} />
             <MenuItem text={t('employer:sidebar.aiSettings')} to={routePath(ROUTES.EMPLOYER.AI_SETTINGS)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.AI_SETTINGS) }} />
           </List>
         </Collapse>

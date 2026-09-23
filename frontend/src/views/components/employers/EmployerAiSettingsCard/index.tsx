@@ -329,7 +329,7 @@ export default function EmployerAiSettingsCard() {
 
         <DialogContent dividers sx={{ py: 2.5 }}>
           <Alert severity="info" sx={{ mb: 2.5, borderRadius: 2 }}>
-            Hệ thống AI phỏng vấn của InfoHR ứng dụng công nghệ kết hợp giữa bộ video cử chỉ hành vi tự nhiên Full HD cùng mô hình học sâu GPU Wav2Lip để render khẩu hình chuyển động trực tiếp theo thời gian thực.
+            Hệ thống AI phỏng vấn của InfoHR ứng dụng công nghệ kết hợp giữa bộ video cử chỉ hành vi tự nhiên Full HD cùng mô hình học sâu nhận diện và đồng bộ khẩu hình thông minh AILA để tái tạo chuyển động trực tiếp theo thời gian thực.
           </Alert>
 
           <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>
@@ -351,7 +351,7 @@ export default function EmployerAiSettingsCard() {
           </Box>
 
           <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1, color: 'text.primary' }}>
-            2. Tiêu chuẩn 2: Ảnh chân dung AI độ phân giải cao cho GPU Wav2Lip
+            2. Tiêu chuẩn 2: Ảnh chân dung AI độ phân giải cao cho đồng bộ khẩu hình AILA
           </Typography>
           <Box sx={{ mb: 2.5, pl: 1 }}>
             <Typography variant="body2" sx={{ mb: 0.5 }}>
@@ -361,7 +361,7 @@ export default function EmployerAiSettingsCard() {
               • <strong>Định dạng</strong>: JPG chất lượng cao hoặc PNG không nền trong suốt
             </Typography>
             <Typography variant="body2">
-              • <strong>Mục đích</strong>: Nạp vào mô hình trí tuệ nhân tạo Wav2Lip trên GPU để tái tạo khẩu hình miệng khớp từng mili-giây với giọng nói phát ra từ hệ thống TTS
+              • <strong>Mục đích</strong>: Nạp vào mô hình trí tuệ nhân tạo AILA để tái tạo khẩu hình miệng khớp từng mili-giây với giọng nói phát ra từ hệ thống chuyển văn bản thành giọng nói
             </Typography>
           </Box>
 
