@@ -165,6 +165,8 @@ class EmployeeSerializer(serializers.ModelSerializer):
     designation_title = serializers.CharField(source='designation.title', read_only=True)
     reports_to_name = serializers.CharField(source='reports_to.full_name', read_only=True)
     contracts = EmploymentContractSerializer(many=True, read_only=True)
+    employee_code = serializers.CharField(required=False, allow_blank=True)
+    full_name = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Employee
@@ -179,6 +181,10 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'tax_id', 'social_insurance_id', 'dependents_count', 'contracts', 'create_at', 'update_at'
         ]
         read_only_fields = ['company', 'create_at', 'update_at']
+        extra_kwargs = {
+            'employee_code': {'required': False, 'allow_blank': True},
+            'full_name': {'required': False, 'allow_blank': True},
+        }
 
     def to_internal_value(self, data):
         payload = data.copy() if hasattr(data, 'copy') else dict(data)
@@ -1048,6 +1054,110 @@ class EmployeeDocumentSerializer(serializers.ModelSerializer):
             if camel in payload and snake not in payload:
                 payload[snake] = payload.get(camel)
         return super().to_internal_value(payload)
+
+
+class OnboardingTaskItemSerializer(serializers.ModelSerializer):
+    assigned_to_name = serializers.CharField(source='assigned_to.full_name', read_only=True)
+    completed_by_name = serializers.CharField(source='completed_by.full_name', read_only=True)
+    document_url = serializers.CharField(source='document.file_url', read_only=True)
+    document_name = serializers.CharField(source='document.name', read_only=True)
+    stage_label = serializers.CharField(source='get_stage_display', read_only=True)
+    assigned_role_label = serializers.CharField(source='get_assigned_role_display', read_only=True)
+
+    class Meta:
+        from .models import OnboardingTaskItem
+        model = OnboardingTaskItem
+        fields = [
+            'id', 'process', 'stage', 'stage_label', 'code', 'title', 'description',
+            'assigned_role', 'assigned_role_label', 'assigned_to', 'assigned_to_name',
+            'is_required', 'is_completed', 'completed_at', 'completed_by', 'completed_by_name',
+            'document', 'document_url', 'document_name', 'rejection_note', 'order',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'process', 'create_at', 'update_at']
+
+
+class EmployeeOnboardingProcessSerializer(serializers.ModelSerializer):
+    stage_label = serializers.CharField(source='get_stage_display', read_only=True)
+    tasks = OnboardingTaskItemSerializer(many=True, read_only=True)
+    employee_detail = serializers.SerializerMethodField()
+    offer_detail = serializers.SerializerMethodField()
+
+    class Meta:
+        from .models import EmployeeOnboardingProcess
+        model = EmployeeOnboardingProcess
+        fields = [
+            'id', 'company', 'employee', 'employee_detail',
+            'offer_letter', 'offer_detail', 'application',
+            'stage', 'stage_label', 'target_start_date', 'actual_start_date',
+            'probation_end_date', 'progress_percent', 'cancel_reason',
+            'cancelled_at', 'cancelled_by', 'tasks',
+            'create_at', 'update_at'
+        ]
+        read_only_fields = ['id', 'company', 'create_at', 'update_at', 'progress_percent']
+
+    def get_employee_detail(self, obj):
+        emp = obj.employee
+        if not emp:
+            return None
+        return {
+            'id': emp.id,
+            'employee_code': emp.employee_code,
+            'full_name': emp.full_name,
+            'email': emp.email,
+            'phone': emp.phone,
+            'avatar': emp.avatar,
+            'department_id': emp.department_id,
+            'department_name': emp.department.name if emp.department else None,
+            'designation_id': emp.designation_id,
+            'designation_title': emp.designation.title if emp.designation else None,
+            'reports_to_name': emp.reports_to.full_name if emp.reports_to else None,
+            'status': emp.status,
+            'join_date': emp.join_date,
+            'probation_end_date': emp.probation_end_date,
+        }
+
+    def get_offer_detail(self, obj):
+        offer = obj.offer_letter
+        if not offer:
+            return None
+        return {
+            'id': offer.id,
+            'position_title': offer.position_title,
+            'salary_offered': offer.salary_offered,
+            'allowance': offer.allowance,
+            'start_date': offer.start_date,
+            'status': offer.status,
+            'candidate_signed_at': offer.candidate_signed_at,
+        }
+
+
+class ApproveDocumentPayloadSerializer(serializers.Serializer):
+    file_url = serializers.CharField(max_length=500, required=False, allow_blank=True, default='')
+    document_type = serializers.CharField(max_length=50, required=False, default='IDENTITY_CARD')
+    name = serializers.CharField(max_length=255, required=False, allow_blank=True, default='')
+
+
+class RejectDocumentPayloadSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=500, required=True)
+
+
+class ProbationEvaluationPayloadSerializer(serializers.Serializer):
+    result = serializers.ChoiceField(choices=['PASSED', 'EXTENDED', 'FAILED'])
+    notes = serializers.CharField(max_length=1000, required=False, allow_blank=True, default='')
+    extension_days = serializers.IntegerField(required=False, default=30)
+
+
+class CancelOnboardingPayloadSerializer(serializers.Serializer):
+    reason = serializers.CharField(max_length=500, required=True)
+
+
+class OnboardingStatsSerializer(serializers.Serializer):
+    total_onboarding = serializers.IntegerField()
+    pending_preboarding_docs = serializers.IntegerField()
+    upcoming_day_one_7d = serializers.IntegerField()
+    probation_due_15d = serializers.IntegerField()
+
 
 
 

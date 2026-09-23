@@ -33,6 +33,8 @@ from apps.hrm.models import (
     WorkShift,
     EmployeeCareerHistory,
     EmployeeDocument,
+    EmployeeOnboardingProcess,
+    OnboardingTaskItem,
 )
 from apps.hrm.serializers import (
     WorkLocationSerializer,
@@ -57,8 +59,24 @@ from apps.hrm.serializers import (
     WorkShiftSerializer,
     EmployeeCareerHistorySerializer,
     EmployeeDocumentSerializer,
+    OnboardingTaskItemSerializer,
+    EmployeeOnboardingProcessSerializer,
+    ApproveDocumentPayloadSerializer,
+    RejectDocumentPayloadSerializer,
+    ProbationEvaluationPayloadSerializer,
+    CancelOnboardingPayloadSerializer,
+    OnboardingStatsSerializer,
 )
-from apps.hrm.services import CandidateToEmployeeConverter, generate_next_employee_code
+from apps.hrm.services import (
+    CandidateToEmployeeConverter,
+    generate_next_employee_code,
+    approve_preboarding_document,
+    reject_preboarding_document,
+    complete_task_item,
+    confirm_day_one_attendance,
+    submit_probation_evaluation,
+    cancel_onboarding_process,
+)
 from shared.configs import variable_system as var_sys
 
 
@@ -1801,6 +1819,150 @@ class EmployeeDocumentViewSet(viewsets.ModelViewSet):
         if not company:
             raise PermissionDenied("Không có quyền thực hiện.")
         serializer.save(company=company)
+
+
+class EmployeeOnboardingProcessViewSet(viewsets.ModelViewSet):
+    permission_classes = [perms_custom.CanManageEmployees]
+    serializer_class = EmployeeOnboardingProcessSerializer
+
+    def get_queryset(self):
+        company = _get_company_for_request(self.request)
+        if not company:
+            return EmployeeOnboardingProcess.objects.none()
+
+        qs = (
+            EmployeeOnboardingProcess.objects.filter(company=company)
+            .select_related('employee', 'employee__department', 'employee__designation', 'employee__reports_to', 'offer_letter', 'company')
+            .prefetch_related('tasks', 'tasks__assigned_to', 'tasks__completed_by', 'tasks__document')
+        )
+
+        stage = self.request.query_params.get('stage')
+        if stage:
+            qs = qs.filter(stage=stage)
+
+        department_id = self.request.query_params.get('department_id') or self.request.query_params.get('department')
+        if department_id:
+            qs = qs.filter(employee__department_id=department_id)
+
+        search = self.request.query_params.get('search') or self.request.query_params.get('kw')
+        if search:
+            search = search.strip()
+            qs = qs.filter(
+                Q(employee__full_name__icontains=search) |
+                Q(employee__employee_code__icontains=search) |
+                Q(employee__email__icontains=search)
+            )
+
+        return qs
+
+    @action(detail=False, methods=['get'], url_path='stats')
+    def stats(self, request):
+        company = _get_company_for_request(request)
+        if not company:
+            return Response({'detail': 'Company not found'}, status=status.HTTP_403_FORBIDDEN)
+
+        today = timezone.now().date()
+        seven_days_later = today + timedelta(days=7)
+        fifteen_days_later = today + timedelta(days=15)
+
+        qs = EmployeeOnboardingProcess.objects.filter(company=company)
+
+        total_onboarding = qs.exclude(stage__in=['COMPLETED', 'CANCELLED']).count()
+        pending_preboarding_docs = qs.filter(stage='PREBOARDING_DOCS').count()
+        upcoming_day_one_7d = qs.filter(
+            stage__in=['PREBOARDING_DOCS', 'INTERNAL_PREP', 'DAY_ONE_WELCOME'],
+            target_start_date__gte=today,
+            target_start_date__lte=seven_days_later,
+        ).count()
+        probation_due_15d = qs.filter(
+            stage='PROBATION_EVALUATION',
+            probation_end_date__gte=today,
+            probation_end_date__lte=fifteen_days_later,
+        ).count()
+
+        return Response({
+            'total_onboarding': total_onboarding,
+            'pending_preboarding_docs': pending_preboarding_docs,
+            'upcoming_day_one_7d': upcoming_day_one_7d,
+            'probation_due_15d': probation_due_15d,
+        })
+
+    @action(detail=True, methods=['post'], url_path=r'tasks/(?P<task_id>\d+)/approve-document')
+    def approve_document(self, request, pk=None, task_id=None):
+        process = self.get_object()
+        serializer = ApproveDocumentPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        vd = serializer.validated_data
+
+        task = approve_preboarding_document(
+            task_id=task_id,
+            actor=request.user,
+            file_url=vd.get('file_url'),
+            document_type=vd.get('document_type', 'IDENTITY_CARD'),
+            name=vd.get('name'),
+        )
+        return Response(OnboardingTaskItemSerializer(task).data)
+
+    @action(detail=True, methods=['post'], url_path=r'tasks/(?P<task_id>\d+)/reject-document')
+    def reject_document(self, request, pk=None, task_id=None):
+        process = self.get_object()
+        serializer = RejectDocumentPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        task = reject_preboarding_document(
+            task_id=task_id,
+            reason=serializer.validated_data['reason'],
+            actor=request.user,
+        )
+        return Response(OnboardingTaskItemSerializer(task).data)
+
+    @action(detail=True, methods=['post'], url_path=r'tasks/(?P<task_id>\d+)/complete')
+    def complete_task(self, request, pk=None, task_id=None):
+        process = self.get_object()
+        task = complete_task_item(
+            task_id=task_id,
+            actor=request.user,
+        )
+        return Response(OnboardingTaskItemSerializer(task).data)
+
+    @action(detail=True, methods=['post'], url_path='confirm-day-one')
+    def confirm_day_one(self, request, pk=None):
+        process = self.get_object()
+        updated_process = confirm_day_one_attendance(
+            process_id=process.id,
+            actor=request.user,
+        )
+        return Response(EmployeeOnboardingProcessSerializer(updated_process).data)
+
+    @action(detail=True, methods=['post'], url_path='probation-evaluation')
+    def probation_evaluation(self, request, pk=None):
+        process = self.get_object()
+        serializer = ProbationEvaluationPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        vd = serializer.validated_data
+
+        updated_process = submit_probation_evaluation(
+            process_id=process.id,
+            result=vd['result'],
+            notes=vd.get('notes', ''),
+            actor=request.user,
+            extension_days=vd.get('extension_days', 30),
+        )
+        return Response(EmployeeOnboardingProcessSerializer(updated_process).data)
+
+    @action(detail=True, methods=['post'], url_path='cancel')
+    def cancel_onboarding(self, request, pk=None):
+        process = self.get_object()
+        serializer = CancelOnboardingPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        cancelled_process = cancel_onboarding_process(
+            process_id=process.id,
+            reason=serializer.validated_data['reason'],
+            actor=request.user,
+        )
+        return Response(EmployeeOnboardingProcessSerializer(cancelled_process).data)
+
 
 
 

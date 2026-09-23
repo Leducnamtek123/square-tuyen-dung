@@ -221,3 +221,58 @@ class OnboardingLifecycleTestCase(TestCase):
         self.assertEqual(cancelled_process.cancel_reason, 'Ứng viên từ chối đi làm vào phút chót')
         employee.refresh_from_db()
         self.assertEqual(employee.status, 'RESIGNED')
+
+    def test_api_onboarding_endpoints(self):
+        """Test API endpoints for listing, stats, approve-document, confirm Day 1, and probation evaluation."""
+        employee, _ = CandidateToEmployeeConverter.convert(
+            company=self.company,
+            actor=self.owner,
+            data={'job_application_id': self.application.id, 'base_salary': 18000000},
+        )
+        process = employee.onboarding_process
+
+        # 1. Test stats endpoint
+        res_stats = self.client.get('/api/v1/native-hrm/onboarding-processes/stats/')
+        self.assertEqual(res_stats.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(res_stats.data['total_onboarding'], 1)
+        self.assertGreaterEqual(res_stats.data['pending_preboarding_docs'], 1)
+
+        # 2. Test list endpoint
+        res_list = self.client.get('/api/v1/native-hrm/onboarding-processes/')
+        self.assertEqual(res_list.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(res_list.data) > 0 or res_list.data.get('count', 0) > 0)
+
+        # 3. Test approve document endpoint
+        id_task = process.tasks.filter(code='UPLOAD_ID_CARD').first()
+        res_approve = self.client.post(
+            f'/api/v1/native-hrm/onboarding-processes/{process.id}/tasks/{id_task.id}/approve-document/',
+            data={
+                'file_url': 'https://s3.infohr.vn/cccd.pdf',
+                'document_type': 'IDENTITY_CARD',
+                'name': 'Bản chụp CCCD',
+            },
+            format='json',
+        )
+        self.assertEqual(res_approve.status_code, status.HTTP_200_OK)
+        self.assertTrue(res_approve.data['is_completed'])
+
+        # 4. Test confirm day one endpoint
+        res_day_one = self.client.post(
+            f'/api/v1/native-hrm/onboarding-processes/{process.id}/confirm-day-one/',
+            format='json',
+        )
+        self.assertEqual(res_day_one.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_day_one.data['stage'], 'PROBATION_EVALUATION')
+
+        # 5. Test probation evaluation endpoint
+        res_eval = self.client.post(
+            f'/api/v1/native-hrm/onboarding-processes/{process.id}/probation-evaluation/',
+            data={
+                'result': 'PASSED',
+                'notes': 'Hoàn thành xuất sắc',
+            },
+            format='json',
+        )
+        self.assertEqual(res_eval.status_code, status.HTTP_200_OK)
+        self.assertEqual(res_eval.data['stage'], 'COMPLETED')
+

@@ -21,6 +21,7 @@ router.register(r'monthly-summaries', views.MonthlyAttendanceSummaryViewSet, bas
 router.register(r'career-histories', views.EmployeeCareerHistoryViewSet, basename='hrm-career-histories')
 router.register(r'documents', views.EmployeeDocumentViewSet, basename='hrm-documents')
 router.register(r'payroll', views.MonthlyPayrollViewSet, basename='hrm-payroll')
+router.register(r'onboarding-processes', views.EmployeeOnboardingProcessViewSet, basename='hrm-onboarding-processes')
 
 urlpatterns = [
     path('dashboard/stats/', views.HrmDashboardStatsAPIView.as_view(), name='hrm-dashboard-stats'),
