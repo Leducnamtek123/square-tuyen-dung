@@ -2005,3 +2005,22 @@ def test_job_seeker_get_resumes_website_sync_location_without_500(job_seeker_use
     assert job_seeker_profile.location.city == city
 
 
+import importlib.util
+from pathlib import Path
+
+_ai_settings_test_path = Path(__file__).resolve().parent / "tests" / "test_company_ai_settings.py"
+if _ai_settings_test_path.exists():
+    _spec = importlib.util.spec_from_file_location("apps.profiles.tests.test_company_ai_settings", _ai_settings_test_path)
+    if _spec and _spec.loader:
+        _mod = importlib.util.module_from_spec(_spec)
+        try:
+            _spec.loader.exec_module(_mod)
+            test_company_ai_settings = _mod
+            CompanyAiSettingsTestCase = getattr(_mod, "CompanyAiSettingsTestCase", None)
+        except Exception:
+            test_company_ai_settings = _mod
+            raise
+
+
+
+

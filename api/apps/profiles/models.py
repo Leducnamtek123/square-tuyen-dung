@@ -399,6 +399,13 @@ class Company(CommonBaseModel):
         verbose_name="Trọng số đánh giá năng lực theo tiêu chuẩn văn hóa công ty",
     )
 
+    ai_settings = models.JSONField(
+        default=dict,
+        blank=True,
+        null=True,
+        verbose_name="Cấu hình Trợ lý AI phỏng vấn của doanh nghiệp",
+    )
+
     def get_evaluation_weights(self) -> dict:
         default_weights = {
             "technical": 30,
@@ -412,6 +419,28 @@ class Company(CommonBaseModel):
             merged.update(self.evaluation_weights)
             return merged
         return default_weights
+
+    def get_ai_settings(self) -> dict:
+        default_settings = {
+            "interviewer_name": "Trợ lý AI AILA",
+            "interviewer_title": "Chuyên viên tuyển dụng thông minh",
+            "background_type": "preset",
+            "selected_background_id": "modern_office",
+            "custom_background_url": None,
+            "avatar_type": "preset",
+            "active_character_id": "ng_c_linh",
+            "selected_avatar_id": "aila_recruiter",
+            "custom_avatar_url": None,
+            "tts_voice": "Trúc Ly",
+            "tts_speed": 1.0,
+            "default_script_id": None,
+        }
+        if isinstance(self.ai_settings, dict) and self.ai_settings:
+            merged = default_settings.copy()
+            merged.update(self.ai_settings)
+            return merged
+        return default_settings
+
 
     class Meta:
 

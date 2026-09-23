@@ -1,7 +1,7 @@
 
 from shared.configs import variable_response as var_res
 
-from rest_framework import viewsets
+from rest_framework import viewsets, views
 
 from rest_framework import permissions as perms_sys
 
@@ -20,8 +20,70 @@ from ..serializers import (
     JobSeekerProfileSerializer,
 
 )
+from ..serializers_ai_settings import CompanyAiSettingsSerializer
+from .web_helpers import _get_user_company, _has_company_permission
+
+
+class CompanyAiSettingsAPIView(views.APIView):
+    """
+    API endpoint để lấy và cập nhật cấu hình Trợ lý AI phỏng vấn của doanh nghiệp.
+    """
+    permission_classes = [perms_sys.IsAuthenticated]
+
+    def _get_company(self, user):
+        company = _get_user_company(user)
+        if not company:
+            try:
+                company = getattr(user, 'company', None)
+            except Exception:
+                company = None
+        return company
+
+    def get(self, request):
+        company = self._get_company(request.user)
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "User has no active company."},
+            )
+
+        serializer = CompanyAiSettingsSerializer(company)
+        return var_res.response_data(data=serializer.data)
+
+    def patch(self, request):
+        company = self._get_company(request.user)
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "User has no active company."},
+            )
+
+        has_perm = (
+            company.user_id == request.user.id
+            or _has_company_permission(request.user, company, "manage_interviews")
+            or _has_company_permission(request.user, company, "manage_candidates")
+            or getattr(request.user, "is_staff", False)
+            or getattr(request.user, "is_superuser", False)
+        )
+        if not has_perm:
+            return var_res.response_data(
+                status=status.HTTP_403_FORBIDDEN,
+                errors={"detail": "You do not have permission to update company AI settings."},
+            )
+
+        serializer = CompanyAiSettingsSerializer(company, data=request.data, partial=True)
+        if not serializer.is_valid():
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors=serializer.errors,
+            )
+
+        serializer.save()
+        return var_res.response_data(data=serializer.data)
+
 
 class ProfileView(viewsets.ViewSet):
+
 
     def get_permissions(self):
 

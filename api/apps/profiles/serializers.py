@@ -10,3 +10,4 @@ This file re-exports everything so that existing imports like
 `from ..serializers import CompanySerializer` continue to work unchanged.
 """
 from .serializers_pkg import *  # noqa: F401,F403
+from .serializers_ai_settings import CompanyAiSettingsSerializer  # noqa: F401

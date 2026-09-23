@@ -81,6 +81,8 @@ urlpatterns = [
 
         })),
 
+        path('company/ai-settings/', views.CompanyAiSettingsAPIView.as_view(), name='company-ai-settings'),
+
     ])),
 
     path('app/', include([
@@ -94,6 +96,8 @@ urlpatterns = [
     ])),
 
     path('web/', include([
+
+        path("company/ai-settings/", views.CompanyAiSettingsAPIView.as_view(), name='company-ai-settings-web'),
 
         path("company/", web_views.CompanyView.as_view({'get': 'get_company_info'})),
 
