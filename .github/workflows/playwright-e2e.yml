@@ -1,0 +1,87 @@
+name: Playwright E2E Quality Gate
+
+on:
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 18 * * *' # Chạy định kỳ 1h sáng giờ VN
+  workflow_dispatch:
+
+jobs:
+  fast-mocked-e2e:
+    name: "Tier 1: Fast Mocked E2E Matrix"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: cd frontend && pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: cd frontend && pnpm exec playwright install --with-deps chromium
+
+      - name: Run Tier 1 Fast Mocked E2E Matrix (4 Workers)
+        run: >
+          cd frontend && pnpm exec playwright test
+          tests/e2e/01-auth/
+          tests/e2e/02-candidate/
+          tests/e2e/03-employer/
+          tests/e2e/04-voice-ai/
+          tests/e2e/05-hrm/
+          tests/e2e/06-admin/
+          --workers=4
+
+      - name: Upload HTML Test Report on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-mock-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+  live-fullstack-e2e:
+    name: "Tier 2: Live Fullstack Lifecycle E2E"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start Full Docker Compose Stack
+        run: docker compose -f docker-compose.yml up -d --build
+
+      - name: Wait for Backend and DB Health
+        run: |
+          docker compose exec -T backend python manage.py migrate
+          docker compose exec -T backend python manage.py check
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install frontend dependencies
+        run: cd frontend && pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: cd frontend && pnpm exec playwright install --with-deps chromium
+
+      - name: Run Live E2E Lifecycle Flow
+        env:
+          LIVE_RECRUITMENT_E2E: '1'
+          PLAYWRIGHT_BASE_URL: 'http://localhost:3000'
+        run: cd frontend && pnpm exec playwright test tests/e2e/07-cross-portal-live/ --workers=1

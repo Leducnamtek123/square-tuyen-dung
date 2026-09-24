@@ -743,7 +743,7 @@ export async function setupCommonApiMocks(page: Page) {
   });
 
   // All careers
-  await page.route(/\/common\/all-careers\/?(\?.*)?$/, async (route) => {
+  await page.route(/\/common\/(all-careers|careers|top-careers)\/?(\?.*)?$/, async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -752,7 +752,7 @@ export async function setupCommonApiMocks(page: Page) {
   });
 
   // All cities
-  await page.route(/\/common\/all-cities\/?(\?.*)?$/, async (route) => {
+  await page.route(/\/common\/(all-cities|cities)\/?(\?.*)?$/, async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -852,6 +852,15 @@ export async function setupCommonApiMocks(page: Page) {
     });
   });
 
+  // Mock top companies
+  await page.route(/\/info\/web\/companies\/top\/?(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
   // Mock popular keywords to avoid 401s from public job search inputs
   await page.route(/\/common\/popular-keywords\/?(\?.*)?$/, async (route) => {
     await route.fulfill({
@@ -862,6 +871,18 @@ export async function setupCommonApiMocks(page: Page) {
         { id: 2, name: 'Python' },
         { id: 3, name: 'Node.js' },
       ]),
+    });
+  });
+
+  // Mock AI Chatbot config
+  await page.route(/(ai\/chatbot\/config|api\/.*\/ai\/chatbot\/config)(\/|\?|$)/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        enabled: false,
+        name: 'AILA Assistant',
+      }),
     });
   });
 }
@@ -944,10 +965,10 @@ export async function setupAuthApiMocks(
       contentType: 'application/json',
       body: JSON.stringify({
         isOnboarded: isOnboarded,
-        onboardingStep: 3,
-        profileCompleteness: 100,
-        completedSteps: ['basic', 'details', 'complete'],
-        pendingSteps: [],
+        onboardingStep: isOnboarded ? 4 : 1,
+        profileCompleteness: isOnboarded ? 100 : 35,
+        completedSteps: isOnboarded ? ['basic', 'details', 'complete'] : [],
+        pendingSteps: isOnboarded ? [] : ['basic', 'details', 'complete'],
       }),
     });
   });
@@ -1029,6 +1050,7 @@ export const MOCK_CANDIDATE_PROFILE = {
     id: 101,
     email: 'candidate.e2e@infohr.vn',
     full_name: 'Nguyen Van Ung Vien',
+    fullName: 'Nguyen Van Ung Vien',
     phone: '0901234567',
   },
   fullName: 'Nguyen Van Ung Vien',
@@ -1146,6 +1168,19 @@ export async function setupJobsApiMocks(page: Page) {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(MOCK_JOBS[1]),
+    });
+  });
+
+  // 5b. AI Recommended jobs
+  await page.route(/\/job\/web\/job-posts\/recommended-jobs\/?(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        count: MOCK_JOBS.length,
+        results: MOCK_JOBS,
+        total_pages: 1,
+      }),
     });
   });
 
@@ -3526,5 +3561,628 @@ export async function setupVoiceAiApiMocks(
     });
   });
 }
+
+/**
+ * ============================================================================
+ * CANDIDATE (JOB SEEKER) ADVANCED E2E MOCKS
+ * ============================================================================
+ */
+
+export const MOCK_CANDIDATE_CVS = [
+  {
+    id: 1,
+    title: 'CV Lập trình viên Fullstack React & Python',
+    slug: 'cv-lap-trinh-vien-fullstack-1',
+    template: 1,
+    template_code: 'modern-navy',
+    templateCode: 'modern-navy',
+    template_name: 'Modern Navy Professional',
+    templateName: 'Modern Navy Professional',
+    template_category: 'MODERN',
+    templateCategory: 'MODERN',
+    is_main_cv: true,
+    isMainCv: true,
+    is_public: true,
+    isPublic: true,
+    views_count: 42,
+    viewsCount: 42,
+    download_count: 15,
+    downloadCount: 15,
+    ai_score: 92,
+    aiScore: 92,
+    create_at: '2026-09-01T10:00:00Z',
+    createAt: '2026-09-01T10:00:00Z',
+    update_at: '2026-09-20T14:30:00Z',
+    updateAt: '2026-09-20T14:30:00Z',
+  },
+  {
+    id: 2,
+    title: 'CV Frontend Lead Architecture',
+    slug: 'cv-frontend-lead-architecture-2',
+    template: 2,
+    template_code: 'minimal-clean',
+    templateCode: 'minimal-clean',
+    template_name: 'Minimal Clean Slate',
+    templateName: 'Minimal Clean Slate',
+    template_category: 'MINIMALIST',
+    templateCategory: 'MINIMALIST',
+    is_main_cv: false,
+    isMainCv: false,
+    is_public: false,
+    isPublic: false,
+    views_count: 12,
+    viewsCount: 12,
+    download_count: 3,
+    downloadCount: 3,
+    ai_score: 85,
+    aiScore: 85,
+    create_at: '2026-09-05T09:00:00Z',
+    createAt: '2026-09-05T09:00:00Z',
+    update_at: '2026-09-18T11:00:00Z',
+    updateAt: '2026-09-18T11:00:00Z',
+  },
+];
+
+export const MOCK_CANDIDATE_INTERVIEW_SESSIONS = [
+  {
+    id: 901,
+    invite_token: 'candidate-mock-session-901',
+    inviteToken: 'candidate-mock-session-901',
+    room_name: 'room-candidate-mock-901',
+    roomName: 'room-candidate-mock-901',
+    job_post: 101,
+    job_name: 'Senior Fullstack Engineer (React & Django)',
+    jobName: 'Senior Fullstack Engineer (React & Django)',
+    company: 10,
+    company_name: 'InfoHR Tech Corp',
+    companyName: 'InfoHR Tech Corp',
+    session_type: 'mock',
+    sessionType: 'mock',
+    status: 'completed',
+    scheduled_at: '2026-09-21T09:00:00Z',
+    scheduledAt: '2026-09-21T09:00:00Z',
+    start_time: '2026-09-21T09:00:00Z',
+    startTime: '2026-09-21T09:00:00Z',
+    end_time: '2026-09-21T09:25:00Z',
+    endTime: '2026-09-21T09:25:00Z',
+    duration_seconds: 1500,
+    ai_overall_score: 8.5,
+    aiOverallScore: 8.5,
+    ai_technical_score: 8.8,
+    aiTechnicalScore: 8.8,
+    ai_communication_score: 8.2,
+    aiCommunicationScore: 8.2,
+    ai_strengths: 'Nắm vững kiến thức React, Next.js, tư duy cấu trúc thuật toán tốt.',
+    aiStrengths: 'Nắm vững kiến thức React, Next.js, tư duy cấu trúc thuật toán tốt.',
+    ai_weaknesses: 'Cần tự tin hơn khi trình bày các giải pháp tối ưu hóa cơ sở dữ liệu lớn.',
+    aiWeaknesses: 'Cần tự tin hơn khi trình bày các giải pháp tối ưu hóa cơ sở dữ liệu lớn.',
+    ai_feedback: 'Ứng viên có tiềm năng xuất sắc, phản hồi mạch lạc và giải quyết bài toán kỹ thuật hiệu quả.',
+    aiFeedback: 'Ứng viên có tiềm năng xuất sắc, phản hồi mạch lạc và giải quyết bài toán kỹ thuật hiệu quả.',
+  },
+  {
+    id: 902,
+    invite_token: 'candidate-official-session-902',
+    inviteToken: 'candidate-official-session-902',
+    room_name: 'room-candidate-official-902',
+    roomName: 'room-candidate-official-902',
+    job_post: 101,
+    job_name: 'Senior Fullstack Engineer (React & Django)',
+    jobName: 'Senior Fullstack Engineer (React & Django)',
+    company: 10,
+    company_name: 'InfoHR Tech Corp',
+    companyName: 'InfoHR Tech Corp',
+    session_type: 'official',
+    sessionType: 'official',
+    status: 'scheduled',
+    scheduled_at: '2026-10-05T14:00:00Z',
+    scheduledAt: '2026-10-05T14:00:00Z',
+    start_time: null,
+    startTime: null,
+    end_time: null,
+    endTime: null,
+  },
+];
+
+export const MOCK_CANDIDATE_COMPANY_QUESTION_SETS = [
+  {
+    id: 1,
+    name: 'Phỏng vấn Fullstack Web - InfoHR Tech',
+    description: 'Bộ câu hỏi chuẩn kiểm tra React 19, Next.js App Router và kiến trúc Django REST Framework.',
+    company_name: 'InfoHR Tech Corp',
+    companyName: 'InfoHR Tech Corp',
+    career_id: 1,
+    careerId: 1,
+    career_name: 'Công nghệ thông tin / Phần mềm',
+    careerName: 'Công nghệ thông tin / Phần mềm',
+    seniority: 'senior',
+    questions_count: 5,
+    questionsCount: 5,
+    total_duration_minutes: 25,
+    totalDurationMinutes: 25,
+    category_tags: ['React', 'Next.js', 'Django', 'Architecture'],
+  },
+  {
+    id: 2,
+    name: 'Phỏng vấn Kỹ sư Frontend Junior',
+    description: 'Đánh giá kiến thức cốt lõi JavaScript ES6+, HTML5/CSS3 và React Hooks cơ bản.',
+    company_name: 'InfoHR Tech Corp',
+    companyName: 'InfoHR Tech Corp',
+    career_id: 1,
+    careerId: 1,
+    career_name: 'Công nghệ thông tin / Phần mềm',
+    careerName: 'Công nghệ thông tin / Phần mềm',
+    seniority: 'junior',
+    questions_count: 4,
+    questionsCount: 4,
+    total_duration_minutes: 15,
+    totalDurationMinutes: 15,
+    category_tags: ['JavaScript', 'React', 'CSS'],
+  },
+];
+
+export const MOCK_CANDIDATE_QUESTION_BANK = [
+  {
+    id: 101,
+    title: 'Giải thích cơ chế Server Component và Client Component trong Next.js App Router?',
+    content: 'Giải thích cơ chế Server Component và Client Component trong Next.js App Router?',
+    difficulty: 3,
+    difficulty_display: 'Khá / Nâng cao',
+    category: 'React & Next.js',
+    category_display: 'Công nghệ Frontend',
+    career: 1,
+    career_name: 'Công nghệ thông tin / Phần mềm',
+    seniority: 'senior',
+    default_duration_seconds: 180,
+    interviewer_intent: 'Kiểm tra khả năng phân định ranh giới SSR / CSR và tối ưu bundle payload.',
+    important_tips: [
+      { id: 1, tip: 'Nhấn mạnh việc bảo mật API keys và fetch data trực tiếp trên Server.' },
+      { id: 2, tip: 'Lưu ý khi nào cần gắn directive "use client".' },
+    ],
+    follow_up_questions: ['Làm thế nào để truyền Props phức tạp giữa Server và Client Component?'],
+  },
+];
+
+export const MOCK_CANDIDATE_SALARY_BENCHMARKS = [
+  {
+    id: 1,
+    job_title: 'Kỹ sư phần mềm Fullstack (React & Python)',
+    jobTitle: 'Kỹ sư phần mềm Fullstack (React & Python)',
+    position_title: 'Kỹ sư phần mềm Fullstack (React & Python)',
+    positionTitle: 'Kỹ sư phần mềm Fullstack (React & Python)',
+    category: 'Công nghệ thông tin / Phần mềm',
+    career_name: 'Công nghệ thông tin / Phần mềm',
+    careerName: 'Công nghệ thông tin / Phần mềm',
+    seniority: 'senior',
+    experience_level: 'senior',
+    experienceLevel: 'senior',
+    experience_level_display: 'Senior (> 4 năm)',
+    min_salary: 30000000,
+    minSalary: 30000000,
+    salary_min: 30000000,
+    salaryMin: 30000000,
+    median_salary: 42000000,
+    medianSalary: 42000000,
+    salary_avg: 42000000,
+    salaryAvg: 42000000,
+    max_salary: 60000000,
+    maxSalary: 60000000,
+    salary_max: 60000000,
+    salaryMax: 60000000,
+    currency: 'VND',
+    sample_size: 450,
+    sampleSize: 450,
+    sampleCount: 450,
+    is_hot: true,
+  },
+  {
+    id: 2,
+    job_title: 'Frontend Developer',
+    jobTitle: 'Frontend Developer',
+    position_title: 'Frontend Developer',
+    positionTitle: 'Frontend Developer',
+    category: 'Công nghệ thông tin / Phần mềm',
+    career_name: 'Công nghệ thông tin / Phần mềm',
+    careerName: 'Công nghệ thông tin / Phần mềm',
+    seniority: 'mid',
+    experience_level: 'mid',
+    experienceLevel: 'mid',
+    experience_level_display: 'Trung cấp (2 - 4 năm)',
+    min_salary: 18000000,
+    minSalary: 18000000,
+    salary_min: 18000000,
+    salaryMin: 18000000,
+    median_salary: 26000000,
+    medianSalary: 26000000,
+    salary_avg: 26000000,
+    salaryAvg: 26000000,
+    max_salary: 35000000,
+    maxSalary: 35000000,
+    salary_max: 35000000,
+    salaryMax: 35000000,
+    currency: 'VND',
+    sample_size: 620,
+    sampleSize: 620,
+    sampleCount: 620,
+    is_hot: false,
+  },
+];
+
+export const MOCK_COMPANIES_FOLLOWED = [
+  {
+    id: 1,
+    company: {
+      id: 10,
+      company_name: 'InfoHR Tech Corp',
+      companyName: 'InfoHR Tech Corp',
+      company_image_url: 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=100',
+      companyImageUrl: 'https://images.unsplash.com/photo-1549923746-c502d488b3ea?w=100',
+      slug: 'infohr-tech-corp',
+    },
+  },
+];
+
+export const MOCK_RESUME_VIEWED = [
+  {
+    id: 1,
+    views: 8,
+    createAt: '2026-09-20T10:00:00Z',
+    resume: MOCK_CANDIDATE_RESUMES[0],
+    company: {
+      id: 10,
+      company_name: 'InfoHR Tech Corp',
+      companyName: 'InfoHR Tech Corp',
+    },
+  },
+];
+
+/**
+ * Mocks Candidate CV Management endpoints (/my-cvs, /ung-vien/quan-ly-cv)
+ */
+export async function setupCandidateCvsApiMocks(page: Page, initialCvs = MOCK_CANDIDATE_CVS) {
+  let cvs = [...initialCvs];
+
+  await page.route(/\/cv\/candidate-cvs\/?(\?.*)?$/, async (route) => {
+    if (route.request().method() === 'GET') {
+      const url = new URL(route.request().url());
+      const search = url.searchParams.get('search')?.toLowerCase();
+      let filtered = [...cvs];
+      if (search) {
+        filtered = filtered.filter((c) => c.title.toLowerCase().includes(search));
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          count: filtered.length,
+          results: filtered,
+        }),
+      });
+      return;
+    }
+    if (route.request().method() === 'POST') {
+      const data = route.request().postDataJSON() || {};
+      const newCv = {
+        id: cvs.length + 10,
+        slug: `cv-new-${cvs.length + 10}`,
+        title: data.title || 'CV Mới Tạo',
+        template: 1,
+        template_code: data.template_code || 'modern-navy',
+        templateCode: data.template_code || 'modern-navy',
+        template_name: 'Modern Navy Professional',
+        templateName: 'Modern Navy Professional',
+        template_category: 'MODERN',
+        templateCategory: 'MODERN',
+        is_main_cv: false,
+        isMainCv: false,
+        is_public: true,
+        isPublic: true,
+        views_count: 0,
+        viewsCount: 0,
+        download_count: 0,
+        downloadCount: 0,
+        ai_score: 90,
+        aiScore: 90,
+        create_at: new Date().toISOString(),
+        createAt: new Date().toISOString(),
+        update_at: new Date().toISOString(),
+        updateAt: new Date().toISOString(),
+      };
+      cvs.push(newCv);
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(newCv),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  // Set Main CV
+  await page.route(/\/cv\/candidate-cvs\/\d+\/set-main\/?$/, async (route) => {
+    const url = route.request().url();
+    const idMatch = url.match(/\/cv\/candidate-cvs\/(\d+)\/set-main/);
+    const id = idMatch ? Number(idMatch[1]) : 1;
+    cvs = cvs.map((c) => ({
+      ...c,
+      is_main_cv: c.id === id,
+      isMainCv: c.id === id,
+    }));
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, message: 'Đã đặt làm CV chính thành công.' }),
+    });
+  });
+
+  // Duplicate CV
+  await page.route(/\/cv\/candidate-cvs\/\d+\/duplicate\/?$/, async (route) => {
+    const url = route.request().url();
+    const idMatch = url.match(/\/cv\/candidate-cvs\/(\d+)\/duplicate/);
+    const id = idMatch ? Number(idMatch[1]) : 1;
+    const target = cvs.find((c) => c.id === id) || cvs[0];
+    const duplicated = {
+      ...target,
+      id: cvs.length + 50,
+      title: `${target.title} (Bản sao)`,
+      slug: `${target.slug}-copy`,
+      is_main_cv: false,
+      isMainCv: false,
+    };
+    cvs.push(duplicated);
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify(duplicated),
+    });
+  });
+
+  // Delete CV
+  await page.route(/\/cv\/candidate-cvs\/\d+\/?$/, async (route) => {
+    if (route.request().method() === 'DELETE') {
+      const url = route.request().url();
+      const idMatch = url.match(/\/cv\/candidate-cvs\/(\d+)/);
+      const id = idMatch ? Number(idMatch[1]) : null;
+      if (id) {
+        cvs = cvs.filter((c) => c.id !== id);
+      }
+      await route.fulfill({
+        status: 204,
+      });
+      return;
+    }
+    await route.continue();
+  });
+}
+
+/**
+ * Mocks Candidate Interviews Hub endpoints (/my-interviews)
+ */
+export async function setupCandidateInterviewsApiMocks(
+  page: Page,
+  sessions = MOCK_CANDIDATE_INTERVIEW_SESSIONS
+) {
+  // Candidate sessions list
+  await page.route(/\/interview\/web\/sessions\/?(\?.*)?$/, async (route) => {
+    if (route.request().method() === 'GET') {
+      const url = new URL(route.request().url());
+      const search = url.searchParams.get('search')?.toLowerCase();
+      let filtered = [...sessions];
+      if (search) {
+        filtered = filtered.filter(
+          (s) =>
+            s.job_name.toLowerCase().includes(search) ||
+            s.company_name.toLowerCase().includes(search)
+        );
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          count: filtered.length,
+          results: filtered,
+        }),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  // Session details by ID or token
+  await page.route(/\/interview\/web\/sessions\/(\d+|candidate-[^/]+)\/?$/, async (route) => {
+    const url = route.request().url();
+    const isMock = url.includes('901') || url.includes('mock');
+    const targetSession = isMock ? sessions[0] : sessions[1] || sessions[0];
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(targetSession),
+    });
+  });
+
+  // Evaluations endpoint for session
+  await page.route(/\/interview\/web\/evaluations\/?(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        count: 1,
+        results: [
+          {
+            id: 1,
+            interview: 901,
+            attitude_score: 8.5,
+            professional_score: 8.8,
+            overall_score: 8.6,
+            result: 'passed',
+            comments: 'Ứng viên trả lời lưu loát, nắm rất chắc kỹ năng cốt lõi React và hệ thống.',
+          },
+        ],
+      }),
+    });
+  });
+}
+
+/**
+ * Mocks Candidate Practice Room endpoints (/practice)
+ */
+export async function setupCandidatePracticeApiMocks(page: Page) {
+  // Company Question Sets
+  await page.route(/\/interview\/web\/question-groups\/public\/?(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(MOCK_CANDIDATE_COMPANY_QUESTION_SETS),
+    });
+  });
+
+  // Question Bank
+  await page.route(/\/interview\/web\/questions\/bank\/?(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        count: MOCK_CANDIDATE_QUESTION_BANK.length,
+        results: MOCK_CANDIDATE_QUESTION_BANK,
+      }),
+    });
+  });
+
+  // Question Hints
+  await page.route(/\/interview\/web\/questions\/\d+\/hints\/?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 101,
+        interviewer_intent: 'Đánh giá khả năng tối ưu render và dữ liệu máy chủ.',
+        important_tips: [
+          { id: 1, tip: 'Nêu bật ưu điểm SEO và thời gian tải trang ban đầu.' },
+        ],
+      }),
+    });
+  });
+
+  // Create Mock Session
+  await page.route(/\/interview\/web\/sessions\/create-mock\/?$/, async (route) => {
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 999,
+        invite_token: 'practice-mock-token-999',
+        interview_url: '/interview/practice-mock-token-999',
+        room_name: 'room-practice-999',
+        status: 'scheduled',
+      }),
+    });
+  });
+}
+
+/**
+ * Mocks Salary Benchmark Tool endpoints (/salary, /tra-cuu-luong)
+ */
+export async function setupCandidateSalaryApiMocks(page: Page) {
+  await page.route(/\/interview\/web\/salary-benchmarks\/?(\?.*)?$/, async (route) => {
+    const url = new URL(route.request().url());
+    const search = url.searchParams.get('search')?.toLowerCase();
+    const seniority = url.searchParams.get('seniority')?.toLowerCase();
+
+    let filtered = [...MOCK_CANDIDATE_SALARY_BENCHMARKS];
+    if (search) {
+      filtered = filtered.filter((b) => b.job_title.toLowerCase().includes(search));
+    }
+    if (seniority) {
+      filtered = filtered.filter((b) => b.seniority.toLowerCase() === seniority);
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        count: filtered.length,
+        results: filtered,
+      }),
+    });
+  });
+}
+
+/**
+ * Mocks Dashboard KPI social data (Companies Followed & Resume Views)
+ */
+export async function setupCandidateDashboardKpiMocks(page: Page) {
+  // Companies followed
+  await page.route(/\/info\/web\/companies-follow\/?(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        count: MOCK_COMPANIES_FOLLOWED.length,
+        results: MOCK_COMPANIES_FOLLOWED,
+      }),
+    });
+  });
+
+  // Resume viewed
+  await page.route(/\/info\/web\/resume-views\/?(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        count: MOCK_RESUME_VIEWED.length,
+        results: MOCK_RESUME_VIEWED,
+      }),
+    });
+  });
+
+  // Candidate Activity Stats
+  await page.route(/\/info\/web\/statistics\/job-seeker\/?(\?.*)?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        profile_views: 45,
+        applied_jobs: 12,
+        saved_jobs: 6,
+        followed_companies: 3,
+        activities_by_day: [
+          { date: '2026-09-18', views: 5, applications: 1 },
+          { date: '2026-09-19', views: 8, applications: 2 },
+          { date: '2026-09-20', views: 12, applications: 3 },
+          { date: '2026-09-21', views: 10, applications: 1 },
+          { date: '2026-09-22', views: 15, applications: 4 },
+        ],
+      }),
+    });
+  });
+}
+
+/**
+ * Mocks Candidate Registration endpoint
+ */
+export async function setupCandidateRegisterApiMocks(page: Page) {
+  await page.route(/\/auth\/job-seeker\/register\/?$/, async (route) => {
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        message: 'Đăng ký tài khoản ứng viên thành công!',
+      }),
+    });
+  });
+
+  await page.route(/\/auth\/send-verify-email\/?$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        message: 'Mã xác thực đã được gửi tới email.',
+      }),
+    });
+  });
+}
+
 
 
