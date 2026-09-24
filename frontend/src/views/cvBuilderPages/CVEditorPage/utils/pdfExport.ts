@@ -7,17 +7,24 @@
  * in the generated PDF or print dialog.
  */
 
+export const exportCVToPDF = async (
+  target: string | HTMLElement = 'cv-print-area',
+  documentTitle: string = 'CV-Ung-Tuyen'
+): Promise<void> => {
+  return printCVToPDF(target, documentTitle);
+};
+
 export const printCVToPDF = async (
-  elementId: string = 'cv-print-area',
+  target: string | HTMLElement = 'cv-print-area',
   documentTitle: string = 'CV-Ung-Tuyen'
 ): Promise<void> => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return;
   }
 
-  const element = document.getElementById(elementId);
+  const element = typeof target === 'string' ? document.getElementById(target) : target;
   if (!element) {
-    console.warn(`CV print target element #${elementId} not found.`);
+    console.warn(`CV print target element ${typeof target === 'string' ? '#' + target : ''} not found.`);
     window.print();
     return;
   }
@@ -125,7 +132,7 @@ const printViaIsolatedIframe = async (
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Geist:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Geist:wght@400;500;600;700;800;900&family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     ${existingHeadTags}
     <style>
       ${collectedStyles}
@@ -148,7 +155,7 @@ const printViaIsolatedIframe = async (
         min-height: 297mm !important;
         background: #ffffff !important;
         color: #0f172a !important;
-        font-family: 'Inter', 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         -webkit-font-smoothing: antialiased;
         overflow: visible !important;
       }
@@ -163,9 +170,21 @@ const printViaIsolatedIframe = async (
         border: none !important;
         transform: none !important;
         display: block !important;
+        font-family: 'Be Vietnam Pro', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
       }
 
-      .break-inside-avoid, .cv-break-avoid, .cv-item, .cv-section {
+      /* Page break protection for sections, experience items, and education items */
+      .break-inside-avoid,
+      .cv-break-avoid,
+      .cv-item,
+      .cv-section,
+      .cv-experience-item,
+      .cv-education-item,
+      .cv-skill-item,
+      .cv-certificate-item,
+      .cv-project-item,
+      section,
+      [data-section] {
         break-inside: avoid !important;
         page-break-inside: avoid !important;
       }
@@ -188,6 +207,15 @@ const printViaIsolatedIframe = async (
   iframeDoc.close();
 
   return new Promise<void>((resolve, reject) => {
+    let hasCleanedUp = false;
+    const cleanup = () => {
+      if (hasCleanedUp) return;
+      hasCleanedUp = true;
+      if (document.body.contains(iframe)) {
+        document.body.removeChild(iframe);
+      }
+    };
+
     const triggerPrint = async () => {
       try {
         if (iframeDoc.fonts && 'ready' in iframeDoc.fonts) {
@@ -214,17 +242,21 @@ const printViaIsolatedIframe = async (
         // Allow layout reflow
         await new Promise((r) => setTimeout(r, 200));
 
+        // Listen for afterprint event for prompt cleanup
+        try {
+          iframeWin.addEventListener('afterprint', cleanup, { once: true });
+        } catch {
+          // Non-blocking if listener fails
+        }
+
         iframeWin.focus();
         iframeWin.print();
         resolve();
       } catch (err) {
+        cleanup();
         reject(err);
       } finally {
-        setTimeout(() => {
-          if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-          }
-        }, 4000);
+        setTimeout(cleanup, 4000);
       }
     };
 

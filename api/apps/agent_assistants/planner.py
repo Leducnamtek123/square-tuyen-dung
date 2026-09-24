@@ -236,7 +236,7 @@ class AgentPlanner:
         model = getattr(settings, "AI_AGENT_ASSISTANT_MODEL", "") or getattr(settings, "AI_LLM_MODEL", "")
 
         system_prompt = (
-            "You are Square Agent Assistants, an internal recruiting operations agent. "
+            "You are InfoHR Agent Assistants, an internal recruiting operations agent. "
             "Choose exactly one action for the newest user message. "
             "Return JSON only, no markdown. "
             "Allowed JSON shape: "

@@ -73,7 +73,7 @@ const AdminLayout = (props: AdminLayoutProps) => {
     windowGetter !== undefined ? () => (windowGetter() as Window).document.body : undefined;
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100dvh', backgroundColor: '#F8FAFC' }}>
+    <Box sx={{ display: 'flex', minHeight: '100dvh', bgcolor: 'background.default' }}>
       {/* Start: Header */}
       <Header
         drawerWidth={currentDrawerWidth}
@@ -124,7 +124,7 @@ const AdminLayout = (props: AdminLayoutProps) => {
           sx={{
             flexGrow: 1,
             mt: '60px',
-            bgcolor: '#F8FAFC',
+            bgcolor: 'background.default',
             display: 'flex',
             justifyContent: 'center',
             width: '100%',

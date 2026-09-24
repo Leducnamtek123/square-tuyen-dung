@@ -66,7 +66,7 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
 
   const user = profileDetail.user || (profileDetail as any).userDict || {};
   const seeker = profileDetail.jobSeekerProfile || (profileDetail as any).jobSeekerProfileDict || {};
-  const isSeekingJob = seeker.isSeekingJob ?? profileDetail.jobSeekerProfile?.isSeekingJob ?? true;
+  const isSeekingJob = seeker.isJobSeeking ?? seeker.isSeekingJob ?? profileDetail.jobSeekerProfile?.isJobSeeking ?? true;
 
   const email = user.email || seeker.userDict?.email || '';
   const phone = seeker.phone || user.phone || '';

@@ -17,6 +17,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import RotateRightIcon from '@mui/icons-material/RotateRight';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
 interface Props {
   open: boolean;
@@ -106,12 +107,12 @@ export const DocumentLightboxModal: React.FC<Props> = ({
             </>
           )}
 
-          {documentUrl && (
+          {getSafeExternalOpenUrl(documentUrl) && (
             <Tooltip title="Mở trong tab mới">
               <IconButton
                 size="small"
                 component="a"
-                href={documentUrl}
+                href={getSafeExternalOpenUrl(documentUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{ color: '#cbd5e1' }}

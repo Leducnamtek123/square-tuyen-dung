@@ -384,7 +384,7 @@ export default function EmployeeListPage() {
   };
 
   const handleSaveDoc = () => {
-    if (!selectedEmp || !docForm.name) return;
+    if (!selectedEmp || !docForm.name || !docForm.file_url) return;
     createEmployeeDocument.mutate(
       {
         employee: selectedEmp.id,
@@ -1506,7 +1506,7 @@ export default function EmployeeListPage() {
           </Button>
           <Button
             variant="contained"
-            disabled={!docForm.name || createEmployeeDocument.isPending}
+            disabled={!docForm.name || !docForm.file_url || createEmployeeDocument.isPending}
             onClick={handleSaveDoc}
             sx={{ fontWeight: 800, borderRadius: 2, textTransform: 'none', bgcolor: '#0d9488', '&:hover': { bgcolor: '#0f766e' } }}
           >

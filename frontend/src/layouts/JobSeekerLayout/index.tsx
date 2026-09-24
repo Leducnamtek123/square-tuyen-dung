@@ -66,7 +66,13 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
       return false;
     }
     if (isAdaptive) {
-      return true;
+      if (typeof window !== 'undefined' && !tokenService.getAccessTokenFromCookie()) {
+        return true;
+      }
+      return Boolean(
+        hasVerifiedCandidateAuthGlobal ||
+          (tokenService.getAccessTokenFromCookie() && currentUser)
+      );
     }
     return Boolean(
       hasVerifiedCandidateAuthGlobal ||
@@ -175,9 +181,9 @@ const JobSeekerLayout = ({ children }: { children?: React.ReactNode }) => {
   }, [activeWorkspace?.type, currentUser, dispatch, i18n.language, isAdaptive, pathname]);
 
   const token = typeof window !== 'undefined' ? tokenService.getAccessTokenFromCookie() : null;
-  const isGuest = !token && !currentUser;
+  const isGuestOrNonCandidate = !token || Boolean(currentUser && !canAccessJobSeekerPortal(currentUser));
 
-  if (isAdaptive && isGuest) {
+  if (isAdaptive && isGuestOrNonCandidate) {
     return <DefaultLayout>{children}</DefaultLayout>;
   }
 

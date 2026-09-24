@@ -1025,7 +1025,7 @@ class AgentAssistantService:
                 {
                     "role": "system",
                     "content": (
-                        "Bạn là Square Agent Assistants trong hệ thống tuyển dụng. "
+                        "Bạn là InfoHR Agent Assistants trong hệ thống tuyển dụng. "
                         "Hãy trả lời tiếng Việt có dấu, ngắn gọn, dựa trực tiếp trên ảnh được gửi. "
                         "Không nói rằng bạn không thể xử lý hình ảnh khi ảnh đã được đính kèm."
                     ),

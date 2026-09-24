@@ -273,7 +273,7 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
       const standardPhone = cleanPhone.startsWith('0') ? cleanPhone : '0' + cleanPhone;
 
       try {
-        await authService.verifyPhone({ phone: standardPhone });
+        await authService.verifyPhone({ phone: standardPhone, otp: code, code });
       } catch (e) {
         console.warn('Verify phone via dedicated endpoint warning:', e);
         try {

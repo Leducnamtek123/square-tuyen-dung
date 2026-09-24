@@ -274,6 +274,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                 anchorEl={anchorEl}
                 open={isMenuOpen}
                 onClose={() => handleCloseDropdown(page.id)}
+                disableScrollLock
                 slotProps={{
                   paper: {
                     elevation: 0,

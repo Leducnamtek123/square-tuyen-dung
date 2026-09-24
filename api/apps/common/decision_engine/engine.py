@@ -634,6 +634,8 @@ class AgentRouterEngine:
 
     @classmethod
     def _is_list_applications(cls, norm: str) -> bool:
+        if any(action in norm for action in ("dua", "them", "tao", "add", "vao danh sach", "vao ds")):
+            return False
         return any(
             k in norm for k in (
                 "ung tuyen", "don ung tuyen", "ho so ung tuyen", "ho so nop", "da nop don",

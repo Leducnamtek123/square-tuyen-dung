@@ -14,7 +14,7 @@ describe('PartnerLogoCarousel Component (Minimalist Logo-Only Standard)', () => 
     ).toBeInTheDocument();
   });
 
-  it('renders pure logos for all 4 companies with correct alt and title', () => {
+  it('renders pure logos for all partner and client companies with correct alt and title', () => {
     const { container } = render(<PartnerLogoCarousel />);
 
     PARTNER_COMPANIES.forEach((company) => {
@@ -34,6 +34,6 @@ describe('PartnerLogoCarousel Component (Minimalist Logo-Only Standard)', () => 
   it('contains image elements with smooth hover transition styles', () => {
     const { container } = render(<PartnerLogoCarousel />);
     const images = container.querySelectorAll('img.partner-logo-img');
-    expect(images.length).toBe(PARTNER_COMPANIES.length * 4); // Duplicated 4 times for seamless marquee
+    expect(images.length).toBe(PARTNER_COMPANIES.length * 2); // Duplicated 2 times for seamless marquee
   });
 });

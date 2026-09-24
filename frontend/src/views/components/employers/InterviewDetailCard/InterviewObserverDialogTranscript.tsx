@@ -19,15 +19,21 @@ type TranscriptRow = {
   isLocal: boolean;
 };
 
-const formatTime = (timestamp: number) =>
-  new Date(timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' });
+const formatTime = (timestamp: number) => {
+  if (!Number.isFinite(timestamp) || isNaN(new Date(timestamp).getTime())) return '--:--';
+  try {
+    return new Date(timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' });
+  } catch {
+    return new Date(timestamp).toLocaleTimeString();
+  }
+};
 
 const mapMessages = (
   items: ReturnType<typeof useInterviewMessages>['messages'],
   t: Props['t'],
 ): TranscriptRow[] =>
-  items.map((item) => {
-    const participant = item.from;
+  (Array.isArray(items) ? items : []).map((item) => {
+    const participant = item?.from;
     const role = getParticipantRole(participant);
     const companyName = getParticipantCompanyName(participant);
     const isLocal = participant?.isLocal === true;
@@ -44,11 +50,11 @@ const mapMessages = (
               : participant?.name || participant?.identity || t('liveRoom.participants.guest');
 
     return {
-      id: item.id,
+      id: item?.id || `obs-${Date.now()}-${Math.random()}`,
       speaker: role === 'agent' ? 'interviewer' : role,
       speakerName: isLocal ? t('liveRoom.participants.you') : speakerName,
-      content: sanitizeInterviewText(item.message),
-      timestamp: item.timestamp,
+      content: sanitizeInterviewText(item?.message),
+      timestamp: Number.isFinite(item?.timestamp) ? item.timestamp : Date.now(),
       isLocal,
     };
   });

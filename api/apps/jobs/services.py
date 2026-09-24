@@ -190,25 +190,36 @@ class JobActivityService:
             var_sys.ApplicationStatus.CONTACTED,
             var_sys.ApplicationStatus.TESTED,
             var_sys.ApplicationStatus.INTERVIEWED,
+            var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.CONTACTED: {
+            var_sys.ApplicationStatus.PENDING_CONFIRMATION,
             var_sys.ApplicationStatus.TESTED,
             var_sys.ApplicationStatus.INTERVIEWED,
             var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.TESTED: {
+            var_sys.ApplicationStatus.CONTACTED,
             var_sys.ApplicationStatus.INTERVIEWED,
             var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.INTERVIEWED: {
+            var_sys.ApplicationStatus.TESTED,
             var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
-        var_sys.ApplicationStatus.HIRED: set(),
-        var_sys.ApplicationStatus.NOT_SELECTED: set(),
+        var_sys.ApplicationStatus.HIRED: {
+            var_sys.ApplicationStatus.INTERVIEWED,
+            var_sys.ApplicationStatus.NOT_SELECTED,
+        },
+        var_sys.ApplicationStatus.NOT_SELECTED: {
+            var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+            var_sys.ApplicationStatus.CONTACTED,
+            var_sys.ApplicationStatus.INTERVIEWED,
+        },
     }
 
     @staticmethod

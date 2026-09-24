@@ -121,6 +121,7 @@ const LanguageSwitcher = ({ color = 'inherit', size = 'medium' }: LanguageSwitch
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        disableScrollLock
         slotProps={{
           list: {
             'aria-labelledby': 'language-button',

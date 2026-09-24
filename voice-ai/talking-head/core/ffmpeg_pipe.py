@@ -90,12 +90,14 @@ def stream_frames_to_ffmpeg(
         "-i", "-",
         "-i", str(audio_file),
         "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-crf", "17",
+        "-preset", "ultrafast",
+        "-threads", "0",
+        "-crf", "23",
         "-pix_fmt", "yuv420p",
         "-c:a", "aac",
         "-b:a", "192k",
         "-shortest",
+        "-movflags", "+faststart",
         str(out_file),
     ]
 
@@ -110,22 +112,22 @@ def stream_frames_to_ffmpeg(
 
     frame_count = 0
     try:
-        byte_chunks: list[bytes] = []
+        import cv2
         for frame in frames:
             # Kiểm tra và điều chỉnh kích thước khung hình nếu chưa khớp
             if frame.shape[0] != height or frame.shape[1] != width:
-                import cv2
                 frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_LINEAR)
 
             # Chuyển đổi mảng numpy C-contiguous sang byte string
             if not frame.flags["C_CONTIGUOUS"]:
                 frame = np.ascontiguousarray(frame)
 
-            byte_chunks.append(frame.tobytes())
+            proc.stdin.write(frame.tobytes())
             frame_count += 1
 
-        raw_data = b"".join(byte_chunks)
-        _, stderr = proc.communicate(input=raw_data, timeout=60)
+        proc.stdin.close()
+        stderr = proc.stderr.read() if proc.stderr else b""
+        proc.wait(timeout=60)
     except Exception as e:
         proc.kill()
         logger.error("Lỗi khi stream raw frames tới FFmpeg: %s", e)

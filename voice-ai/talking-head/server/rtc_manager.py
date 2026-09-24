@@ -55,19 +55,25 @@ class RTCManager:
                 self.pcs.discard(pc)
                 session_manager.remove_session(sessionid)
 
-        # 添加发送轨道
+        # 添加发送轨道 (Unified Plan: Video trước, Audio sau khớp thứ tự client browser)
         from server.webrtc import HumanPlayer
         player = HumanPlayer(avatar_session)
-        pc.addTrack(player.audio)
         pc.addTrack(player.video)
+        pc.addTrack(player.audio)
 
-        # 设置编解码器偏好
+        # 设置编解码器偏好 (Tìm đúng video transceiver để gán H264 / VP8)
         capabilities = RTCRtpSender.getCapabilities("video")
         preferences = list(filter(lambda x: x.name == "H264", capabilities.codecs))
         preferences += list(filter(lambda x: x.name == "VP8", capabilities.codecs))
         preferences += list(filter(lambda x: x.name == "rtx", capabilities.codecs))
-        transceiver = pc.getTransceivers()[1]
-        transceiver.setCodecPreferences(preferences)
+        for transceiver in pc.getTransceivers():
+            if getattr(transceiver, "kind", None) == "video" or (
+                transceiver.sender and transceiver.sender.track and transceiver.sender.track.kind == "video"
+            ):
+                try:
+                    transceiver.setCodecPreferences(preferences)
+                except Exception as e:
+                    logger.warning("Failed to set video codec preferences: %s", e)
 
         await pc.setRemoteDescription(offer)
         answer = await pc.createAnswer()
@@ -169,8 +175,8 @@ class RTCManager:
 
         from server.webrtc import HumanPlayer
         player = HumanPlayer(avatar_session)
-        pc.addTrack(player.audio)
         pc.addTrack(player.video)
+        pc.addTrack(player.audio)
 
         await pc.setLocalDescription(await pc.createOffer())
 

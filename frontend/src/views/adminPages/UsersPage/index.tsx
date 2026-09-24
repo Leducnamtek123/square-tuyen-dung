@@ -216,6 +216,7 @@ const UsersPage = () => {
                     onToggleStatus={handleToggleStatus}
                     onDeleteUser={handleDeleteUser}
                     onRoleChange={handleRoleChange}
+                    onInspectUser={setInspectingUser}
                     currentUserId={currentUserId || ''}
                     disableRoleActions={isMutating}
                 />

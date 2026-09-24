@@ -119,7 +119,7 @@ class EmployerChatResponse(CommonChatResponse):
             "fulfillmentMessages": [
                 self._get_text_response_component(
                     text=[
-                        "Bạn muốn đăng tin tuyển dụng nhanh và thu hút hơn? Square AI có thể hỗ trợ! ✍️✨",
+                        "Bạn muốn đăng tin tuyển dụng nhanh và thu hút hơn? InfoHR AI có thể hỗ trợ! ✍️✨",
                         "Chúng tôi cung cấp chuyên nghiệp dựa trên tiêu đề và yêu cầu của bạn."
                     ]
                 )

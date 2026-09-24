@@ -35,7 +35,7 @@ def generate_interview_ics(
     created_at = format_ics_datetime(timezone.now())
     start_str = format_ics_datetime(scheduled_at)
     end_str = format_ics_datetime(end_at)
-    uid = f"square-interview-{session_id}-{uuid.uuid4().hex[:8]}@square.vn"
+    uid = f"infohr-interview-{session_id}-{uuid.uuid4().hex[:8]}@infohr.vn"
 
     summary = f"Phỏng vấn vị trí {job_title} - {company_name}"
     description = (
@@ -48,14 +48,14 @@ def generate_interview_ics(
         description += f"Link phòng phỏng vấn: {room_url}\\n"
     if interviewer_name:
         description += f"Người phỏng vấn: {interviewer_name}\\n"
-    description += "\\nTrân trọng,\\nĐội ngũ Tuyển dụng Square"
+    description += "\\nTrân trọng,\\nĐội ngũ Tuyển dụng InfoHR"
 
     location = room_url or "Phòng phỏng vấn AI InfoHR"
 
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//Square Recruitment Platform//AI Interview Calendar//VI",
+        "PRODID:-//InfoHR Recruitment Platform//AI Interview Calendar//VI",
         "CALSCALE:GREGORIAN",
         "METHOD:REQUEST",
         "BEGIN:VEVENT",
@@ -73,7 +73,7 @@ def generate_interview_ics(
     if interviewer_name and interviewer_email:
         lines.append(f"ORGANIZER;CN={interviewer_name}:mailto:{interviewer_email}")
     elif company_name:
-        lines.append(f"ORGANIZER;CN={company_name}:mailto:no-reply@square.vn")
+        lines.append(f"ORGANIZER;CN={company_name}:mailto:no-reply@infohr.vn")
 
     if candidate_name and candidate_email:
         lines.append(f"ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;CN={candidate_name}:mailto:{candidate_email}")

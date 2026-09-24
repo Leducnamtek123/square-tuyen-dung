@@ -27,6 +27,7 @@ class TestAutoRecruitmentPipeline:
             email="employer@example.com",
             full_name="Employer Test",
             role_name=var_sys.EMPLOYER,
+            is_onboarded=True,
         )
         company = Company.objects.create(
             user=employer,
@@ -69,6 +70,7 @@ class TestAutoRecruitmentPipeline:
             email="candidate1@example.com",
             full_name="Ngô Tiến Dũng",
             role_name=var_sys.JOB_SEEKER,
+            is_onboarded=True,
         )
         candidate_profile = JobSeekerProfile.objects.create(user=candidate_user, location=location)
         resume = Resume.objects.create(

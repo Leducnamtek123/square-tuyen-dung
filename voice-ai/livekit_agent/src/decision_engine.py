@@ -18,6 +18,8 @@ class TurnIntent(str, Enum):
     QUESTION_FOR_INTERVIEWER = "QUESTION_FOR_INTERVIEWER"
     END_INTERVIEW = "END_INTERVIEW"
     GREETING_READY = "GREETING_READY"
+    PROCTORING_ACKNOWLEDGMENT = "PROCTORING_ACKNOWLEDGMENT"
+    WHISPER_HALLUCINATION = "WHISPER_HALLUCINATION"
     UNKNOWN = "UNKNOWN"
 
 
@@ -37,6 +39,38 @@ def _strip_accents(value: str) -> str:
 def _normalize_text(value: str) -> str:
     return " ".join((value or "").split()).strip()
 
+
+# Whisper hallucination patterns (YouTube outro phrases, silence artifacts)
+_WHISPER_HALLUCINATIONS = (
+    "ghien mi go",
+    "ghiền mì gõ",
+    "subscribe",
+    "subcribe",
+    "dang ky kenh",
+    "đăng ký kênh",
+    "like va share",
+    "like và share",
+    "like va sub",
+    "like và sub",
+    "cam on cac ban da theo doi",
+    "cảm ơn các bạn đã theo dõi",
+    "cam on cac ban da xem",
+    "cảm ơn các bạn đã xem",
+    "hen gap lai cac ban",
+    "hẹn gặp lại các bạn",
+    "chuc cac ban mot ngay",
+    "chúc các bạn một ngày",
+    "bam chuong thong bao",
+    "bấm chuông thông báo",
+    "chia se video",
+    "chia sẻ video",
+    "video hap dan",
+    "video hấp dẫn",
+    "khong bo lo",
+    "không bỏ lỡ",
+    "nhung video tiep theo",
+    "những video tiếp theo",
+)
 
 # Regex patterns for fast, high-confidence matching
 _HOSTILE_EXACT_ACRONYMS = re.compile(
@@ -455,10 +489,40 @@ _GREETING_READY_PHRASES = (
     "bat dau di",
     "bắt đầu thôi",
     "bat dau thoi",
+    "bắt đầu",
+    "bat dau",
     "nghe rõ",
     "nghe ro",
     "nghe được",
     "nghe duoc",
+    "nghe thấy",
+    "nghe thay",
+    "có nghe",
+    "co nghe",
+    "tín hiệu rõ",
+    "tin hieu ro",
+    "tín hiệu tốt",
+    "tin hieu tot",
+    "tương hiệu rõ",
+    "tuong hieu ro",
+    "tín hiệu",
+    "tin hieu",
+    "rõ rồi",
+    "ro roi",
+    "rõ ạ",
+    "ro a",
+    "dạ rõ",
+    "da ro",
+    "vâng rõ",
+    "vang ro",
+    "có rõ",
+    "co ro",
+    "rất rõ",
+    "rat ro",
+    "được rồi",
+    "duoc roi",
+    "tốt rồi",
+    "tot roi",
 )
 
 _GREETING_READY_WORDS = {
@@ -468,7 +532,82 @@ _GREETING_READY_WORDS = {
     "chao",
     "alo",
     "ready",
+    "ok",
+    "okay",
 }
+
+_PROCTORING_ACKNOWLEDGMENT_PHRASES = (
+    "em xin lỗi",
+    "em xin loi",
+    "dạ em xin lỗi",
+    "da em xin loi",
+    "em xin lỗi ạ",
+    "em xin loi a",
+    "dạ em xin lỗi ạ",
+    "da em xin loi a",
+    "xin lỗi bạn",
+    "xin loi ban",
+    "xin lỗi chị",
+    "xin loi chi",
+    "xin lỗi anh",
+    "xin loi anh",
+    "em lỡ tay",
+    "em lo tay",
+    "em bấm nhầm",
+    "em bam nham",
+    "bấm nhầm",
+    "bam nham",
+    "ấn nhầm",
+    "an nham",
+    "em bị lag",
+    "em bi lag",
+    "máy em bị lag",
+    "may em bi lag",
+    "mạng bị lag",
+    "mang bi lag",
+    "bị mất mạng",
+    "bi mat mang",
+    "mất kết nối",
+    "mat ket noi",
+    "mất tín hiệu",
+    "mat tin hieu",
+    "em quay lại rồi",
+    "em quay lai roi",
+    "em vừa quay lại",
+    "em vua quay lai",
+    "em đây rồi",
+    "em day roi",
+    "em vào lại rồi",
+    "em vao lai roi",
+    "dạ vâng em quay lại rồi",
+    "da vang em quay lai roi",
+    "dạ em đây rồi",
+    "da em day roi",
+    "em đây rồi",
+    "em day roi",
+    "dạ em hiểu rồi",
+    "da em hieu roi",
+    "em hiểu rồi ạ",
+    "em hieu roi a",
+    "vâng em hiểu rồi",
+    "vang em hieu roi",
+    "vâng em biết rồi",
+    "vang em biet roi",
+    "em sẽ chú ý",
+    "em se chu y",
+    "dạ em sẽ chú ý",
+    "da em se chu y",
+    "em rút kinh nghiệm",
+    "em rut kinh nghiem",
+    "em xin lỗi em vừa có việc",
+    "em xin loi em vua co viec",
+    "em xin lỗi em vừa bị mất tập trung",
+    "em xin loi em vua bi mat tap trung",
+    "em sơ ý quá",
+    "em so y qua",
+    "sorry",
+    "em sorry",
+)
 
 _SUBSTANTIVE_KEYWORDS = {
     "kinh nghiệm",
@@ -572,6 +711,17 @@ class VoiceDecisionEngine:
 
         lowered = raw_clean.lower()
         stripped = _strip_accents(lowered)
+
+        # Early-exit: Detect Whisper silence/outro hallucinations
+        for phrase in _WHISPER_HALLUCINATIONS:
+            if phrase in lowered or phrase in stripped:
+                return DecisionVerdict(
+                    intent=TurnIntent.WHISPER_HALLUCINATION,
+                    confidence=1.0,
+                    reasoning=f"Matched Whisper hallucination pattern: '{phrase}'",
+                    metadata={"latency_ms": (time.perf_counter() - t_start) * 1000},
+                )
+
         clean_words_text = re.sub(r"[^\wÀ-ỹ\s]", " ", lowered)
         clean_words = clean_words_text.split()
         num_words = len(clean_words)
@@ -587,6 +737,7 @@ class VoiceDecisionEngine:
             TurnIntent.END_INTERVIEW: 0.0,
             TurnIntent.QUESTION_FOR_INTERVIEWER: 0.0,
             TurnIntent.GREETING_READY: 0.0,
+            TurnIntent.PROCTORING_ACKNOWLEDGMENT: 0.0,
             TurnIntent.SUBSTANTIVE_ANSWER: 0.0,
             TurnIntent.SHALLOW_ANSWER: 0.0,
             TurnIntent.UNKNOWN: 0.0,
@@ -671,7 +822,17 @@ class VoiceDecisionEngine:
                     "Matched greeting/readiness phrase or tokens"
                 )
 
-        # 6. SUBSTANTIVE_ANSWER vs SHALLOW_ANSWER Evaluation
+        # 6. PROCTORING_ACKNOWLEDGMENT Detection
+        if num_words <= 15:
+            for phrase in _PROCTORING_ACKNOWLEDGMENT_PHRASES:
+                if phrase in lowered or phrase in stripped:
+                    logits[TurnIntent.PROCTORING_ACKNOWLEDGMENT] += 7.5
+                    reasons[TurnIntent.PROCTORING_ACKNOWLEDGMENT].append(
+                        f"Matched proctoring acknowledgment/apology '{phrase}'"
+                    )
+                    break
+
+        # 7. SUBSTANTIVE_ANSWER vs SHALLOW_ANSWER Evaluation
         # Only evaluate substantive vs shallow if no control/dialogue management intents dominate
         control_max_logit = max(
             logits[TurnIntent.HOSTILE_ABUSE],
@@ -680,6 +841,7 @@ class VoiceDecisionEngine:
             logits[TurnIntent.END_INTERVIEW],
             logits[TurnIntent.QUESTION_FOR_INTERVIEWER],
             logits[TurnIntent.GREETING_READY],
+            logits[TurnIntent.PROCTORING_ACKNOWLEDGMENT],
         )
 
         if control_max_logit == 0.0:

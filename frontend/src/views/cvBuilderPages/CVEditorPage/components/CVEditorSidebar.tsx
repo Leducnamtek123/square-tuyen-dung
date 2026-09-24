@@ -37,6 +37,7 @@ import { DesignCustomizer } from './forms/DesignCustomizer';
 import { AIAssistantTab } from './forms/AIAssistantTab';
 import { AICvScoreTab } from './forms/AICvScoreTab';
 import { useTranslation } from 'react-i18next';
+import toastMessages from '@/utils/toastMessages';
 
 interface CVEditorSidebarProps {
   data: CVData;
@@ -73,15 +74,80 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
     });
   };
 
-  const handleApplyBioFromAI = (bioText: string) => {
+  const handleAddSkill = (skillName: string) => {
+    const trimmed = skillName.trim();
+    if (!trimmed) return;
+    const currentSkills = data.skills || [];
+    const exists = currentSkills.some(
+      (s) => s.name.toLowerCase() === trimmed.toLowerCase()
+    );
+    if (exists) {
+      toastMessages.warn(`Kỹ năng "${trimmed}" đã có trong CV!`);
+      return;
+    }
+    const newSkill: CVSkillItem = {
+      id: 'skill-' + Date.now() + Math.random().toString(36).substring(2, 6),
+      name: trimmed,
+      level: 4,
+    };
+    onChangeData({
+      ...data,
+      skills: [...currentSkills, newSkill],
+    });
+    toastMessages.success(`Đã thêm kỹ năng "${trimmed}" vào CV!`);
+  };
+
+  const handleAddExperienceBullet = (bullet: string) => {
+    const trimmed = bullet.trim();
+    if (!trimmed) return;
+    const formattedBullet = trimmed.startsWith('•') ? trimmed : `• ${trimmed}`;
+    const currentExperiences = data.experiences || [];
+
+    if (currentExperiences.length > 0) {
+      const updatedExperiences = [...currentExperiences];
+      const first = { ...updatedExperiences[0] };
+      first.description = first.description
+        ? `${first.description.trim()}\n${formattedBullet}`
+        : formattedBullet;
+      updatedExperiences[0] = first;
+      onChangeData({
+        ...data,
+        experiences: updatedExperiences,
+      });
+    } else {
+      const newExp: CVExperienceItem = {
+        id: 'exp-' + Date.now() + Math.random().toString(36).substring(2, 6),
+        position: data.personalInfo?.title || 'Kinh nghiệm làm việc',
+        company: 'Đang cập nhật',
+        startDate: '',
+        endDate: '',
+        isCurrent: true,
+        description: formattedBullet,
+      };
+      (newExp as any).title = data.personalInfo?.title || 'Kinh nghiệm làm việc';
+      onChangeData({
+        ...data,
+        experiences: [newExp],
+      });
+    }
+    toastMessages.success('Đã thêm thành tích vào mục Kinh nghiệm!');
+  };
+
+  const handleApplyBio = (bio: string) => {
     onChangeData({
       ...data,
       personalInfo: {
         ...data.personalInfo,
-        bio: bioText,
-      },
+        bio,
+        summary: bio,
+      } as any,
     });
     setActiveTab('content');
+    toastMessages.success('Đã cập nhật mục tiêu & tóm tắt nghề nghiệp!');
+  };
+
+  const handleNavigateTab = (tab: 'content' | 'design' | 'ai') => {
+    setActiveTab(tab);
   };
 
   return (
@@ -181,11 +247,28 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
         )}
 
         {activeTab === 'ai-score' && (
-          <AICvScoreTab data={data} candidateCvId={candidateCvId} onUpdate={onChangeData} />
+          <AICvScoreTab
+            data={data}
+            candidateCvId={candidateCvId}
+            onUpdate={onChangeData}
+            onNavigateTab={handleNavigateTab}
+            onAddSkill={handleAddSkill}
+            onQuickFix={(fixType) => {
+              if (fixType === 'bio') {
+                setActiveTab('ai');
+              } else {
+                setActiveTab('content');
+              }
+            }}
+          />
         )}
 
         {activeTab === 'ai' && (
-          <AIAssistantTab onApplyBio={handleApplyBioFromAI} />
+          <AIAssistantTab
+            onApplyBio={handleApplyBio}
+            onAddSkill={handleAddSkill}
+            onAddExperienceBullet={handleAddExperienceBullet}
+          />
         )}
       </Box>
     </Box>

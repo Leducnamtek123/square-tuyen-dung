@@ -113,9 +113,13 @@
     "salaryInsightAverageRange": "Khoảng lương trung bình",
     "reportCaption": "Tin cậy & An toàn",
     "reportJobTitle": "Báo cáo tin tuyển dụng",
+    "reportTargetCompany": "Công ty được báo cáo",
+    "reportTargetJob": "Tin tuyển dụng được báo cáo",
     "reportReasonLabel": "Lý do",
     "reportMessageLabel": "Chi tiết bổ sung",
     "reportMessagePlaceholder": "Hãy cho chúng tôi biết nội dung nào không đúng hoặc gây hiểu lầm.",
+    "reportPrivacyNotice": "Báo cáo của bạn được gửi ẩn danh và bảo mật tuyệt đối tới Ban kiểm duyệt InfoHR nhằm duy trì môi trường minh bạch.",
+    "reportOptional": "Tùy chọn",
     "reportSuccess": "Gửi báo cáo thành công.",
     "reportReasons": {
       "scam": "Lừa đảo hoặc gian lận",
@@ -415,7 +419,7 @@
       "sections": [
         {
           "title": "Email hỗ trợ",
-          "body": "Với vấn đề tài khoản, tin tuyển dụng, xác thực hoặc phỏng vấn, hãy liên hệ support@square.vn."
+          "body": "Với vấn đề tài khoản, tin tuyển dụng, xác thực hoặc phỏng vấn, hãy liên hệ support@infohr.vn."
         },
         {
           "title": "Giờ làm việc",

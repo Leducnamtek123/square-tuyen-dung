@@ -76,7 +76,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: {
-  children: any;
+  children: React.ReactNode;
 }) {
   return (
     <html lang="vi" className={`${inter.variable} ${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>

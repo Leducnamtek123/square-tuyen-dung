@@ -5,9 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from .decision_engine import (
-    DecisionVerdict,
     TurnIntent,
-    VoiceDecisionEngine,
     evaluate_candidate_turn,
 )
 
@@ -49,6 +47,8 @@ def decide_next_action(payload: QuestionPayload) -> InterviewAction:
 
 
 def is_substantive_answer(text: str | None, *, min_words: int, min_chars: int) -> bool:
+    if is_whisper_hallucination(text):
+        return False
     normalized = " ".join((text or "").split())
     if len(normalized) >= min_chars:
         return True
@@ -62,6 +62,49 @@ def _strip_accents(value: str) -> str:
 
     normalized = unicodedata.normalize("NFD", value)
     return "".join(char for char in normalized if unicodedata.category(char) != "Mn")
+
+
+WHISPER_HALLUCINATIONS = (
+    "ghien mi go",
+    "ghiền mì gõ",
+    "subscribe",
+    "subcribe",
+    "dang ky kenh",
+    "đăng ký kênh",
+    "like va share",
+    "like và share",
+    "like va sub",
+    "like và sub",
+    "cam on cac ban da theo doi",
+    "cảm ơn các bạn đã theo dõi",
+    "cam on cac ban da xem",
+    "cảm ơn các bạn đã xem",
+    "hen gap lai cac ban",
+    "hẹn gặp lại các bạn",
+    "chuc cac ban mot ngay",
+    "chúc các bạn một ngày",
+    "bam chuong thong bao",
+    "bấm chuông thông báo",
+    "chia se video",
+    "chia sẻ video",
+    "video hap dan",
+    "video hấp dẫn",
+    "khong bo lo",
+    "không bỏ lỡ",
+    "nhung video tiep theo",
+    "những video tiếp theo",
+)
+
+
+def is_whisper_hallucination(text: str | None) -> bool:
+    if not text:
+        return False
+    lowered = text.lower().strip()
+    unaccented = _strip_accents(lowered)
+    for phrase in WHISPER_HALLUCINATIONS:
+        if phrase in lowered or phrase in unaccented:
+            return True
+    return False
 
 
 _ABUSIVE_ACCENTED_WORDS_REGEX = re.compile(
@@ -309,6 +352,13 @@ def is_explicit_refusal_or_skip(text: str | None) -> bool:
         return True
 
     return False
+
+
+def is_proctoring_acknowledgment(text: str | None) -> bool:
+    if not text:
+        return False
+    verdict = evaluate_candidate_turn(text)
+    return verdict.intent == TurnIntent.PROCTORING_ACKNOWLEDGMENT and verdict.confidence >= 0.70
 
 
 

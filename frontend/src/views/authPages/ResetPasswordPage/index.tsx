@@ -27,7 +27,7 @@ const ResetPasswordPage = () => {
   const handleResetPassword = async (data: ResetPasswordFormData) => {
     try {
       await authService.resetPassword({
-        token,
+        token: (Array.isArray(token) ? token[0] : token) || undefined,
         newPassword: data.newPassword,
         confirmPassword: data.confirmPassword,
         platform: 'WEB'

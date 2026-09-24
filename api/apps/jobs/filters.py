@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from requests.compat import basestring
 from shared.configs import variable_system as var_sys
 from shared.helpers import utils
+from django.db import models
 from django.db.models import Q
 import django_filters
 from rest_framework.filters import OrderingFilter
@@ -60,6 +61,7 @@ class JobPostFilter(django_filters.FilterSet):
 
     statusId = django_filters.ChoiceFilter(choices=var_sys.JOB_POST_STATUS, field_name="status")
     statusIds = ChoiceInFilter(choices=var_sys.JOB_POST_STATUS, field_name="status", lookup_expr='in')
+    status = django_filters.ChoiceFilter(choices=var_sys.JOB_POST_STATUS, field_name="status")
 
     isActive = django_filters.BooleanFilter(method="filter_is_active")
     is_active = django_filters.BooleanFilter(method="filter_is_active")
@@ -73,7 +75,7 @@ class JobPostFilter(django_filters.FilterSet):
         fields = [
             'kw', 'careerId', 'cityId', 'districtId', 'wardId', 'positionId',
             'experienceId', 'typeOfWorkplaceId', 'jobTypeId',
-            'genderId', 'salaryMin', 'salaryMax', 'isUrgent', 'statusId', 'excludeSlug', 'companyId',
+            'genderId', 'salaryMin', 'salaryMax', 'isUrgent', 'statusId', 'status', 'excludeSlug', 'companyId',
             'isActive', 'is_active',
             'careerIds', 'cityIds', 'districtIds', 'wardIds', 'positionIds',
             'experienceIds', 'typeOfWorkplaceIds', 'jobTypeIds', 'genderIds',
@@ -161,6 +163,7 @@ class AliasedOrderingFilter(OrderingFilter):
 
 
 class EmployerJobPostActivityFilter(django_filters.FilterSet):
+    kw = django_filters.CharFilter(method='filter_kw')
     cityId = django_filters.NumberFilter(method='filter_resume_or_manual_city')
     careerId = django_filters.NumberFilter(method='filter_resume_or_manual_career')
     experienceId = django_filters.ChoiceFilter(choices=var_sys.EXPERIENCE_CHOICES, method='filter_resume_or_manual_experience')
@@ -194,6 +197,16 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
     aiScoreMax = django_filters.NumberFilter(field_name='ai_analysis_score', lookup_expr='lte')
     hasAiAnalysis = django_filters.BooleanFilter(method='filter_has_ai_analysis')
 
+    def filter_kw(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(
+            models.Q(full_name__icontains=value) |
+            models.Q(email__icontains=value) |
+            models.Q(phone__icontains=value) |
+            models.Q(resume__title__icontains=value)
+        )
+
     def _filter_resume_or_manual(self, queryset, resume_field, manual_field, value):
         return queryset.filter(Q(**{resume_field: value}) | Q(**{manual_field: value}))
 
@@ -226,6 +239,7 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
     class Meta:
         model = JobPostActivity
         fields = [
+            'kw',
             'cityId', 'careerId',
             'experienceId', 'positionId',
             'academicLevelId', 'typeOfWorkplaceId',

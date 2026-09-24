@@ -210,7 +210,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
       {
         id: 'quyen-cua-ban',
         title: '6. Quyền chỉnh sửa và xóa dữ liệu',
-        content: 'Người Dùng có thể tự đăng nhập để kiểm tra, cập nhật hoặc xóa thông tin cá nhân trong trang Quản lý tài khoản, hoặc gửi yêu cầu xóa toàn bộ dữ liệu qua email: support@infohr.vn hoặc ceohub.hostmaster@gmail.com.',
+        content: 'Người Dùng có thể tự đăng nhập để kiểm tra, cập nhật hoặc xóa thông tin cá nhân trong trang Quản lý tài khoản, hoặc gửi yêu cầu xóa toàn bộ dữ liệu qua email: support@infohr.vn.',
       },
       {
         id: 'du-lieu-nguoi-dung-google',
@@ -244,7 +244,7 @@ export const LEGAL_DOCUMENTS: Record<string, LegalDocument> = {
           {
             id: 'quyen-thu-hoi-xoa-google',
             title: 'e. Quyền kiểm soát, Hủy liên kết và Yêu cầu Xóa Dữ liệu (Revoke Access & Data Deletion)',
-            content: 'Người dùng có toàn quyền kiểm soát dữ liệu liên kết Google của mình bất cứ lúc nào:\n1. Hủy cấp quyền từ Google: Bạn có thể ngắt kết nối quyền truy cập của ứng dụng infohr.vn với tài khoản Google của bạn bất kỳ lúc nào tại Cài đặt bảo mật Google: https://myaccount.google.com/permissions .\n2. Yêu cầu xóa dữ liệu hoàn toàn trên InfoHR: Bạn có thể tự thực hiện xóa tài khoản tại trang Cài đặt tài khoản (https://infohr.vn/tai-khoan) hoặc gửi yêu cầu xóa tài khoản và dữ liệu cá nhân qua email: support@infohr.vn hoặc ceohub.hostmaster@gmail.com .\n3. Thời hạn xử lý: Ngay khi nhận được yêu cầu hợp lệ, InfoHR sẽ xóa vĩnh viễn dữ liệu người dùng Google khỏi toàn bộ cơ sở dữ liệu hoạt động và hệ thống lưu trữ dự phòng trong vòng tối đa 30 ngày.',
+            content: 'Người dùng có toàn quyền kiểm soát dữ liệu liên kết Google của mình bất cứ lúc nào:\n1. Hủy cấp quyền từ Google: Bạn có thể ngắt kết nối quyền truy cập của ứng dụng infohr.vn với tài khoản Google của bạn bất kỳ lúc nào tại Cài đặt bảo mật Google: https://myaccount.google.com/permissions .\n2. Yêu cầu xóa dữ liệu hoàn toàn trên InfoHR: Bạn có thể tự thực hiện xóa tài khoản tại trang Cài đặt tài khoản (https://infohr.vn/tai-khoan) hoặc gửi yêu cầu xóa tài khoản và dữ liệu cá nhân qua email: support@infohr.vn .\n3. Thời hạn xử lý: Ngay khi nhận được yêu cầu hợp lệ, InfoHR sẽ xóa vĩnh viễn dữ liệu người dùng Google khỏi toàn bộ cơ sở dữ liệu hoạt động và hệ thống lưu trữ dự phòng trong vòng tối đa 30 ngày.',
           },
         ],
       },

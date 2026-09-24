@@ -46,6 +46,10 @@ export const createEmployerSignUpSchema = (t: EmployerSignUpT) =>
     confirmPassword: yup.string().required(t('validation.requiredConfirmPassword')).oneOf([yup.ref('password')], t('validation.confirmPasswordMatch')),
     company: yup.object().shape({
       companyName: yup.string().required(t('validation.requiredCompanyName')).max(255, t('validation.maxCompanyName')),
+      taxCode: yup
+        .string()
+        .required(t('validation.requiredTaxCode'))
+        .matches(REGEX_VALIDATE.taxCodeRegExp, t('validation.invalidTaxCode')),
       location: yup.object().shape({
         city: yup.number().required(t('validation.requiredCity')).integer(t('validation.requiredCity')).moreThan(0, t('validation.requiredCity')).typeError(t('validation.requiredCity')),
       }),
@@ -233,13 +237,13 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
             companyEmail: data.email,
             companyPhone: data.phone || '',
             employeeSize: 2,
-            taxCode: `DRAFT_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+            taxCode: data.company?.taxCode ? String(data.company.taxCode).trim() : '',
             fieldOperation: '',
             websiteUrl: '',
             since: null,
             location: {
               city: selectedCityId,
-              district: selectedDistrictId || (districtOptions[0]?.id ?? ''),
+              district: selectedDistrictId ? Number(selectedDistrictId) : (districtOptions[0]?.id ? Number(districtOptions[0].id) : null),
               address: cityName,
               lat: null,
               lng: null,
@@ -332,6 +336,21 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
           />
         </Grid>
 
+        {/* Mã số thuế (10 hoặc 13 chữ số) */}
+        <Grid size={12}>
+          <TextFieldCustom
+            name="company.taxCode"
+            control={control}
+            title={t('form.taxCode', { defaultValue: 'Mã số thuế' })}
+            placeholder={t('form.taxCodePlaceholder', { defaultValue: 'Nhập mã số thuế (10 hoặc 13 chữ số)' })}
+            showRequired={true}
+            numericOnly={true}
+            maxLength={13}
+            helperText={t('form.taxCodeHelper', { defaultValue: 'Nhập 10 hoặc 13 chữ số (chỉ bao gồm chữ số)' })}
+            sx={inputStyle}
+          />
+        </Grid>
+
         {/* Tỉnh / Thành phố làm việc */}
         <Grid size={{ xs: 12, sm: 6 }}>
           <SingleSelectCustom
@@ -376,7 +395,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
       >
         <InfoOutlinedIcon sx={{ fontSize: 16, color: '#16A34A', flexShrink: 0 }} />
         <Typography sx={{ fontSize: '12px', color: '#15803D', lineHeight: 1.4, fontWeight: 500 }}>
-          Mã số thuế &amp; Giấy phép kinh doanh sẽ được bổ sung tại bước Xác thực sau khi tạo tài khoản.
+          Giấy phép kinh doanh và tài liệu pháp lý sẽ được bổ sung tại bước Xác thực sau khi tạo tài khoản.
         </Typography>
       </Box>
 

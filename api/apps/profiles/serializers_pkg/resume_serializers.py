@@ -205,11 +205,13 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
         if "skills_summary" in validated_data:
             summary = validated_data.get("skills_summary") or ""
+            existing_skills = {s.name.lower(): s.level for s in instance.advanced_skills.all()}
             instance.advanced_skills.all().delete()
             for s in summary.split(","):
                 name = s.strip()
                 if name:
-                    AdvancedSkill.objects.create(resume=instance, name=name, level=3)
+                    lvl = existing_skills.get(name.lower(), 3)
+                    AdvancedSkill.objects.create(resume=instance, name=name, level=lvl)
         return instance
 
     def validate_file(self, cv_file):
@@ -933,6 +935,7 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     jobSeekerProfile = JobSeekerProfileSerializer(
         source="job_seeker_profile",
         fields=["id", "phone", "birthday", "gender", "maritalStatus", "location",
+                "isJobSeeking",
                 "idCardNumber", "idCardIssueDate", "idCardIssuePlace",
                 "taxCode", "socialInsuranceNo",
                 "permanentAddress", "contactAddress",

@@ -4,11 +4,12 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
-import { BarVisualizer, RoomAudioRenderer, StartAudio, VideoTrack, useTracks } from '@livekit/components-react';
-import { Track } from 'livekit-client';
+import { BarVisualizer, RoomAudioRenderer, StartAudio, VideoTrack, useRoomContext, useTracks } from '@livekit/components-react';
+import { RoomEvent, Track } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
 import interviewService from '@/services/interviewService';
 import { type InterviewSession } from '@/types/models';
+import { PROCTORING_TOPIC, QUESTION_CONTROL_TOPIC } from '@/views/interviewPages/useInterviewQuestionHUD';
 
 const ACTIVE_STATUSES = new Set(['scheduled', 'calibration', 'in_progress']);
 const normalizeStatus = (status: string) => status.trim().toLowerCase();
@@ -102,6 +103,34 @@ type LiveObserverVisualizerProps = {
 
 export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ compact = false }) => {
   const { t } = useTranslation(['employer', 'interview', 'common']);
+  const room = useRoomContext();
+  const [liveProctoringAlert, setLiveProctoringAlert] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!room) return;
+    const handleDataReceived = (payload: Uint8Array, _participant?: any, _kind?: any, topic?: string) => {
+      if (topic === PROCTORING_TOPIC || topic === QUESTION_CONTROL_TOPIC) {
+        try {
+          const text = new TextDecoder().decode(payload);
+          const data = JSON.parse(text);
+          if (data.action === 'proctoring_warning' || data.type === 'tab_switch') {
+            const count = data.violation_count || 1;
+            setLiveProctoringAlert(data.message || `Cảnh báo: Ứng viên rời khỏi màn hình (lần ${count})`);
+          } else if (data.action === 'tab_returned') {
+            setLiveProctoringAlert(null);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    room.on(RoomEvent.DataReceived, handleDataReceived);
+    return () => {
+      room.off(RoomEvent.DataReceived, handleDataReceived);
+    };
+  }, [room]);
+
   const audioTracks = useTracks([Track.Source.Microphone]);
   const videoTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
@@ -120,6 +149,32 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
         position: 'relative',
       }}
     >
+      {liveProctoringAlert && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 10,
+            left: 12,
+            right: 12,
+            zIndex: 10,
+            bgcolor: 'rgba(220, 38, 38, 0.94)',
+            backdropFilter: 'blur(8px)',
+            color: '#fff',
+            px: 1.5,
+            py: 0.75,
+            borderRadius: '8px',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            boxShadow: '0 4px 14px rgba(220, 38, 38, 0.45)',
+          }}
+        >
+          <span>⚠️</span>
+          <span>{liveProctoringAlert}</span>
+        </Box>
+      )}
       {screenTracks.length > 0 && (
         <Box
           sx={{

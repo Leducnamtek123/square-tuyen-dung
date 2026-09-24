@@ -2,7 +2,11 @@
 
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Box, Button, Grid2 as Grid, Paper, Skeleton, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, Grid2 as Grid, Paper, Skeleton, Stack, Tab, Tabs, Typography } from '@mui/material';
+import AnalyticsOutlinedIcon from '@mui/icons-material/AnalyticsOutlined';
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
+import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import { LiveKitRoom, RoomAudioRenderer, SessionProvider, useSession } from '@livekit/components-react';
 import { TokenSource } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
@@ -196,6 +200,7 @@ const InterviewDetailCard = () => {
   const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
   const queryClient = useQueryClient();
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [activeTab, setActiveTab] = React.useState<number>(0);
 
   // Auto-start interview detail evaluation tour on first visit
   useTourAutoStart('employer_interview_detail', 1000);
@@ -210,14 +215,21 @@ const InterviewDetailCard = () => {
   const effectiveStatus = liveStatus || session?.status;
 
   React.useEffect(() => {
+    if (isSessionActive) {
+      setActiveTab(1); // Auto-switch to live transcript when session is active
+    }
+  }, [isSessionActive]);
+
+  React.useEffect(() => {
     if (liveStatus && session?.status && liveStatus !== session.status && liveStatus === 'completed') {
       queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
     }
   }, [liveStatus, session?.status, queryClient, id]);
 
   React.useEffect(() => {
-    if (!session?.evaluations?.length) return;
+    if (!Array.isArray(session?.evaluations) || session.evaluations.length === 0) return;
     const lastEval = session.evaluations[session.evaluations.length - 1];
+    if (!lastEval) return;
     dispatch({
       type: 'set_eval',
       payload: createEvaluationFormFromEvaluation(lastEval),
@@ -270,6 +282,11 @@ const InterviewDetailCard = () => {
   };
 
   const submitHRInfo = async () => {
+    const parsedId = Number(id);
+    if (!Number.isFinite(parsedId)) {
+      return;
+    }
+
     const validationError = getEvaluationFormValidationError(state.evalForm);
     if (validationError) {
       toastMessages.error(t(`interview:interviewDetail.messages.${validationError}`));
@@ -277,7 +294,7 @@ const InterviewDetailCard = () => {
     }
 
     try {
-      await submitEvaluation(buildEvaluationPayload(Number(id), state.evalForm));
+      await submitEvaluation(buildEvaluationPayload(parsedId, state.evalForm));
       toastMessages.success(t('interview:interviewDetail.messages.evaluationSuccess'));
     } catch {
       // mutation hook handles errors
@@ -408,11 +425,18 @@ const InterviewDetailCard = () => {
       />
 
       <Grid container spacing={3}>
+        {/* Left Column (35%): Candidate Dossier & Quick Evaluation */}
         <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={3}>
             <InterviewInfoCard session={session} t={t} i18n={i18n} />
             <Box data-tour="interview-detail-score">
-              <InterviewAiEvaluationCard session={session} effectiveStatus={effectiveStatus} t={t} onTriggerAi={handleTriggerAi} isTriggeringAi={state.isTriggeringAi} />
+              <InterviewAiEvaluationCard
+                session={session}
+                effectiveStatus={effectiveStatus}
+                t={t}
+                onTriggerAi={handleTriggerAi}
+                isTriggeringAi={state.isTriggeringAi}
+              />
             </Box>
             <Box data-tour="interview-detail-actions">
               <InterviewHrEvaluationForm
@@ -424,20 +448,135 @@ const InterviewDetailCard = () => {
                 t={t}
               />
             </Box>
-            <InterviewQuestionsCard session={session} t={t} />
           </Stack>
         </Grid>
 
+        {/* Right Column (65%): Tabbed Executive Workspace */}
         <Grid size={{ xs: 12, lg: 8 }}>
-          <Stack spacing={3}>
-            <InterviewRecordingCard recordingUrl={recordingUrl} isCompleted={effectiveStatus === 'completed'} t={t} />
-            <InterviewAnalysisPanel session={session} t={t} />
-            <Box data-tour="interview-detail-transcript">
+          <Stack spacing={2.5}>
+            {/* Tab Navigation Bar */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 0.75,
+                borderRadius: 3,
+                bgcolor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
+              }}
+            >
+              <Tabs
+                value={activeTab}
+                onChange={(_, newValue) => setActiveTab(newValue)}
+                variant="scrollable"
+                scrollButtons="auto"
+                sx={{
+                  minHeight: 44,
+                  '& .MuiTabs-indicator': {
+                    display: 'none',
+                  },
+                  '& .MuiTab-root': {
+                    minHeight: 40,
+                    py: 1,
+                    px: 2.25,
+                    borderRadius: 2,
+                    fontWeight: 750,
+                    fontSize: '0.875rem',
+                    textTransform: 'none',
+                    color: 'text.secondary',
+                    transition: 'all 0.15s ease-in-out',
+                    '&.Mui-selected': {
+                      color: 'primary.main',
+                      bgcolor: 'rgba(37, 99, 235, 0.08)',
+                      fontWeight: 850,
+                    },
+                    '&:hover:not(.Mui-selected)': {
+                      bgcolor: '#F8FAFC',
+                      color: 'text.primary',
+                    },
+                  },
+                }}
+              >
+                <Tab
+                  icon={<AnalyticsOutlinedIcon sx={{ fontSize: 19 }} />}
+                  iconPosition="start"
+                  label={t('interviewDetail.subtitle.analysis', { defaultValue: 'Phân tích AI' })}
+                />
+                <Tab
+                  icon={<ForumOutlinedIcon sx={{ fontSize: 19 }} />}
+                  iconPosition="start"
+                  label={
+                    <Stack direction="row" alignItems="center" spacing={0.75}>
+                      <span>{t('interviewDetail.subtitle.transcript', { defaultValue: 'Bản ghi hội thoại' })}</span>
+                      {Array.isArray(session.transcripts) && session.transcripts.length > 0 && (
+                        <Chip
+                          label={session.transcripts.length}
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: '0.6875rem',
+                            fontWeight: 800,
+                            bgcolor: activeTab === 1 ? 'primary.main' : '#E2E8F0',
+                            color: activeTab === 1 ? '#FFFFFF' : 'text.secondary',
+                          }}
+                        />
+                      )}
+                    </Stack>
+                  }
+                />
+                <Tab
+                  icon={<VideoLibraryOutlinedIcon sx={{ fontSize: 19 }} />}
+                  iconPosition="start"
+                  label={t('interviewDetail.subtitle.recording', { defaultValue: 'Bản ghi hình' })}
+                />
+                <Tab
+                  icon={<QuizOutlinedIcon sx={{ fontSize: 19 }} />}
+                  iconPosition="start"
+                  label={
+                    <Stack direction="row" alignItems="center" spacing={0.75}>
+                      <span>{t('interviewDetail.subtitle.questions', { defaultValue: 'Bộ câu hỏi' })}</span>
+                      {Array.isArray(session.questions) && session.questions.length > 0 && (
+                        <Chip
+                          label={session.questions.length}
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: '0.6875rem',
+                            fontWeight: 800,
+                            bgcolor: activeTab === 3 ? 'primary.main' : '#E2E8F0',
+                            color: activeTab === 3 ? '#FFFFFF' : 'text.secondary',
+                          }}
+                        />
+                      )}
+                    </Stack>
+                  }
+                />
+              </Tabs>
+            </Paper>
+
+            {/* Tab 0: AI Analysis & Radar Insights */}
+            <Box sx={{ display: activeTab === 0 ? 'block' : 'none' }}>
+              <InterviewAnalysisPanel session={session} t={t} />
+            </Box>
+
+            {/* Tab 1: Live / Post-Interview Transcript */}
+            <Box data-tour="interview-detail-transcript" sx={{ display: activeTab === 1 ? 'block' : 'none' }}>
               {liveKitReady ? (
                 <InterviewTranscriptPanelLive session={session} t={t} i18n={i18n} />
               ) : (
                 <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
               )}
+            </Box>
+
+            {/* Tab 2: Media & Video Recording */}
+            <Box sx={{ display: activeTab === 2 ? 'block' : 'none' }}>
+              <InterviewRecordingCard recordingUrl={recordingUrl} isCompleted={effectiveStatus === 'completed'} t={t} />
+            </Box>
+
+            {/* Tab 3: Question Bank & Rubric */}
+            <Box sx={{ display: activeTab === 3 ? 'block' : 'none' }}>
+              <InterviewQuestionsCard session={session} t={t} />
             </Box>
           </Stack>
         </Grid>

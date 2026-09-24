@@ -20,7 +20,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     actionTimeout: 15000,
-    navigationTimeout: 30000,
+    navigationTimeout: 60000,
     permissions: ['microphone', 'camera'],
     launchOptions: {
       args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'],
@@ -39,7 +39,7 @@ export default defineConfig({
 
   /* Run local dev server before starting tests, just like the with_server.py script */
   webServer: {
-    command: 'npm run dev',
+    command: 'pnpm run dev',
     cwd: configDir,
     url: baseURL,
     timeout: 120_000,

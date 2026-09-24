@@ -207,6 +207,7 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/ngan-hang-cau-hoi', destination: '/employer/question-bank' },
       { source: '/nha-tuyen-dung/bo-cau-hoi', destination: '/employer/question-groups' },
       { source: '/nha-tuyen-dung/cai-dat-ai', destination: '/employer/ai-settings' },
+      { source: '/employer/cai-dat-ai', destination: '/employer/ai-settings' },
       { source: '/nha-tuyen-dung/kich-ban-phong-van', destination: '/employer/interview-scripts' },
       { source: '/employer/kich-ban-phong-van', destination: '/employer/interview-scripts' },
       { source: '/nha-tuyen-dung/xac-thuc-nha-tuyen-dung', destination: '/employer/verification' },

@@ -14,9 +14,11 @@ import {
   Chip,
   Avatar,
   Stack,
+  CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
@@ -26,6 +28,7 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import dayjs from 'dayjs';
 import { getSafeExternalOpenUrl, getSafeResourceUrl } from '@/utils/safeExternalUrl';
+import { printCVToPDF, exportCVToPDF } from '@/views/cvBuilderPages/CVEditorPage/utils/pdfExport';
 import type { ExtendedResume, CVDocExperience, CVDocEducation, CVDocAdvancedSkill, CVDocCertificate } from '@/components/Features/CVDoc';
 
 interface CandidateResumePreviewModalProps {
@@ -55,11 +58,40 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   candidateSkills = [],
   avatarUrl,
 }) => {
+  const [isExporting, setIsExporting] = React.useState(false);
+
   const displayName = candidateName || resume?.user?.fullName || resume?.userDict?.fullName || 'Ứng viên';
   const displayEmail = candidateEmail || resume?.user?.email || resume?.userDict?.email || '';
   const displayPhone = candidatePhone || resume?.jobSeekerProfileDict?.phone || '';
   const resumeTitle = resume?.title || 'Hồ sơ ứng viên';
   const updatedAt = resume?.updateAt || resume?.createAt;
+
+  const handlePrint = async () => {
+    setIsExporting(true);
+    try {
+      const docTitle = `CV_${(displayName || 'Ung_Vien').replace(/\s+/g, '_')}`;
+      await printCVToPDF('cv-resume-print-area', docTitle);
+    } catch (err) {
+      console.warn('Isolated print failed, fallback to window.print:', err);
+      if (typeof window !== 'undefined' && typeof window.print === 'function') {
+        window.print();
+      }
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const docTitle = `CV_${(displayName || 'Ung_Vien').replace(/\s+/g, '_')}`;
+      await exportCVToPDF('cv-resume-print-area', docTitle);
+    } catch (err) {
+      console.error('Export PDF failed:', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const cityName =
     candidateCity ||
@@ -84,36 +116,42 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
   const objectiveText = resume?.description || resume?.careerObjective || '';
 
   const formatSalary = () => {
-    if (resume?.salaryMin && resume?.salaryMax) {
-      return `${(resume.salaryMin / 1000000).toLocaleString('vi-VN')} - ${(resume.salaryMax / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
+    const min = Number(resume?.salaryMin);
+    const max = Number(resume?.salaryMax);
+    const expected = Number(resume?.expectedSalary);
+
+    if (!isNaN(min) && min > 0 && !isNaN(max) && max > 0) {
+      return `${(min / 1000000).toLocaleString('vi-VN')} - ${(max / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
     }
-    if (resume?.salaryMin) {
-      return `Từ ${(resume.salaryMin / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
+    if (!isNaN(min) && min > 0) {
+      return `Từ ${(min / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
     }
-    if (resume?.salaryMax) {
-      return `Lên đến ${(resume.salaryMax / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
+    if (!isNaN(max) && max > 0) {
+      return `Lên đến ${(max / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
     }
-    if (resume?.expectedSalary) {
-      return `${(resume.expectedSalary / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
+    if (!isNaN(expected) && expected > 0) {
+      return `${(expected / 1000000).toLocaleString('vi-VN')} triệu VNĐ`;
     }
-    if (typeof resume?.salary === 'string') {
+    if (typeof resume?.salary === 'string' && resume.salary.trim()) {
       return resume.salary;
     }
     return '';
   };
   const salaryText = formatSalary();
 
-  const experiences: CVDocExperience[] = resume?.experienceDetails || [];
-  const educations: CVDocEducation[] = resume?.educationDetails || [];
-  const advancedSkills: CVDocAdvancedSkill[] = resume?.advancedSkills || [];
-  const certificates: CVDocCertificate[] = resume?.certificates || [];
+  const experiences: CVDocExperience[] = Array.isArray(resume?.experienceDetails) ? resume.experienceDetails : [];
+  const educations: CVDocEducation[] = Array.isArray(resume?.educationDetails) ? resume.educationDetails : [];
+  const advancedSkills: CVDocAdvancedSkill[] = Array.isArray(resume?.advancedSkills) ? resume.advancedSkills : [];
+  const certificates: CVDocCertificate[] = Array.isArray(resume?.certificates) ? resume.certificates : [];
 
   const effectiveSkills: string[] = React.useMemo(() => {
-    if (advancedSkills && advancedSkills.length > 0) {
-      return advancedSkills.map((s) => s.name || String(s));
+    if (Array.isArray(advancedSkills) && advancedSkills.length > 0) {
+      return advancedSkills
+        .map((s) => (s && typeof s === 'object' && 'name' in s ? (s as any).name : String(s || '')))
+        .filter(Boolean);
     }
-    if (candidateSkills && candidateSkills.length > 0) {
-      return candidateSkills;
+    if (Array.isArray(candidateSkills) && candidateSkills.length > 0) {
+      return candidateSkills.filter(Boolean);
     }
     if ((resume as any)?.skillsSummary) {
       return String((resume as any).skillsSummary).split(',').map((s) => s.trim()).filter(Boolean);
@@ -140,9 +178,54 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
         },
       }}
     >
+      {/* Scoped print rules to isolate cv-resume-print-area */}
+      <style>{`
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 0;
+          }
+          body > *:not(:has(#cv-resume-print-area)):not(#cv-resume-print-area) {
+            display: none !important;
+          }
+          .MuiBackdrop-root {
+            display: none !important;
+          }
+          .MuiDialog-container {
+            display: block !important;
+            position: static !important;
+            transform: none !important;
+            padding: 0 !important;
+          }
+          .MuiDialog-paper {
+            box-shadow: none !important;
+            border: none !important;
+            background: transparent !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          #cv-resume-print-area {
+            display: block !important;
+            width: 210mm !important;
+            margin: 0 auto !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+          }
+          #cv-resume-print-area .break-inside-avoid {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+        }
+      `}</style>
+
       {/* Header Modal */}
       <DialogTitle
         id="candidate-resume-preview-title"
+        className="no-print"
         sx={{
           m: 0,
           p: 2.5,
@@ -158,7 +241,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
             src={avatarUrl || undefined}
             sx={{ width: 48, height: 48, bgcolor: '#2563eb', fontWeight: 700, fontSize: '1.25rem' }}
           >
-            {displayName.trim().charAt(0).toUpperCase()}
+            {(displayName.trim().charAt(0) || 'U').toUpperCase()}
           </Avatar>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -176,9 +259,29 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
         <Stack direction="row" spacing={1} alignItems="center" className="no-print">
           <Button
             size="small"
+            variant="contained"
+            aria-label="Tải CV định dạng PDF"
+            disabled={isExporting}
+            onClick={handleExportPDF}
+            startIcon={isExporting ? <CircularProgress size={16} color="inherit" /> : <PictureAsPdfOutlinedIcon sx={{ fontSize: 16 }} />}
+            sx={{
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 700,
+              backgroundColor: '#1e40af',
+              color: '#ffffff',
+              boxShadow: '0 2px 6px rgba(30, 64, 175, 0.25)',
+              '&:hover': { backgroundColor: '#1d4ed8' },
+            }}
+          >
+            Tải PDF
+          </Button>
+          <Button
+            size="small"
             variant="outlined"
             aria-label="In bản CV này"
-            onClick={() => window.print()}
+            disabled={isExporting}
+            onClick={handlePrint}
             startIcon={<PrintOutlinedIcon sx={{ fontSize: 16 }} />}
             sx={{ borderRadius: '10px', textTransform: 'none', fontWeight: 700, borderColor: '#cbd5e1', color: '#0f172a' }}
           >
@@ -194,7 +297,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
         <Stack spacing={3}>
           {/* Section: Tệp CV đính kèm (nếu có) */}
           {safePdfUrl ? (
-            <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
+            <Box className="no-print" sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <InsertDriveFileOutlinedIcon sx={{ color: '#2563eb' }} />
@@ -228,8 +331,10 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
             </Box>
           ) : null}
 
-          {/* Section 1: Thông tin cá nhân */}
-          <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
+          {/* Printable Resume Content Container */}
+          <Box id="cv-resume-print-area" sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {/* Section 1: Thông tin cá nhân */}
+            <Box className="break-inside-avoid" sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>
               <PersonOutlineIcon sx={{ color: '#2563eb' }} />
               <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a' }}>
@@ -266,7 +371,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
           </Box>
 
           {/* Section 2: Thông tin chung & Mục tiêu nghề nghiệp */}
-          <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
+          <Box className="break-inside-avoid" sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>
               <WorkOutlineIcon sx={{ color: '#2563eb' }} />
               <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a' }}>
@@ -312,7 +417,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
           </Box>
 
           {/* Section 3: Kinh nghiệm làm việc */}
-          <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
+          <Box className="break-inside-avoid" sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>
               <WorkOutlineIcon sx={{ color: '#2563eb' }} />
               <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a' }}>
@@ -322,17 +427,17 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
 
             {experiences.length > 0 ? (
               <Stack spacing={2}>
-                {experiences.map((exp) => (
-                  <Box key={String(exp.id)} sx={{ pl: 2, borderLeft: '3px solid #2563eb' }}>
+                {experiences.map((exp, idx) => (
+                  <Box key={String(exp?.id ?? idx)} sx={{ pl: 2, borderLeft: '3px solid #2563eb' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                      {exp.jobName} {exp.companyName ? `- ${exp.companyName}` : ''}
+                      {exp?.jobName || 'Công việc'} {exp?.companyName ? `- ${exp.companyName}` : ''}
                     </Typography>
-                    {(exp.startDate || exp.endDate) && (
+                    {(exp?.startDate || exp?.endDate) && (
                       <Typography variant="caption" sx={{ color: '#2563eb', fontWeight: 700, display: 'block', my: 0.25 }}>
-                        {exp.startDate || '-'} - {exp.endDate || 'Hiện tại'}
+                        {exp?.startDate || '-'} - {exp?.endDate || 'Hiện tại'}
                       </Typography>
                     )}
-                    {exp.description && (
+                    {exp?.description && (
                       <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.85rem', lineHeight: 1.6, whiteSpace: 'pre-line' }}>
                         {exp.description}
                       </Typography>
@@ -348,7 +453,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
           </Box>
 
           {/* Section 4: Học vấn & Kỹ năng */}
-          <Grid container spacing={3}>
+          <Grid container spacing={3} className="break-inside-avoid">
             <Grid size={{ xs: 12, md: 6 }}>
               <Box sx={{ p: 3, borderRadius: '16px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', height: '100%' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, pb: 1, borderBottom: '2px solid #2563eb' }}>
@@ -359,17 +464,17 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                 </Box>
                 {educations.length > 0 ? (
                   <Stack spacing={1.5}>
-                    {educations.map((edu) => (
-                      <Box key={String(edu.id)}>
+                    {educations.map((edu, idx) => (
+                      <Box key={String(edu?.id ?? idx)}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0f172a' }}>
-                          {edu.degreeName || edu.major || 'Học vấn'}
+                          {edu?.degreeName || edu?.major || 'Học vấn'}
                         </Typography>
-                        {edu.trainingPlaceName && (
+                        {edu?.trainingPlaceName && (
                           <Typography variant="caption" sx={{ color: '#64748b', display: 'block' }}>
                             {edu.trainingPlaceName} {(edu.startDate || edu.completedDate) ? `(${edu.startDate || ''} - ${edu.completedDate || ''})` : ''}
                           </Typography>
                         )}
-                        {edu.description && (
+                        {edu?.description && (
                           <Typography variant="body2" sx={{ color: '#475569', fontSize: '0.825rem', mt: 0.5 }}>
                             {edu.description}
                           </Typography>
@@ -404,11 +509,11 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
                     )}
                     {certificates.length > 0 && (
                       <Stack spacing={1}>
-                        {certificates.map((cert) => (
-                          <Box key={String(cert.id)} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {certificates.map((cert, idx) => (
+                          <Box key={String(cert?.id ?? idx)} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <CardMembershipIcon sx={{ fontSize: 16, color: '#16a34a' }} />
                             <Typography variant="body2" sx={{ fontWeight: 600, color: '#0f172a' }}>
-                              {cert.name} {cert.trainingPlace ? `(${cert.trainingPlace})` : ''}
+                              {cert?.name || 'Chứng chỉ'} {cert?.trainingPlace ? `(${cert.trainingPlace})` : ''}
                             </Typography>
                           </Box>
                         ))}
@@ -423,6 +528,7 @@ const CandidateResumePreviewModal: React.FC<CandidateResumePreviewModalProps> = 
               </Box>
             </Grid>
           </Grid>
+          </Box>
         </Stack>
       </DialogContent>
 

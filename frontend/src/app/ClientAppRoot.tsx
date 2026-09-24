@@ -129,7 +129,16 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     const THROTTLE_MS = 3000;
 
     const handleError = (event: ErrorEvent) => {
-      if (event.message?.includes("ResizeObserver")) return;
+      const msg = event.message || '';
+      if (
+        msg.includes("ResizeObserver") ||
+        msg.includes("Hydration") ||
+        msg.includes("hydrating") ||
+        msg.includes("Minified React error #418") ||
+        msg.includes("Minified React error #423") ||
+        msg.includes("Minified React error #425") ||
+        msg.includes("Script error")
+      ) return;
       const now = Date.now();
       if (now - lastErrorToast < THROTTLE_MS) return;
       lastErrorToast = now;
@@ -192,22 +201,19 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     return <MaintenanceModeScreen detail={effectiveMaintenanceDetail} />;
   }
 
-  if (!hasMounted || isInitializing) {
-    return null;
-  }
-
   return (
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
         <ProductTourProvider>
           {children}
-          <Toaster richColors position="top-right" />
-          {canShowChatBot && <ChatBot />}
+          {hasMounted && <Toaster richColors position="top-right" />}
+          {hasMounted && canShowChatBot && <ChatBot />}
         </ProductTourProvider>
       </GoogleOAuthProvider>
-      <ConfirmDialogRoot />
-      <ScrollToTop />
+      {hasMounted && <ConfirmDialogRoot />}
+      {hasMounted && <ScrollToTop />}
     </ErrorBoundary>
   );
 }
+
 

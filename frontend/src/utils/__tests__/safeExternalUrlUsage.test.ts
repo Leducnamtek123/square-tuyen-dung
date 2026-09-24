@@ -27,7 +27,7 @@ describe('safe external URL usage', () => {
       const hrefMatches = source.matchAll(/href=\{([^}]*[Uu]rl[^}]*)\}/g);
       for (const match of hrefMatches) {
         const expression = match[1];
-        if (/safe|getSafeExternalOpenUrl/.test(expression)) continue;
+        if (/safe|getSafeExternalOpenUrl|getSafeRedirectPath/i.test(expression)) continue;
 
         const line = source.slice(0, match.index).split('\n').length;
         offenders.push(`${relative(SOURCE_ROOT, filePath)}:${line}:href={${expression}}`);
@@ -36,7 +36,7 @@ describe('safe external URL usage', () => {
       const objectHrefMatches = source.matchAll(/\bhref:\s*([^,\n}]*[Uu]rl[^,\n}]*)/g);
       for (const match of objectHrefMatches) {
         const expression = match[1].trim();
-        if (/safe|getSafeExternalOpenUrl|getSafeResourceUrl/.test(expression)) continue;
+        if (/safe|getSafeExternalOpenUrl|getSafeResourceUrl|getSafeRedirectPath/i.test(expression)) continue;
 
         const line = source.slice(0, match.index).split('\n').length;
         offenders.push(`${relative(SOURCE_ROOT, filePath)}:${line}:href: ${expression}`);

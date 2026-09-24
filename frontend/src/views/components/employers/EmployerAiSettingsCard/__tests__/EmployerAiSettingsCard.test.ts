@@ -135,6 +135,7 @@ describe('EmployerAiSettingsCard and AI Settings Suite', () => {
       join(__dirname, '../AiStudioPreview.tsx'),
       join(__dirname, '../../InterviewScripts/InterviewScriptsManager.tsx'),
       join(__dirname, '../../InterviewScripts/InterviewScriptDrawer.tsx'),
+      join(__dirname, '../../../../../services/avatarService.ts'),
     ];
 
     for (const filePath of filesToAudit) {
@@ -142,6 +143,12 @@ describe('EmployerAiSettingsCard and AI Settings Suite', () => {
       expect(source).not.toContain('LiveKit');
       expect(source).not.toContain('Wav2Lip');
     }
+
+    const apiTabSource = readFileSync(join(__dirname, '../../../../adminPages/SettingsPage/components/ApiIntegrationTab.tsx'), 'utf8');
+    expect(apiTabSource).not.toContain('Test LiveKit WebRTC');
+    expect(apiTabSource).not.toContain('Test MinIO S3 Storage');
+    expect(apiTabSource).not.toContain('Máy chủ LiveKit');
+    expect(apiTabSource).not.toContain('Dịch vụ MinIO');
   });
 
   it('verifies interviewScripts menu item in EmployerMenu has no custom icon and uses standard bullet dot', () => {

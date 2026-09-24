@@ -240,14 +240,12 @@ const NewsContent = () => {
 
   // Determine articles for "Bài viết mới nhất" grid
   const displayLatestArticles = React.useMemo(() => {
-    if (activeCategorySlug === 'all') {
-      if (page === 1 && articles.length > 4) {
-        return articles.slice(4);
-      }
-      return articles;
+    if (activeCategorySlug === 'all' && page === 1) {
+      const featuredIds = new Set(featuredArticles.map((a) => a.id));
+      return articles.filter((a) => !featuredIds.has(a.id));
     }
     return articles;
-  }, [activeCategorySlug, page, articles]);
+  }, [activeCategorySlug, page, articles, featuredArticles]);
 
   const newsListHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language);
   const jobsHref = localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language);
@@ -273,7 +271,8 @@ const NewsContent = () => {
       />
 
       <Container maxWidth="xl" sx={{ mt: 3 }}>
-        {/* -- Featured Articles Section ---------------------------------------- */}
+        {/* -- Featured Articles Section (Only shown on page 1 of all categories) -- */}
+        {activeCategorySlug === 'all' && page === 1 ? (
         <Box sx={{ mb: 6 }}>
           <Typography variant="h5" component="h1" fontWeight={800} color="#0f172a" sx={{ mb: 3, letterSpacing: '-0.01em' }}>
             Tin tức &amp; Cẩm nang nghề nghiệp
@@ -397,12 +396,15 @@ const NewsContent = () => {
             </Grid>
           )}
         </Box>
+        ) : null}
 
         {/* -- Latest Articles Section with Filter Tabs -------------------------- */}
         <Box sx={{ mb: 6 }}>
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={2} sx={{ mb: 3 }}>
             <Typography variant="h5" fontWeight={800} color="#0f172a" sx={{ letterSpacing: '-0.01em' }}>
-              Bài viết mới nhất
+              {activeCategorySlug === 'all'
+                ? 'Bài viết mới nhất'
+                : categories.find((c) => c.slug === activeCategorySlug)?.name || 'Bài viết theo chuyên mục'}
             </Typography>
 
             {/* Category Filter Pills */}

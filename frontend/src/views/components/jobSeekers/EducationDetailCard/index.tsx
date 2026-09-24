@@ -145,7 +145,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
           trainingPlaceName: resData.trainingPlaceName || '',
           startDate: resData.startDate ? new Date(resData.startDate) : null,
           completedDate: resData.completedDate ? new Date(resData.completedDate) : null,
-          gradeOrRank: null,
+          gradeOrRank: resData.gradeOrRank ?? null,
           description: resData.description || null,
         });
         dispatch({ type: 'open_popup' });

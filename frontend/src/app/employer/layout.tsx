@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function EmployerSectionLayout({
   children,
 }: {
-  children: any;
+  children: React.ReactNode;
 }) {
   return <EmployerSectionClient>{children}</EmployerSectionClient>;
 }

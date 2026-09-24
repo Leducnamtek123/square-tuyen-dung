@@ -29,6 +29,7 @@ from livekit.plugins.openai import tts as openai_tts
 
 from .backend_auth import auth_event_hook
 from .config import config
+from .interview_flow import is_whisper_hallucination
 from .interviewer import Interviewer
 from .session_settings import build_session_kwargs
 
@@ -177,6 +178,24 @@ class RetryRateLimitTransport(httpx.AsyncBaseTransport):
 
             return resp
         return resp
+
+
+class FilteredOpenAISTT(openai.STT):
+    """
+    OpenAI STT wrapper that drops hallucinated transcripts caused by silence
+    or ambient noise in Whisper (e.g., YouTube outro phrases like 'Ghiền Mì Gõ', 'subscribe').
+    """
+    async def _recognize_impl(self, *args: Any, **kwargs: Any) -> Any:
+        event = await super()._recognize_impl(*args, **kwargs)
+        if event and getattr(event, "alternatives", None):
+            filtered = []
+            for alt in event.alternatives:
+                if alt.text and is_whisper_hallucination(alt.text):
+                    logger.warning("Filtered out Whisper hallucination from STT recognition: '%s'", alt.text)
+                    continue
+                filtered.append(alt)
+            event.alternatives = filtered
+        return event
 
 
 # --- AgentServer Setup (1.5.x Pattern) ---
@@ -370,7 +389,12 @@ async def entrypoint(ctx: JobContext) -> None:
     # 2. Initialize Models
     curl_headers = {"User-Agent": "curl/7.68.0"}
     stt_transport = RetryRateLimitTransport(httpx.AsyncHTTPTransport(verify=False))
-    stt_model = openai.STT(
+    stt_prompt = (
+        "Phỏng vấn tuyển dụng InfoHR Square. Ứng viên trả lời: nghe rõ, tín hiệu rõ, sẵn sàng, dạ rõ, có rõ, vâng."
+        if stt_lang == "vi"
+        else "Square AI Interviewer. Candidate answers: loud and clear, ready, yes."
+    )
+    stt_model = FilteredOpenAISTT(
         client=openai_lib.AsyncOpenAI(
             api_key=config.STT_API_KEY or "dummy",
             base_url=config.STT_BASE_URL,
@@ -379,6 +403,7 @@ async def entrypoint(ctx: JobContext) -> None:
         ),
         model=config.STT_MODEL,
         language=stt_lang,
+        prompt=stt_prompt,
     )
 
     llm_model = openai.LLM(
@@ -400,7 +425,7 @@ async def entrypoint(ctx: JobContext) -> None:
             tts_voice = "alloy"
         else:
             tts_voice = config.TTS_VOICE
-    if tts_voice in {"TrAc Ly", "TrÃºc Ly", "Trc Ly", "Trc Ly", "Tr?c Ly"}:
+    if tts_voice in {"TrAc Ly", "TrÃºc Ly", "Trc Ly", "Tr?c Ly"}:
         tts_voice = "Trúc Ly"
     logger.info("Using TTS voice for room %s (%s): %s", ctx.room.name, session_lang, tts_voice)
     tts_speed = resolve_tts_speed(agent_context)
@@ -438,7 +463,7 @@ async def entrypoint(ctx: JobContext) -> None:
     tts_model = openai.TTS(**tts_kwargs)
 
     # 3. Create Interviewer Agent (greeting is handled in on_enter)
-    interviewer = Interviewer(context=agent_context)
+    interviewer = Interviewer(context=agent_context, room=ctx.room)
 
     async def _wait_for_participant(
         participant_identity: str | None, timeout_seconds: float = 2.0
@@ -459,6 +484,14 @@ async def entrypoint(ctx: JobContext) -> None:
         participant_identity = _participant_identity(participant_identity)
         text = (await reader.read_all()).strip()
         if not text:
+            return
+
+        if is_whisper_hallucination(text):
+            logger.warning(
+                "Ignoring candidate text chat identified as Whisper hallucination for room %s: %s",
+                ctx.room.name,
+                text,
+            )
             return
 
         participant = await _wait_for_participant(participant_identity)
@@ -604,6 +637,9 @@ async def entrypoint(ctx: JobContext) -> None:
         elif action in {"proctoring_warning", "tab_switch_warning"}:
             warning_text = payload.get("message")
             await interviewer.handle_proctoring_warning(warning_text=warning_text)
+        elif action in {"tab_returned", "proctoring_resumed", "candidate_returned"}:
+            duration = payload.get("duration_seconds") or payload.get("duration") or 0.0
+            await interviewer.handle_candidate_tab_returned(duration_seconds=float(duration))
 
     async def _handle_proctoring_stream(reader, participant_identity) -> None:
         participant_identity = _participant_identity(participant_identity)
@@ -614,6 +650,19 @@ async def entrypoint(ctx: JobContext) -> None:
             payload = json.loads(text)
         except Exception:
             payload = {"action": "proctoring_warning", "message": text}
+
+        action = payload.get("action")
+        if action in {"tab_returned", "proctoring_resumed", "candidate_returned"}:
+            duration = payload.get("duration_seconds") or payload.get("duration") or 0.0
+            logger.info(
+                "Received tab returned event for room %s from %s (away=%.1fs)",
+                ctx.room.name,
+                participant_identity,
+                float(duration),
+            )
+            await interviewer.handle_candidate_tab_returned(duration_seconds=float(duration))
+            return
+
         warning_text = payload.get("message") or text
         logger.info(
             "Received proctoring warning event for room %s from %s: '%s'",
@@ -690,6 +739,14 @@ async def entrypoint(ctx: JobContext) -> None:
         if not content:
             return
 
+        if role == "user":
+            if is_whisper_hallucination(content):
+                logger.warning(
+                    "Dropped Whisper hallucination user turn from transcript: '%s'",
+                    content,
+                )
+                return
+
         if role == "assistant":
             lowered = content.lower()
             if (
@@ -698,17 +755,6 @@ async def entrypoint(ctx: JobContext) -> None:
                 or "get_interview_progress" in lowered
             ):
                 return
-
-            # Gui thong diep den LiveTalking Digital Human de GPU RTX 4070 Ti SUPER sinh lipsync realtime
-            async def _send_talking_head_prompt(text: str):
-                try:
-                    th_url = os.getenv("TALKING_HEAD_URL", "http://talking-head:8010/human")
-                    async with httpx.AsyncClient(timeout=3.0) as client:
-                        await client.post(th_url, json={"text": text, "type": "echo"})
-                except Exception as th_err:
-                    logger.debug("Talking head dispatch skipped: %s", th_err)
-
-            _create_background_task(_send_talking_head_prompt(content))
 
         role = "candidate" if role == "user" else "ai_agent"
         _create_background_task(interviewer.record_transcript(role, content))
@@ -723,6 +769,8 @@ async def entrypoint(ctx: JobContext) -> None:
                 role = "candidate" if item.role == "user" else "ai_agent"
                 content = item.text_content
                 if content and content.strip():
+                    if role == "candidate" and is_whisper_hallucination(content.strip()):
+                        continue
                     _create_background_task(
                         interviewer.record_transcript(role, content.strip())
                     )

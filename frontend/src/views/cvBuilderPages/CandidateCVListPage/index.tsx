@@ -20,10 +20,12 @@ import {
   DialogActions,
   Grid2 as Grid,
   Tooltip,
+  CircularProgress,
 } from '@mui/material';
 import AutoFixHighOutlinedIcon from '@mui/icons-material/AutoFixHighOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
@@ -38,7 +40,9 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined';
 
 import cvBuilderService from '@/services/cvBuilderService';
-import { CandidateCVListItem } from '@/types/cvBuilder';
+import { CandidateCVListItem, CVData } from '@/types/cvBuilder';
+import { CVTemplateRenderer } from '../templates/CVTemplateRenderer';
+import { exportCVToPDF } from '../CVEditorPage/utils/pdfExport';
 import { TabTitle } from '@/utils/generalFunction';
 import toastMessages from '@/utils/toastMessages';
 import { localizeRoutePath } from '@/configs/routeLocalization';
@@ -52,6 +56,78 @@ export const CandidateCVListPage: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [loadingPdfId, setLoadingPdfId] = useState<number | null>(null);
+  const [exportingCV, setExportingCV] = useState<{ id: number; title: string; data: CVData } | null>(null);
+
+  const handleDownloadCVAsPDF = async (cv: CandidateCVListItem) => {
+    setLoadingPdfId(cv.id);
+    try {
+      const cvDetail = await cvBuilderService.getCandidateCVDetail(cv.id);
+      const cvDataVal = (cvDetail.cvData || cvDetail.cv_data || {}) as Partial<CVData>;
+      const themeConfigVal = cvDetail.themeConfig || cvDetail.theme_config || {};
+      const templateCodeVal = cvDetail.templateCode || cvDetail.template_code || 'modern-navy';
+
+      const candidateNameVal = (
+        (cvDetail as unknown as Record<string, unknown>).candidateName ||
+        (cvDetail as unknown as Record<string, unknown>).candidate_name ||
+        ''
+      ) as string;
+
+      const preparedCvData: CVData = {
+        title: cvDetail.title || 'CV Ứng viên',
+        templateId: templateCodeVal,
+        theme: {
+          primaryColor: '#1e40af',
+          fontFamily: 'Inter',
+          fontSize: 'medium',
+          spacing: 'normal',
+          avatarShape: 'circle',
+          showAvatar: true,
+          paperSize: 'A4',
+          ...(cvDataVal.theme || {}),
+          ...themeConfigVal,
+        },
+        personalInfo: {
+          fullName: candidateNameVal,
+          title: cvDataVal.personalInfo?.title || cvDetail.title || '',
+          email: '',
+          phoneNumber: '',
+          address: '',
+          bio: '',
+          ...(cvDataVal.personalInfo || {}),
+        },
+        experiences: cvDataVal.experiences || [],
+        educations: cvDataVal.educations || [],
+        skills: cvDataVal.skills || [],
+        languages: cvDataVal.languages || [],
+        certificates: cvDataVal.certificates || [],
+        projects: cvDataVal.projects || [],
+        ...cvDataVal,
+      };
+
+      if (!preparedCvData.personalInfo.title && cvDetail.title) {
+        preparedCvData.personalInfo.title = cvDetail.title;
+      }
+
+      setExportingCV({
+        id: cv.id,
+        title: cv.title,
+        data: preparedCvData,
+      });
+
+      // Wait for React to render the hidden CV container
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      const docTitle = `CV_${(preparedCvData.personalInfo.fullName || cv.title || 'Ung_Vien').replace(/\s+/g, '_')}`;
+      await exportCVToPDF('cv-list-export-container', docTitle);
+      toastMessages.success('Đang mở hộp thoại xuất file PDF A4...');
+    } catch (err) {
+      console.error('Export CV PDF error:', err);
+      toastMessages.error('Không thể xuất file PDF. Vui lòng thử lại!');
+    } finally {
+      setLoadingPdfId(null);
+    }
+  };
 
   const {
     data: cvList = [],
@@ -319,6 +395,21 @@ export const CandidateCVListPage: React.FC = () => {
                       </IconButton>
                     </Tooltip>
 
+                    <Tooltip title="Tải CV định dạng PDF A4">
+                      <IconButton
+                        size="small"
+                        disabled={loadingPdfId === cv.id}
+                        onClick={() => handleDownloadCVAsPDF(cv)}
+                        sx={{ color: '#475569', '&:hover': { color: '#2563eb', bgcolor: '#ffffff' } }}
+                      >
+                        {loadingPdfId === cv.id ? (
+                          <CircularProgress size={18} sx={{ color: '#2563eb' }} />
+                        ) : (
+                          <PictureAsPdfOutlinedIcon sx={{ fontSize: 18 }} />
+                        )}
+                      </IconButton>
+                    </Tooltip>
+
                     <Tooltip title="Nhân bản CV này">
                       <IconButton size="small" disabled={duplicateMutation.isPending} onClick={() => duplicateMutation.mutate(cv.id)} sx={{ color: '#475569', '&:hover': { color: '#2563eb', bgcolor: '#ffffff' } }}>
                         <ContentCopyOutlinedIcon sx={{ fontSize: 18 }} />
@@ -430,6 +521,27 @@ export const CandidateCVListPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Hidden container for rendering CV during PDF export */}
+      {exportingCV && (
+        <Box
+          aria-hidden="true"
+          sx={{
+            position: 'fixed',
+            left: '-99999px',
+            top: 0,
+            width: '210mm',
+            minHeight: '297mm',
+            opacity: 0,
+            pointerEvents: 'none',
+            zIndex: -9999,
+          }}
+        >
+          <div id="cv-list-export-container" style={{ width: '210mm', minHeight: '297mm', background: '#ffffff' }}>
+            <CVTemplateRenderer data={exportingCV.data} language="vi" />
+          </div>
+        </Box>
+      )}
     </Box>
   );
 };

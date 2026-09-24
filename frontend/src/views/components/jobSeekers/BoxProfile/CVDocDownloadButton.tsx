@@ -23,6 +23,8 @@ const CVDocDownloadButton = ({
   currentUser,
   selectedColor,
   isGeneratingPDF,
+  handleDownloadClick,
+  blobRef,
   t,
 }: CVDocDownloadButtonProps) => {
   const [mounted, setMounted] = useState(false);
@@ -32,11 +34,11 @@ const CVDocDownloadButton = ({
     setMounted(true);
   }, []);
 
-  const handleDownload = async (e: React.MouseEvent) => {
+  const handleDirectDownload = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (loading || !resume || !currentUser) return;
+    if (loading || isGeneratingPDF || !resume || !currentUser) return;
 
     setLoading(true);
     try {
@@ -44,6 +46,10 @@ const CVDocDownloadButton = ({
       const blob = await pdf(
         <CVDoc resume={resume} user={currentUser} themeColor={selectedColor} />
       ).toBlob();
+
+      if (blobRef) {
+        blobRef.current = blob;
+      }
 
       const fileName = `${APP_NAME}_CV_${currentUser?.fullName || ''}-${toSlug(resume?.title || 'title')}.pdf`;
       const url = URL.createObjectURL(blob);
@@ -61,6 +67,14 @@ const CVDocDownloadButton = ({
     }
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (handleDownloadClick) {
+      handleDownloadClick(e);
+    } else {
+      handleDirectDownload(e);
+    }
+  };
+
   if (!mounted) {
     return (
       <Chip
@@ -75,19 +89,21 @@ const CVDocDownloadButton = ({
     );
   }
 
+  const isBusy = loading || isGeneratingPDF;
+
   return (
     <Chip
       size="small"
-      icon={loading || isGeneratingPDF ? <CircularProgress size={16} color="inherit" /> : <DownloadIcon />}
+      icon={isBusy ? <CircularProgress size={16} color="inherit" /> : <DownloadIcon />}
       color="secondary"
-      label={loading || isGeneratingPDF ? t('common:loading') : t('common:actions.download')}
-      onClick={handleDownload}
-      disabled={loading || isGeneratingPDF}
+      label={isBusy ? t('common:loading') : t('common:actions.download')}
+      onClick={handleClick}
+      disabled={isBusy}
       sx={{
         boxShadow: (theme) => theme.customShadows.medium,
         '&:hover': { transform: 'scale(1.03)' },
         transition: 'all 0.2s ease-in-out',
-        cursor: 'pointer',
+        cursor: isBusy ? 'default' : 'pointer',
       }}
     />
   );

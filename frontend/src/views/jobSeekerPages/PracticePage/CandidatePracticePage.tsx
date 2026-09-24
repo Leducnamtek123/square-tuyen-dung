@@ -126,10 +126,10 @@ export const CandidatePracticePage: React.FC = () => {
           setMockJobTitle(primaryResume.title);
           setIsPrefilledFromResume(true);
         }
-        if (primaryResume.career?.id && mockCareerId === null) {
-          const resumeCareerId = primaryResume.career.id;
-          setMockCareerId(resumeCareerId);
-          setSelectedCareerId(resumeCareerId);
+        const careerId = typeof primaryResume.career === 'object' ? primaryResume.career?.id : (primaryResume.career ?? (primaryResume as any).careerChooseData?.id);
+        if (careerId && mockCareerId === null) {
+          setMockCareerId(careerId);
+          setSelectedCareerId(careerId);
         }
       }
     }

@@ -34,11 +34,11 @@ const serviceLabels: Record<string, string> = {
   llm: 'LLM',
   stt: 'STT',
   tts: 'TTS',
-  livekit: 'LiveKit',
+  livekit: 'Voice RTC',
   celery: 'Celery',
 };
 
-const initialServices: ServiceItem[] = ['LLM', 'STT', 'TTS', 'LiveKit', 'Celery'].map((label) => ({
+const initialServices: ServiceItem[] = ['LLM', 'STT', 'TTS', 'Voice RTC', 'Celery'].map((label) => ({
   label,
   state: { status: 'checking' },
 }));

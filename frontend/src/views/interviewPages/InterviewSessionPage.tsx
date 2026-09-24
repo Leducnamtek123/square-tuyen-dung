@@ -154,6 +154,9 @@ type SessionPageState = {
   connectionDetails?: LiveKitConnectionDetails;
   session: InterviewSession | null;
   sessionInviteToken: string;
+  cameraEnabled?: boolean;
+  audioDeviceId?: string;
+  videoDeviceId?: string;
 };
 
 type SessionPageAction =
@@ -165,7 +168,8 @@ type SessionPageAction =
   | { type: 'set-connection-details'; value?: LiveKitConnectionDetails }
   | { type: 'set-session'; value: InterviewSession | null }
   | { type: 'set-session-status'; value: string }
-  | { type: 'set-session-invite-token'; value: string };
+  | { type: 'set-session-invite-token'; value: string }
+  | { type: 'set-media-config'; cameraEnabled?: boolean; audioDeviceId?: string; videoDeviceId?: string };
 
 type FetchSessionDetailsOptions = {
   showLoading?: boolean;
@@ -180,6 +184,9 @@ const initialState: SessionPageState = {
   connectionDetails: undefined,
   session: null,
   sessionInviteToken: '',
+  cameraEnabled: true,
+  audioDeviceId: '',
+  videoDeviceId: '',
 };
 
 const reducer = (state: SessionPageState, action: SessionPageAction): SessionPageState => {
@@ -193,7 +200,14 @@ const reducer = (state: SessionPageState, action: SessionPageAction): SessionPag
     case 'set-session':            return { ...state, session: action.value };
     case 'set-session-status':     return { ...state, session: state.session ? { ...state.session, status: action.value } : state.session };
     case 'set-session-invite-token': return { ...state, sessionInviteToken: action.value };
-  default:                       return state;
+    case 'set-media-config':
+      return {
+        ...state,
+        cameraEnabled: action.cameraEnabled ?? state.cameraEnabled,
+        audioDeviceId: action.audioDeviceId ?? state.audioDeviceId,
+        videoDeviceId: action.videoDeviceId ?? state.videoDeviceId,
+      };
+    default:                       return state;
   }
 };
 
@@ -250,6 +264,9 @@ function ActiveInterviewRoom({
   onEndSession,
   isMock,
   session,
+  cameraEnabled,
+  audioDeviceId,
+  videoDeviceId,
 }: {
   connectionDetails: LiveKitConnectionDetails;
   sessionTitle: string;
@@ -265,6 +282,9 @@ function ActiveInterviewRoom({
   onEndSession: () => Promise<void>;
   isMock?: boolean;
   session?: InterviewSession | null;
+  cameraEnabled?: boolean;
+  audioDeviceId?: string;
+  videoDeviceId?: string;
 }) {
   const sessionMeta = ((session?.sessionMetadata || session?.session_metadata || {}) as Record<string, any>);
   const savedSettings = employerAiSettingService.getSettings();
@@ -321,8 +341,16 @@ function ActiveInterviewRoom({
           token={connectionDetails.token}
           serverUrl={connectionDetails.serverUrl}
           connect={true}
-          video={participantRole === 'jobseeker'}
-          audio={participantRole === 'jobseeker' ? INTERVIEW_AUDIO_CAPTURE_OPTIONS : false}
+          video={
+            participantRole === 'jobseeker' && cameraEnabled !== false
+              ? (videoDeviceId ? { deviceId: { exact: videoDeviceId } } : true)
+              : false
+          }
+          audio={
+            participantRole === 'jobseeker'
+              ? (audioDeviceId ? { ...INTERVIEW_AUDIO_CAPTURE_OPTIONS, deviceId: { exact: audioDeviceId } } : INTERVIEW_AUDIO_CAPTURE_OPTIONS)
+              : false
+          }
           onDisconnected={onDisconnected}
           className="flex flex-1 flex-col min-h-0 h-full w-full overflow-hidden"
           style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}
@@ -336,6 +364,8 @@ function ActiveInterviewRoom({
             avatarBackgroundUrl={avatarBackgroundUrl}
             avatarBackdrop={avatarBackdrop}
             interviewerName={interviewerName}
+            characterId={savedSettings.activeCharacterId || 'ng_c_linh'}
+            avatarActions={savedSettings.avatarActions}
           />
           <RoomAudioRenderer />
         </LiveKitRoom>
@@ -369,7 +399,7 @@ type WaitingRoomLabels = {
 };
 
 type WaitingRoomActions = {
-  onJoin: () => Promise<void>;
+  onJoin: (config?: { cameraEnabled?: boolean; audioDeviceId?: string; videoDeviceId?: string }) => Promise<void>;
   onCancelPreflight: () => void;
   onShowPreflight: () => void;
   onBack: () => void;
@@ -736,11 +766,20 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
 
   // Khởi tạo hoặc kết thúc phiên phỏng vấn
 
-  const initiateInterviewSession = React.useCallback(async () => {
-    const translate = tRef.current;
-    try {
-      dispatch({ type: 'set-starting', value: true });
-      dispatch({ type: 'set-error', value: '' });
+  const initiateInterviewSession = React.useCallback(
+    async (config?: { cameraEnabled?: boolean; audioDeviceId?: string; videoDeviceId?: string }) => {
+      const translate = tRef.current;
+      try {
+        if (config) {
+          dispatch({
+            type: 'set-media-config',
+            cameraEnabled: config.cameraEnabled,
+            audioDeviceId: config.audioDeviceId,
+            videoDeviceId: config.videoDeviceId,
+          });
+        }
+        dispatch({ type: 'set-starting', value: true });
+        dispatch({ type: 'set-error', value: '' });
 
       if (!state.sessionInviteToken && normalizedRole === 'jobseeker') {
         throw new Error(translate('errors.missingInvite'));
@@ -978,6 +1017,9 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
         onEndSession={finalizeInterviewSession}
         isMock={isMock}
         session={state.session}
+        cameraEnabled={state.cameraEnabled}
+        audioDeviceId={state.audioDeviceId}
+        videoDeviceId={state.videoDeviceId}
       />
     );
   }

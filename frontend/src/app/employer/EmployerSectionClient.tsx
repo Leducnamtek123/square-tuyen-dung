@@ -10,7 +10,7 @@ import ChatLayout from '@/layouts/ChatLayout';
 import tokenService from '@/services/tokenService';
 import { getUserInfo, setActiveWorkspace } from '@/redux/userSlice';
 import { ROLES_NAME } from '@/configs/constants';
-import { getPreferredLanguage, getPortalPrefix } from '@/configs/portalRouting';
+import { getPreferredLanguage, getPortalPrefix, isEmployerHostname, stripPortalPrefix } from '@/configs/portalRouting';
 import type { User, Workspace } from '@/types/models';
 
 type AuthGateState = {
@@ -105,6 +105,35 @@ const DEFAULT_LAYOUT_PATHS = [
   // /employer/candidates & /employer/blog are protected routes requiring employer login.
 ];
 
+const PUBLIC_SUBPATHS = [
+  '/login',
+  '/dang-nhap',
+  '/forgot-password',
+  '/quen-mat-khau',
+  '/reset-password',
+  '/cap-nhat-mat-khau',
+  '/register',
+  '/dang-ky',
+  '/introduce',
+  '/gioi-thieu',
+  '/service',
+  '/dich-vu',
+  '/pricing',
+  '/bao-gia',
+  '/support',
+  '/ho-tro',
+  '/contact',
+  '/lien-he',
+  '/faq',
+  '/cau-hoi-thuong-gap',
+  '/terms-of-service',
+  '/terms-and-conditions',
+  '/dieu-khoan-dich-vu',
+  '/privacy-policy',
+  '/chinh-sach-bao-mat',
+  '/legal',
+];
+
 const CHAT_LAYOUT_PATHS = ['/employer/chat', '/nha-tuyen-dung/ket-noi-voi-ung-vien', '/nha-tuyen-dung/chat'];
 
 const getCompanyPortalPath = (fallback = '/employer/dashboard') => {
@@ -141,7 +170,13 @@ export default function EmployerSectionClient({
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
 
+  const strippedPath = stripPortalPrefix(pathname);
+  const onEmployerDomain = isEmployerHostname();
+
   const isPublicPage =
+    (onEmployerDomain && (pathname === '/' || pathname === '')) ||
+    strippedPath === '/' ||
+    PUBLIC_SUBPATHS.some((p) => strippedPath === p || strippedPath.startsWith(`${p}/`)) ||
     DEFAULT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`)) ||
     pathname.endsWith('.html') ||
     pathname.includes('/legal/') ||
@@ -160,9 +195,9 @@ export default function EmployerSectionClient({
 
   useEffect(() => {
     const lang = getPreferredLanguage();
-    const employerPrefix = getPortalPrefix('employer', lang);
+    const employerPrefix = onEmployerDomain ? '' : getPortalPrefix('employer', lang);
     const loginUrl = `${employerPrefix}/login?redirect=${encodeURIComponent(pathname)}`;
-    const dashboardPath = `${employerPrefix}/bang-dieu-khien`;
+    const dashboardPath = onEmployerDomain ? '/bang-dieu-khien' : `${employerPrefix}/bang-dieu-khien`;
 
     if (authGate.shouldRedirectToLogin) {
       window.location.replace(loginUrl);
@@ -185,6 +220,10 @@ export default function EmployerSectionClient({
 
           const canAccessEmployerPortal = user?.roleName === ROLES_NAME.EMPLOYER || user?.canAccessEmployerPortal;
           const isAuthPage =
+            strippedPath === '/login' ||
+            strippedPath === '/register' ||
+            strippedPath === '/forgot-password' ||
+            strippedPath.startsWith('/reset-password') ||
             pathname.endsWith('/login') ||
             pathname.endsWith('/register') ||
             pathname.endsWith('/forgot-password') ||
@@ -227,13 +266,18 @@ export default function EmployerSectionClient({
     };
 
     void checkAuth().finally(() => dispatchAuthGate({ type: 'checked' }));
-  }, [authGate.shouldRedirectToLogin, currentUser, dispatch, isPublicPage, pathname]);
+  }, [authGate.shouldRedirectToLogin, currentUser, dispatch, isPublicPage, onEmployerDomain, pathname, strippedPath]);
 
   if (authGate.isChecking || authGate.shouldRedirectToLogin) {
     return <AuthLoadingScreen />;
   }
 
-  if (CHAT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+  const isChatPage =
+    strippedPath === '/chat' ||
+    strippedPath.startsWith('/chat/') ||
+    CHAT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+
+  if (isChatPage) {
     return <ChatLayout>{children}</ChatLayout>;
   }
 

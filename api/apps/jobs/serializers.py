@@ -167,13 +167,26 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     aiRecommendedAvatars = serializers.SerializerMethodField(method_name="get_ai_recommended_avatars", read_only=True)
     ai_recommended_avatars = serializers.SerializerMethodField(method_name="get_ai_recommended_avatars", read_only=True)
 
-    from apps.interviews.models import QuestionGroup
+    from apps.interviews.models import QuestionGroup, InterviewScript
     interviewTemplate = serializers.PrimaryKeyRelatedField(
         source='interview_template',
         queryset=QuestionGroup.objects.all(),
         required=False,
         allow_null=True
     )
+    interviewScript = serializers.PrimaryKeyRelatedField(
+        source='interview_script',
+        queryset=InterviewScript.objects.all(),
+        required=False,
+        allow_null=True
+    )
+    interview_script = serializers.PrimaryKeyRelatedField(
+        queryset=InterviewScript.objects.all(),
+        required=False,
+        allow_null=True,
+        write_only=True
+    )
+    interviewScriptDetail = serializers.SerializerMethodField(method_name="get_interview_script_detail", read_only=True)
     isAutoSourcingEnabled = serializers.BooleanField(source='is_auto_sourcing_enabled', required=False, default=True)
     autoSourcingLimit = serializers.IntegerField(source='auto_sourcing_limit', required=False, default=10)
     autoInterviewEnabled = serializers.BooleanField(source='auto_interview_enabled', required=False, default=True)
@@ -182,32 +195,53 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     careerChooseData = serializers.SerializerMethodField(method_name="get_career_choose_data", read_only=True)
     fileUrl = serializers.SerializerMethodField(method_name="get_file_url", read_only=True)
 
+    def get_interview_script_detail(self, obj):
+        if not getattr(obj, 'interview_script_id', None) or not getattr(obj, 'interview_script', None):
+            return None
+        from apps.interviews.serializers import InterviewScriptSerializer
+        return InterviewScriptSerializer(obj.interview_script, context=self.context).data
+
     def get_fields(self):
         fields = super().get_fields()
         template_field = fields.get("interviewTemplate")
-        if template_field is None:
-            return fields
+        script_field = fields.get("interviewScript")
+        script_snake_field = fields.get("interview_script")
 
         request = self.context.get("request")
         user = getattr(request, "user", None)
-        if user and getattr(user, "is_authenticated", False) and (
-            getattr(user, "role_name", None) == var_sys.ADMIN
-            or getattr(user, "is_staff", False)
-            or getattr(user, "is_superuser", False)
-        ):
-            return fields
+        is_admin = bool(
+            user and getattr(user, "is_authenticated", False) and (
+                getattr(user, "role_name", None) == var_sys.ADMIN
+                or getattr(user, "is_staff", False)
+                or getattr(user, "is_superuser", False)
+            )
+        )
 
         try:
             company = user.get_active_company() if user else None
         except Exception:
             company = None
 
-        from apps.interviews.models import QuestionGroup
+        if template_field is not None and not is_admin:
+            from apps.interviews.models import QuestionGroup
+            if company:
+                template_field.queryset = QuestionGroup.objects.filter(Q(company__isnull=True) | Q(company=company))
+            else:
+                template_field.queryset = QuestionGroup.objects.none()
 
-        if company:
-            template_field.queryset = QuestionGroup.objects.filter(Q(company__isnull=True) | Q(company=company))
-        else:
-            template_field.queryset = QuestionGroup.objects.none()
+        if (script_field is not None or script_snake_field is not None) and not is_admin:
+            from apps.interviews.models import InterviewScript
+            if company:
+                visible_scripts = InterviewScript.objects.filter(
+                    Q(is_system_preset=True) | Q(company=company)
+                ).filter(is_active=True)
+            else:
+                visible_scripts = InterviewScript.objects.filter(is_system_preset=True, is_active=True)
+            if script_field is not None:
+                script_field.queryset = visible_scripts
+            if script_snake_field is not None:
+                script_snake_field.queryset = visible_scripts
+
         return fields
 
     def get_salary(self, obj):
@@ -396,6 +430,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'isSaved', 'isApplied', 'companyDict', 'mobileCompanyDict', 'locationDict', 'views',
 
                   'isExpired', 'salary', 'city', 'cityChooseData', 'careerChooseData', 'fileUrl', 'interviewTemplate',
+                  'interviewScript', 'interview_script', 'interviewScriptDetail',
                   'isAutoSourcingEnabled', 'autoSourcingLimit', 'autoInterviewEnabled', 'minScreeningScore',
                   'aiRecommendedCount', 'aiRecommendedAvatars', 'ai_recommended_count', 'ai_recommended_avatars')
 

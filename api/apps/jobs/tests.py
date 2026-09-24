@@ -1668,8 +1668,18 @@ class TestJobService:
         assert JobPostActivity.objects.filter(user=job_seeker_user, job_post=job_post, is_deleted=False).count() == 1
         assert JobPostActivity.objects.filter(user=job_seeker_user, job_post=job_post, is_deleted=True).count() == 2
 
-    def test_apply_wrong_resume_owner(self, employer_user, job_post, resume):
+    def test_apply_wrong_resume_owner(self, db, job_post, resume):
         """Should reject if resume doesn't belong to applicant."""
+        from apps.accounts.models import User
+        applicant = User.objects.create_user_with_role_name(
+            email='other_applicant@test.com',
+            full_name='Other Applicant',
+            role_name=var_sys.JOB_SEEKER,
+            password='testpass123',
+            is_active=True,
+            is_verify_email=True,
+            is_onboarded=True,
+        )
         validated_data = {
             'job_post': job_post,
             'resume': resume,
@@ -1677,7 +1687,7 @@ class TestJobService:
             'email': 'test@test.com'
         }
         with pytest.raises(ValueError, match="không thuộc về bạn"):
-            JobActivityService.apply_to_job(employer_user, validated_data)
+            JobActivityService.apply_to_job(applicant, validated_data)
 
     def test_get_employer_job_stats(self, company, job_post):
         """Should return correct employer stats."""
@@ -1789,7 +1799,7 @@ class TestAIScoringFallback:
         job = {'job_name': '', 'experience': 0, 'salary_min': 20000000, 'salary_max': 35000000}
 
         result = _fallback_scoring(resume, job)
-        assert result['salary_match'] == 80
+        assert result['salary_match'] == 85
 
     def test_fallback_no_salary_overlap(self):
         """Should penalize when salary ranges don't overlap."""

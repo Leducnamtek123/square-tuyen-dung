@@ -6,7 +6,16 @@ import tempfile
 import pytest
 from fastapi.testclient import TestClient
 
-from server import app, MEDIA_DIR
+import importlib.util
+from pathlib import Path
+
+server_py_path = Path(__file__).resolve().parent.parent / "server.py"
+spec = importlib.util.spec_from_file_location("talking_head_server", str(server_py_path))
+server_mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(server_mod)
+
+app = server_mod.app
+MEDIA_DIR = server_mod.MEDIA_DIR
 
 client = TestClient(app)
 
@@ -81,13 +90,14 @@ def test_post_lipsync_render():
         assert data["inference_time_ms"] > 0
 
         # Kiểm tra file video thực tế trên đĩa
-        rel_path = data["video_url"].replace("/media/", "")
+        rel_path = data["video_url"].split("/media/")[-1]
         disk_path = MEDIA_DIR / rel_path
         assert disk_path.is_file()
         assert disk_path.stat().st_size > 1000
 
         # Kiểm tra tải video qua endpoint tĩnh /media
-        media_res = client.get(data["video_url"])
+        media_url = f"/media/{rel_path}"
+        media_res = client.get(media_url)
         assert media_res.status_code == 200
         assert len(media_res.content) == disk_path.stat().st_size
 

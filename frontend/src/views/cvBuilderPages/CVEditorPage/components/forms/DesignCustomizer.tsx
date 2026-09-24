@@ -10,7 +10,7 @@ import {
   Stack,
   Switch,
   FormControlLabel,
-  Grid,
+  Grid2 as Grid,
   Chip,
   Tooltip,
 } from '@mui/material';
@@ -22,6 +22,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import cvBuilderService from '@/services/cvBuilderService';
 import { CVThemeConfig, CVTemplateRecord } from '@/types/cvBuilder';
+import { CV_TEMPLATES_CATALOG, getSampleDataForTemplate } from '@/views/cvBuilderPages/templates/templatesData';
+import { CVTemplateRenderer } from '@/views/cvBuilderPages/templates/CVTemplateRenderer';
 
 interface DesignCustomizerProps {
   theme: CVThemeConfig;
@@ -30,7 +32,7 @@ interface DesignCustomizerProps {
   onChangeTemplate: (newTemplateId: string, defaultColor?: string) => void;
 }
 
-const PRESET_COLORS = [
+export const COLOR_PALETTES = [
   '#1e40af', // InfoHR Navy Blue
   '#0284c7', // Sky Blue
   '#059669', // Emerald Green
@@ -43,6 +45,49 @@ const PRESET_COLORS = [
   '#334155', // Slate Neutral
   '#78350f', // Amber Warm
 ];
+
+export const PRESET_COLORS = COLOR_PALETTES;
+
+const CATEGORY_DISPLAY_MAP: Record<string, string> = {
+  modern: 'Hiện đại',
+  simple: 'Tối giản / ATS',
+  creative: 'Sáng tạo',
+  professional: 'Chuyên nghiệp',
+  tech: 'Công nghệ IT',
+  executive: 'Cấp Quản lý',
+  classic: 'Cổ điển',
+};
+
+const getCategoryDisplayName = (category: string) =>
+  CATEGORY_DISPLAY_MAP[category] || category || 'Chuyên nghiệp';
+
+export const loadTemplates = async (): Promise<CVTemplateRecord[]> => {
+  try {
+    const res = await cvBuilderService.getTemplates();
+    if (Array.isArray(res) && res.length > 0) {
+      return res;
+    }
+  } catch (err) {
+    console.warn('cvBuilderService.getTemplates error, falling back to CV_TEMPLATES_CATALOG:', err);
+  }
+  return CV_TEMPLATES_CATALOG.map((cat, idx) => ({
+    id: idx + 1,
+    code: cat.id,
+    name: cat.vietnameseName ? `${cat.vietnameseName} (${cat.name})` : cat.name,
+    description: cat.description,
+    category: cat.category,
+    category_name: getCategoryDisplayName(cat.category),
+    categoryName: getCategoryDisplayName(cat.category),
+    thumbnail_url: cat.thumbnailUrl,
+    thumbnailUrl: cat.thumbnailUrl,
+    color_palettes: cat.defaultColors,
+    colorPalettes: cat.defaultColors,
+    default_theme: { primaryColor: cat.defaultColors[0] },
+    defaultTheme: { primaryColor: cat.defaultColors[0] },
+    is_popular: cat.isPopular,
+    isPopular: cat.isPopular,
+  }));
+};
 
 const FONTS: { id: string; label: string }[] = [
   { id: 'Inter', label: 'Inter - Hiện đại & Sắc nét' },
@@ -61,7 +106,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
 }) => {
   const { data: templates = [] } = useQuery<CVTemplateRecord[]>({
     queryKey: ['cv-templates-compact'],
-    queryFn: () => cvBuilderService.getTemplates(),
+    queryFn: loadTemplates,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -87,45 +132,134 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
         <Grid container spacing={1.5}>
           {templates.map((tpl) => {
             const isSelected = tpl.code === templateId;
+            const catalogMeta = CV_TEMPLATES_CATALOG.find((c) => c.id === tpl.code);
+            const vietnameseTitle = catalogMeta?.vietnameseName || tpl.name.replace(/\s*\(.*\)/, '');
+            const categoryTag = catalogMeta
+              ? getCategoryDisplayName(catalogMeta.category)
+              : tpl.category_name || tpl.categoryName || 'Chuyên nghiệp';
+            const cardActiveColor = isSelected
+              ? theme.primaryColor || '#1e40af'
+              : tpl.default_theme?.primaryColor || tpl.color_palettes?.[0] || '#1e40af';
+
+            const sample = getSampleDataForTemplate(tpl.code);
+            const livePreviewData = {
+              ...sample,
+              templateId: tpl.code,
+              theme: {
+                ...sample.theme,
+                primaryColor: cardActiveColor,
+              },
+            };
+
             return (
-              <Grid item xs={6} sm={4} key={tpl.id}>
+              <Grid size={{ xs: 6, sm: 6 }} key={tpl.id || tpl.code}>
                 <Box
                   onClick={() => {
                     const fallbackColor = tpl.default_theme?.primaryColor || tpl.color_palettes?.[0];
                     onChangeTemplate(tpl.code, fallbackColor);
                   }}
                   sx={{
-                    p: 1.5,
+                    p: 1.25,
                     borderRadius: '12px',
-                    border: isSelected ? '2px solid #2563eb' : '1px solid #e2e8f0',
-                    bgcolor: isSelected ? '#eff6ff' : '#f8fafc',
+                    border: isSelected ? `2px solid ${cardActiveColor}` : '1px solid #e2e8f0',
+                    bgcolor: isSelected ? '#eff6ff' : '#ffffff',
                     cursor: 'pointer',
-                    transition: 'all 0.15s ease',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    boxShadow: isSelected ? '0 4px 12px rgba(37, 99, 235, 0.15)' : 'none',
                     '&:hover': {
                       borderColor: '#2563eb',
-                      bgcolor: '#f1f5f9',
+                      bgcolor: isSelected ? '#eff6ff' : '#f8fafc',
+                      transform: 'translateY(-2px)',
                     },
                   }}
                 >
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography
-                      variant="subtitle2"
+                  {/* Thumbnail Preview */}
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      height: 120,
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      bgcolor: '#f1f5f9',
+                      mb: 1.25,
+                      border: '1px solid #e2e8f0',
+                    }}
+                  >
+                    <Box
                       sx={{
-                        fontWeight: 700,
-                        color: isSelected ? '#1e40af' : '#1e293b',
-                        fontSize: '0.8rem',
+                        position: 'absolute',
+                        top: 0,
+                        left: '50%',
+                        transform: 'translateX(-50%) scale(0.18)',
+                        transformOrigin: 'top center',
+                        width: 794,
+                        minHeight: 1123,
+                        pointerEvents: 'none',
+                        bgcolor: '#ffffff',
                         overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
                       }}
                     >
-                      {tpl.name.replace(/\s*\(.*\)/, '')}
-                    </Typography>
-                    {isSelected && <CheckCircleIcon sx={{ fontSize: 16, color: '#2563eb' }} />}
-                  </Stack>
-                  <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>
-                    {tpl.category_name}
+                      <CVTemplateRenderer data={livePreviewData} language="vi" />
+                    </Box>
+                    {isSelected && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 6,
+                          right: 6,
+                          bgcolor: cardActiveColor,
+                          color: '#ffffff',
+                          borderRadius: '50%',
+                          width: 20,
+                          height: 20,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                          zIndex: 2,
+                        }}
+                      >
+                        <CheckCircleIcon sx={{ fontSize: 16 }} />
+                      </Box>
+                    )}
+                  </Box>
+
+                  {/* Title & Tag */}
+                  <Typography
+                    variant="subtitle2"
+                    title={vietnameseTitle}
+                    sx={{
+                      fontWeight: 700,
+                      color: isSelected ? '#1e40af' : '#1e293b',
+                      fontSize: '0.8rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      display: 'block',
+                      mb: 0.5,
+                    }}
+                  >
+                    {vietnameseTitle}
                   </Typography>
+                  <Box sx={{ mt: 'auto' }}>
+                    <Chip
+                      label={categoryTag}
+                      size="small"
+                      sx={{
+                        height: 20,
+                        fontSize: '0.675rem',
+                        fontWeight: 600,
+                        bgcolor: isSelected ? '#dbeafe' : '#f1f5f9',
+                        color: isSelected ? '#1e40af' : '#475569',
+                        borderRadius: '6px',
+                        maxWidth: '100%',
+                        '& .MuiChip-label': { px: 0.75, overflow: 'hidden', textOverflow: 'ellipsis' },
+                      }}
+                    />
+                  </Box>
                 </Box>
               </Grid>
             );
@@ -155,8 +289,8 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
           </Typography>
         </Stack>
 
-        <Stack direction="row" spacing={1.25} flexWrap="wrap" useFlexGap>
-          {PRESET_COLORS.map((color) => {
+        <Stack direction="row" spacing={1.25} flexWrap="wrap" useFlexGap sx={{ gap: 1.25 }}>
+          {COLOR_PALETTES.map((color) => {
             const isSelected = (theme.primaryColor || '').toLowerCase() === color.toLowerCase();
             return (
               <Tooltip key={color} title={color}>
@@ -170,12 +304,16 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
                     cursor: 'pointer',
                     border: isSelected ? '3px solid #0f172a' : '2px solid #ffffff',
                     boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
-                    transform: isSelected ? 'scale(1.2)' : 'scale(1)',
+                    transform: isSelected ? 'scale(1.15)' : 'scale(1)',
                     transition: 'all 0.15s ease',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#ffffff',
+                    flexShrink: 0,
+                    '&:hover': {
+                      transform: 'scale(1.15)',
+                    },
                   }}
                 >
                   {isSelected && <CheckCircleIcon sx={{ fontSize: 16 }} />}
@@ -208,7 +346,7 @@ export const DesignCustomizer: React.FC<DesignCustomizerProps> = ({
           {FONTS.map((f) => {
             const isSelected = (theme.fontFamily || '').includes(f.id);
             return (
-              <Grid item xs={12} sm={6} key={f.id}>
+              <Grid size={{ xs: 12, sm: 6 }} key={f.id}>
                 <Box
                   onClick={() => onChangeTheme({ ...theme, fontFamily: f.id as any })}
                   sx={{

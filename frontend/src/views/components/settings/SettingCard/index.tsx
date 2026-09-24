@@ -6,7 +6,7 @@ import { Grid2 as Grid } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SettingForm from "../SettingForm";
-import { useUserSettings, useUpdateUserSettings } from "@/views/components/jobSeekers/hooks/useJobSeekerQueries";
+import { useUserSettings, useUpdateUserSettings } from "@/hooks/useUserSettings";
 import type { FormValues as SettingformFormValues } from '../SettingForm';
 import { useTranslation } from 'react-i18next';
 

@@ -127,7 +127,16 @@ const JobSeekerSignUp = () => {
       }
     };
 
-    register({ ...data, platform: PLATFORM }, ROLES_NAME.JOB_SEEKER as RoleName);
+    register(
+      {
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password || '',
+        confirmPassword: data.confirmPassword || '',
+        platform: PLATFORM,
+      },
+      ROLES_NAME.JOB_SEEKER as RoleName
+    );
   };
 
   const handleSocialRegister = async (

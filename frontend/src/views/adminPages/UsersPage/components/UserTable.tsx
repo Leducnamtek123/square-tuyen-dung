@@ -4,6 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box, IconButton } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useTranslation } from 'react-i18next';
 import { ROLES_NAME } from '@/configs/constants';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
@@ -24,6 +25,7 @@ interface UserTableProps {
     onToggleStatus: (user: UserModel) => void;
     onDeleteUser: (user: UserModel) => void;
     onRoleChange: (user: UserModel, roleName: RoleName) => void;
+    onInspectUser?: (user: UserModel) => void;
     currentUserId: string | number;
     disableRoleActions?: boolean;
 }
@@ -41,6 +43,7 @@ const UserTable = ({
     onToggleStatus, 
     onDeleteUser,
     onRoleChange, 
+    onInspectUser,
     currentUserId, 
     disableRoleActions 
 }: UserTableProps) => {
@@ -79,12 +82,21 @@ const UserTable = ({
             cell: (info) => {
                 const user = info.row.original;
                 return (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Box 
+                        onClick={() => onInspectUser?.(user)}
+                        sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 1.5,
+                            cursor: onInspectUser ? 'pointer' : 'default',
+                            '&:hover': onInspectUser ? { opacity: 0.8 } : undefined,
+                        }}
+                    >
                         <Avatar src={user.avatarUrl || undefined} sx={{ width: 32, height: 32 }}>
                             {user.fullName?.charAt(0)}
                         </Avatar>
                         <Box>
-                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.fullName || '-'}</Typography>
+                             <Typography variant="body2" sx={{ fontWeight: 600, color: onInspectUser ? 'primary.main' : 'text.primary' }}>{user.fullName || '-'}</Typography>
                              <Typography variant="caption" color="text.secondary">{user.email}</Typography>
                         </Box>
                     </Box>
@@ -162,6 +174,18 @@ const UserTable = ({
             meta: { align: 'right' },
             cell: (info) => (
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center">
+                    {onInspectUser && (
+                        <Tooltip title={t('pages.users.table.viewDetail', { defaultValue: 'Xem chi tiết tài khoản' })}>
+                            <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={() => onInspectUser(info.row.original)}
+                                aria-label="Xem chi tiết tài khoản"
+                            >
+                                <VisibilityOutlinedIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                     <Tooltip title={info.row.original.isActive ? t('pages.users.table.blockAccount') : t('pages.users.table.unblockAccount')}>
                         <Switch
                             checked={!!info.row.original.isActive}
@@ -188,7 +212,7 @@ const UserTable = ({
                 </Stack>
             ),
         },
-    ], [currentUserId, disableRoleActions, getRoleColor, getRoleLabel, onDeleteUser, onRoleChange, onToggleStatus, t]);
+    ], [currentUserId, disableRoleActions, getRoleColor, getRoleLabel, onDeleteUser, onInspectUser, onRoleChange, onToggleStatus, t]);
 
     return (
         <DataTable

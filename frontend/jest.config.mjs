@@ -9,6 +9,7 @@ const config = {
     '\\.(css|less|scss|sass)$': 'jest-transform-stub',
     '\\.(svg|png|jpg|jpeg|gif|webp)$': 'jest-transform-stub',
     '^query-string$': '<rootDir>/src/__mocks__/queryString.cjs',
+    '^isomorphic-dompurify$': '<rootDir>/src/__mocks__/isomorphicDompurify.cjs',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transform: {

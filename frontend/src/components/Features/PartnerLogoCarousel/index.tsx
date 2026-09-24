@@ -31,18 +31,19 @@ export interface PartnerCompany {
 }
 
 export const PARTNER_COMPANIES: PartnerCompany[] = [
+  // Nhóm tập đoàn cốt lõi
+  {
+    id: 'square',
+    name: 'Square Group',
+    logoSrc: '/images/partners/square.svg',
+    logoAlt: 'Square Group',
+    maxHeight: { xs: 28, sm: 32, md: 36 },
+  },
   {
     id: 'vismarttech',
     name: 'Vi Smart Tech',
     logoSrc: '/images/partners/vismarttech.webp',
     logoAlt: 'Vi Smart Tech',
-    maxHeight: { xs: 32, sm: 36, md: 40 },
-  },
-  {
-    id: 'square',
-    name: 'Square Group',
-    logoSrc: '/images/partners/square.svg',
-    logoAlt: 'Square.vn',
     maxHeight: { xs: 30, sm: 34, md: 38 },
   },
   {
@@ -50,20 +51,254 @@ export const PARTNER_COMPANIES: PartnerCompany[] = [
     name: 'Gold Lotus Travel',
     logoSrc: '/images/partners/goldlotus.webp',
     logoAlt: 'Gold Lotus Travel',
-    maxHeight: { xs: 36, sm: 42, md: 46 },
+    maxHeight: { xs: 32, sm: 38, md: 42 },
   },
   {
     id: 'vietautomate',
     name: 'Việt Automate',
     logoSrc: '/images/partners/vietautomate.svg',
     logoAlt: 'Việt Automate',
+    maxHeight: { xs: 30, sm: 34, md: 38 },
+  },
+
+  // Danh sách Khách hàng tiêu biểu (từ docs.square.vn)
+  {
+    id: 'vilaf',
+    name: 'VILAF',
+    logoSrc: '/images/partners/vilaf.png',
+    logoAlt: 'VILAF',
+    maxHeight: { xs: 24, sm: 28, md: 32 },
+  },
+  {
+    id: 'baekimlee',
+    name: 'BAE, KIM & LEE LLC',
+    logoSrc: '/images/partners/baekimlee.jpg',
+    logoAlt: 'BAE, KIM & LEE LLC',
     maxHeight: { xs: 32, sm: 36, md: 40 },
+  },
+  {
+    id: 'shortflight',
+    name: 'Shortflight Education',
+    logoSrc: '/images/partners/shortflight.jpg',
+    logoAlt: 'Shortflight Education',
+    maxHeight: { xs: 34, sm: 40, md: 44 },
+  },
+  {
+    id: 'titi',
+    name: 'TiTi',
+    logoSrc: '/images/partners/titi.jpg',
+    logoAlt: 'TiTi',
+    maxHeight: { xs: 30, sm: 34, md: 38 },
+  },
+  {
+    id: 'anovafeed',
+    name: 'ANOVA FEED',
+    logoSrc: '/images/partners/anovafeed.png',
+    logoAlt: 'ANOVA FEED',
+    maxHeight: { xs: 30, sm: 34, md: 38 },
+  },
+  {
+    id: 'mbageaslife',
+    name: 'MB Ageas Life',
+    logoSrc: '/images/partners/mbageaslife.jpg',
+    logoAlt: 'MB Ageas Life',
+    maxHeight: { xs: 28, sm: 32, md: 36 },
+  },
+  {
+    id: 'deheus',
+    name: 'De Heus',
+    logoSrc: '/images/partners/deheus.jpg',
+    logoAlt: 'De Heus',
+    maxHeight: { xs: 32, sm: 38, md: 42 },
+  },
+  {
+    id: 'panfood',
+    name: 'PAN FOOD',
+    logoSrc: '/images/partners/panfood.png',
+    logoAlt: 'PAN FOOD',
+    maxHeight: { xs: 22, sm: 26, md: 30 },
+  },
+  {
+    id: 'gamudaland',
+    name: 'Gamuda Land',
+    logoSrc: '/images/partners/gamudaland.png',
+    logoAlt: 'Gamuda Land',
+    maxHeight: { xs: 22, sm: 26, md: 30 },
+  },
+  {
+    id: 'novaland',
+    name: 'Novaland',
+    logoSrc: '/images/partners/novaland.png',
+    logoAlt: 'Novaland',
+    maxHeight: { xs: 32, sm: 38, md: 42 },
+  },
+  {
+    id: 'kiena',
+    name: 'Kiena',
+    logoSrc: '/images/partners/kiena.jpg',
+    logoAlt: 'Kiena',
+    maxHeight: { xs: 26, sm: 30, md: 34 },
+  },
+  {
+    id: 'hunglocphat',
+    name: 'Hưng Lộc Phát',
+    logoSrc: '/images/partners/hunglocphat.png',
+    logoAlt: 'Hưng Lộc Phát',
+    maxHeight: { xs: 34, sm: 40, md: 44 },
+  },
+  {
+    id: 'namlong',
+    name: 'Nam Long',
+    logoSrc: '/images/partners/namlong.jpg',
+    logoAlt: 'Nam Long',
+    maxHeight: { xs: 30, sm: 34, md: 38 },
+  },
+  {
+    id: 'khangdien',
+    name: 'Khang Điền',
+    logoSrc: '/images/partners/khangdien.png',
+    logoAlt: 'Khang Điền',
+    maxHeight: { xs: 26, sm: 30, md: 34 },
+  },
+  {
+    id: 'thuduchouse',
+    name: 'Thuduc House',
+    logoSrc: '/images/partners/thuduchouse.jpg',
+    logoAlt: 'Thuduc House',
+    maxHeight: { xs: 34, sm: 40, md: 44 },
+  },
+  {
+    id: 'cosaco',
+    name: 'Cosaco',
+    logoSrc: '/images/partners/cosaco.png',
+    logoAlt: 'Cosaco',
+    maxHeight: { xs: 24, sm: 28, md: 32 },
+  },
+  {
+    id: 'sym',
+    name: 'SYM',
+    logoSrc: '/images/partners/sym.png',
+    logoAlt: 'SYM',
+    maxHeight: { xs: 32, sm: 36, md: 40 },
+  },
+  {
+    id: 'torrecid',
+    name: 'Torrecid',
+    logoSrc: '/images/partners/torrecid.jpg',
+    logoAlt: 'Torrecid',
+    maxHeight: { xs: 28, sm: 32, md: 36 },
+  },
+  {
+    id: 'leinternational',
+    name: 'L&E International',
+    logoSrc: '/images/partners/leinternational.png',
+    logoAlt: 'L&E International',
+    maxHeight: { xs: 26, sm: 30, md: 34 },
+  },
+  {
+    id: 'kddi',
+    name: 'KDDI Group',
+    logoSrc: '/images/partners/kddi.png',
+    logoAlt: 'KDDI Group',
+    maxHeight: { xs: 28, sm: 32, md: 36 },
+  },
+  {
+    id: 'saintgobain',
+    name: 'Saint-Gobain',
+    logoSrc: '/images/partners/saintgobain.png',
+    logoAlt: 'Saint-Gobain',
+    maxHeight: { xs: 32, sm: 36, md: 40 },
+  },
+  {
+    id: 'inspireventures',
+    name: 'Inspire Ventures',
+    logoSrc: '/images/partners/inspireventures.jpg',
+    logoAlt: 'Inspire Ventures',
+    maxHeight: { xs: 30, sm: 34, md: 38 },
+  },
+  {
+    id: 'dinosys',
+    name: 'Dinosys',
+    logoSrc: '/images/partners/dinosys.jpg',
+    logoAlt: 'Dinosys',
+    maxHeight: { xs: 24, sm: 28, md: 32 },
+  },
+  {
+    id: 'cyberagent',
+    name: 'CyberAgent Ventures',
+    logoSrc: '/images/partners/cyberagent.png',
+    logoAlt: 'CyberAgent Ventures',
+    maxHeight: { xs: 28, sm: 32, md: 36 },
+  },
+  {
+    id: 'lifull',
+    name: 'LIFULL',
+    logoSrc: '/images/partners/lifull.png',
+    logoAlt: 'LIFULL',
+    maxHeight: { xs: 26, sm: 30, md: 34 },
+  },
+  {
+    id: 'runam',
+    name: 'RuNam',
+    logoSrc: '/images/partners/runam.png',
+    logoAlt: 'RuNam',
+    maxHeight: { xs: 34, sm: 40, md: 44 },
+  },
+  {
+    id: 'tiki',
+    name: 'Tiki.vn',
+    logoSrc: '/images/partners/tiki.jpg',
+    logoAlt: 'Tiki.vn',
+    maxHeight: { xs: 28, sm: 32, md: 36 },
+  },
+  {
+    id: 'foody',
+    name: 'Foody.vn',
+    logoSrc: '/images/partners/foody.png',
+    logoAlt: 'Foody.vn',
+    maxHeight: { xs: 28, sm: 32, md: 36 },
+  },
+  {
+    id: 'klook',
+    name: 'Klook',
+    logoSrc: '/images/partners/klook.jpg',
+    logoAlt: 'Klook',
+    maxHeight: { xs: 26, sm: 30, md: 34 },
+  },
+  {
+    id: 'transcosmos',
+    name: 'transcosmos Vietnam',
+    logoSrc: '/images/partners/transcosmos.png',
+    logoAlt: 'transcosmos Vietnam',
+    maxHeight: { xs: 26, sm: 30, md: 34 },
+  },
+  {
+    id: 'panservices',
+    name: 'PAN Services',
+    logoSrc: '/images/partners/panservices.png',
+    logoAlt: 'PAN Services',
+    maxHeight: { xs: 30, sm: 34, md: 38 },
+  },
+  {
+    id: 'enterline',
+    name: 'Enterline and Partners',
+    logoSrc: '/images/partners/enterline.png',
+    logoAlt: 'Enterline and Partners',
+    maxHeight: { xs: 24, sm: 28, md: 32 },
+  },
+  {
+    id: 'aden',
+    name: 'Aden Services',
+    logoSrc: '/images/partners/aden.png',
+    logoAlt: 'Aden Services',
+    maxHeight: { xs: 28, sm: 32, md: 36 },
   },
 ];
 
 interface PartnerLogoCarouselProps {
   label?: string;
   direction?: 'right' | 'left';
+  speedSeconds?: number;
 }
 
 /**
@@ -72,19 +307,18 @@ interface PartnerLogoCarouselProps {
  * Follows the LOGO-ONLY Social Proof standard (taste-skill & UI/UX Pro Max):
  * - Pure logos without cluttered cards, borders, URLs, or industry tags.
  * - No external links to retain user attention on the recruitment portal.
- * - Hiển thị màu sắc thương hiệu gốc trực tiếp, sống động và sắc nét.
- * - Tự động chạy mượt mà qua phải (direction: right).
- * - Smooth hover zoom trên từng logo.
+ * - Trạng thái mặc định: Tông màu xám chuẩn thanh lịch (grayscale 100% & opacity 0.6) đồng nhất phong cách.
+ * - Trạng thái hover: Bừng sáng màu sắc nhận diện thương hiệu gốc sắc nét (grayscale 0% & opacity 1) và phóng to nhẹ.
+ * - Tự động tạm dừng (pause on hover) khi rê chuột vào dải marquee để dễ tương tác.
  * - Gradient fade edges on left & right.
  */
 const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
   label = 'ĐỒNG HÀNH CÙNG CÁC DOANH NGHIỆP TIÊN PHONG',
   direction = 'right',
+  speedSeconds = 90,
 }) => {
-  // Lặp lại mảng logo để chu trình cuộn vô tận mượt mà và không đứt đoạn
+  // Lặp lại 2 lần mảng logo để chu trình cuộn vô tận mượt mà và liền mạch
   const marqueeList = [
-    ...PARTNER_COMPANIES,
-    ...PARTNER_COMPANIES,
     ...PARTNER_COMPANIES,
     ...PARTNER_COMPANIES,
   ];
@@ -100,25 +334,29 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* Refined minimalist trust headline */}
+      {/* Refined trust headline with prominent brand styling */}
       {label && (
-        <Typography
-          variant="caption"
-          component="p"
-          sx={{
-            display: 'block',
-            textAlign: 'center',
-            fontWeight: 600,
-            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: '#64748B', // Slate-500, WCAG 2.1 AA compliant
-            mb: { xs: 2.5, sm: 3, md: 3.5 },
-            userSelect: 'none',
-          }}
-        >
-          {label}
-        </Typography>
+        <Box sx={{ textAlign: 'center', mb: { xs: 2.5, sm: 3, md: 3.5 } }}>
+          <Typography
+            variant="h6"
+            component="h3"
+            sx={{
+              display: 'inline-block',
+              textAlign: 'center',
+              fontWeight: 800,
+              fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' },
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              color: '#1D4ED8', // Fallback blue
+              background: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 50%, #0284C7 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              userSelect: 'none',
+            }}
+          >
+            {label}
+          </Typography>
+        </Box>
       )}
 
       {/* Marquee viewport with smooth edge fade gradient masks */}
@@ -129,11 +367,11 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
           overflow: 'hidden',
           maskImage: {
             xs: 'none',
-            sm: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+            sm: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
           },
           WebkitMaskImage: {
             xs: 'none',
-            sm: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+            sm: 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
           },
           py: 1,
         }}
@@ -144,9 +382,9 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
             display: 'flex',
             alignItems: 'center',
             flexWrap: 'nowrap',
-            gap: { xs: 5, sm: 7, md: 9 }, // Khoảng cách thoáng đãng, sang trọng
+            gap: { xs: 5, sm: 6.5, md: 8 }, // Khoảng cách thoáng đãng, sang trọng
             width: 'max-content',
-            animation: `${direction === 'right' ? partnerMarqueeRight : partnerMarqueeLeft} 28s linear infinite`,
+            animation: `${direction === 'right' ? partnerMarqueeRight : partnerMarqueeLeft} ${speedSeconds}s linear infinite`,
             willChange: 'transform',
             '&:hover': {
               animationPlayState: 'paused',
@@ -182,11 +420,12 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
                 loading="lazy"
                 decoding="async"
                 sx={{
-                  maxHeight: partner.maxHeight || { xs: 32, sm: 38, md: 42 },
-                  maxWidth: { xs: 120, sm: 150, md: 175 },
+                  maxHeight: partner.maxHeight || { xs: 28, sm: 34, md: 38 },
+                  maxWidth: { xs: 110, sm: 140, md: 165 },
                   width: 'auto',
                   height: 'auto',
                   objectFit: 'contain',
+                  mixBlendMode: 'multiply',
                   // Trạng thái mặc định: tông màu xám chuẩn thanh lịch (grayscale 100% và opacity 0.6)
                   filter: 'grayscale(100%)',
                   opacity: 0.6,

@@ -109,6 +109,7 @@ class JobPost(CommonBaseModel):
     )
 
     interview_template = models.ForeignKey('interview.QuestionGroup', on_delete=models.SET_NULL, null=True, blank=True, related_name='linked_job_posts')
+    interview_script = models.ForeignKey('interview.InterviewScript', on_delete=models.SET_NULL, null=True, blank=True, related_name='linked_job_posts', verbose_name="Kịch bản phỏng vấn AI")
 
     is_auto_sourcing_enabled = models.BooleanField(default=True)
 

@@ -34,7 +34,7 @@ TEST_SUITES = [
     {
         "name": "2. Luồng Vòng Đời Toàn Diện Của Ứng Viên (Candidate Full Lifecycle)",
         "file": "test_candidate_lifecycle_live.py",
-        "description": "Đăng ký, tạo CV online, nộp đơn, AI chấm điểm, phỏng vấn LiveKit, onboard HRM"
+        "description": "Đăng ký, tạo CV online, nộp đơn, AI chấm điểm, phỏng vấn AI AILA, onboard HRM"
     },
     {
         "name": "3. Luồng Vòng Đời Tuyển Dụng Của NTD & ATS (Employer ATS Lifecycle)",

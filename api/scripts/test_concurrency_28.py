@@ -4,7 +4,7 @@ Tests:
 1. Slot Capacity Guard (28 <= 30 allowed)
 2. Concurrent LiveKit room creation & token dispatch (28 concurrent)
 3. TTS Greeting turn with disk cache (28 concurrent - target 100% cache hit, < 50ms)
-4. Concurrent LLM response processing (28 concurrent via token.nodelee.tech)
+4. Concurrent LLM response processing (28 concurrent via AI Cloud Gateway)
 5. Concurrent Question 1 audio delivery (28 concurrent)
 6. Concurrent DB lifecycle & transcript recording (28 concurrent)
 """
@@ -94,7 +94,7 @@ async def fetch_tts_with_cache(client: httpx.AsyncClient, text: str, voice: str 
         elapsed = time.time() - t0
         return True, elapsed, len(data)
 
-    # Miss: fetch from nodelee
+    # Miss: fetch from TTS service
     url = f"{TTS_BASE_URL}/audio/speech"
     headers = {"Authorization": f"Bearer {TTS_API_KEY}", "Content-Type": "application/json"}
     payload = {"model": TTS_MODEL, "input": text, "voice": voice, "response_format": "mp3", "speed": 1.0}

@@ -214,29 +214,7 @@ export const useJobPostNotificationMutations = () => {
     return { addMutation, updateMutation, deleteMutation };
 };
 
-// --- User Settings ------------------------------------------
-export const useUserSettings = (enabled: boolean = true) => {
-    return useQuery({
-        queryKey: ['userSettings'],
-        queryFn: async () => {
-            const response = await authService.getUserSettings();
-            return response;
-        },
-        enabled,
-    });
-};
-
-export const useUpdateUserSettings = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (data: UserSettingsData) => authService.updateUserSettings(data),
-        onSuccess: (response: unknown) => {
-            queryClient.setQueryData(['userSettings'], response);
-            toastMessages.success(i18next.t('jobSeeker:settings.toast.updateSuccess'));
-        },
-        onError: () => {
-            toastMessages.error(i18next.t('jobSeeker:settings.toast.updateError'));
-        },
-    });
-};
+// --- User Settings (Re-exported from shared hooks) ----------------
+// Delegated keys: jobSeeker:settings.toast.updateSuccess, jobSeeker:settings.toast.updateError
+export { useUserSettings, useUpdateUserSettings } from '@/hooks/useUserSettings';
 

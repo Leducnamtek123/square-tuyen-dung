@@ -38,6 +38,7 @@ import { interviewService } from '@/services/interviewService';
 import { useEmployerVoiceProfiles } from '../hooks/useEmployerQueries';
 import { getAppliedResumeJobPostId } from '../appliedResumeUtils';
 import toastMessages from '@/utils/toastMessages';
+import employerAiSettingService from '@/services/employerAiSettingService';
 import type { JobPostActivity } from '@/types/models';
 
 interface QuickScheduleInterviewModalProps {
@@ -57,6 +58,7 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
   const { push } = useRouter();
   const queryClient = useQueryClient();
   const { data: voiceProfilesData } = useEmployerVoiceProfiles();
+  const aiSettings = employerAiSettingService.getSettings();
 
   const [interviewFormat, setInterviewFormat] = useState<'ai' | 'live'>('ai');
   const [scheduledAt, setScheduledAt] = useState<string>(() =>
@@ -127,6 +129,16 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
           ? Number(selectedVoiceProfileId)
           : null;
 
+      const currentAiSettings = employerAiSettingService.getSettings();
+      const resolvedInterviewerName =
+        interviewFormat === 'ai'
+          ? currentAiSettings.interviewerName || currentAiSettings.interviewer_name || 'Trợ lý AI AILA'
+          : 'Hội đồng Tuyển dụng';
+      const resolvedAvatarId =
+        currentAiSettings.selectedAvatarId || currentAiSettings.selected_avatar_id || 'aila_recruiter';
+      const resolvedBackdrop =
+        currentAiSettings.selectedBackgroundId || currentAiSettings.selected_background_id || 'modern_office';
+
       const payload = {
         candidate: Number(candidateUserId),
         job_post: Number(jobPostId),
@@ -136,9 +148,12 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
         notes: notes.trim(),
         session_metadata: {
           interview_format: interviewFormat,
-          interviewer_name: interviewFormat === 'ai' ? 'Trợ lý AI Ly' : 'Hội đồng Tuyển dụng',
-          ai_avatar_id: 'ly_3d',
-          avatar_backdrop: 'modern_office',
+          interviewer_name: resolvedInterviewerName,
+          ai_avatar_id: resolvedAvatarId,
+          avatar_backdrop: resolvedBackdrop,
+          avatar_background_url: employerAiSettingService.resolveActiveBackgroundUrl(currentAiSettings),
+          avatar_url: employerAiSettingService.resolveActiveAvatarUrl(currentAiSettings),
+          character_id: currentAiSettings.activeCharacterId || 'ng_c_linh',
         },
       };
 
@@ -395,7 +410,9 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
                       },
                     }}
                   >
-                    <MenuItem value="auto">Mặc định (Trợ lý AI Ly - Nữ miền Bắc)</MenuItem>
+                    <MenuItem value="auto">
+                      Mặc định ({aiSettings.interviewerName || 'Trợ lý AI AILA'} - {aiSettings.ttsVoice || 'Chuẩn'})
+                    </MenuItem>
                     {voiceProfiles.map((vp) => (
                       <MenuItem key={vp.id} value={vp.id}>
                         {vp.name}

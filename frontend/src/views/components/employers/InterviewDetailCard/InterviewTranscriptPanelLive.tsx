@@ -28,21 +28,27 @@ type TimelineItem = {
   isLive: boolean;
 };
 
-const formatTime = (timestamp: number, language: string) =>
-  new Date(timestamp).toLocaleTimeString(language === 'vi' ? 'vi-VN' : 'en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'Asia/Ho_Chi_Minh',
-  });
+const formatTime = (timestamp: number, language?: string) => {
+  if (!Number.isFinite(timestamp) || isNaN(new Date(timestamp).getTime())) return '--:--';
+  try {
+    return new Date(timestamp).toLocaleTimeString(language === 'vi' ? 'vi-VN' : 'en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Asia/Ho_Chi_Minh',
+    });
+  } catch {
+    return new Date(timestamp).toLocaleTimeString();
+  }
+};
 
 const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['messages'], t: TFunction): TimelineItem[] =>
-  items.map((item) => {
-    const participant = item.from;
+  (Array.isArray(items) ? items : []).map((item) => {
+    const participant = item?.from;
     const role = getParticipantRole(participant);
     const companyName = getParticipantCompanyName(participant);
 
     return {
-      id: item.id,
+      id: item?.id || `live-${Date.now()}-${Math.random()}`,
       speaker:
         role === 'agent'
           ? 'interviewer'
@@ -63,26 +69,29 @@ const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['message
               : role === 'candidate'
                 ? t('liveRoom.participants.candidate')
                 : participant?.name || participant?.identity || t('liveRoom.participants.guest'),
-      content: sanitizeInterviewText(item.message),
-      timestamp: item.timestamp,
+      content: sanitizeInterviewText(item?.message),
+      timestamp: Number.isFinite(item?.timestamp) ? item.timestamp : Date.now(),
       isLive: true,
     };
   });
 
-const mapHistoryMessages = (session: InterviewSession, t: TFunction): TimelineItem[] => {
-  const existingTranscripts = Array.isArray(session.transcripts) ? session.transcripts : [];
+const mapHistoryMessages = (session?: InterviewSession, t?: TFunction): TimelineItem[] => {
+  const existingTranscripts = Array.isArray(session?.transcripts) ? session.transcripts : [];
 
-  return existingTranscripts.map((transcript: InterviewTranscript) => ({
-    id: String(transcript.id),
-    speaker: transcript.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
-    speakerName:
-      transcript.speakerRole === 'ai_agent'
-        ? t('interviewDetail.label.interviewer')
-        : t('interviewDetail.label.candidate'),
-    content: sanitizeInterviewText(transcript.content || transcript.text || ''),
-    timestamp: transcript.createAt ? new Date(transcript.createAt).getTime() : Date.now(),
-    isLive: false,
-  }));
+  return existingTranscripts.map((transcript: InterviewTranscript, idx: number) => {
+    const parsedTs = transcript?.createAt ? new Date(transcript.createAt).getTime() : NaN;
+    return {
+      id: String(transcript?.id ?? `hist-${idx}`),
+      speaker: transcript?.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
+      speakerName:
+        transcript?.speakerRole === 'ai_agent'
+          ? t ? t('interviewDetail.label.interviewer') : 'Người phỏng vấn'
+          : t ? t('interviewDetail.label.candidate') : 'Ứng viên',
+      content: sanitizeInterviewText(transcript?.content || transcript?.text || ''),
+      timestamp: !isNaN(parsedTs) ? parsedTs : Date.now(),
+      isLive: false,
+    };
+  });
 };
 
 const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n }) => {
@@ -94,12 +103,14 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
   const mergedTranscripts = React.useMemo(() => {
     const history = mapHistoryMessages(session, t);
     const historyIds = new Set(history.map((item) => item.id));
-    const live = mapLiveMessages(liveMessages, t).filter((item) => !historyIds.has(item.id));
-    const liveChat = sessionMessages.flatMap((message) => {
-      if (historyIds.has(message.id)) return [];
+    const safeLiveMessages = Array.isArray(liveMessages) ? liveMessages : [];
+    const live = mapLiveMessages(safeLiveMessages, t).filter((item) => !historyIds.has(item.id));
+    const safeSessionMessages = Array.isArray(sessionMessages) ? sessionMessages : [];
+    const liveChat = safeSessionMessages.flatMap((message) => {
+      if (!message || historyIds.has(message.id)) return [];
       const role = getParticipantRole(message.from);
       return [{
-        id: message.id,
+        id: message.id || `chat-${Date.now()}-${Math.random()}`,
         speaker:
           role === 'agent'
             ? 'interviewer'
@@ -121,7 +132,7 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                   ? t('liveRoom.participants.candidate')
                   : message.from?.name || message.from?.identity || t('liveRoom.participants.guest'),
         content: sanitizeInterviewText(message.message),
-        timestamp: message.timestamp,
+        timestamp: Number.isFinite(message.timestamp) ? message.timestamp : Date.now(),
         isLive: true,
       } as TimelineItem];
     });

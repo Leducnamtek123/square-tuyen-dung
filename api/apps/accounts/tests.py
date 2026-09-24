@@ -626,6 +626,15 @@ class TestPermissions:
         request = self._make_request(job_seeker_user)
         assert perm.has_permission(request, None) is True
 
+    def test_is_job_seeker_allows_candidate_role(self, job_seeker_user):
+        from apps.accounts.permissions import IsJobSeekerUser
+        job_seeker_user.role_name = 'CANDIDATE'
+        perm = IsJobSeeker()
+        custom_perm = IsJobSeekerUser()
+        request = self._make_request(job_seeker_user)
+        assert perm.has_permission(request, None) is True
+        assert custom_perm.has_permission(request, None) is True
+
     def test_is_job_seeker_denies_employer(self, employer_user):
         perm = IsJobSeeker()
         request = self._make_request(employer_user)

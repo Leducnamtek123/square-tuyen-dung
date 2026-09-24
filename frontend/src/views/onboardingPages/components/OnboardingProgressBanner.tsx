@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import authService from '@/services/authService';
 import { useAppSelector } from '@/redux/hooks';
 import { ROLES_NAME } from '@/configs/constants';
+import { getSafeRedirectPath } from '@/utils/safeExternalUrl';
 
 interface OnboardingProgressBannerProps {
   role: 'candidate' | 'employer';
@@ -180,7 +181,7 @@ export default function OnboardingProgressBanner({
           <Stack direction="row" alignItems="center" spacing={1} sx={{ alignSelf: { xs: 'flex-end', sm: 'center' } }}>
             <Button
               component={Link}
-              href={targetUrl}
+              href={getSafeRedirectPath(targetUrl)}
               variant="contained"
               size="small"
               endIcon={<ArrowForwardIcon fontSize="small" />}

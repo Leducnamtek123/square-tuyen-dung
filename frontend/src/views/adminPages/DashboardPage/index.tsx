@@ -503,6 +503,16 @@ export default function DashboardPage() {
         </Grid>
       </Grid>
 
+      {/* Action Center First: Pending Actions & Voice AI Performance */}
+      <Grid container spacing={3} sx={{ mb: 3.5 }} className="gsap-admin-action-row">
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <PendingActionWidget stats={stats} loading={isLoading} />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 6 }}>
+          <AiVoiceInterviewHealthWidget stats={stats} loading={isLoading} />
+        </Grid>
+      </Grid>
+
       {/* Main Trends & System Health */}
       <Grid container spacing={3} sx={{ mb: 3.5 }} className="gsap-admin-health-row">
         <Grid size={{ xs: 12, lg: 8 }}>
@@ -510,16 +520,6 @@ export default function DashboardPage() {
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
           <SystemHealthWidget />
-        </Grid>
-      </Grid>
-
-      {/* Pending Actions & Voice AI Performance */}
-      <Grid container spacing={3} sx={{ mb: 3.5 }} className="gsap-admin-action-row">
-        <Grid size={{ xs: 12, lg: 6 }}>
-          <PendingActionWidget stats={stats} loading={isLoading} />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 6 }}>
-          <AiVoiceInterviewHealthWidget stats={stats} loading={isLoading} />
         </Grid>
       </Grid>
 

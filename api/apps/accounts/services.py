@@ -106,7 +106,7 @@ class PasswordResetService:
     def _send_web_reset(user: User, expired_at) -> None:
         access_token = secrets.token_urlsafe(32)
 
-        if user.role_name == var_sys.JOB_SEEKER:
+        if user.role_name in {var_sys.JOB_SEEKER, 'CANDIDATE'}:
             domain = settings.DOMAIN_CLIENT["job_seeker"].rstrip("/")
             reset_password_url = f"{domain}/cap-nhat-mat-khau/{access_token}"
         else:

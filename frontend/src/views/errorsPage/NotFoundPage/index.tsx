@@ -29,6 +29,7 @@ import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { ROUTES } from '@/configs/constants';
+import { isEmployerHostname, isAdminHostname } from '@/configs/portalRouting';
 
 interface DestinationItem {
   title: string;
@@ -46,16 +47,19 @@ const NotFoundPage = () => {
 
   // Contextual portal detection (Employer / Admin / Job Seeker)
   const isEmployer = useMemo(
-    () => rawPathname.startsWith('/employer') || rawPathname.startsWith('/nha-tuyen-dung'),
+    () => isEmployerHostname() || rawPathname.startsWith('/employer') || rawPathname.startsWith('/nha-tuyen-dung'),
     [rawPathname]
   );
   const isAdmin = useMemo(
-    () => rawPathname.startsWith('/admin') || rawPathname.startsWith('/quan-tri'),
+    () => isAdminHostname() || rawPathname.startsWith('/admin') || rawPathname.startsWith('/quan-tri'),
     [rawPathname]
   );
 
   const homePath = useMemo(() => {
-    if (isEmployer) return localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, i18n.language);
+    if (isEmployer) {
+      if (isEmployerHostname()) return '/';
+      return localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, i18n.language);
+    }
     if (isAdmin) return '/admin/dashboard';
     return '/';
   }, [isEmployer, isAdmin, i18n.language]);

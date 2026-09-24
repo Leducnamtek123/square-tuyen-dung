@@ -132,7 +132,11 @@ const MenuItem = ({ icon: Icon, text, tooltip, to, external = false, onClick, ki
           <Icon sx={{ fontSize: 20 }} />
         </ListItemIcon>
       )}
-      {isChild && (
+      {isChild && Icon ? (
+        <ListItemIcon sx={{ minWidth: isCollapsed ? 0 : 26, mr: isCollapsed ? 0 : 1, justifyContent: 'center' }}>
+          <Icon sx={{ fontSize: 18 }} />
+        </ListItemIcon>
+      ) : isChild ? (
         <Box
           sx={{
             width: isSelected ? 7 : 5,
@@ -146,7 +150,7 @@ const MenuItem = ({ icon: Icon, text, tooltip, to, external = false, onClick, ki
             flexShrink: 0,
           }}
         />
-      )}
+      ) : null}
       {!isCollapsed && (
         <>
           <ListItemText

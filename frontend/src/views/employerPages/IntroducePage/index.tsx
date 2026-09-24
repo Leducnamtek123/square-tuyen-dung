@@ -143,216 +143,259 @@ export default function IntroducePage() {
 
   useGSAP(
     () => {
+      const el = containerRef.current;
+      if (!el) return;
+      const has = (selector: string) => !!el.querySelector(selector);
+
       const mm = gsap.matchMedia();
 
       // -- Desktop Breakpoint (≥769px) ---------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
-        const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+        if (has('.gsap-hero-title')) {
+          const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-        heroTl
-          .fromTo(
-            '.gsap-hero-badge',
-            { y: -15, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.5, clearProps: "all" }
-          )
-          .fromTo(
+          if (has('.gsap-hero-badge')) {
+            heroTl.fromTo(
+              '.gsap-hero-badge',
+              { y: -15, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.5, clearProps: "all" }
+            );
+          }
+          heroTl.fromTo(
             '.gsap-hero-title',
             { y: 30, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.7, clearProps: "all" },
             '-=0.3'
-          )
-          .fromTo(
-            '.gsap-hero-desc',
-            { y: 20, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.6, clearProps: "all" },
-            '-=0.4'
-          )
-          .fromTo(
-            '.gsap-hero-actions',
-            { y: 20, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.6, clearProps: "all" },
-            '-=0.3'
           );
-
-        gsap.fromTo(
-          '.gsap-highlight-card',
-          { y: 35, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-highlights-grid',
-              start: 'top 85%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.55,
-            stagger: 0.12,
-            ease: 'power2.out',
-            clearProps: "all",
+          if (has('.gsap-hero-desc')) {
+            heroTl.fromTo(
+              '.gsap-hero-desc',
+              { y: 20, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.6, clearProps: "all" },
+              '-=0.4'
+            );
           }
-        );
-
-        gsap.fromTo(
-          '.gsap-services-box',
-          { y: 30, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-services-box',
-              start: 'top 85%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.6,
-            ease: 'power3.out',
-            clearProps: "all",
+          if (has('.gsap-hero-actions')) {
+            heroTl.fromTo(
+              '.gsap-hero-actions',
+              { y: 20, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.6, clearProps: "all" },
+              '-=0.3'
+            );
           }
-        );
+        }
 
-        gsap.fromTo(
-          '.gsap-service-card',
-          { y: 25, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-services-grid',
-              start: 'top 85%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: 'power2.out',
-            clearProps: "all",
-          }
-        );
+        if (has('.gsap-highlight-card')) {
+          gsap.fromTo(
+            '.gsap-highlight-card',
+            { y: 35, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-highlights-grid') ? {
+                trigger: '.gsap-highlights-grid',
+                start: 'top 85%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.55,
+              stagger: 0.12,
+              ease: 'power2.out',
+              clearProps: "all",
+            }
+          );
+        }
 
-        gsap.fromTo(
-          '.gsap-step-card',
-          { y: 25, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-steps-grid',
-              start: 'top 85%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.5,
-            stagger: 0.12,
-            ease: 'power2.out',
-            clearProps: "all",
-          }
-        );
+        if (has('.gsap-services-box')) {
+          gsap.fromTo(
+            '.gsap-services-box',
+            { y: 30, opacity: 0 },
+            {
+              scrollTrigger: {
+                trigger: '.gsap-services-box',
+                start: 'top 85%',
+                once: true,
+              },
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              ease: 'power3.out',
+              clearProps: "all",
+            }
+          );
+        }
+
+        if (has('.gsap-service-card')) {
+          gsap.fromTo(
+            '.gsap-service-card',
+            { y: 25, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-services-grid') ? {
+                trigger: '.gsap-services-grid',
+                start: 'top 85%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.5,
+              stagger: 0.1,
+              ease: 'power2.out',
+              clearProps: "all",
+            }
+          );
+        }
+
+        if (has('.gsap-step-card')) {
+          gsap.fromTo(
+            '.gsap-step-card',
+            { y: 25, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-steps-grid') ? {
+                trigger: '.gsap-steps-grid',
+                start: 'top 85%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.5,
+              stagger: 0.12,
+              ease: 'power2.out',
+              clearProps: "all",
+            }
+          );
+        }
       });
 
       // -- Mobile Breakpoint (≤768px) ----------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
-        const heroTl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+        if (has('.gsap-hero-title')) {
+          const heroTl = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
-        heroTl
-          .fromTo(
-            '.gsap-hero-badge',
-            { y: -10, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.4, clearProps: "all" }
-          )
-          .fromTo(
+          if (has('.gsap-hero-badge')) {
+            heroTl.fromTo(
+              '.gsap-hero-badge',
+              { y: -10, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.4, clearProps: "all" }
+            );
+          }
+          heroTl.fromTo(
             '.gsap-hero-title',
             { y: 16, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.5, clearProps: "all" },
             '-=0.2'
-          )
-          .fromTo(
-            '.gsap-hero-desc',
-            { y: 12, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.45, clearProps: "all" },
-            '-=0.25'
-          )
-          .fromTo(
-            '.gsap-hero-actions',
-            { y: 12, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.45, clearProps: "all" },
-            '-=0.2'
           );
-
-        gsap.fromTo(
-          '.gsap-highlight-card',
-          { y: 16, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-highlights-grid',
-              start: 'top 92%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            stagger: 0.08,
-            ease: 'power2.out',
-            clearProps: "all",
+          if (has('.gsap-hero-desc')) {
+            heroTl.fromTo(
+              '.gsap-hero-desc',
+              { y: 12, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.45, clearProps: "all" },
+              '-=0.25'
+            );
           }
-        );
-
-        gsap.fromTo(
-          '.gsap-services-box',
-          { y: 14, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-services-box',
-              start: 'top 92%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            ease: 'power2.out',
-            clearProps: "all",
+          if (has('.gsap-hero-actions')) {
+            heroTl.fromTo(
+              '.gsap-hero-actions',
+              { y: 12, opacity: 0 },
+              { y: 0, opacity: 1, duration: 0.45, clearProps: "all" },
+              '-=0.2'
+            );
           }
-        );
+        }
 
-        gsap.fromTo(
-          '.gsap-service-card',
-          { y: 14, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-services-grid',
-              start: 'top 92%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.4,
-            stagger: 0.06,
-            ease: 'power2.out',
-            clearProps: "all",
-          }
-        );
+        if (has('.gsap-highlight-card')) {
+          gsap.fromTo(
+            '.gsap-highlight-card',
+            { y: 16, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-highlights-grid') ? {
+                trigger: '.gsap-highlights-grid',
+                start: 'top 92%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.45,
+              stagger: 0.08,
+              ease: 'power2.out',
+              clearProps: "all",
+            }
+          );
+        }
 
-        gsap.fromTo(
-          '.gsap-step-card',
-          { y: 14, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-steps-grid',
-              start: 'top 92%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.4,
-            stagger: 0.06,
-            ease: 'power2.out',
-            clearProps: "all",
-          }
-        );
+        if (has('.gsap-services-box')) {
+          gsap.fromTo(
+            '.gsap-services-box',
+            { y: 14, opacity: 0 },
+            {
+              scrollTrigger: {
+                trigger: '.gsap-services-box',
+                start: 'top 92%',
+                once: true,
+              },
+              y: 0,
+              opacity: 1,
+              duration: 0.45,
+              ease: 'power2.out',
+              clearProps: "all",
+            }
+          );
+        }
+
+        if (has('.gsap-service-card')) {
+          gsap.fromTo(
+            '.gsap-service-card',
+            { y: 14, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-services-grid') ? {
+                trigger: '.gsap-services-grid',
+                start: 'top 92%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.4,
+              stagger: 0.06,
+              ease: 'power2.out',
+              clearProps: "all",
+            }
+          );
+        }
+
+        if (has('.gsap-step-card')) {
+          gsap.fromTo(
+            '.gsap-step-card',
+            { y: 14, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-steps-grid') ? {
+                trigger: '.gsap-steps-grid',
+                start: 'top 92%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.4,
+              stagger: 0.06,
+              ease: 'power2.out',
+              clearProps: "all",
+            }
+          );
+        }
       });
 
       // -- Reduced Motion -----------------------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
-        gsap.set(
-          '.gsap-hero-badge, .gsap-hero-title, .gsap-hero-desc, .gsap-hero-actions, .gsap-highlight-card, .gsap-services-box, .gsap-service-card, .gsap-step-card',
-          { opacity: 1, y: 0, clearProps: "all" }
-        );
+        const targets = [
+          '.gsap-hero-badge',
+          '.gsap-hero-title',
+          '.gsap-hero-desc',
+          '.gsap-hero-actions',
+          '.gsap-highlight-card',
+          '.gsap-services-box',
+          '.gsap-service-card',
+          '.gsap-step-card'
+        ].filter(has);
+        if (targets.length > 0) {
+          gsap.set(targets.join(', '), { opacity: 1, y: 0, clearProps: "all" });
+        }
       });
     },
     { scope: containerRef }
@@ -375,6 +418,7 @@ export default function IntroducePage() {
           {/* Header Texts */}
           <Stack spacing={2.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 4, md: 6 } }}>
             <Chip
+              className="gsap-hero-badge"
               icon={<BoltIcon sx={{ color: '#2563EB !important', fontSize: 18 }} />}
               label="GIẢI PHÁP TUYỂN DỤNG & AI MATCHING DOANH NGHIỆP"
               sx={{
@@ -395,6 +439,7 @@ export default function IntroducePage() {
             />
 
             <Typography
+              className="gsap-hero-title"
               variant="h1"
               component="h1"
               sx={{
@@ -410,6 +455,7 @@ export default function IntroducePage() {
             </Typography>
 
             <Typography
+              className="gsap-hero-desc"
               variant="body1"
               sx={{
                 color: '#475569',
@@ -461,6 +507,7 @@ export default function IntroducePage() {
 
             {/* Action CTA Buttons */}
             <Stack
+              className="gsap-hero-actions"
               direction={{ xs: 'column', sm: 'row' }}
               spacing={2}
               alignItems="center"
@@ -646,10 +693,11 @@ export default function IntroducePage() {
       {/* PHÂN TẦNG 2: THƯỚC ĐO HIỆU QUẢ TUYỂN DỤNG (KEY METRICS) */}
       {/* ──────────────────────────────────────────────────────────── */}
       <Container maxWidth="lg" sx={{ mt: { xs: 5, md: 8 }, mb: { xs: 6, md: 10 } }}>
-        <Grid container spacing={{ xs: 2, md: 3 }}>
+        <Grid container className="gsap-highlights-grid" spacing={{ xs: 2, md: 3 }}>
           {stats.map((stat, idx) => (
             <Grid key={idx} size={{ xs: 6, md: 3 }}>
               <Card
+                className="gsap-highlight-card"
                 elevation={0}
                 sx={{
                   p: { xs: 2.5, md: 3 },
@@ -715,10 +763,11 @@ export default function IntroducePage() {
           </Typography>
         </Stack>
 
-        <Grid container spacing={{ xs: 3, md: 4 }}>
+        <Grid container className="gsap-services-grid" spacing={{ xs: 3, md: 4 }}>
           {/* TRỤ CỘT 1: CỔNG ĐĂNG TIN & SÀNG LỌC ỨNG VIÊN */}
           <Grid size={{ xs: 12, md: 6 }}>
             <Card
+              className="gsap-service-card"
               elevation={0}
               sx={{
                 borderRadius: '24px',
@@ -825,6 +874,7 @@ export default function IntroducePage() {
           {/* TRỤ CỘT 2: AILA AI PHỎNG VẤN THÔNG MINH */}
           <Grid size={{ xs: 12, md: 6 }}>
             <Card
+              className="gsap-service-card"
               elevation={0}
               sx={{
                 borderRadius: '24px',
@@ -1034,12 +1084,13 @@ export default function IntroducePage() {
           </Typography>
         </Stack>
 
-        <Grid container spacing={{ xs: 2.5, md: 3 }}>
+        <Grid container className="gsap-steps-grid" spacing={{ xs: 2.5, md: 3 }}>
           {steps.map((stepItem) => {
             const StepIcon = stepItem.icon;
             return (
               <Grid key={stepItem.step} size={{ xs: 12, sm: 6, md: 3 }}>
                 <Card
+                  className="gsap-step-card"
                   elevation={0}
                   sx={{
                     p: { xs: 3, md: 3.5 },

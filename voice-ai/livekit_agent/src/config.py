@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -55,7 +54,7 @@ def _normalize_voice_name(voice: str | None) -> str:
     if not voice or not str(voice).strip():
         return "Trúc Ly"
     v = str(voice).strip()
-    if v in {"TrAc Ly", "TrÃºc Ly", "Trc Ly", "Trc Ly", "Tr?c Ly"}:
+    if v in {"TrAc Ly", "TrÃºc Ly", "Trc Ly", "Tr?c Ly"}:
         return "Trúc Ly"
     return v
 

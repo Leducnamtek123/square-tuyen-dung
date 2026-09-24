@@ -39,6 +39,18 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTranslation } from 'react-i18next';
 import useRequireAuth from '@/hooks/useRequireAuth';
 import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
+import { canAccessJobSeekerPortal } from '@/utils/accessControl';
+
+const safeUUID = (prefix: string = 'id'): string => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    try {
+      return `${prefix}-${crypto.randomUUID()}`;
+    } catch {
+      // fallback below
+    }
+  }
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+};
 
 export const CVEditorPage: React.FC = () => {
   const router = useRouter();
@@ -88,6 +100,7 @@ export const CVEditorPage: React.FC = () => {
 
   const isInitialLoad = useRef<boolean>(true);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const profileLoadedRef = useRef<boolean>(false);
 
   // 1. Load CV from Database if ID is provided, OR auto-populate logged-in candidate profile when creating fresh
   useEffect(() => {
@@ -154,14 +167,21 @@ export const CVEditorPage: React.FC = () => {
       loadCVFromDB();
     } else {
       // Fresh CV creation: Auto-populate candidate's real profile & resume details
+      if (!currentUser || !canAccessJobSeekerPortal(currentUser) || profileLoadedRef.current) {
+        return;
+      }
+      profileLoadedRef.current = true;
+
       const loadCandidateProfile = async () => {
         try {
           const profile = await jobSeekerProfileService.getProfile();
           let primaryResumeSlug: string | null = null;
+          let primaryResume: any = null;
           if (profile?.id) {
             try {
               const resumes = await jobSeekerProfileService.getResumes(profile.id, { resumeType: 'WEBSITE' });
               if (resumes && resumes.results && resumes.results.length > 0) {
+                primaryResume = resumes.results[0];
                 primaryResumeSlug = resumes.results[0].slug;
               }
             } catch (e) {
@@ -193,7 +213,7 @@ export const CVEditorPage: React.FC = () => {
 
               if (expList.length > 0) {
                 experiencesData = expList.map((e, idx) => ({
-                  id: e.id != null ? String(e.id) : `exp-${idx}-${crypto.randomUUID()}`,
+                  id: e.id != null ? String(e.id) : safeUUID(`exp-${idx}`),
                   sourceEntityId: typeof e.id === 'number' ? e.id : undefined,
                   position: e.jobName || (e as any).position || '',
                   company: e.companyName || '',
@@ -206,7 +226,7 @@ export const CVEditorPage: React.FC = () => {
 
               if (eduList.length > 0) {
                 educationsData = eduList.map((ed, idx) => ({
-                  id: ed.id != null ? String(ed.id) : `edu-${idx}-${crypto.randomUUID()}`,
+                  id: ed.id != null ? String(ed.id) : safeUUID(`edu-${idx}`),
                   sourceEntityId: typeof ed.id === 'number' ? ed.id : undefined,
                   school: ed.trainingPlaceName || (ed as any).schoolName || '',
                   major: ed.major || '',
@@ -220,7 +240,7 @@ export const CVEditorPage: React.FC = () => {
 
               if (skillList.length > 0) {
                 skillsData = skillList.map((s, idx) => ({
-                  id: s.id != null ? String(s.id) : `sk-${idx}-${crypto.randomUUID()}`,
+                  id: s.id != null ? String(s.id) : safeUUID(`sk-${idx}`),
                   sourceEntityId: typeof s.id === 'number' ? s.id : undefined,
                   name: s.name || s.skillName || '',
                   level: Number(s.level) || 5,
@@ -229,7 +249,7 @@ export const CVEditorPage: React.FC = () => {
 
               if (langList.length > 0) {
                 languagesData = langList.map((l, idx) => ({
-                  id: l.id != null ? String(l.id) : `lang-${idx}-${crypto.randomUUID()}`,
+                  id: l.id != null ? String(l.id) : safeUUID(`lang-${idx}`),
                   sourceEntityId: typeof l.id === 'number' ? l.id : undefined,
                   name: l.languageName || (typeof (l as any).language === 'object' ? (l as any).language?.name : String(l.language || 'Ngoại ngữ')),
                   proficiency: l.levelName || String(l.level || 'Thành thạo'),
@@ -238,7 +258,7 @@ export const CVEditorPage: React.FC = () => {
 
               if (certList.length > 0) {
                 certificatesData = certList.map((c, idx) => ({
-                  id: c.id != null ? String(c.id) : `cert-${idx}-${crypto.randomUUID()}`,
+                  id: c.id != null ? String(c.id) : safeUUID(`cert-${idx}`),
                   sourceEntityId: typeof c.id === 'number' ? c.id : undefined,
                   name: c.name || c.certificateName || '',
                   organization: c.trainingPlaceName || c.trainingPlace || '',
@@ -255,23 +275,47 @@ export const CVEditorPage: React.FC = () => {
           const districtName = loc?.district?.name || (typeof loc?.district === 'string' ? loc.district : '') || '';
           const fullAddress = [loc?.address, districtName, cityName].filter(Boolean).join(', ');
 
+          const candidateProfile = profile as any;
+          const resolvedTitle =
+            primaryResume?.title ||
+            primaryResume?.career_title ||
+            candidateProfile?.career ||
+            primaryResume?.career ||
+            candidateProfile?.title ||
+            '';
+
+          const resolvedFullName =
+            primaryResume?.full_name ||
+            candidateProfile?.full_name ||
+            currentUser?.fullName ||
+            candidateProfile?.user?.fullName ||
+            '';
+
+          const resolvedAvatar =
+            primaryResume?.avatar_url ||
+            candidateProfile?.avatar ||
+            currentUser?.avatarUrl ||
+            candidateProfile?.avatarUrl ||
+            candidateProfile?.user?.avatarUrl ||
+            '';
+
           setCvData((prev) => ({
             ...prev,
-            title: currentUser?.fullName ? `CV - ${currentUser.fullName}` : prev.title,
+            title: resolvedFullName ? `CV - ${resolvedFullName}` : prev.title,
             personalInfo: {
               ...prev.personalInfo,
-              fullName: currentUser?.fullName || (profile as any)?.user?.fullName || prev.personalInfo.fullName || '',
-              title: (profile as any)?.title || prev.personalInfo.title || '',
-              email: currentUser?.email || (profile as any)?.user?.email || prev.personalInfo.email || '',
+              fullName: resolvedFullName || prev.personalInfo.fullName || '',
+              title: resolvedTitle || prev.personalInfo.title || '',
+              email: currentUser?.email || candidateProfile?.user?.email || prev.personalInfo.email || '',
               phoneNumber: profile?.phone || (currentUser as any)?.phoneNumber || prev.personalInfo.phoneNumber || '',
               address: fullAddress || prev.personalInfo.address || '',
               dob: profile?.birthday ? String(profile.birthday).slice(0, 10) : prev.personalInfo.dob || '',
               gender: profile?.gender || prev.personalInfo.gender || '',
-              avatarUrl: currentUser?.avatarUrl || (profile as any)?.avatarUrl || (profile as any)?.user?.avatarUrl || prev.personalInfo.avatarUrl || '',
-              bio: (profile as any)?.bio || (profile as any)?.description || prev.personalInfo.bio || '',
-              website: (profile as any)?.website || prev.personalInfo.website || '',
-              linkedin: (profile as any)?.linkedin || prev.personalInfo.linkedin || '',
-              github: (profile as any)?.github || prev.personalInfo.github || '',
+              avatarUrl: resolvedAvatar || prev.personalInfo.avatarUrl || '',
+              bio: candidateProfile?.bio || candidateProfile?.description || prev.personalInfo.bio || '',
+              website: candidateProfile?.website || prev.personalInfo.website || '',
+              linkedin: candidateProfile?.linkedin || prev.personalInfo.linkedin || '',
+              github: candidateProfile?.github || prev.personalInfo.github || '',
             },
             experiences: experiencesData.length > 0 ? experiencesData : prev.experiences,
             educations: educationsData.length > 0 ? educationsData : prev.educations,
@@ -279,8 +323,10 @@ export const CVEditorPage: React.FC = () => {
             languages: languagesData.length > 0 ? languagesData : prev.languages,
             certificates: certificatesData.length > 0 ? certificatesData : prev.certificates,
           }));
-        } catch (e) {
-          console.warn('Could not auto-load profile info for fresh CV:', e);
+        } catch (e: any) {
+          if (e?.response?.status !== 401 && e?.response?.status !== 403) {
+            console.warn('Could not auto-load profile info for fresh CV:', e);
+          }
         } finally {
           setTimeout(() => {
             isInitialLoad.current = false;
@@ -414,10 +460,12 @@ export const CVEditorPage: React.FC = () => {
       const profile = await jobSeekerProfileService.getProfile();
 
       let primaryResumeSlug: string | null = null;
+      let primaryResume: any = null;
       if (profile?.id) {
         try {
           const resumes = await jobSeekerProfileService.getResumes(profile.id, { resumeType: 'WEBSITE' });
           if (resumes && resumes.results && resumes.results.length > 0) {
+            primaryResume = resumes.results[0];
             primaryResumeSlug = resumes.results[0].slug;
           }
         } catch (e) {
@@ -453,7 +501,7 @@ export const CVEditorPage: React.FC = () => {
 
           if (expList.length > 0) {
             experiencesData = expList.map((e, idx) => ({
-              id: e.id != null ? String(e.id) : `exp-${idx}-${crypto.randomUUID()}`,
+              id: e.id != null ? String(e.id) : safeUUID(`exp-${idx}`),
               sourceEntityId: typeof e.id === 'number' ? e.id : undefined,
               position: e.jobName || (e as any).position || '',
               company: e.companyName || '',
@@ -466,7 +514,7 @@ export const CVEditorPage: React.FC = () => {
 
           if (eduList.length > 0) {
             educationsData = eduList.map((ed, idx) => ({
-              id: ed.id != null ? String(ed.id) : `edu-${idx}-${crypto.randomUUID()}`,
+              id: ed.id != null ? String(ed.id) : safeUUID(`edu-${idx}`),
               sourceEntityId: typeof ed.id === 'number' ? ed.id : undefined,
               school: ed.trainingPlaceName || (ed as any).schoolName || '',
               major: ed.major || '',
@@ -480,7 +528,7 @@ export const CVEditorPage: React.FC = () => {
 
           if (skillList.length > 0) {
             skillsData = skillList.map((s, idx) => ({
-              id: s.id != null ? String(s.id) : `sk-${idx}-${crypto.randomUUID()}`,
+              id: s.id != null ? String(s.id) : safeUUID(`sk-${idx}`),
               sourceEntityId: typeof s.id === 'number' ? s.id : undefined,
               name: s.name || s.skillName || '',
               level: Number(s.level) || 5,
@@ -489,7 +537,7 @@ export const CVEditorPage: React.FC = () => {
 
           if (langList.length > 0) {
             languagesData = langList.map((l, idx) => ({
-              id: l.id != null ? String(l.id) : `lang-${idx}-${crypto.randomUUID()}`,
+              id: l.id != null ? String(l.id) : safeUUID(`lang-${idx}`),
               sourceEntityId: typeof l.id === 'number' ? l.id : undefined,
               name: l.languageName || (typeof (l as any).language === 'object' ? (l as any).language?.name : String(l.language || 'Ngoại ngữ')),
               proficiency: l.levelName || String(l.level || 'Thành thạo'),
@@ -498,7 +546,7 @@ export const CVEditorPage: React.FC = () => {
 
           if (certList.length > 0) {
             certificatesData = certList.map((c, idx) => ({
-              id: c.id != null ? String(c.id) : `cert-${idx}-${crypto.randomUUID()}`,
+              id: c.id != null ? String(c.id) : safeUUID(`cert-${idx}`),
               sourceEntityId: typeof c.id === 'number' ? c.id : undefined,
               name: c.name || c.certificateName || '',
               organization: c.trainingPlaceName || c.trainingPlace || '',
@@ -515,21 +563,42 @@ export const CVEditorPage: React.FC = () => {
       const districtName = loc?.district?.name || (typeof loc?.district === 'string' ? loc.district : '') || '';
       const fullAddress = [loc?.address, districtName, cityName].filter(Boolean).join(', ');
 
+      const candidateProfile = profile as any;
+      const resolvedTitle =
+        primaryResume?.title ||
+        primaryResume?.career_title ||
+        candidateProfile?.career ||
+        primaryResume?.career ||
+        candidateProfile?.title ||
+        '';
+
+      const resolvedFullName =
+        primaryResume?.full_name ||
+        candidateProfile?.full_name ||
+        currentUser?.fullName ||
+        candidateProfile?.user?.fullName ||
+        '';
+
+      const resolvedAvatar =
+        primaryResume?.avatar_url ||
+        candidateProfile?.avatar ||
+        currentUser?.avatarUrl ||
+        candidateProfile?.avatarUrl ||
+        candidateProfile?.user?.avatarUrl ||
+        '';
+
       const updatedSyncedData: CVData = {
         ...cvData,
         personalInfo: {
           ...cvData.personalInfo,
-          fullName: currentUser?.fullName || (profile as any)?.user?.fullName || cvData.personalInfo.fullName,
-          title: (profile as any)?.title || cvData.personalInfo.title,
-          email: currentUser?.email || cvData.personalInfo.email,
+          fullName: resolvedFullName || cvData.personalInfo.fullName,
+          title: resolvedTitle || cvData.personalInfo.title,
+          email: currentUser?.email || candidateProfile?.user?.email || cvData.personalInfo.email,
           phoneNumber: profile?.phone || (currentUser as any)?.phoneNumber || cvData.personalInfo.phoneNumber,
           address: fullAddress || cvData.personalInfo.address,
           dob: profile?.birthday ? String(profile.birthday).slice(0, 10) : cvData.personalInfo.dob,
-          avatarUrl:
-            currentUser?.avatarUrl ||
-            cvData.personalInfo.avatarUrl ||
-            '/images/cv-avatars/avatar-modern.jpg',
-          bio: (profile as any)?.bio || (profile as any)?.description || cvData.personalInfo.bio,
+          avatarUrl: resolvedAvatar || cvData.personalInfo.avatarUrl || '',
+          bio: candidateProfile?.bio || candidateProfile?.description || cvData.personalInfo.bio,
           website: cvData.personalInfo.website,
           linkedin: cvData.personalInfo.linkedin,
           github: cvData.personalInfo.github,

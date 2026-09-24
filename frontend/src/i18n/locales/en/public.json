@@ -113,9 +113,13 @@
     "salaryInsightAverageRange": "Average posted range",
     "reportCaption": "Trust & Safety",
     "reportJobTitle": "Report job post",
+    "reportTargetCompany": "Reported company",
+    "reportTargetJob": "Reported job post",
     "reportReasonLabel": "Reason",
     "reportMessageLabel": "Additional details",
     "reportMessagePlaceholder": "Tell us what looks wrong or misleading.",
+    "reportPrivacyNotice": "Your report is submitted anonymously and confidentially to the InfoHR moderation team.",
+    "reportOptional": "Optional",
     "reportSuccess": "Report sent successfully.",
     "reportReasons": {
       "scam": "Scam or fraud",

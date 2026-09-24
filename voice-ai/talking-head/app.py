@@ -109,7 +109,8 @@ async def download_record(request):
     if not sessionid:
         return web.Response(status=400, text="sessionid is required")
     
-    record_file = os.path.join('data', 'record', f"{sessionid}.mp4")
+    filename = sessionid if sessionid.endswith('.mp4') else f"{sessionid}.mp4"
+    record_file = os.path.join('data', 'record', filename)
     
     if os.path.exists(record_file):
         return web.FileResponse(record_file)
@@ -164,13 +165,15 @@ def main():
         rendthrd = Thread(target=session_manager.get_session('0').render, args=(thread_quit,))
         rendthrd.start()
         if opt.transport == 'virtualcam':
-            logger.info("[VirtualCam] Virtual camera output enabled - digital human will be rendered to virtual camera")
+            logger.info("[VirtualCam] Virtual camera output enabled - Aila avatar will be rendered to virtual camera")
 
     #############################################################################
     appasync = web.Application(client_max_size=1024**2*100)
     appasync["llm_response"] = llm_response
     appasync["opt"] = opt
     appasync["rtc_manager"] = rtc_manager
+    appasync["model"] = model
+    appasync["global_avatars"] = global_avatars
 
     appasync.on_shutdown.append(on_shutdown)
     appasync.router.add_post("/offer", offer)

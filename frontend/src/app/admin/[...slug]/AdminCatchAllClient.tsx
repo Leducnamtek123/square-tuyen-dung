@@ -9,6 +9,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import { useTranslation } from 'react-i18next';
 import ProfileDetailPage from '@/views/adminPages/ProfileDetailPage';
 import { getPreferredLanguage, getPortalPrefix } from '@/configs/portalRouting';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { ROUTES } from '@/configs/constants';
 
 export default function AdminCatchAllClient() {
   const params = useParams<{ slug?: string | string[] }>();
@@ -85,7 +87,7 @@ export default function AdminCatchAllClient() {
           <Button
             variant="contained"
             startIcon={<DashboardIcon />}
-            onClick={() => router.push(`${adminPrefix}/bang-dieu-khien`)}
+            onClick={() => router.push(localizeRoutePath(`/${ROUTES.ADMIN.DASHBOARD}`, lang))}
             sx={{ textTransform: 'none', borderRadius: 2, fontWeight: 700 }}
           >
             Bảng điều khiển Quản trị

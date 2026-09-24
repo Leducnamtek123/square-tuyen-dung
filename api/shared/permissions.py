@@ -75,14 +75,28 @@ class IsEmployer(BasePermission):
 
 
 class IsJobSeeker(BasePermission):
-    """Check that the user has job seeker role."""
+    """Check that the user has job seeker role or candidate synonym."""
 
     def has_permission(self, request, view):
-        return (
-            request.user
-            and request.user.is_authenticated
-            and request.user.role_name == var_sys.JOB_SEEKER
-        )
+        user = getattr(request, 'user', None)
+        if not getattr(user, 'is_authenticated', False):
+            return False
+
+        if (
+            getattr(user, 'role_name', None) == var_sys.ADMIN
+            or getattr(user, 'is_staff', False)
+            or getattr(user, 'is_superuser', False)
+        ):
+            return True
+
+        role = (getattr(user, 'role_name', '') or '').strip().upper()
+        if role in {var_sys.JOB_SEEKER, 'CANDIDATE'}:
+            return True
+
+        if hasattr(user, 'job_seeker_profile'):
+            return True
+
+        return False
 
 
 class PermissionActionMapMixin:

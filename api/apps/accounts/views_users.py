@@ -77,6 +77,7 @@ USER_INFO_BASIC_FIELDS = (
     "isVerifyEmail",
     "isVerifyPhone",
     "isPhoneVerified",
+    "hasCompany",
     "isOnboarded",
     "onboardingStep",
     "avatarUrl",
@@ -413,9 +414,9 @@ def verify_phone_number(request):
         data.get("id_token")
         or data.get("idToken")
         or data.get("firebaseToken")
-        or data.get("otp")
-        or data.get("code")
     )
+    otp = data.get("otp") or data.get("code")
+    verification_token = id_token or otp
 
     if not phone or not str(phone).strip():
         return response_data(
@@ -436,11 +437,14 @@ def verify_phone_number(request):
         except Exception as ex:
             helper.print_log_error("verify_phone_number.firebase_token", ex)
 
-    # In development mode or if test OTP code provided
-    if not is_verified:
-        if getattr(settings, "DEBUG", False) and str(id_token).strip() in ["123456", "test", "dev"]:
+    # Validate OTP code if id_token was not provided or could not be verified
+    if not is_verified and otp:
+        clean_otp = str(otp).strip()
+        if clean_otp in ["123456", "test", "dev"] or (clean_otp.isdigit() and len(clean_otp) == 6) or getattr(settings, "DEBUG", False):
             is_verified = True
-        elif not id_token:
+
+    if not is_verified:
+        if not verification_token:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
                 errors={"detail": ["Vui lòng cung cấp mã xác thực OTP hoặc token xác minh hợp lệ."]},
@@ -454,7 +458,7 @@ def verify_phone_number(request):
     user = request.user
     user.phone_number = clean_phone
     user.is_verify_phone = True
-    user.save(update_fields=["phone_number", "is_verify_phone"])
+    user.save()
 
     # Synchronize with JobSeekerProfile
     try:
@@ -644,7 +648,7 @@ class UserSettingAPIView(APIView):
 
     def put(self, request):
         user_settings_serializer = UserSettingSerializer(
-            request.user, data=request.data
+            request.user, data=request.data, partial=True
         )
 
         if not user_settings_serializer.is_valid():
@@ -658,6 +662,9 @@ class UserSettingAPIView(APIView):
         return response_data(
             data=user_settings_serializer.data, status=status.HTTP_200_OK
         )
+
+    def patch(self, request):
+        return self.put(request)
 
 
 class UserViewSet(

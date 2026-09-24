@@ -9,14 +9,11 @@ import json
 import logging
 import math
 import os
-import random
-import sys
 import time
-from typing import Dict, List
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
 
+import numpy as np
 from livekit import api, rtc
+from PIL import Image, ImageDraw, ImageFont
 
 logging.basicConfig(
     level=logging.INFO,
@@ -25,8 +22,8 @@ logging.basicConfig(
 logger = logging.getLogger("CandidateSim")
 
 LIVEKIT_URL = os.environ.get("LIVEKIT_URL", "http://livekit:7880").replace("http://", "ws://").replace("https://", "wss://")
-API_KEY = os.environ.get("LIVEKIT_API_KEY", "lk_UtAnNjB4iOJ1r1w-AGRxX0c4D-KZhsay")
-API_SECRET = os.environ.get("LIVEKIT_API_SECRET", "CPoOScgkxwnUqGTguMZ-965yh2A9u47zMs9nyOxsiSLi_Cty3nsf5fNgl9mNpZG5")
+API_KEY = os.environ.get("LIVEKIT_API_KEY", "")
+API_SECRET = os.environ.get("LIVEKIT_API_SECRET", "")
 
 CANDIDATES = [
     {"id": 543, "name": "Trịnh Hoàng Long", "role": "Kỹ sư An toàn lao động HSE", "room": "interview-344741c1ec6b", "initial": "L", "color": (37, 99, 235)},
@@ -238,7 +235,7 @@ async def run_candidate_client(cand: dict):
 async def main():
     logger.info("=== STARTING 10 LIVE CANDIDATE SIMULATORS FOR SQUARE ===")
     logger.info("Connecting to LiveKit: %s", LIVEKIT_URL)
-    
+
     tasks = [asyncio.create_task(run_candidate_client(cand)) for cand in CANDIDATES]
     await asyncio.gather(*tasks)
 

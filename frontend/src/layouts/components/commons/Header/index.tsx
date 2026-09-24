@@ -24,7 +24,7 @@ const NotificationCard = React.lazy(() => import("../../../../components/Feature
 const ChatCard = React.lazy(() => import("../../../../components/Features/ChatCard"));
 
 import LanguageSwitcher from "../LanguageSwitcher";
-import { isAdminPortalPath, isEmployerPortalPath } from "@/configs/portalRouting";
+import { isAdminPortalPath, isEmployerPortalPath, isAdminHostname, isEmployerHostname } from "@/configs/portalRouting";
 import { localizeRoutePath } from "@/configs/routeLocalization";
 import HeaderNavLinks from "./HeaderNavLinks";
 import HeaderAuthArea from "./HeaderAuthArea";
@@ -148,17 +148,14 @@ const Header = (_props: HeaderProps) => {
 
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
 
-  const pathname = usePathname();
-
-  const hostName = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-
-  const fullPathname = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const pathname = usePathname() || '/';
+  const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
   const isAdminPortal =
-    isAdminPortalPath(fullPathname) ||
-    hostName === HOST_NAME.ADMIN_PROJECT;
+    isAdminPortalPath(pathname) ||
+    isAdminHostname(hostName);
   const isEmployerPortal =
-    isEmployerPortalPath(fullPathname) ||
-    hostName === HOST_NAME.EMPLOYER_PROJECT;
+    isEmployerPortalPath(pathname) ||
+    isEmployerHostname(hostName);
 
   const currentPortalHost = isAdminPortal
     ? HOST_NAME.ADMIN_PROJECT

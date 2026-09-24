@@ -765,7 +765,7 @@ def synthesize_and_cache_audio(model: str, voice: str, speed: float, text: str) 
     base_url = (
         getattr(settings, "TTS_BASE_URL", None)
         or config("TTS_BASE_URL", default="")
-        or config("AI_TTS_BASE_URL", default="https://api.nodelee.tech:4433/v1")
+        or config("AI_TTS_BASE_URL", default="https://api.metaconnect.vn/v1")
     ).rstrip("/")
     api_key = (
         getattr(settings, "TTS_API_KEY", None)

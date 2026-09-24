@@ -1,5 +1,4 @@
 import time
-import pytest
 
 from livekit_agent.decision_engine import (
     DecisionVerdict,
@@ -175,6 +174,25 @@ def test_confidence_calibration_and_edge_cases() -> None:
     assert isinstance(helper_verdict, DecisionVerdict)
     assert helper_verdict.intent == TurnIntent.REFUSAL_OR_SKIP
     assert 0.0 <= helper_verdict.confidence <= 1.0
+
+
+def test_proctoring_acknowledgment_classification() -> None:
+    test_cases = [
+        "Dạ em xin lỗi ạ",
+        "Em xin lỗi, em vừa bị lag",
+        "Dạ vâng em quay lại rồi",
+        "Em bấm nhầm, xin lỗi bạn",
+        "Dạ em hiểu rồi ạ",
+        "Vâng ạ, em đây rồi",
+        "Dạ em sẽ chú ý ạ",
+    ]
+
+    engine = VoiceDecisionEngine()
+    for text in test_cases:
+        verdict = engine.classify_turn(text)
+        assert verdict.intent == TurnIntent.PROCTORING_ACKNOWLEDGMENT, f"Failed for '{text}': got {verdict.intent}"
+        assert verdict.confidence >= 0.75, f"Low confidence for '{text}': {verdict.confidence}"
+        assert len(verdict.reasoning) > 0
 
 
 def test_execution_latency_under_1ms() -> None:

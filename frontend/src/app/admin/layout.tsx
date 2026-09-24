@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function AdminSectionLayout({
   children,
 }: {
-  children: any;
+  children: React.ReactNode;
 }) {
   return <AdminSectionClient>{children}</AdminSectionClient>;
 }

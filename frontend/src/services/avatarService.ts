@@ -1,5 +1,5 @@
 /**
- * Dịch vụ Quản lý Nhân vật Người ảo AI và Render Khẩu hình Lipsync Wav2Lip
+ * Dịch vụ Quản lý Nhân vật Người ảo AI và Render Khẩu hình Lipsync AILA
  * Kết nối tới Talking Head FastAPI service hoặc fallback dữ liệu tĩnh chuẩn xác.
  */
 
@@ -83,7 +83,7 @@ export const avatarService = {
   },
 
   /**
-   * Kích hoạt render Lipsync Wav2Lip từ audio sang clip video câu trả lời
+   * Kích hoạt render Lipsync AILA từ audio sang clip video câu trả lời
    */
   renderLipsync: async (req: LipsyncRenderRequest): Promise<LipsyncRenderResponse> => {
     try {

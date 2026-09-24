@@ -13,6 +13,8 @@ const t = (key: string, defaultValue?: string) => {
     'validation.requiredConfirmPassword': 'Confirm password is required.',
     'validation.confirmPasswordMatch': 'Passwords do not match.',
     'validation.requiredCompanyName': 'Company name is required.',
+    'validation.requiredTaxCode': 'Tax code is required.',
+    'validation.invalidTaxCode': 'Tax code must be 10 or 13 digits.',
     'validation.requiredCity': 'City is required.',
   };
 
@@ -20,7 +22,7 @@ const t = (key: string, defaultValue?: string) => {
 };
 
 describe('createEmployerSignUpSchema (Single-step lean registration)', () => {
-  it('validates a correct registration payload successfully', async () => {
+  it('validates a correct registration payload successfully with 10-digit tax code', async () => {
     const schema = createEmployerSignUpSchema(t as never);
     const validData = {
       fullName: 'Nguyễn Văn Tuyển',
@@ -30,6 +32,7 @@ describe('createEmployerSignUpSchema (Single-step lean registration)', () => {
       confirmPassword: 'Password@123',
       company: {
         companyName: 'TechCorp Vietnam JSC',
+        taxCode: '0101234567',
         location: {
           city: 1,
         },
@@ -37,6 +40,45 @@ describe('createEmployerSignUpSchema (Single-step lean registration)', () => {
     };
 
     await expect(schema.isValid(validData)).resolves.toBe(true);
+  });
+
+  it('validates a correct registration payload successfully with 13-digit tax code', async () => {
+    const schema = createEmployerSignUpSchema(t as never);
+    const validData = {
+      fullName: 'Nguyễn Văn Tuyển',
+      phone: '0901234567',
+      email: 'recruiter@techcorp.vn',
+      password: 'Password@123',
+      confirmPassword: 'Password@123',
+      company: {
+        companyName: 'TechCorp Vietnam JSC - Branch',
+        taxCode: '0101234567001',
+        location: {
+          city: 1,
+        },
+      },
+    };
+
+    await expect(schema.isValid(validData)).resolves.toBe(true);
+  });
+
+  it('rejects invalid tax code formats and lengths (non-numeric, 9 digits, 11 digits, 12 digits, 14 digits)', async () => {
+    const schema = createEmployerSignUpSchema(t as never);
+
+    const testInvalidCodes = ['010123456', '01012345678', '010123456789', '01012345678901', '010123456A', '010-1234567'];
+    for (const code of testInvalidCodes) {
+      await expect(
+        schema.validateAt('company.taxCode', { company: { taxCode: code } })
+      ).rejects.toThrow('Tax code must be 10 or 13 digits.');
+    }
+  });
+
+  it('rejects empty or missing tax code', async () => {
+    const schema = createEmployerSignUpSchema(t as never);
+
+    await expect(
+      schema.validateAt('company.taxCode', { company: { taxCode: '' } })
+    ).rejects.toThrow('Tax code is required.');
   });
 
   it('rejects invalid phone numbers', async () => {
@@ -70,6 +112,7 @@ describe('createEmployerSignUpSchema (Single-step lean registration)', () => {
         confirmPassword: 'DifferentPassword@123',
         company: {
           companyName: 'TechCorp',
+          taxCode: '0101234567',
           location: { city: 1 },
         },
       })

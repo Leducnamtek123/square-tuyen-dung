@@ -18,6 +18,8 @@ import { ROUTES } from '@/configs/constants';
 import { getPreferredLanguage } from '@/configs/portalRouting';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import type { AdminGeneralStats } from '@/services/statisticService';
+import { useQuery } from '@tanstack/react-query';
+import adminManagementService from '@/services/adminManagementService';
 
 interface PendingActionWidgetProps {
   stats?: AdminGeneralStats;
@@ -28,9 +30,15 @@ export default function PendingActionWidget({ stats, loading = false }: PendingA
   const router = useRouter();
   const lang = getPreferredLanguage();
 
+  const { data: trustReportsData } = useQuery({
+    queryKey: ['admin-pending-reports-count'],
+    queryFn: () => adminManagementService.getTrustReports({ page: 1, pageSize: 1, status: 'pending' }),
+    staleTime: 60000,
+  });
+
   const pendingJobs = stats?.totalJobPostsPending || 0;
   const pendingVerifications = stats?.totalCompanyVerificationsPending || 0;
-  const totalReports = (stats?.totalCompanyVerificationsRejected || 0) + (stats?.totalJobPostsRejected || 0);
+  const totalReports = trustReportsData?.count ?? 0;
 
   const items = [
     {

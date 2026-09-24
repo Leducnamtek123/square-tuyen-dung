@@ -26,34 +26,38 @@ type ScoreBarProps = {
   color: string;
 };
 
-const ScoreBar = ({ icon, label, value, color }: ScoreBarProps) => (
-  <Box>
-    <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2} mb={0.75}>
-      <Typography variant="body2" sx={{ fontWeight: 750, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary', fontSize: '0.8125rem' }}>
-        {icon}
-        {label}
-      </Typography>
-      <Typography variant="body2" sx={{ fontWeight: 850, color, fontSize: '0.875rem' }}>
-        {value || 0}<Box component="span" sx={{ color: 'text.disabled', ml: 0.25, fontWeight: 700, fontSize: '0.75rem' }}>/10</Box>
-      </Typography>
-    </Stack>
-    <LinearProgress
-      variant="determinate"
-      value={(value || 0) * 10}
-      sx={{
-        height: 7,
-        borderRadius: 2,
-        bgcolor: alpha(color, 0.12),
-        '& .MuiLinearProgress-bar': {
+const ScoreBar = ({ icon, label, value, color }: ScoreBarProps) => {
+  const safeValue = Number.isFinite(value) ? value : 0;
+  return (
+    <Box>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2} mb={0.75}>
+        <Typography variant="body2" sx={{ fontWeight: 750, display: 'flex', alignItems: 'center', gap: 1, color: 'text.primary', fontSize: '0.8125rem' }}>
+          {icon}
+          {label}
+        </Typography>
+        <Typography variant="body2" sx={{ fontWeight: 850, color, fontSize: '0.875rem' }}>
+          {safeValue}<Box component="span" sx={{ color: 'text.disabled', ml: 0.25, fontWeight: 700, fontSize: '0.75rem' }}>/10</Box>
+        </Typography>
+      </Stack>
+      <LinearProgress
+        variant="determinate"
+        value={Math.min(100, Math.max(0, safeValue * 10))}
+        sx={{
+          height: 7,
           borderRadius: 2,
-          bgcolor: color,
-        },
-      }}
-    />
-  </Box>
-);
+          bgcolor: alpha(color, 0.12),
+          '& .MuiLinearProgress-bar': {
+            borderRadius: 2,
+            bgcolor: color,
+          },
+        }}
+      />
+    </Box>
+  );
+};
 
 const getRatingBadge = (score: number) => {
+  if (isNaN(score)) return { label: 'Chưa có', color: '#64748b', bg: alpha('#64748b', 0.1) };
   if (score >= 8.5) return { label: 'Xuất sắc', color: '#16a34a', bg: alpha('#22c55e', 0.1) };
   if (score >= 7.0) return { label: 'Khá / Phù hợp', color: '#0284c7', bg: alpha('#0284c7', 0.1) };
   if (score >= 5.0) return { label: 'Trung bình', color: '#d97706', bg: alpha('#f59e0b', 0.1) };
@@ -68,28 +72,31 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
   isTriggeringAi = false,
 }) => {
   const theme = useTheme();
-  const overallScore = session.aiOverallScore ?? session.ai_overall_score;
-  const technicalScore = Number(session.aiTechnicalScore ?? session.ai_technical_score ?? 0);
-  const communicationScore = Number(session.aiCommunicationScore ?? session.ai_communication_score ?? 0);
+  const overallScore = session?.aiOverallScore ?? session?.ai_overall_score;
+  const rawTechScore = Number(session?.aiTechnicalScore ?? session?.ai_technical_score ?? 0);
+  const technicalScore = Number.isFinite(rawTechScore) ? rawTechScore : 0;
+  const rawCommScore = Number(session?.aiCommunicationScore ?? session?.ai_communication_score ?? 0);
+  const communicationScore = Number.isFinite(rawCommScore) ? rawCommScore : 0;
   const hasResult = overallScore !== null && overallScore !== undefined;
-  const numOverallScore = Number(overallScore || 0);
-  const isProcessing = effectiveStatus === 'processing' || session.status === 'processing';
-  const canTriggerAi = effectiveStatus === 'completed' || session.status === 'completed';
+  const parsedOverall = Number(overallScore ?? 0);
+  const numOverallScore = Number.isFinite(parsedOverall) ? parsedOverall : 0;
+  const isProcessing = effectiveStatus === 'processing' || session?.status === 'processing';
+  const canTriggerAi = effectiveStatus === 'completed' || session?.status === 'completed';
   const rating = getRatingBadge(numOverallScore);
 
   const score100 = numOverallScore <= 10 ? Math.round(numOverallScore * 10) : Math.round(numOverallScore);
   const techScore100 = technicalScore <= 10 ? Math.round(technicalScore * 10) : Math.round(technicalScore);
   const commScore100 = communicationScore <= 10 ? Math.round(communicationScore * 10) : Math.round(communicationScore);
-  const softSkills = (session.aiDetailedFeedback as any)?.soft_skills;
+  const softSkills = (session?.aiDetailedFeedback as any)?.soft_skills;
   const confidenceScore = softSkills?.confidence != null ? Math.round(Number(softSkills.confidence) * 10) : Math.round(score100 * 0.95);
   const clarityScore = softSkills?.clarity != null ? Math.round(Number(softSkills.clarity) * 10) : commScore100;
   const relevanceScore = Math.round((techScore100 + score100) / 2);
 
   const radarDimensions: RadarDimension[] = [
-    { key: 'content', label: 'Nội dung', value: techScore100 },
-    { key: 'clarity', label: 'Rõ ràng', value: clarityScore },
-    { key: 'relevance', label: 'Liên quan', value: relevanceScore },
-    { key: 'confidence', label: 'Tự tin', value: confidenceScore },
+    { key: 'content', label: 'Nội dung', value: Number.isFinite(techScore100) ? techScore100 : 0 },
+    { key: 'clarity', label: 'Rõ ràng', value: Number.isFinite(clarityScore) ? clarityScore : 0 },
+    { key: 'relevance', label: 'Liên quan', value: Number.isFinite(relevanceScore) ? relevanceScore : 0 },
+    { key: 'confidence', label: 'Tự tin', value: Number.isFinite(confidenceScore) ? confidenceScore : 0 },
   ];
 
   return (
@@ -115,8 +122,8 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
           <Box
             sx={{
               p: 2.25,
-              borderRadius: 3.5,
-              background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(99, 102, 241, 0.06) 100%)',
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.06) 0%, rgba(99, 102, 241, 0.05) 100%)',
               border: '1px solid',
               borderColor: alpha(theme.palette.primary.main, 0.18),
               position: 'relative',
@@ -125,19 +132,21 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
           >
             <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
               <Box>
-                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.75 }}>
                   <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.6875rem' }}>
                     {t('interviewDetail.label.aiOverallQuality')}
                   </Typography>
                   <Box
                     sx={{
                       px: 1,
-                      py: 0.2,
+                      py: 0.25,
                       borderRadius: '8px',
                       bgcolor: rating.bg,
                       color: rating.color,
                       fontWeight: 800,
                       fontSize: '0.6875rem',
+                      border: '1px solid',
+                      borderColor: alpha(rating.color, 0.2),
                     }}
                   >
                     {rating.label}
@@ -145,7 +154,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
                 </Stack>
                 <Typography variant="h3" sx={{ fontWeight: 900, color: 'primary.main', letterSpacing: '-0.03em', lineHeight: 1 }}>
                   {overallScore}
-                  <Box component="span" sx={{ fontSize: '1.15rem', fontWeight: 700, color: 'text.disabled', ml: 0.5 }}>
+                  <Box component="span" sx={{ fontSize: '1.1rem', fontWeight: 700, color: 'text.disabled', ml: 0.5 }}>
                     /10
                   </Box>
                 </Typography>
@@ -154,21 +163,23 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
                 sx={{
                   width: 52,
                   height: 52,
-                  borderRadius: '16px',
-                  bgcolor: alpha(theme.palette.primary.main, 0.12),
+                  borderRadius: 2.5,
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
                   color: 'primary.main',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  border: '1px solid',
+                  borderColor: alpha(theme.palette.primary.main, 0.18),
                 }}
               >
-                <AutoAwesomeIcon sx={{ fontSize: 28 }} />
+                <AutoAwesomeIcon sx={{ fontSize: 26 }} />
               </Box>
             </Stack>
           </Box>
 
           {/* Sub-scores */}
-          <Stack spacing={2} sx={{ p: 2, borderRadius: 3, bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider' }}>
+          <Stack spacing={2} sx={{ p: 2, borderRadius: 2.5, bgcolor: '#F8FAFC', border: '1px solid', borderColor: 'divider' }}>
             <ScoreBar
               icon={<PsychologyIcon sx={{ fontSize: 18, color: '#0284c7' }} />}
               label={t('interviewDetail.label.technicalScore')}
@@ -187,7 +198,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
           <Box
             sx={{
               p: 2,
-              borderRadius: 3,
+              borderRadius: 2.5,
               bgcolor: 'background.paper',
               border: '1px solid',
               borderColor: 'divider',
@@ -206,25 +217,25 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
                 sx={{ height: 20, fontSize: '0.6875rem', fontWeight: 700 }}
               />
             </Stack>
-            <CompetencyRadarChart dimensions={radarDimensions} size={250} accentColor="#4f46e5" />
+            <CompetencyRadarChart dimensions={radarDimensions} size={240} accentColor="#4f46e5" />
           </Box>
 
           {/* Executive Summary */}
           <Box
             sx={{
               p: 2.25,
-              borderRadius: 3,
+              borderRadius: 2.5,
               bgcolor: 'background.paper',
               border: '1px solid',
               borderColor: 'divider',
-              boxShadow: '0 2px 8px -2px rgba(15, 23, 42, 0.04)',
+              boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
             }}
           >
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', mb: 0.75, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Tóm tắt nhận định AI
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 550, color: 'text.primary', lineHeight: 1.75, fontSize: '0.875rem' }}>
-              {session.aiSummary || session.ai_summary || t('interviewDetail.messages.aiGenerating')}
+            <Typography variant="body2" sx={{ fontWeight: 550, color: 'text.primary', lineHeight: 1.7, fontSize: '0.84rem' }}>
+              {session?.aiSummary || session?.ai_summary || t('interviewDetail.messages.aiGenerating')}
             </Typography>
           </Box>
 
@@ -237,13 +248,16 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
             sx={{
               fontWeight: 800,
               py: 1.1,
-              borderRadius: '12px',
+              borderRadius: 2.5,
               textTransform: 'none',
-              fontSize: '0.8125rem',
-              boxShadow: 'none',
-              borderColor: 'divider',
-              color: 'text.primary',
-              '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.05), borderColor: 'primary.main' },
+              fontSize: '0.84rem',
+              borderColor: alpha(theme.palette.primary.main, 0.3),
+              color: 'primary.main',
+              bgcolor: alpha(theme.palette.primary.main, 0.02),
+              '&:hover': {
+                bgcolor: alpha(theme.palette.primary.main, 0.08),
+                borderColor: 'primary.main',
+              },
             }}
           >
             {t('interviewDetail.actions.retryAi')}

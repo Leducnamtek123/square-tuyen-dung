@@ -14,7 +14,12 @@ import {
   FormControlLabel,
   FormHelperText,
   IconButton,
+  Menu,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Tooltip,
   Stack,
   Switch,
   TextField,
@@ -26,6 +31,7 @@ import BusinessIcon from '@mui/icons-material/Business';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { ColumnDef } from '@tanstack/react-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -74,6 +80,74 @@ const statusColor = (status?: string): 'success' | 'warning' | 'error' | 'defaul
 };
 
 const getProfileType = (profile: VoiceProfile) => profile.voiceType || profile.voice_type || 'cloned';
+
+interface VoiceProfileActionsCellProps {
+  profile: VoiceProfile;
+  onEdit: (profile: VoiceProfile) => void;
+  onTest: (profile: VoiceProfile) => void;
+  onSample: (profile: VoiceProfile) => void;
+  onGrant: (profile: VoiceProfile) => void;
+  onDelete: (profile: VoiceProfile) => void;
+  isCloned: boolean;
+  t: (key: string, options?: any) => string;
+}
+
+const VoiceProfileActionsCell = ({
+  profile,
+  onEdit,
+  onTest,
+  onSample,
+  onGrant,
+  onDelete,
+  isCloned,
+  t,
+}: VoiceProfileActionsCellProps) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  return (
+    <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center">
+      <Tooltip title={t('pages.voiceProfiles.messages.testActionAria', { name: profile.name, defaultValue: 'Nghe thử giọng' })}>
+        <span>
+          <IconButton
+            size="small"
+            color="primary"
+            disabled={profile.status !== 'ready'}
+            onClick={() => onTest(profile)}
+            aria-label={t('pages.voiceProfiles.messages.testActionAria', { name: profile.name })}
+          >
+            <PlayCircleOutlineIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
+      <Tooltip title={t('pages.voiceProfiles.actions.edit')}>
+        <IconButton size="small" color="primary" onClick={() => onEdit(profile)}>
+          <EditIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <IconButton size="small" onClick={(e) => setAnchorEl(e.currentTarget)}>
+        <MoreVertIcon fontSize="small" />
+      </IconButton>
+      <Menu anchorEl={anchorEl} open={open} onClose={() => setAnchorEl(null)}>
+        {isCloned && (
+          <MenuItem onClick={() => { setAnchorEl(null); onSample(profile); }}>
+            <ListItemIcon><UploadFileIcon fontSize="small" /></ListItemIcon>
+            <ListItemText>{t('pages.voiceProfiles.actions.sample')}</ListItemText>
+          </MenuItem>
+        )}
+        <MenuItem onClick={() => { setAnchorEl(null); onGrant(profile); }}>
+          <ListItemIcon><BusinessIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('pages.voiceProfiles.actions.grant')}</ListItemText>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => { setAnchorEl(null); onDelete(profile); }} sx={{ color: 'error.main' }}>
+          <ListItemIcon sx={{ color: 'error.main' }}><DeleteOutlineIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>{t('pages.voiceProfiles.actions.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
+    </Stack>
+  );
+};
 
 const VoiceProfilesPage = () => {
   const queryClient = useQueryClient();
@@ -499,36 +573,18 @@ const VoiceProfilesPage = () => {
       id: 'actions',
       header: t('pages.voiceProfiles.table.actions') as string,
       meta: { align: 'right' as const },
-      cell: (info) => {
-        const profile = info.row.original;
-        return (
-          <Stack direction="row" gap={1} justifyContent="flex-end" flexWrap="wrap">
-            <Button size="small" variant="outlined" startIcon={<EditIcon />} onClick={() => openEditDialog(profile)}>
-              {t('pages.voiceProfiles.actions.edit')}
-            </Button>
-            <IconButton
-              size="small"
-              color="primary"
-              aria-label={t('pages.voiceProfiles.messages.testActionAria', { name: profile.name })}
-              disabled={profile.status !== 'ready'}
-              onClick={() => openTestDialog(profile)}
-            >
-              <PlayCircleOutlineIcon fontSize="small" />
-            </IconButton>
-            {getProfileType(profile) === 'cloned' ? (
-              <Button size="small" variant="outlined" startIcon={<UploadFileIcon />} onClick={() => setSampleProfile(profile)}>
-                {t('pages.voiceProfiles.actions.sample')}
-              </Button>
-            ) : null}
-            <Button size="small" variant="outlined" startIcon={<BusinessIcon />} onClick={() => setGrantProfile(profile)}>
-              {t('pages.voiceProfiles.actions.grant')}
-            </Button>
-            <Button size="small" color="error" variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={() => setDeleteProfile(profile)}>
-              {t('pages.voiceProfiles.actions.delete')}
-            </Button>
-          </Stack>
-        );
-      },
+      cell: (info) => (
+        <VoiceProfileActionsCell
+          profile={info.row.original}
+          isCloned={getProfileType(info.row.original) === 'cloned'}
+          onEdit={openEditDialog}
+          onTest={openTestDialog}
+          onSample={setSampleProfile}
+          onGrant={setGrantProfile}
+          onDelete={setDeleteProfile}
+          t={t}
+        />
+      ),
     },
   ]), [getStatusLabel, getVoiceTypeLabel, openEditDialog, openTestDialog, t]);
 

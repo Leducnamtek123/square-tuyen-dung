@@ -144,8 +144,8 @@ describe('CandidatePracticePage logic and data handling', () => {
       return '/my-interviews';
     };
 
-    expect(resolveRedirect({ interview_url: 'https://square.vn/interview/livekit-token-123' })).toBe(
-      'https://square.vn/interview/livekit-token-123'
+    expect(resolveRedirect({ interview_url: 'https://infohr.vn/interview/session-token-123' })).toBe(
+      'https://infohr.vn/interview/session-token-123'
     );
     expect(resolveRedirect({ session_id: 'session-456' })).toBe('/interview/session-456');
     expect(resolveRedirect({})).toBe('/my-interviews');

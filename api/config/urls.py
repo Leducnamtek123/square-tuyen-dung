@@ -7,6 +7,7 @@ from rest_framework import permissions
 from config.admin import custom_admin_site
 from config import views
 from apps.interviews import views_compat as interviews_compat_views
+from apps.interviews.urls import scripts_router
 from config.health import health_check
 from integrations.ai import views as ai_views
 from integrations.livekit import webhook as livekit_webhook
@@ -27,11 +28,13 @@ api_v1_patterns = [
     path("common/", include("apps.common.urls")),
     path("auth/", include("apps.accounts.urls")),
     path("info/", include("apps.profiles.urls")),
+    path("profiles/", include("apps.profiles.urls")),
     path("job/", include("apps.jobs.urls")),
     path("cv/", include("apps.cv_builder.urls")),
     path("content/", include("apps.content.urls")),
     path("chatbot/", include("apps.chatbot.urls")),
     path("interview/", include("apps.interviews.urls")),
+    path("interview-scripts/", include((scripts_router.urls, "interview-scripts"), namespace="interview-scripts-v1")),
     path("agent-assistants/", include("apps.agent_assistants.urls")),
     path("native-hrm/", include("apps.hrm.urls")),
     path("exchange/", include("apps.exchange.urls")),

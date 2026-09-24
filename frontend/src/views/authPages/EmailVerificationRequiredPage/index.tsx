@@ -774,7 +774,7 @@ const EmailVerificationRequiredPage = () => {
 
               <Button
                 component={Link}
-                href={getLoginUrl(email)}
+                href={getSafeRedirectPath(getLoginUrl(email))}
                 variant="text"
                 endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 15 }} />}
                 sx={{

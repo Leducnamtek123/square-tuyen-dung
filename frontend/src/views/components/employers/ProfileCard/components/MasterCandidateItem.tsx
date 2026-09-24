@@ -57,9 +57,10 @@ export const MasterCandidateItem: React.FC<MasterCandidateItemProps> = ({
     resume.experience && allConfig?.experienceDict?.[resume.experience]
       ? tConfig(String(allConfig.experienceDict[resume.experience]))
       : null;
+  const cityId = typeof resume.city === 'object' ? resume.city?.id : (resume.city ?? (resume as any).cityChooseData?.id);
   const cityLabel =
-    resume.city?.id && allConfig?.cityDict?.[resume.city.id]
-      ? tConfig(String(allConfig.cityDict[resume.city.id]))
+    cityId && allConfig?.cityDict?.[cityId]
+      ? tConfig(String(allConfig.cityDict[cityId]))
       : null;
 
   const matchScore = typeof resume.matchScore === 'number' ? resume.matchScore : 0;

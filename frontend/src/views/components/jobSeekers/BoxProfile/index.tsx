@@ -26,7 +26,7 @@ import errorHandling from "@/utils/errorHandling";
 import MuiImageCustom from "@/components/Common/MuiImageCustom";
 import toSlug, { formatLocalizedSalaryRange } from "@/utils/customData";
 import NoDataCard from "@/components/Common/NoDataCard";
-import type { ExtendedResume } from "@/components/Features/CVDoc";
+import CVDoc, { type ExtendedResume } from "@/components/Features/CVDoc";
 import { reloadResume } from "@/redux/profileSlice";
 import jobSeekerProfileService from "@/services/jobSeekerProfileService";
 import resumeService from "@/services/resumeService";
@@ -137,16 +137,49 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
     activeResume(slug);
   };
 
-  const handleColorSelect = async (color: string) => {
-    setSelectedColor(color);
-    setIsGeneratingPDF(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setIsGeneratingPDF(false);
-  };
-
   const handleDownloadClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (!resume || !currentUser) {
+      toastMessages.error(t("jobSeeker:profile.messages.noResumeData", "Không tìm thấy dữ liệu hồ sơ để tải"));
+      return;
+    }
     setOpenColorPicker(true);
+  };
+
+  const handleColorSelect = async (color: string) => {
+    if (!resume || !currentUser) {
+      toastMessages.error(t("jobSeeker:profile.messages.noResumeData", "Không tìm thấy dữ liệu hồ sơ để tải"));
+      return;
+    }
+    setSelectedColor(color);
+    setIsGeneratingPDF(true);
+    setOpenColorPicker(false);
+    try {
+      const { pdf } = await import('@react-pdf/renderer');
+      const blob = await pdf(
+        <CVDoc resume={resume as ExtendedResume} user={currentUser} themeColor={color} />
+      ).toBlob();
+
+      if (blobRef) {
+        blobRef.current = blob;
+      }
+
+      const fileName = `${APP_NAME}_CV_${currentUser?.fullName || ''}-${toSlug(resume?.title || 'title')}.pdf`;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toastMessages.success(t("jobSeeker:profile.messages.downloadSuccess", "Đã tải xuống CV thành công!"));
+    } catch (err) {
+      console.error('[BoxProfile] Failed to generate PDF:', err);
+      toastMessages.error(t("jobSeeker:profile.messages.downloadError", "Không thể tạo file PDF. Vui lòng thử lại!"));
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   return (
@@ -333,21 +366,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
       <ColorPickerDialog
         open={openColorPicker}
         onClose={() => setOpenColorPicker(false)}
-        onColorSelect={async (color: string) => {
-          await handleColorSelect(color);
-          setTimeout(() => {
-            if (blobRef.current) {
-              const url = URL.createObjectURL(blobRef.current);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = `${APP_NAME}_CV-${toSlug(resume?.title || "title")}.pdf`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(url);
-            }
-          }, 1000);
-        }}
+        onColorSelect={handleColorSelect}
       />
       {isFullScreenLoading && <BackdropLoading />}
     </>

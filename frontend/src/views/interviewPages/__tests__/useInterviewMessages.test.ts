@@ -43,12 +43,82 @@ describe('mapTranscriptions', () => {
     ] as any;
 
     const messages = mapTranscriptions(transcriptions, 'candidate-1', participants as any);
-
     expect(messages).toHaveLength(3);
     expect(messages[0]?.type).toBe('userTranscript');
     expect(messages[1]?.type).toBe('agentTranscript');
     expect(messages[2]?.type).toBe('userTranscript');
     expect(messages[2]?.from?.identity).toBe('employer-1');
+  });
+
+  it('filters out STT hallucinations like YouTube outro phrases', () => {
+    const participants = [
+      {
+        kind: ParticipantKind.STANDARD,
+        identity: 'candidate-1',
+        name: 'Candidate',
+        attributes: { role: 'candidate' },
+      },
+    ] as any;
+
+    const transcriptions = [
+      {
+        text: 'Hãy subscribe cho kênh Ghiền Mì Gõ Để không bỏ lỡ những video hấp dẫn',
+        participantInfo: { identity: 'candidate-1' },
+        streamInfo: { id: 's1', timestamp: 1 },
+      },
+      {
+        text: 'Chào bạn, tôi là ứng viên',
+        participantInfo: { identity: 'candidate-1' },
+        streamInfo: { id: 's2', timestamp: 2 },
+      },
+    ] as any;
+
+    const messages = mapTranscriptions(transcriptions, 'candidate-1', participants as any);
+
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.message).toBe('Chào bạn, tôi là ứng viên');
+  });
+});
+
+describe('isAgentMessage & normalizeMessageText', () => {
+  const { isAgentMessage, normalizeMessageText } = require('../useInterviewMessages');
+
+  it('normalizes punctuation and case correctly', () => {
+    expect(normalizeMessageText('  Tuyệt vời, chúng ta cùng bắt đầu nhé!  ')).toBe('tuyệt vời chúng ta cùng bắt đầu nhé');
+    expect(normalizeMessageText('Chào bạn: bạn nghe rõ không?')).toBe('chào bạn bạn nghe rõ không');
+    expect(normalizeMessageText('')).toBe('');
+    expect(normalizeMessageText(null)).toBe('');
+  });
+
+  it('correctly identifies agent messages across diverse identities and participant kinds', () => {
+    expect(isAgentMessage({ type: 'agentTranscript', id: '1', message: 'Hi', timestamp: 100 })).toBe(true);
+    expect(
+      isAgentMessage({
+        type: 'chat',
+        id: '2',
+        message: 'Hi',
+        timestamp: 100,
+        from: { identity: 'agent-interview-1' },
+      }),
+    ).toBe(true);
+    expect(
+      isAgentMessage({
+        type: 'chat',
+        id: '3',
+        message: 'Hi',
+        timestamp: 100,
+        from: { kind: ParticipantKind.AGENT, identity: 'custom-worker' },
+      }),
+    ).toBe(true);
+    expect(
+      isAgentMessage({
+        type: 'chat',
+        id: '4',
+        message: 'Hi',
+        timestamp: 100,
+        from: { identity: 'candidate-1', attributes: { role: 'candidate' } },
+      }),
+    ).toBe(false);
   });
 });
 

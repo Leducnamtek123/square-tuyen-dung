@@ -18,6 +18,8 @@ interface Props<T extends FieldValues = FieldValues> {
   disabled?: boolean;
   icon?: React.ReactNode;
   type?: string;
+  maxLength?: number;
+  numericOnly?: boolean;
   sx?: SxProps<Theme>;
 }
 
@@ -31,6 +33,8 @@ const TextFieldCustom = <T extends FieldValues = FieldValues>({
   disabled = false,
   icon = null,
   type = 'text',
+  maxLength,
+  numericOnly = false,
   sx = EMPTY_SX,
 }: Props<T>) => {
 
@@ -67,13 +71,20 @@ const TextFieldCustom = <T extends FieldValues = FieldValues>({
               placeholder={placeholder}
               value={formatDisplay(field.value) ?? ''}
               onChange={(e) => {
+                let value = e.target.value;
 
-                const value = e.target.value.replace(/,/g, '');
+                if (numericOnly) {
+                  value = value.replace(/\D/g, '');
+                } else if (type === 'number') {
+                  value = value.replace(/,/g, '');
+                  if (!/^\d*$/.test(value)) return;
+                }
 
-                if (type === 'number' && !/^\d*$/.test(value)) return;
+                if (typeof maxLength === 'number' && value.length > maxLength) {
+                  value = value.slice(0, maxLength);
+                }
 
                 field.onChange(value);
-
               }}
 
               onBlur={field.onBlur}
@@ -91,7 +102,8 @@ const TextFieldCustom = <T extends FieldValues = FieldValues>({
                   ),
                 },
                 htmlInput: {
-                  inputMode: type === 'number' ? 'numeric' : 'text',
+                  inputMode: type === 'number' || numericOnly ? 'numeric' : 'text',
+                  ...(typeof maxLength === 'number' ? { maxLength } : {}),
                 },
               }}
 

@@ -18,7 +18,7 @@ from apps.profiles.models import (
     Company,
     CompanyMember
 )
-from apps.locations.models import Location
+from apps.locations.models import Location, District
 from apps.files.models import File
 from apps.common.serializers import LocationSerializer
 from shared.helpers.cloudinary_service import CloudinaryService
@@ -153,6 +153,9 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
         ],
     )
 class CompanyRegisterLocationSerializer(serializers.ModelSerializer):
+    district = serializers.PrimaryKeyRelatedField(
+        queryset=District.objects.all(), required=False, allow_null=True
+    )
     address = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
     lat = serializers.FloatField(required=False, allow_null=True)
     lng = serializers.FloatField(required=False, allow_null=True)
@@ -176,6 +179,9 @@ class CompanyRegisterLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ('city', 'district', 'ward', 'address', 'lat', 'lng')
+        extra_kwargs = {
+            'district': {'required': False, 'allow_null': True},
+        }
 
 class CompanyRegisterSerializer(serializers.ModelSerializer):
     companyName = serializers.CharField(
@@ -308,6 +314,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     isVerifyEmail = serializers.BooleanField(source='is_verify_email', read_only=True)
     isVerifyPhone = serializers.BooleanField(source='is_verify_phone', read_only=True)
     isPhoneVerified = serializers.BooleanField(source='is_verify_phone', read_only=True)
+    hasCompany = serializers.BooleanField(source='has_company', read_only=True)
     isOnboarded = serializers.BooleanField(source='is_onboarded', read_only=True)
     onboardingStep = serializers.IntegerField(source='onboarding_step', read_only=True)
     roleName = serializers.ChoiceField(source="role_name", choices=var_sys.ROLE_CHOICES, required=False)
@@ -338,7 +345,8 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return None
 
     def _get_job_seeker_profile_safe(self, user):
-        if getattr(user, 'role_name', None) != var_sys.JOB_SEEKER:
+        role = (getattr(user, 'role_name', None) or "").strip().upper()
+        if role not in {var_sys.JOB_SEEKER, 'CANDIDATE'}:
             return None
         try:
             cached = getattr(user, "job_seeker_profile", None)
@@ -439,11 +447,12 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         except Exception as ex:
             helper.print_log_error("UserSerializer.get_workspaces.has_job_seeker_profile", ex)
 
-        if (role_name == var_sys.JOB_SEEKER or has_job_seeker_profile) and role_name != var_sys.ADMIN:
+        is_candidate_role = role_name in {var_sys.JOB_SEEKER, 'CANDIDATE'}
+        if (is_candidate_role or has_job_seeker_profile) and role_name != var_sys.ADMIN:
             workspaces.append({
                 "type": "job_seeker",
                 "label": "Candidate",
-                "isDefault": role_name == var_sys.JOB_SEEKER,
+                "isDefault": is_candidate_role,
             })
 
         company_ids = set()
@@ -530,6 +539,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         model = User
         fields = ("id", "fullName", "email", "phoneNumber", "phone",
                   "isActive", "isVerifyEmail", "isVerifyPhone", "isPhoneVerified",
+                  "hasCompany",
                   "isOnboarded", "onboardingStep",
                   "avatarUrl", "coverUrl", "roleName",
                   "jobSeekerProfileId", "jobSeekerProfile",

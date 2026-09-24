@@ -220,6 +220,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
         id="account-menu"
         open={open}
         onClose={handleCloseUserMenu}
+        disableScrollLock
         slotProps={{
           transition: {
             onExited: handleMenuExited,

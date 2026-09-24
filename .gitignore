@@ -88,3 +88,6 @@ coverage/
 
 # Local isolated worktrees
 .worktrees/
+
+# Local scratch directory
+scratch/

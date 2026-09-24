@@ -72,9 +72,20 @@ class IsJobSeekerUser(permissions.IsAuthenticated):
 
         user = request.user
 
-        if user.is_authenticated:
+        if getattr(user, "is_authenticated", False):
+            if (
+                getattr(user, "role_name", None) == var_sys.ADMIN
+                or getattr(user, "is_staff", False)
+                or getattr(user, "is_superuser", False)
+            ):
+                return True
 
-            return user.role_name == var_sys.JOB_SEEKER
+            role = (getattr(user, "role_name", "") or "").strip().upper()
+            if role in {var_sys.JOB_SEEKER, "CANDIDATE"}:
+                return True
+
+            if hasattr(user, "job_seeker_profile"):
+                return True
 
         return False
 

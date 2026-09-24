@@ -54,17 +54,17 @@ export const ApiIntegrationTab: React.FC<ApiIntegrationTabProps> = ({ formData, 
       if (serviceName === 'storage') {
         if (health?.services?.storage === 'up') {
           setTestResults((prev) => ({ ...prev, storage: 'success' }));
-          toastMessages.success('Kết nối MinIO S3 Object Storage thành công!');
+          toastMessages.success('Kết nối Dịch vụ Lưu trữ Đám mây S3 thành công!');
         } else {
-          throw new Error('Dịch vụ MinIO S3 không phản hồi');
+          throw new Error('Dịch vụ Lưu trữ Đám mây S3 không phản hồi');
         }
       } else {
-        // livekit probe
+        // voice rtc probe
         if (health?.services?.api === 'up') {
           setTestResults((prev) => ({ ...prev, livekit: 'success' }));
-          toastMessages.success('Máy chủ LiveKit WebRTC Voice AI đang trực tuyến!');
+          toastMessages.success('Máy chủ Voice AI WebRTC đang trực tuyến!');
         } else {
-          throw new Error('Máy chủ LiveKit WebRTC không phản hồi');
+          throw new Error('Máy chủ Voice AI WebRTC không phản hồi');
         }
       }
     } catch (err: any) {
@@ -161,7 +161,7 @@ export const ApiIntegrationTab: React.FC<ApiIntegrationTabProps> = ({ formData, 
               }
               sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
             >
-              Test MinIO S3 Storage
+              Test Cloud Storage
             </Button>
 
             <Button
@@ -180,7 +180,7 @@ export const ApiIntegrationTab: React.FC<ApiIntegrationTabProps> = ({ formData, 
               }
               sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
             >
-              Test LiveKit WebRTC
+              Test Voice AI WebRTC
             </Button>
           </Stack>
         </Box>

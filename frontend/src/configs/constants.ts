@@ -29,7 +29,7 @@ const APP_NAME = 'InfoHR';
 const getBaseHostname = (): string => {
   if (typeof window === 'undefined') return 'localhost';
   const hn = window.location.hostname;
-  return hn.replace(/^(admin\.|employer\.|www\.)/, '');
+  return hn.replace(/^(admin\.|ntd\.|employer\.|www\.)/, '');
 };
 
 const BASE_HOSTNAME = getBaseHostname();
@@ -44,7 +44,7 @@ const HOST_NAME = {
     : BASE_HOSTNAME,
   EMPLOYER_PROJECT: isProdDomain(process.env.NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME)
     ? process.env.NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME
-    : `employer.${BASE_HOSTNAME}`,
+    : `ntd.${BASE_HOSTNAME}`,
   ADMIN_PROJECT: isProdDomain(process.env.NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME)
     ? process.env.NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME
     : `admin.${BASE_HOSTNAME}`,
@@ -119,6 +119,7 @@ const REGEX_VALIDATE = {
     /^((\+[1-9]{1,4}[ \-]*)|(\([0-9]{2,3}\)[ \-]*)|([0-9]{2,4})[ \-]*)*?[0-9]{3,4}?[ \-]*[0-9]{3,4}?$/,
   urlRegExp:
     /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/,
+  taxCodeRegExp: /^(\d{10}|\d{13})$/,
 } as const;
 
 const CV_TYPES = {

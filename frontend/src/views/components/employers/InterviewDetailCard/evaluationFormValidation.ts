@@ -6,7 +6,7 @@ export type EvaluationFormValidationError =
   | 'scoreInvalid'
   | 'proposedSalaryInvalid';
 
-const SCORE_MIN = 0;
+const SCORE_MIN = 1;
 const SCORE_MAX = 10;
 const SCORE_DECIMAL_PLACES = 2;
 
@@ -31,21 +31,21 @@ const firstDefined = <T>(...values: Array<T | null | undefined>): T | undefined 
   values.find((value): value is T => value !== null && value !== undefined);
 
 export const createEvaluationFormFromEvaluation = (
-  evaluation: InterviewEvaluation,
+  evaluation?: InterviewEvaluation | null,
 ): EvalFormType => ({
-  attitude_score: firstDefined(evaluation.attitude_score, evaluation.attitudeScore, 0) ?? 0,
-  professional_score: firstDefined(evaluation.professional_score, evaluation.professionalScore, 0) ?? 0,
-  result: evaluation.result ?? 'pending',
-  comments: evaluation.comments ?? '',
-  proposed_salary: firstDefined(evaluation.proposed_salary, evaluation.proposedSalary, 0) ?? 0,
+  attitude_score: firstDefined(evaluation?.attitude_score, evaluation?.attitudeScore, 0) ?? 0,
+  professional_score: firstDefined(evaluation?.professional_score, evaluation?.professionalScore, 0) ?? 0,
+  result: evaluation?.result ?? 'pending',
+  comments: evaluation?.comments ?? '',
+  proposed_salary: firstDefined(evaluation?.proposed_salary, evaluation?.proposedSalary, 0) ?? 0,
 });
 
 export const getEvaluationFormValidationError = (
   form: EvalFormType,
 ): EvaluationFormValidationError | null => {
-  const attitudeScore = toFiniteNumber(form.attitude_score);
-  const professionalScore = toFiniteNumber(form.professional_score);
-  const proposedSalary = toFiniteNumber(form.proposed_salary);
+  const attitudeScore = toFiniteNumber(form?.attitude_score);
+  const professionalScore = toFiniteNumber(form?.professional_score);
+  const proposedSalary = toFiniteNumber(form?.proposed_salary);
 
   if (!isScoreValid(attitudeScore) || !isScoreValid(professionalScore)) {
     return 'scoreInvalid';
@@ -62,16 +62,16 @@ export const buildEvaluationPayload = (
   interviewId: number,
   form: EvalFormType,
 ): SubmitEvaluationInput => {
-  const attitudeScore = toFiniteNumber(form.attitude_score);
-  const professionalScore = toFiniteNumber(form.professional_score);
+  const attitudeScore = toFiniteNumber(form?.attitude_score);
+  const professionalScore = toFiniteNumber(form?.professional_score);
 
   return {
     interview: interviewId,
     attitude_score: toBackendScoreDecimal(attitudeScore),
     professional_score: toBackendScoreDecimal(professionalScore),
     overall_score: toBackendScoreDecimal((attitudeScore + professionalScore) / 2),
-    result: form.result,
-    comments: form.comments.trim(),
-    proposed_salary: toFiniteNumber(form.proposed_salary),
+    result: form?.result ?? 'pending',
+    comments: (form?.comments || '').trim(),
+    proposed_salary: toFiniteNumber(form?.proposed_salary),
   };
 };

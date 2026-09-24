@@ -40,7 +40,7 @@ URL_PREFIX = os.getenv("URL_PREFIX", "").rstrip("/")
 
 app = FastAPI(
     title="InfoHR Real-Time Talking Head AI Service",
-    description="Wav2Lip GPU Lip-Sync & Video Synthesis Microservice for Square Tuyển Dụng",
+    description="AILA Real-Time Talking Head & Video Synthesis Microservice for InfoHR",
     version="1.0.0",
 )
 

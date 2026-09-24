@@ -343,7 +343,7 @@
     },
     "messages": {
       "evaluationSuccess": "Lưu đánh giá thành công",
-      "scoreInvalid": "Điểm đánh giá phải nằm trong khoảng 0 đến 10.",
+      "scoreInvalid": "Điểm đánh giá phải nằm trong khoảng 1 đến 10.",
       "proposedSalaryInvalid": "Lương đề xuất phải lớn hơn hoặc bằng 0.",
       "aiTriggerSuccess": "Bắt đầu đánh giá AI",
       "notFound": "Không tìm thấy phỏng vấn",

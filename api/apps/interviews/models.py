@@ -398,7 +398,7 @@ class InterviewSession(CommonBaseModel):
 
     room_name = models.CharField(
         max_length=255, unique=True,
-        verbose_name="Tên phòng LiveKit Room"
+        verbose_name="Tên phòng phỏng vấn trực tuyến"
     )
     invite_token = models.CharField(
         max_length=255, unique=True, blank=True, null=True,
@@ -713,7 +713,7 @@ class InterviewEvaluation(CommonBaseModel):
 
 
 class InterviewProctoringEvent(CommonBaseModel):
-    """Sự kiện giám sát chống gian lận trong buổi phỏng vấn AI/LiveKit."""
+    """Sự kiện giám sát chống gian lận trong buổi phỏng vấn AI."""
 
     EVENT_TAB_SWITCH = 'tab_switch'
     EVENT_TAB_HIDDEN = 'tab_hidden'

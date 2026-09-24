@@ -37,7 +37,36 @@ export const getPreferredLanguage = (): LanguageCode => {
   return normalizeLanguage(i18nLanguage || 'vi');
 };
 
-export const getPortalPrefix = (portal: PortalType, language?: string | null): string => {
+export const isEmployerHostname = (hostname?: string): boolean => {
+  if (!hostname && typeof window !== 'undefined') {
+    hostname = window.location.hostname;
+  }
+  if (!hostname) return false;
+  const h = hostname.toLowerCase().split(':')[0];
+  return (
+    h.startsWith('employer.') ||
+    h.startsWith('ntd.') ||
+    h === 'employer.localhost' ||
+    h === 'ntd.localhost'
+  );
+};
+
+export const isAdminHostname = (hostname?: string): boolean => {
+  if (!hostname && typeof window !== 'undefined') {
+    hostname = window.location.hostname;
+  }
+  if (!hostname) return false;
+  const h = hostname.toLowerCase().split(':')[0];
+  return h.startsWith('admin.') || h === 'admin.localhost';
+};
+
+export const getPortalPrefix = (portal: PortalType, language?: string | null, hostname?: string): string => {
+  if (portal === 'employer' && isEmployerHostname(hostname)) {
+    return '';
+  }
+  if (portal === 'admin' && isAdminHostname(hostname)) {
+    return '';
+  }
   const normalizedLanguage = normalizeLanguage(language || undefined);
   if (portal === 'admin') {
     return normalizedLanguage === 'en' ? '/admin' : '/quan-tri';
@@ -48,7 +77,13 @@ export const getPortalPrefix = (portal: PortalType, language?: string | null): s
   return '';
 };
 
-export const detectPortalFromPath = (pathname = '/'): PortalType => {
+export const detectPortalFromPath = (pathname = '/', hostname?: string): PortalType => {
+  if (isEmployerHostname(hostname)) {
+    return 'employer';
+  }
+  if (isAdminHostname(hostname)) {
+    return 'admin';
+  }
   if (ADMIN_PREFIXES.some((prefix) => isPrefixMatch(pathname, prefix))) {
     return 'admin';
   }
@@ -58,14 +93,14 @@ export const detectPortalFromPath = (pathname = '/'): PortalType => {
   return 'jobseeker';
 };
 
-export const isAdminPortalPath = (pathname = '/'): boolean =>
-  detectPortalFromPath(pathname) === 'admin';
+export const isAdminPortalPath = (pathname = '/', hostname?: string): boolean =>
+  isAdminHostname(hostname) || detectPortalFromPath(pathname, hostname) === 'admin';
 
-export const isEmployerPortalPath = (pathname = '/'): boolean =>
-  detectPortalFromPath(pathname) === 'employer';
+export const isEmployerPortalPath = (pathname = '/', hostname?: string): boolean =>
+  isEmployerHostname(hostname) || detectPortalFromPath(pathname, hostname) === 'employer';
 
-export const stripPortalPrefix = (pathname = '/'): string => {
-  const portal = detectPortalFromPath(pathname);
+export const stripPortalPrefix = (pathname = '/', hostname?: string): string => {
+  const portal = detectPortalFromPath(pathname, hostname);
   if (portal === 'admin') {
     for (const prefix of ADMIN_PREFIXES) {
       const stripped = stripPrefix(pathname, prefix);
@@ -84,9 +119,19 @@ export const stripPortalPrefix = (pathname = '/'): string => {
 export const buildPortalPath = (
   portal: PortalType,
   childPath = '/',
-  language: string | null | undefined = 'vi'
+  language: string | null | undefined = 'vi',
+  hostname?: string
 ): string => {
-  const prefix = getPortalPrefix(portal, language);
+  if (portal === 'employer' && isEmployerHostname(hostname)) {
+    const normalizedChild = childPath && childPath !== '/' ? `/${childPath.replace(/^\/+/, '')}` : '/';
+    return normalizedChild;
+  }
+  if (portal === 'admin' && isAdminHostname(hostname)) {
+    const normalizedChild = childPath && childPath !== '/' ? `/${childPath.replace(/^\/+/, '')}` : '/';
+    return normalizedChild;
+  }
+
+  const prefix = getPortalPrefix(portal, language, hostname);
   const normalizedChild =
     childPath && childPath !== '/' ? `/${childPath.replace(/^\/+/, '')}` : '/';
 
@@ -101,12 +146,13 @@ export const buildPortalPath = (
 
 export const normalizePortalPath = (
   pathname = '/',
-  language: string | null | undefined = 'vi'
+  language: string | null | undefined = 'vi',
+  hostname?: string
 ): string => {
-  const portal = detectPortalFromPath(pathname);
+  const portal = detectPortalFromPath(pathname, hostname);
   if (portal === 'jobseeker') {
     return pathname || '/';
   }
-  const childPath = stripPortalPrefix(pathname);
-  return buildPortalPath(portal, childPath, language);
+  const childPath = stripPortalPrefix(pathname, hostname);
+  return buildPortalPath(portal, childPath, language, hostname);
 };

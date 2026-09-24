@@ -75,13 +75,18 @@ const SKILL_SUGGESTIONS = [
   'Lập kế hoạch chiến lược',
 ];
 
+const safeUUID = (prefix: string) =>
+  typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? `${prefix}-${crypto.randomUUID()}`
+    : `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
 export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   data,
   onChangeData,
   onOpenAISuggestions,
 }) => {
   const [showExtraPersonalInfo, setShowExtraPersonalInfo] = useState<boolean>(
-    Boolean(data.personalInfo.website || data.personalInfo.linkedin || data.personalInfo.github)
+    Boolean(data?.personalInfo?.website || data?.personalInfo?.linkedin || data?.personalInfo?.github)
   );
 
   // Update handlers
@@ -89,7 +94,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
     onChangeData({
       ...data,
       personalInfo: {
-        ...data.personalInfo,
+        ...(data?.personalInfo || {}),
         [field]: value,
       },
     });
@@ -124,7 +129,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   // -- Experiences Handlers ------------------------------------------
   const handleAddExperience = () => {
     const newItem: CVExperienceItem = {
-      id: `exp-${crypto.randomUUID()}`,
+      id: safeUUID('exp'),
       position: '',
       company: '',
       startDate: '',
@@ -132,27 +137,27 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       isCurrent: false,
       description: '',
     };
-    onChangeData({ ...data, experiences: [...data.experiences, newItem] });
+    onChangeData({ ...data, experiences: [...(data?.experiences || []), newItem] });
   };
 
   const handleUpdateExperience = (id: string, field: keyof CVExperienceItem, value: any) => {
     onChangeData({
       ...data,
-      experiences: data.experiences.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+      experiences: (data?.experiences || []).map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     });
   };
 
   const handleDeleteExperience = (id: string) => {
     onChangeData({
       ...data,
-      experiences: data.experiences.filter((item) => item.id !== id),
+      experiences: (data?.experiences || []).filter((item) => item.id !== id),
     });
   };
 
   // -- Educations Handlers -------------------------------------------
   const handleAddEducation = () => {
     const newItem: CVEducationItem = {
-      id: `edu-${crypto.randomUUID()}`,
+      id: safeUUID('edu'),
       school: '',
       major: '',
       degree: 'Cử nhân',
@@ -161,20 +166,20 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       gpa: '',
       description: '',
     };
-    onChangeData({ ...data, educations: [...data.educations, newItem] });
+    onChangeData({ ...data, educations: [...(data?.educations || []), newItem] });
   };
 
   const handleUpdateEducation = (id: string, field: keyof CVEducationItem, value: any) => {
     onChangeData({
       ...data,
-      educations: data.educations.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+      educations: (data?.educations || []).map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     });
   };
 
   const handleDeleteEducation = (id: string) => {
     onChangeData({
       ...data,
-      educations: data.educations.filter((item) => item.id !== id),
+      educations: (data?.educations || []).filter((item) => item.id !== id),
     });
   };
 
@@ -184,57 +189,59 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   const handleAddSkill = (nameToAdd?: string) => {
     const skillName = (nameToAdd || newSkillName).trim();
     if (!skillName) return;
-    if (data.skills.some((s) => s.name.toLowerCase() === skillName.toLowerCase())) return;
+    const currentSkills = data?.skills || [];
+    if (currentSkills.some((s) => s?.name?.toLowerCase() === skillName.toLowerCase())) return;
 
     const newItem: CVSkillItem = {
-      id: `sk-${crypto.randomUUID()}`,
+      id: safeUUID('sk'),
       name: skillName,
       level: 5,
     };
-    onChangeData({ ...data, skills: [...data.skills, newItem] });
+    onChangeData({ ...data, skills: [...currentSkills, newItem] });
     if (!nameToAdd) setNewSkillName('');
   };
 
   const handleUpdateSkillLevel = (id: string, level: number) => {
     onChangeData({
       ...data,
-      skills: data.skills.map((s) => (s.id === id ? { ...s, level } : s)),
+      skills: (data?.skills || []).map((s) => (s.id === id ? { ...s, level } : s)),
     });
   };
 
   const handleDeleteSkill = (id: string) => {
     onChangeData({
       ...data,
-      skills: data.skills.filter((s) => s.id !== id),
+      skills: (data?.skills || []).filter((s) => s.id !== id),
     });
   };
 
   // -- Languages Handlers (Vieclam24h 5-Star Style) -------------------
   const handleAddLanguage = (name = 'Tiếng Anh') => {
     const newItem: CVLanguageItem = {
-      id: `lang-${crypto.randomUUID()}`,
+      id: safeUUID('lang'),
       name,
       proficiency: 'Thành thạo',
     };
-    onChangeData({ ...data, languages: [...data.languages, newItem] });
+    onChangeData({ ...data, languages: [...(data?.languages || []), newItem] });
   };
 
   const handleUpdateLanguage = (id: string, field: keyof CVLanguageItem, value: any) => {
     onChangeData({
       ...data,
-      languages: data.languages.map((l) => (l.id === id ? { ...l, [field]: value } : l)),
+      languages: (data?.languages || []).map((l) => (l.id === id ? { ...l, [field]: value } : l)),
     });
   };
 
   const handleDeleteLanguage = (id: string) => {
     onChangeData({
       ...data,
-      languages: data.languages.filter((l) => l.id !== id),
+      languages: (data?.languages || []).filter((l) => l.id !== id),
     });
   };
 
   // Convert proficiency string to 1-5 rating & vice-versa
-  const getLanguageStarValue = (prof: string): number => {
+  const getLanguageStarValue = (prof?: string): number => {
+    if (!prof) return 1;
     if (prof.includes('Bản ngữ') || prof.includes('5') || prof.includes('Xuất sắc')) return 5;
     if (prof.includes('Thành thạo') || prof.includes('4') || prof.includes('Tốt')) return 4;
     if (prof.includes('Khá') || prof.includes('3') || prof.includes('Trung bình khá')) return 3;
@@ -255,50 +262,50 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
   // -- Certificates Handlers -----------------------------------------
   const handleAddCertificate = () => {
     const newItem: CVCertificateItem = {
-      id: `cert-${crypto.randomUUID()}`,
+      id: safeUUID('cert'),
       name: '',
       organization: '',
       issueDate: '',
     };
-    onChangeData({ ...data, certificates: [...data.certificates, newItem] });
+    onChangeData({ ...data, certificates: [...(data?.certificates || []), newItem] });
   };
 
   const handleUpdateCertificate = (id: string, field: keyof CVCertificateItem, value: any) => {
     onChangeData({
       ...data,
-      certificates: data.certificates.map((c) => (c.id === id ? { ...c, [field]: value } : c)),
+      certificates: (data?.certificates || []).map((c) => (c.id === id ? { ...c, [field]: value } : c)),
     });
   };
 
   const handleDeleteCertificate = (id: string) => {
     onChangeData({
       ...data,
-      certificates: data.certificates.filter((c) => c.id !== id),
+      certificates: (data?.certificates || []).filter((c) => c.id !== id),
     });
   };
 
   // -- Projects Handlers ---------------------------------------------
   const handleAddProject = () => {
     const newItem: CVProjectItem = {
-      id: `proj-${crypto.randomUUID()}`,
+      id: safeUUID('proj'),
       name: '',
       role: '',
       description: '',
     };
-    onChangeData({ ...data, projects: [...data.projects, newItem] });
+    onChangeData({ ...data, projects: [...(data?.projects || []), newItem] });
   };
 
   const handleUpdateProject = (id: string, field: keyof CVProjectItem, value: any) => {
     onChangeData({
       ...data,
-      projects: data.projects.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
+      projects: (data?.projects || []).map((p) => (p.id === id ? { ...p, [field]: value } : p)),
     });
   };
 
   const handleDeleteProject = (id: string) => {
     onChangeData({
       ...data,
-      projects: data.projects.filter((p) => p.id !== id),
+      projects: (data?.projects || []).filter((p) => p.id !== id),
     });
   };
 
@@ -333,39 +340,83 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               border: '2px solid #ffffff',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
-            <img
-              src={data.personalInfo.avatarUrl || '/images/cv-avatars/avatar-modern.jpg'}
-              alt={data.personalInfo.fullName || 'Avatar'}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              onError={(e) => {
-                e.currentTarget.src = '/images/cv-avatars/avatar-modern.jpg';
-              }}
-            />
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            <label>
-              <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: 'none' }} />
-              <Button
-                component="span"
-                size="small"
-                variant="outlined"
-                startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 16 }} />}
+            {data?.personalInfo?.avatarUrl ? (
+              <img
+                src={data?.personalInfo?.avatarUrl}
+                alt={data?.personalInfo?.fullName || 'Avatar'}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            ) : (
+              <Typography
                 sx={{
-                  borderRadius: '8px',
-                  borderColor: '#cbd5e1',
-                  color: '#334155',
-                  fontWeight: 700,
-                  fontSize: '0.75rem',
-                  textTransform: 'none',
-                  bgcolor: '#ffffff',
-                  '&:hover': { bgcolor: '#f1f5f9', borderColor: '#94a3b8' },
+                  fontWeight: 800,
+                  fontSize: '1.25rem',
+                  color: '#475569',
+                  userSelect: 'none',
+                  textTransform: 'uppercase',
                 }}
               >
-                Tải ảnh chân dung lên
-              </Button>
-            </label>
+                {data?.personalInfo?.fullName
+                  ? data.personalInfo.fullName
+                      .trim()
+                      .split(/\s+/)
+                      .filter(Boolean)
+                      .map((p) => p[0])
+                      .slice(0, 2)
+                      .join('')
+                  : 'CV'}
+              </Typography>
+            )}
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+              <label>
+                <input type="file" accept="image/*" onChange={handleAvatarUpload} style={{ display: 'none' }} />
+                <Button
+                  component="span"
+                  size="small"
+                  variant="outlined"
+                  startIcon={<AddPhotoAlternateOutlinedIcon sx={{ fontSize: 16 }} />}
+                  sx={{
+                    borderRadius: '8px',
+                    borderColor: '#cbd5e1',
+                    color: '#334155',
+                    fontWeight: 700,
+                    fontSize: '0.75rem',
+                    textTransform: 'none',
+                    bgcolor: '#ffffff',
+                    '&:hover': { bgcolor: '#f1f5f9', borderColor: '#94a3b8' },
+                  }}
+                >
+                  Tải ảnh chân dung lên
+                </Button>
+              </label>
+              {Boolean(data?.personalInfo?.avatarUrl) && (
+                <Button
+                  size="small"
+                  variant="text"
+                  color="error"
+                  onClick={() => updatePersonalInfo('avatarUrl', '')}
+                  sx={{
+                    borderRadius: '8px',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    textTransform: 'none',
+                    py: 0.5,
+                  }}
+                >
+                  Xoá ảnh
+                </Button>
+              )}
+            </Box>
             <Typography variant="caption" sx={{ display: 'block', color: '#64748b', fontSize: '0.7rem', mt: 0.5 }}>
               Khuyên dùng ảnh chân dung rõ nét, vuông tỉ lệ 1:1 (JPG, PNG).
             </Typography>
@@ -376,7 +427,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
         <Stack spacing={2}>
           <TextField
             label="Họ và tên *"
-            value={data.personalInfo.fullName}
+            value={data?.personalInfo?.fullName || ''}
             onChange={(e) => updatePersonalInfo('fullName', e.target.value)}
             placeholder="VD: NGUYỄN VĂN A"
             size="small"
@@ -388,7 +439,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
 
           <TextField
             label="Vị trí ứng tuyển *"
-            value={data.personalInfo.title}
+            value={data?.personalInfo?.title || ''}
             onChange={(e) => updatePersonalInfo('title', e.target.value)}
             placeholder="VD: Chuyên viên Marketing / Kỹ sư Xây dựng"
             size="small"
@@ -401,7 +452,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 1.5 }}>
             <TextField
               label="Email liên hệ"
-              value={data.personalInfo.email}
+              value={data?.personalInfo?.email || ''}
               onChange={(e) => updatePersonalInfo('email', e.target.value)}
               placeholder="email@example.com"
               size="small"
@@ -410,7 +461,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
             />
             <TextField
               label="Số điện thoại"
-              value={data.personalInfo.phoneNumber}
+              value={data?.personalInfo?.phoneNumber || ''}
               onChange={(e) => updatePersonalInfo('phoneNumber', e.target.value)}
               placeholder="0912 345 678"
               size="small"
@@ -422,7 +473,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1.2fr 0.8fr' }, gap: 1.5 }}>
             <TextField
               label="Địa chỉ / Tỉnh thành"
-              value={data.personalInfo.address}
+              value={data?.personalInfo?.address || ''}
               onChange={(e) => updatePersonalInfo('address', e.target.value)}
               placeholder="Quận 1, TP. Hồ Chí Minh"
               size="small"
@@ -431,7 +482,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
             />
             <TextField
               label="Ngày sinh"
-              value={data.personalInfo.dob || ''}
+              value={data?.personalInfo?.dob || ''}
               onChange={(e) => updatePersonalInfo('dob', e.target.value)}
               placeholder="DD/MM/YYYY"
               size="small"
@@ -442,27 +493,42 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
 
           {/* Toggle Additional Info */}
           <Button
+            type="button"
+            fullWidth
             onClick={() => setShowExtraPersonalInfo(!showExtraPersonalInfo)}
             endIcon={showExtraPersonalInfo ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             sx={{
-              alignSelf: 'flex-start',
-              fontWeight: 700,
-              fontSize: '0.75rem',
+              px: 2,
+              py: 1,
+              border: '1px dashed #cbd5e1',
+              bgcolor: '#f8fafc',
+              borderRadius: 2,
+              fontWeight: 600,
+              fontSize: '0.8rem',
               color: '#2563eb',
               textTransform: 'none',
               fontFamily: 'Inter, sans-serif',
-              p: 0,
-              '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                bgcolor: '#f1f5f9',
+                borderColor: '#94a3b8',
+                color: '#1d4ed8',
+              },
             }}
           >
-            {showExtraPersonalInfo ? 'Ẩn bớt liên kết bổ sung' : 'Thông tin bổ sung - Website, LinkedIn, GitHub >'}
+            {showExtraPersonalInfo ? 'Ẩn bớt liên kết bổ sung' : 'Thông tin bổ sung - Website, LinkedIn, GitHub'}
           </Button>
 
           <Collapse in={showExtraPersonalInfo}>
             <Stack spacing={1.5} sx={{ pt: 1 }}>
               <TextField
                 label="Website / Portfolio"
-                value={data.personalInfo.website || ''}
+                value={data?.personalInfo?.website || ''}
                 onChange={(e) => updatePersonalInfo('website', e.target.value)}
                 placeholder="https://yourportfolio.me"
                 size="small"
@@ -471,7 +537,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               />
               <TextField
                 label="LinkedIn Profile"
-                value={data.personalInfo.linkedin || ''}
+                value={data?.personalInfo?.linkedin || ''}
                 onChange={(e) => updatePersonalInfo('linkedin', e.target.value)}
                 placeholder="https://linkedin.com/in/username"
                 size="small"
@@ -480,7 +546,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
               />
               <TextField
                 label="GitHub / Behance"
-                value={data.personalInfo.github || ''}
+                value={data?.personalInfo?.github || ''}
                 onChange={(e) => updatePersonalInfo('github', e.target.value)}
                 placeholder="https://github.com/username"
                 size="small"
@@ -534,7 +600,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           multiline
           minRows={3}
           maxRows={6}
-          value={data.personalInfo.bio || ''}
+          value={data?.personalInfo?.bio || ''}
           onChange={(e) => updatePersonalInfo('bio', e.target.value)}
           placeholder="Giới thiệu sơ bản thân thông qua mong muốn, mục tiêu của bạn khi đi làm. Nêu bật thế mạnh và giá trị bạn mang lại cho nhà tuyển dụng."
           fullWidth
@@ -546,7 +612,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
             Nên viết từ 2 - 4 câu cô đọng, súc tích và có trọng tâm.
           </Typography>
           <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 600, fontSize: '0.7rem' }}>
-            Số ký tự: {(data.personalInfo.bio || '').length}/600
+            Số ký tự: {(data?.personalInfo?.bio || '').length}/600
           </Typography>
         </Stack>
       </Paper>
@@ -587,7 +653,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Button>
         </Stack>
 
-        {data.experiences.length === 0 ? (
+        {(data?.experiences || []).length === 0 ? (
           <Box sx={{ p: 3, textAlign: 'center', border: '1.5px dashed #e2e8f0', borderRadius: '12px' }}>
             <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.8rem', mb: 1 }}>
               Chưa có thông tin kinh nghiệm làm việc
@@ -598,7 +664,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Box>
         ) : (
           <Stack spacing={2}>
-            {data.experiences.map((exp, idx) => (
+            {(data?.experiences || []).map((exp, idx) => (
               <Box
                 key={exp.id}
                 sx={{
@@ -711,7 +777,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Button>
         </Stack>
 
-        {data.educations.length === 0 ? (
+        {(data?.educations || []).length === 0 ? (
           <Box sx={{ p: 3, textAlign: 'center', border: '1.5px dashed #e2e8f0', borderRadius: '12px' }}>
             <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.8rem', mb: 1 }}>
               Chưa có thông tin học vấn
@@ -722,7 +788,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Box>
         ) : (
           <Stack spacing={2}>
-            {data.educations.map((edu, idx) => (
+            {(data?.educations || []).map((edu, idx) => (
               <Box
                 key={edu.id}
                 sx={{
@@ -874,7 +940,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
 
         {/* Active Skills List with Levels */}
         <Stack spacing={1.25}>
-          {data.skills.map((skill) => (
+          {(data?.skills || []).map((skill) => (
             <Box
               key={skill.id}
               sx={{
@@ -943,7 +1009,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Button>
         </Stack>
 
-        {data.languages.length === 0 ? (
+        {(data?.languages || []).length === 0 ? (
           <Box sx={{ p: 3, textAlign: 'center', border: '1.5px dashed #e2e8f0', borderRadius: '12px' }}>
             <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.8rem', mb: 1 }}>
               Chưa có ngoại ngữ nào
@@ -954,7 +1020,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Box>
         ) : (
           <Stack spacing={1.5}>
-            {data.languages.map((lang) => (
+            {(data?.languages || []).map((lang) => (
               <Box
                 key={lang.id}
                 sx={{
@@ -1059,7 +1125,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Button>
         </Stack>
 
-        {data.certificates.length === 0 ? (
+        {(data?.certificates || []).length === 0 ? (
           <Box sx={{ p: 2.5, textAlign: 'center', border: '1.5px dashed #e2e8f0', borderRadius: '12px' }}>
             <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.8rem' }}>
               Chưa có chứng chỉ nào
@@ -1067,7 +1133,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Box>
         ) : (
           <Stack spacing={1.5}>
-            {data.certificates.map((cert) => (
+            {(data?.certificates || []).map((cert) => (
               <Box
                 key={cert.id}
                 sx={{
@@ -1154,7 +1220,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Button>
         </Stack>
 
-        {data.projects.length === 0 ? (
+        {(data?.projects || []).length === 0 ? (
           <Box sx={{ p: 2.5, textAlign: 'center', border: '1.5px dashed #e2e8f0', borderRadius: '12px' }}>
             <Typography variant="body2" sx={{ color: '#64748b', fontSize: '0.8rem' }}>
               Chưa có dự án nào
@@ -1162,7 +1228,7 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
           </Box>
         ) : (
           <Stack spacing={2}>
-            {data.projects.map((proj, idx) => (
+            {(data?.projects || []).map((proj, idx) => (
               <Box
                 key={proj.id}
                 sx={{

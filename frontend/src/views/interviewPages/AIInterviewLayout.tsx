@@ -48,6 +48,7 @@ import { useLiveAudioTrackAnalyzer } from './hooks/useLiveAudioTrackAnalyzer';
 import {
   getParticipantCompanyName,
   getParticipantRole,
+  isLiveKitAgentIdentity,
   isLiveKitAgentParticipant,
   sanitizeInterviewText,
 } from './livekitParticipant';
@@ -59,9 +60,11 @@ import { InterviewRoadmapDrawer } from './components/InterviewRoadmapDrawer';
 import { InterviewQuestionCard } from './components/InterviewQuestionCard';
 import { ProductTourTrigger, useTourAutoStart } from '@/components/Features/ProductTour';
 import interviewService from '@/services/interviewService';
+import employerAiSettingService from '@/services/employerAiSettingService';
 
 const AI_CONTROL_TOPIC = 'square.interview.ai_control';
 const AI_TAKEOVER_TOPIC = 'square.interview.ai_takeover';
+const AVATAR_EVENT_TOPIC = 'interview_avatar_event';
 
 type ChatComposerMode = 'chat' | 'aiControl' | 'takeover';
 
@@ -342,6 +345,9 @@ function AIParticipantTile({
   avatarBackgroundUrl,
   avatarBackdrop,
   interviewerName,
+  characterId,
+  avatarActions,
+  lipsyncVideoUrl,
   isTakeoverActive,
   isSelf: propIsSelf,
   isPip,
@@ -361,6 +367,9 @@ function AIParticipantTile({
   avatarBackgroundUrl?: string | null;
   avatarBackdrop?: string | null;
   interviewerName?: string;
+  characterId?: string;
+  avatarActions?: Record<string, string>;
+  lipsyncVideoUrl?: string | null;
   isTakeoverActive?: boolean;
   isSelf?: boolean;
   isPip?: boolean;
@@ -407,6 +416,11 @@ function AIParticipantTile({
           avatarImageUrl={avatarImageUrl}
           avatarBackgroundUrl={avatarBackgroundUrl}
           avatarBackdrop={avatarBackdrop}
+          characterId={characterId}
+          avatarActions={avatarActions}
+          lipsyncVideoUrl={lipsyncVideoUrl}
+          room={props?.room}
+          isPip={isPip}
         />
         {/* Floating title badge */}
         <div className="absolute top-2 left-2 z-30 flex items-center gap-1.5 rounded-full border border-sky-500/40 bg-slate-950/85 px-2.5 py-0.5 text-[10px] font-bold text-sky-300 backdrop-blur-md shadow-md">
@@ -669,12 +683,16 @@ function TimelineMessage({
 }) {
   const { t } = useTranslation(['interview']);
   const isTranscript = isTranscriptMessage(entry);
-  const isAgent = entry.type === 'agentTranscript';
-  const isLocal = entry.from?.isLocal === true;
   const participantRole = entry.from ? getParticipantRole(entry.from as any) : 'guest';
+  const isAgent =
+    entry.type === 'agentTranscript' ||
+    participantRole === 'agent' ||
+    isLiveKitAgentIdentity(entry.from?.identity) ||
+    Boolean((entry.from as any)?.isAgent);
+  const isLocal = entry.from?.isLocal === true && !isAgent;
   const employerCompanyName = getParticipantCompanyName(entry.from as any) || t('liveRoom.participants.employer');
-  const isEmployer = participantRole === 'employer';
-  const isCandidate = participantRole === 'candidate';
+  const isEmployer = !isAgent && participantRole === 'employer';
+  const isCandidate = !isAgent && participantRole === 'candidate';
   const alignRight = isLocal && !isAgent;
   const chipLabel = isAgent
     ? t('liveRoom.chips.ai')
@@ -855,7 +873,7 @@ function ChatPanel({
   useEffect(() => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages.length]);
+  }, [(messages || []).length]);
 
   return (
     <div
@@ -876,7 +894,7 @@ function ChatPanel({
             <div className="flex items-center gap-2">
               <p className="text-sm font-bold text-slate-800">{t('liveRoom.chat.title')}</p>
               <span className="rounded-full border border-sky-500/30 bg-sky-50 px-2 py-0.5 text-[10px] font-extrabold text-sky-600">
-                {t('liveRoom.chat.messagesCount', { count: messages.length })}
+                {t('liveRoom.chat.messagesCount', { count: (messages || []).length })}
               </span>
             </div>
             <p className="mt-0.5 text-xs text-slate-500 truncate">{t('liveRoom.chat.subtitle')}</p>
@@ -904,9 +922,9 @@ function ChatPanel({
               '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(0,0,0,0.12)', borderRadius: 3 },
             }}
           >
-            {messages.length > 0 ? (
+            {(messages || []).length > 0 ? (
               <Stack spacing={2}>
-                {messages.map((entry) => (
+                {(messages || []).map((entry) => (
                   <TimelineMessage key={`${entry.type}-${entry.id}`} entry={entry as any} />
                 ))}
               </Stack>
@@ -1086,6 +1104,8 @@ type AIInterviewLayoutProps = {
   avatarBackgroundUrl?: string | null;
   avatarBackdrop?: string | null;
   interviewerName?: string;
+  characterId?: string;
+  avatarActions?: Record<string, string>;
 };
 
 export function AIInterviewLayout({
@@ -1098,7 +1118,13 @@ export function AIInterviewLayout({
   avatarBackgroundUrl,
   avatarBackdrop,
   interviewerName,
+  characterId: propCharacterId,
+  avatarActions: propAvatarActions,
 }: AIInterviewLayoutProps) {
+  const savedSettings = employerAiSettingService.getSettings();
+  const effectiveCharacterId = propCharacterId || savedSettings.activeCharacterId || 'ng_c_linh';
+  const effectiveAvatarActions = propAvatarActions || savedSettings.avatarActions;
+  const [lipsyncVideoUrl, setLipsyncVideoUrl] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDraft, setChatDraft] = useState('');
   const [composerMode, setComposerMode] = useState<ChatComposerMode>('chat');
@@ -1211,15 +1237,14 @@ export function AIInterviewLayout({
               });
 
               try {
-                room.localParticipant.sendText(payload, { topic: QUESTION_CONTROL_TOPIC });
-              } catch (err) {
-                console.warn('[Proctoring] Failed to broadcast proctoring_warning on QUESTION_CONTROL_TOPIC:', err);
-              }
-
-              try {
                 room.localParticipant.sendText(payload, { topic: PROCTORING_TOPIC });
-              } catch {
-                // optional fallback
+              } catch (err) {
+                console.warn('[Proctoring] Failed to broadcast proctoring_warning on PROCTORING_TOPIC, falling back to QUESTION_CONTROL_TOPIC:', err);
+                try {
+                  room.localParticipant.sendText(payload, { topic: QUESTION_CONTROL_TOPIC });
+                } catch {
+                  // ignore
+                }
               }
             }
           }
@@ -1238,6 +1263,26 @@ export function AIInterviewLayout({
             durationSeconds: durationSec,
             details: { awayDurationSeconds: durationSec },
           }).catch(() => {});
+
+          // Báo cho AI Agent biết ứng viên đã quay lại màn hình để tiếp tục phỏng vấn
+          if (room?.localParticipant && tabViolationCountRef.current > 0) {
+            const returnPayload = JSON.stringify({
+              action: 'tab_returned',
+              type: 'tab_switch_return',
+              duration_seconds: durationSec,
+              message: 'Ứng viên đã quay lại màn hình phỏng vấn.',
+            });
+
+            try {
+              room.localParticipant.sendText(returnPayload, { topic: PROCTORING_TOPIC });
+            } catch (err) {
+              try {
+                room.localParticipant.sendText(returnPayload, { topic: QUESTION_CONTROL_TOPIC });
+              } catch {
+                // ignore
+              }
+            }
+          }
         }
         const timer = setTimeout(() => setTabSwitchWarning(null), 4500);
         return () => clearTimeout(timer);
@@ -1266,7 +1311,12 @@ export function AIInterviewLayout({
     mediaQuery.addEventListener('change', update);
     return () => mediaQuery.removeEventListener('change', update);
   }, []);
-  const hasAgentTranscript = messages.some((message) => message.type === 'agentTranscript');
+  const hasAgentTranscript = (messages || []).some(
+    (message) =>
+      message.type === 'agentTranscript' ||
+      isLiveKitAgentIdentity(message.from?.identity) ||
+      getParticipantRole(message.from as any) === 'agent'
+  );
   const agentIdentity = voiceAssistant.agent?.identity;
   const agentSid = voiceAssistant.agent?.sid;
 
@@ -1291,13 +1341,13 @@ export function AIInterviewLayout({
   const localParticipantRole = getParticipantRole(localParticipant);
   const isLocalEmployer = localParticipantRole === 'employer';
   const takeoverActive = Boolean(takeoverOwnerIdentity);
-  const otherEmployerCount = participants.filter((participant) => !participant.isLocal && getParticipantRole(participant) === 'employer').length;
-  const candidatePresent = participants.some((participant) => getParticipantRole(participant) === 'candidate');
+  const otherEmployerCount = (participants || []).filter((participant) => !participant.isLocal && getParticipantRole(participant) === 'employer').length;
+  const candidatePresent = (participants || []).some((participant) => getParticipantRole(participant) === 'candidate');
 
-  const remoteEmployerParticipant = participants.find((participant) => !participant.isLocal && getParticipantRole(participant) === 'employer');
+  const remoteEmployerParticipant = (participants || []).find((participant) => !participant.isLocal && getParticipantRole(participant) === 'employer');
   const hasEmployer = isLocalEmployer || Boolean(remoteEmployerParticipant);
 
-  const agentParticipant = voiceAssistant.agent ?? participants.find((participant) => getParticipantRole(participant) === 'agent');
+  const agentParticipant = voiceAssistant.agent ?? (participants || []).find((participant) => getParticipantRole(participant) === 'agent');
 
   const candidateScreenTrack =
     screenTracks.find(
@@ -1305,10 +1355,10 @@ export function AIInterviewLayout({
         getParticipantRole(track.participant) === 'candidate' ||
         (!isLocalEmployer && track.participant?.isLocal),
     ) ??
-    (!isLocalEmployer && isScreenShareEnabled && localParticipant.getTrackPublication(Track.Source.ScreenShare)?.track
+    (!isLocalEmployer && isScreenShareEnabled && localParticipant?.getTrackPublication?.(Track.Source.ScreenShare)?.track
       ? ({
           participant: localParticipant,
-          publication: localParticipant.getTrackPublication(Track.Source.ScreenShare),
+          publication: localParticipant?.getTrackPublication?.(Track.Source.ScreenShare),
           source: Track.Source.ScreenShare,
         } as any)
       : undefined);
@@ -1427,15 +1477,17 @@ export function AIInterviewLayout({
       }
     };
 
+    if (!room || typeof room.registerTextStreamHandler !== 'function') return;
+
     try {
       room.registerTextStreamHandler(AI_TAKEOVER_TOPIC, handleTakeoverControl);
     } catch {
-      room.unregisterTextStreamHandler(AI_TAKEOVER_TOPIC);
+      room.unregisterTextStreamHandler?.(AI_TAKEOVER_TOPIC);
       room.registerTextStreamHandler(AI_TAKEOVER_TOPIC, handleTakeoverControl);
     }
 
     return () => {
-      room.unregisterTextStreamHandler(AI_TAKEOVER_TOPIC);
+      room.unregisterTextStreamHandler?.(AI_TAKEOVER_TOPIC);
     };
   }, [room]);
 
@@ -1476,34 +1528,90 @@ export function AIInterviewLayout({
   }, [room, onEndSession]);
 
   useEffect(() => {
+    if (!room) return;
+
+    // 1. LiveKit text stream handler
+    const handleAvatarTextStream = async (reader: { readAll: () => Promise<string> }) => {
+      try {
+        const text = await reader.readAll();
+        const payload = JSON.parse(text);
+        if (payload?.type === 'lipsync_video' && (payload?.video_url || payload?.videoUrl)) {
+          const vUrl = payload.video_url || payload.videoUrl;
+          console.log('[AIInterviewLayout] Nhận lipsync_video từ room stream:', vUrl);
+          setLipsyncVideoUrl(vUrl);
+        }
+      } catch (err) {
+        console.warn('[AIInterviewLayout] Lỗi phân tích avatar event stream:', err);
+      }
+    };
+
+    if (typeof room.registerTextStreamHandler === 'function') {
+      try {
+        room.registerTextStreamHandler(AVATAR_EVENT_TOPIC, handleAvatarTextStream);
+      } catch {
+        // Ignore nếu đã đăng ký
+      }
+    }
+
+    // 2. LiveKit binary / data packet handler
+    const handleAvatarDataReceived = (payload: Uint8Array, participant?: any, kind?: any, topic?: string) => {
+      if (topic !== AVATAR_EVENT_TOPIC) return;
+      try {
+        const text = new TextDecoder().decode(payload);
+        const data = JSON.parse(text);
+        if (data?.type === 'lipsync_video' && (data?.video_url || data?.videoUrl)) {
+          const vUrl = data.video_url || data.videoUrl;
+          console.log('[AIInterviewLayout] Nhận lipsync_video từ data packet:', vUrl);
+          setLipsyncVideoUrl(vUrl);
+        }
+      } catch (err) {
+        console.warn('[AIInterviewLayout] Lỗi phân tích avatar data packet:', err);
+      }
+    };
+
+    room.on(RoomEvent.DataReceived, handleAvatarDataReceived);
+
+    return () => {
+      if (typeof room.unregisterTextStreamHandler === 'function') {
+        try {
+          room.unregisterTextStreamHandler(AVATAR_EVENT_TOPIC);
+        } catch {
+          // Ignore
+        }
+      }
+      room.off(RoomEvent.DataReceived, handleAvatarDataReceived);
+    };
+  }, [room]);
+
+  useEffect(() => {
     if (!takeoverOwnerIdentity) return;
     const takeoverOwnerStillPresent =
       takeoverOwnerIdentity === localParticipant.identity ||
-      participants.some((participant) => participant.identity === takeoverOwnerIdentity);
+      (participants || []).some((participant) => participant.identity === takeoverOwnerIdentity);
     if (!takeoverOwnerStillPresent) {
       setTakeoverOwnerIdentity(null);
     }
-  }, [localParticipant.identity, participants, takeoverOwnerIdentity]);
+  }, [localParticipant?.identity, participants, takeoverOwnerIdentity]);
 
   const sendTakeoverControl = React.useCallback(async (action: 'acquire' | 'release') => {
     if (!isLocalEmployer) return;
     setIsTakeoverSending(true);
     try {
-      await room.localParticipant.sendText(JSON.stringify({ action }), {
+      await room?.localParticipant?.sendText?.(JSON.stringify({ action }), {
         topic: AI_TAKEOVER_TOPIC,
         attributes: { kind: 'employer_takeover', action },
       });
       if (action === 'acquire') {
-        setTakeoverOwnerIdentity(localParticipant.identity);
-        await localParticipant.setMicrophoneEnabled(true);
+        setTakeoverOwnerIdentity(localParticipant?.identity ?? null);
+        await localParticipant?.setMicrophoneEnabled?.(true);
       } else {
         setTakeoverOwnerIdentity(null);
-        await localParticipant.setMicrophoneEnabled(false);
+        await localParticipant?.setMicrophoneEnabled?.(false);
       }
     } finally {
       setIsTakeoverSending(false);
     }
-  }, [isLocalEmployer, localParticipant, room.localParticipant]);
+  }, [isLocalEmployer, localParticipant, room?.localParticipant]);
 
   return (
     <div className="relative flex h-full w-full overflow-hidden bg-[#f8fafc]">
@@ -1656,6 +1764,45 @@ export function AIInterviewLayout({
                       : 'opacity-100 scale-100 pointer-events-auto z-10'
                   }`}
                 >
+                  {!(isEmployerActive || isEmployerCameraActive) && (
+                    <AIParticipantTile
+                      variant="agent"
+                      candidateLabel={candidateLabel}
+                      trackRef={agentTrack}
+                      audioTrack={agentAudioTrack}
+                      hasAgentTranscript={hasAgentTranscript}
+                      hasDetectedAgent={Boolean(agentParticipant)}
+                      agentState={takeoverActive ? 'listening' : voiceAssistant.state}
+                      agentIdentity={agentIdentity}
+                      agentSid={agentSid}
+                      avatarId={avatarId}
+                      avatarImageUrl={avatarImageUrl}
+                      avatarBackgroundUrl={avatarBackgroundUrl}
+                      avatarBackdrop={avatarBackdrop}
+                      interviewerName={interviewerName}
+                      characterId={effectiveCharacterId}
+                      avatarActions={effectiveAvatarActions}
+                      lipsyncVideoUrl={lipsyncVideoUrl}
+                      sessionStatus={isFinishingTransition ? 'completed' : undefined}
+                      isTakeoverActive={takeoverActive}
+                      room={room}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Floating Picture-in-Picture (PiP) for AI Agent: Smoothly glides up into the top-right corner */}
+            <div
+              data-tour="interview-agent-pip"
+              className={`absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 z-30 w-44 h-32 sm:w-56 sm:h-40 md:w-64 md:h-44 rounded-2xl overflow-hidden border-2 border-slate-700/80 shadow-[0_14px_40px_rgba(0,0,0,0.65)] bg-slate-950 backdrop-blur-md ring-1 ring-white/15 transition-all duration-700 ease-out transform ${
+                isEmployerActive || isEmployerCameraActive
+                  ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto shadow-2xl'
+                  : 'opacity-0 -translate-y-6 scale-75 pointer-events-none'
+              }`}
+            >
+              <div className="relative h-full w-full">
+                {(isEmployerActive || isEmployerCameraActive) && (
                   <AIParticipantTile
                     variant="agent"
                     candidateLabel={candidateLabel}
@@ -1671,42 +1818,15 @@ export function AIInterviewLayout({
                     avatarBackgroundUrl={avatarBackgroundUrl}
                     avatarBackdrop={avatarBackdrop}
                     interviewerName={interviewerName}
+                    characterId={effectiveCharacterId}
+                    avatarActions={effectiveAvatarActions}
+                    lipsyncVideoUrl={lipsyncVideoUrl}
                     sessionStatus={isFinishingTransition ? 'completed' : undefined}
                     isTakeoverActive={takeoverActive}
+                    isPip={true}
+                    room={room}
                   />
-                </div>
-              </div>
-            </div>
-
-            {/* Floating Picture-in-Picture (PiP) for AI Agent: Smoothly glides up into the top-right corner */}
-            <div
-              data-tour="interview-agent-pip"
-              className={`absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 z-30 w-44 h-32 sm:w-56 sm:h-40 md:w-64 md:h-44 rounded-2xl overflow-hidden border-2 border-slate-700/80 shadow-[0_14px_40px_rgba(0,0,0,0.65)] bg-slate-950 backdrop-blur-md ring-1 ring-white/15 transition-all duration-700 ease-out transform ${
-                isEmployerActive || isEmployerCameraActive
-                  ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto shadow-2xl'
-                  : 'opacity-0 -translate-y-6 scale-75 pointer-events-none'
-              }`}
-            >
-              <div className="relative h-full w-full">
-                <AIParticipantTile
-                  variant="agent"
-                  candidateLabel={candidateLabel}
-                  trackRef={agentTrack}
-                  audioTrack={agentAudioTrack}
-                  hasAgentTranscript={hasAgentTranscript}
-                  hasDetectedAgent={Boolean(agentParticipant)}
-                  agentState={takeoverActive ? 'listening' : voiceAssistant.state}
-                  agentIdentity={agentIdentity}
-                  agentSid={agentSid}
-                  avatarId={avatarId}
-                  avatarImageUrl={avatarImageUrl}
-                  avatarBackgroundUrl={avatarBackgroundUrl}
-                  avatarBackdrop={avatarBackdrop}
-                  interviewerName={interviewerName}
-                  sessionStatus={isFinishingTransition ? 'completed' : undefined}
-                  isTakeoverActive={takeoverActive}
-                  isPip={true}
-                />
+                )}
               </div>
             </div>
             {isFinishingTransition && (
@@ -1776,7 +1896,7 @@ export function AIInterviewLayout({
             setChatOpen={setChatOpen}
             onEndSession={async () => {
               const finalizePromise = onEndSession?.();
-              room.disconnect();
+              room?.disconnect?.();
               await finalizePromise;
             }}
             isLocalEmployer={isLocalEmployer}
@@ -1821,7 +1941,7 @@ export function AIInterviewLayout({
             if (composerMode === 'aiControl' && isLocalEmployer) {
               setIsControlSending(true);
               try {
-                await room.localParticipant.sendText(text, {
+                await room?.localParticipant?.sendText?.(text, {
                   topic: AI_CONTROL_TOPIC,
                   attributes: { kind: 'employer_instruction' },
                 });

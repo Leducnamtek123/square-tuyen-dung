@@ -18,6 +18,16 @@ const BUTTON_RADIUS = 'var(--sq-button-radius)';
  */
 const theme = createTheme(baseTheme, {
   components: {
+    MuiMenu: {
+      defaultProps: {
+        disableScrollLock: true,
+      },
+    },
+    MuiPopover: {
+      defaultProps: {
+        disableScrollLock: true,
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
@@ -260,7 +270,7 @@ const theme = createTheme(baseTheme, {
   },
 });
 
-export default function ThemeRegistry({ children }: { children: any }) {
+export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
   return (
     <NextAppDirEmotionCacheProvider options={{ key: 'mui' }}>
       <ThemeProvider theme={theme}>

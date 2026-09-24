@@ -3,16 +3,18 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import type { AgentState } from '@livekit/components-react';
+import { useMaybeRoomContext } from '@livekit/components-react';
+import { RoomEvent } from 'livekit-client';
 import {
   type AvatarAction,
   resolveAvatarState,
   resolveActionVideoUrl,
   AVATAR_STATE_META,
 } from './avatarStates';
-import { AvatarImage } from './AvatarImage';
 import { useAvatarState } from './AvatarStateController';
 import { LiveAudioVisualizerBar } from '../LiveAudioVisualizerBar';
 import { useLiveAudioTrackAnalyzer } from '../../hooks/useLiveAudioTrackAnalyzer';
+import { isLiveKitAgentParticipant, isLiveKitAgentIdentity } from '../../livekitParticipant';
 import styles from './InterviewAvatarVideo.module.css';
 
 export interface InterviewAvatarProps {
@@ -33,6 +35,21 @@ export interface InterviewAvatarProps {
   lipsyncVideoUrl?: string | null;
   speakVideoUrl?: string | null;
   actionHint?: string | null;
+  onLipsyncEnded?: () => void;
+  isPip?: boolean;
+  room?: any;
+}
+
+export const AVATAR_ACTION_VERSION = '20260923_v2_lipsync';
+
+export function withVersion(url?: string | null): string {
+  if (!url) return '';
+  // Video MP4 sinh động lipsync đã có mã băm nội dung trong tên file (lipsync_hash.mp4).
+  // Tuyệt đối không thêm tham số query (?v=) để tránh Chrome phát sinh lỗi net::ERR_CACHE_OPERATION_NOT_SUPPORTED
+  if (url.includes('/talking-head/record/') || url.includes('/record/') || url.includes('lipsync_')) {
+    return url;
+  }
+  return url.includes('?') ? url : `${url}?v=${AVATAR_ACTION_VERSION}`;
 }
 
 /**
@@ -56,6 +73,9 @@ export function InterviewAvatar({
   lipsyncVideoUrl,
   speakVideoUrl,
   actionHint,
+  onLipsyncEnded,
+  isPip = false,
+  room: propRoom,
 }: InterviewAvatarProps) {
   const isCustomUploadedImage = Boolean(
     avatarImageUrl &&
@@ -66,23 +86,25 @@ export function InterviewAvatar({
 
   const effectiveAvatarId = avatarId || (avatarImageUrl?.includes('expert_male') ? 'expert_male' : 'aila_recruiter');
 
-  // May trang thai cu chi video
+  // Máy trạng thái cử chỉ video Full HD
   const [currentAction, setCurrentAction] = useState<AvatarAction>('wave');
   const [isSpeakActive, setIsSpeakActive] = useState(false);
-  const [videoFallbackActive, setVideoFallbackActive] = useState(false);
+  const [activeLipsyncUrl, setActiveLipsyncUrl] = useState<string | null>(lipsyncVideoUrl || speakVideoUrl || null);
 
   const idleVideoRef = useRef<HTMLVideoElement | null>(null);
   const speakVideoRef = useRef<HTMLVideoElement | null>(null);
+  const lastLoadedSpeakSrcRef = useRef<string>('');
   const nodTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isSpeakingRef = useRef<boolean>(false);
 
-  // LiveTalking WebRTC Engine (Chay truc tiep tren GPU RTX 4070 Ti SUPER)
-  const [isWebRtcConnected, setIsWebRtcConnected] = useState(false);
-  const liveVideoRef = useRef<HTMLVideoElement | null>(null);
-  const pcRef = useRef<RTCPeerConnection | null>(null);
-  const liveSessionIdRef = useRef<string | null>(null);
+  // Cấu hình transceiver chuẩn video trước, audio sau nếu sử dụng WebRTC kết nối
+  const setupWebRtcTransceivers = useCallback((pc: RTCPeerConnection) => {
+    pc.addTransceiver('video', { direction: 'recvonly' });
+    pc.addTransceiver('audio', { direction: 'recvonly' });
+  }, []);
 
-  // Dong bo trang thai hien thi badge va visualizer
-  const { state: canonicalState, assetSrc, isSpeaking } = useAvatarState({
+  // Đồng bộ trạng thái hiển thị badge và visualizer
+  const { state: canonicalState, isSpeaking } = useAvatarState({
     avatarId: effectiveAvatarId,
     voiceAssistantState,
     isSpeaking: isSpeakingHint,
@@ -91,28 +113,190 @@ export function InterviewAvatar({
 
   const meta = AVATAR_STATE_META[canonicalState] || AVATAR_STATE_META.idle;
 
-  // Real-time audio analyzer cho vach song am thanh
+  // Real-time audio analyzer cho vạch sóng âm thanh
   const analyzer = useLiveAudioTrackAnalyzer(audioTrack, {
     bandCount: 5,
     isSpeakingHint: isSpeaking || isSpeakActive,
   });
 
-  // Phan giai video cu chi hien tai
+  // Lắng nghe room context an toàn từ LiveKit (nếu nằm trong LiveKitRoom)
+  const roomContext = useMaybeRoomContext();
+  const effectiveRoom = propRoom || roomContext;
+
+  const isGenericSpeaking = Boolean(isSpeakingHint || voiceAssistantState === 'speaking');
+  useEffect(() => {
+    isSpeakingRef.current = isGenericSpeaking;
+  }, [isGenericSpeaking]);
+
+  const lastLipsyncReceivedAtRef = useRef<number>(0);
+
+  // Cập nhật khi prop lipsyncVideoUrl hoặc speakVideoUrl thay đổi từ bên ngoài
+  useEffect(() => {
+    if (lipsyncVideoUrl) {
+      lastLipsyncReceivedAtRef.current = Date.now();
+      setActiveLipsyncUrl(lipsyncVideoUrl);
+    } else if (speakVideoUrl) {
+      lastLipsyncReceivedAtRef.current = Date.now();
+      setActiveLipsyncUrl(speakVideoUrl);
+    } else {
+      setActiveLipsyncUrl(null);
+    }
+  }, [lipsyncVideoUrl, speakVideoUrl]);
+
+
+  // Lắng nghe sự kiện lipsync từ LiveKit Room data message (topic: interview_avatar_event)
+  useEffect(() => {
+    if (!effectiveRoom) return;
+
+    const AVATAR_EVENT_TOPIC = 'interview_avatar_event';
+
+    const handleTextStream = async (reader: { readAll: () => Promise<string> }) => {
+      try {
+        const text = await reader.readAll();
+        const payload = JSON.parse(text);
+        if (payload?.type === 'lipsync_video' && (payload?.video_url || payload?.videoUrl)) {
+          const vUrl = payload.video_url || payload.videoUrl;
+          console.log('[InterviewAvatar] Nhận lipsync_video từ room text stream:', vUrl);
+          lastLipsyncReceivedAtRef.current = Date.now();
+          setActiveLipsyncUrl(vUrl);
+        }
+      } catch (err) {
+        console.warn('[InterviewAvatar] Lỗi phân tích avatar event stream:', err);
+      }
+    };
+
+    if (typeof effectiveRoom.registerTextStreamHandler === 'function') {
+      try {
+        effectiveRoom.registerTextStreamHandler(AVATAR_EVENT_TOPIC, handleTextStream);
+      } catch {
+        // Ignore nếu đã đăng ký
+      }
+    }
+
+    const handleDataReceived = (payload: Uint8Array, participant?: any, kind?: any, topic?: string) => {
+      if (topic !== AVATAR_EVENT_TOPIC) return;
+      try {
+        const text = new TextDecoder().decode(payload);
+        const data = JSON.parse(text);
+        if (data?.type === 'lipsync_video' && (data?.video_url || data?.videoUrl)) {
+          const vUrl = data.video_url || data.videoUrl;
+          console.log('[InterviewAvatar] Nhận lipsync_video từ room data packet:', vUrl);
+          lastLipsyncReceivedAtRef.current = Date.now();
+          setActiveLipsyncUrl(vUrl);
+        }
+      } catch (err) {
+        console.warn('[InterviewAvatar] Lỗi phân tích avatar data packet:', err);
+      }
+    };
+
+    effectiveRoom.on(RoomEvent.DataReceived, handleDataReceived);
+
+    return () => {
+      if (typeof effectiveRoom.unregisterTextStreamHandler === 'function') {
+        try {
+          effectiveRoom.unregisterTextStreamHandler(AVATAR_EVENT_TOPIC);
+        } catch {
+          // Ignore
+        }
+      }
+      effectiveRoom.off(RoomEvent.DataReceived, handleDataReceived);
+    };
+  }, [effectiveRoom]);
+
+  // Phân giải video cử chỉ hiện tại
   const currentIdleSrc = useMemo(() => {
-    return resolveActionVideoUrl(currentAction, characterId, avatarActions);
+    const raw = resolveActionVideoUrl(currentAction, characterId, avatarActions);
+    return withVersion(raw);
   }, [currentAction, characterId, avatarActions]);
 
-  // Phan giai video noi lipsync
+  // Phân giải video nói nhép lipsync (bám sát opc007: KHÔNG fallback sang generic speaking.mp4)
   const effectiveSpeakSrc = useMemo(() => {
-    return (
+    const raw = (
+      activeLipsyncUrl ||
       lipsyncVideoUrl ||
       speakVideoUrl ||
-      avatarActions?.speaking ||
-      resolveActionVideoUrl('speaking', characterId, avatarActions)
+      null
     );
-  }, [lipsyncVideoUrl, speakVideoUrl, avatarActions, characterId]);
+    if (!raw) return '';
+    // lipsync MP4 file đã mang mã băm content_hash độc nhất, không gắn ?v= để tránh lỗi disk cache Chrome
+    if (raw.includes('/talking-head/record/') || raw.includes('/record/') || raw.includes('lipsync_')) {
+      return raw;
+    }
+    return withVersion(raw);
+  }, [activeLipsyncUrl, lipsyncVideoUrl, speakVideoUrl]);
 
-  // Dieu phoi State Machine theo context phong phong van
+  const hasSpecificLipsync = Boolean(activeLipsyncUrl || lipsyncVideoUrl || speakVideoUrl);
+  // Bám sát opc007: Chỉ kích hoạt speak video khi có lipsync video cụ thể (không fallback vào generic speaking.mp4)
+  const hasSpeakTrigger = hasSpecificLipsync;
+
+  // Điều khiển tắt/mở âm thanh WebRTC của Agent trong phòng để triệt tiêu hoàn toàn echo/dual audio
+  const toggleWebRTCAgentAudio = useCallback((muted: boolean) => {
+    // 1. Tắt audioTrack truyền vào props
+    if (audioTrack) {
+      const track = (audioTrack as any)?.publication?.track || (audioTrack as any)?.track || audioTrack;
+      if (typeof track?.setVolume === 'function') {
+        try { track.setVolume(muted ? 0 : 1); } catch {}
+      }
+      if (track?.mediaStreamTrack) {
+        try { track.mediaStreamTrack.enabled = !muted; } catch {}
+      }
+      if (Array.isArray(track?.attachedElements)) {
+        track.attachedElements.forEach((el: HTMLMediaElement) => {
+          try {
+            el.muted = muted;
+            el.volume = muted ? 0 : 1;
+          } catch {}
+        });
+      }
+    }
+
+    // 2. Quét toàn bộ remote participants thuộc về Agent trong LiveKit Room
+    if (effectiveRoom && effectiveRoom.remoteParticipants) {
+      try {
+        effectiveRoom.remoteParticipants.forEach((p: any) => {
+          let role = '';
+          if (p.metadata) {
+            try { role = JSON.parse(p.metadata)?.role; } catch {}
+          }
+          const isAgent =
+            role === 'agent' ||
+            isLiveKitAgentParticipant(p) ||
+            isLiveKitAgentIdentity(p.identity) ||
+            (p.identity || '').toLowerCase().includes('agent') ||
+            (p.name || '').toLowerCase().includes('trợ lý');
+          if (isAgent && p.audioTrackPublications) {
+            p.audioTrackPublications.forEach((pub: any) => {
+              if (pub.track) {
+                if (typeof pub.track.setVolume === 'function') {
+                  try { pub.track.setVolume(muted ? 0 : 1); } catch {}
+                }
+                if (pub.track.mediaStreamTrack) {
+                  try { pub.track.mediaStreamTrack.enabled = !muted; } catch {}
+                }
+                if (Array.isArray(pub.track.attachedElements)) {
+                  pub.track.attachedElements.forEach((el: HTMLMediaElement) => {
+                    try {
+                      el.muted = muted;
+                      el.volume = muted ? 0 : 1;
+                    } catch {}
+                  });
+                }
+              }
+            });
+          }
+        });
+      } catch {}
+    }
+  }, [audioTrack, effectiveRoom]);
+
+  // Khôi phục WebRTC audio nếu unmount component
+  useEffect(() => {
+    return () => {
+      toggleWebRTCAgentAudio(false);
+    };
+  }, [toggleWebRTCAgentAudio]);
+
+  // Điều phối State Machine theo ngữ cảnh phòng phỏng vấn
   useEffect(() => {
     if (actionHint && ['wave', 'idle', 'nod', 'thinking', 'thanks_wave'].includes(actionHint)) {
       setCurrentAction(actionHint as AvatarAction);
@@ -134,7 +318,7 @@ export function InterviewAvatar({
         setCurrentAction('idle');
       }
 
-      // Neu ung vien noi lien tuc hon 5 giay, kich hoat cu chi gat dau
+      // Nếu ứng viên nói liên tục hơn 5 giây, kích hoạt cử chỉ gật đầu
       if (!nodTimerRef.current) {
         nodTimerRef.current = setTimeout(() => {
           setCurrentAction('nod');
@@ -143,164 +327,114 @@ export function InterviewAvatar({
       return;
     }
 
-    // Reset nod timer neu khong con listening
+    // Reset nod timer nếu không còn listening
     if (nodTimerRef.current) {
       clearTimeout(nodTimerRef.current);
       nodTimerRef.current = null;
     }
   }, [actionHint, sessionStatus, voiceAssistantState, currentAction]);
 
-  // Xu ly khi co tin hieu noi hoac video lipsync moi
-  const hasSpeakTrigger = Boolean(
-    lipsyncVideoUrl ||
-    speakVideoUrl ||
-    isSpeakingHint ||
-    voiceAssistantState === 'speaking'
-  );
-
+  // Xử lý nạp và phát video nhép môi có tiếng
   useEffect(() => {
     const speakEl = speakVideoRef.current;
     if (!speakEl) return;
 
-    if (hasSpeakTrigger) {
-      if (speakEl.src !== effectiveSpeakSrc) {
+    if (hasSpeakTrigger && effectiveSpeakSrc) {
+      if (lastLoadedSpeakSrcRef.current !== effectiveSpeakSrc) {
+        lastLoadedSpeakSrcRef.current = effectiveSpeakSrc;
         speakEl.src = effectiveSpeakSrc;
-        speakEl.load();
-      } else if (speakEl.paused && !isSpeakActive) {
-        speakEl.play().catch(() => {
-          // Trinh duyet chan autoplay thi chuyen trang thai mem
-        });
-        setIsSpeakActive(true);
+        speakEl.currentTime = 0;
+        // Bám sát opc007: Khi có lipsync video cụ thể, video phát CÓ TIẾNG để đồng bộ 100% phần cứng
+        // Nếu là avatar trong chế độ PiP (phụ) thì luôn tắt tiếng tuyệt đối để tránh lồng tiếng
+        speakEl.muted = isPip || !hasSpecificLipsync;
+        speakEl.volume = isPip ? 0 : 1.0;
+
+        // Tắt tiếng WebRTC của agent cục bộ trên trình duyệt để tránh vọng tiếng
+        if (!isPip) {
+          toggleWebRTCAgentAudio(true);
+        }
+
+        const playPromise = speakEl.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              setIsSpeakActive(true);
+            })
+            .catch((err) => {
+              if (err.name !== 'AbortError') {
+                console.warn('[InterviewAvatar] Lỗi phát speak video có tiếng:', err);
+              }
+              // Fallback nếu trình duyệt chặn autoplay có tiếng: mute video và bật lại WebRTC audio
+              if (err.name === 'NotAllowedError') {
+                speakEl.muted = true;
+                toggleWebRTCAgentAudio(false);
+                speakEl.play().then(() => setIsSpeakActive(true)).catch(() => {});
+              }
+            });
+        }
+      } else if (speakEl.paused) {
+        speakEl.play().then(() => setIsSpeakActive(true)).catch(() => {});
       }
     } else {
-      if (isSpeakActive) {
+      if (!hasSpecificLipsync) {
+        lastLoadedSpeakSrcRef.current = '';
         setIsSpeakActive(false);
+        // Khôi phục WebRTC audio nếu không còn lipsync video
+        toggleWebRTCAgentAudio(false);
       }
     }
-  }, [hasSpeakTrigger, effectiveSpeakSrc, isSpeakActive]);
+  }, [hasSpeakTrigger, effectiveSpeakSrc, hasSpecificLipsync, toggleWebRTCAgentAudio]);
 
-  // Ket noi LiveTalking WebRTC stream truc tiep tu GPU RTX 4070 Ti SUPER
-  useEffect(() => {
-    let isMounted = true;
-    let pc: RTCPeerConnection | null = null;
-
-    async function initLiveTalkingWebRTC() {
-      if (typeof window === 'undefined' || !window.RTCPeerConnection) return;
-      try {
-        pc = new RTCPeerConnection({
-          iceServers: [
-            { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
-          ],
-        });
-        pcRef.current = pc;
-
-        pc.addTransceiver('video', { direction: 'recvonly' });
-        pc.addTransceiver('audio', { direction: 'recvonly' });
-
-        pc.ontrack = (event) => {
-          if (event.track.kind === 'video' && liveVideoRef.current) {
-            liveVideoRef.current.srcObject = event.streams[0];
-            liveVideoRef.current.play().catch(() => {});
-            if (isMounted) {
-              setIsWebRtcConnected(true);
-            }
-          }
-        };
-
-        pc.onconnectionstatechange = () => {
-          if (pc?.connectionState === 'connected' && isMounted) {
-            setIsWebRtcConnected(true);
-          } else if (
-            (pc?.connectionState === 'failed' || pc?.connectionState === 'disconnected') &&
-            isMounted
-          ) {
-            setIsWebRtcConnected(false);
-          }
-        };
-
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-
-        await new Promise<void>((resolve) => {
-          if (pc!.iceGatheringState === 'complete') {
-            resolve();
-          } else {
-            const checkState = () => {
-              if (pc!.iceGatheringState === 'complete') {
-                pc!.removeEventListener('icegatheringstatechange', checkState);
-                resolve();
-              }
-            };
-            pc!.addEventListener('icegatheringstatechange', checkState);
-            setTimeout(resolve, 1500);
-          }
-        });
-
-        const localDesc = pc.localDescription;
-        if (!localDesc || !isMounted) return;
-
-        const res = await fetch('/talking-head/offer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            sdp: localDesc.sdp,
-            type: localDesc.type,
-            avatar: characterId || 'ng_c_linh',
-          }),
-        });
-
-        if (res.ok) {
-          const answer = await res.json();
-          liveSessionIdRef.current = answer.sessionid;
-          await pc.setRemoteDescription(new RTCSessionDescription(answer));
-        }
-      } catch (err) {
-        console.warn('[InterviewAvatar] WebRTC AI avatar init fallback:', err);
-      }
-    }
-
-    initLiveTalkingWebRTC();
-
-    return () => {
-      isMounted = false;
-      if (pc) {
-        pc.close();
-      }
-      pcRef.current = null;
-    };
-  }, [characterId]);
-
-  // Khi video noi duoc tai du lieu khung hinh dau tien
+  // Khi video nói được nạp khung hình đầu tiên
   const handleSpeakLoadedData = useCallback(() => {
     const speakEl = speakVideoRef.current;
     if (!speakEl) return;
 
     speakEl.play().then(() => {
       setIsSpeakActive(true);
-    }).catch(() => {
-      setIsSpeakActive(true);
+    }).catch((err) => {
+      console.warn('[InterviewAvatar] Lỗi phát speak video sau khi load data:', err);
+      setIsSpeakActive(false);
     });
   }, []);
 
-  // Khi video noi hoan tat
+  // Khi video nói hoàn tất: fade-out 0.12s về lại idle.mp4
   const handleSpeakEnded = useCallback(() => {
     setIsSpeakActive(false);
+    lastLoadedSpeakSrcRef.current = '';
     setCurrentAction('idle');
-  }, []);
+    setActiveLipsyncUrl(null);
+    // Khôi phục âm lượng WebRTC audio của agent sau khi video lipsync kết thúc
+    toggleWebRTCAgentAudio(false);
+    if (onLipsyncEnded) {
+      onLipsyncEnded();
+    }
+  }, [toggleWebRTCAgentAudio, onLipsyncEnded]);
 
-  // Khi video idle hoan tat mot luot
+  // Khi video cử chỉ hoàn tất một lượt
   const handleIdleEnded = useCallback(() => {
-    if (currentAction === 'wave') {
-      setCurrentAction('idle');
-    } else if (currentAction === 'nod') {
+    if (currentAction === 'wave' || currentAction === 'nod') {
       setCurrentAction('idle');
     }
   }, [currentAction]);
 
-  // Fallback tu dong neu video khong tai duoc
-  const handleVideoError = useCallback(() => {
-    setVideoFallbackActive(true);
-  }, []);
+  // Xử lý lỗi nạp video: giữ video idle an toàn, không bao giờ để đen màn hoặc mất nhân vật
+  const handleVideoError = useCallback((e: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    const videoEl = e.currentTarget;
+    console.warn('[InterviewAvatar] Cảnh báo nạp video hành động, giữ video idle an toàn:', videoEl.src);
+    if (videoEl === speakVideoRef.current) {
+      setIsSpeakActive(false);
+      lastLoadedSpeakSrcRef.current = '';
+      toggleWebRTCAgentAudio(false);
+      return;
+    }
+    // Tránh lặp vô hạn nếu chính video idle cũng kích hoạt lỗi
+    if (!videoEl.src.includes('idle.mp4')) {
+      const defaultIdle = withVersion(resolveActionVideoUrl('idle', characterId || 'ng_c_linh'));
+      videoEl.src = defaultIdle;
+      videoEl.play().catch(() => {});
+    }
+  }, [characterId, toggleWebRTCAgentAudio]);
 
   // Studio background
   const defaultOfficeBg = '/images/avatar/ai-interview-office-bg.jpg';
@@ -319,51 +453,43 @@ export function InterviewAvatar({
         transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
       }}
     >
-      {/* Studio Background Layer */}
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `url("${bgUrl}")`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 40%',
-          backgroundColor: '#0f172a',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      />
-
-      {/* Lop Ambient Backdrop: Lam mo video goc 9:16 de lap day toan man hinh 16:9 khong bi vien den */}
-      {!videoFallbackActive && !isCustomUploadedImage && (
-        <video
-          className={styles.stageBackdropVideo}
-          src={isSpeakActive ? effectiveSpeakSrc : currentIdleSrc}
-          autoPlay
-          loop
-          muted
-          playsInline
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Lop Live WebRTC GPU AI (LiveTalking Engine render truc tiep tu GPU NVIDIA RTX 4070 Ti SUPER) */}
-      {!videoFallbackActive && !isCustomUploadedImage && (
-        <video
-          ref={liveVideoRef}
-          className={styles.stageLiveWebRtc}
-          style={{
-            opacity: isWebRtcConnected ? 1 : 0,
-            transition: 'opacity 0.25s ease-in-out',
-            pointerEvents: isWebRtcConnected ? 'auto' : 'none',
+      {/* Lớp Ambient Backdrop mờ tự nhiên phía sau video (loại bỏ viền đen và không bị nhân 3 bức tường) */}
+      {!isCustomUploadedImage && (
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: -20,
+            backgroundImage: `url("${bgUrl}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 40%',
+            filter: 'blur(36px) brightness(0.55)',
+            transform: 'scale(1.15)',
+            pointerEvents: 'none',
+            zIndex: 1,
           }}
-          autoPlay
-          playsInline
-          muted
         />
       )}
 
-      {/* Lop A: Video Cho / Cu chi (Fallback khi WebRTC dang khoi dong) */}
-      {!videoFallbackActive && !isCustomUploadedImage && !isWebRtcConnected && (
+      {/* Studio Background Layer cho ảnh tùy chỉnh 2D cắt nền */}
+      {isCustomUploadedImage && (
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url("${bgUrl}")`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 40%',
+            backgroundColor: '#0f172a',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        />
+      )}
+
+
+
+      {/* Lớp A: Video Chờ / Cử chỉ (Full HD MP4: idle, wave, nod, thinking, thanks_wave) */}
+      {!isCustomUploadedImage && (
         <video
           ref={idleVideoRef}
           className={styles.stageIdle}
@@ -377,15 +503,14 @@ export function InterviewAvatar({
         />
       )}
 
-      {/* Lop B: Video Tra loi Lipsync (Fallback khi WebRTC dang khoi dong) */}
-      {!videoFallbackActive && !isCustomUploadedImage && !isWebRtcConnected && (
+      {/* Lớp B: Video Trả lời Lipsync (Che lên Lớp A với fade-in/fade-out 0.12s mượt mà) */}
+      {!isCustomUploadedImage && (
         <video
           ref={speakVideoRef}
           className={`${styles.stageSpeak} ${isSpeakActive ? styles.stageSpeakActive : ''}`}
-          src={effectiveSpeakSrc}
+          src={effectiveSpeakSrc || undefined}
           playsInline
-          muted
-          loop
+          loop={false}
           preload="auto"
           onLoadedData={handleSpeakLoadedData}
           onEnded={handleSpeakEnded}
@@ -393,8 +518,8 @@ export function InterviewAvatar({
         />
       )}
 
-      {/* Fallback 2D Avatar Image khi video loi hoac co anh tuy chinh */}
-      {(videoFallbackActive || isCustomUploadedImage) && (
+      {/* Hiển thị ảnh tĩnh tùy chỉnh (CHỈ KHI nhà tuyển dụng chủ động tải lên ảnh riêng) */}
+      {isCustomUploadedImage && avatarImageUrl && (
         <Box
           sx={{
             position: 'absolute',
@@ -409,37 +534,28 @@ export function InterviewAvatar({
             zIndex: 10,
           }}
         >
-          {isCustomUploadedImage && avatarImageUrl ? (
-            <Box
-              component="img"
-              src={avatarImageUrl}
-              alt={interviewerName}
-              sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                objectPosition: 'bottom center',
-                userSelect: 'none',
-                pointerEvents: 'none',
-              }}
-            />
-          ) : (
-            <AvatarImage
-              avatarId={effectiveAvatarId}
-              src={assetSrc}
-              state={canonicalState}
-              alt={`${interviewerName} - ${meta.labelVi}`}
-            />
-          )}
+          <Box
+            component="img"
+            src={avatarImageUrl}
+            alt={interviewerName}
+            sx={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'bottom center',
+              userSelect: 'none',
+              pointerEvents: 'none',
+            }}
+          />
         </Box>
       )}
 
-      {/* Top-Left Floating State Badge */}
+      {/* Top-Right Floating State Badge */}
       <Box
         sx={{
           position: 'absolute',
           top: 14,
-          left: 14,
+          right: 14,
           zIndex: 20,
           display: 'flex',
           alignItems: 'center',

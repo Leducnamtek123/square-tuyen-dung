@@ -38,13 +38,18 @@ import { IMAGES } from '@/configs/images';
 import type { InterviewSession } from '@/types/models';
 
 interface PreflightRoomProps {
-  onJoin: () => void;
+  onJoin: (config?: { cameraEnabled?: boolean; audioDeviceId?: string; videoDeviceId?: string }) => void;
   onCancel: () => void;
   starting: boolean;
   session?: InterviewSession | null;
 }
 
 interface AudioDeviceOption {
+  deviceId: string;
+  label: string;
+}
+
+interface VideoDeviceOption {
   deviceId: string;
   label: string;
 }
@@ -59,9 +64,14 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
 }) => {
   // Device & Stream States
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [audioDevices, setAudioDevices] = useState<AudioDeviceOption[]>([]);
   const [selectedAudioId, setSelectedAudioId] = useState<string>('');
+  const [videoDevices, setVideoDevices] = useState<VideoDeviceOption[]>([]);
+  const [selectedVideoId, setSelectedVideoId] = useState<string>('');
   const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
+  const [cameraLoading, setCameraLoading] = useState<boolean>(false);
+  const [cameraError, setCameraError] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [volume, setVolume] = useState<number>(0);
   const [dbLevel, setDbLevel] = useState<number>(-55);
@@ -73,7 +83,9 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const activeVideoTrackRef = useRef<MediaStreamTrack | null>(null);
+  const activeVideoStreamRef = useRef<MediaStream | null>(null);
   const activeAudioStreamRef = useRef<MediaStream | null>(null);
+  const videoRequestSeqRef = useRef<number>(0);
 
   // Metadata Resolution from Session
   const isMock =
@@ -108,11 +120,12 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
   const difficultyLabel =
     (session?.session_metadata as any)?.difficulty || 'TRUNG BÌNH';
 
-  // 1. Enumerate Audio Devices
-  const loadAudioDevices = useCallback(async () => {
+  // 1. Enumerate Audio & Video Devices
+  const loadMediaDevices = useCallback(async () => {
     try {
-      if (!navigator.mediaDevices?.enumerateDevices) return;
+      if (typeof navigator === 'undefined' || !navigator.mediaDevices?.enumerateDevices) return;
       const devices = await navigator.mediaDevices.enumerateDevices();
+
       const audioInputs = devices
         .filter((d) => d.kind === 'audioinput')
         .map((d, index) => ({
@@ -123,10 +136,21 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
       if (audioInputs.length > 0 && !selectedAudioId) {
         setSelectedAudioId(audioInputs[0].deviceId);
       }
+
+      const videoInputs = devices
+        .filter((d) => d.kind === 'videoinput')
+        .map((d, index) => ({
+          deviceId: d.deviceId,
+          label: d.label || `Camera ${index + 1}`,
+        }));
+      setVideoDevices(videoInputs);
+      if (videoInputs.length > 0 && !selectedVideoId) {
+        setSelectedVideoId(videoInputs[0].deviceId);
+      }
     } catch {
       // Ignore enumeration failure
     }
-  }, [selectedAudioId]);
+  }, [selectedAudioId, selectedVideoId]);
 
   // 2. Request & Manage Microphone Stream
   const initAudioStream = useCallback(async () => {
@@ -134,8 +158,16 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
 
     // Stop previous audio tracks
     if (activeAudioStreamRef.current) {
-      activeAudioStreamRef.current.getTracks().forEach((track) => track.stop());
+      try {
+        activeAudioStreamRef.current.getTracks?.().forEach((track) => track.stop());
+      } catch {}
       activeAudioStreamRef.current = null;
+    }
+
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      setAudioStream(null);
+      setError('Trình duyệt không hỗ trợ truy cập thiết bị âm thanh hoặc kết nối không an toàn (yêu cầu HTTPS).');
+      return;
     }
 
     try {
@@ -148,43 +180,210 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       activeAudioStreamRef.current = stream;
       setAudioStream(stream);
-      void loadAudioDevices();
+      void loadMediaDevices();
     } catch {
       setAudioStream(null);
       setError('Không thể truy cập Microphone. Vui lòng cho phép quyền truy cập micro trên trình duyệt.');
     }
-  }, [selectedAudioId, loadAudioDevices]);
+  }, [selectedAudioId, loadMediaDevices]);
 
   // 3. Request & Manage Camera Stream
   const initVideoStream = useCallback(async () => {
-    // Stop previous video track
+    const seq = ++videoRequestSeqRef.current;
+
+    // Dọn dẹp triệt để stream cũ và các tracks để giải phóng camera UVC hoàn toàn
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    if (activeVideoStreamRef.current) {
+      try {
+        activeVideoStreamRef.current.getTracks().forEach((t) => {
+          try {
+            t.stop();
+          } catch {}
+        });
+      } catch {}
+      activeVideoStreamRef.current = null;
+    }
     if (activeVideoTrackRef.current) {
-      activeVideoTrackRef.current.stop();
-      activeVideoTrackRef.current = null;
+      try {
+        activeVideoTrackRef.current.stop();
+      } catch {}
+        activeVideoTrackRef.current = null;
     }
 
     if (!cameraEnabled) {
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
+      if (seq === videoRequestSeqRef.current) {
+        setVideoStream(null);
+        setCameraError('');
+        setCameraLoading(false);
       }
       return;
     }
 
+    setCameraLoading(true);
+    setCameraError('');
+
+    // Chờ 350ms để Windows DirectShow/UVC hardware driver giải phóng webcam USB hoàn toàn trước khi gọi lại
+    await new Promise((r) => setTimeout(r, 350));
+    if (seq !== videoRequestSeqRef.current) return;
+
     try {
-      const vStream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false,
-      });
-      const track = vStream.getVideoTracks()[0];
-      activeVideoTrackRef.current = track;
-      if (videoRef.current) {
-        videoRef.current.srcObject = new MediaStream([track]);
+      let vStream: MediaStream | null = null;
+      // Dùng constraint { ideal: id } để Windows Driver tự điều phối mượt mà, tránh lỗi OverconstrainedError gây đen màn
+      const baseConstraints: MediaTrackConstraints = selectedVideoId
+        ? { deviceId: { ideal: selectedVideoId } }
+        : {};
+
+      // Helper request getUserMedia có retry tự động khi gặp NotReadableError (device in use)
+      const fetchMediaWithRetry = async (constraints: MediaStreamConstraints, retries = 3): Promise<MediaStream> => {
+        if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+          throw new Error('Webcam API không khả dụng hoặc kết nối không an toàn (yêu cầu HTTPS).');
+        }
+        try {
+          return await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (mErr: any) {
+          const errName = mErr?.name || '';
+          const errMsg = (mErr?.message || '').toLowerCase();
+          if (
+            retries > 0 &&
+            (errName === 'NotReadableError' || errMsg.includes('device in use') || errMsg.includes('could not start'))
+          ) {
+            await new Promise((r) => setTimeout(r, 400));
+            if (seq !== videoRequestSeqRef.current) throw new Error('Camera request superseded');
+            return fetchMediaWithRetry(constraints, retries - 1);
+          }
+          throw mErr;
+        }
+      };
+
+      try {
+        // Preferred high quality constraint (1280x720) với ideal deviceId
+        vStream = await fetchMediaWithRetry({
+          video: {
+            ...baseConstraints,
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+      } catch (firstErr: any) {
+        if (seq !== videoRequestSeqRef.current) return;
+        // Fallback 1: Thử basic constraint
+        try {
+          vStream = await fetchMediaWithRetry({
+            video: baseConstraints.deviceId ? baseConstraints : true,
+            audio: false,
+          });
+        } catch {
+          // Fallback 2: Tối hậu thư mở camera mặc định
+          try {
+            vStream = await fetchMediaWithRetry({
+              video: true,
+              audio: false,
+            });
+          } catch {
+            throw firstErr;
+          }
+        }
       }
-    } catch {
-      // Camera is optional; fallback gracefully
-      setCameraEnabled(false);
+
+      if (seq !== videoRequestSeqRef.current) {
+        if (vStream) {
+          vStream.getTracks?.().forEach((t) => t.stop());
+        }
+        return;
+      }
+
+      if (!vStream) {
+        throw new Error('No video stream returned');
+      }
+
+      const track = vStream.getVideoTracks?.()?.[0];
+      if (!track) {
+        throw new Error('No video track available');
+      }
+
+      track.onended = () => {
+        console.warn('[PreflightRoom] Video track ended by hardware/browser');
+        if (seq === videoRequestSeqRef.current) {
+          setVideoStream(null);
+        }
+      };
+
+      activeVideoStreamRef.current = vStream;
+      activeVideoTrackRef.current = track;
+      setVideoStream(vStream);
+      setCameraError('');
+
+      // Gắn và phát ngay lập tức trên videoRef
+      const playVideo = () => {
+        if (videoRef.current && videoRef.current.srcObject === vStream) {
+          videoRef.current.play().catch(() => {});
+        }
+      };
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = vStream;
+        playVideo();
+      }
+
+      // Trên Windows DirectShow, track có thể bị muted trong vài frame đầu; unmute đảm bảo video play ngay
+      track.addEventListener('unmute', playVideo, { once: true });
+
+      void loadMediaDevices();
+    } catch (err: any) {
+      if (seq !== videoRequestSeqRef.current) return;
+      setVideoStream(null);
+
+      let errorMsg = 'Không thể kết nối với Camera. Vui lòng thử lại.';
+      const errName = err?.name || '';
+      const errMsg = (err?.message || '').toLowerCase();
+
+      if (
+        errName === 'NotReadableError' ||
+        errMsg.includes('device in use') ||
+        errMsg.includes('could not start') ||
+        errMsg.includes('concurrent')
+      ) {
+        errorMsg = 'Camera đang bị ứng dụng khác (Zoom, Teams, OBS hoặc tab khác) sử dụng. Vui lòng đóng ứng dụng đó và nhấn "Thử lại".';
+      } else if (errName === 'NotAllowedError' || errName === 'PermissionDeniedError') {
+        errorMsg = 'Trình duyệt chưa được cấp quyền truy cập Camera. Vui lòng nhấn vào biểu tượng ổ khóa/camera trên thanh địa chỉ để cấp quyền.';
+      } else if (errName === 'NotFoundError' || errName === 'DevicesNotFoundError') {
+        errorMsg = 'Không tìm thấy thiết bị Camera nào được kết nối với máy tính.';
+      } else if (errName === 'OverconstrainedError') {
+        errorMsg = 'Độ phân giải camera không tương thích. Vui lòng nhấn "Thử lại".';
+      }
+
+      setCameraError(errorMsg);
+    } finally {
+      if (seq === videoRequestSeqRef.current) {
+        setCameraLoading(false);
+      }
     }
-  }, [cameraEnabled]);
+  }, [cameraEnabled, selectedVideoId, loadMediaDevices]);
+
+  // Luôn gắn videoStream an toàn vào videoRef.current mà không phụ thuộc vào chu kỳ render
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+    if (cameraEnabled && videoStream) {
+      if (videoEl.srcObject !== videoStream) {
+        videoEl.srcObject = videoStream;
+      }
+      videoEl.play().catch((playErr) => {
+        console.warn('[PreflightRoom] video play error:', playErr);
+      });
+      const track = videoStream.getVideoTracks?.()?.[0];
+      if (track) {
+        track.addEventListener('unmute', () => {
+          videoEl.play().catch(() => {});
+        }, { once: true });
+      }
+    } else {
+      videoEl.srcObject = null;
+    }
+  }, [videoStream, cameraEnabled]);
 
   useEffect(() => {
     void initAudioStream();
@@ -193,9 +392,16 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
   useEffect(() => {
     void initVideoStream();
     return () => {
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
       if (activeVideoTrackRef.current) {
         activeVideoTrackRef.current.stop();
         activeVideoTrackRef.current = null;
+      }
+      if (activeVideoStreamRef.current) {
+        activeVideoStreamRef.current.getTracks().forEach((t) => t.stop());
+        activeVideoStreamRef.current = null;
       }
     };
   }, [initVideoStream]);
@@ -207,12 +413,52 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
         activeAudioStreamRef.current.getTracks().forEach((t) => t.stop());
         activeAudioStreamRef.current = null;
       }
+      if (activeVideoStreamRef.current) {
+        activeVideoStreamRef.current.getTracks().forEach((t) => t.stop());
+        activeVideoStreamRef.current = null;
+      }
       if (activeVideoTrackRef.current) {
         activeVideoTrackRef.current.stop();
         activeVideoTrackRef.current = null;
       }
     };
   }, []);
+
+  // Giải phóng phần cứng camera & micro trước khi chuyển phòng
+  const handleJoin = useCallback(async () => {
+    if (activeVideoStreamRef.current) {
+      try {
+        activeVideoStreamRef.current.getTracks().forEach((track) => track.stop());
+      } catch {}
+      activeVideoStreamRef.current = null;
+    }
+    if (activeVideoTrackRef.current) {
+      try {
+        activeVideoTrackRef.current.stop();
+      } catch {}
+      activeVideoTrackRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setVideoStream(null);
+    if (activeAudioStreamRef.current) {
+      try {
+        activeAudioStreamRef.current.getTracks().forEach((track) => track.stop());
+      } catch {}
+      activeAudioStreamRef.current = null;
+    }
+    setAudioStream(null);
+
+    // Chờ 350ms để Windows DirectShow/UVC giải phóng hoàn toàn camera trước khi LiveKitRoom kết nối
+    await new Promise((r) => setTimeout(r, 350));
+
+    onJoin({
+      cameraEnabled: cameraEnabled && !cameraError,
+      audioDeviceId: selectedAudioId || undefined,
+      videoDeviceId: selectedVideoId || undefined,
+    });
+  }, [onJoin, cameraEnabled, cameraError, selectedAudioId, selectedVideoId]);
 
   // 4. Web Audio Analyzer for Volume and Equalizer Waveform
   useEffect(() => {
@@ -224,6 +470,8 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
 
     let audioContext: AudioContext | null = null;
     let animId: number | null = null;
+
+    if (typeof window === 'undefined') return;
 
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -713,13 +961,71 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
             justifyContent: 'center',
           }}
         >
-          {cameraEnabled ? (
+          {cameraError ? (
+            <Stack
+              alignItems="center"
+              spacing={1.25}
+              sx={{ px: 3, textAlign: 'center', color: '#f87171' }}
+            >
+              <VideocamOffOutlinedIcon sx={{ fontSize: 38, color: '#f87171' }} />
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 600, color: '#fecaca', fontSize: '0.8rem', maxWidth: 420, lineHeight: 1.5 }}
+              >
+                {cameraError}
+              </Typography>
+              <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="error"
+                  startIcon={<RefreshOutlinedIcon />}
+                  onClick={() => void initVideoStream()}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    fontSize: '0.75rem',
+                    bgcolor: '#e11d48',
+                    '&:hover': { bgcolor: '#be123c' },
+                  }}
+                >
+                  Thử lại
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    setCameraEnabled(false);
+                    setCameraError('');
+                  }}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    fontSize: '0.75rem',
+                    borderColor: 'rgba(255,255,255,0.2)',
+                    color: '#e2e8f0',
+                    '&:hover': {
+                      borderColor: 'rgba(255,255,255,0.4)',
+                      bgcolor: 'rgba(255,255,255,0.05)',
+                    },
+                  }}
+                >
+                  Tắt camera & tiếp tục
+                </Button>
+              </Stack>
+            </Stack>
+          ) : cameraEnabled ? (
             <>
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
+                onLoadedMetadata={() => {
+                  videoRef.current?.play().catch(() => {});
+                }}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -727,6 +1033,26 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                   transform: 'scaleX(-1)',
                 }}
               />
+              {cameraLoading && (
+                <Stack
+                  alignItems="center"
+                  justifyContent="center"
+                  spacing={1}
+                  sx={{
+                    position: 'absolute',
+                    inset: 0,
+                    bgcolor: 'rgba(15, 23, 42, 0.72)',
+                    backdropFilter: 'blur(4px)',
+                    zIndex: 10,
+                    color: '#94a3b8',
+                  }}
+                >
+                  <CircularProgress size={28} sx={{ color: '#38bdf8' }} />
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#94a3b8', fontSize: '0.8rem' }}>
+                    Đang kết nối camera...
+                  </Typography>
+                </Stack>
+              )}
               <Chip
                 icon={<FiberManualRecordIcon sx={{ fontSize: '9px !important', color: '#22c55e !important' }} />}
                 label="Preview"
@@ -743,6 +1069,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                   height: 24,
                   borderRadius: '6px',
                   border: '1px solid rgba(255, 255, 255, 0.15)',
+                  zIndex: 11,
                 }}
               />
             </>
@@ -752,6 +1079,29 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
               <Typography variant="caption" sx={{ fontWeight: 600, color: '#94a3b8', fontSize: '0.8rem' }}>
                 Camera đang tắt — Có thể bật ở bên dưới
               </Typography>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => {
+                  setCameraEnabled(true);
+                  setCameraError('');
+                }}
+                sx={{
+                  mt: 0.5,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  borderRadius: '8px',
+                  fontSize: '0.75rem',
+                  borderColor: 'rgba(255,255,255,0.2)',
+                  color: '#e2e8f0',
+                  '&:hover': {
+                    borderColor: 'rgba(255,255,255,0.4)',
+                    bgcolor: 'rgba(255,255,255,0.05)',
+                  },
+                }}
+              >
+                Bật Camera
+              </Button>
             </Stack>
           )}
         </Box>
@@ -804,7 +1154,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                   {audioDevices.length > 0 ? (
                     audioDevices.map((dev) => (
                       <MenuItem key={dev.deviceId} value={dev.deviceId} sx={{ fontSize: '0.8125rem' }}>
-                        {dev.label || `Microphone · ${dev.deviceId.slice(0, 6)}...`}
+                        {dev.label || `Microphone · ${(dev.deviceId || '').slice(0, 6)}...`}
                       </MenuItem>
                     ))
                   ) : (
@@ -817,7 +1167,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
             </Box>
           </Grid>
 
-          {/* Camera Toggle */}
+          {/* Camera Selection & Toggle */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <Box
               sx={{
@@ -831,52 +1181,79 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
                 justifyContent: 'space-between',
               }}
             >
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: '0.6875rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
-                  color: '#64748b',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  mb: 1,
-                }}
-              >
-                <VideocamOutlinedIcon sx={{ fontSize: 16, color: '#2563eb' }} />
-                Camera
-              </Typography>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  bgcolor: '#ffffff',
-                  borderRadius: '10px',
-                  border: '1px solid #e2e8f0',
-                  px: 1.5,
-                  py: 0.6,
-                }}
-              >
-                <Typography sx={{ fontSize: '0.8125rem', fontWeight: 600, color: '#334155' }}>
-                  Bật ghi hình
-                </Typography>
-                <Switch
-                  checked={cameraEnabled}
-                  onChange={(e) => setCameraEnabled(e.target.checked)}
-                  size="small"
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                <Typography
+                  variant="caption"
                   sx={{
-                    '& .MuiSwitch-switchBase.Mui-checked': {
-                      color: '#2563eb',
-                    },
-                    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                      backgroundColor: '#2563eb',
+                    fontWeight: 700,
+                    fontSize: '0.6875rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    color: '#64748b',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                  }}
+                >
+                  <VideocamOutlinedIcon sx={{ fontSize: 16, color: '#2563eb' }} />
+                  Camera
+                </Typography>
+                <Stack direction="row" spacing={0.5} alignItems="center">
+                  <Typography
+                    sx={{
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      color: cameraEnabled ? '#2563eb' : '#94a3b8',
+                    }}
+                  >
+                    {cameraEnabled ? 'Bật' : 'Tắt'}
+                  </Typography>
+                  <Switch
+                    checked={cameraEnabled}
+                    onChange={(e) => {
+                      setCameraEnabled(e.target.checked);
+                      if (e.target.checked) setCameraError('');
+                    }}
+                    size="small"
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: '#2563eb',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: '#2563eb',
+                      },
+                    }}
+                  />
+                </Stack>
+              </Box>
+              <FormControl fullWidth size="small" disabled={!cameraEnabled}>
+                <Select
+                  value={selectedVideoId}
+                  onChange={(e) => setSelectedVideoId(e.target.value)}
+                  displayEmpty
+                  sx={{
+                    bgcolor: cameraEnabled ? '#ffffff' : '#f1f5f9',
+                    borderRadius: '10px',
+                    fontSize: { xs: '0.875rem', sm: '0.8125rem' },
+                    fontWeight: 600,
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#e2e8f0',
                     },
                   }}
-                />
-              </Box>
+                >
+                  {videoDevices.length > 0 ? (
+                    videoDevices.map((dev) => (
+                      <MenuItem key={dev.deviceId} value={dev.deviceId} sx={{ fontSize: '0.8125rem' }}>
+                        {dev.label || `Camera · ${(dev.deviceId || '').slice(0, 6)}...`}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value="" sx={{ fontSize: '0.8125rem' }}>
+                      Camera mặc định của hệ thống
+                    </MenuItem>
+                  )}
+                </Select>
+              </FormControl>
             </Box>
           </Grid>
         </Grid>
@@ -1006,7 +1383,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
             </Button>
 
             <Button
-              onClick={onJoin}
+              onClick={handleJoin}
               data-testid="join-interview-room-btn"
               disabled={starting || !audioStream || !!error}
               variant="contained"
@@ -1041,7 +1418,7 @@ export const PreflightRoom: React.FC<PreflightRoomProps> = ({
           {error && (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
               <Button
-                onClick={onJoin}
+                onClick={handleJoin}
                 data-testid="skip-check-and-join-btn"
                 variant="outlined"
                 color="inherit"

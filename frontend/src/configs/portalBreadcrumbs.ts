@@ -121,6 +121,7 @@ const breadcrumbRoutes: BreadcrumbRoute[] = [
   employerRoute(ROUTES.EMPLOYER.INTERVIEW_DETAIL, item('employer', 'interviewDetail.title'), employerOnlineInterview),
   employerRoute(ROUTES.EMPLOYER.QUESTION_BANK, item('employer', 'sidebar.questionBank'), employerOnlineInterview),
   employerRoute(ROUTES.EMPLOYER.QUESTION_GROUPS, item('employer', 'questionGroupsCard.questionGroups'), employerOnlineInterview),
+  employerRoute(ROUTES.EMPLOYER.INTERVIEW_SCRIPTS, item('employer', 'sidebar.interviewScripts'), employerOnlineInterview),
   employerRoute(ROUTES.EMPLOYER.AI_SETTINGS, item('employer', 'sidebar.aiSettings'), employerOnlineInterview),
   employerRoute(ROUTES.EMPLOYER.NOTIFICATION, item('employer', 'sidebar.notifications')),
   employerRoute(ROUTES.EMPLOYER.COMPANY, item('employer', 'sidebar.companyInfo'), employerAccountManagement),

@@ -120,7 +120,7 @@ export const CandidateHeader: React.FC<CandidateHeaderProps> = ({
     }
   };
 
-  const isSeekingJob = profileDetail.jobSeekerProfile?.isSeekingJob ?? true;
+  const isSeekingJob = profileDetail.jobSeekerProfile?.isJobSeeking ?? true;
   const statusLabel = isSeekingJob ? 'Đang tìm việc' : 'Tạm dừng tìm việc';
 
   const code = candidateCode || (profileDetail.id ? `UV${String(profileDetail.id).padStart(8, '0')}` : '-');

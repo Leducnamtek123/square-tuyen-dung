@@ -5,6 +5,8 @@ import {
 import { 
   isAdminPortalPath, 
   isEmployerPortalPath,
+  isEmployerHostname,
+  isAdminHostname,
   getPreferredLanguage,
   getPortalPrefix,
   detectPortalFromPath,
@@ -63,6 +65,37 @@ describe('Portal Routing', () => {
 
     it('should return empty string for jobseeker', () => {
       expect(getPortalPrefix('jobseeker', 'vi')).toBe('');
+    });
+
+    it('should return empty string when on portal subdomains', () => {
+      expect(getPortalPrefix('employer', 'vi', 'employer.infohr.vn')).toBe('');
+      expect(getPortalPrefix('employer', 'vi', 'employer.localhost:3000')).toBe('');
+      expect(getPortalPrefix('employer', 'vi', 'ntd.infohr.vn')).toBe('');
+      expect(getPortalPrefix('employer', 'vi', 'ntd.localhost:3000')).toBe('');
+      expect(getPortalPrefix('admin', 'vi', 'admin.infohr.vn')).toBe('');
+      expect(getPortalPrefix('admin', 'vi', 'admin.localhost:3000')).toBe('');
+    });
+  });
+
+  describe('Hostname Detection', () => {
+    it('detects employer hostnames with or without port', () => {
+      expect(isEmployerHostname('employer.infohr.vn')).toBe(true);
+      expect(isEmployerHostname('employer.infohr.vn:443')).toBe(true);
+      expect(isEmployerHostname('employer.localhost:3000')).toBe(true);
+      expect(isEmployerHostname('ntd.infohr.vn')).toBe(true);
+      expect(isEmployerHostname('ntd.infohr.vn:443')).toBe(true);
+      expect(isEmployerHostname('ntd.localhost:3000')).toBe(true);
+      expect(isEmployerHostname('infohr.vn')).toBe(false);
+      expect(isEmployerHostname('localhost')).toBe(false);
+    });
+
+    it('detects admin hostnames with or without port', () => {
+      expect(isAdminHostname('admin.infohr.vn')).toBe(true);
+      expect(isAdminHostname('admin.infohr.vn:443')).toBe(true);
+      expect(isAdminHostname('admin.localhost:3000')).toBe(true);
+      expect(isAdminHostname('infohr.vn')).toBe(false);
+      expect(isAdminHostname('employer.infohr.vn')).toBe(false);
+      expect(isAdminHostname('ntd.infohr.vn')).toBe(false);
     });
   });
 

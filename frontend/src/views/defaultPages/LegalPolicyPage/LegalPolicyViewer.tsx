@@ -491,13 +491,6 @@ export const LegalPolicyViewer: React.FC<Props> = ({ slug, portal = 'jobseeker' 
                     style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
                   >
                     support@infohr.vn
-                  </a>{' '}
-                  |{' '}
-                  <a
-                    href="mailto:ceohub.hostmaster@gmail.com"
-                    style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
-                  >
-                    ceohub.hostmaster@gmail.com
                   </a>
                 </Typography>
               </Stack>

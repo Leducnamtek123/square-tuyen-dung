@@ -39,6 +39,7 @@
   height: 100%;
   object-fit: contain;
   object-position: center center;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.35));
 }
 
 .stageSpeak {
@@ -52,20 +53,11 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.12s ease-in-out;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.35));
 }
 
 .stageSpeakActive,
 .stageSpeak.isActive {
   opacity: 1;
   pointer-events: auto;
-}
-
-.stageLiveWebRtc {
-  z-index: 5;
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center center;
 }

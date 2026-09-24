@@ -1,5 +1,5 @@
-from livekit_agent.config import config
 from livekit_agent.agent import resolve_tts_speed
+from livekit_agent.config import config
 from livekit_agent.session_settings import build_session_kwargs
 
 

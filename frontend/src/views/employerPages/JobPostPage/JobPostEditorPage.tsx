@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 import {
   Box,
   Button,
@@ -204,6 +205,7 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
     handleSubmit,
     setValue,
     reset,
+    getValues,
     formState: { isDirty, errors },
   } = useForm<JobPostFormValues>({
     resolver: typedYupResolver(schema),
@@ -211,6 +213,139 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
   });
 
   usePreventUnsavedChanges(isDirty);
+
+  const DRAFT_STORAGE_KEY = 'sq_employer_job_post_draft';
+  const [hasDraft, setHasDraft] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+
+  // Check draft existence in create mode
+  useEffect(() => {
+    if (isEdit || typeof window === 'undefined') return;
+    try {
+      const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && (parsed.jobName || parsed.career || parsed.jobDescriptionHtml)) {
+          setHasDraft(true);
+          setDraftSavedAt(parsed.savedAt ? dayjs(parsed.savedAt).format('HH:mm DD/MM/YYYY') : null);
+        }
+      }
+    } catch {}
+  }, [isEdit]);
+
+  const saveDraft = useCallback(
+    (silent = false) => {
+      if (isEdit || typeof window === 'undefined') return;
+      try {
+        const currentValues = getValues();
+        const draftData = {
+          jobName: currentValues.jobName,
+          career: currentValues.career,
+          position: currentValues.position,
+          experience: currentValues.experience,
+          typeOfWorkplace: currentValues.typeOfWorkplace,
+          jobType: currentValues.jobType,
+          quantity: currentValues.quantity,
+          genderRequired: currentValues.genderRequired,
+          salaryMin: currentValues.salaryMin,
+          salaryMax: currentValues.salaryMax,
+          academicLevel: currentValues.academicLevel,
+          deadline: currentValues.deadline
+            ? dayjs(currentValues.deadline).format('YYYY-MM-DD')
+            : '',
+          interviewTemplate: currentValues.interviewTemplate,
+          autoInterviewEnabled: currentValues.autoInterviewEnabled,
+          minScreeningScore: currentValues.minScreeningScore,
+          jobDescriptionHtml: convertEditorStateToHTMLString(
+            currentValues.jobDescription as any,
+          ),
+          jobRequirementHtml: convertEditorStateToHTMLString(
+            currentValues.jobRequirement as any,
+          ),
+          benefitsEnjoyedHtml: convertEditorStateToHTMLString(
+            currentValues.benefitsEnjoyed as any,
+          ),
+          location: currentValues.location,
+          contactPersonName: currentValues.contactPersonName,
+          contactPersonPhone: currentValues.contactPersonPhone,
+          contactPersonEmail: currentValues.contactPersonEmail,
+          isUrgent: currentValues.isUrgent,
+          isHot: currentValues.isHot,
+          savedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData));
+        if (!silent) {
+          toastMessages.success('Đã lưu bản nháp tin tuyển dụng thành công!');
+        }
+      } catch {
+        if (!silent) {
+          toastMessages.error('Không thể lưu bản nháp vào bộ nhớ trình duyệt.');
+        }
+      }
+    },
+    [isEdit, getValues],
+  );
+
+  const restoreDraft = useCallback(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      const restoredValues: Partial<JobPostFormValues> = {
+        jobName: draft.jobName || '',
+        career: draft.career ?? '',
+        position: draft.position ?? '',
+        experience: draft.experience ?? '',
+        typeOfWorkplace: draft.typeOfWorkplace ?? '',
+        jobType: draft.jobType ?? '',
+        quantity: draft.quantity ?? 1,
+        genderRequired: draft.genderRequired ?? '',
+        salaryMin: draft.salaryMin ?? '',
+        salaryMax: draft.salaryMax ?? '',
+        academicLevel: draft.academicLevel ?? '',
+        deadline: draft.deadline ? new Date(draft.deadline) : '',
+        interviewTemplate: draft.interviewTemplate ?? null,
+        autoInterviewEnabled:
+          draft.autoInterviewEnabled !== undefined
+            ? Boolean(draft.autoInterviewEnabled)
+            : true,
+        minScreeningScore: draft.minScreeningScore ?? 70,
+        jobDescription: createEditorStateFromHTMLString(
+          draft.jobDescriptionHtml || '',
+        ),
+        jobRequirement: createEditorStateFromHTMLString(
+          draft.jobRequirementHtml || '',
+        ),
+        benefitsEnjoyed: createEditorStateFromHTMLString(
+          draft.benefitsEnjoyedHtml || '',
+        ),
+        location: {
+          city: draft.location?.city ?? '',
+          district: draft.location?.district ?? '',
+          address: draft.location?.address ?? '',
+          lat: draft.location?.lat ?? '',
+          lng: draft.location?.lng ?? '',
+        },
+        contactPersonName: draft.contactPersonName || '',
+        contactPersonPhone: draft.contactPersonPhone || '',
+        contactPersonEmail: draft.contactPersonEmail || '',
+        isUrgent: Boolean(draft.isUrgent),
+        isHot: Boolean(draft.isHot),
+      };
+      reset(buildDefaultFormValues(restoredValues));
+      setHasDraft(false);
+      toastMessages.success('Đã khôi phục dữ liệu bản nháp thành công!');
+    } catch {
+      toastMessages.error('Không thể khôi phục bản nháp.');
+    }
+  }, [reset]);
+
+  const discardDraft = useCallback(() => {
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {}
+    setHasDraft(false);
+  }, []);
 
   // Watch fields for progress and dependencies
   const watchedValues = useWatch({ control });
@@ -366,6 +501,13 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
       setValue('location.lng', val.lng, { shouldDirty: true });
   };
 
+  // Auto-save draft when form changes in create mode
+  const debouncedWatchedValues = useDebounce(watchedValues, 2500);
+  useEffect(() => {
+    if (isEdit || !isDirty) return;
+    saveDraft(true);
+  }, [debouncedWatchedValues, isDirty, isEdit, saveDraft]);
+
   const listRoute = localizeRoutePath(`/${ROUTES.EMPLOYER.JOB_POST}`, i18n.language);
   const verificationRoute = localizeRoutePath(`/${ROUTES.EMPLOYER.VERIFICATION}`, i18n.language);
 
@@ -394,7 +536,7 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
       deadline: formData.deadline
         ? typeof formData.deadline === 'string'
           ? formData.deadline
-          : (formData.deadline as any).toISOString()
+          : dayjs(formData.deadline).format('YYYY-MM-DD')
         : '',
       quantity: Number(formData.quantity),
       salaryMin: Number(formData.salaryMin),
@@ -447,6 +589,9 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
       } else {
         await addJobPost(payload);
         toastMessages.success(t('jobPost.messages.addSuccess'));
+        try {
+          localStorage.removeItem(DRAFT_STORAGE_KEY);
+        } catch {}
       }
       router.push(listRoute);
     } catch (error) {
@@ -669,6 +814,45 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
             }
           >
             {t('jobPost.verificationRequired.message')}
+          </Alert>
+        )}
+
+        {hasDraft && !isEdit && (
+          <Alert
+            severity="info"
+            sx={{
+              mb: 3,
+              borderRadius: 2.5,
+              alignItems: 'center',
+              bgcolor: 'rgba(37, 99, 235, 0.08)',
+              border: '1px solid rgba(37, 99, 235, 0.2)',
+            }}
+            action={
+              <Stack direction="row" spacing={1}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={restoreDraft}
+                  sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 2 }}
+                >
+                  Khôi phục
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="inherit"
+                  onClick={discardDraft}
+                  sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
+                >
+                  Hủy bỏ
+                </Button>
+              </Stack>
+            }
+          >
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              Hệ thống phát hiện bản nháp tin tuyển dụng chưa hoàn tất{draftSavedAt ? ` (lưu lúc ${draftSavedAt})` : ''}. Bạn có muốn tiếp tục chỉnh sửa từ bản nháp?
+            </Typography>
           </Alert>
         )}
 
@@ -1439,6 +1623,29 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
             </Stack>
 
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ flex: { xs: 2, sm: 'none' } }}>
+              {!isEdit && (
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  onClick={() => saveDraft(false)}
+                  disabled={isMutating}
+                  startIcon={<SaveIcon />}
+                  sx={{
+                    minWidth: { xs: 110, sm: 140 },
+                    py: 1.25,
+                    px: { xs: 1.5, sm: 2.5 },
+                    borderRadius: 2.5,
+                    fontWeight: 700,
+                    textTransform: 'none',
+                    borderColor: '#CBD5E1',
+                    color: '#334155',
+                    whiteSpace: 'nowrap',
+                    '&:hover': { bgcolor: '#F8FAFC', borderColor: 'primary.main', color: 'primary.main' },
+                  }}
+                >
+                  Lưu bản nháp
+                </Button>
+              )}
               <LoadingButton
                 type="submit"
                 form="job-post-editor-form"

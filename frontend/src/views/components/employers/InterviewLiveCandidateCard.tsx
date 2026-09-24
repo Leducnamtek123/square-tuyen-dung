@@ -300,6 +300,27 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                   }}
                 />
               )}
+              {Boolean((session.proctoringViolationCount || session.proctoring_violation_count || (session.proctoringEvents && session.proctoringEvents.length) || 0) > 0) && (
+                <Tooltip
+                  title={`Ghi nhận ${session.proctoringViolationCount || session.proctoring_violation_count || session.proctoringEvents?.length} cảnh báo giám sát / rời màn hình`}
+                  arrow
+                >
+                  <Chip
+                    label={`⚠️ ${session.proctoringViolationCount || session.proctoring_violation_count || session.proctoringEvents?.length} cảnh báo`}
+                    size="small"
+                    sx={{
+                      height: 20,
+                      fontSize: '0.65rem',
+                      fontWeight: 800,
+                      bgcolor: 'rgba(239, 68, 68, 0.1)',
+                      color: '#dc2626',
+                      border: '1px solid rgba(239, 68, 68, 0.25)',
+                      borderRadius: '6px',
+                      flexShrink: 0,
+                    }}
+                  />
+                </Tooltip>
+              )}
             </Stack>
             <Stack direction="row" alignItems="center" spacing={0.6} sx={{ minWidth: 0 }}>
               <WorkIcon sx={{ fontSize: 13, color: '#94a3b8', flexShrink: 0 }} />

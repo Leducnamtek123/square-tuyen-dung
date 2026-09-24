@@ -321,6 +321,10 @@ class CandidateToEmployeeConverter:
         except Exception as exc:
             logger.warning("Failed to initialize onboarding process for Employee %s: %s", employee.id, exc)
 
+        if activity and activity.status != var_sys.ApplicationStatus.HIRED:
+            activity.status = var_sys.ApplicationStatus.HIRED
+            activity.save(update_fields=["status", "update_at"])
+
         logger.info(
             "Successfully onboarded candidate %s as Employee %s (%s) for company %s",
             email,

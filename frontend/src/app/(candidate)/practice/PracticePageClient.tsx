@@ -7,6 +7,8 @@ import { canAccessJobSeekerPortal } from '@/utils/accessControl';
 import PracticeLandingPage from '@/views/defaultPages/PracticeLandingPage';
 import CandidatePracticePage from '@/views/jobSeekerPages/PracticePage/CandidatePracticePage';
 
+import { Box, CircularProgress } from '@mui/material';
+
 /**
  * Adaptive Practice Page Client:
  * - When logged in as Candidate (Job Seeker): Renders CandidatePracticePage.
@@ -15,26 +17,35 @@ import CandidatePracticePage from '@/views/jobSeekerPages/PracticePage/Candidate
  *   Layout shell (DefaultLayout) is provided by JobSeekerLayout adaptive delegation.
  */
 export const PracticePageClient: React.FC = () => {
-  const { currentUser } = useAppSelector((state) => state.user);
-  const [isCandidate, setIsCandidate] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    const token = tokenService.getAccessTokenFromCookie();
-    return Boolean(token && currentUser && canAccessJobSeekerPortal(currentUser));
-  });
+  const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
+  const token = typeof window !== 'undefined' ? tokenService.getAccessTokenFromCookie() : null;
+  const hasAuthToken = Boolean(token || isAuthenticated);
 
-  useEffect(() => {
-    const token = tokenService.getAccessTokenFromCookie();
-    setIsCandidate(Boolean(token && currentUser && canAccessJobSeekerPortal(currentUser)));
-  }, [currentUser]);
-
-  if (isCandidate) {
+  // When logged in as Candidate (Job Seeker): render CandidatePracticePage
+  if (hasAuthToken && currentUser && canAccessJobSeekerPortal(currentUser)) {
     return (
-      <React.Suspense fallback={null}>
+      <React.Suspense
+        fallback={
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+            <CircularProgress size={36} />
+          </Box>
+        }
+      >
         <CandidatePracticePage />
       </React.Suspense>
     );
   }
 
+  // When auth token exists but currentUser is in-flight: show spinner instead of flashing landing page
+  if (hasAuthToken && !currentUser) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <CircularProgress size={36} />
+      </Box>
+    );
+  }
+
+  // When guest / unauthenticated / non-candidate: render PracticeLandingPage
   return <PracticeLandingPage />;
 };
 

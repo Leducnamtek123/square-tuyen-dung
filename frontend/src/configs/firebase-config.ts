@@ -1,6 +1,6 @@
 import { initializeApp, getApps, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-import { getFirestore, initializeFirestore, serverTimestamp, type Firestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, serverTimestamp, disableNetwork, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 const DEFAULT_API_KEY = 'AIzaSyDummyDevApiKeyForTesting_MockMode123';
@@ -27,6 +27,13 @@ try {
   db = enableLongPolling
     ? initializeFirestore(app, { experimentalForceLongPolling: true })
     : getFirestore(app);
+
+  const isDummyApiKey = !process.env.NEXT_PUBLIC_FIREBASE_API_KEY || firebaseConfig.apiKey === DEFAULT_API_KEY;
+  if (isDummyApiKey && typeof window !== 'undefined') {
+    // Tránh timeout 10s cố kết nối đến Cloud Firestore không tồn tại khi đang ở dev/mock mode
+    void disableNetwork(db).catch(() => {});
+  }
+
   auth = getAuth(app);
   storage = getStorage(app);
 } catch (error) {

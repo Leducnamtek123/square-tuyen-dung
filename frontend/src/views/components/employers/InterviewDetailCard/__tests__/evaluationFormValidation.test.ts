@@ -15,10 +15,14 @@ const baseForm: EvalFormType = {
 
 describe('Interview HR evaluation form validation', () => {
   it.each([
+    ['attitude_score', 0],
+    ['attitude_score', 0.5],
     ['attitude_score', -0.1],
     ['attitude_score', 10.1],
     ['attitude_score', Number.NaN],
     ['attitude_score', 8.123],
+    ['professional_score', 0],
+    ['professional_score', 0.5],
     ['professional_score', -0.1],
     ['professional_score', 10.1],
     ['professional_score', Number.NaN],

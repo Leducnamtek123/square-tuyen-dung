@@ -41,7 +41,7 @@ def parse_args():
 
     优先级：CLI 参数 > YAML 配置文件 > add_argument(default=...)
     """
-    parser = argparse.ArgumentParser(description="LiveTalking Digital Human Server")
+    parser = argparse.ArgumentParser(description="Aila Realtime Lipsync & Talking Head Engine")
 
     # ─── 配置文件 ──────────────────────────────────────────────────────
     parser.add_argument('--config', '-c', type=str, default='config.yaml',

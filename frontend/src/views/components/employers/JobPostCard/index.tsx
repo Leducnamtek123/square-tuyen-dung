@@ -87,8 +87,15 @@ const JobPostCard = () => {
     pageSize,
     ordering,
     kw: filter.appliedValues.kw || undefined,
+    careerId: filter.appliedValues.careerId || undefined,
+    cityId: filter.appliedValues.cityId || undefined,
+    positionId: filter.appliedValues.positionId || undefined,
+    experienceId: filter.appliedValues.experienceId || undefined,
+    typeOfWorkplaceId: filter.appliedValues.typeOfWorkplaceId || undefined,
+    jobTypeId: filter.appliedValues.jobTypeId || undefined,
+    genderId: filter.appliedValues.genderId || undefined,
     isUrgent: activeUrgentVal,
-    status: filter.appliedValues.statusId === '' ? undefined : filter.appliedValues.statusId,
+    statusId: filter.appliedValues.statusId,
   });
 
   const { deleteJobPost, isMutating } = useJobPostMutations();

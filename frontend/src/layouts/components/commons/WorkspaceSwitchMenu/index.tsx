@@ -106,6 +106,7 @@ const WorkspaceSwitchMenu = () => {
         anchorEl={anchorEl}
         open={open}
         onClose={() => setAnchorEl(null)}
+        disableScrollLock
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
       >

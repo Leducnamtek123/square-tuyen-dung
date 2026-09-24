@@ -123,8 +123,7 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     location = common_serializers.LocationSerializer()
 
-    since = serializers.DateField(required=True, allow_null=True, input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
-                                                                                 var_sys.DATE_TIME_FORMAT["Ymd"]])
+    since = serializers.DateField(required=False, allow_null=True)
 
     companyEmail = serializers.EmailField(source="company_email", required=True,
                                          max_length=100, validators=[UniqueValidator(Company.objects.all(),

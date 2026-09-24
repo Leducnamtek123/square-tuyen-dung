@@ -35,32 +35,37 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
 
     // Merge existing + live transcripts, deduplicate by id
     const mergedTranscripts = React.useMemo(() => {
-        const existingTranscripts = Array.isArray(session.transcripts) ? session.transcripts : [];
-        const existingIds = new Set(existingTranscripts.map((transcript: InterviewTranscript) => transcript.id));
-        const liveOnly = liveTranscripts.filter((lt) => !existingIds.has(lt.id));
+        const existingTranscripts = Array.isArray(session?.transcripts) ? session.transcripts : [];
+        const liveTranscriptsSafe = Array.isArray(liveTranscripts) ? liveTranscripts : [];
+        const existingIds = new Set(existingTranscripts.map((transcript: InterviewTranscript) => transcript?.id));
+        const liveOnly = liveTranscriptsSafe.filter((lt) => !existingIds.has(lt?.id));
         const mapped: TranscriptItem[] = existingTranscripts.map((transcript: InterviewTranscript) => ({
-            speaker: transcript.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
-            text: transcript.content || transcript.text || '',
-            timestamp: transcript.createAt ? new Date(transcript.createAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' }) : '',
-            id: transcript.id,
+            speaker: transcript?.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
+            text: transcript?.content || transcript?.text || '',
+            timestamp: transcript?.createAt && !isNaN(new Date(transcript.createAt).getTime())
+                ? new Date(transcript.createAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' })
+                : '',
+            id: transcript?.id ?? Math.random().toString(),
             isLive: false,
         }));
         const liveMapped: TranscriptItem[] = liveOnly.map((lt) => ({
-            speaker: lt.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
-            text: lt.content,
-            timestamp: lt.createAt ? new Date(lt.createAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' }) : '',
-            id: lt.id,
+            speaker: lt?.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
+            text: lt?.content || '',
+            timestamp: lt?.createAt && !isNaN(new Date(lt.createAt).getTime())
+                ? new Date(lt.createAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' })
+                : '',
+            id: lt?.id ?? Math.random().toString(),
             isLive: true,
         }));
         return [...mapped, ...liveMapped];
-    }, [liveTranscripts, session.transcripts]);
+    }, [liveTranscripts, session?.transcripts]);
 
     // Auto-scroll when new live transcripts appear
     useEffect(() => {
-        if (liveTranscripts.length > 0 && transcriptEndRef.current) {
+        if (Array.isArray(liveTranscripts) && liveTranscripts.length > 0 && transcriptEndRef.current) {
             transcriptEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-    }, [liveTranscripts.length]);
+    }, [Array.isArray(liveTranscripts) ? liveTranscripts.length : 0]);
 
     return (
         <Paper 

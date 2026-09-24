@@ -58,6 +58,8 @@ services:
         condition: service_started
       talking-head:
         condition: service_started
+    volumes:
+      - ./nginx-gateway/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     restart: always
     networks:
       proxy-net:
@@ -76,7 +78,7 @@ services:
         NEXT_PUBLIC_NODE_ENV: ${NEXT_PUBLIC_NODE_ENV:-production}
         NEXT_PUBLIC_PROJECT_HOST_NAME: ${NEXT_PUBLIC_PROJECT_HOST_NAME:-infohr.vn}
         NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME: ${NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME:-admin.infohr.vn}
-        NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME: ${NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME:-employer.infohr.vn}
+        NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME: ${NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME:-ntd.infohr.vn}
         NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID: ${NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID:-${CLIENT_ID}}
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
         NEXT_PUBLIC_FACEBOOK_CLIENT_ID: ${NEXT_PUBLIC_FACEBOOK_CLIENT_ID:-}
@@ -121,7 +123,7 @@ services:
     environment:
       - DEBUG=${DEBUG:-False}
       - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-infohr.vn,s3.infohr.vn,admin.infohr.vn,employer.infohr.vn,113.177.113.137,113.177.129.249,localhost,127.0.0.1,backend,thinkgift.square.vn,.square.vn,.infohr.vn}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-infohr.vn,s3.infohr.vn,admin.infohr.vn,ntd.infohr.vn,employer.infohr.vn,113.177.113.137,113.177.129.249,localhost,127.0.0.1,backend,thinkgift.square.vn,.square.vn,.infohr.vn}
       - AI_TTS_BASE_URL=${AI_TTS_BASE_URL:-https://api.metaconnect.vn/v1}
       - AI_TTS_API_KEY=${AI_TTS_API_KEY:-}
       - AI_TTS_MODEL=${AI_TTS_MODEL:-tts-vi}
@@ -532,6 +534,9 @@ services:
       - ./voice-ai/talking-head/media:/app/media
       - ./voice-ai/talking-head/data:/app/data
       - ./voice-ai/talking-head/models:/app/models
+      - ./voice-ai/talking-head/server:/app/server
+      - ./voice-ai/talking-head/core:/app/core
+      - ./voice-ai/talking-head/app.py:/app/app.py
     deploy:
       resources:
         reservations:
@@ -604,7 +609,12 @@ services:
       mc alias set local http://minio:9000 "$$ROOT_USER" "$$ROOT_PASS";
       mc mb --ignore-existing local/$${MINIO_BUCKET:-square};
       mc anonymous set none local/$${MINIO_BUCKET:-square};
-      echo 'MinIO bucket policy set to private (none)';
+      mc anonymous set download local/$${MINIO_BUCKET:-square}/articles;
+      mc anonymous set download local/$${MINIO_BUCKET:-square}/banners;
+      mc anonymous set download local/$${MINIO_BUCKET:-square}/logos;
+      mc anonymous set download local/$${MINIO_BUCKET:-square}/system;
+      mc anonymous set download local/$${MINIO_BUCKET:-square}/avatars;
+      echo 'MinIO bucket policy configured for private bucket with public assets download';
       "
     env_file:
       - .env
