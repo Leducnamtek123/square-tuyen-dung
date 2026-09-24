@@ -314,8 +314,8 @@ interface PartnerLogoCarouselProps {
  */
 const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
   label = 'ĐỒNG HÀNH CÙNG CÁC DOANH NGHIỆP TIÊN PHONG',
-  direction = 'right',
-  speedSeconds = 90,
+  direction = 'left',
+  speedSeconds = 45,
 }) => {
   // Lặp lại 2 lần mảng logo để chu trình cuộn vô tận mượt mà và liền mạch
   const marqueeList = [
@@ -378,17 +378,26 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
       >
         {/* Continuous 60fps marquee track */}
         <Box
+          className={`partner-marquee-track ${direction === 'right' ? 'partner-marquee-right' : 'partner-marquee-left'}`}
           sx={{
             display: 'flex',
             alignItems: 'center',
             flexWrap: 'nowrap',
             gap: { xs: 5, sm: 6.5, md: 8 }, // Khoảng cách thoáng đãng, sang trọng
             width: 'max-content',
-            animation: `${direction === 'right' ? partnerMarqueeRight : partnerMarqueeLeft} ${speedSeconds}s linear infinite`,
+            animation: `${direction === 'right' ? partnerMarqueeRight : partnerMarqueeLeft} var(--marquee-speed, ${speedSeconds}s) linear infinite !important`,
             willChange: 'transform',
             '&:hover': {
-              animationPlayState: 'paused',
+              animationPlayState: 'paused !important',
             },
+            '@media (prefers-reduced-motion: reduce)': {
+              animationDuration: 'var(--marquee-reduced-speed, 70s) !important',
+              animationIterationCount: 'infinite !important',
+            },
+          }}
+          style={{
+            ['--marquee-speed' as string]: `${speedSeconds}s`,
+            ['--marquee-reduced-speed' as string]: `${Math.round(speedSeconds * 1.5)}s`,
           }}
         >
           {marqueeList.map((partner, index) => (

@@ -550,6 +550,47 @@ h1, h2, h3, h4, h5, .display-text {
   transform: translate(100%, 100%) rotate(45deg);
 }
 
+/* ==========================================================================
+   PARTNER LOGO MARQUEE (Continuous 60fps Ticker)
+   ========================================================================== */
+@keyframes partnerMarqueeLeft {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes partnerMarqueeRight {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.partner-marquee-track {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  width: max-content !important;
+  will-change: transform;
+}
+
+.partner-marquee-left {
+  animation: partnerMarqueeLeft var(--marquee-speed, 45s) linear infinite !important;
+}
+
+.partner-marquee-right {
+  animation: partnerMarqueeRight var(--marquee-speed, 45s) linear infinite !important;
+}
+
+.partner-marquee-track:hover {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -569,7 +610,10 @@ h1, h2, h3, h4, h5, .display-text {
   .MuiLinearProgress-bar2Indeterminate,
   .MuiSkeleton-pulse,
   .MuiSkeleton-wave::after,
-  .animate-spin {
+  .animate-spin,
+  .partner-marquee-track,
+  .partner-marquee-left,
+  .partner-marquee-right {
     animation-iteration-count: infinite !important;
   }
 
@@ -590,6 +634,11 @@ h1, h2, h3, h4, h5, .display-text {
 
   .animate-spin {
     animation-duration: var(--sq-loading-animation-duration, 1s) !important;
+  }
+
+  .partner-marquee-left,
+  .partner-marquee-right {
+    animation-duration: var(--marquee-reduced-speed, 70s) !important;
   }
 }
 
