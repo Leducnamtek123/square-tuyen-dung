@@ -874,6 +874,38 @@ export async function setupCommonApiMocks(page: Page) {
     });
   });
 
+  // Mock external OpenStreetMap & CartoCDN tile requests to prevent ERR_CONNECTION_RESET
+  await page.route(/(tile\.openstreetmap\.org|basemaps\.cartocdn\.com).*\.(png|jpg|jpeg)$/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'image/png',
+      body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64'),
+    });
+  });
+
+  // Mock Nominatim & Photon geocoding API
+  await page.route(/(nominatim\.openstreetmap\.org|photon\.komoot\.io).*/, async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          place_id: 1,
+          lat: '21.0285',
+          lon: '105.8542',
+          display_name: 'Duy Tân, Cầu Giấy, Hà Nội, Việt Nam',
+          address: {
+            road: 'Duy Tân',
+            suburb: 'Dịch Vọng Hậu',
+            city_district: 'Cầu Giấy',
+            city: 'Thành phố Hà Nội',
+            country: 'Việt Nam',
+          },
+        },
+      ]),
+    });
+  });
+
   // Mock AI Chatbot config
   await page.route(/(ai\/chatbot\/config|api\/.*\/ai\/chatbot\/config)(\/|\?|$)/, async (route) => {
     await route.fulfill({

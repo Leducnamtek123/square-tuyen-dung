@@ -86,10 +86,10 @@ const Map = ({ title, subTitle, latitude, longitude, height = '260px' }: Props) 
         '</svg>'
       );
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      subdomains: "abc",
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      subdomains: "abcd",
       maxZoom: 19,
-      attribution: "",
+      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
       errorTileUrl: FALLBACK_TILE_DATA_URI,
     }).addTo(map);
 

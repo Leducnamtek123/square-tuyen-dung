@@ -244,6 +244,18 @@ function InteractiveMapEvents({
   );
 }
 
+const FALLBACK_TILE_DATA_URI =
+  "data:image/svg+xml;charset=utf-8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">' +
+    '<rect width="256" height="256" fill="#f8fafc"/>' +
+    '<path d="M0 64 H256 M0 128 H256 M0 192 H256 M64 0 V256 M128 0 V256 M192 0 V256" stroke="#e2e8f0" stroke-width="1"/>' +
+    '<path d="M0 100 Q128 140 256 110" stroke="#cbd5e1" stroke-width="4" fill="none"/>' +
+    '<path d="M80 0 Q110 128 100 256" stroke="#cbd5e1" stroke-width="3" fill="none"/>' +
+    '<circle cx="128" cy="128" r="6" fill="#94a3b8" opacity="0.4"/>' +
+    '</svg>'
+  );
+
 export default function LocationPickerContent({
   value,
   onChange,
@@ -547,10 +559,11 @@ export default function LocationPickerContent({
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
-            attribution=""
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            subdomains={['a', 'b', 'c']}
+            attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            subdomains={['a', 'b', 'c', 'd']}
             maxZoom={19}
+            errorTileUrl={FALLBACK_TILE_DATA_URI}
           />
           <MapAutoResize />
           <MapRecenter center={position} />
