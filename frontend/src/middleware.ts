@@ -7,7 +7,7 @@ import { isEmployerHostname, isAdminHostname } from '@/configs/portalRouting';
  * Rewrites incoming paths to their Next.js internal app router paths.
  */
 const EMPLOYER_EXACT_MAP: Record<string, string> = {
-  '/': '/employer/introduce',
+  '/': '/employer',
   '/dang-nhap': '/employer/login',
   '/login': '/employer/login',
   '/dang-ky': '/employer/register',
@@ -16,8 +16,8 @@ const EMPLOYER_EXACT_MAP: Record<string, string> = {
   '/forgot-password': '/employer/forgot-password',
   '/gioi-thieu': '/employer/introduce',
   '/introduce': '/employer/introduce',
-  '/dich-vu': '/employer/service',
-  '/service': '/employer/service',
+  '/dich-vu': '/employer/pricing',
+  '/service': '/employer/pricing',
   '/bao-gia': '/employer/pricing',
   '/pricing': '/employer/pricing',
   '/ho-tro': '/employer/support',
@@ -234,18 +234,26 @@ export function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // Already prefixed with /employer
+    // Clean URL: Redirect any /employer or /nha-tuyen-dung prefix on employer subdomain to clean root path
+    if (pathname === '/employer' || pathname === '/nha-tuyen-dung') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url, 301);
+    }
     if (pathname.startsWith('/employer/')) {
-      return NextResponse.next();
+      const stripped = pathname.slice('/employer'.length);
+      const url = request.nextUrl.clone();
+      url.pathname = stripped || '/';
+      return NextResponse.redirect(url, 301);
+    }
+    if (pathname.startsWith('/nha-tuyen-dung/')) {
+      const stripped = pathname.slice('/nha-tuyen-dung'.length);
+      const url = request.nextUrl.clone();
+      url.pathname = stripped || '/';
+      return NextResponse.redirect(url, 301);
     }
 
-    // Normalize path by stripping /nha-tuyen-dung prefix if present
     let targetPath = pathname;
-    if (targetPath === '/nha-tuyen-dung') {
-      targetPath = '/';
-    } else if (targetPath.startsWith('/nha-tuyen-dung/')) {
-      targetPath = targetPath.slice('/nha-tuyen-dung'.length);
-    }
 
     // Handle .html legal pages: e.g. /quy-dinh-dang-tin.html -> /employer/legal/quy-dinh-dang-tin
     if (targetPath.endsWith('.html')) {
@@ -280,17 +288,26 @@ export function middleware(request: NextRequest) {
 
   // ── 2. Admin Subdomain (admin.infohr.vn / admin.localhost) ──
   if (isAdminHostname(hostname)) {
+    // Clean URL: Redirect any /admin or /quan-tri prefix on admin subdomain to clean root path
+    if (pathname === '/admin' || pathname === '/quan-tri') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url, 301);
+    }
     if (pathname.startsWith('/admin/')) {
-      return NextResponse.next();
+      const stripped = pathname.slice('/admin'.length);
+      const url = request.nextUrl.clone();
+      url.pathname = stripped || '/';
+      return NextResponse.redirect(url, 301);
+    }
+    if (pathname.startsWith('/quan-tri/')) {
+      const stripped = pathname.slice('/quan-tri'.length);
+      const url = request.nextUrl.clone();
+      url.pathname = stripped || '/';
+      return NextResponse.redirect(url, 301);
     }
 
-    // Normalize path by stripping /quan-tri prefix if present
     let targetPath = pathname;
-    if (targetPath === '/quan-tri') {
-      targetPath = '/';
-    } else if (targetPath.startsWith('/quan-tri/')) {
-      targetPath = targetPath.slice('/quan-tri'.length);
-    }
 
     if (ADMIN_EXACT_MAP[targetPath]) {
       const url = request.nextUrl.clone();

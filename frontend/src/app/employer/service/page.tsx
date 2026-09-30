@@ -1,11 +1,6 @@
-import type { Metadata } from 'next';
-import { buildPageMetadata } from '@/utils/serverI18n';
-import ServicePage from '@/views/employerPages/ServicePage';
+import { redirect } from 'next/navigation';
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildPageMetadata('employer.service');
+export default function EmployerServicePage() {
+  redirect('/employer/pricing');
 }
 
-export default function Page() {
-  return <ServicePage />;
-}
