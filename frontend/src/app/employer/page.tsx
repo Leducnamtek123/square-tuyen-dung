@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
 import { buildPageMetadata } from '@/utils/serverI18n';
-import { redirect } from 'next/navigation';
+import EmployerHomePage from '@/views/employerPages/EmployerHomePage';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildPageMetadata('employer.introduce');
+  return buildPageMetadata('employer.home');
 }
 
 export default function EmployerRootPage() {
-  redirect('/employer/introduce');
+  return <EmployerHomePage />;
 }
-

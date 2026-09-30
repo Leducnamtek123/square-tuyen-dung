@@ -93,6 +93,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   'admin.components':         { vi: 'Thư viện thành phần UI', en: 'Component Library' },
 
   // Employer (Optimized lengths >= 35 chars)
+  'employer.home':            { vi: 'Cổng Nhà tuyển dụng - Nền tảng tuyển dụng kỹ thuật & Voice AI', en: 'Employer Portal - Technical Hiring & Voice AI Platform' },
   'employer.login':           { vi: 'Đăng nhập cổng Nhà tuyển dụng', en: 'Employer Portal Login' },
   'employer.register':        { vi: 'Đăng ký tài khoản Nhà tuyển dụng', en: 'Employer Registration' },
   'employer.forgot-password': { vi: 'Khôi phục mật khẩu Nhà tuyển dụng', en: 'Employer Forgot Password' },
@@ -242,6 +243,10 @@ const PAGE_DESCRIPTIONS: Record<string, Record<SupportedLocale, string>> = {
     vi: 'Trung tâm trợ giúp và hỗ trợ kỹ thuật 24/7 dành cho Nhà tuyển dụng. Đội ngũ chuyên viên InfoHR luôn sẵn sàng đồng hành cùng doanh nghiệp.',
     en: '24/7 help center and technical support for employers. InfoHR specialist team is always ready to assist your hiring.',
   },
+  'employer.home': {
+    vi: 'Giải pháp tuyển dụng nhân sự chuyên sâu 4 khối ngành Kỹ thuật, Xây dựng, BĐS, MEP kết hợp trợ lý Voice AI AILA sơ loại tự động.',
+    en: 'Specialized recruitment solution for Engineering, Construction, Real Estate, MEP with AILA Voice AI automated screening.',
+  },
   'employer.register': {
     vi: 'Đăng ký tài khoản nhà tuyển dụng miễn phí trên InfoHR. Tiếp cận hàng triệu ứng viên tiềm năng và ứng dụng công nghệ AI vào quy trình tuyển dụng.',
     en: 'Register a free employer account on InfoHR. Reach millions of candidates and leverage AI technology in your hiring workflow.',
@@ -322,6 +327,7 @@ const PAGE_CANONICAL_PATHS: Record<string, string> = {
   'salary': '/tra-cuu-luong',
   'cv-builder': '/tao-cv',
   'cv-templates': '/danh-sach-mau-cv',
+  'employer.home': '/nha-tuyen-dung',
   'employer.pricing': '/nha-tuyen-dung/bao-gia',
   'employer.candidates': '/nha-tuyen-dung/danh-sach-ung-vien',
   'employer.faq': '/nha-tuyen-dung/cau-hoi-thuong-gap',

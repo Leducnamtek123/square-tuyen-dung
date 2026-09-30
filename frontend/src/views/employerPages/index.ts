@@ -3,6 +3,7 @@ export { default as AccountPage } from './AccountPage'
 export { default as CompanyPage } from './CompanyPage'
 
 export { default as DashboardPage } from './DashboardPage'
+export { default as EmployerHomePage } from './EmployerHomePage'
 export { default as IntroducePage } from './IntroducePage'
 export { default as JobPostPage } from './JobPostPage'
 export { default as ServicePage } from './ServicePage'
