@@ -93,15 +93,22 @@
     "jobCount": "{{count}} việc làm",
     "followers": "người theo dõi"
   },
+  "announcement": {
+    "aiInterviewBadge": "MỚI",
+    "aiInterviewMessage": "Luyện phỏng vấn thực chiến cùng công nghệ Voice AI chuẩn doanh nghiệp.",
+    "aiInterviewCta": "Khám phá ngay"
+  },
   "nav": {
+    "home": "Trang chủ",
     "createCv": "Tạo CV",
     "jobs": "Việc làm",
     "companies": "Công ty",
     "practice": "Phỏng vấn thử",
     "news": "Tin tức",
-    "aboutUs": "Về chúng tôi",
+    "aboutUs": "Giới thiệu",
     "introduction": "Giới thiệu",
     "services": "Dịch vụ",
+    "servicesAndPricing": "Dịch vụ & Bảng giá",
     "pricing": "Bảng giá",
     "support": "Hỗ trợ",
     "blog": "Blog tuyển dụng",

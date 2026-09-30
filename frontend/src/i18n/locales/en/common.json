@@ -48,6 +48,7 @@
     "followers": "followers"
   },
   "nav": {
+    "home": "Home",
     "createCv": "Create CV",
     "jobs": "Jobs",
     "companies": "Companies",
@@ -55,6 +56,7 @@
     "aboutUs": "About Us",
     "introduction": "Introduction",
     "services": "Services",
+    "servicesAndPricing": "Services & Pricing",
     "pricing": "Pricing",
     "support": "Support",
     "news": "News",
@@ -111,6 +113,11 @@
     "aboutInfoHRDesc": "Introduction to InfoHR recruitment platform & HR solutions",
     "ailaPlatform": "AILA AI - Interview Platform",
     "ailaPlatformDesc": "Access automated voice & video interview solutions at aila.infohr.vn"
+  },
+  "announcement": {
+    "aiInterviewBadge": "NEW",
+    "aiInterviewMessage": "Practice real-world interviews with enterprise-grade Voice AI.",
+    "aiInterviewCta": "Explore now"
   },
   "footer": {
     "createCv": "Create CV Online",

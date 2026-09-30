@@ -28,6 +28,7 @@ import { isAdminPortalPath, isEmployerPortalPath, isAdminHostname, isEmployerHos
 import { localizeRoutePath } from "@/configs/routeLocalization";
 import HeaderNavLinks from "./HeaderNavLinks";
 import HeaderAuthArea from "./HeaderAuthArea";
+import TopAnnouncementBanner from "./TopAnnouncementBanner";
 
 import { useQuery } from '@tanstack/react-query';
 import contentService from '@/services/contentService';
@@ -137,16 +138,17 @@ const Header = (_props: HeaderProps) => {
       },
     ],
     [HOST_NAME.EMPLOYER_PROJECT]: [
-      { id: '1', label: t('nav.introServices', 'Giới thiệu & Dịch vụ'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
-      { id: '2', label: t('nav.findCandidates', 'Tìm ứng viên'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true, isHighlight: true },
-      { id: '3', label: t('nav.pricing', { defaultValue: 'Bảng giá' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
-      { id: '4', label: t('nav.support', { defaultValue: 'Hỗ trợ' }), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
+      { id: '1', label: t('nav.home', 'Trang chủ'), path: localizeRoutePath('/', i18n.language) },
+      { id: '2', label: t('nav.aboutUs', 'Giới thiệu'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
+      { id: '3', label: t('nav.servicesAndPricing', 'Dịch vụ & Bảng giá'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
+      { id: '4', label: t('nav.findCandidates', 'Tìm ứng viên'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true, isHighlight: true },
+      { id: '5', label: t('nav.support', 'Hỗ trợ'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
     ],
   }), [t, i18n.language, infoChildren, aboutChildren]);
 
   const theme = useTheme();
 
-  const isSmall = useMediaQuery(theme.breakpoints.down("md"));
+  const isSmall = useMediaQuery(theme.breakpoints.down("lg"));
 
   const pathname = usePathname() || '/';
   const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
@@ -195,31 +197,41 @@ const Header = (_props: HeaderProps) => {
 
   const handleLogin = () => {
     if (isAdminPortal) {
+      if (isAdminHostname(hostName)) {
+        push(`/${ROUTES.AUTH.LOGIN}`);
+        return;
+      }
       push(`/${ROUTES.ADMIN_AUTH.LOGIN}`);
       return;
     }
     if (isEmployerPortal) {
+      if (isEmployerHostname(hostName)) {
+        push(`/${ROUTES.AUTH.LOGIN}`);
+        return;
+      }
       push(`/${ROUTES.EMPLOYER_AUTH.LOGIN}`);
       return;
     }
     push(`/${ROUTES.AUTH.LOGIN}`);
-
   };
 
   const handleSignUp = () => {
-
     if (isAdminPortal) return;
     if (isEmployerPortal) {
+      if (isEmployerHostname(hostName)) {
+        push(`/${ROUTES.AUTH.REGISTER}`);
+        return;
+      }
       push(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`);
       return;
     }
     push(`/${ROUTES.AUTH.REGISTER}`);
-
   };
 
   return (
 
     <>
+      {!isAdminPortal && !isEmployerPortal && <TopAnnouncementBanner />}
 
       <AppBar
         position="sticky"
@@ -261,7 +273,7 @@ const Header = (_props: HeaderProps) => {
                 p: { xs: 1, sm: 1.25 },
                 minWidth: 44,
                 minHeight: 44,
-                display: { md: "none" },
+                display: { lg: "none" },
                 flexShrink: 0,
               }}
             >
@@ -276,7 +288,7 @@ const Header = (_props: HeaderProps) => {
                 display: 'flex',
                 alignItems: 'center',
                 textDecoration: 'none',
-                flexShrink: { xs: 1, md: 0 },
+                flexShrink: { xs: 1, lg: 0 },
                 minWidth: 0,
                 overflow: 'hidden',
               }}
@@ -288,7 +300,7 @@ const Header = (_props: HeaderProps) => {
                 sx={{
                   height: { xs: 26, sm: 30, md: 34 },
                   width: 'auto',
-                  maxWidth: { xs: 105, sm: 140, md: 'none' },
+                  maxWidth: { xs: 105, sm: 140, lg: 'none' },
                   display: 'block',
                   objectFit: 'contain',
                   objectPosition: 'left center',
@@ -303,7 +315,7 @@ const Header = (_props: HeaderProps) => {
               sx={{
                 mx: 1.5,
                 borderColor: 'rgba(226, 232, 240, 0.9)',
-                display: { xs: "none", md: "flex" },
+                display: { xs: "none", lg: "flex" },
               }}
             />
 
@@ -315,7 +327,7 @@ const Header = (_props: HeaderProps) => {
             />
 
             {/* -- Mobile: spacer để đẩy icons sang phải -- */}
-            <Box sx={{ flexGrow: 1, minWidth: { xs: 4, sm: 8 }, display: { xs: "flex", md: "none" } }} />
+            <Box sx={{ flexGrow: 1, minWidth: { xs: 4, sm: 8 }, display: { xs: "flex", lg: "none" } }} />
 
             {/* -- Right side: icons + auth -- */}
             <Stack

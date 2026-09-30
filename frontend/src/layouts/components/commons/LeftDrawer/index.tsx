@@ -14,7 +14,7 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 import { removeUserInfo } from '@/redux/userSlice';
 import tokenService from '@/services/tokenService';
 import AccountSwitchMenu from '../AccountSwitchMenu';
-import { isEmployerPortalPath } from '@/configs/portalRouting';
+import { isEmployerPortalPath, isEmployerHostname } from '@/configs/portalRouting';
 import type { ApiError } from '@/types/api';
 import type { AxiosError } from 'axios';
 import type { AppDispatch } from '@/redux/store';
@@ -23,6 +23,7 @@ import {
   resetSearchJobPostFilter,
   resetSearchResume,
 } from '@/redux/filterSlice';
+import AnimatedFlame from '@/components/Common/AnimatedFlame';
 
 interface PageItem {
   id: string;
@@ -30,6 +31,7 @@ interface PageItem {
   label: string;
   requireAuth?: boolean;
   isHot?: boolean;
+  isHighlight?: boolean;
   children?: {
     id: string;
     path: string;
@@ -62,9 +64,11 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
   };
 
   const container = windowProp !== undefined ? () => windowProp().document.body : undefined;
-  const isEmployerPortal = isEmployerPortalPath(pathname);
-  const loginRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.LOGIN : ROUTES.AUTH.LOGIN;
-  const registerRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.REGISTER : ROUTES.AUTH.REGISTER;
+  const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
+  const onEmployerDomain = isEmployerHostname(hostName);
+  const isEmployerPortal = isEmployerPortalPath(pathname, hostName);
+  const loginRoute = (isEmployerPortal && !onEmployerDomain) ? ROUTES.EMPLOYER_AUTH.LOGIN : ROUTES.AUTH.LOGIN;
+  const registerRoute = (isEmployerPortal && !onEmployerDomain) ? ROUTES.EMPLOYER_AUTH.REGISTER : ROUTES.AUTH.REGISTER;
 
   const handleLogout = () => {
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
@@ -163,7 +167,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
               minWidth: 40,
               minHeight: 40,
               color: 'text.secondary',
-              borderRadius: 2,
+              borderRadius: 0,
               '&:hover': {
                 backgroundColor: 'action.hover',
                 color: 'text.primary',
@@ -185,13 +189,16 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
             {pages.map((page) => {
               const hasSubItems = Boolean(page.children && page.children.length > 0);
               const isSubOpen = Boolean(openSubMenus[page.id]);
+              const isItemActive = page.path === '/'
+                ? (pathname === '/' || pathname === '')
+                : pathname.startsWith(page.path);
 
               return (
                 <React.Fragment key={page.id}>
                   <ListItem
                     component={hasSubItems ? 'div' : Link}
                     href={hasSubItems ? undefined : page.path}
-                    className={pathname.startsWith(page.path) ? 'active' : ''}
+                    className={isItemActive ? 'active' : ''}
                     disablePadding
                     onClick={(e: React.MouseEvent<HTMLElement>) => handleItemClick(e, page)}
                     sx={{ mb: 0.5, mx: 1, width: 'auto', cursor: 'pointer', minWidth: 0 }}
@@ -202,9 +209,9 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                       sx={{
                         minHeight: 44,
                         textAlign: 'left',
-                        borderRadius: 2,
+                        borderRadius: 0,
                         transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-                        color: 'text.primary',
+                        color: page.isHighlight ? 'primary.main' : 'text.primary',
                         justifyContent: 'space-between',
                         minWidth: 0,
                         px: 1.5,
@@ -227,43 +234,21 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                     >
                       <ListItemText
                         primary={
-                          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+                          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
                             <span>{page.label}</span>
                             {page.isHot && (
                               <Box
                                 component="span"
                                 sx={{
-                                  bgcolor: '#ef4444',
-                                  color: '#ffffff',
-                                  fontSize: '0.625rem',
-                                  fontWeight: 900,
-                                  letterSpacing: '0.04em',
-                                  lineHeight: 1,
-                                  px: 0.75,
-                                  py: 0.35,
-                                  borderRadius: '5px',
                                   display: 'inline-flex',
                                   alignItems: 'center',
-                                  justifyContent: 'center',
-                                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.45)',
-                                  animation: 'hotBadgePulse 1.8s infinite ease-in-out',
-                                  '@keyframes hotBadgePulse': {
-                                    '0%': {
-                                      transform: 'scale(1)',
-                                      boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.65)',
-                                    },
-                                    '50%': {
-                                      transform: 'scale(1.08)',
-                                      boxShadow: '0 0 0 5px rgba(239, 68, 68, 0)',
-                                    },
-                                    '100%': {
-                                      transform: 'scale(1)',
-                                      boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)',
-                                    },
-                                  },
+                                  verticalAlign: 'middle',
+                                  lineHeight: 1,
                                 }}
+                                title="HOT"
+                                aria-label="HOT"
                               >
-                                HOT
+                                <AnimatedFlame size={18} />
                               </Box>
                             )}
                           </Box>
@@ -271,7 +256,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                         slotProps={{
                           primary: {
                             fontSize: '0.9rem',
-                            fontWeight: 600,
+                            fontWeight: page.isHighlight ? 700 : 600,
                             sx: { overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0 },
                           },
                         }}
@@ -309,7 +294,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
                             <ListItemButton
                               sx={{
                                 minHeight: 44,
-                                borderRadius: 1.5,
+                                borderRadius: 0,
                                 py: 0.75,
                                 px: 1.25,
                                 minWidth: 0,

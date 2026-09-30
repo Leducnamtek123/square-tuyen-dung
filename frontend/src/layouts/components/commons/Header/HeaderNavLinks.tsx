@@ -16,6 +16,7 @@ import { useAppSelector } from "@/redux/hooks";
 import tokenService from "@/services/tokenService";
 import { useTranslation } from "react-i18next";
 import { localizeRoutePath } from "@/configs/routeLocalization";
+import AnimatedFlame from "@/components/Common/AnimatedFlame";
 
 type HeaderNavSubLink = {
   id: string;
@@ -69,16 +70,16 @@ const DoodleUnderlineSvg = ({ isVisible = true }: { isVisible?: boolean }) => {
     <Box
       component="svg"
       className="doodle-underline-stroke"
-      viewBox="0 0 120 24"
+      viewBox="0 0 100 8"
+      preserveAspectRatio="none"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       sx={{
         position: 'absolute',
         bottom: -2,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '96%',
-        height: '11px',
+        left: 0,
+        width: '100%',
+        height: '5px',
         pointerEvents: 'none',
         opacity: isVisible ? 1 : 0,
         transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -88,39 +89,19 @@ const DoodleUnderlineSvg = ({ isVisible = true }: { isVisible?: boolean }) => {
       <defs>
         <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#0284c7" />
-          <stop offset="30%" stopColor="#38bdf8" />
-          <stop offset="70%" stopColor="#0ea5e9" />
+          <stop offset="50%" stopColor="#0ea5e9" />
           <stop offset="100%" stopColor="#38bdf8" />
         </linearGradient>
       </defs>
 
-      {/* Main sweeping hand-drawn curve */}
+      {/* 1 đường lượn sóng mỏng duy nhất, bám chuẩn độ dài của chữ */}
       <path
-        d="M 4,13 C 24,6 50,15.5 78,10 C 93,7 106,10.5 116,10"
+        d="M 0,4.5 Q 25,1.5 50,4.5 T 100,4.5"
         stroke={`url(#${gradId})`}
-        strokeWidth="3.2"
+        strokeWidth="1.6"
+        vectorEffect="non-scaling-stroke"
         strokeLinecap="round"
         strokeLinejoin="round"
-      />
-
-      {/* Organic secondary sketch line / crayon scribble underneath */}
-      <path
-        d="M 11,17 C 35,12 65,18 96,14.5 C 105,13.5 111,15 115,16"
-        stroke={`url(#${gradId})`}
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeOpacity="0.9"
-      />
-
-      {/* Subtle starter scribble trace */}
-      <path
-        d="M 6,14.5 C 18,11.5 34,15 48,13.5"
-        stroke={`url(#${gradId})`}
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeOpacity="0.8"
       />
     </Box>
   );
@@ -152,7 +133,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
   };
 
   return (
-    <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, alignItems: 'center' }}>
+    <Box sx={{ flexGrow: 1, display: { xs: "none", lg: "flex" }, alignItems: 'center' }}>
       {pages.map((page) => {
         const isHighlight =
           Boolean(page.isHighlight) ||
@@ -161,7 +142,9 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
           page.label === t('nav.jobs', { defaultValue: 'Việc làm' }) ||
           page.path.includes('/viec-lam') ||
           page.path.includes('/nha-tuyen-dung/ung-vien');
-        const isActive = activePathname.startsWith(page.path);
+        const isActive = page.path === '/'
+          ? (activePathname === '/' || activePathname === '')
+          : activePathname.startsWith(page.path);
         const hasChildren = Boolean(page.children && page.children.length > 0);
         const anchorEl = dropdownAnchors[page.id] || null;
         const isMenuOpen = Boolean(anchorEl);
@@ -183,7 +166,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
               endIcon={hasChildren ? <KeyboardArrowDownIcon sx={{ fontSize: '18px !important', ml: -0.5 }} /> : undefined}
               sx={{
                 my: 1,
-                mr: 0.75,
+                mr: { lg: 0.25, xl: 0.75 },
                 color: '#0f172a',
                 display: "inline-flex",
                 alignItems: "center",
@@ -191,10 +174,10 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                 whiteSpace: "nowrap",
                 textDecoration: "none",
                 fontWeight: 700,
-                fontSize: '0.925rem',
-                px: isHighlight ? 2.25 : 2,
+                fontSize: { lg: '0.85rem', xl: '0.925rem' },
+                px: { lg: 1.25, xl: 2 },
                 py: isHighlight ? 0.9 : 0.85,
-                borderRadius: isHighlight ? '12px' : '8px',
+                borderRadius: 0,
                 position: 'relative',
                 backgroundColor: isActive
                   ? isHighlight
@@ -215,7 +198,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                   transform: isHighlight ? 'translateY(-1px)' : 'none',
                   textDecoration: "none",
                   '& .doodle-underline-stroke': {
-                    transform: 'translateX(-50%) scale(1.04)',
+                    transform: 'scaleY(1.15)',
                     opacity: 1,
                   },
                 },
@@ -224,47 +207,37 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                 },
               }}
             >
-              <Box component="span" sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 0.75, pb: isHighlight ? 0.75 : 0 }}>
-                {page.label}
+              <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
+                <Box
+                  component="span"
+                  sx={{
+                    position: 'relative',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    lineHeight: 1.2,
+                    pb: isHighlight ? 0.35 : 0,
+                  }}
+                >
+                  <span>{page.label}</span>
+                  {isHighlight && <DoodleUnderlineSvg isVisible={true} />}
+                </Box>
                 {page.isHot && (
                   <Box
                     component="span"
                     sx={{
-                      bgcolor: '#ef4444',
-                      color: '#ffffff',
-                      fontSize: '0.625rem',
-                      fontWeight: 900,
-                      letterSpacing: '0.04em',
-                      lineHeight: 1,
-                      px: 0.75,
-                      py: 0.35,
-                      borderRadius: '5px',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
                       verticalAlign: 'middle',
-                      boxShadow: '0 2px 6px rgba(239, 68, 68, 0.45)',
-                      animation: 'hotBadgePulse 1.8s infinite ease-in-out',
-                      '@keyframes hotBadgePulse': {
-                        '0%': {
-                          transform: 'scale(1)',
-                          boxShadow: '0 0 0 0 rgba(239, 68, 68, 0.65)',
-                        },
-                        '50%': {
-                          transform: 'scale(1.08)',
-                          boxShadow: '0 0 0 5px rgba(239, 68, 68, 0)',
-                        },
-                        '100%': {
-                          transform: 'scale(1)',
-                          boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)',
-                        },
-                      },
+                      lineHeight: 1,
+                      ml: 0.5,
+                      transform: 'translateY(-1px)',
                     }}
+                    title="HOT"
+                    aria-label="HOT"
                   >
-                    HOT
+                    <AnimatedFlame size={19} />
                   </Box>
                 )}
-                {isHighlight && <DoodleUnderlineSvg isVisible={true} />}
               </Box>
             </Button>
 
@@ -282,7 +255,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                       mt: 1.25,
                       p: 1,
                       width: 360,
-                      borderRadius: 3,
+                      borderRadius: 0,
                       boxShadow: '0 20px 48px rgba(15, 23, 42, 0.18)',
                       border: '1px solid rgba(226, 232, 240, 0.95)',
                     },
@@ -304,7 +277,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                     sx={{
                       py: 1.25,
                       px: 1.5,
-                      borderRadius: 2,
+                      borderRadius: 0,
                       mb: 0.5,
                       whiteSpace: 'normal',
                       '&:hover': {
