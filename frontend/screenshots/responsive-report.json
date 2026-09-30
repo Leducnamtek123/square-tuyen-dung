@@ -1,0 +1,524 @@
+[
+  {
+    "page": "home",
+    "url": "/",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "home-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "home-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "home-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "home-desktop-1440.png"
+      }
+    }
+  },
+  {
+    "page": "jobs",
+    "url": "/jobs",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "jobs-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "jobs-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "jobs-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "jobs-desktop-1440.png"
+      }
+    }
+  },
+  {
+    "page": "login",
+    "url": "/login",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "login-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "login-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "login-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "login-desktop-1440.png"
+      }
+    }
+  },
+  {
+    "page": "register",
+    "url": "/register",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "register-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "register-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "register-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "register-desktop-1440.png"
+      }
+    }
+  },
+  {
+    "page": "employer-login",
+    "url": "/employer/login",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-login-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-login-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-login-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-login-desktop-1440.png"
+      }
+    }
+  },
+  {
+    "page": "employer-dashboard",
+    "url": "/employer/dashboard",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-dashboard-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-dashboard-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-dashboard-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-dashboard-desktop-1440.png"
+      }
+    }
+  },
+  {
+    "page": "employer-job-posts",
+    "url": "/employer/job-posts",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-job-posts-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-job-posts-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-job-posts-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "employer-job-posts-desktop-1440.png"
+      }
+    }
+  },
+  {
+    "page": "tra-cuu-luong",
+    "url": "/tra-cuu-luong",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "tra-cuu-luong-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "tra-cuu-luong-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "tra-cuu-luong-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": false,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "tra-cuu-luong-desktop-1440.png"
+      }
+    }
+  },
+  {
+    "page": "tao-cv",
+    "url": "/tao-cv",
+    "viewports": {
+      "mobile-375": {
+        "clientWidth": 375,
+        "scrollWidth": 375,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "tao-cv-mobile-375.png"
+      },
+      "tablet-768": {
+        "clientWidth": 768,
+        "scrollWidth": 768,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": true,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "tao-cv-tablet-768.png"
+      },
+      "laptop-1024": {
+        "clientWidth": 1024,
+        "scrollWidth": 1024,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "tao-cv-laptop-1024.png"
+      },
+      "desktop-1440": {
+        "clientWidth": 1440,
+        "scrollWidth": 1440,
+        "hasHorizontalOverflow": false,
+        "overflowDiff": 0,
+        "overflowingElements": [],
+        "visualChecks": {
+          "hasDesktopNav": true,
+          "hasHamburger": false,
+          "teaserVisibleOnMobile": false
+        },
+        "screenshot": "tao-cv-desktop-1440.png"
+      }
+    }
+  }
+]

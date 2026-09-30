@@ -551,7 +551,7 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
         ]
         filtered_query.sort()
         query_str = urlencode(filtered_query)
-        query_hash = hashlib.md5(query_str.encode("utf-8")).hexdigest()
+        query_hash = hashlib.md5(query_str.encode("utf-8"), usedforsecurity=False).hexdigest()
         cache_key = f'job_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
 
         try:

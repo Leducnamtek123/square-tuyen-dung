@@ -108,6 +108,9 @@ const customShadows = {
 
 const defaultTheme = {
   mode,
+  shape: {
+    borderRadius: 0,
+  },
   palette: colors,
   customShadows,
   typography: {

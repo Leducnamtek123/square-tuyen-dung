@@ -30,7 +30,7 @@ const ChatRoomSearch = ({ value, setValue, placeholder }: ChatRoomSearchProps) =
       }}
       sx={{
         '& .MuiOutlinedInput-root': {
-          borderRadius: '12px',
+          borderRadius: 0,
           backgroundColor: '#f8fafc',
           transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           '& fieldset': {

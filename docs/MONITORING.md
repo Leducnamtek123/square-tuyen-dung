@@ -1,79 +1,122 @@
-# 📊 Hướng Dẫn Vận Hành Hệ Thống Giám Sát (Sentry + Prometheus + Grafana)
+# 📊 Hướng Dẫn Vận Hành Hệ Thống Giám Sát & Sao Lưu (InfoHR Ops Guide)
 
 > **Hệ thống**: Square Tuyển Dụng (InfoHR)  
-> **Các phân hệ giám sát**:
-> 1. **Sentry**: Theo dõi, cảnh báo lỗi ứng dụng tức thì (Error Tracking & Crash Reporting).
-> 2. **Prometheus**: Thu thập số liệu định lượng (Metrics Collection).
-> 3. **Grafana**: Bảng điều khiển trực quan hóa thời gian thực (Dashboards & Visualization).
+> **Các phân hệ vận hành**:
+> 1. **Prometheus & Alertmanager**: Thu thập số liệu định lượng và phát cảnh báo tự động (Telegram / Webhook).
+> 2. **Grafana**: Trực quan hóa bảng điều khiển thời gian thực (WebRTC Voice AI, Hạ tầng máy chủ).
+> 3. **Loki & Promtail**: Quản lý và tra cứu nhật ký (logs) tập trung toàn bộ container Docker.
+> 4. **Automated Backup Service**: Sao lưu tự động toàn diện MySQL + MinIO Media với cơ chế xác thực dung lượng chống file hỏng.
+> 5. **Sentry**: Bắt lỗi ứng dụng tức thì (Error Tracking & Crash Reporting).
 
 ---
 
-## 1. 🚨 Phân hệ Sentry (Error Tracking)
+## 1. 📈 Cổng Dịch Vụ Giám Sát & Vận Hành
 
-Sentry giúp phát hiện ngay lập tức các sự cố lỗi xảy ra với người dùng hoặc ứng viên đang phỏng vấn AI.
-
-### 1.1. Cách cấu hình
-1. Đăng ký tài khoản miễn phí tại [sentry.io](https://sentry.io).
-2. Tạo 2 Projects:
-   - **Django Backend**: Platform: `Django` -> Nhận được **DSN Backend**.
-   - **Next.js Frontend**: Platform: `React` / `Next.js` -> Nhận được **DSN Frontend**.
-3. Điền DSN vào file `.env` trên máy chủ:
-   ```env
-   # Sentry Backend (Django & Celery)
-   SENTRY_DSN=https://your-backend-key@sentry.io/123456
-   SENTRY_TRACES_SAMPLE_RATE=0.1
-
-   # Sentry Frontend (Next.js)
-   NEXT_PUBLIC_SENTRY_DSN=https://your-frontend-key@sentry.io/654321
-   ```
-4. Khi chưa điền DSN hoặc để trống, hệ thống sẽ tự động tắt Sentry một cách an toàn mà không làm gián đoạn bất kỳ chức năng nào.
-
-### 1.2. Tính năng được tự động bảo vệ
-- **Django Requests**: Mọi lỗi 500 unhandled exception đều gửi stack trace kèm request headers lên Sentry.
-- **Celery Tasks**: Các tác vụ ngầm (chuyển đổi giọng nói TTS, bóc tách CV bằng AI, phân tích phỏng vấn) nếu thất bại sẽ gửi cảnh báo kèm tham số task.
-- **React Frontend**: Mọi lỗi component crash được bắt tại `ErrorBoundary` sẽ tự động ghi nhận kèm component stack.
-
----
-
-## 2. 📈 Phân hệ Prometheus & Grafana
-
-### 2.1. Cổng Dịch Vụ & Tài Khoản
-
-| Dịch vụ | Cổng Host | Đường dẫn truy cập | Tài khoản mặc định | Ghi chú |
+| Dịch vụ | Cổng Host | Đường dẫn truy cập | Tài khoản / Bảo mật | Vai trò |
 | :--- | :--- | :--- | :--- | :--- |
-| **Grafana** | `3001` | `http://localhost:3001` | User: `admin`<br>Pass: `infohr_admin_2026` | Trực quan hóa Dashboard. Tránh xung đột port 3000 của Next.js. |
-| **Prometheus** | `9090` | `http://localhost:9090` | Không cần mật khẩu | Engine thu thập số liệu định kỳ mỗi 15s. |
-| **LiveKit Metrics** | `7880` | `http://localhost:7880/metrics` | Nội bộ Docker | Số liệu phòng phỏng vấn WebRTC, bitrate, packet loss. |
-| **Node Exporter** | `9100` | `http://localhost:9100/metrics` | Nội bộ Docker | Tải CPU, RAM, Disk, Network máy chủ. |
-
-*(Lưu ý: Mật khẩu Grafana có thể thay đổi bằng biến `GRAFANA_ADMIN_PASSWORD` trong `.env`)*.
-
----
-
-## 3. 🖥️ Các Dashboard Sẵn Có trong Grafana
-
-Ngay khi khởi động container Grafana, hệ thống đã **tự động kết nối Prometheus** và nạp sẵn Dashboard **"InfoHR — Giám Sát Hệ Thống & Voice AI"** (`infohr-overview`):
-
-1. **Số phòng Phỏng vấn AI đang mở (`livekit_room_total`)**: Theo dõi số phiên phỏng vấn Voice AI đang diễn ra đồng thời.
-2. **Số ứng viên & Agent tham gia (`livekit_participant_total`)**: Theo dõi tổng số ứng viên và bot AI đang kết nối vào phòng.
-3. **Trạng thái LiveKit Server (`up{job="livekit"}`)**: Cảnh báo tức thì nếu SFU WebRTC bị gián đoạn.
-4. **Tải CPU máy chủ (`node_cpu_seconds_total`)**: Biểu đồ phần trăm CPU tiêu thụ theo thời gian thực.
-5. **Tải RAM máy chủ (`node_memory_MemAvailable_bytes`)**: Biểu đồ dung lượng bộ nhớ đang sử dụng.
+| **Grafana** | `3001` | `http://localhost:3001` | User: `admin`<br>Pass: `infohr_admin_2026` *(đổi bằng `GRAFANA_ADMIN_PASSWORD`)* | Giao diện Dashboard & Explore Logs |
+| **Prometheus** | `9090` | `http://localhost:9090` | Đang chạy với TSDB Retention 15 ngày / 10GB | Engine thu thập metrics định kỳ 15s |
+| **Alertmanager** | `9093` | `http://127.0.0.1:9093` | Cổng nội bộ | Điều phối và phát cảnh báo tới Telegram / Webhook |
+| **Loki** | `3100` | `http://127.0.0.1:3100` | Cổng nội bộ | Cơ sở dữ liệu lưu trữ log tập trung |
+| **Promtail** | `9080` | Nội bộ Docker | Đọc trực tiếp Docker Socket | Thu thập log container đẩy về Loki |
+| **LiveKit Metrics**| `7889` | `http://livekit:7889/metrics` | Nội bộ Docker | Metrics WebRTC SFU (rooms, participants, packet loss) |
+| **Node Exporter** | `9100` | `http://node-exporter:9100/metrics` | Nội bộ Docker | Tải CPU, RAM, Disk máy chủ |
 
 ---
 
-## 4. 🛠️ Các Lệnh Vận Hành
+## 2. 🖥️ Các Dashboard Trực Quan Hóa Trên Grafana
+
+Truy cập `http://localhost:3001` -> Menu **Dashboards**:
+
+1. **InfoHR — Giám Sát Hệ Thống & Voice AI (`infohr-overview`)**:
+   - Số phòng phỏng vấn AI đang mở (`livekit_room_total`).
+   - Số ứng viên & AI Agent đang kết nối (`livekit_participant_total`).
+   - Trạng thái sống còn của LiveKit WebRTC (`up{job="livekit"}`).
+   - Tải CPU máy chủ Xeon (%) và Tải RAM (%).
+
+2. **InfoHR — LiveKit WebRTC Voice AI Quality (`infohr-livekit-quality`)**:
+   - Tỷ lệ rớt gói tin âm thanh / video (*Packet Loss Rate*).
+   - Băng thông WebRTC gửi và nhận (*Inbound / Outbound Bps*).
+   - Số phiên ghi hình phỏng vấn đang chạy (*Active Egress Sessions*).
+
+---
+
+## 3. 🔍 Tra Cứu Nhật Ký Tập Trung Với Loki (Centralized Logging)
+
+Không cần phải mở terminal gõ `docker logs` thủ công:
+1. Vào Grafana `http://localhost:3001` -> Nhấp vào biểu tượng la bàn **Explore** (thanh bên trái).
+2. Chọn Data source: **Loki**.
+3. Ví dụ các câu truy vấn LogQL thông dụng:
+   ```logql
+   # Xem tất cả log của LiveKit Agent:
+   {container="tuyendung-studio-livekit-agent"}
+
+   # Lọc các dòng log có chứa chữ "error" hoặc "CRITICAL" trong Backend:
+   {container="tuyendung-studio-backend"} |= "error"
+
+   # Lọc log của hệ thống WAF ModSecurity:
+   {container="tuyendung-studio-waf"}
+
+   # Tìm log của một session phỏng vấn cụ thể:
+   {container=~"tuyendung-studio-.*"} |= "interview_session_id"
+   ```
+
+---
+
+## 4. 🚨 Cảnh Báo Sự Cố Tự Động (Prometheus & Alertmanager)
+
+File quy tắc cảnh báo tại `monitoring/prometheus/alert.rules.yml` tự động giám sát các điều kiện:
+*   **LiveKitServerDown**: SFU LiveKit rớt kết nối quá 1 phút -> Báo động mức **CRITICAL**.
+*   **HostHighCpuUsage**: Tải CPU > 85% liên tục 5 phút -> Báo động mức **WARNING**.
+*   **HostHighMemoryUsage**: RAM khả dụng còn dưới 10% -> Báo động mức **CRITICAL**.
+*   **HostDiskFilling**: Ổ cứng còn trống dưới 15% -> Báo động mức **CRITICAL**.
+*   **MonitoringTargetMissing**: Dịch vụ bị crash quá 2 phút -> Báo động mức **WARNING**.
+
+### Cấu hình nhận tin nhắn Telegram:
+Điền vào file `.env` trên máy chủ:
+```env
+BACKUP_TELEGRAM_BOT_TOKEN=123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ
+BACKUP_TELEGRAM_CHAT_ID=-1001234567890
+```
+
+---
+
+## 5. 💾 Dịch Vụ Sao Lưu Toàn Diện (Database & MinIO Media)
+
+Container `tuyendung-studio-db-backup` chạy ngầm 24/7 theo script `scripts/backup-service-entrypoint.sh`:
+
+1. **Sao lưu Cơ sở dữ liệu MySQL**:
+   - Sử dụng `mysqldump` chế độ zero-downtime (`--single-transaction --quick --routines --triggers --events`).
+   - **Xác thực toàn vẹn**: Bắt buộc kiểm tra kích thước file > 50 KB (loại bỏ hoàn toàn lỗi file rỗng 20-byte).
+   - Tự động cập nhật liên kết tượng trưng `db_backup_latest.sql.gz`.
+2. **Sao lưu MinIO Media (CV, Avatar, Video Phỏng vấn)**:
+   - Tự động đóng gói nén toàn bộ thư mục `/minio_data/square` thành `minio_media_<TIMESTAMP>.tar.gz`.
+   - Cập nhật `minio_media_latest.tar.gz`.
+3. **Quản lý vòng đời lưu trữ (Retention)**:
+   - Tự động dọn dẹp các bản backup cũ hơn 30 ngày (`RETENTION_DAYS=30`).
+4. **Phục hồi khi có sự cố**:
+   ```bash
+   # Phục hồi trên Linux:
+   ./scripts/restore_db.sh backups/db_backup_latest.sql.gz
+
+   # Phục hồi trên Windows PowerShell:
+   powershell -ExecutionPolicy Bypass -File ./scripts/restore_db.ps1
+   ```
+
+---
+
+## 6. 🛠️ Các Lệnh Vận Hành Nhanh
 
 ```bash
-# Khởi động cụm giám sát
-docker compose up -d prometheus grafana node-exporter
+# Khởi động hoặc cập nhật toàn bộ cụm Giám sát & Sao lưu
+docker compose up -d prometheus alertmanager grafana loki promtail node-exporter db-backup
 
-# Khởi động lại LiveKit để nhận cấu hình xuất metrics
-docker compose restart livekit
+# Xem trạng thái backup thời gian thực
+docker logs -f tuyendung-studio-db-backup
 
-# Xem log của Grafana
-docker compose logs -f grafana
+# Xem log của Promtail gom log Docker
+docker logs -f tuyendung-studio-promtail
 
-# Xem log của Prometheus
-docker compose logs -f prometheus
+# Khởi động lại Grafana sau khi cập nhật dashboard
+docker compose restart grafana
 ```

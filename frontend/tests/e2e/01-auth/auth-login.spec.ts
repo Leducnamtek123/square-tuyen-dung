@@ -124,17 +124,21 @@ test.describe('Phân hệ 01-Auth: Đăng nhập & Quản lý phiên (AUTH-02, A
     await expect(logoutBtn).toBeVisible({ timeout: 15_000 });
     await logoutBtn.click();
 
-    // Xác nhận trên modal confirm nếu có
-    const confirmModalBtn = page.locator('.MuiDialog-root').getByRole('button', { name: /đăng xuất|đồng ý|xác nhận/i }).first();
-    if (await confirmModalBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await confirmModalBtn.click();
-    }
+    // Xác nhận trên modal confirm (Radix UI AlertDialog, SweetAlert, hoặc MUI Dialog)
+    const confirmModalBtn = page
+      .getByRole('alertdialog')
+      .getByRole('button', { name: /đồng ý|xác nhận|đăng xuất/i })
+      .or(page.locator('.swal2-confirm'))
+      .or(page.locator('.MuiDialog-root').getByRole('button', { name: /đăng xuất|đồng ý|xác nhận/i }))
+      .first();
+    await expect(confirmModalBtn).toBeVisible({ timeout: 10_000 });
+    await confirmModalBtn.click();
 
     // Chờ chuyển hướng về trang đăng nhập hoặc trang chủ
-    await page.waitForURL(/\/(login|dang-nhap|$)/, { timeout: 15_000 });
+    await expect(page).toHaveURL(/\/(login|dang-nhap|$)/, { timeout: 15_000 });
 
-    // Kiểm tra sạch sẽ cookies
-    const cookies = await context.cookies();
+    // Kiểm tra sạch sẽ cookies trên domain hiện tại
+    const cookies = await context.cookies(page.url());
     const accessToken = cookies.find((c) => c.name === 'access_token');
     const refreshToken = cookies.find((c) => c.name === 'refresh_token');
     expect(accessToken?.value || '').toBe('');

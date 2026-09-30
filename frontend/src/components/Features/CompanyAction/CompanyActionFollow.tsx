@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBriefcase, faFontAwesome, faUsers } from '@fortawesome/free-solid-svg-icons';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
-import { ROUTES } from '@/configs/constants';
+import { ROUTES, IMAGES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
 import type { Company } from '@/types/models';
@@ -59,12 +59,15 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                 <MuiImageCustom
                   width={85}
                   height={85}
-                  src={company?.companyImageUrl}
+                  src={company?.companyImageUrl || IMAGES.companyLogoDefault}
+                  fallbackSrc={IMAGES.companyLogoDefault}
+                  alt={company?.companyName || "Logo công ty"}
                   sx={{
                     borderRadius: 2,
                     border: `1px solid ${theme.palette.divider}`,
                     p: 0.5,
                     backgroundColor: 'white',
+                    objectFit: 'contain',
                   }}
                 />
               </Stack>

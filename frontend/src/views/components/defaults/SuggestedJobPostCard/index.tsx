@@ -146,8 +146,6 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize, f
 
                   size="small"
 
-                  shape="rounded"
-
                   variant="outlined"
 
                   sx={{
@@ -158,7 +156,7 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize, f
 
                       fontWeight: 600,
 
-                      borderRadius: "8px",
+                      borderRadius: 0,
 
                       borderColor: "divider",
 

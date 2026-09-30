@@ -20,7 +20,7 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 const FAKE_SESSION = {
   jobName: 'Frontend Engineer – React/Next.js',
   candidateName: 'Ứng viên mẫu (Demo)',
-  roomCode: 'SQ-2026-C219012',
+  roomCode: 'IV-2026-C219012',
   scheduledAt: '2026-04-25T14:00:00',
   status: 'in_progress',
 };
@@ -172,7 +172,7 @@ function PreflightStep({ onNext, onBack }: { onNext: () => void; onBack: () => v
   return (
     <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.15),transparent_52%)]" />
-      <div className="relative z-10 mx-auto w-full max-w-[560px] rounded-[2rem] border border-cyan-400/20 bg-[#020617]/90 p-8 text-center shadow-[0_0_50px_rgba(56,189,248,0.1)]">
+      <div className="relative z-10 mx-auto w-full max-w-[560px] rounded-none border border-cyan-400/20 bg-[#020617]/90 p-8 text-center shadow-[0_0_50px_rgba(56,189,248,0.1)]">
         <h2 className="mb-1 text-2xl font-semibold uppercase tracking-widest text-white">{t('pages.interviewPreview.preflight.title')}</h2>
         <p className="mb-8 text-sm text-zinc-400">{t('pages.interviewPreview.preflight.description')}</p>
 
@@ -329,26 +329,26 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
       {/* Control bar */}
       <div className={`flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl ${chatOpen && isCompactChatView ? 'hidden' : ''}`}>
         <button type="button" aria-label={micOn ? t('pages.interviewPreview.aria.turnMicrophoneOff') : t('pages.interviewPreview.aria.turnMicrophoneOn')} onClick={() => setMicOn(!micOn)}
-          className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
+          className={`flex size-11 items-center justify-center rounded-[var(--btn-radius,var(--sq-button-radius,10px))] border transition-all
             ${micOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>
           <FontAwesomeIcon icon={micOn ? faMicrophone : faMicrophoneSlash} />
         </button>
         <button type="button" aria-label={camOn ? t('pages.interviewPreview.aria.turnCameraOff') : t('pages.interviewPreview.aria.turnCameraOn')} onClick={() => setCamOn(!camOn)}
-          className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
+          className={`flex size-11 items-center justify-center rounded-[var(--btn-radius,var(--sq-button-radius,10px))] border transition-all
             ${camOn ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}>
           <FontAwesomeIcon icon={camOn ? faVideo : faVideoSlash} />
         </button>
-        <button type="button" aria-label={t('pages.interviewPreview.aria.shareScreen')} className="flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border border-white/15 bg-white/8 text-white hover:bg-white/15 transition-all">
+        <button type="button" aria-label={t('pages.interviewPreview.aria.shareScreen')} className="flex size-11 items-center justify-center rounded-[var(--btn-radius,var(--sq-button-radius,10px))] border border-white/15 bg-white/8 text-white hover:bg-white/15 transition-all">
           <FontAwesomeIcon icon={faDesktop} />
         </button>
         <button type="button" aria-label={chatOpen ? t('pages.interviewPreview.aria.closeChat') : t('pages.interviewPreview.aria.openChat')} onClick={() => setChatOpen(!chatOpen)}
-          className={`flex size-11 items-center justify-center rounded-[var(--sq-button-radius)] border transition-all
+          className={`flex size-11 items-center justify-center rounded-[var(--btn-radius,var(--sq-button-radius,10px))] border transition-all
             ${chatOpen ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}>
           <FontAwesomeIcon icon={faComment} />
         </button>
         <div className="mx-2 h-6 w-px bg-white/10" />
         <button type="button" onClick={onEnd}
-          className="flex h-11 items-center gap-2 rounded-[var(--sq-button-radius)] border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-semibold text-rose-300 hover:bg-rose-500/30 transition-all">
+          className="flex h-11 items-center gap-2 rounded-[var(--btn-radius,var(--sq-button-radius,10px))] border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-semibold text-rose-300 hover:bg-rose-500/30 transition-all">
           <FontAwesomeIcon icon={faPhoneSlash} />
           {t('pages.interviewPreview.connected.end')}
         </button>
@@ -390,7 +390,7 @@ export default function InterviewPreviewPage() {
       <div className="mb-4 flex gap-2 rounded-2xl border border-white/8 bg-zinc-900/40 p-2">
         {STEPS.map(s => (
           <button key={s.key} type="button" onClick={() => setStep(s.key)}
-            className={`flex-1 rounded-[var(--sq-button-radius)] px-3 py-2.5 text-left transition-all duration-200
+            className={`flex-1 rounded-[var(--btn-radius,var(--sq-button-radius,10px))] px-3 py-2.5 text-left transition-all duration-200
               ${step === s.key ? 'bg-cyan-500/15 border border-cyan-400/30' : 'border border-transparent hover:bg-white/5'}`}>
             <p className={`text-xs font-semibold ${step === s.key ? 'text-cyan-300' : 'text-zinc-400'}`}>{t(s.labelKey)}</p>
             <p className="text-[10px] text-zinc-500 mt-0.5">{t(s.descKey)}</p>
@@ -425,7 +425,7 @@ export default function InterviewPreviewPage() {
       </div>
 
       {/* Main stage */}
-      <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#020617] shadow-[0_0_80px_rgba(0,0,0,0.6)]">
+      <div className="relative overflow-hidden rounded-none border border-white/10 bg-[#020617] shadow-[0_0_80px_rgba(0,0,0,0.6)]">
         {step === 'waiting'   && <WaitingStep   onNext={() => setStep('preflight')} />}
         {step === 'preflight' && <PreflightStep onNext={() => setStep('connected')} onBack={() => setStep('waiting')} />}
         {step === 'connected' && <ConnectedStep onEnd={() => setStep('waiting')} />}

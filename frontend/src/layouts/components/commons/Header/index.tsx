@@ -148,7 +148,7 @@ const Header = (_props: HeaderProps) => {
 
   const theme = useTheme();
 
-  const isSmall = useMediaQuery(theme.breakpoints.down("lg"));
+  const isSmall = useMediaQuery(theme.breakpoints.down("md"));
 
   const pathname = usePathname() || '/';
   const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
@@ -231,7 +231,12 @@ const Header = (_props: HeaderProps) => {
   return (
 
     <>
-      {!isAdminPortal && !isEmployerPortal && <TopAnnouncementBanner />}
+      {!isAdminPortal && !isEmployerPortal && (
+        <TopAnnouncementBanner
+          isAdminPortal={isAdminPortal}
+          isEmployerPortal={isEmployerPortal}
+        />
+      )}
 
       <AppBar
         position="sticky"
@@ -273,7 +278,7 @@ const Header = (_props: HeaderProps) => {
                 p: { xs: 1, sm: 1.25 },
                 minWidth: 44,
                 minHeight: 44,
-                display: { lg: "none" },
+                display: { md: "none" },
                 flexShrink: 0,
               }}
             >
@@ -288,7 +293,7 @@ const Header = (_props: HeaderProps) => {
                 display: 'flex',
                 alignItems: 'center',
                 textDecoration: 'none',
-                flexShrink: { xs: 1, lg: 0 },
+                flexShrink: { xs: 1, md: 0 },
                 minWidth: 0,
                 overflow: 'hidden',
               }}
@@ -298,9 +303,9 @@ const Header = (_props: HeaderProps) => {
                 src={IMAGES.getTextLogo("light")}
                 alt="InfoHR Logo"
                 sx={{
-                  height: { xs: 26, sm: 30, md: 34 },
+                  height: { xs: 26, sm: 30, md: 32, lg: 34 },
                   width: 'auto',
-                  maxWidth: { xs: 105, sm: 140, lg: 'none' },
+                  maxWidth: { xs: 105, sm: 125, md: 135, lg: 'none' },
                   display: 'block',
                   objectFit: 'contain',
                   objectPosition: 'left center',
@@ -313,9 +318,9 @@ const Header = (_props: HeaderProps) => {
               flexItem
               variant="middle"
               sx={{
-                mx: 1.5,
+                mx: { md: 1, lg: 1.5 },
                 borderColor: 'rgba(226, 232, 240, 0.9)',
-                display: { xs: "none", lg: "flex" },
+                display: { xs: "none", md: "flex" },
               }}
             />
 
@@ -327,7 +332,7 @@ const Header = (_props: HeaderProps) => {
             />
 
             {/* -- Mobile: spacer để đẩy icons sang phải -- */}
-            <Box sx={{ flexGrow: 1, minWidth: { xs: 4, sm: 8 }, display: { xs: "flex", lg: "none" } }} />
+            <Box sx={{ flexGrow: 1, minWidth: { xs: 4, sm: 8 }, display: { xs: "flex", md: "none" } }} />
 
             {/* -- Right side: icons + auth -- */}
             <Stack

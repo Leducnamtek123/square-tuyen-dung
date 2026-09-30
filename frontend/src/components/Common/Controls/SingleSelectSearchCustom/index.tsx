@@ -86,7 +86,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
                 p: 0.5,
                 boxShadow: '0 22px 50px rgba(15, 23, 42, 0.18)',
                 border: '1px solid rgba(226, 232, 240, 0.95)',
-                borderRadius: 3,
+                borderRadius: 0,
               },
             },
             listbox: {
@@ -98,7 +98,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
                 maxHeight: 380,
                 overflowY: 'auto',
                 '& .MuiAutocomplete-option': {
-                  borderRadius: 2,
+                  borderRadius: 0,
                   py: 1,
                   px: 1.5,
                   fontSize: '0.875rem',
@@ -147,11 +147,11 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
               sx={{
                 backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
-                borderRadius: isHero ? 1 : 999,
+                borderRadius: 0,
                 boxShadow: isHero ? 'none' : '0 10px 26px rgba(15, 23, 42, 0.08)',
                 '& .MuiOutlinedInput-root': {
                   minHeight: isHero ? 56 : 48,
-                  borderRadius: isHero ? 1 : 999,
+                  borderRadius: 0,
                   backgroundColor: isHero ? 'transparent' : theme.palette.mode === 'light' ? 'white' : '#121212',
                   transition: 'box-shadow 180ms ease, border-color 180ms ease',
                   '& fieldset': {

@@ -4,8 +4,14 @@ param (
     [string]$ContainerName = "tuyendung-studio-db",
     [string]$DbName = "square_db",
     [string]$DbUser = "root",
-    [string]$DbPassword = "5Dg-UfRnuEvcqJ9mkhrpaPccoijdKlQCIQKHEA-zaPHn-4vECYIVUNWJOi8XTJFV"
+    [string]$DbPassword = $env:DB_PASSWORD
 )
+
+if ([string]::IsNullOrWhiteSpace($DbPassword)) {
+    $secPass = Read-Host -Prompt "Enter MySQL root password for restore" -AsSecureString
+    $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secPass)
+    $DbPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($bstr)
+}
 
 if (-not (Test-Path $BackupFile)) {
     Write-Error "Backup file '$BackupFile' does not exist."

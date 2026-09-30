@@ -227,7 +227,7 @@ export default function ComponentsDesignSystemPage() {
                 <JobPostLarge
                   id={101}
                   slug="ki-su-thiet-ke-noi-that-senior"
-                  companyName="Square Group Studio"
+                  companyName="Vi Smart Tech Studio"
                   jobName="Kỹ Sư Thiết Kế Nội Thất Senior (Senior Interior Designer)"
                   cityId={1}
                   salaryMin={20000000}

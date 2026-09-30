@@ -224,9 +224,15 @@ class CustomConvertTokenView(ConvertTokenView):
         for candidate in (
             getattr(settings, "WEB_JOB_SEEKER_CLIENT_URL", None),
             getattr(settings, "WEB_EMPLOYER_CLIENT_URL", None),
+            "https://infohr.vn",
+            "https://www.infohr.vn",
+            "https://ntd.infohr.vn",
+            "https://www.ntd.infohr.vn",
+            "https://employer.infohr.vn",
+            "https://admin.infohr.vn",
         ):
             normalized = self._normalize_redirect_uri(candidate)
-            if normalized:
+            if normalized and normalized not in allowed:
                 allowed.append(normalized)
         return allowed
 
@@ -505,7 +511,7 @@ class FirebaseLoginView(TokenView):
 
         unique_users = {user.id: user for user in matched_users}
         if len(unique_users) > 1:
-            return None, "Sá»‘ Ä‘iá»‡n thoáº¡i nÃ y Ä‘ang liÃªn káº¿t vá»›i nhiá»u tÃ i khoáº£n. Vui lÃ²ng Ä‘Äƒng nháº­p báº±ng email hoáº·c liÃªn há»‡ há»— trá»£."
+            return None, "Số điện thoại này đang liên kết với nhiều tài khoản. Vui lòng đăng nhập bằng email hoặc liên hệ hỗ trợ."
 
         user = next(iter(unique_users.values()), None)
         if user:
@@ -529,7 +535,7 @@ class FirebaseLoginView(TokenView):
         if not id_token or not role_name:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"token": ["Token vÃ  role_name lÃ  báº¯t buá»™c."]},
+                errors={"token": ["Token và role_name là bắt buộc."]},
             )
 
         # Validate role_name - NEVER allow ADMIN via Firebase login
@@ -539,7 +545,7 @@ class FirebaseLoginView(TokenView):
             )
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"role_name": ["Role khÃ´ng há»£p lá»‡."]},
+                errors={"role_name": ["Role không hợp lệ."]},
             )
 
         decoded_token = verify_id_token(id_token)
@@ -547,7 +553,7 @@ class FirebaseLoginView(TokenView):
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
                 errors={
-                    "token": ["Token khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n."]
+                    "token": ["Token không hợp lệ hoặc đã hết hạn."]
                 },
             )
 
@@ -555,7 +561,7 @@ class FirebaseLoginView(TokenView):
         if not phone_number:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"token": ["Token khÃ´ng chá»©a sá»‘ Ä‘iá»‡n thoáº¡i."]},
+                errors={"token": ["Token không chứa số điện thoại."]},
             )
 
         # Find or create user. Prefer linking phone login to an existing account

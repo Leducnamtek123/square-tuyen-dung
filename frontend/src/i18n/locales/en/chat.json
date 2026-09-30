@@ -77,5 +77,27 @@
   "startWithGreeting": "Start the conversation with a warm greeting",
   "startConversationWith": "Start conversation with {{name}}",
   "startConversation": "Start conversation",
-  "sendFirstMessageHint": "Send a greeting or ask a question to connect right away."
+  "sendFirstMessageHint": "Send a greeting or ask a question to connect right away.",
+  "actionCards": {
+    "employer": {
+      "findCandidates": "Find Candidates",
+      "findCandidatesDesc": "Filter top candidates by role & skills",
+      "inviteInterview": "Interview Invitation",
+      "inviteInterviewDesc": "Draft professional invitation messages",
+      "optimizeJd": "Optimize JD",
+      "optimizeJdDesc": "Get AI help crafting attractive JDs",
+      "salarySurvey": "Salary Benchmarks",
+      "salarySurveyDesc": "Explore competitive market compensation"
+    },
+    "jobSeeker": {
+      "findJobs": "Find Matching Jobs",
+      "findJobsDesc": "Get personalized jobs by skills & salary",
+      "reviewCv": "Review & Fix CV",
+      "reviewCvDesc": "Audit resume against ATS standards",
+      "interviewTips": "Interview Prep",
+      "interviewTipsDesc": "Ace difficult recruiter questions",
+      "salarySurvey": "Salary Benchmarks",
+      "salarySurveyDesc": "Check average compensation in your field"
+    }
+  }
 }

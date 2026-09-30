@@ -111,7 +111,7 @@ const CompanyPage = () => {
           elevation={0}
           sx={{
             p: { xs: 2, sm: 3, md: 4 },
-            borderRadius: '24px',
+            borderRadius: 0,
             border: '1px solid rgba(226, 232, 240, 0.8)',
             background: '#ffffff',
             boxShadow: '0 12px 32px rgba(15, 23, 42, 0.03)',

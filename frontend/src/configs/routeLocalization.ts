@@ -5,6 +5,7 @@
  */
 
 import { VI_TO_EN_MAP, EN_TO_VI_MAP, generateRewrites } from './routeConfig';
+import { isEmployerHostname, isAdminHostname, stripPortalPrefix } from './portalRouting';
 
 type LanguageCode = 'en' | 'vi';
 type RewriteRule = ReturnType<typeof generateRewrites>[number];
@@ -187,18 +188,28 @@ export const localizeRoutePath = (path: string, language: string): string => {
   const { pathname, suffix } = splitPathAndSuffix(path);
   const contextualPathname = localizePathByRewrite(pathname, language);
 
+  let resultPath = '';
   if (contextualPathname) {
-    return `${contextualPathname}${suffix}`;
+    resultPath = `${contextualPathname}${suffix}`;
+  } else {
+    const hasLeadingSlash = pathname.startsWith('/');
+
+    const localizedPathname = pathname
+      .split('/')
+      .map((segment) => localizePathSegment(segment, language))
+      .join('/');
+
+    resultPath = `${hasLeadingSlash ? localizedPathname : localizedPathname.replace(/^\//, '')}${suffix}`;
   }
 
-  const hasLeadingSlash = pathname.startsWith('/');
+  if (typeof window !== 'undefined') {
+    const hn = window.location.hostname;
+    if (isEmployerHostname(hn) || isAdminHostname(hn)) {
+      resultPath = stripPortalPrefix(resultPath, hn);
+    }
+  }
 
-  const localizedPathname = pathname
-    .split('/')
-    .map((segment) => localizePathSegment(segment, language))
-    .join('/');
-
-  return `${hasLeadingSlash ? localizedPathname : localizedPathname.replace(/^\//, '')}${suffix}`;
+  return resultPath;
 };
 
 export const getLocalizedRouteVariants = (path: string): string[] => {

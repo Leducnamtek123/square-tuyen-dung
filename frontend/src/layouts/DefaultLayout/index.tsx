@@ -25,6 +25,15 @@ const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
   const isAuthPage = AUTH_PATHS.some((p) => pathname === p || pathname.endsWith(p));
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
+  const cleanPath = pathname.replace(/^\/(vi|en)/, '');
+  const isFullBleedPage =
+    cleanPath === '/practice' ||
+    cleanPath.startsWith('/practice/') ||
+    cleanPath === '/luyen-phong-van' ||
+    cleanPath.startsWith('/luyen-phong-van/') ||
+    cleanPath === '/phong-van-thu' ||
+    cleanPath.startsWith('/phong-van-thu/');
+
   const [isCandidateSkipped, setIsCandidateSkipped] = React.useState(false);
   const [isEmployerSkipped, setIsEmployerSkipped] = React.useState(false);
 
@@ -37,6 +46,7 @@ const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
 
   const showCandidateBanner =
     !isAuthPage &&
+    !isFullBleedPage &&
     (isCandidateSkipped ||
       (isAuthenticated &&
         currentUser?.roleName === ROLES_NAME.JOB_SEEKER &&
@@ -44,6 +54,7 @@ const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
 
   const showEmployerBanner =
     !isAuthPage &&
+    !isFullBleedPage &&
     (isEmployerSkipped ||
       (isAuthenticated &&
         currentUser?.roleName === ROLES_NAME.EMPLOYER &&
@@ -58,12 +69,20 @@ const DefaultLayout = ({ children }: { children?: React.ReactNode }) => {
 
       <Container
         component="main"
-        maxWidth="xl"
-        disableGutters={isAuthPage}
+        maxWidth={isFullBleedPage ? false : 'xl'}
+        disableGutters={isAuthPage || isFullBleedPage}
         sx={{
-          paddingLeft: isAuthPage ? { xs: 0, sm: 4, md: 6, lg: 8, xl: 8 } : { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
-          paddingRight: isAuthPage ? { xs: 0, sm: 4, md: 6, lg: 8, xl: 8 } : { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
-          pb: isAuthPage ? { xs: 3, md: 4 } : { xs: 8, md: 4 },
+          paddingLeft: isFullBleedPage
+            ? 0
+            : isAuthPage
+            ? { xs: 0, sm: 4, md: 6, lg: 8, xl: 8 }
+            : { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
+          paddingRight: isFullBleedPage
+            ? 0
+            : isAuthPage
+            ? { xs: 0, sm: 4, md: 6, lg: 8, xl: 8 }
+            : { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
+          pb: isFullBleedPage ? 0 : isAuthPage ? { xs: 3, md: 4 } : { xs: 8, md: 4 },
         }}
       >
         {children}

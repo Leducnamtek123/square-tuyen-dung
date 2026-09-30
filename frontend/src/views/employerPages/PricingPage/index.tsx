@@ -2269,9 +2269,24 @@ export default function PricingPage() {
               />
 
               <Stack spacing={2.5} alignItems="center" sx={{ position: 'relative', zIndex: 1, maxWidth: 780, mx: 'auto' }}>
+                <Chip
+                  label="TƯ VẤN DOANH NGHIỆP"
+                  size="small"
+                  sx={{
+                    bgcolor: 'rgba(59, 130, 246, 0.15)',
+                    color: '#60A5FA',
+                    fontWeight: 700,
+                    fontSize: '0.75rem',
+                    letterSpacing: '0.05em',
+                    border: '1px solid rgba(59, 130, 246, 0.4)',
+                    borderRadius: '100px',
+                  }}
+                />
+
                 <Typography
                   variant="h3"
                   sx={{
+                    color: '#FFFFFF',
                     fontSize: { xs: '1.5rem', sm: '1.85rem', md: '2.25rem' },
                     fontWeight: 800,
                     letterSpacing: '-0.02em',
@@ -2287,31 +2302,12 @@ export default function PricingPage() {
                   Đội ngũ chuyên viên tư vấn kỹ thuật của InfoHR luôn sẵn sàng đồng hành cùng các nhà thầu và doanh nghiệp 24/7.
                 </Typography>
 
-                <Stack
-                  direction={{ xs: 'column', sm: 'row' }}
-                  spacing={3}
-                  alignItems="center"
-                  sx={{ py: 1, color: '#E2E8F0', fontSize: '0.95rem' }}
-                >
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <PhoneInTalkOutlinedIcon sx={{ color: '#60A5FA', fontSize: 20 }} />
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      Hotline: 028 7108 8688
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <MailOutlineRoundedIcon sx={{ color: '#60A5FA', fontSize: 20 }} />
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      Email: hotline@infohr.vn
-                    </Typography>
-                  </Stack>
-                </Stack>
-
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ pt: 1, width: { xs: '100%', sm: 'auto' } }}>
                   <Button
                     component={Link}
                     href={localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language)}
                     variant="contained"
+                    endIcon={<ArrowForwardRoundedIcon />}
                     sx={{
                       background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                       color: '#FFFFFF',
@@ -2325,6 +2321,7 @@ export default function PricingPage() {
                       '&:hover': {
                         background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
                         boxShadow: '0 6px 22px rgba(37, 99, 235, 0.55)',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >
@@ -2335,22 +2332,52 @@ export default function PricingPage() {
                     variant="outlined"
                     sx={{
                       borderColor: 'rgba(255, 255, 255, 0.25)',
+                      bgcolor: 'rgba(255, 255, 255, 0.05)',
                       color: '#FFFFFF',
                       px: 3.5,
                       py: 1.4,
                       fontWeight: 700,
                       borderRadius: '12px',
                       textTransform: 'none',
-                      backdropFilter: 'blur(4px)',
+                      backdropFilter: 'blur(8px)',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        borderColor: '#FFFFFF',
-                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        borderColor: '#60A5FA',
+                        bgcolor: 'rgba(255, 255, 255, 0.12)',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >
                     Yêu Cầu Báo Giá Tùy Chỉnh
                   </Button>
+                </Stack>
+
+                {/* Direct B2B contact channels */}
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={{ xs: 1.5, sm: 3 }}
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{
+                    pt: 2,
+                    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                    width: '100%',
+                    color: '#E2E8F0',
+                    fontSize: '0.95rem',
+                  }}
+                >
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <PhoneInTalkOutlinedIcon sx={{ color: '#60A5FA', fontSize: 18 }} />
+                    <Typography variant="body2" sx={{ color: '#E2E8F0', fontWeight: 600 }}>
+                      Hotline: 028 7108 8688
+                    </Typography>
+                  </Stack>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <MailOutlineRoundedIcon sx={{ color: '#60A5FA', fontSize: 18 }} />
+                    <Typography variant="body2" sx={{ color: '#E2E8F0', fontWeight: 600 }}>
+                      Email: hotline@infohr.vn
+                    </Typography>
+                  </Stack>
                 </Stack>
               </Stack>
             </Box>

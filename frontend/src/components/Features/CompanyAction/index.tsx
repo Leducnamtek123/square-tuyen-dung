@@ -6,7 +6,7 @@ import { Box, Card, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { formatRoute } from '@/utils/funcUtils';
-import { ROUTES } from '@/configs/constants';
+import { ROUTES, IMAGES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTranslation } from 'react-i18next';
 
@@ -82,25 +82,18 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
             <Stack justifyContent="center">
 
               <MuiImageCustom
-
                 width={85}
-
                 height={85}
-
-                src={company?.companyImageUrl}
-
-                sx={{ 
-
+                src={company?.companyImageUrl || IMAGES.companyLogoDefault}
+                fallbackSrc={IMAGES.companyLogoDefault}
+                alt={company?.companyName || "Logo công ty"}
+                sx={{
                   borderRadius: 2,
-
                   border: `1px solid ${theme.palette.grey[200]}`,
-
                   p: 0.5,
-
                   backgroundColor: 'white',
-
+                  objectFit: 'contain',
                 }}
-
               />
 
             </Stack>

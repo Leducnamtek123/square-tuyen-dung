@@ -49,6 +49,34 @@ describe('getPortalBreadcrumbs', () => {
     expect(commonEn.breadcrumbs.admin).toBe('Admin');
   });
 
+  it('returns employer HRM root breadcrumbs for /employer/hrm', () => {
+    expect(getPortalBreadcrumbs('/employer/hrm')).toEqual([
+      { namespace: 'common', labelKey: 'breadcrumbs.employer', href: '/employer/dashboard' },
+      { namespace: 'employer', labelKey: 'sidebar.hrmManagement' },
+    ]);
+  });
+
+  it('returns employer HRM dashboard breadcrumbs for canonical and localized routes', () => {
+    const expected = [
+      { namespace: 'common', labelKey: 'breadcrumbs.employer', href: '/employer/dashboard' },
+      { namespace: 'employer', labelKey: 'sidebar.hrmManagement', href: '/employer/hrm/dashboard' },
+      { namespace: 'employer', labelKey: 'sidebar.hrmDashboard' },
+    ];
+    expect(getPortalBreadcrumbs('/employer/hrm/dashboard')).toEqual(expected);
+    expect(getPortalBreadcrumbs('/nha-tuyen-dung/hrm/bang-dieu-khien')).toEqual(expected);
+  });
+
+  it('returns employer HRM attendances breadcrumbs for canonical and nested sub-routes', () => {
+    const expected = [
+      { namespace: 'common', labelKey: 'breadcrumbs.employer', href: '/employer/dashboard' },
+      { namespace: 'employer', labelKey: 'sidebar.hrmManagement', href: '/employer/hrm/dashboard' },
+      { namespace: 'employer', labelKey: 'sidebar.hrmAttendances' },
+    ];
+    expect(getPortalBreadcrumbs('/employer/hrm/attendances')).toEqual(expected);
+    expect(getPortalBreadcrumbs('/nha-tuyen-dung/hrm/cham-cong')).toEqual(expected);
+    expect(getPortalBreadcrumbs('/employer/hrm/attendances/timesheets')).toEqual(expected);
+  });
+
   it('returns no breadcrumbs for routes outside employer/admin portals', () => {
     expect(getPortalBreadcrumbs('/not-a-portal-page')).toEqual([]);
   });

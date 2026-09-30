@@ -87,7 +87,7 @@ const LanguageSwitcher = ({ color = 'inherit', size = 'medium' }: LanguageSwitch
           height: size === 'small' ? 36 : 40,
           px: size === 'small' ? 1 : { xs: 0.75, sm: 1.25 },
           py: 0.5,
-          borderRadius: '10px',
+          borderRadius: 0,
           border: '1px solid transparent',
           transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
@@ -137,7 +137,7 @@ const LanguageSwitcher = ({ color = 'inherit', size = 'medium' }: LanguageSwitch
         }}
         sx={{
           '& .MuiPaper-root': {
-            borderRadius: 2,
+            borderRadius: 0,
             marginTop: 1,
             minWidth: 150,
             boxShadow: '0px 5px 15px rgba(0,0,0,0.1)',

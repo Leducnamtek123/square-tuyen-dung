@@ -40,6 +40,12 @@ const employerAccountManagement: PortalBreadcrumbItem = {
   href: routePath(ROUTES.EMPLOYER.COMPANY),
 };
 
+const employerHrmRoot: PortalBreadcrumbItem = {
+  namespace: 'employer',
+  labelKey: 'sidebar.hrmManagement',
+  href: routePath(ROUTES.EMPLOYER.HRM_DASHBOARD),
+};
+
 const adminRoot: PortalBreadcrumbItem = {
   namespace: 'common',
   labelKey: 'breadcrumbs.admin',
@@ -135,6 +141,16 @@ const breadcrumbRoutes: BreadcrumbRoute[] = [
   employerRoute(ROUTES.EMPLOYER.FAQ, item('employer', 'support.faq.title')),
   employerRoute(ROUTES.EMPLOYER.TERMS_OF_SERVICE, item('common', 'footer.tos')),
   employerRoute(ROUTES.EMPLOYER.PRIVACY_POLICY, item('common', 'footer.privacy')),
+  employerRoute(ROUTES.EMPLOYER.HRM, item('employer', 'sidebar.hrmManagement')),
+  employerRoute(ROUTES.EMPLOYER.HRM_DASHBOARD, item('employer', 'sidebar.hrmDashboard'), employerHrmRoot),
+  employerRoute(ROUTES.EMPLOYER.HRM_EMPLOYEES, item('employer', 'sidebar.hrmEmployeesList'), employerHrmRoot),
+  employerRoute(ROUTES.EMPLOYER.HRM_ONBOARDING, item('employer', 'sidebar.hrmOnboarding'), employerHrmRoot),
+  employerRoute(ROUTES.EMPLOYER.HRM_DEPARTMENTS, item('employer', 'sidebar.hrmDepartments'), employerHrmRoot),
+  employerRoute(ROUTES.EMPLOYER.HRM_CONTRACTS, item('employer', 'sidebar.hrmContracts'), employerHrmRoot),
+  employerRoute(ROUTES.EMPLOYER.HRM_ATTENDANCES, item('employer', 'sidebar.hrmAttendances'), employerHrmRoot),
+  employerRoute(ROUTES.EMPLOYER.HRM_LEAVES, item('employer', 'sidebar.hrmLeaves'), employerHrmRoot),
+  employerRoute(ROUTES.EMPLOYER.HRM_PAYROLL, item('employer', 'sidebar.hrmPayroll'), employerHrmRoot),
+  employerRoute(ROUTES.EMPLOYER.HRM_ORG_CHART, item('employer', 'sidebar.hrmOrgChart'), employerHrmRoot),
 
   adminRoute('admin', item('admin', 'sidebar.systemOverview')),
   adminRoute(ROUTES.ADMIN.DASHBOARD, item('admin', 'sidebar.systemOverview')),
@@ -198,5 +214,20 @@ export const getPortalBreadcrumbs = (pathname: string): PortalBreadcrumbItem[] =
   const normalizedPathname = normalizePathname(pathname);
   const route = breadcrumbRoutes.find((candidate) => patternToRegex(candidate.pattern).test(normalizedPathname));
 
-  return route?.items ?? [];
+  if (route) {
+    return route.items;
+  }
+
+  // Fallback for nested sub-routes without an explicit pattern (e.g. /employer/hrm/attendances/timesheets)
+  const segments = normalizedPathname.split('/').filter(Boolean);
+  while (segments.length > 1) {
+    segments.pop();
+    const parentPath = `/${segments.join('/')}`;
+    const parentRoute = breadcrumbRoutes.find((candidate) => patternToRegex(candidate.pattern).test(parentPath));
+    if (parentRoute) {
+      return parentRoute.items;
+    }
+  }
+
+  return [];
 };

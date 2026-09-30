@@ -1403,6 +1403,11 @@ const JobPostEditorPage = ({ mode = 'create', id: propId }: JobPostEditorPagePro
                 position: { xs: 'static', lg: 'sticky' },
                 top: 88,
                 zIndex: 2,
+                maxHeight: { lg: 'calc(100vh - 104px)' },
+                overflowY: { lg: 'auto' },
+                '&::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
               }}
             >
               <Stack spacing={3}>

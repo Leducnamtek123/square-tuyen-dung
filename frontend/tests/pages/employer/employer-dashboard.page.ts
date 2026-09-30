@@ -34,11 +34,12 @@ export class EmployerDashboardPage extends BasePage {
     this.refreshBtn = page.getByRole('button', { name: /làm mới|cập nhật/i }).or(page.locator('button:has([data-testid="RefreshIcon"])')).first();
     this.periodToggleGroup = page.locator('.MuiToggleButtonGroup-root').first();
 
-    // 4 KPI Cards in EmployerQuantityStatistics
-    this.applicationsCard = page.locator('.MuiPaper-root').filter({ hasText: /hồ sơ ứng tuyển|tổng hồ sơ/i }).first();
-    this.jobPostsCard = page.locator('.MuiPaper-root').filter({ hasText: /tin tuyển dụng|tổng tin đăng/i }).first();
-    this.interviewsCard = page.locator('.MuiPaper-root').filter({ hasText: /phỏng vấn|lượt phỏng vấn/i }).first();
-    this.conversionCard = page.locator('.MuiPaper-root').filter({ hasText: /tỷ lệ chuyển đổi|điểm ai/i }).first();
+    // 4 KPI Cards in EmployerQuantityStatistics (scoped to main to avoid drawer collision)
+    const main = page.locator('main');
+    this.applicationsCard = main.locator('.MuiPaper-root').filter({ hasText: /lượt ứng tuyển|tổng số lượng ứng tuyển|total applications/i }).first();
+    this.jobPostsCard = main.locator('.MuiPaper-root').filter({ hasText: /tin tuyển dụng|tổng tin đăng|total job posts/i }).first();
+    this.interviewsCard = main.locator('.MuiPaper-root').filter({ hasText: /số phỏng vấn|lượt phỏng vấn|total interviews/i }).first();
+    this.conversionCard = main.locator('.MuiPaper-root').filter({ hasText: /chuyển đổi|conversion rate/i }).first();
 
     // Recent Applications Widget
     this.recentApplicationsWidget = page.locator('.MuiPaper-root').filter({ hasText: /ứng viên mới nộp hồ sơ/i }).first();
@@ -83,6 +84,7 @@ export class EmployerDashboardPage extends BasePage {
 
     const getCardValue = async (card: Locator) => {
       const heading = card.locator('h4, [class*="MuiTypography-h4"]').first();
+      await expect(heading).toBeVisible({ timeout: 10_000 });
       return (await heading.textContent())?.trim() || '0';
     };
 

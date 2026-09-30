@@ -17,6 +17,7 @@ import CompanyFormLoading from '../CompanyForm/CompanyFormLoading';
 import { compressImageFile } from '@/utils/imageCompression';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import ImageCropDialog from '@/components/Common/ImageCropDialog';
+import { IMAGES } from '@/configs/constants';
 import { useCompanyProfile, useCompanyMutations } from '../hooks/useEmployerQueries';
 import type { CompanyFormValues } from '../CompanyForm/types';
 import type { Company } from '@/types/models';
@@ -238,10 +239,12 @@ const CompanyCard = () => {
                 }}
               >
                 <MuiImageCustom
-                  src={company?.companyImageUrl || ''}
+                  src={company?.companyImageUrl || IMAGES.companyLogoDefault}
+                  fallbackSrc={IMAGES.companyLogoDefault}
+                  alt={company?.companyName || 'Company Logo'}
                   width="100%"
                   height="100%"
-                  sx={{ display: 'block' }}
+                  sx={{ display: 'block', objectFit: 'contain' }}
                 />
               </Box>
               <Button

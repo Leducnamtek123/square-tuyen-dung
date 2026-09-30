@@ -20,6 +20,11 @@ export class LivekitRoomPage extends BasePage {
   readonly reconnectionBanner: Locator;
   readonly tabSwitchWarning: Locator;
   readonly observingBar: Locator;
+  readonly avatarStateBadge: Locator;
+  readonly avatarVisualizerPill: Locator;
+  readonly idleVideoElement: Locator;
+  readonly speakVideoElement: Locator;
+  readonly customAvatarImage: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -39,6 +44,11 @@ export class LivekitRoomPage extends BasePage {
     });
     this.tabSwitchWarning = page.locator('div').filter({ hasText: /cảnh báo:.*chuyển tab/i });
     this.observingBar = page.locator('div').filter({ hasText: /trực tiếp|đang quan sát|phỏng vấn/i });
+    this.avatarStateBadge = page.getByTestId('avatar-state-badge');
+    this.avatarVisualizerPill = page.getByTestId('avatar-voice-visualizer-pill');
+    this.idleVideoElement = page.locator('video[class*="stageIdle"]');
+    this.speakVideoElement = page.locator('video[class*="stageSpeak"]');
+    this.customAvatarImage = page.getByTestId('avatar-custom-image');
   }
 
   /**
@@ -113,13 +123,10 @@ export class LivekitRoomPage extends BasePage {
     const btn = this.toggleCamBtn;
     const ariaLabel = (await btn.getAttribute('aria-label')) || '';
     const classAttr = (await btn.getAttribute('class')) || '';
-    const cameraOffPlaceholder = this.page.getByText(/camera.*đang tắt/i).first();
-    const isPlaceholderVisible = await cameraOffPlaceholder.isVisible().catch(() => false);
     return (
       ariaLabel.toLowerCase().includes('bật') ||
       ariaLabel.toLowerCase().includes('turn on') ||
-      classAttr.includes('text-rose-500') ||
-      isPlaceholderVisible
+      classAttr.includes('text-rose-500')
     );
   }
 
@@ -131,12 +138,12 @@ export class LivekitRoomPage extends BasePage {
       const aiAvatar = this.agentAvatarTile.first();
       await expect(aiAvatar).toBeVisible({ timeout: 15_000 });
       const visualizer = aiAvatar.locator('svg, canvas, [class*="visualizer"], div[class*="pulse"]').first();
-      await expect(visualizer.or(aiAvatar)).toBeVisible({ timeout: 10_000 });
+      await expect(visualizer.or(aiAvatar).first()).toBeVisible({ timeout: 10_000 });
     } else {
       const candidateTile = this.candidateVideoTile.first();
       await expect(candidateTile).toBeVisible({ timeout: 15_000 });
       const micBadge = candidateTile.locator('[class*="LiveMicActivity"], [data-speaking], svg, [class*="badge"]').first();
-      await expect(micBadge.or(candidateTile)).toBeVisible({ timeout: 10_000 });
+      await expect(micBadge.or(candidateTile).first()).toBeVisible({ timeout: 10_000 });
     }
   }
 
@@ -160,5 +167,30 @@ export class LivekitRoomPage extends BasePage {
       ? this.page.locator('div, p, span').filter({ hasText: message }).first()
       : this.reconnectionBanner.first();
     await expect(banner).toBeVisible({ timeout: 15_000 });
+  }
+
+  /**
+   * Kiểm tra nhãn trạng thái của trợ lý AI Avatar
+   */
+  async expectAvatarState(expectedState: string | RegExp, timeout = 15_000) {
+    const badge = this.avatarStateBadge.first();
+    await expect(badge).toBeVisible({ timeout });
+    if (typeof expectedState === 'string') {
+      await expect(badge).toContainText(expectedState, { timeout });
+    } else {
+      await expect(badge).toHaveText(expectedState, { timeout });
+    }
+  }
+
+  /**
+   * Kiểm tra xem lớp video phát biểu Lipsync (stageSpeak) có đang kích hoạt hay không
+   */
+  async isSpeakVideoLayerActive(): Promise<boolean> {
+    const speakVideo = this.speakVideoElement.first();
+    if (!(await speakVideo.isVisible().catch(() => false))) {
+      return false;
+    }
+    const classAttr = (await speakVideo.getAttribute('class')) || '';
+    return classAttr.includes('stageSpeakActive') || classAttr.includes('isActive');
   }
 }

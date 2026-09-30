@@ -276,3 +276,49 @@ class OnboardingLifecycleTestCase(TestCase):
         self.assertEqual(res_eval.status_code, status.HTTP_200_OK)
         self.assertEqual(res_eval.data['stage'], 'COMPLETED')
 
+    def test_employee_self_service_portal_and_punch(self):
+        """Test employee self-service endpoints: profile view, task submission, and web punch."""
+        employee, _ = CandidateToEmployeeConverter.convert(
+            company=self.company,
+            actor=self.owner,
+            data={'job_application_id': self.application.id, 'base_salary': 15000000},
+        )
+        process = employee.onboarding_process
+
+        # Authenticate as candidate / employee
+        self.client.force_authenticate(user=self.candidate_user)
+
+        # 1. GET /api/v1/native-hrm/me/
+        res_me = self.client.get('/api/v1/native-hrm/me/')
+        self.assertEqual(res_me.status_code, status.HTTP_200_OK)
+        self.assertIn('employee', res_me.data)
+        self.assertIn('onboarding_process', res_me.data)
+        self.assertIsNotNone(res_me.data['onboarding_process'])
+        self.assertEqual(res_me.data['onboarding_process']['id'], process.id)
+
+        # 2. POST /api/v1/native-hrm/me/onboarding/tasks/<id>/submit/ (Bank Account)
+        bank_task = process.tasks.filter(code='BANK_ACCOUNT').first()
+        res_bank = self.client.post(
+            f'/api/v1/native-hrm/me/onboarding/tasks/{bank_task.id}/submit/',
+            data={
+                'bank_name': 'Vietcombank',
+                'bank_account_number': '0123456789',
+                'bank_account_holder': 'TRAN THI UNG VIEN',
+            },
+            format='json',
+        )
+        self.assertEqual(res_bank.status_code, status.HTTP_200_OK)
+        self.assertTrue(res_bank.data['is_completed'])
+        employee.refresh_from_db()
+        self.assertEqual(employee.bank_account_number, '0123456789')
+
+        # 3. POST /api/v1/native-hrm/me/punch/ (Web Attendance Punch)
+        res_punch = self.client.post(
+            '/api/v1/native-hrm/me/punch/',
+            data={'punch_type': 'CHECK_IN'},
+            format='json',
+        )
+        self.assertEqual(res_punch.status_code, status.HTTP_200_OK)
+        self.assertIn('punch_log', res_punch.data)
+        self.assertEqual(res_punch.data['punch_log']['source'], 'WEB_APP')
+

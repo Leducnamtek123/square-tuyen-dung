@@ -53,7 +53,7 @@ const MainJobPostCardContent = () => {
               fontWeight: 600,
               backgroundColor: 'primary.background',
               padding: '4px 12px',
-              borderRadius: '20px',
+              borderRadius: 0,
               fontSize: '0.9em'
             }}
           >

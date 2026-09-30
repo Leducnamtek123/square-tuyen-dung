@@ -190,7 +190,17 @@ export const ChatbotSettingsTab: React.FC<ChatbotSettingsTabProps> = ({ formData
 
       {/* Right Column: Live Chatbot Widget Preview */}
       <Grid size={{ xs: 12, lg: 5, xl: 4 }}>
-        <Box sx={{ position: 'sticky', top: 24 }}>
+        <Box
+          sx={{
+            position: 'sticky',
+            top: 80,
+            maxHeight: 'calc(100vh - 104px)',
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': { display: 'none' },
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
           <LiveChatbotPreview
             title={formData.chatbotTitle}
             subtitle={formData.chatbotSubtitle}

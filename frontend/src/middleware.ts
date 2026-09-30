@@ -253,6 +253,31 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(url, 301);
     }
 
+    // ── Candidate Routes on Employer Subdomain: Redirect to Main Candidate Portal ──
+    const isCandidateRoute =
+      pathname === '/luyen-phong-van' ||
+      pathname === '/practice' ||
+      pathname.startsWith('/luyen-phong-van/') ||
+      pathname.startsWith('/practice/') ||
+      pathname === '/tao-cv' ||
+      pathname.startsWith('/tao-cv/') ||
+      pathname === '/cv-builder' ||
+      pathname.startsWith('/cv-builder/') ||
+      pathname === '/viec-lam' ||
+      pathname.startsWith('/viec-lam/') ||
+      pathname === '/jobs' ||
+      pathname.startsWith('/jobs/');
+
+    if (isCandidateRoute) {
+      const targetQuery = search ? (search.startsWith('?') ? search : `?${search}`) : '';
+      if (hostname.endsWith('.localhost') || hostname === 'localhost') {
+        const port = host.split(':')[1] ? `:${host.split(':')[1]}` : '';
+        return NextResponse.redirect(new URL(`http://localhost${port}${pathname}${targetQuery}`), 302);
+      }
+      const mainHost = process.env.NEXT_PUBLIC_PROJECT_HOST_NAME || 'infohr.vn';
+      return NextResponse.redirect(`https://${mainHost}${pathname}${targetQuery}`, 302);
+    }
+
     let targetPath = pathname;
 
     // Handle .html legal pages: e.g. /quy-dinh-dang-tin.html -> /employer/legal/quy-dinh-dang-tin

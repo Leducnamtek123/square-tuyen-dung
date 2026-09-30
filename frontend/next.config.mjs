@@ -22,7 +22,7 @@ const backendApiUsesDockerHost = /^https?:\/\/backend(?::|\/|$)/.test(backendApi
 const dockerHostApiProxyOrigin = `http://host.docker.internal:${process.env.NGINX_PORT || '8080'}`;
 const apiProxyOrigin =
   explicitApiProxyOrigin ||
-  (backendApiOrigin && (!backendApiUsesDockerHost || !isDockerRuntime) ? backendApiOrigin : '') ||
+  (backendApiOrigin && (!backendApiUsesDockerHost || isDockerRuntime) ? backendApiOrigin : '') ||
   (isDockerRuntime ? dockerHostApiProxyOrigin : `http://localhost:${process.env.NGINX_PORT || '8080'}`);
 
 const nextConfig = {
@@ -368,6 +368,7 @@ const nextConfig = {
       "connect-src 'self' https: wss: ws: http://localhost:*",
       "media-src 'self' blob: data: https:",
       "object-src 'none'",
+      "frame-src 'self' https://maps.google.com https://www.google.com https://*.google.com https://www.youtube.com",
       "frame-ancestors 'self'",
       "base-uri 'self'",
       "form-action 'self'",

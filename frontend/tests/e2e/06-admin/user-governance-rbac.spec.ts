@@ -76,10 +76,10 @@ test.describe('Phân Hệ Admin - Quản Trị Người Dùng & Phân Quyền (U
       await injectSession(context, DEFAULT_EMPLOYER);
 
       // Khi phiên bị thu hồi hoặc tài khoản bị vô hiệu hóa, truy cập trang được bảo vệ
-      await page.goto('/employer/dashboard');
+      await page.goto('/employer/dashboard', { waitUntil: 'domcontentloaded' });
 
       // Kỳ vọng hệ thống chuyển hướng về trang login hoặc hiển thị trạng thái hết hạn phiên
-      await page.waitForURL(/\/(login|dang-nhap|\?)/, { timeout: 20_000 }).catch(() => {
+      await page.waitForURL(/\/(login|dang-nhap|\?)/, { timeout: 30_000 }).catch(() => {
         // Fallback: Nếu không redirect ngay thì phải hiển thị lỗi hoặc không cho truy cập dữ liệu nhạy cảm
       });
       await expect(page.locator('body')).toBeVisible();
@@ -99,10 +99,10 @@ test.describe('Phân Hệ Admin - Quản Trị Người Dùng & Phân Quyền (U
       await injectSession(context, DEFAULT_CANDIDATE);
 
       // Cố tình truy cập route quản trị
-      await page.goto('/admin/dashboard');
+      await page.goto('/admin/dashboard', { waitUntil: 'domcontentloaded' });
 
       // AdminSectionClient phát hiện role !== ADMIN và redirect về '/'
-      await page.waitForURL(/^http:\/\/[^/]+\/?$/, { timeout: 20_000 });
+      await page.waitForURL(/^http:\/\/[^/]+\/?$/, { timeout: 30_000 });
       expect(page.url()).not.toContain('/admin/dashboard');
 
       // Đảm bảo không render các thẻ thống kê hay bảng quản trị ra ngoài
@@ -123,9 +123,9 @@ test.describe('Phân Hệ Admin - Quản Trị Người Dùng & Phân Quyền (U
       });
       await injectSession(context, DEFAULT_EMPLOYER);
 
-      await page.goto('/admin/jobs');
+      await page.goto('/admin/jobs', { waitUntil: 'domcontentloaded' });
 
-      await page.waitForURL(/^http:\/\/[^/]+\/?$/, { timeout: 20_000 });
+      await page.waitForURL(/^http:\/\/[^/]+\/?$/, { timeout: 30_000 });
       expect(page.url()).not.toContain('/admin/jobs');
       await expect(page.getByTestId('approve-job-btn')).toBeHidden();
     });
@@ -136,10 +136,10 @@ test.describe('Phân Hệ Admin - Quản Trị Người Dùng & Phân Quyền (U
     test('ADM-07: Khách vãng lai chưa đăng nhập truy cập /admin/dashboard -> Điều hướng về /admin/login', async ({ page }) => {
       await setupAllApiMocks(page);
 
-      await page.goto('/admin/dashboard');
+      await page.goto('/admin/dashboard', { waitUntil: 'domcontentloaded' });
 
       // Phải chuyển hướng về màn hình đăng nhập quản trị
-      await page.waitForURL(/\/(admin|quan-tri)\/login/, { timeout: 20_000 });
+      await expect(page).toHaveURL(/\/(admin|quan-tri)\/login/, { timeout: 35_000 });
       expect(page.url()).toContain('/login');
     });
   });

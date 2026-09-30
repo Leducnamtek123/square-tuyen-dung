@@ -89,6 +89,26 @@ describe('Employer Portal Routing & Middleware Mapping', () => {
       const resEn = testRewrite('/pricing');
       expect(resEn.headers.get('x-middleware-rewrite')).toContain('/employer/pricing');
     });
+
+    it('redirects candidate routes on ntd.infohr.vn to main candidate portal', () => {
+      const resPracticeVi = testRewrite('/luyen-phong-van');
+      expect(resPracticeVi.status).toBe(302);
+      expect(resPracticeVi.headers.get('location')).toBe('https://infohr.vn/luyen-phong-van');
+
+      const resPracticeEn = testRewrite('/practice');
+      expect(resPracticeEn.status).toBe(302);
+      expect(resPracticeEn.headers.get('location')).toBe('https://infohr.vn/practice');
+
+      const resCv = testRewrite('/tao-cv');
+      expect(resCv.status).toBe(302);
+      expect(resCv.headers.get('location')).toBe('https://infohr.vn/tao-cv');
+    });
+
+    it('redirects candidate routes on employer.localhost to localhost main portal', () => {
+      const res = testRewrite('/luyen-phong-van', 'employer.localhost');
+      expect(res.status).toBe(302);
+      expect(res.headers.get('location')).toBe('http://localhost/luyen-phong-van');
+    });
   });
 
   describe('Employer Service Page Redirect', () => {

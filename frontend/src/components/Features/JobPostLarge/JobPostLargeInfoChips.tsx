@@ -21,7 +21,7 @@ type JobPostLargeInfoChipsProps = {
 
 const chipSx = (theme: Theme, colorKey: 'primary' | 'info' | 'success') => ({
   backgroundColor: theme.palette[colorKey].background,
-  borderRadius: 1.5,
+  borderRadius: 0,
   px: { xs: 1.25, sm: 1.5 },
   py: { xs: 0.5, sm: 0.75 },
   display: 'flex',

@@ -24,7 +24,7 @@ from apps.common.serializers import LocationSerializer
 from shared.helpers.cloudinary_service import CloudinaryService
 
 PHONE_PATTERN = re.compile(
-    r"^((\+[1-9]{1,4}[ \-]*)|(\([0-9]{2,3}\)[ \-]*)|([0-9]{2,4})[ \-]*)*?[0-9]{3,4}?[ \-]*[0-9]{3,4}?$"
+    r"^((\+[1-9]{1,4}[ \.\-]*)|(\([0-9]{2,3}\)[ \.\-]*)|([0-9]{2,4})[ \.\-]*)*?[0-9]{3,4}?[ \.\-]*[0-9]{3,4}?$"
 )
 PASSWORD_COMPLEXITY_PATTERN = re.compile(
     r"^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%\^&\*]).+$"
@@ -503,6 +503,21 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
 
+    def validate_phoneNumber(self, value):
+        if not value:
+            return None
+        clean_val = str(value).strip()
+        if not PHONE_PATTERN.fullmatch(clean_val):
+            raise serializers.ValidationError("Số điện thoại không hợp lệ.")
+        from apps.accounts.views_oauth import _phone_lookup_values
+        lookup = _phone_lookup_values(clean_val)
+        query = User.objects.filter(phone_number__in=lookup)
+        if self.instance:
+            query = query.exclude(id=self.instance.id)
+        if query.exists():
+            raise serializers.ValidationError("Số điện thoại này đã được sử dụng bởi tài khoản khác.")
+        return clean_val
+
     def update(self, user, validated_data):
         should_sync_firebase = False
 
@@ -517,7 +532,8 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             user.role_name = validated_data.get("role_name")
 
         if "phone_number" in validated_data:
-            user.phone_number = validated_data.get("phone_number")
+            phone_val = validated_data.get("phone_number")
+            user.phone_number = str(phone_val).strip() if phone_val and str(phone_val).strip() else None
             try:
                 profile = getattr(user, 'job_seeker_profile', None)
                 if profile:

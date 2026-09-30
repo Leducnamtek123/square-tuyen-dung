@@ -84,7 +84,7 @@ export function AgentControlBar({
     <div
       aria-label={t('voiceAi.aria.controls')}
       className={cn(
-        'bg-slate-950/60 backdrop-blur-2xl border-white/10 flex flex-col rounded-[32px] border p-3 shadow-2xl shadow-black/60',
+        'bg-slate-950/60 backdrop-blur-2xl border-white/10 flex flex-col rounded-none border p-3 shadow-2xl shadow-black/60',
         className
       )}
       {...props}

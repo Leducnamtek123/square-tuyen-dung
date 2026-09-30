@@ -44,7 +44,17 @@ def initialize_firebase_app() -> Optional[firebase_admin.App]:
             credentials_json = base64.b64decode(credentials_json_base64).decode("utf-8")
 
         if credentials_json:
-            credential = credentials.Certificate(json.loads(credentials_json))
+            cert_data = json.loads(credentials_json)
+            configured_project_id = (getattr(settings, "FIREBASE_CONFIG", {}) or {}).get("projectId")
+            if configured_project_id and cert_data.get("project_id") != configured_project_id:
+                logger.warning(
+                    "Firebase Admin credentials project '%s' does not match configured FIREBASE_PROJECT_ID '%s'. Skipping Admin SDK.",
+                    cert_data.get("project_id"),
+                    configured_project_id,
+                )
+                _FIREBASE_DISABLED = True
+                return None
+            credential = credentials.Certificate(cert_data)
         else:
             credentials_path = getattr(settings, "FIREBASE_CREDENTIALS_PATH", "")
             if not credentials_path:
@@ -74,13 +84,13 @@ def get_firestore_client():
     return firestore.client(app=app)
 
 
-def verify_id_token(id_token: str):
+def verify_id_token(id_token: str, clock_skew_seconds: int = 300):
     app = _FIREBASE_APP
     if not app and has_firebase_admin_credentials():
         app = initialize_firebase_app()
     if app:
         try:
-            return auth.verify_id_token(id_token, app=app)
+            return auth.verify_id_token(id_token, app=app, clock_skew_seconds=clock_skew_seconds)
         except Exception:
             logger.exception("Firebase Admin token verification failed")
 
@@ -94,6 +104,7 @@ def verify_id_token(id_token: str):
             id_token,
             google_auth_requests.Request(),
             audience=project_id,
+            clock_skew_in_seconds=clock_skew_seconds,
         )
         expected_issuer = f"https://securetoken.google.com/{project_id}"
         if decoded_token.get("iss") != expected_issuer:

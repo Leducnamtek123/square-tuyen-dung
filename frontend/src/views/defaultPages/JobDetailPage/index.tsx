@@ -344,7 +344,7 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
               <JobSalaryInsightCard slug={slug as string} />
               <JobDetailContactCard jobPostDetail={state.jobPostDetail as JobPost & { companyDict?: Company; location?: Location & { lat?: number; lng?: number; } }} />
             </div>
-            <div>
+            <div className="lg:sticky lg:top-[88px] self-start space-y-6">
               <JobDetailSidebar jobPostDetail={state.jobPostDetail as JobPost & { companyDict?: Company }} />
             </div>
           </div>
@@ -366,7 +366,7 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
               bgcolor: '#2563eb',
               color: '#ffffff',
               fontWeight: 700,
-              borderRadius: '10px',
+              borderRadius: 0,
               py: 1.25,
               textTransform: 'none',
               fontSize: '0.95rem',

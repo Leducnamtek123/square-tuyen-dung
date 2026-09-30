@@ -259,11 +259,13 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
 
     try {
       // 1. Confirm code with Firebase or Test mode
+      let idToken: string | undefined;
       if (confirmationResult && !isTestMode) {
-        await confirmationResult.confirm(code);
+        const userCredential = await confirmationResult.confirm(code);
+        idToken = await userCredential.user.getIdToken();
       } else {
-        // Test mode: accept '123456' or any 6-digit in dev
-        if (code !== '123456' && code.length !== 6) {
+        // Test mode: accept '123456' in dev
+        if (code !== '123456') {
           throw new Error('Mã OTP không chính xác. Trong chế độ thử nghiệm, vui lòng nhập mã: 123456');
         }
       }
@@ -272,20 +274,12 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
       const cleanPhone = phoneInput.replace(/\D/g, '');
       const standardPhone = cleanPhone.startsWith('0') ? cleanPhone : '0' + cleanPhone;
 
-      try {
-        await authService.verifyPhone({ phone: standardPhone, otp: code, code });
-      } catch (e) {
-        console.warn('Verify phone via dedicated endpoint warning:', e);
-        try {
-          await authService.updateUser({
-            phoneNumber: standardPhone,
-            isPhoneVerified: true,
-            isVerifyPhone: true,
-          });
-        } catch (err) {
-          console.warn('Update user via authService warning:', err);
-        }
-      }
+      await authService.verifyPhone({
+        phone: standardPhone,
+        idToken,
+        otp: code,
+        code,
+      });
 
       try {
         await jobSeekerProfileService.updateProfile({
@@ -316,10 +310,15 @@ export const PhoneVerificationModal: React.FC<PhoneVerificationModalProps> = ({
       }, 1500);
     } catch (err: any) {
       console.error('Error verifying OTP:', err);
+      const backendErr =
+        err?.response?.data?.errors?.phone?.[0] ||
+        err?.response?.data?.errors?.detail?.[0] ||
+        err?.response?.data?.errors?.errorMessage?.[0];
       setErrorMessage(
-        err?.code === 'auth/invalid-verification-code'
-          ? 'Mã OTP không chính xác. Vui lòng kiểm tra lại!'
-          : err?.message || 'Xác thực mã OTP thất bại. Vui lòng thử lại.'
+        backendErr ||
+          (err?.code === 'auth/invalid-verification-code'
+            ? 'Mã OTP không chính xác. Vui lòng kiểm tra lại!'
+            : err?.message || 'Xác thực mã OTP thất bại. Vui lòng thử lại.')
       );
     } finally {
       setIsVerifying(false);

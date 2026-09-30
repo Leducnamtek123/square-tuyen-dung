@@ -828,7 +828,11 @@ class Interviewer(Agent):
                 pass
         if room and getattr(room, "local_participant", None):
             try:
-                await room.local_participant.send_text(clean, topic="lk.chat")
+                await room.local_participant.send_text(
+                    clean,
+                    topic="lk.chat",
+                    attributes={"role": "agent", "sender": "ai"},
+                )
                 logger.info("Published AI message to lk.chat: '%s'", clean[:60])
             except Exception as chat_err:
                 logger.warning("Failed to publish AI chat message: %s", chat_err)
@@ -1223,6 +1227,34 @@ class Interviewer(Agent):
 
         return resume_text
 
+    async def _resume_active_session_question(self, delay_seconds: float = 1.5) -> None:
+        """Kích hoạt lại câu hỏi hiện tại khi ứng viên kết nối lại phòng phỏng vấn dở dang."""
+        await asyncio.sleep(delay_seconds)
+        if self._completed or self._employer_takeover_active:
+            return
+        sess = self._safe_session or getattr(self, "session", None)
+        if sess is None:
+            return
+        backend_payload = await self._fetch_next_question_payload(advance=False)
+        current_q_text = ""
+        if backend_payload is not None:
+            parsed_payload = parse_question_payload(backend_payload)
+            action = decide_next_action(parsed_payload)
+            if action.kind == "ask_question" and action.text:
+                current_q_text = action.text
+        elif self._scripted_questions and self._scripted_question_index < len(self._scripted_questions):
+            current_q_text = self._scripted_questions[self._scripted_question_index]
+
+        if current_q_text:
+            clean_q = _clean_question_for_candidate(current_q_text)
+            self._last_asked_question_text = current_q_text
+            resume_msg = f"Chào mừng bạn đã kết nối lại. Chúng ta cùng tiếp tục câu hỏi: {clean_q} nhé."
+            await self._speak_and_dispatch(sess, resume_msg, allow_interruptions=True)
+            try:
+                await self.record_transcript("ai_agent", resume_msg)
+            except Exception as exc:
+                logger.warning("Failed to record resumption transcript: %s", exc)
+
     async def on_enter(self) -> None:
         """Called when the agent joins the session."""
         if self._greeting_dispatched:
@@ -1232,15 +1264,20 @@ class Interviewer(Agent):
         initial_status = str(self._context.get("status") or "").lower()
         question_cursor = int(self._context.get("questionCursor") or 0)
         has_transcripts = bool(self._context.get("hasTranscripts", False))
-        if initial_status in ("in_progress", "interrupted") or question_cursor > 0 or has_transcripts:
+
+        # Chỉ coi là phiên tiếp tục (resumed) khi ĐÃ CÓ lịch sử hội thoại hoặc con trỏ câu hỏi đã vượt qua câu 0.
+        # Nếu chưa có transcripts và cursor == 0, đây là phiên mới (dù status đã là in_progress do backend kích hoạt khi vào phòng).
+        is_resumed_session = (question_cursor > 0 or has_transcripts) and initial_status in ("in_progress", "interrupted")
+        if is_resumed_session:
             logger.info(
-                "Interview session %s is resumed/in-progress (status=%s, cursor=%d, hasTranscripts=%s). Skipping initial greeting.",
+                "Interview session %s is resumed/in-progress (status=%s, cursor=%d, hasTranscripts=%s). Resuming current question.",
                 self._room_name,
                 initial_status,
                 question_cursor,
                 has_transcripts,
             )
             self._greeting_dispatched = True
+            self._create_background_task(self._resume_active_session_question())
             return
 
         self._greeting_dispatched = True
@@ -1249,10 +1286,11 @@ class Interviewer(Agent):
 
         # Keep the bootstrap greeting short and resilient with retry loop to withstand cold starts or transient TTS delays
         max_retries = 3
+        sess = self._safe_session or getattr(self, "session", None)
         for attempt in range(1, max_retries + 1):
             try:
                 logger.info("Playing initial greeting (attempt %d/%d)...", attempt, max_retries)
-                await self._speak_and_dispatch(self.session, greeting, allow_interruptions=True)
+                await self._speak_and_dispatch(sess, greeting, allow_interruptions=True)
                 logger.info("Initial greeting played successfully.")
                 break
             except Exception as exc:
@@ -1267,10 +1305,10 @@ class Interviewer(Agent):
         except Exception as exc:
             logger.warning("Failed to record greeting transcript: %s", exc)
 
-        # Proactively start Question 1 if candidate remains silent after greeting (18s allows greeting playout + candidate pause)
-        self._create_background_task(self._auto_start_first_question_if_silent(delay_seconds=18.0))
+        # Proactively start Question 1 if candidate remains silent after greeting (8s allows greeting playout + candidate pause)
+        self._create_background_task(self._auto_start_first_question_if_silent(delay_seconds=8.0))
 
-    async def _auto_start_first_question_if_silent(self, delay_seconds: float = 18.0) -> None:
+    async def _auto_start_first_question_if_silent(self, delay_seconds: float = 8.0) -> None:
         """If candidate remains silent after greeting, proactively ask Question 1 without waiting indefinitely."""
         await asyncio.sleep(delay_seconds)
         if self._completed or self._employer_takeover_active:
@@ -1622,12 +1660,16 @@ class Interviewer(Agent):
         self._completed = True
         self._current_stage = InterviewStage.CLOSING
 
-    async def _fetch_next_question_payload(self, target_index: int | None = None) -> dict[str, Any] | None:
+    async def _fetch_next_question_payload(
+        self,
+        target_index: int | None = None,
+        advance: bool = True,
+    ) -> dict[str, Any] | None:
         if not self._backend_api_url or not self._room_name:
             return None
         try:
             url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/next-question"
-            body: dict[str, Any] = {"advance": True}
+            body: dict[str, Any] = {"advance": advance}
             if target_index is not None:
                 body["target_index"] = target_index
             async with httpx.AsyncClient(

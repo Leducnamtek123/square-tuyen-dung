@@ -65,12 +65,21 @@ def validate_pdf_cv_file(cv_file):
     content_type = (getattr(cv_file, "content_type", "") or "").lower()
     file_size = getattr(cv_file, "size", 0) or 0
 
+    if ".." in file_name or "/" in file_name or "\\" in file_name or "\x00" in file_name:
+        raise serializers.ValidationError("Tên tệp tin không hợp lệ.")
+
     if not file_name.endswith(".pdf"):
         raise serializers.ValidationError("Only PDF files are accepted.")
     if content_type and content_type not in PDF_CONTENT_TYPES:
         raise serializers.ValidationError("Only PDF files are accepted.")
     if file_size > MAX_CV_FILE_SIZE:
         raise serializers.ValidationError("PDF file must be 10MB or smaller.")
+
+    if hasattr(cv_file, "read") and hasattr(cv_file, "seek"):
+        header = cv_file.read(16)
+        cv_file.seek(0)
+        if len(header) >= 4 and not header.startswith(b"%PDF"):
+            raise serializers.ValidationError("Tệp PDF không hợp lệ hoặc bị hỏng (magic header sai).")
 
     return cv_file
 

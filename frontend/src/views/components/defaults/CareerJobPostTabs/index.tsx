@@ -144,7 +144,7 @@ export const CareerJobPostTabs: React.FC = () => {
             fontWeight: 700,
             fontSize: '0.875rem',
             color: '#2563eb',
-            borderRadius: '10px',
+            borderRadius: 0,
             px: 1.5,
             py: 0.75,
             bgcolor: 'rgba(37, 99, 235, 0.06)',
@@ -169,7 +169,7 @@ export const CareerJobPostTabs: React.FC = () => {
           '&::-webkit-scrollbar': { height: 4 },
           '&::-webkit-scrollbar-thumb': {
             bgcolor: 'rgba(100, 116, 139, 0.2)',
-            borderRadius: 4,
+            borderRadius: 0,
           },
         }}
       >
@@ -181,7 +181,7 @@ export const CareerJobPostTabs: React.FC = () => {
           onClick={() => setSelectedCareerId('all')}
           sx={{
             height: 40,
-            borderRadius: '12px',
+            borderRadius: 0,
             px: 1,
             fontWeight: 700,
             fontSize: '0.85rem',
@@ -212,10 +212,10 @@ export const CareerJobPostTabs: React.FC = () => {
           ? Array.from({ length: 5 }).map((_, idx) => (
               <Skeleton
                 key={idx}
-                variant="rounded"
+                variant="rectangular"
                 width={130}
                 height={40}
-                sx={{ borderRadius: '12px', flexShrink: 0 }}
+                sx={{ borderRadius: 0, flexShrink: 0 }}
               />
             ))
           : careers.map((career) => {
@@ -236,7 +236,7 @@ export const CareerJobPostTabs: React.FC = () => {
                           sx={{
                             px: 0.75,
                             py: 0.15,
-                            borderRadius: '6px',
+                            borderRadius: 0,
                             fontSize: '0.7rem',
                             fontWeight: 700,
                             bgcolor: isSelected ? 'rgba(255, 255, 255, 0.22)' : 'rgba(37, 99, 235, 0.08)',
@@ -252,7 +252,7 @@ export const CareerJobPostTabs: React.FC = () => {
                   onClick={() => setSelectedCareerId(career.id)}
                   sx={{
                     height: 40,
-                    borderRadius: '12px',
+                    borderRadius: 0,
                     px: 1,
                     fontWeight: isSelected ? 750 : 600,
                     fontSize: '0.85rem',

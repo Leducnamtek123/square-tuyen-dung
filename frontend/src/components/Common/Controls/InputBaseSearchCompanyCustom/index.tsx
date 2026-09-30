@@ -32,7 +32,7 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
         <Box
           sx={{
           boxShadow: 'none',
-          borderRadius: 999,
+          borderRadius: 0,
           p: '3px 4px',
           display: 'flex',
           alignItems: 'center',

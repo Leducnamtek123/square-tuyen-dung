@@ -411,7 +411,7 @@ const PartnerLogoCarousel: React.FC<PartnerLogoCarouselProps> = ({
                 cursor: 'pointer',
                 px: 1.5,
                 py: 0.75,
-                borderRadius: 1,
+                borderRadius: 0,
                 // Rê chuột vào vùng logo: kích hoạt hiển thị màu sắc đầy đủ và hiệu ứng nổi bật
                 '&:hover .partner-logo-img': {
                   filter: 'grayscale(0%) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.08))',

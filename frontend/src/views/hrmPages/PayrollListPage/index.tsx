@@ -370,8 +370,8 @@ export default function PayrollListPage() {
           <Table>
             <TableHead sx={{ bgcolor: pc.bgDefault(0.5) }}>
               <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>Mã NV</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Nhân viên</TableCell>
+                <TableCell sx={{ fontWeight: 700, position: 'sticky', left: 0, zIndex: 10, bgcolor: 'background.paper', minWidth: 90 }}>Mã NV</TableCell>
+                <TableCell sx={{ fontWeight: 700, position: 'sticky', left: 90, zIndex: 10, bgcolor: 'background.paper', minWidth: 160, borderRight: '1px solid', borderColor: 'divider' }}>Nhân viên</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>Phòng ban</TableCell>
                 <TableCell sx={{ fontWeight: 700 }} align="right">Lương Gross</TableCell>
                 <TableCell sx={{ fontWeight: 700 }} align="center">Công TT / Chuẩn</TableCell>
@@ -414,10 +414,12 @@ export default function PayrollListPage() {
               ) : (
                 payrollRecords.map((row) => (
                   <TableRow key={row.id} hover>
-                    <TableCell sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    <TableCell sx={{ fontWeight: 600, color: 'primary.main', position: 'sticky', left: 0, zIndex: 5, bgcolor: 'background.paper', minWidth: 90 }}>
                       {row.employeeCode || row.employee_code}
                     </TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{row.employeeName || row.employee_name}</TableCell>
+                    <TableCell sx={{ fontWeight: 600, position: 'sticky', left: 90, zIndex: 5, bgcolor: 'background.paper', minWidth: 160, borderRight: '1px solid', borderColor: 'divider' }}>
+                      {row.employeeName || row.employee_name}
+                    </TableCell>
                     <TableCell>{row.departmentName || row.department_name || '-'}</TableCell>
                     <TableCell align="right">{formatVND(row.grossSalary ?? row.gross_salary)}</TableCell>
                     <TableCell align="center">

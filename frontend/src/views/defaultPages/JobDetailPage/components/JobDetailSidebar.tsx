@@ -44,12 +44,21 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
     : '';
 
   return (
-    <Stack spacing={3}>
+    <Stack
+      spacing={3}
+      sx={{
+        maxHeight: { lg: 'calc(100vh - 104px)' },
+        overflowY: { lg: 'auto' },
+        '&::-webkit-scrollbar': { display: 'none' },
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+      }}
+    >
       {/* -- 1. Company Info Card ---------------------------------------- */}
       <Card
         variant="outlined"
         sx={{
-          borderRadius: '16px',
+          borderRadius: 0,
           boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)',
           borderColor: '#e2e8f0',
           backgroundColor: '#ffffff',
@@ -65,7 +74,7 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
               src={companyLogo}
               fallbackSrc={IMAGES.companyLogoDefault}
               sx={{
-                borderRadius: '12px',
+                borderRadius: 0,
                 border: '1px solid #f1f5f9',
                 objectFit: 'contain',
                 p: 0.5,
@@ -125,7 +134,7 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
       <Card
         variant="outlined"
         sx={{
-          borderRadius: '16px',
+          borderRadius: 0,
           boxShadow: '0 4px 20px rgba(15, 23, 42, 0.04)',
           borderColor: '#e2e8f0',
           backgroundColor: '#ffffff',
@@ -136,7 +145,7 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
         <Typography variant="h6" sx={{ fontWeight: 800, color: '#0f172a', mb: 0.75, fontSize: '1rem' }}>
           Việc làm tương tự cho bạn
         </Typography>
-        <Box sx={{ width: 56, height: 3, bgcolor: '#2563eb', borderRadius: 2, mb: 2.5 }} />
+        <Box sx={{ width: 56, height: 3, bgcolor: '#2563eb', borderRadius: 0, mb: 2.5 }} />
 
         <FilterJobPostCard
           compact={true}

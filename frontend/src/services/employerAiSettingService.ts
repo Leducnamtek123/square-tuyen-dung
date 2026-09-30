@@ -463,7 +463,8 @@ export const DEFAULT_EMPLOYER_AI_SETTINGS: EmployerAiSettings = {
   system_prompt: PRESET_HR_PERSONAS[1].systemPromptTemplate,
 };
 
-const STORAGE_KEY = 'sq_employer_ai_custom_settings';
+const STORAGE_KEY = 'employer_ai_custom_settings';
+const LEGACY_STORAGE_KEY = 'sq_employer_ai_custom_settings';
 
 export function mapBackendToSettings(raw: unknown, current: EmployerAiSettings): EmployerAiSettings {
   if (!raw || typeof raw !== 'object') return current;
@@ -590,7 +591,7 @@ export const employerAiSettingService = {
     if (typeof window === 'undefined') return DEFAULT_EMPLOYER_AI_SETTINGS;
 
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
       if (!raw) return DEFAULT_EMPLOYER_AI_SETTINGS;
       const parsed = JSON.parse(raw);
       return {
@@ -645,6 +646,7 @@ export const employerAiSettingService = {
 
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent('employer-ai-settings-updated', { detail: updated }));
       window.dispatchEvent(new CustomEvent('sq-ai-settings-updated', { detail: updated }));
     } catch (e) {
       console.error('Không thể lưu cấu hình AI của Nhà tuyển dụng', e);
@@ -682,6 +684,8 @@ export const employerAiSettingService = {
 
     try {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      window.dispatchEvent(new CustomEvent('employer-ai-settings-updated', { detail: DEFAULT_EMPLOYER_AI_SETTINGS }));
       window.dispatchEvent(new CustomEvent('sq-ai-settings-updated', { detail: DEFAULT_EMPLOYER_AI_SETTINGS }));
     } catch (e) {
       console.error('Không thể đặt lại cấu hình AI', e);

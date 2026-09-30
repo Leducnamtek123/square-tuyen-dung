@@ -1,5 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
+import { presignInObject } from '../utils/presignUrl';
 import { cleanParams } from '../utils/params';
 import type { JobPost } from '../types/models';
 import type { ExportTableRow, PaginatedResponse } from '../types/api';
@@ -156,11 +157,10 @@ const jobService = {
     return httpRequest.get(url) as Promise<JobPostOptionResponse>;
   },
 
-  getJobPosts: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
+  getJobPosts: async (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = 'job/web/job-posts/';
-    return (httpRequest.get(url, { params: cleanParams(params) }) as Promise<unknown>).then((data) =>
-      normalizePaginatedResponse<JobPost>(data)
-    );
+    const data = await httpRequest.get(url, { params: cleanParams(params) });
+    return normalizePaginatedResponse<JobPost>(await presignInObject(data));
   },
 
   getJobPostDetailById: (slug: IdType): Promise<JobPost> => {

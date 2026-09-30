@@ -154,7 +154,7 @@ const ProfileDetailCard: React.FC = () => {
         />
 
         {/* 4. MAIN LAYOUT: CONTENT + SIDEBAR */}
-        <Grid container spacing={3} alignItems="flex-start">
+        <Grid container spacing={3}>
           {/* Left / Main Section (72%) */}
           <Grid size={{ xs: 12, lg: 8.5 }}>
             {activeTab === 'overview' && (

@@ -190,7 +190,6 @@ class JobActivityService:
             var_sys.ApplicationStatus.CONTACTED,
             var_sys.ApplicationStatus.TESTED,
             var_sys.ApplicationStatus.INTERVIEWED,
-            var_sys.ApplicationStatus.HIRED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
         var_sys.ApplicationStatus.CONTACTED: {
@@ -215,11 +214,7 @@ class JobActivityService:
             var_sys.ApplicationStatus.INTERVIEWED,
             var_sys.ApplicationStatus.NOT_SELECTED,
         },
-        var_sys.ApplicationStatus.NOT_SELECTED: {
-            var_sys.ApplicationStatus.PENDING_CONFIRMATION,
-            var_sys.ApplicationStatus.CONTACTED,
-            var_sys.ApplicationStatus.INTERVIEWED,
-        },
+        var_sys.ApplicationStatus.NOT_SELECTED: set(),
     }
 
     @staticmethod
@@ -298,15 +293,16 @@ class JobActivityService:
 
         phone_val = validated_data.get("phone", "")
         if not phone_val and resume and getattr(resume, "job_seeker_profile", None):
-            phone_val = getattr(resume.job_seeker_profile, "phone", "") or getattr(user, "phone", "")
+            phone_val = getattr(resume.job_seeker_profile, "phone", "") or getattr(user, "phone_number", "") or getattr(user, "phone", "")
 
         # Create the activity in its own atomic block
+        user_phone = getattr(user, "phone_number", "") or getattr(user, "phone", "")
         activity_payload = {
             "job_post": job_post,
             "resume": resume,
             "full_name": validated_data.get("full_name", validated_data.get("fullName", user.full_name)),
             "email": validated_data.get("email", user.email),
-            "phone": phone_val or getattr(user, "phone", ""),
+            "phone": phone_val or user_phone,
         }
         with transaction.atomic():
             activity, _ = JobPostActivity.objects.get_or_create(
@@ -651,7 +647,7 @@ class JobViewService:
             return f"usr_{user.id}"
         ip = cls.get_client_ip(request)
         ua = request.META.get("HTTP_USER_AGENT", "")
-        ua_hash = hashlib.md5(ua.encode("utf-8", errors="ignore")).hexdigest()[:10]
+        ua_hash = hashlib.md5(ua.encode("utf-8", errors="ignore"), usedforsecurity=False).hexdigest()[:10]
         return f"anon_{ip}_{ua_hash}"
 
     @classmethod

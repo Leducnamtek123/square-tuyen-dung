@@ -1,0 +1,59 @@
+# =============================================================================
+# InfoHR (Square Tuyển Dụng) — Prometheus Alert Rules
+# =============================================================================
+
+groups:
+  - name: infohr_core_alerts
+    rules:
+      # --- 1. Voice AI & WebRTC Services ---
+      - alert: LiveKitServerDown
+        expr: up{job="livekit"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: voice_ai
+        annotations:
+          summary: "LiveKit SFU Server is down!"
+          description: "LiveKit WebRTC server (instance {{ $labels.instance }}) has been unreachable for more than 1 minute. Live voice interviews will fail."
+
+      # --- 2. System Resources ---
+      - alert: HostHighCpuUsage
+        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)) > 85
+        for: 5m
+        labels:
+          severity: warning
+          category: infrastructure
+        annotations:
+          summary: "Host CPU utilization is critically high (> 85%)"
+          description: "CPU load on instance {{ $labels.instance }} has exceeded 85% for 5 consecutive minutes (current: {{ $value | printf \"%.1f\" }}%)."
+
+      - alert: HostHighMemoryUsage
+        expr: ((1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100) > 90
+        for: 5m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Host RAM utilization is critically high (> 90%)"
+          description: "Available system memory is below 10% on {{ $labels.instance }} (current: {{ $value | printf \"%.1f\" }}% used). Risk of OOM killer terminating core services."
+
+      - alert: HostDiskFilling
+        expr: ((node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100) < 15
+        for: 5m
+        labels:
+          severity: critical
+          category: storage
+        annotations:
+          summary: "Host root disk space is dangerously low (< 15%)"
+          description: "Disk mountpoint {{ $labels.mountpoint }} has less than 15% free space remaining."
+
+      # --- 3. Prometheus Target Availability ---
+      - alert: MonitoringTargetMissing
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: warning
+          category: monitoring
+        annotations:
+          summary: "A monitored target service is unreachable"
+          description: "Target {{ $labels.job }} on {{ $labels.instance }} has been down for more than 2 minutes."

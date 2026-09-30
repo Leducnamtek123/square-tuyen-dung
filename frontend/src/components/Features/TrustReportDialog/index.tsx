@@ -151,7 +151,7 @@ const TrustReportDialogContent = ({
         },
         paper: {
           sx: {
-            borderRadius: '24px',
+            borderRadius: 0,
             maxWidth: '500px',
             mx: { xs: 2, sm: 'auto' },
             overflow: 'hidden',
@@ -167,7 +167,7 @@ const TrustReportDialogContent = ({
           {/* Header */}
           <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-3.5">
             <div className="flex items-center gap-3">
-              <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 shadow-xs">
+              <div className="flex size-11 shrink-0 items-center justify-center rounded-none bg-rose-50 border border-rose-100 text-rose-600 shadow-xs">
                 <ShieldAlert className="size-5" />
               </div>
               <div>
@@ -187,7 +187,7 @@ const TrustReportDialogContent = ({
               aria-label="close"
               sx={{
                 color: '#64748b',
-                borderRadius: '10px',
+                borderRadius: 0,
                 border: '1px solid #f1f5f9',
                 p: 0.75,
                 '&:hover': {
@@ -202,8 +202,8 @@ const TrustReportDialogContent = ({
 
           {/* Target entity context card */}
           {targetName ? (
-            <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
-              <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white border border-slate-200 text-slate-500 shadow-xs">
+            <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-none bg-slate-50 border border-slate-200/80">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-none bg-white border border-slate-200 text-slate-500 shadow-xs">
                 {targetType === 'job' ? (
                   <Briefcase className="size-4 text-blue-600" />
                 ) : (
@@ -244,7 +244,7 @@ const TrustReportDialogContent = ({
                         aria-checked={isSelected}
                         disabled={isSubmitting}
                         onClick={() => field.onChange(option.value)}
-                        className={`w-full group flex items-center justify-between p-2.5 sm:px-3 sm:py-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        className={`w-full group flex items-center justify-between p-2.5 sm:px-3 sm:py-2.5 rounded-none border text-left transition-all cursor-pointer ${
                           isSelected
                             ? 'border-blue-600 bg-blue-50/50 shadow-xs ring-1 ring-blue-600/20'
                             : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
@@ -252,7 +252,7 @@ const TrustReportDialogContent = ({
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div
-                            className={`flex size-7 shrink-0 items-center justify-center rounded-lg border transition-colors ${option.badgeColor}`}
+                            className={`flex size-7 shrink-0 items-center justify-center rounded-none border transition-colors ${option.badgeColor}`}
                           >
                             <IconComp className="size-3.5" />
                           </div>
@@ -311,14 +311,14 @@ const TrustReportDialogContent = ({
                   maxLength={500}
                   disabled={isSubmitting}
                   placeholder={t('public:jobDetail.reportMessagePlaceholder')}
-                  className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-xs transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 disabled:bg-slate-50"
+                  className="w-full resize-none rounded-none border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-xs transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 disabled:bg-slate-50"
                 />
               )}
             />
           </div>
 
           {/* Trust notice */}
-          <div className="flex items-start gap-2.5 rounded-xl bg-slate-50 border border-slate-200/70 p-2.5 text-xs text-slate-600">
+          <div className="flex items-start gap-2.5 rounded-none bg-slate-50 border border-slate-200/70 p-2.5 text-xs text-slate-600">
             <ShieldCheck className="size-4 text-emerald-600 shrink-0 mt-0.5" />
             <span className="leading-relaxed">
               {t('public:jobDetail.reportPrivacyNotice')}
@@ -331,14 +331,14 @@ const TrustReportDialogContent = ({
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-none border border-slate-200 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition active:scale-[0.98] disabled:opacity-50 cursor-pointer"
             >
               {t('common:actions.cancel')}
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm font-semibold text-white shadow-sm transition active:scale-[0.98] disabled:opacity-60 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

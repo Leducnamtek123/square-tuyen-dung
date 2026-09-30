@@ -100,11 +100,7 @@ def format_opening_greeting(
 def get_tts_cache_dir() -> str:
     cache_dir = getattr(settings, "TTS_CACHE_DIR", "/tmp/tts_cache")
     try:
-        os.makedirs(cache_dir, exist_ok=True)
-        try:
-            os.chmod(cache_dir, 0o777)
-        except Exception:
-            pass
+        os.makedirs(cache_dir, mode=0o750, exist_ok=True)
     except Exception as exc:
         logger.warning("Failed to create TTS cache dir %s: %s", cache_dir, exc)
     return cache_dir

@@ -153,8 +153,6 @@ const MainJobRightBanner = () => {
     <Stack
       spacing={2}
       sx={{
-        position: "sticky",
-        top: { xs: 0, md: 88 },
         pb: 2,
         px: { xs: 2, md: 0 },
       }}

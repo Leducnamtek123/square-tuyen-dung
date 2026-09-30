@@ -123,8 +123,19 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
   };
 
   return (
-    <Stack spacing={3}>
-      {/* 1. THÔNG TIN LIÊN HỆ */}
+    <Box
+      sx={{
+        position: { xs: 'static', lg: 'sticky' },
+        top: { lg: 84 },
+        maxHeight: { lg: 'calc(100vh - 104px)' },
+        overflowY: { lg: 'auto' },
+        '&::-webkit-scrollbar': { display: 'none' },
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+      }}
+    >
+      <Stack spacing={3}>
+        {/* 1. THÔNG TIN LIÊN HỆ */}
       <Paper
         elevation={0}
         sx={{
@@ -558,7 +569,8 @@ export const CandidateSidebar: React.FC<CandidateSidebarProps> = ({ profileDetai
           {isSavingRating ? 'Đang lưu...' : 'Lưu đánh giá'}
         </Button>
       </Paper>
-    </Stack>
+      </Stack>
+    </Box>
   );
 };
 

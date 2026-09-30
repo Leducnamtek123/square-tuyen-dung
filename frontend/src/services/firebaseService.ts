@@ -226,8 +226,14 @@ const generateKeywords = (displayName: string): string[] => {
 };
 
 export const setupRecaptcha = (containerId: string): RecaptchaVerifier => {
+  if (typeof document !== 'undefined') {
+    const el = document.getElementById(containerId);
+    if (el) {
+      el.innerHTML = '';
+    }
+  }
   return new RecaptchaVerifier(auth, containerId, {
-    size: 'normal',
+    size: 'invisible',
     callback: () => {
       // reCAPTCHA solved, allow signInWithPhoneNumber.
     },

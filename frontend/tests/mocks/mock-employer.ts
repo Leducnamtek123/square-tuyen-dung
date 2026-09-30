@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
-import { setupEmployerApiMocks, MOCK_JOBS } from '../helpers/mockApi';
+import { setupEmployerApiMocks, setupAuthApiMocks, MOCK_JOBS } from '../helpers/mockApi';
+import { DEFAULT_EMPLOYER } from '../helpers/auth';
 
 export const MOCK_COMPANY_VERIFICATION = {
   id: 1,
@@ -122,6 +123,14 @@ export const MOCK_INTERVIEW_DETAIL_COMPLETED = {
  */
 export async function setupDomainEmployerMocks(page: Page) {
   await setupEmployerApiMocks(page);
+  await setupAuthApiMocks(page, {
+    role: 'EMPLOYER',
+    id: DEFAULT_EMPLOYER.id,
+    email: DEFAULT_EMPLOYER.email,
+    fullName: DEFAULT_EMPLOYER.fullName,
+    companyId: DEFAULT_EMPLOYER.companyId,
+    companyName: DEFAULT_EMPLOYER.companyName,
+  });
 
   // Mock company verification (GET / PUT)
   await page.route(/\/info\/web\/company-verification\/?(\?.*)?$/, async (route) => {

@@ -38,6 +38,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { toast } from 'sonner';
+import AnimatedFlame from '@/components/Common/AnimatedFlame';
 
 import { useAppSelector } from '@/redux/hooks';
 import commonService from '@/services/commonService';
@@ -114,36 +115,36 @@ const FEATURED_FALLBACK_SETS: CompanyQuestionSet[] = [
 ];
 
 const TRUST_METRICS = [
-  { value: '100.000+', label: 'Lượt phỏng vấn thử thành công' },
-  { value: '94%', label: 'Ứng viên vượt qua phỏng vấn thật' },
+  { value: '100.000+', label: 'Lượt phỏng vấn hoàn thành' },
+  { value: '94%', label: 'Tự tin khi phỏng vấn thật' },
   { value: '1.200+', label: 'Bộ câu hỏi chuẩn doanh nghiệp' },
-  { value: '< 300ms', label: 'Độ trễ AI phản hồi giọng nói' },
+  { value: '< 300ms', label: 'Tốc độ phản hồi giọng nói' },
 ];
 
 const BENTO_FEATURES = [
   {
     icon: <GraphicEqIcon sx={{ fontSize: 26, color: '#2563EB' }} />,
-    title: 'Mô phỏng giọng nói 1-1 tự nhiên',
+    title: 'Hội thoại giọng nói tự nhiên',
     description:
-      'Công nghệ AI Voice-to-Voice thời gian thực. Trợ lý AI tương tác mượt mà bằng tiếng Việt, phản hồi linh hoạt theo câu trả lời của bạn thay vì đọc kịch bản cứng nhắc.',
-    tag: 'Voice AI 2026',
+      'Giao tiếp hai chiều bằng tiếng Việt mượt mà, phản hồi linh hoạt theo mạch đối đáp thực tế thay vì những câu hỏi rập khuôn.',
+    tag: 'Voice Interaction',
     iconBg: '#EFF6FF',
     iconBorder: '#DBEAFE',
   },
   {
     icon: <AssessmentOutlinedIcon sx={{ fontSize: 26, color: '#DC2626' }} />,
-    title: 'Báo cáo chấm điểm đa chiều tức thì',
+    title: 'Đánh giá đa chiều tức thì',
     description:
-      'Đánh giá toàn diện 5 tiêu chuẩn: Kiến thức chuyên môn, Độ tự tin (Confidence), Phát âm & Ngữ điệu, Độ trôi chảy (Fluency), và Tốc độ nhả chữ chuẩn xác.',
-    tag: 'Real-time Scoring',
+      'Phân tích toàn diện từ kiến thức chuyên môn, độ lưu loát đến phong thái và ngữ điệu trả lời, kèm nhận xét chi tiết sau mỗi câu hỏi.',
+    tag: 'Instant Scoring',
     iconBg: 'rgba(239, 68, 68, 0.08)',
     iconBorder: 'rgba(239, 68, 68, 0.2)',
   },
   {
     icon: <BusinessIcon sx={{ fontSize: 26, color: '#16A34A' }} />,
-    title: 'Ngân hàng câu hỏi chuẩn thực chiến',
+    title: 'Ngân hàng câu hỏi thực chiến',
     description:
-      'Hơn 1.200 bộ câu hỏi được tổng hợp từ các đợt tuyển dụng thực tế của hàng trăm doanh nghiệp hàng đầu: IT, Marketing, Sales, Tài chính, Kế toán, HR...',
+      'Hơn 1.200 bộ câu hỏi đúc kết từ các đợt tuyển dụng thực tế của doanh nghiệp hàng đầu: IT, Marketing, Sales, Tài chính, Nhân sự...',
     tag: 'Enterprise Sets',
     iconBg: 'rgba(34, 197, 94, 0.08)',
     iconBorder: 'rgba(34, 197, 94, 0.2)',
@@ -152,8 +153,8 @@ const BENTO_FEATURES = [
     icon: <LockOpenIcon sx={{ fontSize: 26, color: '#4F46E5' }} />,
     title: 'Không gian riêng tư, không áp lực',
     description:
-      'Thoải mái thử nghiệm, luyện tập nhiều lần và sửa chữa lỗi sai trong phòng phỏng vấn riêng biệt trước khi bước vào cuộc gặp trực tiếp với nhà tuyển dụng.',
-    tag: '100% Private & Free',
+      'Chủ động luyện tập và hoàn thiện kỹ năng trong không gian riêng biệt, không giới hạn số lần trước khi bước vào phỏng vấn chính thức.',
+    tag: '100% Private',
     iconBg: 'rgba(79, 70, 229, 0.08)',
     iconBorder: 'rgba(79, 70, 229, 0.2)',
   },
@@ -163,19 +164,19 @@ const STEPS = [
   {
     step: '01',
     title: 'Chọn vị trí & bộ câu hỏi',
-    description: 'Lựa chọn ngành nghề mục tiêu hoặc tải CV để Trợ lý AI tự động cá nhân hóa câu hỏi phù hợp nhất với bạn.',
+    description: 'Lựa chọn ngành nghề mục tiêu hoặc tải CV để hệ thống gợi ý bộ câu hỏi sát với hồ sơ của bạn.',
     image: '/images/practice/step1_select_job.jpg',
   },
   {
     step: '02',
-    title: 'Bật micro & camera thực hành',
-    description: 'Trò chuyện trực tiếp cùng AI Interviewer trong phòng phỏng vấn ảo, rèn luyện phản xạ và thần thái trả lời.',
+    title: 'Bật micro & thực hành',
+    description: 'Trò chuyện trực tiếp trong không gian phỏng vấn mô phỏng, rèn luyện phản xạ và phong thái tự tin.',
     image: '/images/practice/step2_interview_session.jpg',
   },
   {
     step: '03',
-    title: 'Xem bảng điểm & gợi ý trả lời',
-    description: 'Nhận ngay báo cáo phân tích điểm mạnh, điểm cần khắc phục cùng câu trả lời mẫu tối ưu từ chuyên gia.',
+    title: 'Xem đánh giá & gợi ý hoàn thiện',
+    description: 'Nhận báo cáo phân tích chi tiết điểm mạnh, điểm cần khắc phục cùng câu trả lời mẫu chuẩn phương pháp STAR.',
     image: '/images/practice/step3_score_report.jpg',
   },
 ];
@@ -311,18 +312,63 @@ const PracticeLandingPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: '#F8FAFC', color: '#0F172A', overflow: 'hidden' }}>
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        bgcolor: '#F8FAFC',
+        color: '#0F172A',
+        overflow: 'hidden',
+        minHeight: '100vh',
+      }}
+    >
+      {/* Full-Page Continuous Modern Tech Grid / Caro Pattern */}
+      <Box
+        aria-hidden="true"
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          zIndex: 0,
+          backgroundImage: `
+            linear-gradient(to right, rgba(148, 163, 184, 0.14) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(148, 163, 184, 0.14) 1px, transparent 1px)
+          `,
+          backgroundSize: '36px 36px',
+          backgroundRepeat: 'repeat',
+        }}
+      />
+
       {/* 1. HERO SECTION */}
       <Box
         sx={{
           position: 'relative',
-          pt: { xs: 4, sm: 6, md: 8 },
+          pt: { xs: 5, sm: 7, md: 8.5 },
           pb: { xs: 5, sm: 7, md: 9 },
-          background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
+          backgroundColor: 'transparent',
           borderBottom: '1px solid #E2E8F0',
+          overflow: 'hidden',
+          zIndex: 1,
         }}
       >
-        <Container maxWidth="lg">
+        {/* Delicate Modern Tech Glow Accent */}
+        <Box
+          aria-hidden="true"
+          sx={{
+            position: 'absolute',
+            top: '-5%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: { xs: '320px', sm: '560px', md: '840px' },
+            height: { xs: '260px', sm: '380px', md: '420px' },
+            background: 'radial-gradient(ellipse, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.02) 50%, transparent 75%)',
+            filter: 'blur(36px)',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           {/* Top Pill Badge with Brand Red Accent */}
           <Box sx={{ textAlign: 'center', mb: 2.5 }}>
             <Box
@@ -338,21 +384,7 @@ const PracticeLandingPage: React.FC = () => {
                 boxShadow: '0 2px 8px rgba(37, 99, 235, 0.06)',
               }}
             >
-              <Box
-                component="span"
-                sx={{
-                  bgcolor: '#EF4444',
-                  color: '#FFFFFF',
-                  fontSize: '10px',
-                  fontWeight: 900,
-                  px: 0.75,
-                  py: 0.25,
-                  borderRadius: '4px',
-                  lineHeight: 1,
-                }}
-              >
-                HOT
-              </Box>
+              <AnimatedFlame size={18} />
               <Typography
                 sx={{
                   fontSize: '13px',
@@ -361,7 +393,7 @@ const PracticeLandingPage: React.FC = () => {
                   letterSpacing: '0.01em',
                 }}
               >
-                Công nghệ Phỏng vấn thử AI 1-1 • Độc quyền InfoHR
+                Luyện phỏng vấn thực chiến • Voice AI InfoHR
               </Typography>
             </Box>
           </Box>
@@ -371,20 +403,17 @@ const PracticeLandingPage: React.FC = () => {
             component="h1"
             sx={{
               fontWeight: 900,
-              fontSize: { xs: '24px', sm: '38px', md: '46px' },
+              fontSize: { xs: '26px', sm: '38px', md: '46px' },
               lineHeight: 1.25,
               textAlign: 'center',
               letterSpacing: '-0.03em',
               color: '#0F172A',
               maxWidth: '860px',
               mx: 'auto',
-              mb: 2.5,
+              mb: 2.25,
             }}
           >
             Luyện Phỏng Vấn Thử{' '}
-            <Box component="span" sx={{ whiteSpace: 'nowrap' }}>
-              AI 1-1
-            </Box>{' '}
             <Box
               component="span"
               sx={{
@@ -399,17 +428,16 @@ const PracticeLandingPage: React.FC = () => {
           {/* Subtitle */}
           <Typography
             sx={{
-              fontSize: { xs: '14.5px', sm: '16px', md: '17px' },
+              fontSize: { xs: '15px', sm: '16.5px' },
               color: '#475569',
               textAlign: 'center',
               maxWidth: '680px',
               mx: 'auto',
-              lineHeight: 1.6,
+              lineHeight: 1.65,
               mb: 4,
             }}
           >
-            Tự tin chinh phục mọi nhà tuyển dụng với trợ lý ảo AI phỏng vấn giọng nói hai chiều thời gian thực,
-            phân tích biểu cảm camera, chấm điểm độ tự tin và gợi ý hoàn thiện câu trả lời tức thì.
+            Rèn luyện phản xạ đối đáp bằng giọng nói thực tế, nhận đánh giá chuyên sâu và gợi ý câu trả lời tối ưu giúp bạn tự tin trước mọi nhà tuyển dụng.
           </Typography>
 
           {/* Primary Action Buttons */}
@@ -535,15 +563,16 @@ const PracticeLandingPage: React.FC = () => {
       <Box
         sx={{
           py: { xs: 6, sm: 8, md: 10 },
-          bgcolor: '#F8FAFC',
+          bgcolor: 'transparent',
           borderBottom: '1px solid #E2E8F0',
           position: 'relative',
+          zIndex: 1,
         }}
       >
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 5.5 } }}>
             <Chip
-              label="TRỰC QUAN GIAO DIỆN PHÒNG PHỎNG VẤN ẢO"
+              label="TRỰC QUAN GIAO DIỆN PHÒNG PHỎNG VẤN"
               size="small"
               sx={{
                 bgcolor: '#EFF6FF',
@@ -575,8 +604,7 @@ const PracticeLandingPage: React.FC = () => {
                 lineHeight: 1.6,
               }}
             >
-              Hệ thống tích hợp công nghệ AI Vision & Voice thông minh, phân tích độ tự tin và kỹ năng của ứng viên
-              ngay trong từng câu trả lời.
+              Không gian phỏng vấn mô phỏng chân thực, đánh giá chuẩn xác phong thái và năng lực trả lời trong từng câu hỏi.
             </Typography>
           </Box>
 
@@ -595,7 +623,7 @@ const PracticeLandingPage: React.FC = () => {
             <Box
               component="img"
               src="/images/practice/ai_mock_interview_showcase.webp"
-              alt="InfoHR AI Mock Interview Studio Interface Mockup"
+              alt="InfoHR Mock Interview Studio Interface Mockup"
               loading="lazy"
               decoding="async"
               sx={{
@@ -639,10 +667,10 @@ const PracticeLandingPage: React.FC = () => {
                 </Box>
                 <Box>
                   <Typography sx={{ fontSize: '13.5px', fontWeight: 700, color: '#0F172A' }}>
-                    Giọng nói AI hai chiều
+                    Đối thoại giọng nói tự nhiên
                   </Typography>
                   <Typography sx={{ fontSize: '12px', color: '#64748B', mt: 0.25 }}>
-                    Phản hồi tức thì &lt;300ms
+                    Phản xạ mượt mà, tức thì
                   </Typography>
                 </Box>
               </Card>
@@ -679,7 +707,7 @@ const PracticeLandingPage: React.FC = () => {
                 </Box>
                 <Box>
                   <Typography sx={{ fontSize: '13.5px', fontWeight: 700, color: '#0F172A' }}>
-                    Báo cáo chấm điểm đa chiều
+                    Báo cáo năng lực đa chiều
                   </Typography>
                   <Typography sx={{ fontSize: '12px', color: '#64748B', mt: 0.25 }}>
                     Đánh giá tự tin &amp; chuyên môn
@@ -719,10 +747,10 @@ const PracticeLandingPage: React.FC = () => {
                 </Box>
                 <Box>
                   <Typography sx={{ fontSize: '13.5px', fontWeight: 700, color: '#0F172A' }}>
-                    Gợi ý trả lời tối ưu
+                    Gợi ý câu trả lời tối ưu
                   </Typography>
                   <Typography sx={{ fontSize: '12px', color: '#64748B', mt: 0.25 }}>
-                    Khắc phục lỗi sai chuẩn STAR
+                    Chuẩn phương pháp STAR
                   </Typography>
                 </Box>
               </Card>
@@ -732,7 +760,7 @@ const PracticeLandingPage: React.FC = () => {
       </Box>
 
       {/* 3. BENTO CORE ADVANTAGES */}
-      <Box sx={{ py: { xs: 6, sm: 8, md: 10 }, bgcolor: '#FFFFFF' }}>
+      <Box sx={{ py: { xs: 6, sm: 8, md: 10 }, bgcolor: 'transparent', position: 'relative', zIndex: 1 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
             <Typography
@@ -757,10 +785,10 @@ const PracticeLandingPage: React.FC = () => {
                 mb: 1.5,
               }}
             >
-              Tại Sao Nên Luyện Phỏng Vấn Cùng InfoHR AI?
+              Tại Sao Nên Luyện Phỏng Vấn Cùng InfoHR?
             </Typography>
             <Typography sx={{ color: '#64748B', fontSize: '15.5px', maxWidth: '640px', mx: 'auto', lineHeight: 1.6 }}>
-              Giải pháp đột phá giúp loại bỏ hoàn toàn tâm lý lo âu, sẵn sàng câu trả lời sắc sảo trước mọi nhà tuyển dụng.
+              Giải tỏa áp lực tâm lý, rèn luyện phản xạ đối đáp sắc sảo và tự tin chinh phục nhà tuyển dụng.
             </Typography>
           </Box>
 
@@ -843,7 +871,7 @@ const PracticeLandingPage: React.FC = () => {
       </Box>
 
       {/* 4. 3-STEP PROCESS SECTION WITH RICH 3D ILLUSTRATIONS */}
-      <Box sx={{ py: { xs: 6, sm: 8, md: 10 }, bgcolor: '#F8FAFC', borderTop: '1px solid #E2E8F0' }}>
+      <Box sx={{ py: { xs: 6, sm: 8, md: 10 }, bgcolor: 'transparent', borderTop: '1px solid #E2E8F0', position: 'relative', zIndex: 1 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
             <Typography
@@ -981,8 +1009,10 @@ const PracticeLandingPage: React.FC = () => {
         id="question-sets-section"
         sx={{
           py: { xs: 6, sm: 8, md: 10 },
-          bgcolor: '#FFFFFF',
+          bgcolor: 'transparent',
           borderTop: '1px solid #E2E8F0',
+          position: 'relative',
+          zIndex: 1,
         }}
       >
         <Container maxWidth="lg">
@@ -1041,7 +1071,7 @@ const PracticeLandingPage: React.FC = () => {
                 width: { xs: '100%', md: 320 },
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '12px',
-                  backgroundColor: '#F8FAFC',
+                  backgroundColor: '#FFFFFF',
                 },
               }}
             />
@@ -1068,7 +1098,7 @@ const PracticeLandingPage: React.FC = () => {
                 sx={{
                   fontWeight: 700,
                   borderRadius: '8px',
-                  backgroundColor: selectedCareerId === null ? '#2563EB' : 'transparent',
+                  backgroundColor: selectedCareerId === null ? '#2563EB' : '#FFFFFF',
                   color: selectedCareerId === null ? '#FFFFFF' : '#475569',
                   borderColor: selectedCareerId === null ? '#2563EB' : '#CBD5E1',
                   '&:hover': {
@@ -1085,7 +1115,7 @@ const PracticeLandingPage: React.FC = () => {
                   sx={{
                     fontWeight: 600,
                     borderRadius: '8px',
-                    backgroundColor: selectedCareerId === c.id ? '#2563EB' : 'transparent',
+                    backgroundColor: selectedCareerId === c.id ? '#2563EB' : '#FFFFFF',
                     color: selectedCareerId === c.id ? '#FFFFFF' : '#475569',
                     borderColor: selectedCareerId === c.id ? '#2563EB' : '#CBD5E1',
                     '&:hover': {
@@ -1306,7 +1336,7 @@ const PracticeLandingPage: React.FC = () => {
       </Box>
 
       {/* 6. BOTTOM BANNER CTA (HIGH-END 3D ILLUSTRATED BANNER) */}
-      <Box sx={{ py: { xs: 6, sm: 8 }, bgcolor: '#FFFFFF', borderTop: '1px solid #E2E8F0' }}>
+      <Box sx={{ py: { xs: 6, sm: 8 }, bgcolor: 'transparent', borderTop: '1px solid #E2E8F0', position: 'relative', zIndex: 1 }}>
         <Container maxWidth="lg">
           <Box
             sx={{
@@ -1397,7 +1427,7 @@ const PracticeLandingPage: React.FC = () => {
                   mx: { xs: 'auto', md: 0 },
                 }}
               >
-                Hàng ngàn ứng viên đã tự tin nắm bắt cơ hội nghề nghiệp mơ ước nhờ luyện tập trước cùng Trợ lý AI InfoHR.
+                Hàng ngàn ứng viên đã tự tin nắm bắt cơ hội nghề nghiệp mơ ước nhờ luyện tập thuần thục và nhận phản hồi chi tiết từ InfoHR.
               </Typography>
 
               <Stack
@@ -1430,7 +1460,7 @@ const PracticeLandingPage: React.FC = () => {
                     },
                   }}
                 >
-                  Bắt đầu phỏng vấn thử miễn phí ngay
+                  Bắt đầu phỏng vấn thử ngay
                 </Button>
               </Stack>
 
@@ -1508,11 +1538,13 @@ const PracticeLandingPage: React.FC = () => {
         onClose={() => setIsAuthPromptOpen(false)}
         maxWidth="xs"
         fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: '20px',
-            p: 1.5,
-            boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: '20px',
+              p: 1.5,
+              boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+            },
           },
         }}
       >
@@ -1522,7 +1554,7 @@ const PracticeLandingPage: React.FC = () => {
               <AutoAwesomeIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography sx={{ fontWeight: 800, fontSize: '17px', color: '#0F172A' }}>
-              Bắt Đầu Phỏng Vấn Cùng AI
+              Bắt Đầu Luyện Phỏng Vấn
             </Typography>
           </Box>
           <IconButton size="small" onClick={() => setIsAuthPromptOpen(false)}>
@@ -1532,7 +1564,7 @@ const PracticeLandingPage: React.FC = () => {
 
         <DialogContent sx={{ pt: 1.5 }}>
           <Typography sx={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, mb: 2 }}>
-            Đăng nhập tài khoản Ứng viên để Trợ lý AI có thể cá nhân hóa bộ câu hỏi theo hồ sơ của bạn, lưu lại lịch sử
+            Đăng nhập tài khoản Ứng viên để hệ thống cá nhân hóa bộ câu hỏi theo hồ sơ của bạn, lưu lại lịch sử
             phỏng vấn và xuất bảng phân tích năng lực chi tiết.
           </Typography>
 

@@ -7,6 +7,14 @@ global:
   evaluation_interval: 15s
   scrape_timeout: 10s
 
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+rule_files:
+  - "/etc/prometheus/alert.rules.yml"
+
 scrape_configs:
   # ---------------------------------------------------------------------------
   # 1. Self-Monitoring (Prometheus engine)

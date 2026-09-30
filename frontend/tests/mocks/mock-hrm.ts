@@ -51,7 +51,7 @@ export async function setupDomainHrmMocks(page: Page, options?: SetupHrmOptions)
       });
       return;
     }
-    await route.continue();
+    await route.fallback();
   });
 
   // Mock tạo nhân viên mới hoặc kiểm tra trùng mã
@@ -70,7 +70,7 @@ export async function setupDomainHrmMocks(page: Page, options?: SetupHrmOptions)
         });
         return;
       }
-      await route.continue();
+      await route.fallback();
     });
   }
 
@@ -117,7 +117,7 @@ export async function setupDomainHrmMocks(page: Page, options?: SetupHrmOptions)
       });
       return;
     }
-    await route.continue();
+    await route.fallback();
   });
 
   // Mock phê duyệt / từ chối yêu cầu chấm công (Stage 1 / Stage 2 / Reject)

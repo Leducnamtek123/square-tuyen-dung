@@ -32,7 +32,7 @@ export const CandidateFooter: React.FC = () => {
   const infoLinks = [
     { label: t('footer.careerGuide', 'Cẩm nang nghề nghiệp'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, lang) },
     { label: t('footer.createCv', 'Tạo CV trực tuyến'), route: localizeRoutePath('/tao-cv', lang) },
-    { label: t('footer.servicePricing', 'Báo giá dịch vụ'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang) },
+    { label: t('footer.servicePricing', 'Báo giá dịch vụ'), route: 'https://ntd.infohr.vn/bao-gia', isExternal: true },
     { label: t('footer.termsOfUse', 'Điều khoản sử dụng'), route: `/${ROUTES.JOB_SEEKER.TERMS_HTML}` },
     { label: t('footer.privacyPolicy', 'Quy định bảo mật'), route: `/${ROUTES.JOB_SEEKER.PRIVACY_HTML}` },
     { label: t('footer.sitemap', 'Sơ đồ trang web'), route: `/${ROUTES.JOB_SEEKER.SITEMAP_HTML}` },
@@ -121,8 +121,10 @@ export const CandidateFooter: React.FC = () => {
                 {infoLinks.map((item) => (
                   <Box
                     key={item.label}
-                    component={Link}
+                    component={item.isExternal ? 'a' : Link}
                     href={item.route}
+                    {...(!item.isExternal && { prefetch: false })}
+                    {...(item.isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
                     sx={{
                       color: '#475569',
                       fontSize: '0.875rem',

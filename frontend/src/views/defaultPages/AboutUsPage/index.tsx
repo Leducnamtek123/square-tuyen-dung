@@ -13,220 +13,350 @@ import {
   Typography,
   Chip,
   Avatar,
+  Divider,
 } from '@mui/material';
+import {
+  Building2,
+  Cpu,
+  ShieldCheck,
+  CheckCircle2,
+  ArrowRight,
+  ExternalLink,
+  Layers,
+  Radio,
+  Users,
+  Lock,
+  Compass,
+  Briefcase,
+  AlertCircle,
+  Sparkles,
+  Workflow,
+  Scale,
+  HardHat,
+  Home,
+  DraftingCompass,
+  Zap,
+} from 'lucide-react';
+import { getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 
-// Icons
-import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
-import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
-import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
-import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
-import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
-import ApartmentIcon from '@mui/icons-material/Apartment';
-import ArchitectureIcon from '@mui/icons-material/Architecture';
-import EngineeringIcon from '@mui/icons-material/Engineering';
-import BoltIcon from '@mui/icons-material/Bolt';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import SpeedIcon from '@mui/icons-material/Speed';
-import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import HandshakeOutlinedIcon from '@mui/icons-material/HandshakeOutlined';
-import HubOutlinedIcon from '@mui/icons-material/HubOutlined';
-import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
-import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import {
+  GSAP_MEDIA_CONDITIONS,
+  registerGsapPlugins,
+} from '@/utils/gsapHelpers';
 
 import { TabTitle } from '@/utils/generalFunction';
 import { APP_NAME } from '@/configs/constants';
 import { useTranslation } from 'react-i18next';
 
+registerGsapPlugins();
+
 export default function AboutUsPage() {
   const { t } = useTranslation('about');
-  TabTitle(t('aboutUsPage.tabTitle', { appName: APP_NAME, defaultValue: `Về chúng tôi - Hệ sinh thái Tuyển dụng & Quản trị Nhân sự ${APP_NAME}` }));
+  TabTitle(t('aboutUsPage.tabTitle', { appName: APP_NAME, defaultValue: `Về chúng tôi — Nền tảng Tuyển dụng Chuyên ngành & Phỏng vấn Voice AI | ${APP_NAME}` }));
 
-  // 4 Nhóm ngành trọng điểm
-  const focusIndustries = [
-    { label: t('aboutUsPage.industries.construction', { defaultValue: 'Xây dựng' }), icon: EngineeringIcon },
-    { label: t('aboutUsPage.industries.realEstate', { defaultValue: 'Bất động sản' }), icon: ApartmentIcon },
-    { label: t('aboutUsPage.industries.architecture', { defaultValue: 'Kiến trúc / Thiết kế nội thất' }), icon: ArchitectureIcon },
-    { label: t('aboutUsPage.industries.mep', { defaultValue: 'Kỹ thuật & Cơ điện (MEP)' }), icon: BoltIcon },
-  ];
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // 4 Thước đo số liệu bảo chứng
-  const stats = [
-    { num: '50.000+', label: t('aboutUsPage.stats.candidates', { defaultValue: 'Ứng viên tài năng kết nối' }), desc: t('aboutUsPage.stats.candidatesDesc', { defaultValue: 'Hồ sơ chuyên môn cao' }) },
-    { num: '1.200+', label: t('aboutUsPage.stats.companies', { defaultValue: 'Doanh nghiệp đồng hành' }), desc: t('aboutUsPage.stats.companiesDesc', { defaultValue: 'Tập đoàn & đối tác uy tín' }) },
-    { num: '98%', label: t('aboutUsPage.stats.satisfaction', { defaultValue: 'Độ hài lòng tuyển dụng' }), desc: t('aboutUsPage.stats.satisfactionDesc', { defaultValue: 'Đánh giá tích cực từ đối tác' }) },
-    { num: '24/7', label: t('aboutUsPage.stats.aiOperating', { defaultValue: 'Vận hành & Phỏng vấn AI' }), desc: t('aboutUsPage.stats.aiOperatingDesc', { defaultValue: 'Không giới hạn thời gian' }) },
-  ];
+  // GSAP animation definitions for smooth entrance
+  useGSAP(
+    () => {
+      const el = containerRef.current;
+      if (!el) return;
+      const has = (selector: string) => !!el.querySelector(selector);
+      const mm = gsap.matchMedia();
 
-  // 4 Bento Cards - Giá trị cốt lõi
-  const coreValues = [
-    {
-      title: t('aboutUsPage.coreValues.aiTechTitle', { defaultValue: 'Tiên Phong Công Nghệ AI' }),
-      desc: t('aboutUsPage.coreValues.aiTechDesc', { defaultValue: 'Ứng dụng mô hình Voice AI và thuật toán phân tích năng lực khách quan, xóa bỏ rào cản thời gian và định kiến tuyển dụng.' }),
-      icon: PsychologyOutlinedIcon,
-      color: '#2563EB',
-      bgColor: '#EFF6FF',
-      borderColor: '#DBEAFE',
-    },
-    {
-      title: t('aboutUsPage.coreValues.speedCostTitle', { defaultValue: 'Tối Ưu Tốc Độ & Chi Phí' }),
-      desc: t('aboutUsPage.coreValues.speedCostDesc', { defaultValue: 'Cắt giảm đến 80% thời gian sơ loại hồ sơ và sàng lọc ứng viên, tối ưu hóa ngân sách nhân sự cho mọi quy mô doanh nghiệp.' }),
-      icon: SpeedIcon,
-      color: '#059669',
-      bgColor: '#ECFDF5',
-      borderColor: '#A7F3D0',
-    },
-    {
-      title: t('aboutUsPage.coreValues.fourIndustriesTitle', { defaultValue: 'Chuyên Sâu 4 Khối Ngành' }),
-      desc: t('aboutUsPage.coreValues.fourIndustriesDesc', { defaultValue: 'Thấu hiểu đặc thù tiêu chuẩn nghề nghiệp của Xây dựng, Bất động sản, Thiết kế kiến trúc và Kỹ thuật Cơ điện.' }),
-      icon: HubOutlinedIcon,
-      color: '#D97706',
-      bgColor: '#FEF3C7',
-      borderColor: '#FDE68A',
-    },
-    {
-      title: t('aboutUsPage.coreValues.securityTitle', { defaultValue: 'Bảo Mật Chuẩn Doanh Nghiệp' }),
-      desc: t('aboutUsPage.coreValues.securityDesc', { defaultValue: 'Hệ thống bảo vệ dữ liệu hồ sơ và thông tin nhân sự tuân thủ nghiêm ngặt các tiêu chuẩn mã hóa an toàn thông tin.' }),
-      icon: SecurityOutlinedIcon,
-      color: '#7C3AED',
-      bgColor: '#F5F3FF',
-      borderColor: '#DDD6FE',
-    },
-  ];
+      // Desktop animations
+      mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
+        if (has('.gsap-about-hero')) {
+          gsap.fromTo(
+            '.gsap-about-hero',
+            { y: 30, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', clearProps: 'all' }
+          );
+        }
 
-  // 4 Bước Chuyển đổi số tuyển dụng & HRM
-  const digitalSteps = [
-    {
-      step: '01',
-      title: t('aboutUsPage.steps.step1Title', { defaultValue: 'Đăng Tin & Thu Hút Ứng Viên' }),
-      desc: t('aboutUsPage.steps.step1Desc', { defaultValue: 'Doanh nghiệp đăng tin tuyển dụng thông minh, tối ưu SEO việc làm và tiếp cận hàng ngàn ứng viên đúng chuyên môn.' }),
-      icon: PostAddOutlinedIcon,
+        if (has('.gsap-stat-card')) {
+          gsap.fromTo(
+            '.gsap-stat-card',
+            { y: 25, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-stats-grid') ? {
+                trigger: '.gsap-stats-grid',
+                start: 'top 88%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.5,
+              stagger: 0.1,
+              ease: 'power2.out',
+              clearProps: 'all',
+            }
+          );
+        }
+
+        if (has('.gsap-problem-card')) {
+          gsap.fromTo(
+            '.gsap-problem-card',
+            { y: 30, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-problem-section') ? {
+                trigger: '.gsap-problem-section',
+                start: 'top 85%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              stagger: 0.15,
+              ease: 'power2.out',
+              clearProps: 'all',
+            }
+          );
+        }
+
+        if (has('.gsap-industry-card')) {
+          gsap.fromTo(
+            '.gsap-industry-card',
+            { y: 25, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-industries-grid') ? {
+                trigger: '.gsap-industries-grid',
+                start: 'top 85%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.55,
+              stagger: 0.1,
+              ease: 'power2.out',
+              clearProps: 'all',
+            }
+          );
+        }
+
+        if (has('.gsap-node-card')) {
+          gsap.fromTo(
+            '.gsap-node-card',
+            { y: 25, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-nodes-grid') ? {
+                trigger: '.gsap-nodes-grid',
+                start: 'top 85%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.55,
+              stagger: 0.1,
+              ease: 'power2.out',
+              clearProps: 'all',
+            }
+          );
+        }
+      });
+
+      // Mobile animations
+      mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
+        if (has('.gsap-about-hero')) {
+          gsap.fromTo(
+            '.gsap-about-hero',
+            { y: 15, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', clearProps: 'all' }
+          );
+        }
+
+        if (has('.gsap-stat-card')) {
+          gsap.fromTo(
+            '.gsap-stat-card',
+            { y: 15, opacity: 0 },
+            {
+              scrollTrigger: has('.gsap-stats-grid') ? {
+                trigger: '.gsap-stats-grid',
+                start: 'top 92%',
+                once: true,
+              } : undefined,
+              y: 0,
+              opacity: 1,
+              duration: 0.4,
+              stagger: 0.08,
+              ease: 'power2.out',
+              clearProps: 'all',
+            }
+          );
+        }
+      });
+
+      // Reduced motion fallback
+      mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
+        const targets = [
+          '.gsap-about-hero',
+          '.gsap-stat-card',
+          '.gsap-problem-card',
+          '.gsap-industry-card',
+          '.gsap-node-card',
+        ].filter(has);
+        if (targets.length > 0) {
+          gsap.set(targets.join(', '), { opacity: 1, y: 0, clearProps: 'all' });
+        }
+      });
     },
-    {
-      step: '02',
-      title: t('aboutUsPage.steps.step2Title', { defaultValue: 'AI Sàng Lọc & Phỏng Vấn Voice' }),
-      desc: t('aboutUsPage.steps.step2Desc', { defaultValue: 'AILA AI tự động phân tích CV, tính toán Match Score và thực hiện phỏng vấn sơ tuyển bằng giọng nói tự nhiên 24/7.' }),
-      icon: SmartToyOutlinedIcon,
-    },
-    {
-      step: '03',
-      title: t('aboutUsPage.steps.step3Title', { defaultValue: 'Đánh Giá Năng Lực Chuẩn STAR' }),
-      desc: t('aboutUsPage.steps.step3Desc', { defaultValue: 'Hội đồng tuyển dụng nhận báo cáo phân tích kỹ năng, khoảng trống năng lực và video/transcript phỏng vấn để ra quyết định.' }),
-      icon: AssignmentIndOutlinedIcon,
-    },
-    {
-      step: '04',
-      title: t('aboutUsPage.steps.step4Title', { defaultValue: 'Tiếp Nhận & Quản Trị HRM' }),
-      desc: t('aboutUsPage.steps.step4Desc', { defaultValue: 'Đồng bộ hồ sơ trúng tuyển vào hệ thống InfoHR HRM: ký hợp đồng số, cập nhật sơ đồ tổ chức và quản lý nhân sự liền mạch.' }),
-      icon: BadgeOutlinedIcon,
-    },
-  ];
+    { scope: containerRef }
+  );
+
+  // Industry Icon mapping
+  const INDUSTRY_ICONS = {
+    construction: HardHat,
+    realEstate: Home,
+    architecture: DraftingCompass,
+    mep: Zap,
+  };
+
+  // Traditional Pains Data
+  const traditionalPains = (t('aboutUsPage.problemSection.traditionalPains', { returnObjects: true }) as Array<{ title: string; desc: string }>) || [];
+  const solutionPoints = (t('aboutUsPage.problemSection.solutionPoints', { returnObjects: true }) as Array<{ title: string; desc: string }>) || [];
+  const industryItems = (t('aboutUsPage.industriesSection.items', { returnObjects: true }) as Array<{ id: 'construction' | 'realEstate' | 'architecture' | 'mep'; name: string; roles: string; challenge: string; solution: string }>) || [];
+  const ecosystemItems = (t('aboutUsPage.ecosystemSection.items', { returnObjects: true }) as Array<{ subdomain: string; name: string; desc: string; url: string; target: string }>) || [];
+  const techCards = (t('aboutUsPage.technologySection.cards', { returnObjects: true }) as Array<{ title: string; desc: string }>) || [];
+  const statsList = (t('aboutUsPage.stats', { returnObjects: true }) as Array<{ num: string; label: string; desc: string }>) || [];
 
   return (
-    <Box sx={{ bgcolor: '#F8FAFC', minHeight: '100dvh', pb: { xs: 8, md: 12 } }}>
+    <Box ref={containerRef} sx={{ bgcolor: '#F8FAFC', minHeight: '100dvh', pb: { xs: 8, md: 12 } }}>
       {/* ──────────────────────────────────────────────────────────── */}
-      {/* PHÂN TẦNG 1: HERO BANNER & HỆ SINH THÁI 3D SHOWCASE */}
+      {/* PHẦN 1: HERO EDITORIAL & BẢN SẮC NỀN TẢNG */}
       {/* ──────────────────────────────────────────────────────────── */}
       <Box
+        component="section"
         sx={{
-          pt: { xs: 5, sm: 7, md: 9 },
+          pt: { xs: 6, sm: 8, md: 11 },
           pb: { xs: 6, md: 10 },
-          background: 'radial-gradient(ellipse at top, #EFF6FF 0%, #F8FAFC 70%)',
+          background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
           borderBottom: '1px solid #E2E8F0',
         }}
       >
         <Container maxWidth="lg">
-          {/* Header Texts */}
-          <Stack spacing={2.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 4, md: 6 } }}>
+          <Stack className="gsap-about-hero" spacing={3} textAlign="center" alignItems="center" sx={{ mb: { xs: 4, md: 6 } }}>
+            {/* Kicker badge */}
             <Chip
-              icon={<AutoAwesomeIcon sx={{ color: '#2563EB !important', fontSize: 18 }} />}
-              label={t('aboutUsPage.heroBadge', { defaultValue: 'HỆ SINH THÁI TUYỂN DỤNG & QUẢN TRỊ NHÂN SỰ INFOHR' })}
+              icon={<Building2 size={15} className="text-blue-600" />}
+              label={t('aboutUsPage.kicker', { defaultValue: 'THÔNG TIN NỀN TẢNG • HỆ SINH THÁI CÔNG NGHỆ INFOHR' })}
               sx={{
-                backgroundColor: '#EFF6FF',
+                bgcolor: '#EFF6FF',
                 color: '#1D4ED8',
                 fontWeight: 700,
-                fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                fontSize: { xs: '0.75rem', sm: '0.8rem' },
                 px: 1.5,
-                py: 0.75,
+                py: 0.6,
                 border: '1px solid #BFDBFE',
                 borderRadius: '100px',
-                maxWidth: '92vw',
-                '& .MuiChip-label': {
-                  whiteSpace: 'normal',
-                  textAlign: 'center',
-                },
+                letterSpacing: '0.04em',
               }}
             />
 
+            {/* Editorial Headline */}
             <Typography
               variant="h1"
               component="h1"
               sx={{
                 fontWeight: 800,
                 color: '#0F172A',
-                fontSize: { xs: '1.9rem', sm: '2.6rem', md: '3.3rem' },
+                fontSize: { xs: '1.85rem', sm: '2.6rem', md: '3.2rem' },
                 lineHeight: { xs: 1.25, md: 1.2 },
-                maxWidth: 950,
-                letterSpacing: '-0.02em',
+                maxWidth: 960,
+                letterSpacing: '-0.025em',
               }}
             >
-              Kiến Tạo Tương Lai Tuyển Dụng & Quản Trị Nhân Sự Việt Nam
+              {t('aboutUsPage.heroTitle', {
+                defaultValue: 'Tái Định Nghĩa Tuyển Dụng Kỹ Thuật Bằng Dữ Liệu Thực & Voice AI Minh Bạch',
+              })}
             </Typography>
 
+            {/* Grounded, authentic narrative lead */}
             <Typography
               variant="body1"
               sx={{
                 color: '#475569',
-                maxWidth: 720,
+                maxWidth: 780,
                 mx: 'auto',
                 fontSize: { xs: '0.95rem', sm: '1.05rem', md: '1.15rem' },
-                lineHeight: 1.7,
+                lineHeight: 1.75,
               }}
             >
-              InfoHR mang đến nền tảng toàn diện kết nối tài năng, quản trị hồ sơ và số hóa quy trình nhân sự doanh nghiệp - hỗ trợ chuyên sâu <strong>4 khối ngành kinh tế trọng điểm</strong>. Đồng thời tích hợp trực tiếp với nền tảng phỏng vấn AI thông minh <strong>AILA AI</strong>.
+              {t('aboutUsPage.heroLead', {
+                defaultValue:
+                  'InfoHR được phát triển nhằm giải quyết triệt để sự đứt gãy giữa bằng cấp danh nghĩa và năng lực thực chiến tại Việt Nam. Chúng tôi xây dựng chuẩn mực tuyển dụng chuyên sâu cho 4 khối ngành kinh tế kỹ thuật trọng điểm — kết hợp sàn kết nối hồ sơ xác thực và trợ lý phỏng vấn giọng nói AILA 24/7.',
+              })}
             </Typography>
 
-            {/* 4 Nhóm ngành Trọng Điểm Chips */}
+            {/* 4 Concrete Identity Anchors */}
             <Stack
               direction="row"
               spacing={1}
               flexWrap="wrap"
               justifyContent="center"
-              gap={1}
-              sx={{ pt: 1, pb: 2 }}
+              gap={1.25}
+              sx={{ pt: 1, pb: 1.5 }}
             >
-              {focusIndustries.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Chip
-                    key={item.label}
-                    icon={<Icon fontSize="small" sx={{ color: '#2563EB !important' }} />}
-                    label={item.label}
-                    sx={{
-                      bgcolor: '#FFFFFF',
-                      color: '#1E293B',
-                      fontWeight: 600,
-                      fontSize: '0.85rem',
-                      border: '1px solid #CBD5E1',
-                      py: 2,
-                      px: 1,
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                      '&:hover': {
-                        bgcolor: '#EFF6FF',
-                        borderColor: '#93C5FD',
-                        color: '#1D4ED8',
-                      },
-                      transition: 'all 0.2s ease',
-                    }}
-                  />
-                );
-              })}
+              <Chip
+                icon={<Building2 size={16} className="text-slate-700" />}
+                label={t('aboutUsPage.badges.squareGroup', { defaultValue: 'Hệ sinh thái InfoHR' })}
+                sx={{
+                  bgcolor: '#FFFFFF',
+                  color: '#334155',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  border: '1px solid #CBD5E1',
+                  py: 1.8,
+                  px: 0.5,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                }}
+              />
+              <Chip
+                icon={<Radio size={16} className="text-red-600" />}
+                label={t('aboutUsPage.badges.webrtc', { defaultValue: 'Hạ tầng WebRTC Voice AI' })}
+                sx={{
+                  bgcolor: '#FFFFFF',
+                  color: '#334155',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  border: '1px solid #CBD5E1',
+                  py: 1.8,
+                  px: 0.5,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                }}
+              />
+              <Chip
+                icon={<ShieldCheck size={16} className="text-emerald-600" />}
+                label={t('aboutUsPage.badges.verified', { defaultValue: '100% Hồ sơ thẩm định năng lực' })}
+                sx={{
+                  bgcolor: '#FFFFFF',
+                  color: '#334155',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  border: '1px solid #CBD5E1',
+                  py: 1.8,
+                  px: 0.5,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                }}
+              />
+              <Chip
+                icon={<HardHat size={16} className="text-blue-600" />}
+                label={t('aboutUsPage.badges.fourIndustries', { defaultValue: 'Chuyên sâu 4 ngành kỹ thuật' })}
+                sx={{
+                  bgcolor: '#FFFFFF',
+                  color: '#334155',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  border: '1px solid #CBD5E1',
+                  py: 1.8,
+                  px: 0.5,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                }}
+              />
             </Stack>
 
-            {/* Action CTA Buttons */}
+            {/* Clear Action CTAs */}
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
               spacing={2}
@@ -238,22 +368,22 @@ export default function AboutUsPage() {
                 variant="contained"
                 component={Link}
                 href="/jobs"
-                endIcon={<ArrowForwardIcon />}
+                endIcon={<ArrowRight size={18} />}
                 sx={{
                   width: { xs: '100%', sm: 'auto' },
                   bgcolor: '#2563EB',
                   color: '#FFFFFF',
                   fontWeight: 700,
-                  fontSize: '1rem',
-                  py: 1.5,
+                  fontSize: '0.95rem',
+                  py: 1.4,
                   px: 3.5,
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 25px -5px rgba(37, 99, 235, 0.4)',
+                  borderRadius: '10px',
+                  boxShadow: '0 6px 20px -4px rgba(37, 99, 235, 0.35)',
                   textTransform: 'none',
                   '&:hover': { bgcolor: '#1D4ED8' },
                 }}
               >
-                Khám Phá Việc Làm InfoHR
+                {t('aboutUsPage.heroCtaPrimary', { defaultValue: 'Khám Phá Việc Làm Kỹ Thuật' })}
               </Button>
 
               <Button
@@ -262,39 +392,38 @@ export default function AboutUsPage() {
                 href="https://aila.infohr.vn/"
                 target="_blank"
                 rel="noopener noreferrer"
-                endIcon={<OpenInNewIcon />}
+                endIcon={<ExternalLink size={17} />}
                 sx={{
                   width: { xs: '100%', sm: 'auto' },
-                  borderColor: '#DC2626',
-                  color: '#DC2626',
+                  borderColor: '#CBD5E1',
+                  color: '#0F172A',
                   fontWeight: 700,
-                  fontSize: '1rem',
-                  py: 1.5,
-                  px: 3.5,
-                  borderRadius: '12px',
+                  fontSize: '0.95rem',
+                  py: 1.4,
+                  px: 3,
+                  borderRadius: '10px',
                   textTransform: 'none',
                   bgcolor: '#FFFFFF',
                   '&:hover': {
-                    bgcolor: '#FEF2F2',
-                    borderColor: '#B91C1C',
-                    color: '#B91C1C',
+                    bgcolor: '#F1F5F9',
+                    borderColor: '#94A3B8',
                   },
                 }}
               >
-                Trải Nghiệm AILA AI Platform
+                {t('aboutUsPage.heroCtaSecondary', { defaultValue: 'Trải Nghiệm AILA Voice AI' })}
               </Button>
             </Stack>
           </Stack>
 
-          {/* 3D Ecosystem Showcase Hero Board */}
+          {/* Hero Ecosystem Diagram Showcase */}
           <Box
             sx={{
               position: 'relative',
-              borderRadius: { xs: '16px', md: '24px' },
+              borderRadius: { xs: '16px', md: '20px' },
               overflow: 'hidden',
               border: '1px solid #E2E8F0',
               bgcolor: '#FFFFFF',
-              boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.12)',
+              boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.08)',
               mt: { xs: 3, md: 5 },
             }}
           >
@@ -302,25 +431,25 @@ export default function AboutUsPage() {
               sx={{
                 position: 'relative',
                 width: '100%',
-                height: { xs: 260, sm: 400, md: 540 },
+                height: { xs: 240, sm: 380, md: 500 },
               }}
             >
               <Image
                 src="/images/about/about_hero_ecosystem.webp"
-                alt="Mô hình 3D Hệ sinh thái Tuyển dụng & Quản trị Nhân sự InfoHR"
+                alt="Kiến trúc hệ sinh thái InfoHR Tuyển dụng & AILA Voice AI"
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, 1200px"
                 style={{ objectFit: 'cover' }}
               />
 
-              {/* Floating Badge on Top Left */}
+              {/* Floating Architectural Badge */}
               <Box
                 sx={{
                   position: 'absolute',
                   top: { xs: 12, md: 20 },
                   left: { xs: 12, md: 20 },
-                  bgcolor: 'rgba(15, 23, 42, 0.78)',
+                  bgcolor: 'rgba(15, 23, 42, 0.85)',
                   backdropFilter: 'blur(8px)',
                   color: '#FFFFFF',
                   borderRadius: '100px',
@@ -329,110 +458,41 @@ export default function AboutUsPage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-                  border: '1px solid rgba(255,255,255,0.2)',
+                  border: '1px solid rgba(255,255,255,0.18)',
                 }}
               >
-                <AutoAwesomeIcon sx={{ color: '#60A5FA', fontSize: { xs: 16, md: 18 } }} />
+                <Cpu size={16} className="text-blue-400" />
                 <Typography sx={{ fontWeight: 700, fontSize: { xs: '0.75rem', md: '0.85rem' }, color: '#FFFFFF' }}>
-                  Hệ Sinh Thái Tuyển Dụng & HRM Toàn Diện
+                  Hệ Sinh Thái Tuyển Dụng Chuyên Ngành & HRM 2.0
                 </Typography>
               </Box>
-            </Box>
-
-            {/* 4 Mini Feature Anchors underneath Hero Image */}
-            <Box sx={{ p: { xs: 2, md: 3 }, bgcolor: '#FFFFFF', borderTop: '1px solid #F1F5F9' }}>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Avatar sx={{ bgcolor: '#EFF6FF', color: '#2563EB', width: 40, height: 40, borderRadius: '10px' }}>
-                      <PeopleAltOutlinedIcon fontSize="small" />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.9rem' }}>
-                        Cổng Tuyển Dụng
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748B' }}>
-                        Kết nối 1.200+ doanh nghiệp
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Avatar sx={{ bgcolor: '#ECFDF5', color: '#059669', width: 40, height: 40, borderRadius: '10px' }}>
-                      <BadgeOutlinedIcon fontSize="small" />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.9rem' }}>
-                        Quản Trị InfoHR HRM
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748B' }}>
-                        Hồ sơ, hợp đồng & chấm công
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Avatar sx={{ bgcolor: '#FEF2F2', color: '#DC2626', width: 40, height: 40, borderRadius: '10px' }}>
-                      <SmartToyOutlinedIcon fontSize="small" />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.9rem' }}>
-                        AILA AI Phỏng Vấn
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748B' }}>
-                        Voice & Video AI tự động 24/7
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Avatar sx={{ bgcolor: '#FEF3C7', color: '#D97706', width: 40, height: 40, borderRadius: '10px' }}>
-                      <HubOutlinedIcon fontSize="small" />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '0.9rem' }}>
-                        4 Ngành Trọng Điểm
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748B' }}>
-                        Xây dựng, BĐS, Thiết kế, MEP
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </Grid>
-              </Grid>
             </Box>
           </Box>
         </Container>
       </Box>
 
       {/* ──────────────────────────────────────────────────────────── */}
-      {/* PHÂN TẦNG 2: THƯỚC ĐO QUY MÔ & SỐ LIỆU BẢO CHỨNG */}
+      {/* PHẦN 2: BẢO CHỨNG BẰNG CON SỐ THỰC TẾ (REAL METRICS) */}
       {/* ──────────────────────────────────────────────────────────── */}
-      <Container maxWidth="lg" sx={{ mt: { xs: 5, md: 8 }, mb: { xs: 6, md: 10 } }}>
-        <Grid container spacing={{ xs: 2, md: 3 }}>
-          {stats.map((stat, idx) => (
+      <Container maxWidth="lg" sx={{ mt: { xs: 5, md: 8 }, mb: { xs: 6, md: 9 } }}>
+        <Grid container className="gsap-stats-grid" spacing={{ xs: 2, md: 3 }}>
+          {statsList.map((stat, idx) => (
             <Grid key={idx} size={{ xs: 6, md: 3 }}>
               <Card
+                className="gsap-stat-card"
                 elevation={0}
                 sx={{
                   p: { xs: 2.5, md: 3 },
-                  textAlign: 'center',
-                  borderRadius: '16px',
+                  textAlign: 'left',
+                  borderRadius: '14px',
                   bgcolor: '#FFFFFF',
                   border: '1px solid #E2E8F0',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 12px 25px rgba(37, 99, 235, 0.08)',
-                    borderColor: '#BFDBFE',
+                    transform: 'translateY(-3px)',
+                    borderColor: '#93C5FD',
+                    boxShadow: '0 10px 20px -5px rgba(37, 99, 235, 0.08)',
                   },
                 }}
               >
@@ -440,19 +500,20 @@ export default function AboutUsPage() {
                   variant="h3"
                   sx={{
                     fontWeight: 800,
-                    color: idx % 2 === 0 ? '#2563EB' : '#DC2626',
-                    fontSize: { xs: '1.75rem', sm: '2.2rem', md: '2.6rem' },
+                    color: idx === 1 ? '#0F172A' : idx === 2 ? '#059669' : '#2563EB',
+                    fontSize: { xs: '1.75rem', sm: '2.1rem', md: '2.5rem' },
                     lineHeight: 1.1,
-                    mb: 0.75,
+                    mb: 0.5,
                     fontVariantNumeric: 'tabular-nums',
+                    letterSpacing: '-0.03em',
                   }}
                 >
                   {stat.num}
                 </Typography>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: { xs: '0.85rem', sm: '0.95rem' } }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', fontSize: { xs: '0.85rem', sm: '0.92rem' } }}>
                   {stat.label}
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: 0.25 }}>
+                <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: 0.25, fontSize: '0.8rem' }}>
                   {stat.desc}
                 </Typography>
               </Card>
@@ -462,414 +523,217 @@ export default function AboutUsPage() {
       </Container>
 
       {/* ──────────────────────────────────────────────────────────── */}
-      {/* PHÂN TẦNG 3: HAI TRỤ CỘT CHIẾN LƯỢC (TÍCH HỢP ẢNH 3D ĐỘC QUYỀN) */}
+      {/* PHẦN 3: BÀI TOÁN THỰC TẾ & NGUỒN CỘI RA ĐỜI (THE MARKET FRICTION) */}
       {/* ──────────────────────────────────────────────────────────── */}
-      <Container maxWidth="lg" sx={{ mb: { xs: 7, md: 11 } }}>
-        <Stack spacing={1.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 4, md: 6 } }}>
-          <Chip
-            label="HAI TRỤ CỘT CÔNG NGHỆ"
-            sx={{
-              bgcolor: '#EFF6FF',
-              color: '#1D4ED8',
-              fontWeight: 700,
-              fontSize: '0.8rem',
-              border: '1px solid #DBEAFE',
-              borderRadius: '100px',
-            }}
-          />
-          <Typography variant="h2" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.75rem', md: '2.4rem' } }}>
-            Giải Pháp Toàn Diện: Tuyển Dụng & AI Phỏng Vấn
-          </Typography>
-          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 750, fontSize: { xs: '0.95rem', md: '1.05rem' } }}>
-            Sự kết hợp đồng bộ giữa nền tảng tuyển dụng chuyên sâu InfoHR và công nghệ trí tuệ nhân tạo đột phá AILA AI.
-          </Typography>
-        </Stack>
-
-        <Grid container spacing={{ xs: 3, md: 4 }}>
-          {/* TRỤ CỘT 1: INFOHR & QUẢN TRỊ HRM */}
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card
-              elevation={0}
-              sx={{
-                borderRadius: '24px',
-                border: '1.5px solid #2563EB',
-                bgcolor: '#FFFFFF',
-                overflow: 'hidden',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                boxShadow: '0 12px 35px -5px rgba(37, 99, 235, 0.1)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  boxShadow: '0 20px 45px -5px rgba(37, 99, 235, 0.16)',
-                },
-              }}
-            >
-              {/* Image Frame */}
-              <Box sx={{ position: 'relative', width: '100%', height: { xs: 200, sm: 260 } }}>
-                <Image
-                  src="/images/about/about_pillar_infohr.webp"
-                  alt="Trụ cột InfoHR Tuyển dụng & Quản trị HRM"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 600px"
-                  style={{ objectFit: 'cover' }}
-                />
-                <Chip
-                  label="INFOHR PLATFORM"
-                  sx={{
-                    position: 'absolute',
-                    top: 16,
-                    left: 16,
-                    bgcolor: 'rgba(37, 99, 235, 0.9)',
-                    backdropFilter: 'blur(6px)',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    fontSize: '0.75rem',
-                    borderRadius: '100px',
-                  }}
-                />
-              </Box>
-
-              {/* Content */}
-              <Stack spacing={2.5} sx={{ p: { xs: 3, sm: 4 }, flexGrow: 1 }}>
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <Avatar sx={{ bgcolor: '#EFF6FF', color: '#2563EB', width: 46, height: 46, borderRadius: '12px' }}>
-                    <BusinessOutlinedIcon />
-                  </Avatar>
-                  <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.25rem', sm: '1.4rem' } }}>
-                      1. InfoHR & Phân Hệ HRM
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Nền Tảng Tuyển Dụng & Vận Hành Doanh Nghiệp
-                    </Typography>
-                  </Box>
-                </Stack>
-
-                <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.7, fontSize: '0.95rem' }}>
-                  Tập trung phát triển giải pháp số hóa toàn diện quy trình nhân sự: Cổng đăng tin tuyển dụng thông minh, kho dữ liệu ứng viên 4 khối ngành trọng điểm và bộ máy quản trị nhân sự HRM tinh gọn.
-                </Typography>
-
-                <Stack spacing={1.5} sx={{ mt: 'auto', pt: 1 }}>
-                  <Stack direction="row" spacing={1.25} alignItems="flex-start">
-                    <CheckCircleOutlinedIcon sx={{ color: '#16A34A', fontSize: 20, mt: 0.2 }} />
-                    <Typography variant="body2" sx={{ color: '#1E293B', fontWeight: 600 }}>
-                      Cổng tuyển dụng & Tìm kiếm hồ sơ ứng viên chuẩn hóa
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1.25} alignItems="flex-start">
-                    <CheckCircleOutlinedIcon sx={{ color: '#16A34A', fontSize: 20, mt: 0.2 }} />
-                    <Typography variant="body2" sx={{ color: '#1E293B', fontWeight: 600 }}>
-                      Phân hệ HRM: Quản lý nhân viên, sơ đồ tổ chức & hợp đồng số
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1.25} alignItems="flex-start">
-                    <CheckCircleOutlinedIcon sx={{ color: '#16A34A', fontSize: 20, mt: 0.2 }} />
-                    <Typography variant="body2" sx={{ color: '#1E293B', fontWeight: 600 }}>
-                      Đồng bộ dữ liệu chấm công và quy trình tiếp nhận onboarding
-                    </Typography>
-                  </Stack>
-                </Stack>
-
-                <Button
-                  variant="contained"
-                  component={Link}
-                  href="/jobs"
-                  endIcon={<ArrowForwardIcon />}
-                  sx={{
-                    mt: 2,
-                    backgroundColor: '#2563EB',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    borderRadius: '12px',
-                    py: 1.4,
-                    textTransform: 'none',
-                    fontSize: '0.95rem',
-                    '&:hover': { backgroundColor: '#1D4ED8' },
-                  }}
-                >
-                  Khám Phá Việc Làm & Doanh Nghiệp InfoHR
-                </Button>
-              </Stack>
-            </Card>
-          </Grid>
-
-          {/* TRỤ CỘT 2: AILA AI PHỎNG VẤN THÔNG MINH */}
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card
-              elevation={0}
-              sx={{
-                borderRadius: '24px',
-                border: '1.5px solid #DC2626',
-                bgcolor: '#FFFFFF',
-                overflow: 'hidden',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                boxShadow: '0 12px 35px -5px rgba(220, 38, 38, 0.1)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  boxShadow: '0 20px 45px -5px rgba(220, 38, 38, 0.16)',
-                },
-              }}
-            >
-              {/* Image Frame */}
-              <Box sx={{ position: 'relative', width: '100%', height: { xs: 200, sm: 260 } }}>
-                <Image
-                  src="/images/about/about_pillar_aila.webp"
-                  alt="Trụ cột AILA AI Phỏng vấn tự động & Đánh giá năng lực"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 600px"
-                  style={{ objectFit: 'cover' }}
-                />
-                <Chip
-                  label="AILA AI PLATFORM"
-                  sx={{
-                    position: 'absolute',
-                    top: 16,
-                    left: 16,
-                    bgcolor: 'rgba(220, 38, 38, 0.9)',
-                    backdropFilter: 'blur(6px)',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    fontSize: '0.75rem',
-                    borderRadius: '100px',
-                  }}
-                />
-              </Box>
-
-              {/* Content */}
-              <Stack spacing={2.5} sx={{ p: { xs: 3, sm: 4 }, flexGrow: 1 }}>
-                <Stack direction="row" spacing={1.5} alignItems="center">
-                  <Avatar sx={{ bgcolor: '#FEF2F2', color: '#DC2626', width: 46, height: 46, borderRadius: '12px' }}>
-                    <SmartToyOutlinedIcon />
-                  </Avatar>
-                  <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.25rem', sm: '1.4rem' } }}>
-                      2. AILA AI - Phỏng Vấn Thông Minh
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: '#DC2626', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Nền Tảng Phỏng Vấn AI Toàn Diện (aila.infohr.vn)
-                    </Typography>
-                  </Box>
-                </Stack>
-
-                <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.7, fontSize: '0.95rem' }}>
-                  Chuyên biệt cho phỏng vấn sơ loại tự động bằng AI: Voice AI đa ngôn ngữ với giọng nói tự nhiên, phân tích biểu cảm video, thuật toán Match Score % và báo cáo Skill Gap Analysis chuẩn STAR.
-                </Typography>
-
-                <Stack spacing={1.5} sx={{ mt: 'auto', pt: 1 }}>
-                  <Stack direction="row" spacing={1.25} alignItems="flex-start">
-                    <CheckCircleOutlinedIcon sx={{ color: '#DC2626', fontSize: 20, mt: 0.2 }} />
-                    <Typography variant="body2" sx={{ color: '#1E293B', fontWeight: 600 }}>
-                      Phỏng vấn Voice & Video AI tự động không giới hạn 24/7
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1.25} alignItems="flex-start">
-                    <CheckCircleOutlinedIcon sx={{ color: '#DC2626', fontSize: 20, mt: 0.2 }} />
-                    <Typography variant="body2" sx={{ color: '#1E293B', fontWeight: 600 }}>
-                      Thuật toán AI Match Score & Xuất báo cáo năng lực khách quan
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" spacing={1.25} alignItems="flex-start">
-                    <CheckCircleOutlinedIcon sx={{ color: '#DC2626', fontSize: 20, mt: 0.2 }} />
-                    <Typography variant="body2" sx={{ color: '#1E293B', fontWeight: 600 }}>
-                      Trải nghiệm trực tiếp tại Cổng thông tin aila.infohr.vn
-                    </Typography>
-                  </Stack>
-                </Stack>
-
-                <Button
-                  variant="contained"
-                  component="a"
-                  href="https://aila.infohr.vn/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  endIcon={<OpenInNewIcon />}
-                  sx={{
-                    mt: 2,
-                    backgroundColor: '#DC2626',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    borderRadius: '12px',
-                    py: 1.4,
-                    textTransform: 'none',
-                    fontSize: '0.95rem',
-                    boxShadow: '0 4px 14px rgba(220, 38, 38, 0.3)',
-                    '&:hover': { backgroundColor: '#B91C1C' },
-                  }}
-                >
-                  Mở Trang Platform AILA AI (aila.infohr.vn)
-                </Button>
-              </Stack>
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
-
-      {/* ──────────────────────────────────────────────────────────── */}
-      {/* PHÂN TẦNG 4: GIÁ TRỊ CỐT LÕI & SỨ MỆNH (BENTO GRID 4 THẺ) */}
-      {/* ──────────────────────────────────────────────────────────── */}
-      <Box sx={{ py: { xs: 6, md: 9 }, bgcolor: '#FFFFFF', borderTop: '1px solid #E2E8F0', borderBottom: '1px solid #E2E8F0', mb: { xs: 7, md: 11 } }}>
+      <Box
+        component="section"
+        className="gsap-problem-section"
+        sx={{
+          py: { xs: 6, md: 10 },
+          bgcolor: '#FFFFFF',
+          borderTop: '1px solid #E2E8F0',
+          borderBottom: '1px solid #E2E8F0',
+          mb: { xs: 7, md: 11 },
+        }}
+      >
         <Container maxWidth="lg">
-          <Stack spacing={1.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 4, md: 6 } }}>
+          <Stack spacing={1.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 5, md: 7 } }}>
             <Chip
-              label="GIÁ TRỊ CỐT LÕI"
+              label={t('aboutUsPage.problemSection.tag', { defaultValue: 'BÀI TOÁN THỰC TẾ & NGUỒN CỘI' })}
               sx={{
                 bgcolor: '#F1F5F9',
                 color: '#475569',
                 fontWeight: 700,
-                fontSize: '0.8rem',
+                fontSize: '0.75rem',
                 border: '1px solid #CBD5E1',
                 borderRadius: '100px',
+                letterSpacing: '0.04em',
               }}
             />
-            <Typography variant="h2" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.75rem', md: '2.4rem' } }}>
-              Cam Kết Vững Bền Cùng Doanh Nghiệp & Ứng Viên
+            <Typography variant="h2" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.75rem', md: '2.3rem' }, letterSpacing: '-0.02em' }}>
+              {t('aboutUsPage.problemSection.title', { defaultValue: 'Vì Sao Thị Trường Cần Một Nền Tảng Như InfoHR?' })}
             </Typography>
-            <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 750, fontSize: { xs: '0.95rem', md: '1.05rem' } }}>
-              Những nguyên tắc nền tảng định hình sự phát triển và giá trị phụng sự của hệ sinh thái InfoHR.
+            <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 760, fontSize: { xs: '0.95rem', md: '1.05rem' } }}>
+              {t('aboutUsPage.problemSection.description', {
+                defaultValue:
+                  'Thị trường tuyển dụng truyền thống đang lãng phí hàng triệu giờ lao động vì cơ chế sàng lọc dàn trải và khủng hoảng \'CV ảo\'.',
+              })}
             </Typography>
           </Stack>
 
-          <Grid container spacing={{ xs: 2.5, md: 3 }}>
-            {coreValues.map((item) => {
-              const IconComp = item.icon;
-              return (
-                <Grid key={item.title} size={{ xs: 12, sm: 6, md: 3 }}>
-                  <Card
-                    elevation={0}
-                    sx={{
-                      p: { xs: 3, md: 3.5 },
-                      height: '100%',
-                      borderRadius: '20px',
-                      border: '1px solid #E2E8F0',
-                      bgcolor: '#FFFFFF',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      transition: 'all 0.25s ease',
-                      '&:hover': {
-                        transform: 'translateY(-4px)',
-                        boxShadow: '0 12px 25px rgba(0,0,0,0.06)',
-                        borderColor: item.color,
-                      },
-                    }}
-                  >
-                    <Avatar
-                      sx={{
-                        bgcolor: item.bgColor,
-                        color: item.color,
-                        width: 52,
-                        height: 52,
-                        borderRadius: '14px',
-                        mb: 2.5,
-                        border: `1px solid ${item.borderColor}`,
-                      }}
-                    >
-                      <IconComp fontSize="medium" />
-                    </Avatar>
-
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.1rem', mb: 1.5 }}>
-                      {item.title}
+          {/* Comparative 2-Column Editorial Grid */}
+          <Grid container spacing={{ xs: 3, md: 4 }}>
+            {/* Cột 1: Thực trạng truyền thống */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box
+                className="gsap-problem-card"
+                sx={{
+                  p: { xs: 3, sm: 4 },
+                  borderRadius: '16px',
+                  bgcolor: '#FFFDFD',
+                  border: '1px solid #FECACA',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+                  <Avatar sx={{ bgcolor: '#FEE2E2', color: '#DC2626', width: 44, height: 44, borderRadius: '10px' }}>
+                    <AlertCircle size={22} />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#991B1B', fontSize: '1.15rem' }}>
+                      {t('aboutUsPage.problemSection.traditionalTitle', { defaultValue: 'Nghịch lý của tuyển dụng truyền thống' })}
                     </Typography>
-
-                    <Typography variant="body2" sx={{ color: '#64748B', lineHeight: 1.65, fontSize: '0.9rem' }}>
-                      {item.desc}
+                    <Typography variant="caption" sx={{ color: '#B91C1C', fontWeight: 600 }}>
+                      Sự lãng phí nguồn lực & khủng hoảng niềm tin
                     </Typography>
-                  </Card>
-                </Grid>
-              );
-            })}
+                  </Box>
+                </Stack>
+
+                <Stack spacing={2.5} sx={{ flexGrow: 1 }}>
+                  {traditionalPains.map((pain, idx) => (
+                    <Box key={idx} sx={{ p: 2, borderRadius: '10px', bgcolor: '#FFFFFF', border: '1px solid #FEE2E2' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', mb: 0.5, fontSize: '0.95rem' }}>
+                        {idx + 1}. {pain.title}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#64748B', lineHeight: 1.6, fontSize: '0.88rem' }}>
+                        {pain.desc}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            </Grid>
+
+            {/* Cột 2: Chuẩn mực giải pháp InfoHR */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box
+                className="gsap-problem-card"
+                sx={{
+                  p: { xs: 3, sm: 4 },
+                  borderRadius: '16px',
+                  bgcolor: '#F8FAFC',
+                  border: '1px solid #BFDBFE',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+                  <Avatar sx={{ bgcolor: '#EFF6FF', color: '#2563EB', width: 44, height: 44, borderRadius: '10px' }}>
+                    <CheckCircle2 size={22} />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#1E40AF', fontSize: '1.15rem' }}>
+                      {t('aboutUsPage.problemSection.solutionTitle', { defaultValue: 'Chuẩn mực giải pháp từ InfoHR' })}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600 }}>
+                      Dữ liệu thực, phỏng vấn tự động & đánh giá khách quan
+                    </Typography>
+                  </Box>
+                </Stack>
+
+                <Stack spacing={2.5} sx={{ flexGrow: 1 }}>
+                  {solutionPoints.map((sol, idx) => (
+                    <Box key={idx} sx={{ p: 2, borderRadius: '10px', bgcolor: '#FFFFFF', border: '1px solid #DBEAFE' }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', mb: 0.5, fontSize: '0.95rem' }}>
+                        ✓ {sol.title}
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.6, fontSize: '0.88rem' }}>
+                        {sol.desc}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            </Grid>
           </Grid>
         </Container>
       </Box>
 
       {/* ──────────────────────────────────────────────────────────── */}
-      {/* PHÂN TẦNG 5: QUY TRÌNH CHUYỂN ĐỔI SỐ TUYỂN DỤNG & HRM (4 BƯỚC) */}
+      {/* PHẦN 4: TẠI SAO LÀ 4 NGÀNH KỸ THUẬT TRỌNG ĐIỂM? */}
       {/* ──────────────────────────────────────────────────────────── */}
       <Container maxWidth="lg" sx={{ mb: { xs: 8, md: 12 } }}>
-        <Stack spacing={1.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 4, md: 6 } }}>
+        <Stack spacing={1.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 5, md: 7 } }}>
           <Chip
-            label="QUY TRÌNH VẬN HÀNH"
+            label={t('aboutUsPage.industriesSection.tag', { defaultValue: 'CHIẾN LƯỢC TRỌNG TÂM' })}
             sx={{
               bgcolor: '#EFF6FF',
               color: '#1D4ED8',
               fontWeight: 700,
-              fontSize: '0.8rem',
+              fontSize: '0.75rem',
               border: '1px solid #DBEAFE',
               borderRadius: '100px',
+              letterSpacing: '0.04em',
             }}
           />
-          <Typography variant="h2" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.75rem', md: '2.4rem' } }}>
-            Quy Trình Tuyển Dụng & Quản Trị Nhân Sự Liền Mạch
+          <Typography variant="h2" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.75rem', md: '2.3rem' }, letterSpacing: '-0.02em' }}>
+            {t('aboutUsPage.industriesSection.title', { defaultValue: 'Chuyên Sâu 4 Khối Ngành Kinh Tế Kỹ Thuật Trọng Điểm' })}
           </Typography>
-          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 750, fontSize: { xs: '0.95rem', md: '1.05rem' } }}>
-            Khép kín từ khâu tiếp cận ứng viên, phỏng vấn AI thông minh đến tiếp nhận và quản trị hợp đồng số.
+          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 800, fontSize: { xs: '0.95rem', md: '1.05rem' } }}>
+            {t('aboutUsPage.industriesSection.description', {
+              defaultValue:
+                'Thay vì dàn trải đa ngành, InfoHR tập trung giải quyết chiều sâu cho 4 lĩnh vực đòi hỏi chứng chỉ hành nghề pháp lý và tiêu chuẩn kỹ thuật khắt khe nhất Việt Nam.',
+            })}
           </Typography>
         </Stack>
 
-        <Grid container spacing={{ xs: 2.5, md: 3 }}>
-          {digitalSteps.map((stepItem) => {
-            const StepIcon = stepItem.icon;
+        <Grid container className="gsap-industries-grid" spacing={{ xs: 2.5, md: 3 }}>
+          {industryItems.map((item) => {
+            const IconComponent = INDUSTRY_ICONS[item.id] || HardHat;
             return (
-              <Grid key={stepItem.step} size={{ xs: 12, sm: 6, md: 3 }}>
+              <Grid key={item.id} size={{ xs: 12, md: 6 }}>
                 <Card
+                  className="gsap-industry-card"
                   elevation={0}
                   sx={{
-                    p: { xs: 3, md: 3.5 },
+                    p: { xs: 3, sm: 3.5 },
                     height: '100%',
-                    borderRadius: '20px',
-                    bgcolor: '#FFFFFF',
+                    borderRadius: '16px',
                     border: '1px solid #E2E8F0',
-                    position: 'relative',
-                    overflow: 'hidden',
+                    bgcolor: '#FFFFFF',
                     display: 'flex',
                     flexDirection: 'column',
                     transition: 'all 0.25s ease',
                     '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 12px 30px rgba(37, 99, 235, 0.08)',
-                      borderColor: '#BFDBFE',
+                      borderColor: '#93C5FD',
+                      boxShadow: '0 8px 25px rgba(37, 99, 235, 0.08)',
                     },
                   }}
                 >
-                  {/* Step Number Badge */}
-                  <Typography
-                    sx={{
-                      position: 'absolute',
-                      top: 12,
-                      right: 16,
-                      fontWeight: 900,
-                      fontSize: '2.5rem',
-                      lineHeight: 1,
-                      color: '#F1F5F9',
-                      userSelect: 'none',
-                      letterSpacing: '-0.04em',
-                    }}
-                  >
-                    {stepItem.step}
-                  </Typography>
+                  <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                    <Avatar sx={{ bgcolor: '#EFF6FF', color: '#2563EB', width: 48, height: 48, borderRadius: '12px' }}>
+                      <IconComponent size={24} />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '1.15rem' }}>
+                        {item.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#2563EB', fontWeight: 600, display: 'block' }}>
+                        {item.roles}
+                      </Typography>
+                    </Box>
+                  </Stack>
 
-                  <Avatar
-                    sx={{
-                      bgcolor: '#EFF6FF',
-                      color: '#2563EB',
-                      width: 48,
-                      height: 48,
-                      borderRadius: '12px',
-                      mb: 2,
-                    }}
-                  >
-                    <StepIcon />
-                  </Avatar>
+                  <Box sx={{ mt: 1, p: 2, borderRadius: '10px', bgcolor: '#F8FAFC', border: '1px solid #F1F5F9', mb: 2 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 0.5 }}>
+                      Thách thức tuyển dụng thực địa:
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.6, fontSize: '0.88rem' }}>
+                      {item.challenge}
+                    </Typography>
+                  </Box>
 
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.05rem', mb: 1.25 }}>
-                    {stepItem.title}
-                  </Typography>
-
-                  <Typography variant="body2" sx={{ color: '#64748B', lineHeight: 1.65, fontSize: '0.9rem' }}>
-                    {stepItem.desc}
-                  </Typography>
+                  <Box sx={{ mt: 'auto', p: 2, borderRadius: '10px', bgcolor: '#F0FDF4', border: '1px solid #DCFCE7' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#166534', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', mb: 0.5 }}>
+                      Giải pháp InfoHR chuyên biệt:
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#15803D', lineHeight: 1.6, fontSize: '0.88rem' }}>
+                      {item.solution}
+                    </Typography>
+                  </Box>
                 </Card>
               </Grid>
             );
@@ -878,18 +742,260 @@ export default function AboutUsPage() {
       </Container>
 
       {/* ──────────────────────────────────────────────────────────── */}
-      {/* PHÂN TẦNG 6: BANNER CTA ĐÁY TRANG VỚI HÌNH ẢNH 3D NGHỆ THUẬT */}
+      {/* PHẦN 5: BẢN ĐỒ 4 PHÂN HỆ TRỰC THUỘC HỆ SINH THÁI (CONCRETE URLS) */}
+      {/* ──────────────────────────────────────────────────────────── */}
+      <Box
+        component="section"
+        sx={{
+          py: { xs: 6, md: 10 },
+          bgcolor: '#FFFFFF',
+          borderTop: '1px solid #E2E8F0',
+          borderBottom: '1px solid #E2E8F0',
+          mb: { xs: 7, md: 11 },
+        }}
+      >
+        <Container maxWidth="lg">
+          <Stack spacing={1.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 5, md: 7 } }}>
+            <Chip
+              label={t('aboutUsPage.ecosystemSection.tag', { defaultValue: 'HỆ SINH THÁI KHÉP KÍN' })}
+              sx={{
+                bgcolor: '#F1F5F9',
+                color: '#475569',
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                border: '1px solid #CBD5E1',
+                borderRadius: '100px',
+                letterSpacing: '0.04em',
+              }}
+            />
+            <Typography variant="h2" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.75rem', md: '2.3rem' }, letterSpacing: '-0.02em' }}>
+              {t('aboutUsPage.ecosystemSection.title', { defaultValue: 'Bản Đồ 4 Phân Hệ Trực Thuộc Hệ Sinh Thái InfoHR' })}
+            </Typography>
+            <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 760, fontSize: { xs: '0.95rem', md: '1.05rem' } }}>
+              {t('aboutUsPage.ecosystemSection.description', {
+                defaultValue:
+                  'Mỗi phân hệ đảm nhận một mắt xích chuyên biệt trong chuỗi giá trị nhân sự, kết nối đồng bộ theo thời gian thực.',
+              })}
+            </Typography>
+          </Stack>
+
+          <Grid container className="gsap-nodes-grid" spacing={{ xs: 2.5, md: 3 }}>
+            {ecosystemItems.map((item, idx) => (
+              <Grid key={idx} size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card
+                  className="gsap-node-card"
+                  elevation={0}
+                  sx={{
+                    p: { xs: 3, md: 3.5 },
+                    height: '100%',
+                    borderRadius: '16px',
+                    border: '1px solid #E2E8F0',
+                    bgcolor: '#FFFFFF',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.25s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      borderColor: '#2563EB',
+                      boxShadow: '0 10px 25px rgba(37, 99, 235, 0.08)',
+                    },
+                  }}
+                >
+                  <Chip
+                    label={item.subdomain}
+                    size="small"
+                    sx={{
+                      alignSelf: 'flex-start',
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      fontSize: '0.78rem',
+                      color: idx === 2 ? '#DC2626' : '#2563EB',
+                      bgcolor: idx === 2 ? '#FEF2F2' : '#EFF6FF',
+                      border: idx === 2 ? '1px solid #FECACA' : '1px solid #DBEAFE',
+                      mb: 2,
+                    }}
+                  />
+
+                  <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '1.1rem', mb: 1.25 }}>
+                    {item.name}
+                  </Typography>
+
+                  <Typography variant="body2" sx={{ color: '#64748B', lineHeight: 1.65, fontSize: '0.88rem', mb: 3, flexGrow: 1 }}>
+                    {item.desc}
+                  </Typography>
+
+                  <Button
+                    variant="text"
+                    component="a"
+                    href={getSafeExternalOpenUrl(item.url)}
+                    target={item.target}
+                    rel="noopener noreferrer"
+                    endIcon={<ExternalLink size={15} />}
+                    sx={{
+                      alignSelf: 'flex-start',
+                      p: 0,
+                      fontWeight: 700,
+                      color: idx === 2 ? '#DC2626' : '#2563EB',
+                      textTransform: 'none',
+                      fontSize: '0.88rem',
+                      '&:hover': {
+                        bgcolor: 'transparent',
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    Truy cập {item.subdomain}
+                  </Button>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
+
+      {/* ──────────────────────────────────────────────────────────── */}
+      {/* PHẦN 6: MINH BẠCH CÔNG NGHỆ & AI CÓ ĐẠO ĐỨC (RESPONSIBLE AI) */}
+      {/* ──────────────────────────────────────────────────────────── */}
+      <Container maxWidth="lg" sx={{ mb: { xs: 8, md: 12 } }}>
+        <Stack spacing={1.5} textAlign="center" alignItems="center" sx={{ mb: { xs: 5, md: 7 } }}>
+          <Chip
+            label={t('aboutUsPage.technologySection.tag', { defaultValue: 'MINH BẠCH CÔNG NGHỆ' })}
+            sx={{
+              bgcolor: '#EFF6FF',
+              color: '#1D4ED8',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              border: '1px solid #DBEAFE',
+              borderRadius: '100px',
+              letterSpacing: '0.04em',
+            }}
+          />
+          <Typography variant="h2" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.75rem', md: '2.3rem' }, letterSpacing: '-0.02em' }}>
+            {t('aboutUsPage.technologySection.title', { defaultValue: 'Kiến Trúc Thực Chiến & Nguyên Tắc AI Có Trách Nhiệm' })}
+          </Typography>
+          <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 800, fontSize: { xs: '0.95rem', md: '1.05rem' } }}>
+            {t('aboutUsPage.technologySection.description', {
+              defaultValue:
+                'Chúng tôi không coi AI là \'chiếc đũa thần\', mà là trợ lý chuẩn hóa, khách quan và minh bạch để bảo vệ lợi ích của cả ứng viên và doanh nghiệp.',
+            })}
+          </Typography>
+        </Stack>
+
+        <Grid container spacing={{ xs: 3, md: 4 }}>
+          {techCards.map((card, idx) => (
+            <Grid key={idx} size={{ xs: 12, md: 4 }}>
+              <Box
+                sx={{
+                  p: { xs: 3, sm: 3.5 },
+                  borderRadius: '16px',
+                  bgcolor: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: idx === 0 ? '#EFF6FF' : idx === 1 ? '#FEF2F2' : '#F0FDF4',
+                    color: idx === 0 ? '#2563EB' : idx === 1 ? '#DC2626' : '#16A34A',
+                    width: 48,
+                    height: 48,
+                    borderRadius: '12px',
+                    mb: 2,
+                  }}
+                >
+                  {idx === 0 ? <Radio size={22} /> : idx === 1 ? <Scale size={22} /> : <Lock size={22} />}
+                </Avatar>
+
+                <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '1.05rem', mb: 1.25 }}>
+                  {card.title}
+                </Typography>
+
+                <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.7, fontSize: '0.9rem' }}>
+                  {card.desc}
+                </Typography>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+
+      {/* ──────────────────────────────────────────────────────────── */}
+      {/* PHẦN 7: ĐƠN VỊ PHÁT TRIỂN & BANNER CTA */}
       {/* ──────────────────────────────────────────────────────────── */}
       <Container maxWidth="lg">
+        {/* InfoHR Technology Corporate Credibility Box */}
+        <Box
+          sx={{
+            p: { xs: 3.5, sm: 5 },
+            borderRadius: '20px',
+            bgcolor: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            mb: { xs: 5, md: 7 },
+            boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
+          }}
+        >
+          <Grid container spacing={3} alignItems="center">
+            <Grid size={{ xs: 12, md: 8 }}>
+              <Chip
+                label={t('aboutUsPage.corporateSection.tag', { defaultValue: 'ĐƠN VỊ PHÁT TRIỂN' })}
+                size="small"
+                sx={{
+                  bgcolor: '#F1F5F9',
+                  color: '#475569',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  mb: 1.5,
+                }}
+              />
+              <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', fontSize: { xs: '1.4rem', sm: '1.75rem' }, mb: 1.25 }}>
+                {t('aboutUsPage.corporateSection.companyName', { defaultValue: 'InfoHR Technology — Kiến Tạo Giải Pháp Chuyển Đổi Số' })}
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#475569', lineHeight: 1.7, fontSize: '0.95rem' }}>
+                {t('aboutUsPage.corporateSection.companyDesc', {
+                  defaultValue:
+                    'InfoHR là nền tảng chiến lược trong lĩnh vực công nghệ nhân sự (HRTech). Với nền tảng kỹ thuật vững chắc và bề dày kinh nghiệm đồng hành cùng các doanh nghiệp hàng đầu tại Việt Nam, InfoHR cam kết đem lại giá trị bền vững và sự minh bạch cho thị trường tuyển dụng.',
+                })}
+              </Typography>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 4 }} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
+              <Box
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1.5,
+                  p: 2,
+                  borderRadius: '12px',
+                  bgcolor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <ShieldCheck size={28} className="text-blue-600" />
+                <Box textAlign="left">
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F172A' }}>
+                    Cam Kết Chất Lượng
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#64748B' }}>
+                    Bảo hành tuyển dụng & hỗ trợ 24/7
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+
+        {/* High-End Editorial CTA Banner */}
         <Box
           sx={{
             position: 'relative',
-            borderRadius: { xs: '20px', md: '28px' },
+            borderRadius: { xs: '20px', md: '24px' },
             overflow: 'hidden',
-            minHeight: { xs: 440, md: 380 },
+            minHeight: { xs: 400, md: 340 },
             display: 'flex',
             alignItems: 'center',
-            boxShadow: '0 20px 45px -10px rgba(37, 99, 235, 0.25)',
+            boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.25)',
           }}
         >
           {/* Background Image */}
@@ -901,87 +1007,73 @@ export default function AboutUsPage() {
             style={{ objectFit: 'cover', objectPosition: 'center right' }}
           />
 
-          {/* Gradient Overlay: Deep rich royal blue over text area */}
+          {/* Gradient Overlay */}
           <Box
             sx={{
               position: 'absolute',
               inset: 0,
               background: {
-                xs: 'linear-gradient(180deg, rgba(30, 58, 138, 0.92) 0%, rgba(37, 99, 235, 0.88) 100%)',
-                md: 'linear-gradient(90deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 58, 138, 0.9) 45%, rgba(37, 99, 235, 0.35) 80%, rgba(37, 99, 235, 0) 100%)',
+                xs: 'linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 58, 138, 0.9) 100%)',
+                md: 'linear-gradient(90deg, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.88) 55%, rgba(37, 99, 235, 0.35) 85%, rgba(37, 99, 235, 0) 100%)',
               },
             }}
           />
 
-          {/* CTA Content Container */}
+          {/* Content */}
           <Box
             sx={{
               position: 'relative',
               zIndex: 2,
               p: { xs: 3.5, sm: 5, md: 6 },
-              maxWidth: { xs: '100%', md: 660 },
+              maxWidth: { xs: '100%', md: 680 },
             }}
           >
-            <Chip
-              icon={<AutoAwesomeIcon sx={{ fontSize: '15px !important', color: '#FFFFFF !important' }} />}
-              label="BẮT ĐẦU CHUYỂN ĐỔI SỐ CÙNG INFOHR"
-              sx={{
-                bgcolor: 'rgba(255, 255, 255, 0.2)',
-                backdropFilter: 'blur(8px)',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: { xs: '0.75rem', sm: '0.8rem' },
-                border: '1px solid rgba(255, 255, 255, 0.35)',
-                mb: 2,
-                borderRadius: '100px',
-              }}
-            />
-
             <Typography
               variant="h3"
               sx={{
                 fontWeight: 800,
                 color: '#FFFFFF',
-                fontSize: { xs: '1.6rem', sm: '2.1rem', md: '2.4rem' },
+                fontSize: { xs: '1.6rem', sm: '2rem', md: '2.3rem' },
                 lineHeight: 1.25,
                 mb: 1.5,
               }}
             >
-              Sẵn Sàng Bứt Phá Quy Trình Tuyển Dụng & Quản Trị Nhân Sự?
+              {t('aboutUsPage.ctaSection.title', { defaultValue: 'Sẵn Sàng Đồng Hành Cùng Chuẩn Mực Tuyển Dụng Mới?' })}
             </Typography>
 
             <Typography
               variant="body1"
               sx={{
-                color: '#E0E7FF',
-                fontSize: { xs: '0.9rem', sm: '1.05rem' },
+                color: '#CBD5E1',
+                fontSize: { xs: '0.92rem', sm: '1.02rem' },
                 lineHeight: 1.65,
                 mb: 3.5,
               }}
             >
-              Tham gia cùng hơn 1.200+ doanh nghiệp hàng đầu và 50.000+ ứng viên đang tối ưu hóa hiệu quả nhân sự mỗi ngày trên nền tảng InfoHR & AILA AI.
+              {t('aboutUsPage.ctaSection.desc', {
+                defaultValue:
+                  'Cho dù bạn là kỹ sư đang tìm kiếm bến đỗ xứng tầm hay doanh nghiệp đang khát khao nhân sự tinh nhuệ, InfoHR luôn sẵn sàng đồng hành.',
+              })}
             </Typography>
 
-            {/* Dual CTA Buttons */}
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
               spacing={2}
               alignItems={{ xs: 'stretch', sm: 'center' }}
-              sx={{ mb: 3.5 }}
             >
               <Button
                 variant="contained"
                 component={Link}
                 href="/jobs"
-                endIcon={<ArrowForwardIcon />}
+                endIcon={<ArrowRight size={18} />}
                 sx={{
                   bgcolor: '#FFFFFF',
                   color: '#1D4ED8',
                   fontWeight: 800,
-                  fontSize: '1rem',
-                  py: 1.5,
+                  fontSize: '0.95rem',
+                  py: 1.4,
                   px: 3.5,
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   textTransform: 'none',
                   boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
                   '&:hover': {
@@ -990,58 +1082,35 @@ export default function AboutUsPage() {
                   },
                 }}
               >
-                Tìm Việc Làm Ngay
+                {t('aboutUsPage.ctaSection.candidateCta', { defaultValue: 'Khám Phá Việc Làm Kỹ Thuật' })}
               </Button>
 
               <Button
                 variant="outlined"
-                component={Link}
-                href="/employer/job-posts/create"
+                component="a"
+                href="https://employer.infohr.vn"
+                target="_blank"
+                rel="noopener noreferrer"
+                endIcon={<ExternalLink size={16} />}
                 sx={{
-                  borderColor: 'rgba(255, 255, 255, 0.7)',
+                  borderColor: 'rgba(255, 255, 255, 0.6)',
                   color: '#FFFFFF',
                   fontWeight: 700,
-                  fontSize: '1rem',
-                  py: 1.5,
-                  px: 3.5,
-                  borderRadius: '12px',
+                  fontSize: '0.95rem',
+                  py: 1.4,
+                  px: 3,
+                  borderRadius: '10px',
                   textTransform: 'none',
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  bgcolor: 'rgba(255, 255, 255, 0.08)',
                   backdropFilter: 'blur(4px)',
                   '&:hover': {
                     borderColor: '#FFFFFF',
-                    bgcolor: 'rgba(255, 255, 255, 0.2)',
+                    bgcolor: 'rgba(255, 255, 255, 0.18)',
                   },
                 }}
               >
-                Đăng Tin Tuyển Dụng
+                {t('aboutUsPage.ctaSection.employerCta', { defaultValue: 'Đăng Ký Nhà Tuyển Dụng' })}
               </Button>
-            </Stack>
-
-            {/* 3 Trust Signals */}
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={{ xs: 1.5, sm: 3 }}
-              sx={{ pt: 1, borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}
-            >
-              <Stack direction="row" spacing={1} alignItems="center">
-                <VerifiedIcon sx={{ color: '#93C5FD', fontSize: 18 }} />
-                <Typography sx={{ color: '#E0E7FF', fontSize: '0.85rem', fontWeight: 600 }}>
-                  Miễn phí khởi tạo
-                </Typography>
-              </Stack>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <SecurityOutlinedIcon sx={{ color: '#93C5FD', fontSize: 18 }} />
-                <Typography sx={{ color: '#E0E7FF', fontSize: '0.85rem', fontWeight: 600 }}>
-                  Bảo mật chuẩn Quốc tế
-                </Typography>
-              </Stack>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <HandshakeOutlinedIcon sx={{ color: '#93C5FD', fontSize: 18 }} />
-                <Typography sx={{ color: '#E0E7FF', fontSize: '0.85rem', fontWeight: 600 }}>
-                  Hỗ trợ chuyên môn 24/7
-                </Typography>
-              </Stack>
             </Stack>
           </Box>
         </Box>

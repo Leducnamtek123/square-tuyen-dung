@@ -194,7 +194,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
           display: 'flex',
           flexDirection: 'column',
           bgcolor: '#ffffff',
-          borderRadius: '18px',
+          borderRadius: 0,
           border: '1px solid #e2e8f0',
           boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.05)',
           overflow: 'hidden',
@@ -241,6 +241,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                 aria-label={effectiveIsFavorite ? t('jobHover.unsaveJob', 'Bỏ lưu tin') : t('jobHover.saveJob', 'Lưu tin')}
                 onClick={(e) => onToggleFavorite && onToggleFavorite(e, activeJob.id, activeJob.slug)}
                 sx={{
+                  borderRadius: 0,
                   border: '1px solid #e2e8f0',
                   color: effectiveIsFavorite ? '#ef4444' : '#64748b',
                   bgcolor: effectiveIsFavorite ? '#fef2f2' : '#ffffff',
@@ -307,7 +308,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
             sx={{
               mt: 1.75,
               p: 1.25,
-              borderRadius: '12px',
+              borderRadius: 0,
               bgcolor: 'rgba(249, 115, 22, 0.08)',
               border: '1px solid rgba(249, 115, 22, 0.2)',
               display: 'flex',
@@ -341,7 +342,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
               sx={{
                 flex: 1,
                 py: 1,
-                borderRadius: '10px',
+                borderRadius: 0,
                 bgcolor: '#2563eb',
                 fontWeight: 700,
                 textTransform: 'none',
@@ -363,7 +364,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
               sx={{
                 flex: 1,
                 py: 1,
-                borderRadius: '10px',
+                borderRadius: 0,
                 borderColor: '#cbd5e1',
                 color: '#1e293b',
                 fontWeight: 600,
@@ -393,7 +394,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
             },
             '&::-webkit-scrollbar-thumb': {
               backgroundColor: 'rgba(100, 116, 139, 0.25)',
-              borderRadius: '10px',
+              borderRadius: 0,
             },
           }}
         >
@@ -415,7 +416,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                 sx={{
                   width: 4,
                   height: 14,
-                  borderRadius: 1,
+                  borderRadius: 0,
                   bgcolor: '#2563eb',
                 }}
               />
@@ -494,7 +495,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                   sx={{
                     width: 4,
                     height: 14,
-                    borderRadius: 1,
+                    borderRadius: 0,
                     bgcolor: '#ea580c',
                   }}
                 />
@@ -560,7 +561,7 @@ export const JobHoverPreviewCard: React.FC<JobHoverPreviewCardProps> = ({
                   sx={{
                     width: 4,
                     height: 14,
-                    borderRadius: 1,
+                    borderRadius: 0,
                     bgcolor: '#16a34a',
                   }}
                 />

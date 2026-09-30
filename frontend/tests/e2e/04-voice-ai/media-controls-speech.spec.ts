@@ -40,32 +40,35 @@ test.describe('Phân Hệ Voice AI - Điều Khiển Media & Sóng Âm Thoại (
 
     // 1. Kiểm tra bật/tắt Micro
     await expect(room.toggleMicBtn).toBeVisible({ timeout: 15_000 });
-    // Bấm tắt mic (Mute)
-    await room.toggleMute();
-    // Đợi cập nhật trạng thái
-    await page.waitForTimeout(500);
-    const isMuted = await room.isMicrophoneMuted();
-    expect(isMuted).toBeTruthy();
+    const initiallyMuted = await room.isMicrophoneMuted();
 
-    // Bấm bật lại mic (Unmute)
+    // Bấm đổi trạng thái Micro lần 1
     await room.toggleMute();
     await page.waitForTimeout(500);
-    const isUnmuted = await room.isMicrophoneMuted();
-    expect(isUnmuted).toBeFalsy();
+    const micAfterFirstToggle = await room.isMicrophoneMuted();
+    expect(micAfterFirstToggle).toBe(!initiallyMuted);
+
+    // Bấm đổi trạng thái Micro lần 2 để hoàn nguyên
+    await room.toggleMute();
+    await page.waitForTimeout(500);
+    const micAfterSecondToggle = await room.isMicrophoneMuted();
+    expect(micAfterSecondToggle).toBe(initiallyMuted);
 
     // 2. Kiểm tra bật/tắt Camera
     await expect(room.toggleCamBtn).toBeVisible({ timeout: 15_000 });
-    // Bấm tắt camera
-    await room.toggleCamera();
-    await page.waitForTimeout(500);
-    const isCamOff = await room.isCameraOff();
-    expect(isCamOff).toBeTruthy();
+    const initiallyCamOff = await room.isCameraOff();
 
-    // Bấm bật lại camera
+    // Bấm đổi trạng thái Camera lần 1
     await room.toggleCamera();
     await page.waitForTimeout(500);
-    const isCamBackOn = await room.isCameraOff();
-    expect(isCamBackOn).toBeFalsy();
+    const camAfterFirstToggle = await room.isCameraOff();
+    expect(camAfterFirstToggle).toBe(!initiallyCamOff);
+
+    // Bấm đổi trạng thái Camera lần 2 để hoàn nguyên
+    await room.toggleCamera();
+    await page.waitForTimeout(500);
+    const camAfterSecondToggle = await room.isCameraOff();
+    expect(camAfterSecondToggle).toBe(initiallyCamOff);
   });
 
   /**

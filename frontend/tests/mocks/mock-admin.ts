@@ -1,12 +1,14 @@
 import type { Page } from '@playwright/test';
 import {
   setupAdminApiMocks,
+  setupAuthApiMocks,
   MOCK_CAREERS,
   MOCK_AUDIT_LOGS,
   MOCK_ADMIN_JOB_POSTS,
   MOCK_COMPANY_VERIFICATIONS,
   MOCK_ADMIN_USERS,
 } from '../helpers/mockApi';
+import { DEFAULT_ADMIN } from '../helpers/auth';
 
 export interface SetupAdminOptions {
   revokedUserId?: number;
@@ -18,6 +20,12 @@ export interface SetupAdminOptions {
  */
 export async function setupDomainAdminMocks(page: Page, options?: SetupAdminOptions) {
   await setupAdminApiMocks(page);
+  await setupAuthApiMocks(page, {
+    role: 'ADMIN',
+    id: DEFAULT_ADMIN.id,
+    email: DEFAULT_ADMIN.email,
+    fullName: DEFAULT_ADMIN.fullName,
+  });
 
   const dynamicCareers = [...(options?.initialCareers || MOCK_CAREERS)];
 

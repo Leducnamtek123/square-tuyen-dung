@@ -3,12 +3,13 @@ import React, { useMemo } from "react";
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { Button, Menu, Stack, Typography } from "@mui/material";
+import { Box, Button, Menu, Stack, Typography } from "@mui/material";
 
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 import LogoutIcon from "@mui/icons-material/Logout";
+import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
 import Feedback from '@/components/Features/Feedback';
 
 import { confirmModal } from "@/utils/sweetalert2Modal";
@@ -35,6 +36,7 @@ interface UserMenuProps {
   anchorElUser: HTMLElement | null;
   open: boolean;
   handleCloseUserMenu: () => void;
+  isVerified?: boolean;
 }
 
 interface WorkspaceItem {
@@ -51,7 +53,7 @@ interface MenuItem {
   onClick: () => void;
 }
 
-const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) => {
+const UserMenu = ({ anchorElUser, open, handleCloseUserMenu, isVerified }: UserMenuProps) => {
   const { t, i18n } = useTranslation('common');
   const { push } = useRouter();
   const pathname = usePathname() || "/";
@@ -61,6 +63,10 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
   const canSubmitFeedback = !!currentUser && currentUser.roleName !== ROLES_NAME.ADMIN;
   const [hostname, setHostname] = React.useState('');
+
+  const accountVerified = isVerified ?? Boolean(
+    currentUser?.isOnboarded || currentUser?.isPhoneVerified || currentUser?.isVerifyEmail
+  );
 
   React.useEffect(() => {
     setHostname(window.location.hostname);
@@ -155,6 +161,10 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
           };
           dispatch(setActiveWorkspace(normalizedWorkspace));
           if (workspace.type === "company") {
+            if (rawRole === "employee") {
+              window.location.href = '/employee/dashboard';
+              return;
+            }
             if (currentUser?.isOnboarded === false) {
               window.location.href = '/onboarding/employer';
               return;
@@ -229,8 +239,11 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
             elevation: 0,
             sx: {
               overflow: "visible",
-              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              filter: "drop-shadow(0px 4px 20px rgba(15, 23, 42, 0.12))",
               mt: 1.5,
+              minWidth: 220,
+              borderRadius: 2,
+              border: "1px solid #e2e8f0",
               "& .MuiAvatar-root": {
                 width: 32,
                 height: 32,
@@ -248,6 +261,8 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
                 bgcolor: "background.paper",
                 transform: "translateY(-50%) rotate(45deg)",
                 zIndex: 0,
+                borderTop: '1px solid #e2e8f0',
+                borderLeft: '1px solid #e2e8f0',
               },
             },
           },
@@ -255,7 +270,49 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <Stack spacing={1} sx={{ p: 1 }}>
+        {currentUser && (
+          <Box
+            sx={{
+              px: 2,
+              py: 1.5,
+              borderBottom: '1px solid #e2e8f0',
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontWeight: 700,
+                color: '#0f172a',
+                fontSize: '0.875rem',
+                lineHeight: 1.3,
+              }}
+              noWrap
+            >
+              {currentUser?.fullName || t('common.user', 'Ứng viên')}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6, mt: 0.5 }}>
+              <VerifiedRoundedIcon
+                sx={{ fontSize: 14, color: accountVerified ? '#16a34a' : '#94a3b8' }}
+              />
+              <Typography
+                variant="caption"
+                sx={{
+                  color: accountVerified ? '#15803d' : '#64748b',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                }}
+              >
+                {accountVerified
+                  ? t('auth.verifiedAccount', 'Tài khoản đã xác thực')
+                  : t('auth.unverifiedAccount', 'Tài khoản chưa xác thực')}
+              </Typography>
+            </Box>
+          </Box>
+        )}
+
+        <Stack spacing={0.5} sx={{ p: 1, position: 'relative', zIndex: 1 }}>
           {shouldShowAdminPortalLink && (
             <Button
               startIcon={<AdminPanelSettingsIcon style={{ marginLeft: 4 }} />}

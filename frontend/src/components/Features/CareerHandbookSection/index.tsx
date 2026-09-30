@@ -71,7 +71,7 @@ const CareerHandbookSection = () => {
         <Grid container spacing={3}>
           {Array.from(Array(3).keys()).map((i) => (
             <Grid key={i} size={{ xs: 12, md: 4 }}>
-              <Skeleton variant="rounded" height={340} sx={{ borderRadius: '16px' }} />
+              <Skeleton variant="rectangular" height={340} sx={{ borderRadius: 0 }} />
             </Grid>
           ))}
         </Grid>
@@ -91,7 +91,7 @@ const CareerHandbookSection = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     height: '100%',
-                    borderRadius: '16px',
+                    borderRadius: 0,
                     border: '1px solid #e2e8f0',
                     boxShadow: 0,
                     textDecoration: 'none',
@@ -197,7 +197,7 @@ const CareerHandbookSection = () => {
             color: '#ffffff',
             fontWeight: 800,
             fontSize: '0.9rem',
-            borderRadius: '24px',
+            borderRadius: 0,
             px: 3.5,
             py: 1.2,
             textTransform: 'none',

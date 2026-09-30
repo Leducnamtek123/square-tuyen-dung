@@ -1,110 +1,161 @@
 {
-  "tabTitle": "About Us - {{appName}} Recruitment Ecosystem",
+  "tabTitle": "About Us — Domain Recruitment & Real-Time Voice AI Platform | InfoHR",
   "heading": "Our Mission",
-  "description": "{{appName}} is a leading HR technology platform built to solve the biggest challenges in connecting talent and businesses. We are not just a connection website, but a comprehensive ecosystem supporting Profile Analysis, Competency Assessment, and Online Interview Management. {{appName}} is committed to bringing transparency, security, and superior efficiency to the modern recruitment process.",
-  "features": {
-    "careerTitle": "Accurate Career Orientation",
-    "careerDesc": "Provide a comprehensive view of career maps, skill requirements, and development paths at leading enterprises.",
-    "cvTitle": "Professional Profile Building",
-    "cvDesc": "Online CV and Profile creation tools help candidates stand out to employers with scientific information structures.",
-    "locationTitle": "Local Job Connection",
-    "locationDesc": "Digitized job maps make it easy for candidates to find career opportunities right where they live.",
-    "notificationTitle": "Instant Update System",
-    "notificationDesc": "Multi-channel notifications help both candidates and employers not miss any important feedback or interview opportunities."
-  },
-  "mobileAppHeading": "Comprehensive Recruitment Process",
-  "cvProfileDetail": {
-    "title": "Digitize Application Profiles",
-    "desc1": "Create a professional online Profile, easily share and apply with just one click.",
-    "desc2": "Support attaching old file CVs and automatically extract important information to optimize search results.",
-    "desc3": "Always updated and flexibly adjusted to suit each different career direction of candidates."
-  },
-  "aroundJobDetail": {
-    "title": "Smart Regional Jobs",
-    "desc1": "Easily search for jobs within your desired radius.",
-    "desc2": "Use visual maps to identify business locations, helping you be more proactive in choosing where to work.",
-    "desc3": "Save travel time and find the perfect balance between work and personal life."
-  },
-  "notificationDetail": {
-    "title": "Effective Interaction Management",
-    "desc1": "Smart notification system helps you closely follow the status of your application profile.",
-    "desc2": "Receive interview appointments directly from employers and respond right on the platform.",
-    "desc3": "Ensure seamless communication between businesses and candidates throughout the selection process."
-  },
-  "subtitle": "Comprehensive AI Recruitment Solution under InfoHR Ecosystem: Intelligent searching & screening, multilingual Video & Voice AI interviews, competency assessment & Collaborative Hiring.",
-  "stats": {
-    "stat1Num": "80%",
-    "stat1Text": "Reduction in pre-screening & profile review time",
-    "stat2Num": "3.5x",
-    "stat2Text": "Increase in successful interview & hiring rate",
-    "stat3Num": "95%",
-    "stat3Text": "AI Match Score skill matching algorithm accuracy",
-    "stat4Num": "24/7",
-    "stat4Text": "Automated interviews without time or geographic constraints"
-  },
-  "workflowHeading": "Breakthrough Recruitment Process with AILA AI",
-  "workflowLead": "Comprehensive digital solution empowering enterprises to automate job posting, screening, interviewing, and onboarding.",
-  "steps": {
-    "step1Title": "1. Smart Search & Screening",
-    "step1Desc": "Automatically analyze CV profiles, compute AI Match Scores, and suggest top potential candidates.",
-    "step2Title": "2. Multilingual Video & Voice AI Interviews",
-    "step2Desc": "AI conducts live interviews with natural voice, analyzing tone, facial cues, and real-time transcripts.",
-    "step3Title": "3. Competency Assessment & Skill Gap Analysis",
-    "step3Desc": "Export comprehensive reports on strengths, weaknesses, and skill gaps against job requirements.",
-    "step4Title": "4. Hiring Decision & Collaborative Team Review",
-    "step4Desc": "Recruitment panels easily collaborate, submit feedback, and synchronize data with InfoHR HRM."
-  },
-  "featuresHeading": "Breakthrough Features Powered by AILA",
-  "aiVoiceTitle": "Voice AI Interview Assistant",
-  "aiVoiceDesc1": "Conduct automated screening interviews with fluid AI voices supporting Vietnamese and English.",
-  "aiVoiceDesc2": "Automated audio recording, speech-to-text transcription, and searchable transcripts for hiring managers.",
-  "aiVoiceDesc3": "Eliminate 90% of manual phone screening time for HR professionals.",
-  "aiMatchTitle": "Match Score Algorithm & Skill Analysis",
-  "aiMatchDesc1": "AI matches candidate profiles against Job Descriptions to calculate precise compatibility percentages.",
-  "aiMatchDesc2": "Identifies skill gaps and suggests targeted interview questions for each specific candidate.",
-  "aiMatchDesc3": "Enables data-driven hiring decisions while eliminating subjective human bias.",
-  "aiPipelineTitle": "Candidate Pipeline CRM",
-  "aiPipelineDesc1": "Visual Kanban pipeline from Pre-screening and Live AI Interview to Job Offer and Onboarding.",
-  "aiPipelineDesc2": "Automated notifications, interview invites, and status updates delivered instantly via email.",
-  "aiPipelineDesc3": "Seamless two-way integration with the InfoHR Human Resource Management ecosystem.",
+  "description": "InfoHR is a premier HR technology and Voice AI platform engineered to bridge the gap between academic credentials and field competency in Vietnam's vital technical and economic industries.",
   "aboutUsPage": {
-    "tabTitle": "About Us - Recruitment & HRM Ecosystem {{appName}}",
-    "heroBadge": "INFOHR RECRUITMENT & HUMAN RESOURCE ECOSYSTEM",
-    "industries": {
-      "construction": "Construction",
-      "realEstate": "Real Estate",
-      "architecture": "Architecture & Interior Design",
-      "mep": "Engineering & MEP Systems"
+    "tabTitle": "About Us — Domain Recruitment & Real-Time Voice AI Platform | InfoHR",
+    "kicker": "PLATFORM OVERVIEW • INFOHR TECHNOLOGY ECOSYSTEM",
+    "heroTitle": "Redefining Technical Recruitment with Verified Data & Transparent Voice AI",
+    "heroLead": "InfoHR was engineered to eliminate the disconnect between resume claims and real-world competency. We establish specialized recruitment standards across 4 vital engineering sectors — combining a verified credentials talent exchange with 24/7 AILA Voice AI screening.",
+    "badges": {
+      "squareGroup": "InfoHR Ecosystem",
+      "webrtc": "LiveKit WebRTC Voice AI",
+      "verified": "100% Competency Verified",
+      "fourIndustries": "4 Specialized Verticals"
     },
-    "stats": {
-      "candidates": "Connected Talent Profiles",
-      "candidatesDesc": "High-skilled professionals",
-      "companies": "Partner Enterprises",
-      "companiesDesc": "Reputable corporations & firms",
-      "satisfaction": "Recruitment Satisfaction",
-      "satisfactionDesc": "Positive partner feedback",
-      "aiOperating": "AI Interview Operations",
-      "aiOperatingDesc": "24/7 round-the-clock availability"
+    "heroCtaPrimary": "Explore Technical Careers",
+    "heroCtaSecondary": "Experience AILA Voice AI",
+    "problemSection": {
+      "tag": "REALITY & ORIGIN",
+      "title": "Why the Market Needs InfoHR",
+      "description": "Conventional recruitment squanders millions of productive hours due to superficial resume screening and the crisis of embellished CVs.",
+      "traditionalTitle": "The Paradox of Traditional Hiring",
+      "traditionalPains": [
+        {
+          "title": "Inflated CVs & Embellished Skills",
+          "desc": "Over 75% of candidate profiles rely on generic online templates, obscuring true competency gaps until costly post-hire disillusionment."
+        },
+        {
+          "title": "Manual Pre-Screening Call Fatigue",
+          "desc": "HR specialists spend 20 to 30 hours per week repeating routine preliminary questions, dragging hiring cycles out to 3-4 weeks per opening."
+        },
+        {
+          "title": "Subjective Biases & Data-Deficient Decisions",
+          "desc": "Early screening rounds are easily influenced by appearance, age, or regional bias rather than objective domain mastery and verified track record."
+        }
+      ],
+      "solutionTitle": "The InfoHR Method",
+      "solutionPoints": [
+        {
+          "title": "Standardized Technical Profiles & Verified Licenses",
+          "desc": "Clean separation between self-reported resumes and verified professional licenses (Grade I/II/III), technical degrees, and completed project milestones."
+        },
+        {
+          "title": "Autonomous 24/7 AILA Voice AI Pre-Screening",
+          "desc": "Candidates interview at their own convenience via natural spoken dialogue. The system produces real-time transcripts and STAR competency assessments."
+        },
+        {
+          "title": "80% Faster Time-to-Hire",
+          "desc": "Hiring panels evaluate comprehensive skill matrices and recorded interview transcripts, closing high-caliber talent in as little as 48 hours."
+        }
+      ]
     },
-    "coreValues": {
-      "aiTechTitle": "Pioneering AI Technology",
-      "aiTechDesc": "Employing natural Voice AI models and objective competency algorithms, removing time constraints and hiring biases.",
-      "speedCostTitle": "Optimized Speed & Cost",
-      "speedCostDesc": "Reduce candidate pre-screening and review time by up to 80%, optimizing HR budgets for companies of any size.",
-      "fourIndustriesTitle": "Specialized Across 4 Industries",
-      "fourIndustriesDesc": "Deep domain expertise in Construction, Real Estate, Architecture/Interior Design, and MEP Engineering.",
-      "securityTitle": "Enterprise-Grade Security",
-      "securityDesc": "Candidate and corporate HR data is safeguarded with strict modern enterprise-grade security encryption standards."
+    "industriesSection": {
+      "tag": "FOCUSED STRATEGY",
+      "title": "Specialized Across 4 Vital Engineering Verticals",
+      "description": "Instead of building a generic job board, InfoHR deliberately focuses on 4 sectors demanding strict statutory licensing and rigorous technical accountability.",
+      "items": [
+        {
+          "id": "construction",
+          "name": "Construction & Project Management",
+          "roles": "Chief Site Engineers, Structural Supervisors, QS/QC Engineers, HSE Officers",
+          "challenge": "Strictly requires Ministry of Construction Practicing Certificates (Grade I/II/III) and rugged field leadership that generic boards cannot filter.",
+          "solution": "Digital certification verification, specialized Voice AI situational questions covering on-site crisis management, safety protocols, and shop drawing execution."
+        },
+        {
+          "id": "realEstate",
+          "name": "Real Estate & Project Development",
+          "roles": "Real Estate Legal Counsel, Project M&A, Building Operations, Asset Valuators",
+          "challenge": "Demands mastery over Land Law, Real Estate Business Law, cash flow modeling, and executive-level negotiations that cannot be treated like mass retail.",
+          "solution": "Evaluates regulatory acumen, feasibility assessment logic, and high-stakes negotiation demeanor through dynamic Voice AI interactive scenarios."
+        },
+        {
+          "id": "architecture",
+          "name": "Architecture & Interior Design",
+          "roles": "Principal Architects, Interior Designers, 3D Visualizers, Structural Designers",
+          "challenge": "Skill is validated through real-world built portfolios, spatial intelligence, and software fluency (Revit, BIM, 3ds Max, AutoCAD, SketchUp).",
+          "solution": "High-fidelity digital portfolio vault, design philosophy cross-referencing, and verification of detailed construction drawing experience."
+        },
+        {
+          "id": "mep",
+          "name": "MEP Engineering & Building Systems",
+          "roles": "Mechanical/Electrical/Plumbing Designers, HVAC Engineers, Fire Protection Engineers, BMS Automation",
+          "challenge": "Stringent safety regulations (QCVN 06 Fire Safety), electrical load calculations, and building automation requiring absolute zero-tolerance for error.",
+          "solution": "Specialized interview scripts aligned with MEP engineering codes, electrical load modeling, and statutory inspection acceptance track records."
+        }
+      ]
     },
-    "steps": {
-      "step1Title": "Post Jobs & Attract Talent",
-      "step1Desc": "Post smart job listings optimized for search engines, reaching thousands of verified specialized candidates.",
-      "step2Title": "AI Screening & Voice Interviews",
-      "step2Desc": "AILA AI analyzes resumes, computes Match Scores, and conducts natural automated voice screening interviews 24/7.",
-      "step3Title": "STAR Competency Assessment",
-      "step3Desc": "Hiring panels receive skill matrices, competency gap analysis, and recorded interview transcripts for confident decision-making.",
-      "step4Title": "Onboarding & HRM Integration",
-      "step4Desc": "Seamlessly sync hired talent into InfoHR HRM: digital employment contracts, org-chart mapping, and unified workforce management."
+    "ecosystemSection": {
+      "tag": "INTEGRATED ECOSYSTEM",
+      "title": "The 4 Subsystems of the InfoHR Platform",
+      "description": "Each component serves a dedicated milestone within the human capital lifecycle, connected in real-time.",
+      "items": [
+        {
+          "subdomain": "infohr.vn",
+          "name": "Technical Job Seeker Portal",
+          "desc": "Built for specialized professionals. Create competency-structured CVs, discover radius-based verified openings, and practice with Voice AI.",
+          "url": "https://infohr.vn",
+          "target": "_self"
+        },
+        {
+          "subdomain": "employer.infohr.vn",
+          "name": "Recruiter Command Center",
+          "desc": "Built for talent acquisition teams. Publish SEO-optimized engineering JDs, access verified candidate pools, and manage Kanban recruitment pipelines.",
+          "url": "https://employer.infohr.vn",
+          "target": "_blank"
+        },
+        {
+          "subdomain": "aila.infohr.vn",
+          "name": "AILA Voice AI Interview Suite",
+          "desc": "24/7 WebRTC voice interview engine. Automates initial screening, eliminates scheduling friction, and exports objective STAR skill gap matrices.",
+          "url": "https://aila.infohr.vn",
+          "target": "_blank"
+        },
+        {
+          "subdomain": "hrm.infohr.vn",
+          "name": "Workforce HRM Management",
+          "desc": "End-to-end employee lifecycle: seamless onboarding transition, digital employment contracts, employee master records, attendance, and org charts.",
+          "url": "https://hrm.infohr.vn",
+          "target": "_blank"
+        }
+      ]
+    },
+    "technologySection": {
+      "tag": "TECHNICAL TRANSPARENCY",
+      "title": "Battle-Tested Architecture & Responsible AI",
+      "description": "We treat AI not as an opaque black box, but as an objective, transparent pre-screening assistant safeguarding both candidate dignity and employer trust.",
+      "cards": [
+        {
+          "title": "Low-Latency WebRTC SFU (LiveKit)",
+          "desc": "Sub-300ms audio streaming with active noise suppression, facilitating natural spoken human-agent dialogue without perceptible latency."
+        },
+        {
+          "title": "Ethical AI: Humans Hold Final Authority",
+          "desc": "AILA AI never unilaterally rejects or approves candidates. It acts as an impartial recording secretary, delivering structured evidence to human hiring committees."
+        },
+        {
+          "title": "Enterprise Security & Zero Data Reselling",
+          "desc": "All candidate resumes, audio streams, and interview transcripts are encrypted with AES-256 on isolated MinIO S3 storage behind an OWASP WAF edge shield."
+        }
+      ]
+    },
+    "stats": [
+      { "num": "1,200+", "label": "Enterprise Partners", "desc": "Trusted hiring corporations" },
+      { "num": "50,000+", "label": "Technical Talent Profiles", "desc": "Verified industry candidates" },
+      { "num": "80%", "label": "Screening Time Reduced", "desc": "Optimized hiring efficiency" },
+      { "num": "< 300ms", "label": "WebRTC Voice Latency", "desc": "Natural real-time interview" }
+    ],
+    "corporateSection": {
+      "tag": "PLATFORM DEVELOPER",
+      "companyName": "InfoHR Technology — Architecting Digital Enterprise Solutions",
+      "companyDesc": "InfoHR is a strategic HRTech platform. Backed by solid engineering infrastructure and extensive experience serving top enterprises in Vietnam, InfoHR is committed to sustainable value and market transparency.",
+      "badge": "Comprehensive Recruitment Warranty Guarantee"
+    },
+    "ctaSection": {
+      "title": "Ready to Experience the New Standard in Technical Hiring?",
+      "desc": "Whether you are an engineer seeking your next career leap or an enterprise hunting for technical leaders, InfoHR is your trusted partner.",
+      "candidateCta": "Explore Engineering Careers",
+      "employerCta": "Register as an Employer"
     }
   }
 }

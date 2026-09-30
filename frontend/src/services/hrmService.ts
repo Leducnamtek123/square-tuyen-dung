@@ -112,6 +112,13 @@ export type NativeEmployee = {
   tax_id?: string;
   socialInsuranceId?: string;
   social_insurance_id?: string;
+  company?: number;
+  company_name?: string;
+  companyName?: string;
+  designation_name?: string;
+  designationName?: string;
+  dependents_count?: number;
+  dependentsCount?: number;
   contracts?: NativeContract[];
 };
 
@@ -327,6 +334,8 @@ export interface NativeEmployeeOnboardingProcess {
   updateAt?: string;
 }
 
+export type NativeOnboardingProcess = NativeEmployeeOnboardingProcess;
+
 export interface OnboardingStatsResponse {
   total_onboarding: number;
   totalOnboarding?: number;
@@ -414,6 +423,10 @@ export type NativeMonthlyPayrollRecord = {
   taxable_income?: number;
   personalIncomeTax?: number;
   personal_income_tax?: number;
+  pitAmount?: number;
+  pit_amount?: number;
+  baseSalary?: number;
+  base_salary?: number;
   netSalary?: number;
   net_salary?: number;
   totalCompanyExpense?: number;
@@ -584,6 +597,39 @@ export type QuickCheckinPayload = {
   notes?: string;
 };
 
+export type NativeAttendanceRecord = {
+  id: number;
+  employee: number;
+  employee_name?: string;
+  employee_code?: string;
+  department_name?: string;
+  shift?: number | null;
+  shift_name?: string | null;
+  shift_code?: string | null;
+  date: string;
+  check_in?: string | null;
+  checkIn?: string | null;
+  check_out?: string | null;
+  checkOut?: string | null;
+  scheduled_in?: string | null;
+  scheduled_out?: string | null;
+  late_minutes?: number;
+  early_minutes?: number;
+  working_hours?: number | string;
+  workingHours?: number | string;
+  effective_work_hours?: number | string;
+  overtime_hours?: number | string;
+  status_code?: string;
+  status: 'PRESENT' | 'LATE' | 'EARLY_LEAVE' | 'ABSENT' | 'ON_LEAVE' | 'WEEKEND' | string;
+  status_label?: string;
+  is_manually_adjusted?: boolean;
+  adjustment_reason?: string;
+  is_locked?: boolean;
+  notes?: string;
+  create_at?: string;
+  update_at?: string;
+};
+
 export type MyHrmProfileResponse = {
   employee: NativeEmployee;
   active_contract?: NativeContract | null;
@@ -592,6 +638,12 @@ export type MyHrmProfileResponse = {
   leaveBalances?: NativeLeaveBalance[];
   recent_payrolls?: NativeMonthlyPayrollRecord[];
   recentPayrolls?: NativeMonthlyPayrollRecord[];
+  recent_attendance_summaries?: any[];
+  recentAttendanceSummaries?: any[];
+  onboarding_process?: NativeOnboardingProcess | null;
+  onboardingProcess?: NativeOnboardingProcess | null;
+  today_attendance?: NativeAttendanceRecord | null;
+  todayAttendance?: NativeAttendanceRecord | null;
 };
 
 export type NativeWorkShift = {
@@ -955,6 +1007,30 @@ const hrmService = {
 
   getMyHrmProfile: (): Promise<MyHrmProfileResponse> => {
     return httpRequest.get('native-hrm/me/').then((res) => unwrapDataResponse<MyHrmProfileResponse>(res));
+  },
+
+  submitSelfOnboardingTask: (
+    taskId: number,
+    payload: {
+      file_url?: string;
+      document_type?: string;
+      name?: string;
+      bank_name?: string;
+      bank_account_number?: string;
+      bank_account_holder?: string;
+      tax_id?: string;
+      dependents_count?: number;
+    }
+  ): Promise<NativeOnboardingTaskItem> => {
+    return httpRequest
+      .post(`native-hrm/me/onboarding/tasks/${taskId}/submit/`, payload)
+      .then((res) => unwrapDataResponse<NativeOnboardingTaskItem>(res));
+  },
+
+  punchSelfAttendance: (payload: { punch_type: 'CHECK_IN' | 'CHECK_OUT' | 'AUTO'; note?: string }): Promise<any> => {
+    return httpRequest
+      .post('native-hrm/me/punch/', payload)
+      .then((res) => unwrapDataResponse<any>(res));
   },
 
   deleteEmployee: (id: number): Promise<void> => {

@@ -34,7 +34,7 @@ const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   boxShadow: 'none',
   border: 'none',
   [theme.breakpoints.up('sm')]: {
-    borderRadius: '28px',
+    borderRadius: 0,
     boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
     border: '1px solid #E2E8F0',
   },
@@ -362,7 +362,7 @@ const EmployerLogin = () => {
                       border: '1px solid #DBEAFE',
                       px: 1.5,
                       py: 0.6,
-                      borderRadius: '8px',
+                      borderRadius: 0,
                     }}
                   >
                     <Typography
@@ -444,7 +444,7 @@ const EmployerLogin = () => {
                     severity="error"
                     sx={{
                       mb: 2.5,
-                      borderRadius: '12px',
+                      borderRadius: 0,
                       fontSize: '13.5px',
                     }}
                   >
@@ -458,7 +458,7 @@ const EmployerLogin = () => {
                     severity="success"
                     sx={{
                       mb: 2.5,
-                      borderRadius: '12px',
+                      borderRadius: 0,
                       fontSize: '13.5px',
                     }}
                   >

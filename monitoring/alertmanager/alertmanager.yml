@@ -1,0 +1,28 @@
+# =============================================================================
+# Alertmanager Configuration — InfoHR Monitoring
+# =============================================================================
+
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'job', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'telegram-receiver'
+
+receivers:
+  - name: 'telegram-receiver'
+    telegram_configs:
+      - bot_token: '8868779628:AAHsMdX6URzb8QhzyzBeh3G6N3Kbes0pUHg'
+        chat_id: 5423979716
+        send_resolved: true
+        parse_mode: 'HTML'
+        message: |-
+          {{ if eq .Status "firing" }}🔥 <b>[CẢNH BÁO HỆ THỐNG]</b>{{ else }}✅ <b>[ĐÃ KHẮC PHỤC]</b>{{ end }}
+          <b>Cảnh báo:</b> {{ .CommonLabels.alertname }}
+          <b>Mức độ:</b> {{ .CommonLabels.severity }}
+          <b>Dịch vụ:</b> {{ .CommonLabels.job }}
+          <b>Tóm tắt:</b> {{ .CommonAnnotations.summary }}
+          {{ if .CommonAnnotations.description }}<b>Chi tiết:</b> {{ .CommonAnnotations.description }}{{ end }}

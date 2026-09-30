@@ -610,12 +610,16 @@ class EmployerStepSaveView(APIView):
 
         # Find or create Company
         company = user.get_active_company() or Company.objects.filter(user=user).first()
+        user_comp_phone = user.phone_number if (user.phone_number and not Company.objects.filter(company_phone=user.phone_number).exists()) else None
+        clean_comp_phone = company_phone if (company_phone and not Company.objects.filter(company_phone=company_phone).exists()) else None
+        safe_company_phone = clean_comp_phone or user_comp_phone or f"099{user.id:07d}"[:10]
+
         if not company and company_name:
             company = Company.objects.create(
                 user=user,
                 company_name=company_name,
                 company_email=company_email or user.email,
-                company_phone=company_phone or user.phone_number or "0900000000",
+                company_phone=safe_company_phone,
                 tax_code=tax_code or f"PENDING_{user.id}",
                 employee_size=int(raw_emp_size) if raw_emp_size in [1, 2, 3, 4] else 2,
                 field_operation=field_operation or "",
@@ -826,7 +830,8 @@ class EmployerOnboardingView(APIView):
 
             final_tax = clean_tax or f"PENDING_{user.id}"
             final_email = clean_email or user.email
-            final_phone = clean_phone or user.phone_number or ""
+            user_candidate_phone = user.phone_number if (user.phone_number and not Company.objects.filter(company_phone=user.phone_number).exists()) else None
+            final_phone = clean_phone or user_candidate_phone or f"099{user.id:07d}"[:10]
 
             company = Company.objects.create(
                 user=user,
@@ -1044,9 +1049,16 @@ class TaxLookupView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+        import re
+        import requests
+
         tax_code = (request.query_params.get("tax_code") or "").strip()
         if not tax_code:
             return Response({"message": "Vui lòng cung cấp mã số thuế"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Regex validation: Vietnamese tax codes are 10 digits or 10 digits + '-' + 3 digits (e.g. 0101234567 or 0101234567-001)
+        if not re.match(r"^\d{10}(-\d{3})?$", tax_code):
+            return Response({"message": "Mã số thuế không đúng định dạng (yêu cầu 10 hoặc 13 chữ số)."}, status=status.HTTP_400_BAD_REQUEST)
 
         # 1. Check if company already exists in InfoHR
         existing_company = Company.objects.filter(tax_code=tax_code).first()
@@ -1074,22 +1086,22 @@ class TaxLookupView(APIView):
         # 2. Try looking up from VietQR open public API
         lookup_data = None
         try:
-            import urllib.request
-            import json
-            req = urllib.request.Request(
-                f"https://api.vietqr.io/v2/business/{tax_code}",
-                headers={"User-Agent": "InfoHR/1.0"}
+            vietqr_url = f"https://api.vietqr.io/v2/business/{tax_code}"
+            resp = requests.get(
+                vietqr_url,
+                headers={"User-Agent": "InfoHR/1.0"},
+                timeout=3.5,
+                verify=True,
             )
-            with urllib.request.urlopen(req, timeout=3.5) as resp:
-                if resp.status == 200:
-                    res_json = json.loads(resp.read().decode("utf-8"))
-                    if res_json.get("code") == "00" and res_json.get("data"):
-                        b_data = res_json["data"]
-                        lookup_data = {
-                            "companyName": b_data.get("name") or b_data.get("shortName") or "",
-                            "address": b_data.get("address") or "",
-                            "taxCode": tax_code,
-                        }
+            if resp.status_code == 200:
+                res_json = resp.json()
+                if res_json.get("code") == "00" and res_json.get("data"):
+                    b_data = res_json["data"]
+                    lookup_data = {
+                        "companyName": b_data.get("name") or b_data.get("shortName") or "",
+                        "address": b_data.get("address") or "",
+                        "taxCode": tax_code,
+                    }
         except Exception as ex:
             logger.info(f"VietQR lookup skipped or timed out for {tax_code}: {ex}")
 

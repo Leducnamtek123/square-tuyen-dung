@@ -28,6 +28,8 @@ const getFirebaseAuthErrorMessage = (
       return t('login.phoneTooManyRequests');
     case 'auth/unauthorized-domain':
       return t('login.unauthorizedDomain');
+    case 'auth/internal-error':
+      return 'Lỗi xác thực Firebase (auth/internal-error). Vui lòng thử lại hoặc đảm bảo tên miền infohr.vn đã được thêm vào Authorized Domains trên Firebase Console.';
     default:
       return firebaseError.message || t('login.phoneSendFailed');
   }
@@ -266,11 +268,21 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
   );
 
   const resetRecaptcha = React.useCallback(() => {
-    recaptchaVerifierRef.current?.clear();
-    recaptchaVerifierRef.current = null;
+    if (recaptchaVerifierRef.current) {
+      try {
+        recaptchaVerifierRef.current.clear();
+      } catch (e) {
+        console.warn('Failed to clear recaptcha verifier', e);
+      }
+      recaptchaVerifierRef.current = null;
+    }
   }, []);
 
-  React.useEffect(() => resetRecaptcha, [resetRecaptcha]);
+  React.useEffect(() => {
+    return () => {
+      resetRecaptcha();
+    };
+  }, [resetRecaptcha]);
 
   React.useEffect(() => {
     if (state.resendTimer <= 0) {
@@ -350,7 +362,6 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
           >
             {t('actions.sendOTP')}
           </StyledButton>
-          <Box id={RECAPTCHA_CONTAINER_ID} sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}></Box>
         </Stack>
       ) : (
         <Stack spacing={2}>
@@ -401,9 +412,9 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
               {t('actions.resendOTP')}
             </Button>
           )}
-          <Box id={RECAPTCHA_CONTAINER_ID} sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}></Box>
         </Stack>
       )}
+      <Box id={RECAPTCHA_CONTAINER_ID} sx={{ display: 'none' }}></Box>
     </Box>
   );
 };

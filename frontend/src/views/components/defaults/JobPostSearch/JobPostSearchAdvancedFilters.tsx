@@ -57,7 +57,7 @@ const FilterSection = ({
   <Box
     sx={{
       p: 2,
-      borderRadius: '14px',
+      borderRadius: 0,
       backgroundColor: '#f8fafc',
       border: '1px solid #e2e8f0',
     }}
@@ -138,7 +138,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
             sx={{
               width: 38,
               height: 38,
-              borderRadius: '10px',
+              borderRadius: 0,
               backgroundColor: '#eff6ff',
               color: '#2563eb',
               display: 'flex',
@@ -188,7 +188,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
                   color: '#64748b',
                   backgroundColor: '#f8fafc',
                   border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
+                  borderRadius: 0,
                   p: 0.75,
                   '&:hover': {
                     color: '#ef4444',
@@ -211,7 +211,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
                 color: '#64748b',
                 backgroundColor: '#f8fafc',
                 border: '1px solid #e2e8f0',
-                borderRadius: '8px',
+                borderRadius: 0,
                 p: 0.75,
                 '&:hover': {
                   color: '#0f172a',
@@ -375,7 +375,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
           startIcon={<RestartAltRoundedIcon />}
           sx={{
             py: 1.2,
-            borderRadius: '12px',
+            borderRadius: 0,
             borderColor: '#cbd5e1',
             color: '#475569',
             fontWeight: 700,
@@ -397,7 +397,7 @@ const JobPostSearchAdvancedFilters: React.FC<JobPostSearchAdvancedFiltersProps> 
           startIcon={<CheckRoundedIcon />}
           sx={{
             py: 1.2,
-            borderRadius: '12px',
+            borderRadius: 0,
             backgroundColor: '#2563eb',
             fontWeight: 700,
             textTransform: 'none',

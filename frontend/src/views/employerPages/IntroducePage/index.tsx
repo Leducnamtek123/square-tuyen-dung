@@ -1701,6 +1701,7 @@ export default function IntroducePage() {
                   href={localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language)}
                   sx={{
                     borderColor: 'rgba(255, 255, 255, 0.25)',
+                    bgcolor: 'rgba(255, 255, 255, 0.05)',
                     color: '#FFFFFF',
                     fontWeight: 600,
                     fontSize: '1rem',
@@ -1708,11 +1709,12 @@ export default function IntroducePage() {
                     px: 3.5,
                     borderRadius: '12px',
                     textTransform: 'none',
-                    backdropFilter: 'blur(4px)',
+                    backdropFilter: 'blur(8px)',
                     transition: 'all 0.2s ease',
                     '&:hover': {
-                      borderColor: '#FFFFFF',
-                      bgcolor: 'rgba(255, 255, 255, 0.1)',
+                      borderColor: '#60A5FA',
+                      bgcolor: 'rgba(255, 255, 255, 0.12)',
+                      transform: 'translateY(-1px)',
                     },
                   }}
                 >

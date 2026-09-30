@@ -1,110 +1,161 @@
 {
-  "tabTitle": "Về chúng tôi - AILA AI Phỏng vấn & Tuyển dụng Thông minh | InfoHR",
-  "heading": "AILA - AI Phỏng vấn & Tuyển dụng Thông minh",
-  "subtitle": "Giải pháp AI Tuyển dụng Toàn diện thuộc Hệ sinh thái InfoHR: Tìm kiếm & sàng lọc thông minh, phỏng vấn Video & Giọng nói đa ngôn ngữ, đánh giá năng lực & Collaborative Hiring.",
-  "stats": {
-    "stat1Num": "80%",
-    "stat1Text": "Rút ngắn thời gian sơ tuyển & sàng lọc hồ sơ",
-    "stat2Num": "3.5x",
-    "stat2Text": "Tăng tỉ lệ phỏng vấn & tiếp nhận ứng viên thành công",
-    "stat3Num": "95%",
-    "stat3Text": "Độ chính xác thuật toán so khớp kỹ năng AI Match Score",
-    "stat4Num": "24/7",
-    "stat4Text": "Phỏng vấn tự động không khoảng cách thời gian & địa lý"
-  },
-  "workflowHeading": "Quy trình Tuyển dụng Đột phá với AILA AI",
-  "workflowLead": "Giải pháp số hóa toàn diện giúp doanh nghiệp tự động hóa từ khâu đăng tin, sàng lọc đến phỏng vấn và tiếp nhận nhân sự.",
-  "steps": {
-    "step1Title": "1. Tìm kiếm & Sàng lọc Thông minh",
-    "step1Desc": "Tự động phân tích CV, chấm điểm độ phù hợp và gợi ý các ứng viên tiềm năng nhất.",
-    "step2Title": "2. Phỏng vấn Video & Giọng nói AI Đa ngôn ngữ",
-    "step2Desc": "AI phỏng vấn trực tiếp bằng giọng nói tự nhiên, phân tích ngữ điệu, biểu cảm và chuyển ngữ real-time.",
-    "step3Title": "3. Đánh giá Năng lực & Phân tích Kỹ năng",
-    "step3Desc": "Xuất báo cáo chi tiết về điểm mạnh, điểm yếu và khoảng trống kỹ năng so với yêu cầu công việc.",
-    "step4Title": "4. Quyết định Tuyển dụng & Đánh giá Chung",
-    "step4Desc": "Hội đồng tuyển dụng dễ dàng đánh giá chung, trao đổi nhận xét và đồng bộ dữ liệu với hệ thống HRM."
-  },
-  "featuresHeading": "Các Tính Năng Đột Phá Thuộc Nền Tảng AILA",
-  "aiVoiceTitle": "Trợ lý Phỏng vấn Giọng nói AI",
-  "aiVoiceDesc1": "Tự động thực hiện các cuộc phỏng vấn sơ loại bằng giọng nói AI mượt mà, hỗ trợ cả Tiếng Việt và Tiếng Anh.",
-  "aiVoiceDesc2": "Tự động ghi âm, nhận diện giọng nói và chuyển đổi thành văn bản transcript để hội đồng tuyển dụng xem lại bất kỳ lúc nào.",
-  "aiVoiceDesc3": "Giảm thiểu 90% thời gian gọi điện sơ tuyển thủ công của chuyên viên HR.",
-  "aiMatchTitle": "Thuật Toán Match Score & Phân Tích Kỹ Năng",
-  "aiMatchDesc1": "AI tự động đối soát hồ sơ ứng viên với yêu cầu công việc để chấm điểm phần trăm phù hợp.",
-  "aiMatchDesc2": "Phân tích khoảng trống kỹ năng, đưa ra gợi ý câu hỏi phỏng vấn đào sâu cho từng ứng viên.",
-  "aiMatchDesc3": "Giúp doanh nghiệp ra quyết định tuyển dụng dựa trên dữ liệu khách quan, tránh định kiến cá nhân.",
-  "aiPipelineTitle": "Quản Lý Đường Ống Tuyển Dụng",
-  "aiPipelineDesc1": "Quy trình Kanban trực quan từ Sơ tuyển, Phỏng vấn AI Live đến Ký hợp đồng & Onboarding.",
-  "aiPipelineDesc2": "Tự động gửi thông báo, lịch hẹn phỏng vấn và kết quả đến email/sĐT của ứng viên tức thì.",
-  "aiPipelineDesc3": "Kết nối liền mạch với Hệ sinh thái Quản lý Nhân sự InfoHR HRM.",
-  "description": "{{appName}} is a leading HR technology platform built to solve the biggest challenges in connecting talent and businesses. We are not just a connection website, but a comprehensive ecosystem supporting Profile Analysis, Competency Assessment, and Online Interview Management. {{appName}} is committed to bringing transparency, security, and superior efficiency to the modern recruitment process.",
-  "features": {
-    "careerTitle": "Accurate Career Orientation",
-    "careerDesc": "Provide a comprehensive view of career maps, skill requirements, and development paths at leading enterprises.",
-    "cvTitle": "Professional Profile Building",
-    "cvDesc": "Online CV and Profile creation tools help candidates stand out to employers with scientific information structures.",
-    "locationTitle": "Local Job Connection",
-    "locationDesc": "Digitized job maps make it easy for candidates to find career opportunities right where they live.",
-    "notificationTitle": "Instant Update System",
-    "notificationDesc": "Multi-channel notifications help both candidates and employers not miss any important feedback or interview opportunities."
-  },
-  "mobileAppHeading": "Comprehensive Recruitment Process",
-  "cvProfileDetail": {
-    "title": "Digitize Application Profiles",
-    "desc1": "Create a professional online Profile, easily share and apply with just one click.",
-    "desc2": "Support attaching old file CVs and automatically extract important information to optimize search results.",
-    "desc3": "Always updated and flexibly adjusted to suit each different career direction of candidates."
-  },
-  "aroundJobDetail": {
-    "title": "Smart Regional Jobs",
-    "desc1": "Easily search for jobs within your desired radius.",
-    "desc2": "Use visual maps to identify business locations, helping you be more proactive in choosing where to work.",
-    "desc3": "Save travel time and find the perfect balance between work and personal life."
-  },
-  "notificationDetail": {
-    "title": "Effective Interaction Management",
-    "desc1": "Smart notification system helps you closely follow the status of your application profile.",
-    "desc2": "Receive interview appointments directly from employers and respond right on the platform.",
-    "desc3": "Ensure seamless communication between businesses and candidates throughout the selection process."
-  },
+  "tabTitle": "Về chúng tôi — Nền tảng Tuyển dụng Chuyên ngành & Phỏng vấn Voice AI | InfoHR",
+  "heading": "Sứ mệnh của chúng tôi",
+  "description": "InfoHR là hệ sinh thái công nghệ nhân sự thông minh và phỏng vấn Voice AI, được xây dựng để giải quyết sự đứt gãy giữa bằng cấp danh nghĩa và năng lực thực chiến trong 4 ngành kinh tế kỹ thuật trọng điểm tại Việt Nam.",
   "aboutUsPage": {
-    "tabTitle": "Về chúng tôi - Hệ sinh thái Tuyển dụng & Quản trị Nhân sự {{appName}}",
-    "heroBadge": "HỆ SINH THÁI TUYỂN DỤNG & QUẢN TRỊ NHÂN SỰ INFOHR",
-    "industries": {
-      "construction": "Xây dựng",
-      "realEstate": "Bất động sản",
-      "architecture": "Kiến trúc / Thiết kế nội thất",
-      "mep": "Kỹ thuật & Cơ điện (MEP)"
+    "tabTitle": "Về chúng tôi — Nền tảng Tuyển dụng Chuyên ngành & Phỏng vấn Voice AI | InfoHR",
+    "kicker": "THÔNG TIN NỀN TẢNG • HỆ SINH THÁI CÔNG NGHỆ INFOHR",
+    "heroTitle": "Tái Định Nghĩa Tuyển Dụng Kỹ Thuật Bằng Dữ Liệu Thực & Voice AI Minh Bạch",
+    "heroLead": "InfoHR được phát triển nhằm giải quyết triệt để sự đứt gãy giữa bằng cấp danh nghĩa và năng lực thực chiến tại Việt Nam. Chúng tôi xây dựng chuẩn mực tuyển dụng chuyên sâu cho 4 khối ngành kinh tế kỹ thuật trọng điểm — kết hợp sàn kết nối hồ sơ xác thực và trợ lý phỏng vấn giọng nói AILA 24/7.",
+    "badges": {
+      "squareGroup": "Hệ sinh thái InfoHR",
+      "webrtc": "Hạ tầng WebRTC Voice AI",
+      "verified": "100% Hồ sơ thẩm định năng lực",
+      "fourIndustries": "Chuyên sâu 4 ngành kỹ thuật"
     },
-    "stats": {
-      "candidates": "Ứng viên tài năng kết nối",
-      "candidatesDesc": "Hồ sơ chuyên môn cao",
-      "companies": "Doanh nghiệp đồng hành",
-      "companiesDesc": "Tập đoàn & đối tác uy tín",
-      "satisfaction": "Độ hài lòng tuyển dụng",
-      "satisfactionDesc": "Đánh giá tích cực từ đối tác",
-      "aiOperating": "Vận hành & Phỏng vấn AI",
-      "aiOperatingDesc": "Không giới hạn thời gian"
+    "heroCtaPrimary": "Khám Phá Việc Làm Kỹ Thuật",
+    "heroCtaSecondary": "Trải Nghiệm AILA Voice AI",
+    "problemSection": {
+      "tag": "BÀI TOÁN THỰC TẾ & NGUỒN CỘI",
+      "title": "Vì Sao Thị Trường Cần Một Nền Tảng Như InfoHR?",
+      "description": "Thị trường tuyển dụng truyền thống đang lãng phí hàng triệu giờ lao động vì cơ chế sàng lọc dàn trải và khủng hoảng 'CV ảo'.",
+      "traditionalTitle": "Nghịch lý của tuyển dụng truyền thống",
+      "traditionalPains": [
+        {
+          "title": "Khủng hoảng CV sao chép & kỹ năng phóng đại",
+          "desc": "Hơn 75% hồ sơ ứng viên sử dụng mẫu chung chung trên mạng, che giấu khoảng trống năng lực thực tế khiến nhà tuyển dụng vỡ mộng sau khi nhận việc."
+        },
+        {
+          "title": "Quá tải vòng sơ tuyển thủ công lặp lại",
+          "desc": "Chuyên viên HR tốn 20-30 giờ mỗi tuần chỉ để gọi điện hỏi những câu cơ bản: có bằng cấp không, có đi công trình xa được không, kéo dài quy trình tuyển dụng đến 3-4 tuần."
+        },
+        {
+          "title": "Định kiến cảm tính và đánh giá thiếu dữ liệu",
+          "desc": "Vòng sơ loại truyền thống dễ bị chi phối bởi ngoại hình, tuổi tác, vùng miền thay vì đo lường chuẩn xác năng lực chuyên môn và kinh nghiệm thực chiến."
+        }
+      ],
+      "solutionTitle": "Chuẩn mực giải pháp từ InfoHR",
+      "solutionPoints": [
+        {
+          "title": "Hồ sơ kỹ thuật chuẩn hóa & xác thực chứng chỉ",
+          "desc": "Tách bạch rõ ràng giữa hồ sơ tự khai và hồ sơ được đối soát chứng chỉ hành nghề, bằng cấp chuyên môn, kinh nghiệm dự án thực tế đã hoàn thành."
+        },
+        {
+          "title": "AILA Voice AI sơ tuyển tự động 24/7",
+          "desc": "Ứng viên chủ động phỏng vấn trực tiếp bằng giọng nói tự nhiên bất kể ngày đêm. Hệ thống xuất transcript và phân tích năng lực chuẩn STAR."
+        },
+        {
+          "title": "Rút ngắn 80% thời gian chốt nhân tài",
+          "desc": "Hội đồng tuyển dụng nhận báo cáo đối soát kỹ năng và video/audio phỏng vấn khách quan, ra quyết định tuyển chọn chính xác chỉ trong 48 giờ."
+        }
+      ]
     },
-    "coreValues": {
-      "aiTechTitle": "Tiên Phong Công Nghệ AI",
-      "aiTechDesc": "Ứng dụng mô hình Voice AI và thuật toán phân tích năng lực khách quan, xóa bỏ rào cản thời gian và định kiến tuyển dụng.",
-      "speedCostTitle": "Tối Ưu Tốc Độ & Chi Phí",
-      "speedCostDesc": "Cắt giảm đến 80% thời gian sơ loại hồ sơ và sàng lọc ứng viên, tối ưu hóa ngân sách nhân sự cho mọi quy mô doanh nghiệp.",
-      "fourIndustriesTitle": "Chuyên Sâu 4 Khối Ngành",
-      "fourIndustriesDesc": "Thấu hiểu đặc thù tiêu chuẩn nghề nghiệp của Xây dựng, Bất động sản, Thiết kế kiến trúc và Kỹ thuật Cơ điện.",
-      "securityTitle": "Bảo Mật Chuẩn Doanh Nghiệp",
-      "securityDesc": "Hệ thống bảo vệ dữ liệu hồ sơ và thông tin nhân sự tuân thủ nghiêm ngặt các tiêu chuẩn mã hóa an toàn thông tin."
+    "industriesSection": {
+      "tag": "CHIẾN LƯỢC TRỌNG TÂM",
+      "title": "Chuyên Sâu 4 Khối Ngành Kinh Tế Kỹ Thuật Trọng Điểm",
+      "description": "Thay vì dàn trải đa ngành, InfoHR tập trung giải quyết chiều sâu cho 4 lĩnh vực đòi hỏi chứng chỉ hành nghề pháp lý và tiêu chuẩn kỹ thuật khắt khe nhất Việt Nam.",
+      "items": [
+        {
+          "id": "construction",
+          "name": "Xây Dựng & Quản Lý Dự Án",
+          "roles": "Chỉ huy trưởng, Kỹ sư giám sát kết cấu, Kỹ sư QS/QC, An toàn lao động HSE",
+          "challenge": "Bắt buộc có chứng chỉ hành nghề hoạt động xây dựng (Hạng I/II/III) và kinh nghiệm thực địa công trường khắc nghiệt mà các sàn tuyển dụng chung không có trường dữ liệu phân loại.",
+          "solution": "Xác thực chứng chỉ số, bộ câu hỏi phỏng vấn Voice AI chuyên sâu về xử lý sự cố công trường, an toàn lao động và đọc bản vẽ thi công."
+        },
+        {
+          "id": "realEstate",
+          "name": "Bất Động Sản & Phát Triển Dự Án",
+          "roles": "Pháp lý bất động sản, M&A dự án, Quản lý tòa nhà & vận hành, Định giá BĐS",
+          "challenge": "Đòi hỏi am hiểu sâu Luật Đất đai, Luật Kinh doanh BĐS, kỹ năng phân tích dòng tiền và tư vấn đàm phán cao cấp, không thể đánh đồng với bán hàng đại trà.",
+          "solution": "Đánh giá tư duy pháp lý, năng lực thẩm định dự án và phong thái giao tiếp qua các tình huống thực tế được Voice AI tương tác trực tiếp."
+        },
+        {
+          "id": "architecture",
+          "name": "Kiến Trúc & Thiết Kế Nội Thất",
+          "roles": "Kiến trúc sư chủ trì, Thiết kế nội thất, Diễn họa 3D Visualizer, Kỹ sư kết cấu",
+          "challenge": "Năng lực phụ thuộc vào Portfolio công trình thực tế, tư duy không gian và độ thành thạo công cụ chuyên dụng (Revit, BIM, 3ds Max, AutoCAD, SketchUp).",
+          "solution": "Cổng lưu trữ Portfolio chất lượng cao, đối soát phong cách thiết kế và kiểm tra kinh nghiệm triển khai hồ sơ bản vẽ thi công chi tiết."
+        },
+        {
+          "id": "mep",
+          "name": "Kỹ Thuật & Cơ Điện (MEP)",
+          "roles": "Kỹ sư thiết kế Cơ - Điện - Nước, Kỹ sư HVAC, Kỹ sư hệ thống PCCC, Tự động hóa BMS",
+          "challenge": "Tiêu chuẩn an toàn nghiêm ngặt, quy chuẩn QCVN 06 về PCCC, tính toán phụ tải và tích hợp hệ thống thông minh đòi hỏi sự chính xác tuyệt đối.",
+          "solution": "Bộ kịch bản phỏng vấn bám sát tiêu chuẩn thiết kế MEP, tính toán tải thực tế và kinh nghiệm nghiệm thu công trình với cơ quan chức năng."
+        }
+      ]
     },
-    "steps": {
-      "step1Title": "Đăng Tin & Thu Hút Ứng Viên",
-      "step1Desc": "Doanh nghiệp đăng tin tuyển dụng thông minh, tối ưu SEO việc làm và tiếp cận hàng ngàn ứng viên đúng chuyên môn.",
-      "step2Title": "AI Sàng Lọc & Phỏng Vấn Voice",
-      "step2Desc": "AILA AI tự động phân tích CV, tính toán Match Score và thực hiện phỏng vấn sơ tuyển bằng giọng nói tự nhiên 24/7.",
-      "step3Title": "Đánh Giá Năng Lực Chuẩn STAR",
-      "step3Desc": "Hội đồng tuyển dụng nhận báo cáo phân tích kỹ năng, khoảng trống năng lực và video/transcript phỏng vấn để ra quyết định.",
-      "step4Title": "Tiếp Nhận & Quản Trị HRM",
-      "step4Desc": "Đồng bộ hồ sơ trúng tuyển vào hệ thống InfoHR HRM: ký hợp đồng số, cập nhật sơ đồ tổ chức và quản lý nhân sự liền mạch."
+    "ecosystemSection": {
+      "tag": "HỆ SINH THÁI KHÉP KÍN",
+      "title": "Bản Đồ 4 Phân Hệ Trực Thuộc Hệ Sinh Thái InfoHR",
+      "description": "Mỗi phân hệ đảm nhận một mắt xích chuyên biệt trong chuỗi giá trị nhân sự, kết nối đồng bộ theo thời gian thực.",
+      "items": [
+        {
+          "subdomain": "infohr.vn",
+          "name": "Cổng Ứng Viên Kỹ Thuật",
+          "desc": "Dành cho người tìm việc chuyên ngành. Tạo CV chuẩn cấu trúc năng lực kỹ thuật, tìm việc theo bán kính địa lý, luyện tập phỏng vấn và nhận đánh giá từ AI.",
+          "url": "https://infohr.vn",
+          "target": "_self"
+        },
+        {
+          "subdomain": "employer.infohr.vn",
+          "name": "Trung Tâm Điều Hành Tuyển Dụng",
+          "desc": "Dành cho phòng nhân sự & hội đồng tuyển dụng. Đăng tin chuẩn JD kỹ thuật, truy cập kho hồ sơ xác thực, lọc ứng viên thông minh và quản lý đường ống Kanban CRM.",
+          "url": "https://employer.infohr.vn",
+          "target": "_blank"
+        },
+        {
+          "subdomain": "aila.infohr.vn",
+          "name": "Nền Tảng Phỏng Vấn Voice AI",
+          "desc": "Phòng phỏng vấn trực tuyến 24/7 trên nền tảng LiveKit WebRTC. Tự động hóa vòng sơ tuyển, loại bỏ rào cản thời gian và xuất báo cáo Skill Gap Analysis chuẩn STAR.",
+          "url": "https://aila.infohr.vn",
+          "target": "_blank"
+        },
+        {
+          "subdomain": "hrm.infohr.vn",
+          "name": "Quản Trị Nhân Sự Doanh Nghiệp",
+          "desc": "Phân hệ HRM nội bộ khép kín: chuyển giao ứng viên trúng tuyển thành nhân viên, ký hợp đồng lao động số, quản lý hồ sơ nhân sự, chấm công và sơ đồ tổ chức.",
+          "url": "https://hrm.infohr.vn",
+          "target": "_blank"
+        }
+      ]
+    },
+    "technologySection": {
+      "tag": "MINH BẠCH CÔNG NGHỆ",
+      "title": "Kiến Trúc Thực Chiến & Nguyên Tắc AI Có Trách Nhiệm",
+      "description": "Chúng tôi không coi AI là 'chiếc đũa thần', mà là trợ lý chuẩn hóa, khách quan và minh bạch để bảo vệ lợi ích của cả ứng viên và doanh nghiệp.",
+      "cards": [
+        {
+          "title": "Hạ Tầng WebRTC Low-Latency (LiveKit SFU)",
+          "desc": "Truyền tải âm thanh thời gian thực với độ trễ dưới 300ms, thuật toán khử ồn chủ động giúp cuộc đối thoại Voice AI diễn ra tự nhiên như phỏng vấn trực tiếp."
+        },
+        {
+          "title": "Nguyên Tắc Đạo Đức: Không Thay Thế Con Người",
+          "desc": "AILA AI không bao giờ tự ý quyết định loại hay nhận ứng viên. Hệ thống đóng vai trò người thư ký sơ tuyển công tâm: ghi âm, chuyển ngữ và phân tích dữ liệu để hội đồng tuyển dụng ra quyết định."
+        },
+        {
+          "title": "Bảo Mật Cấp Doanh Nghiệp & Quyền Riêng Tư",
+          "desc": "Toàn bộ dữ liệu hồ sơ, audio và video phỏng vấn được mã hóa AES-256 trên cụm lưu trữ MinIO S3 độc lập, bảo vệ qua tường lửa WAF OWASP CRS và cam kết không bán dữ liệu."
+        }
+      ]
+    },
+    "stats": [
+      { "num": "1.200+", "label": "Doanh nghiệp & Tập đoàn", "desc": "Đối tác tuyển dụng tin cậy" },
+      { "num": "50.000+", "label": "Hồ sơ kỹ thuật kết nối", "desc": "Ứng viên chuyên ngành xác thực" },
+      { "num": "80%", "label": "Thời gian sơ tuyển cắt giảm", "desc": "Tối ưu ngân sách tuyển dụng" },
+      { "num": "< 300ms", "label": "Độ trễ WebRTC Voice AI", "desc": "Tương tác thời gian thực" }
+    ],
+    "corporateSection": {
+      "tag": "ĐƠN VỊ PHÁT TRIỂN",
+      "companyName": "InfoHR Technology — Kiến Tạo Giải Pháp Chuyển Đổi Số",
+      "companyDesc": "InfoHR là nền tảng chiến lược trong lĩnh vực công nghệ nhân sự (HRTech). Với nền tảng kỹ thuật vững chắc và bề dày kinh nghiệm đồng hành cùng các doanh nghiệp hàng đầu tại Việt Nam, InfoHR cam kết đem lại giá trị bền vững và sự minh bạch cho thị trường tuyển dụng.",
+      "badge": "Cam kết bảo hành dịch vụ tuyển dụng"
+    },
+    "ctaSection": {
+      "title": "Sẵn Sàng Đồng Hành Cùng Chuẩn Mực Tuyển Dụng Mới?",
+      "desc": "Cho dù bạn là kỹ sư đang tìm kiếm bến đỗ xứng tầm hay doanh nghiệp đang khát khao nhân sự tinh nhuệ, InfoHR luôn sẵn sàng đồng hành.",
+      "candidateCta": "Khám Phá Việc Làm Kỹ Thuật",
+      "employerCta": "Đăng Ký Nhà Tuyển Dụng"
     }
   }
 }

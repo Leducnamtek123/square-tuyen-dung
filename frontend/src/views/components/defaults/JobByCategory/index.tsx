@@ -74,7 +74,7 @@ const CategorySection = ({
             textDecoration: 'none',
             py: 0.5,
             px: 1.5,
-            borderRadius: 1,
+            borderRadius: 0,
             transition: 'all 0.2s ease-in-out',
             '&:hover': {
               backgroundColor: 'primary.background',

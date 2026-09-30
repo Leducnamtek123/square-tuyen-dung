@@ -194,9 +194,14 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           row.jobPostDict?.jobName ||
           '';
         const cleanTitle = rawTitle.replace(/^\[?TUYỂN GẤP\]?\|?\s*/i, '').trim();
+        const isUrgent = Boolean(
+          (info.row.original as any).jobPost?.isUrgent ||
+          (info.row.original as any).job_post?.is_urgent ||
+          (info.row.original as any).isUrgent
+        );
         return (
           <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>
-            {cleanTitle ? `[TUYỂN GẤP] ${cleanTitle}` : '---'}
+            {isUrgent && cleanTitle ? `[TUYỂN GẤP] ${cleanTitle}` : (cleanTitle || '---')}
           </Typography>
         );
       },

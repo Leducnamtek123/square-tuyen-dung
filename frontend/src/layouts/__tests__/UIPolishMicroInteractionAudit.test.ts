@@ -20,7 +20,7 @@ describe('UI Polish & Micro-Interaction Audit Suite', () => {
       expect(source).toContain('<LanguageSwitcher size="small" />');
       expect(source).toContain('height: 36');
       expect(source).toContain("border: '1px solid #e2e8f0'");
-      expect(source).toContain("borderRadius: '10px'");
+      expect(source).toContain("borderRadius: 0");
     });
   });
 
@@ -30,7 +30,7 @@ describe('UI Polish & Micro-Interaction Audit Suite', () => {
 
     it('reserves transparent border to prevent layout shift on hover or focus', () => {
       expect(source).toContain("border: '1px solid transparent'");
-      expect(source).toContain("borderRadius: '10px'");
+      expect(source).toContain("borderRadius: 0");
     });
 
     it('supports small and medium size variants with explicit height dimensions', () => {
@@ -57,14 +57,14 @@ describe('UI Polish & Micro-Interaction Audit Suite', () => {
 
     it('ensures WorkspaceSwitchMenu has visible border and stable hover styling', () => {
       expect(workspaceMenuSource).toContain('border: "1px solid #e2e8f0"');
-      expect(workspaceMenuSource).toContain('borderRadius: "10px"');
+      expect(workspaceMenuSource).toContain('borderRadius: 0');
       expect(workspaceMenuSource).toContain('height: 38');
     });
 
     it('ensures AccountSwitchMenu avoids layout-shifting translateY transforms', () => {
       expect(accountMenuSource).toContain("border: '1px solid #e2e8f0'");
-      expect(accountMenuSource).toContain("borderRadius: '10px'");
-      expect(accountMenuSource).toContain('height: 38');
+      expect(accountMenuSource).toContain("borderRadius: 0");
+      expect(accountMenuSource).toMatch(/height:\s*(?:38|\{[^}]*lg:\s*38)/);
       expect(accountMenuSource).not.toContain("transform: 'translateY(-1px)'");
     });
   });
@@ -73,9 +73,9 @@ describe('UI Polish & Micro-Interaction Audit Suite', () => {
     const filePath = join(__dirname, '../../components/Features/Chats/ChatRoomSearch/index.tsx');
     const source = readFileSync(filePath, 'utf8');
 
-    it('provides SearchRoundedIcon input adornment and 12px rounded borders', () => {
+    it('provides SearchRoundedIcon input adornment and square borders', () => {
       expect(source).toContain('SearchRoundedIcon');
-      expect(source).toContain("borderRadius: '12px'");
+      expect(source).toContain("borderRadius: 0");
       expect(source).toContain("borderColor: '#e2e8f0'");
     });
   });

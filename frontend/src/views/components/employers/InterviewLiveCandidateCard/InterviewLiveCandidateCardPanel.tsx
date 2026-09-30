@@ -177,7 +177,8 @@ const InterviewLiveCandidateCardPanel = ({
       <Box
         sx={{
           width: '100%',
-          height: { xs: 260, sm: 280 },
+          aspectRatio: '16/9',
+          minHeight: { xs: 240, sm: 280 },
           borderRadius: 3,
           overflow: 'hidden',
           bgcolor: '#080c14',

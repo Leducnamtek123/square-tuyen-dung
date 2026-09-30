@@ -95,7 +95,7 @@ const CompanySearch = () => {
           boxShadow: '0 20px 45px rgba(37, 99, 235, 0.08), 0 4px 16px rgba(15, 23, 42, 0.04)',
           background: '#ffffff',
           border: '1px solid rgba(226, 232, 240, 0.9)',
-          borderRadius: '24px',
+          borderRadius: 0,
           width: '100%',
         }}
       >
@@ -162,7 +162,7 @@ const CompanySearch = () => {
                     color: 'white',
                     whiteSpace: 'nowrap',
                     px: { xs: 1.75, sm: 2 },
-                    borderRadius: '999px',
+                    borderRadius: 0,
                     fontWeight: 700,
                     fontSize: { xs: '0.88rem', sm: '0.92rem' },
                     textTransform: 'none',
@@ -193,7 +193,7 @@ const CompanySearch = () => {
                       background: activeAdvancedFilterCount > 0 ? '#eff6ff' : '#f8fafc',
                       border: `1px solid ${activeAdvancedFilterCount > 0 ? '#bfdbfe' : '#e2e8f0'}`,
                       color: activeAdvancedFilterCount > 0 ? '#1d4ed8' : '#475569',
-                      borderRadius: '999px',
+                      borderRadius: 0,
                       transition: 'all 0.2s ease',
                       '&:hover': {
                         background: '#eff6ff',
@@ -221,7 +221,7 @@ const CompanySearch = () => {
                       background: '#f8fafc',
                       border: '1px solid #e2e8f0',
                       color: '#64748b',
-                      borderRadius: '999px',
+                      borderRadius: 0,
                       transition: 'all 0.2s ease',
                       '&:hover': {
                         background: '#fef2f2',
@@ -248,7 +248,7 @@ const CompanySearch = () => {
             p: 1.25,
             px: 2,
             backgroundColor: '#ffffff',
-            borderRadius: '12px',
+            borderRadius: 0,
             border: '1px solid #e2e8f0',
             display: 'flex',
             alignItems: 'center',
@@ -268,7 +268,7 @@ const CompanySearch = () => {
                 setValue('cityId', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 
@@ -280,7 +280,7 @@ const CompanySearch = () => {
                 setValue('employeeSize', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 

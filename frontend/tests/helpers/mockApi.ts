@@ -3414,6 +3414,11 @@ export async function setupVoiceAiApiMocks(
     roomName?: string;
     status?: 'scheduled' | 'in_progress' | 'completed';
     sessionType?: 'mock' | 'official';
+    interviewerName?: string;
+    avatarImageUrl?: string | null;
+    avatarId?: string;
+    characterId?: string;
+    lipsyncVideoUrl?: string | null;
   } = {}
 ) {
   const inviteToken = options.inviteToken || 'e2e-voice-ai-invite';
@@ -3430,6 +3435,13 @@ export async function setupVoiceAiApiMocks(
       // ignore if unsupported in environment
     }
   }
+
+  // Tắt popup tour hướng dẫn để không che khuất màn hình phòng phỏng vấn trong E2E tests
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.setItem('infohr_product_tour_completed_interview_ai_live', 'true');
+    } catch {}
+  });
 
   // Question sets & question groups for practice
   await page.route('**/api/**/interview/web/question-groups/public/**', async (route) => {
@@ -3585,6 +3597,23 @@ export async function setupVoiceAiApiMocks(
               : {}),
           }
         : {}),
+      ...(options.interviewerName ? { interviewer_name: options.interviewerName, interviewerName: options.interviewerName } : {}),
+      ...(options.avatarImageUrl !== undefined ? { avatar_image_url: options.avatarImageUrl, avatarImageUrl: options.avatarImageUrl } : {}),
+      ...(options.avatarId ? { avatar_id: options.avatarId, avatarId: options.avatarId } : {}),
+      ...(options.characterId ? { character_id: options.characterId, characterId: options.characterId } : {}),
+      ...(options.lipsyncVideoUrl !== undefined ? { lipsync_video_url: options.lipsyncVideoUrl, lipsyncVideoUrl: options.lipsyncVideoUrl } : {}),
+      session_metadata: {
+        ...((baseSession as any).session_metadata || {}),
+        ...(options.avatarImageUrl !== undefined ? { avatar_image_url: options.avatarImageUrl, avatarImageUrl: options.avatarImageUrl } : {}),
+        ...(options.avatarId ? { avatar_id: options.avatarId, avatarId: options.avatarId } : {}),
+        ...(options.interviewerName ? { interviewer_name: options.interviewerName, interviewerName: options.interviewerName } : {}),
+      },
+      sessionMetadata: {
+        ...((baseSession as any).sessionMetadata || {}),
+        ...(options.avatarImageUrl !== undefined ? { avatar_image_url: options.avatarImageUrl, avatarImageUrl: options.avatarImageUrl } : {}),
+        ...(options.avatarId ? { avatar_id: options.avatarId, avatarId: options.avatarId } : {}),
+        ...(options.interviewerName ? { interviewer_name: options.interviewerName, interviewerName: options.interviewerName } : {}),
+      },
     };
     await route.fulfill({
       status: 200,

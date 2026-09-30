@@ -241,7 +241,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           sx={{
             minHeight: isHero ? 56 : showSubmitButton ? 54 : 48,
             boxShadow: isHero ? 'none' : '0 10px 26px rgba(15, 23, 42, 0.08)',
-            borderRadius: isHero ? 1 : 999,
+            borderRadius: 0,
             p: isHero ? 0 : '4px',
             display: 'flex',
             alignItems: 'center',
@@ -262,7 +262,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               height: isHero ? 56 : 38,
               display: 'grid',
               placeItems: 'center',
-              borderRadius: isHero ? 1 : '50%',
+              borderRadius: 0,
               color: '#0f172a',
               bgcolor: isHero ? 'transparent' : 'rgba(15, 23, 42, 0.06)',
               flexShrink: 0,
@@ -368,7 +368,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               px: 2,
               boxShadow: '0 22px 50px rgba(15, 23, 42, 0.16)',
               border: '1px solid rgba(226, 232, 240, 0.95)',
-              borderRadius: 3,
+              borderRadius: 0,
               maxHeight: '60vh',
               overflowY: 'auto',
               boxSizing: 'border-box',
@@ -398,7 +398,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           sx={{
                             '&:hover': { backgroundColor: 'rgba(15, 23, 42, 0.04)' },
                             cursor: 'pointer',
-                            borderRadius: 2,
+                            borderRadius: 0,
                             px: 1.5,
                             py: 1,
                           }}
@@ -429,7 +429,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                             sx={{
                               '&:hover': { backgroundColor: 'rgba(225, 29, 72, 0.06)' },
                               cursor: 'pointer',
-                              borderRadius: 2,
+                              borderRadius: 0,
                               px: 1.25,
                               py: 0.75,
                             }}
@@ -458,7 +458,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                             sx={{
                               '&:hover': { backgroundColor: 'rgba(37, 99, 235, 0.06)' },
                               cursor: 'pointer',
-                              borderRadius: 2,
+                              borderRadius: 0,
                               px: 1.25,
                               py: 0.75,
                             }}
@@ -487,7 +487,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                             sx={{
                               '&:hover': { backgroundColor: 'rgba(15, 23, 42, 0.04)' },
                               cursor: 'pointer',
-                              borderRadius: 2,
+                              borderRadius: 0,
                               px: 1.25,
                               py: 0.75,
                             }}

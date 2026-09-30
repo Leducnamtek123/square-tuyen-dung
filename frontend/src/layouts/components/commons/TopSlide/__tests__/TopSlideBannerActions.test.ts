@@ -24,8 +24,7 @@ describe('TopSlide banner actions', () => {
 
   it('renders the hero copy and search as an overlay on the banner image', () => {
     expect(source).toContain('const HERO_HEADER_OFFSET');
-    expect(source).toContain('calc(100svh - ${HERO_HEADER_OFFSET.xs})');
-    expect(source).toContain('minHeight: { xs: 520, md: 620 }');
+    expect(source).toContain('minHeight: { xs: 250, sm: 280, md: 310 }');
     expect(source).toContain('rgba(4, 48, 104, 0.95)');
     expect(source).toContain('<HomeSearch variant="hero" />');
     expect(source).not.toContain('<Card');

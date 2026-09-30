@@ -75,7 +75,7 @@ export function App({ appConfig, connectionDetails, onDisconnect }: AppProps) {
           <SessionView appConfig={appConfig} className="w-full h-full" onDisconnect={onDisconnect} />
         ) : (
           <div className="flex h-full w-full items-center justify-center px-6 py-10">
-            <div className="relative w-full max-w-xl overflow-hidden rounded-[32px] border border-white/10 bg-zinc-900/55 p-8 text-center shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-10">
+            <div className="relative w-full max-w-xl overflow-hidden rounded-none border border-white/10 bg-zinc-900/55 p-8 text-center shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-10">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),transparent_55%)]" />
               <div className="relative mx-auto flex size-16 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-400/10">
                 <div className="size-8 animate-spin rounded-full border-2 border-cyan-300/25 border-t-cyan-300" />

@@ -13,7 +13,7 @@ import {
   faLocationDot,
 } from '@fortawesome/free-solid-svg-icons';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
-import { ROUTES } from '@/configs/constants';
+import { ROUTES, IMAGES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { formatRoute } from '@/utils/funcUtils';
 import { tConfig } from '@/utils/tConfig';
@@ -98,12 +98,15 @@ const JobPostAction = ({
                 <MuiImageCustom
                   width={70}
                   height={70}
-                  src={companyImageUrl || ''}
+                  src={companyImageUrl || IMAGES.companyLogoDefault}
+                  fallbackSrc={IMAGES.companyLogoDefault}
+                  alt={companyName || "Logo công ty"}
                   sx={{
                     borderRadius: 2,
                     border: `1px solid ${theme.palette.grey[200]}`,
                     p: 0.5,
                     backgroundColor: 'white',
+                    objectFit: 'contain',
                   }}
                 />
               </Stack>

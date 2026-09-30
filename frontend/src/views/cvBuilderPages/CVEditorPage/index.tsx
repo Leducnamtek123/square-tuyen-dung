@@ -22,6 +22,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
 import CloudDoneOutlinedIcon from '@mui/icons-material/CloudDoneOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { CVData, CandidateCVRecord } from '@/types/cvBuilder';
 import { createEmptyCVData, CV_TEMPLATES_CATALOG } from '../templates/templatesData';
 import { CVEditorSidebar } from './components/CVEditorSidebar';
@@ -643,7 +644,7 @@ export const CVEditorPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f1f5f9', overflow: 'hidden' }}>
+    <Box className="cv-builder-editor-container" data-page="cv-builder" sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#f1f5f9', overflow: 'hidden' }}>
       {/* -- Top Navbar (Material UI AppBar standard) ------------------------ */}
       <Paper
         elevation={0}
@@ -652,7 +653,7 @@ export const CVEditorPage: React.FC = () => {
           height: 64,
           bgcolor: '#ffffff',
           borderBottom: '1px solid #e2e8f0',
-          px: { xs: 1.25, sm: 3 },
+          px: { xs: 1, sm: 3 },
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -661,7 +662,7 @@ export const CVEditorPage: React.FC = () => {
         }}
       >
         {/* Left: Back & Title input */}
-        <Stack direction="row" spacing={{ xs: 1, sm: 1.5 }} alignItems="center" sx={{ minWidth: 0 }}>
+        <Stack direction="row" spacing={{ xs: 0.5, sm: 1.5 }} alignItems="center" sx={{ minWidth: 0, flex: 1, mr: { xs: 0.5, sm: 2 } }}>
           <IconButton
             onClick={() => router.push(localizeRoutePath('/danh-sach-mau-cv', i18n.language))}
             size="small"
@@ -669,7 +670,7 @@ export const CVEditorPage: React.FC = () => {
               color: '#64748b',
               borderRadius: '10px',
               border: '1px solid #e2e8f0',
-              p: 0.75,
+              p: { xs: 0.5, sm: 0.75 },
               flexShrink: 0,
               '&:hover': { bgcolor: '#f1f5f9', color: '#0f172a' },
             }}
@@ -678,36 +679,38 @@ export const CVEditorPage: React.FC = () => {
             <ArrowBackIcon sx={{ fontSize: 18 }} />
           </IconButton>
 
-          <Box sx={{ display: { xs: 'none', sm: 'block' }, width: '1px', height: 24, bgcolor: '#e2e8f0' }} />
+          <Box sx={{ display: { xs: 'none', sm: 'block' }, width: '1px', height: 24, bgcolor: '#e2e8f0', flexShrink: 0 }} />
 
-          <Box sx={{ maxWidth: { xs: 90, sm: 280, md: 380 }, minWidth: 0, overflow: 'hidden' }}>
+          <Box sx={{ maxWidth: { xs: '100%', sm: 300, md: 400 }, minWidth: 0, overflow: 'hidden', flex: 1 }}>
             <Typography component="h1" sx={{ position: 'absolute', width: '1px', height: '1px', p: 0, m: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>
               {cvData.title || 'Tạo CV Trực Tuyến & Studio Thiết Kế CV'}
             </Typography>
-            <Stack direction="row" spacing={0.5} alignItems="center">
+            <Stack direction="row" spacing={0.5} alignItems="center" sx={{ minWidth: 0, width: '100%', flex: 1 }}>
               <input
                 type="text"
                 value={cvData.title}
                 onChange={(e) => handleDataChange({ ...cvData, title: e.target.value })}
                 style={{
-                  fontWeight: 800,
-                  fontSize: '0.825rem',
+                  fontWeight: 700,
+                  fontSize: '0.8rem',
                   fontFamily: 'Inter, sans-serif',
                   color: '#0f172a',
                   background: 'transparent',
                   border: '1px solid transparent',
                   borderRadius: '6px',
-                  padding: '2px 4px',
+                  padding: '1px 3px',
                   outline: 'none',
-                  maxWidth: '100%',
+                  flex: 1,
+                  minWidth: 0,
+                  width: '100%',
                   textOverflow: 'ellipsis',
                 }}
                 title={t('cvBuilder.renameHint', 'Bấm để đổi tên CV')}
               />
-              <EditOutlinedIcon sx={{ fontSize: 13, color: '#94a3b8', pointerEvents: 'none', flexShrink: 0 }} />
+              <EditOutlinedIcon sx={{ fontSize: 12, color: '#94a3b8', pointerEvents: 'none', flexShrink: 0 }} />
 
               {/* Mobile Auto-Save Indicator Dot */}
-              <Box sx={{ display: { xs: 'inline-flex', sm: 'none' }, ml: 0.5 }}>
+              <Box sx={{ display: { xs: 'inline-flex', sm: 'none' }, ml: 0.5, flexShrink: 0 }}>
                 {saveStatus === 'saving' ? (
                   <Tooltip title={t('cvBuilder.saveStatus.saving', 'Đang tự động lưu...')}>
                     <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#d97706' }} />
@@ -756,48 +759,52 @@ export const CVEditorPage: React.FC = () => {
           </Box>
         </Stack>
 
-        {/* Center: Mobile Toggle Tabs (Editor / Preview) */}
-        <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'flex', md: 'none' }, bgcolor: '#f1f5f9', p: 0.5, borderRadius: '10px', flexShrink: 0 }}>
+        {/* Right: Actions (Mobile View Toggle, Share, Word, JSON, Save, PDF) */}
+        <Stack direction="row" spacing={{ xs: 0.5, sm: 1 }} alignItems="center" sx={{ flexShrink: 0 }}>
+          {/* Mobile Single Toggle Button (Preview <-> Edit) */}
           <Button
             size="small"
-            variant={mobileView === 'editor' ? 'contained' : 'text'}
-            onClick={() => setMobileView('editor')}
+            variant={mobileView === 'preview' ? 'contained' : 'outlined'}
+            onClick={() => setMobileView(mobileView === 'editor' ? 'preview' : 'editor')}
+            aria-label={mobileView === 'editor' ? 'Xem trước CV' : 'Sửa CV'}
+            title={mobileView === 'editor' ? 'Xem trước CV' : 'Sửa CV'}
             sx={{
-              py: 0.5,
-              px: { xs: 0.75, sm: 1.5 },
-              fontSize: '0.7rem',
-              fontWeight: 700,
-              textTransform: 'none',
+              display: { xs: 'inline-flex', md: 'none' },
               borderRadius: '8px',
-              whiteSpace: 'nowrap',
-              minWidth: 'auto',
-              ...(mobileView === 'editor' ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } : { color: '#64748b' }),
+              borderColor: mobileView === 'preview' ? '#2563eb' : '#cbd5e1',
+              bgcolor: mobileView === 'preview' ? '#2563eb' : '#ffffff',
+              color: mobileView === 'preview' ? '#ffffff' : '#1e293b',
+              py: { xs: 0.5, sm: 0.4 },
+              px: { xs: 0.75, sm: 1.5 },
+              minWidth: { xs: 36, sm: 'auto' },
+              boxShadow: mobileView === 'preview' ? '0 2px 6px rgba(37,99,235,0.25)' : 'none',
+              '&:hover': {
+                bgcolor: mobileView === 'preview' ? '#1d4ed8' : '#f8fafc',
+                borderColor: mobileView === 'preview' ? '#1d4ed8' : '#94a3b8',
+              },
             }}
           >
-            {t('cvBuilder.mobile.edit', 'Chỉnh sửa')}
+            {mobileView === 'editor' ? (
+              <VisibilityOutlinedIcon sx={{ fontSize: 16 }} />
+            ) : (
+              <EditOutlinedIcon sx={{ fontSize: 16 }} />
+            )}
+            <Box
+              component="span"
+              sx={{
+                display: { xs: 'none', sm: 'inline' },
+                ml: 0.75,
+                fontSize: '0.725rem',
+                fontWeight: 700,
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {mobileView === 'editor'
+                ? t('cvBuilder.mobile.preview', 'Xem trước')
+                : t('cvBuilder.mobile.edit', 'Sửa CV')}
+            </Box>
           </Button>
-          <Button
-            size="small"
-            variant={mobileView === 'preview' ? 'contained' : 'text'}
-            onClick={() => setMobileView('preview')}
-            sx={{
-              py: 0.5,
-              px: { xs: 0.75, sm: 1.5 },
-              fontSize: '0.7rem',
-              fontWeight: 700,
-              textTransform: 'none',
-              borderRadius: '8px',
-              whiteSpace: 'nowrap',
-              minWidth: 'auto',
-              ...(mobileView === 'preview' ? { bgcolor: '#ffffff', color: '#2563eb', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' } : { color: '#64748b' }),
-            }}
-          >
-            {t('cvBuilder.mobile.preview', 'Xem trước')}
-          </Button>
-        </Stack>
-
-        {/* Right: Actions (Share, Word, JSON, Save, PDF) */}
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ flexShrink: 0 }}>
           <Box sx={{ display: { xs: 'none', md: 'inline-flex' } }}>
             <ProductTourTrigger tourKey="cv_builder" variant="chip" label="Hướng dẫn tạo CV" />
           </Box>

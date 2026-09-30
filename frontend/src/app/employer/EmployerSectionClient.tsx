@@ -194,6 +194,7 @@ export default function EmployerSectionClient({
   );
 
   useEffect(() => {
+    let isMounted = true;
     const lang = getPreferredLanguage();
     const employerPrefix = onEmployerDomain ? '' : getPortalPrefix('employer', lang);
     const loginUrl = `${employerPrefix}/login?redirect=${encodeURIComponent(pathname)}`;
@@ -214,6 +215,9 @@ export default function EmployerSectionClient({
             try {
               user = await dispatch(getUserInfo()).unwrap();
             } catch {
+              if (isMounted) {
+                dispatchAuthGate({ type: 'checked' });
+              }
               return;
             }
           }
@@ -235,7 +239,11 @@ export default function EmployerSectionClient({
               dispatch(setActiveWorkspace(companyWorkspace));
             }
             window.location.replace(getCompanyPortalPath(dashboardPath));
+            return;
           }
+        }
+        if (isMounted) {
+          dispatchAuthGate({ type: 'checked' });
         }
         return;
       }
@@ -263,9 +271,17 @@ export default function EmployerSectionClient({
         window.location.replace('/onboarding/employer');
         return;
       }
+
+      if (isMounted) {
+        dispatchAuthGate({ type: 'checked' });
+      }
     };
 
-    void checkAuth().finally(() => dispatchAuthGate({ type: 'checked' }));
+    void checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, [authGate.shouldRedirectToLogin, currentUser, dispatch, isPublicPage, onEmployerDomain, pathname, strippedPath]);
 
   if (authGate.isChecking || authGate.shouldRedirectToLogin) {

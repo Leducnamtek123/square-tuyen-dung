@@ -39,7 +39,7 @@ const Sidebar = ({ drawerWidth, isAdmin, liveInterviewCount, isCollapsed = false
           backgroundColor: '#ffffff',
           boxShadow: '4px 0 20px rgba(15, 23, 42, 0.02)',
           borderRadius: 0,
-          transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'width 200ms cubic-bezier(0.4, 0, 0.2, 1)',
           overflowX: 'hidden',
         },
       }}

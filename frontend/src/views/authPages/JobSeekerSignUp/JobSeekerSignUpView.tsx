@@ -18,7 +18,7 @@ const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   boxShadow: 'none',
   border: 'none',
   [theme.breakpoints.up('sm')]: {
-    borderRadius: '28px',
+    borderRadius: 0,
     boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
     border: '1px solid #E2E8F0',
   },
@@ -117,7 +117,7 @@ const JobSeekerSignUpView = ({
                       backgroundColor: '#EFF6FF',
                       px: 1.5,
                       py: 0.5,
-                      borderRadius: '8px',
+                      borderRadius: 0,
                     }}
                   >
                     Người tìm việc
@@ -174,7 +174,7 @@ const JobSeekerSignUpView = ({
                     icon={<InfoOutlinedIcon sx={{ color: '#2563EB', mt: 0.25 }} />}
                     sx={{
                       mb: 2.5,
-                      borderRadius: '16px',
+                      borderRadius: 0,
                       border: '1px solid #BFDBFE',
                       backgroundColor: '#EFF6FF',
                       '& .MuiAlert-message': { width: '100%' },
@@ -205,7 +205,7 @@ const JobSeekerSignUpView = ({
                           fontSize: '13px',
                           py: 0.75,
                           px: 1.75,
-                          borderRadius: '10px',
+                          borderRadius: 0,
                           background: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 100%)',
                           boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
                           '&:hover': {

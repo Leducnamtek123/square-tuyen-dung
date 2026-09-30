@@ -30,7 +30,7 @@ const AdminLayout = (props: AdminLayoutProps) => {
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('square_sidebar_collapsed');
+      const saved = localStorage.getItem('sidebar_collapsed') || localStorage.getItem('square_sidebar_collapsed');
       if (saved === 'true') {
         setIsCollapsed(true);
       }
@@ -56,7 +56,7 @@ const AdminLayout = (props: AdminLayoutProps) => {
     });
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('square_sidebar_collapsed', String(!isCollapsed));
+        localStorage.setItem('sidebar_collapsed', String(!isCollapsed));
       } catch (err) {
         console.warn('Could not save sidebar collapsed state:', err);
       }
@@ -73,7 +73,7 @@ const AdminLayout = (props: AdminLayoutProps) => {
     windowGetter !== undefined ? () => (windowGetter() as Window).document.body : undefined;
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100dvh', bgcolor: 'background.default' }}>
+    <Box sx={{ display: 'flex', minHeight: '100dvh', bgcolor: 'background.default', minWidth: 0 }}>
       {/* Start: Header */}
       <Header
         drawerWidth={currentDrawerWidth}
@@ -113,6 +113,7 @@ const AdminLayout = (props: AdminLayoutProps) => {
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100dvh',
+          minWidth: 0,
           width: {
             xs: '100%',
             md: `calc(100% - ${currentDrawerWidth}px)`,
@@ -128,12 +129,14 @@ const AdminLayout = (props: AdminLayoutProps) => {
             display: 'flex',
             justifyContent: 'center',
             width: '100%',
+            minWidth: 0,
           }}
         >
           <Box
             sx={{
               width: '100%',
               maxWidth: '1600px',
+              minWidth: 0,
               p: {
                 xs: 2, // 16px
                 sm: 3, // 24px (8pt system)

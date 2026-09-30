@@ -62,7 +62,7 @@ const swiperStyles = {
     width: 24,
     height: 8,
     opacity: 1,
-    borderRadius: '4px',
+    borderRadius: 0,
     backgroundColor: '#2563eb',
   },
 };
@@ -114,18 +114,18 @@ const LoadingSkeleton = (
       minHeight: 190,
       p: 2.5,
       boxShadow: 0,
-      borderRadius: '20px',
+      borderRadius: 0,
       border: '1px solid #E2E8F0',
       backgroundColor: '#ffffff',
     }}
   >
     <Stack direction="row" justifyContent="space-between" alignItems="center">
-      <Skeleton variant="rounded" width={52} height={52} sx={{ borderRadius: '14px' }} />
+      <Skeleton variant="rectangular" width={52} height={52} sx={{ borderRadius: 0 }} />
       <Skeleton variant="circular" width={28} height={28} />
     </Stack>
     <Box sx={{ mt: 2.5 }}>
       <Skeleton width="75%" height={26} sx={{ mb: 1 }} />
-      <Skeleton width="45%" height={22} sx={{ borderRadius: '12px' }} />
+      <Skeleton width="45%" height={22} sx={{ borderRadius: 0 }} />
     </Box>
   </Card>
 );
@@ -229,7 +229,7 @@ const CareerCarousel: React.FC = () => {
                         p: 2.5,
                         bgcolor: '#ffffff',
                         border: '1px solid rgba(226, 232, 240, 0.9)',
-                        borderRadius: '20px',
+                        borderRadius: 0,
                         textDecoration: 'none',
                         color: 'inherit',
                         boxShadow: '0 4px 14px rgba(15, 23, 42, 0.03)',
@@ -257,7 +257,7 @@ const CareerCarousel: React.FC = () => {
                           sx={{
                             width: 52,
                             height: 52,
-                            borderRadius: '15px',
+                            borderRadius: 0,
                             bgcolor: theme.bg,
                             color: theme.text,
                             display: 'flex',
@@ -324,7 +324,7 @@ const CareerCarousel: React.FC = () => {
                             color: jobCount > 0 ? theme.text : '#64748b',
                             bgcolor: jobCount > 0 ? theme.bg : '#f1f5f9',
                             border: `1px solid ${jobCount > 0 ? theme.border : '#e2e8f0'}`,
-                            borderRadius: '8px',
+                            borderRadius: 0,
                           }}
                         />
                       </Box>

@@ -786,8 +786,9 @@ def synthesize_and_cache_audio(model: str, voice: str, speed: float, text: str) 
         "speed": speed,
     }
 
+    tts_ssl_verify = getattr(settings, "TTS_SSL_VERIFY", True)
     try:
-        with httpx.Client(timeout=30.0, verify=False) as client:
+        with httpx.Client(timeout=30.0, verify=tts_ssl_verify) as client:
             resp = client.post(url, json=payload, headers=headers)
             if resp.status_code == 200 and len(resp.content) > 100:
                 tmp_dir = os.path.dirname(cache_path)
@@ -797,7 +798,7 @@ def synthesize_and_cache_audio(model: str, voice: str, speed: float, text: str) 
                     f.write(resp.content)
                 shutil.move(tmp_file, cache_path)
                 try:
-                    os.chmod(cache_path, 0o666)
+                    os.chmod(cache_path, 0o644)
                 except Exception:
                     pass
                 logger.info("TTS Pre-warmed audio written to %s (%d bytes)", cache_path, len(resp.content))

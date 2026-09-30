@@ -17,7 +17,7 @@ const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   boxShadow: 'none',
   border: 'none',
   [theme.breakpoints.up('sm')]: {
-    borderRadius: '28px',
+    borderRadius: 0,
     boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.12), 0 0 1px 1px rgba(15, 23, 42, 0.05)',
     border: '1px solid #E2E8F0',
   },
@@ -121,7 +121,7 @@ const JobSeekerLoginView = ({
                     border: '1px solid #DBEAFE',
                     px: 1.5,
                     py: 0.6,
-                    borderRadius: '8px',
+                    borderRadius: 0,
                   }}
                 >
                   <Typography
@@ -203,7 +203,7 @@ const JobSeekerLoginView = ({
                   severity="error"
                   sx={{
                     mb: 2.5,
-                    borderRadius: '12px',
+                    borderRadius: 0,
                     fontSize: '13.5px',
                   }}
                 >
@@ -217,7 +217,7 @@ const JobSeekerLoginView = ({
                   severity="success"
                   sx={{
                     mb: 2.5,
-                    borderRadius: '12px',
+                    borderRadius: 0,
                     fontSize: '13.5px',
                   }}
                 >
@@ -235,7 +235,7 @@ const JobSeekerLoginView = ({
                     p: '4px',
                     width: '100%',
                     backgroundColor: '#F1F5F9',
-                    borderRadius: '14px',
+                    borderRadius: 0,
                   }}
                 >
                   <Button
@@ -245,7 +245,7 @@ const JobSeekerLoginView = ({
                     sx={{
                       flex: 1,
                       textTransform: 'none',
-                      borderRadius: '10px',
+                      borderRadius: 0,
                       fontWeight: 600,
                       fontSize: '13.5px',
                       py: 0.85,
@@ -267,7 +267,7 @@ const JobSeekerLoginView = ({
                     sx={{
                       flex: 1,
                       textTransform: 'none',
-                      borderRadius: '10px',
+                      borderRadius: 0,
                       fontWeight: 600,
                       fontSize: '13.5px',
                       py: 0.85,

@@ -26,5 +26,7 @@ router.register(r'onboarding-processes', views.EmployeeOnboardingProcessViewSet,
 urlpatterns = [
     path('dashboard/stats/', views.HrmDashboardStatsAPIView.as_view(), name='hrm-dashboard-stats'),
     path('me/', views.EmployeeSelfServiceView.as_view(), name='hrm-self-service'),
+    path('me/onboarding/tasks/<int:task_id>/submit/', views.EmployeeSubmitOnboardingTaskView.as_view(), name='hrm-self-submit-onboarding-task'),
+    path('me/punch/', views.EmployeePunchAttendanceView.as_view(), name='hrm-self-punch-attendance'),
     path('', include(router.urls)),
 ]

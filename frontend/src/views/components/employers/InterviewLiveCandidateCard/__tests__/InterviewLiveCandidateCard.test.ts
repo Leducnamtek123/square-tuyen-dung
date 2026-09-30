@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { formatElapsed } from '../InterviewLiveCandidateCardPresence';
 
 describe('InterviewLiveCandidateCard Component & Real-time LiveKit Connection', () => {
   const cardPath = join(__dirname, '../../InterviewLiveCandidateCard.tsx');
@@ -56,6 +57,46 @@ describe('InterviewLiveCandidateCard Component & Real-time LiveKit Connection', 
     expect(panelSource).toContain("t('employer:interviewLive.candidateCard.end', 'Kết thúc')");
     expect(viLocale.interviewLive.candidateCard.maximize).toBe('Phóng to');
     expect(viLocale.interviewLive.candidateCard.end).toBe('Kết thúc');
+  });
+
+  it('maintains 16:9 webcam aspect ratio and minHeight in Studio Viewport', () => {
+    expect(panelSource).toContain("aspectRatio: '16/9'");
+    expect(panelSource).toContain("minHeight: { xs: 240, sm: 280 }");
+  });
+
+  describe('formatElapsed timer calculation', () => {
+    it('returns --:-- for empty or null startTime', () => {
+      expect(formatElapsed(null)).toBe('--:--');
+      expect(formatElapsed(undefined)).toBe('--:--');
+      expect(formatElapsed('')).toBe('--:--');
+      expect(formatElapsed('invalid-date')).toBe('--:--');
+    });
+
+    it('formats minutes and seconds under 1 hour correctly', () => {
+      const base = new Date('2026-09-30T10:00:00Z').getTime();
+      const after5m30s = base + (5 * 60 + 30) * 1000;
+      expect(formatElapsed(new Date(base).toISOString(), after5m30s)).toBe('05:30');
+    });
+
+    it('formats hours, minutes, and seconds when >= 1 hour and < 8 hours', () => {
+      const base = new Date('2026-09-30T10:00:00Z').getTime();
+      const after1h15m20s = base + (1 * 3600 + 15 * 60 + 20) * 1000;
+      expect(formatElapsed(new Date(base).toISOString(), after1h15m20s)).toBe('01:15:20');
+
+      const after7h59m59s = base + (7 * 3600 + 59 * 60 + 59) * 1000;
+      expect(formatElapsed(new Date(base).toISOString(), after7h59m59s)).toBe('07:59:59');
+    });
+
+    it('returns >8h (Quá hạn) when elapsed >= 8 hours, preventing massive minute anomalies like 22173:17', () => {
+      const base = new Date('2026-09-30T10:00:00Z').getTime();
+      const after8h = base + 8 * 3600 * 1000;
+      expect(formatElapsed(new Date(base).toISOString(), after8h)).toBe('>8h (Quá hạn)');
+
+      // A session from 15 days ago (previously showed 22173:17)
+      const after15days = base + 15 * 24 * 3600 * 1000;
+      expect(formatElapsed(new Date(base).toISOString(), after15days)).toBe('>8h (Quá hạn)');
+      expect(formatElapsed(new Date(base).toISOString(), after15days)).not.toContain('22173:17');
+    });
   });
 });
 

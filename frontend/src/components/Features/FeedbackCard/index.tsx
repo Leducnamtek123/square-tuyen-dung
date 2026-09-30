@@ -79,7 +79,7 @@ const FeedbackCard = ({
         height: '100%',
         minHeight: 280,
         p: { xs: 2.5, sm: 3 },
-        borderRadius: 3.5,
+        borderRadius: 0,
         border: '1px solid',
         borderColor: 'rgba(226, 232, 240, 0.9)',
         bgcolor: '#ffffff',
@@ -271,7 +271,7 @@ const Loading = () => (
       height: '100%',
       minHeight: 280,
       p: { xs: 2.5, sm: 3 },
-      borderRadius: 4,
+      borderRadius: 0,
       border: '1px solid rgba(226, 232, 240, 0.9)',
       bgcolor: '#ffffff',
     }}
@@ -285,7 +285,7 @@ const Loading = () => (
             <Skeleton variant="text" width={80} height={16} />
           </Box>
         </Stack>
-        <Skeleton variant="rounded" width={80} height={26} sx={{ borderRadius: 2 }} />
+        <Skeleton variant="rectangular" width={80} height={26} sx={{ borderRadius: 0 }} />
       </Stack>
       <Skeleton variant="text" width={90} height={20} sx={{ mb: 1.5 }} />
       <Skeleton variant="text" width="100%" height={18} />

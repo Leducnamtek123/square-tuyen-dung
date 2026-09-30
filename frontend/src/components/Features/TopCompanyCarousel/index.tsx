@@ -146,7 +146,7 @@ const TopCompanyCarousel = () => {
                 sx={{
                   px: 2.2,
                   py: 0.85,
-                  borderRadius: '24px',
+                  borderRadius: 0,
                   border: '1px solid',
                   borderColor: isActive ? '#e11d48' : '#e2e8f0',
                   backgroundColor: isActive ? '#fff1f2' : '#ffffff',
@@ -178,6 +178,7 @@ const TopCompanyCarousel = () => {
             backgroundColor: '#ffffff',
             width: 32,
             height: 32,
+            borderRadius: 0,
             flexShrink: 0,
             '&:hover': { backgroundColor: '#f1f5f9' },
           }}
@@ -191,7 +192,7 @@ const TopCompanyCarousel = () => {
         <Grid container spacing={2.5}>
           {Array.from(Array(6).keys()).map((i) => (
             <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Skeleton variant="rounded" height={96} sx={{ borderRadius: '16px' }} />
+              <Skeleton variant="rectangular" height={96} sx={{ borderRadius: 0 }} />
             </Grid>
           ))}
         </Grid>
@@ -222,7 +223,7 @@ const TopCompanyCarousel = () => {
                     minHeight: 96,
                     backgroundColor: '#ffffff',
                     border: '1px solid #e2e8f0',
-                    borderRadius: '16px',
+                    borderRadius: 0,
                     boxShadow: 0,
                     textDecoration: 'none',
                     color: 'inherit',
@@ -241,7 +242,7 @@ const TopCompanyCarousel = () => {
                     src={logo}
                     fallbackSrc={IMAGES.companyLogoDefault}
                     sx={{
-                      borderRadius: '12px',
+                      borderRadius: 0,
                       border: '1px solid #f1f5f9',
                       objectFit: 'contain',
                       p: 0.5,

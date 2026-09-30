@@ -21,7 +21,7 @@ CACHE_TTL = 3600  # 1 hour
 def _cache_key(resume_id, job_id):
     """Generate a unique cache key for a resume-job pair."""
     raw = f"ai_score:{resume_id}:{job_id}"
-    return hashlib.md5(raw.encode()).hexdigest()
+    return hashlib.md5(raw.encode(), usedforsecurity=False).hexdigest()
 
 
 def build_scoring_prompt(resume_data, job_data):

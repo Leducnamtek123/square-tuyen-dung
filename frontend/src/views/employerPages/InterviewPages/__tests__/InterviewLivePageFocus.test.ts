@@ -95,4 +95,55 @@ describe('InterviewLivePage focused live management', () => {
     expect(source).toContain('RefreshIcon');
     expect(source).toContain('interviewLive.autoRefresh.on');
   });
+
+  it('filters out orphan sessions older than 12 hours from live interview list', () => {
+    const now = Date.now();
+    const recentSession = {
+      id: 1,
+      status: 'in_progress',
+      startTime: new Date(now - 2 * 3600 * 1000).toISOString(),
+    };
+    const orphanSessionOldStartTime = {
+      id: 2,
+      status: 'in_progress',
+      startTime: new Date(now - 13 * 3600 * 1000).toISOString(),
+    };
+    const orphanSessionOldCreatedAt = {
+      id: 3,
+      status: 'in_progress',
+      createdAt: new Date(now - 24 * 3600 * 1000).toISOString(),
+    };
+    const orphanSessionOldCreateAt = {
+      id: 4,
+      status: 'in_progress',
+      create_at: new Date(now - 48 * 3600 * 1000).toISOString(),
+    };
+    const orphanSessionOldScheduledAt = {
+      id: 5,
+      status: 'in_progress',
+      scheduledAt: new Date(now - 15 * 3600 * 1000).toISOString(),
+    };
+
+    const sessions = [
+      recentSession,
+      orphanSessionOldStartTime,
+      orphanSessionOldCreatedAt,
+      orphanSessionOldCreateAt,
+      orphanSessionOldScheduledAt,
+    ];
+    expect(getLiveInterviewSessions(sessions).map((s) => s.id)).toEqual([1]);
+  });
+
+  it('requires confirmation dialog before force-ending an active interview session', () => {
+    const source = readInterviewPageSource('InterviewLivePage.tsx');
+
+    expect(source).toContain('confirmSession');
+    expect(source).toContain('handleRequestEnd');
+    expect(source).toContain('onForceEnd={handleRequestEnd}');
+    expect(source).toContain('Dialog');
+    expect(source).toContain('interviewLive.confirmEndTitle');
+    expect(source).toContain('interviewLive.confirmEndWarning');
+    expect(source).toContain('interviewLive.confirmEndButton');
+    expect(source).toContain('handleForceEnd(target)');
+  });
 });

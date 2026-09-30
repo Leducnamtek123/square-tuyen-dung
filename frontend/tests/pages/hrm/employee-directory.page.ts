@@ -57,12 +57,14 @@ export class EmployeeDirectoryPage extends BasePage {
     super(page);
     this.pageHeading = page.getByText(/hồ sơ nhân sự 360°|quản lý nhân sự/i).first();
     this.searchInput = page.getByPlaceholder(/tìm theo tên/i);
-    this.deptFilterSelect = page.locator('label:has-text("Phòng ban") + .MuiInputBase-root').or(
-      page.getByRole('combobox', { name: /phòng ban/i })
-    );
-    this.statusFilterSelect = page.locator('label:has-text("Trạng thái làm việc") + .MuiInputBase-root').or(
-      page.getByRole('combobox', { name: /trạng thái/i })
-    );
+    this.deptFilterSelect = page
+      .getByRole('combobox', { name: /phòng ban/i })
+      .or(page.locator('label:has-text("Phòng ban") + .MuiInputBase-root'))
+      .first();
+    this.statusFilterSelect = page
+      .getByRole('combobox', { name: /trạng thái/i })
+      .or(page.locator('label:has-text("Trạng thái làm việc") + .MuiInputBase-root'))
+      .first();
     this.createEmployeeBtn = page.getByRole('button', { name: /tạo hồ sơ mới|thêm nhân viên|tạo mới/i }).first();
     this.employeeTable = page.locator('table');
     this.employeeRows = page.locator('tbody tr');
@@ -81,9 +83,12 @@ export class EmployeeDirectoryPage extends BasePage {
     this.saveEmployeeBtn = page.getByRole('button', { name: /tạo hồ sơ|lưu cập nhật/i });
     this.cancelEmployeeBtn = page.getByRole('button', { name: /^Hủy$/i });
 
-    // Detail drawer
-    this.detailDrawer = page.locator('.MuiDrawer-paper');
-    this.closeDrawerBtn = page.getByRole('button', { name: /^Đóng$/i }).or(page.locator('button[aria-label="Đóng"]'));
+    // Detail drawer (specifically right-anchored drawer to distinguish from left-anchored sidebar drawers)
+    this.detailDrawer = page.locator('.MuiDrawer-paperAnchorRight');
+    this.closeDrawerBtn = this.detailDrawer
+      .getByRole('button', { name: /^Đóng$/i })
+      .or(this.detailDrawer.locator('button[aria-label="Đóng"], button[aria-label="Close"], button[aria-label="close"]'))
+      .first();
 
     // Delete dialog
     this.deleteDialog = page.getByRole('dialog').filter({ hasText: /xác nhận xóa/i });

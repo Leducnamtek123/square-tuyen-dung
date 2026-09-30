@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Box, ListItemIcon, ListItemText, ListItemButton, Tooltip, Menu, MenuItem as MuiMenuItem, Typography, Divider } from '@mui/material';
+import { Badge, Box, ListItemIcon, ListItemText, ListItemButton, Tooltip, Menu, MenuItem as MuiMenuItem, Typography, Divider } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -89,10 +89,12 @@ const MenuItem = ({ icon: Icon, text, tooltip, to, external = false, onClick, ki
   const isActive = to && !external ? pathname === to || pathname.startsWith(to + '/') : false;
   const isGroupSelected = hasChildren && subItems ? subItems.some((s) => s.isSelected) : false;
   const isSelected = state?.selected || isActive || isGroupSelected;
-  const visibleBadgeContent = typeof badgeContent === 'number' && badgeContent >= 0
+  const visibleBadgeContent = typeof badgeContent === 'number' && badgeContent > 0
     ? badgeContent > 99 ? '99+' : String(badgeContent)
     : null;
-  const hasActiveBadge = typeof badgeContent === 'number' && badgeContent > 0;
+  const hasActiveBadge =
+    (typeof badgeContent === 'number' && badgeContent > 0) ||
+    Boolean(subItems?.some((s) => typeof s.badgeContent === 'number' && s.badgeContent > 0));
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -129,12 +131,24 @@ const MenuItem = ({ icon: Icon, text, tooltip, to, external = false, onClick, ki
     >
       {!isChild && Icon && (
         <ListItemIcon sx={{ minWidth: isCollapsed ? 0 : 32, mr: isCollapsed ? 0 : 1, justifyContent: 'center' }}>
-          <Icon sx={{ fontSize: 20 }} />
+          {isCollapsed && hasActiveBadge ? (
+            <Badge color="error" variant="dot">
+              <Icon sx={{ fontSize: 20 }} />
+            </Badge>
+          ) : (
+            <Icon sx={{ fontSize: 20 }} />
+          )}
         </ListItemIcon>
       )}
       {isChild && Icon ? (
         <ListItemIcon sx={{ minWidth: isCollapsed ? 0 : 26, mr: isCollapsed ? 0 : 1, justifyContent: 'center' }}>
-          <Icon sx={{ fontSize: 18 }} />
+          {isCollapsed && hasActiveBadge ? (
+            <Badge color="error" variant="dot">
+              <Icon sx={{ fontSize: 18 }} />
+            </Badge>
+          ) : (
+            <Icon sx={{ fontSize: 18 }} />
+          )}
         </ListItemIcon>
       ) : isChild ? (
         <Box

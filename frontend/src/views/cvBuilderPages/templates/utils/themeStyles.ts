@@ -39,7 +39,7 @@ export function getThemeStyles(theme?: Partial<CVThemeConfig>): ThemeStylesOutpu
   if (theme?.avatarShape === 'rounded') {
     avatarRadius = '16px';
   } else if (theme?.avatarShape === 'square') {
-    avatarRadius = '4px';
+    avatarRadius = '0px';
   }
 
   return {

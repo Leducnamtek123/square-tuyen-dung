@@ -51,7 +51,7 @@ const FilterSection = ({
   <Box
     sx={{
       p: 2,
-      borderRadius: '14px',
+      borderRadius: 0,
       backgroundColor: '#f8fafc',
       border: '1px solid #e2e8f0',
     }}
@@ -143,7 +143,7 @@ const CompanySearchAdvancedFilters: React.FC<CompanySearchAdvancedFiltersProps> 
             aria-label={t('common.actions.close', { defaultValue: 'Đóng' })}
             sx={{
               color: '#64748b',
-              borderRadius: '8px',
+              borderRadius: 0,
               '&:hover': { backgroundColor: '#f1f5f9', color: '#0f172a' },
             }}
           >
@@ -208,7 +208,7 @@ const CompanySearchAdvancedFilters: React.FC<CompanySearchAdvancedFiltersProps> 
             startIcon={<RestartAltRoundedIcon />}
             sx={{
               flex: 1,
-              borderRadius: '12px',
+              borderRadius: 0,
               borderColor: '#e2e8f0',
               color: '#64748b',
               fontWeight: 700,
@@ -230,7 +230,7 @@ const CompanySearchAdvancedFilters: React.FC<CompanySearchAdvancedFiltersProps> 
             startIcon={<CheckRoundedIcon />}
             sx={{
               flex: 1.5,
-              borderRadius: '12px',
+              borderRadius: 0,
               backgroundColor: '#2563eb',
               color: '#ffffff',
               fontWeight: 700,

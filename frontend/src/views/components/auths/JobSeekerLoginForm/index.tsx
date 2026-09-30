@@ -42,7 +42,7 @@ export const createJobSeekerLoginSchema = (t: JobSeekerLoginT) =>
 const StyledButton = styled(Button)(({ theme }) => ({
   minHeight: "48px",
   padding: "12px 24px",
-  borderRadius: "14px",
+  borderRadius: 0,
   fontSize: "15px",
   fontWeight: 700,
   textTransform: "none",
@@ -72,7 +72,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 const StyledSocialButton = styled(Button)(({ theme }) => ({
   minHeight: "46px",
   padding: "10px 20px",
-  borderRadius: "14px",
+  borderRadius: 0,
   fontSize: "14.5px",
   fontWeight: 600,
   textTransform: "none",

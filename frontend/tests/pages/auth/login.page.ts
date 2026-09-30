@@ -23,7 +23,7 @@ export class LoginPage extends BasePage {
     this.alertError = page.locator('[role="alert"].MuiAlert-standardError, [role="alert"]').first();
     this.alertSuccess = page.locator('[role="alert"].MuiAlert-standardSuccess').first();
     this.validationErrors = page
-      .locator('.Mui-error, [role="alert"]')
+      .locator('.MuiFormHelperText-root.Mui-error, p.Mui-error, span.Mui-error, [role="alert"].MuiAlert-standardError')
       .or(page.getByText(/bắt buộc|vui lòng nhập|không hợp lệ/i));
     this.forgotPasswordLink = page.locator('a[href*="forgot-password"], a[href*="quen-mat-khau"]').first();
     this.registerLink = page.locator('a[href*="register"], a[href*="dang-ky"]').first();
@@ -44,6 +44,13 @@ export class LoginPage extends BasePage {
     const targetUrl = urls[portalOrPath] || (portalOrPath.startsWith('/') ? portalOrPath : `/${portalOrPath}`);
     await super.goto(targetUrl);
     await this.waitForLoadingGone();
+    // Chờ React hydration hoàn tất trên input form
+    await this.page.waitForFunction(() => {
+      const emailEl = document.querySelector('input[name="email"], input#email');
+      if (!emailEl) return false;
+      const keys = Object.keys(emailEl);
+      return keys.some((k) => k.startsWith('__reactFiber') || k.startsWith('__reactProps'));
+    }, { timeout: 15_000 }).catch(() => {});
   }
 
   /**
@@ -51,7 +58,12 @@ export class LoginPage extends BasePage {
    */
   async fillEmail(email: string) {
     await this.emailInput.waitFor({ state: 'visible', timeout: 15_000 });
+    await this.emailInput.click();
     await this.emailInput.fill(email);
+    if ((await this.emailInput.inputValue().catch(() => '')) !== email) {
+      await this.page.waitForTimeout(300);
+      await this.emailInput.fill(email);
+    }
   }
 
   /**
@@ -59,7 +71,12 @@ export class LoginPage extends BasePage {
    */
   async fillPassword(password: string) {
     await this.passwordInput.waitFor({ state: 'visible', timeout: 15_000 });
+    await this.passwordInput.click();
     await this.passwordInput.fill(password);
+    if ((await this.passwordInput.inputValue().catch(() => '')) !== password) {
+      await this.page.waitForTimeout(300);
+      await this.passwordInput.fill(password);
+    }
   }
 
   /**
@@ -71,12 +88,27 @@ export class LoginPage extends BasePage {
   }
 
   /**
-   * Điền form và thực hiện đăng nhập
+   * Điền form và thực hiện đăng nhập với kiểm tra hydration an toàn
    */
   async login(email: string, password?: string) {
     await this.fillEmail(email);
     if (password !== undefined) {
       await this.fillPassword(password);
+    }
+    // Đảm bảo không bị Next.js hydration reset lại input trước khi submit
+    for (let i = 0; i < 3; i++) {
+      const currentEmail = await this.emailInput.inputValue().catch(() => '');
+      const currentPass = password !== undefined ? await this.passwordInput.inputValue().catch(() => '') : '';
+      if (currentEmail === email && (password === undefined || currentPass === password)) {
+        break;
+      }
+      if (currentEmail !== email) {
+        await this.emailInput.fill(email);
+      }
+      if (password !== undefined && currentPass !== password) {
+        await this.passwordInput.fill(password);
+      }
+      await this.page.waitForTimeout(200);
     }
     await this.submit();
   }

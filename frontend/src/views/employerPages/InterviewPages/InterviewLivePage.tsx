@@ -5,6 +5,11 @@ import {
   Alert,
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControlLabel,
   IconButton,
   InputAdornment,
@@ -148,6 +153,8 @@ const InterviewLivePage = () => {
     return () => clearInterval(interval);
   }, [activeSessions.length, state.autoRefresh, fetchSessions]);
 
+  const [confirmSession, setConfirmSession] = useState<InterviewSession | null>(null);
+
   const handleForceEnd = useCallback(async (session: InterviewSession) => {
     if (!session.roomName) return;
     dispatch({ type: 'set-action-loading-id', value: session.id });
@@ -164,6 +171,10 @@ const InterviewLivePage = () => {
       dispatch({ type: 'set-action-loading-id', value: null });
     }
   }, [fetchSessions, t]);
+
+  const handleRequestEnd = useCallback((s: InterviewSession) => {
+    setConfirmSession(s);
+  }, []);
 
   return (
     <Box sx={{ px: { xs: 1.5, sm: 3 }, py: { xs: 2.5, sm: 3 }, maxWidth: 1600, mx: 'auto' }}>
@@ -496,12 +507,86 @@ const InterviewLivePage = () => {
             <InterviewLiveCandidateCard
               key={session.id}
               session={session}
-              onForceEnd={handleForceEnd}
+              onForceEnd={handleRequestEnd}
               isForceEnding={state.actionLoadingId === session.id}
             />
           ))}
         </Box>
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={Boolean(confirmSession)}
+        onClose={() => setConfirmSession(null)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 1,
+          },
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, pb: 1 }}>
+          {t('employer:interviewLive.confirmEndTitle', 'Xác nhận kết thúc buổi phỏng vấn')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+            {t(
+              'employer:interviewLive.confirmEndWarning',
+              'Hành động này sẽ ngắt kết nối phòng phỏng vấn trực tiếp của ứng viên ngay lập tức. Bạn có chắc chắn muốn kết thúc?',
+            )}
+          </DialogContentText>
+          {confirmSession && (
+            <Box
+              sx={{
+                mt: 2,
+                p: 1.5,
+                bgcolor: alpha(theme.palette.error.main, 0.08),
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: alpha(theme.palette.error.main, 0.2),
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'error.main' }}>
+                {confirmSession.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate', 'Ứng viên phỏng vấn')}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                {typeof confirmSession.questionGroup === 'object' &&
+                confirmSession.questionGroup &&
+                'name' in confirmSession.questionGroup
+                  ? String((confirmSession.questionGroup as any).name)
+                  : confirmSession.jobName || ''}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setConfirmSession(null)}
+            variant="outlined"
+            size="small"
+            sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 600 }}
+          >
+            {t('common:actions.cancel', 'Hủy')}
+          </Button>
+          <Button
+            onClick={async () => {
+              if (confirmSession) {
+                const target = confirmSession;
+                setConfirmSession(null);
+                await handleForceEnd(target);
+              }
+            }}
+            variant="contained"
+            color="error"
+            size="small"
+            sx={{ borderRadius: '8px', textTransform: 'none', fontWeight: 700 }}
+          >
+            {t('employer:interviewLive.confirmEndButton', 'Xác nhận kết thúc')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

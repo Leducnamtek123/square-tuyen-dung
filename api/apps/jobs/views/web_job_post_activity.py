@@ -530,9 +530,11 @@ class EmployerJobPostActivityViewSet(
                 errors={"detail": ["Ứng viên này đã có trong danh sách ứng tuyển của tin này."]},
             )
 
-        phone = candidate_user.phone
-        if not phone and hasattr(resume, "job_seeker_profile") and resume.job_seeker_profile:
-            phone = resume.job_seeker_profile.phone
+        phone = (
+            getattr(candidate_user, "phone_number", None)
+            or getattr(candidate_user, "phone", None)
+            or (getattr(resume.job_seeker_profile, "phone", None) if hasattr(resume, "job_seeker_profile") and resume.job_seeker_profile else None)
+        )
 
         job_post_activity = JobPostActivity.objects.create(
             job_post=job_post,

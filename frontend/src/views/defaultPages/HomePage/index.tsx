@@ -27,7 +27,6 @@ import ArchitectureIcon from '@mui/icons-material/Architecture';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import SearchIcon from '@mui/icons-material/Search';
-import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import WeekendIcon from '@mui/icons-material/Weekend';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -35,15 +34,9 @@ import { ROLES_NAME, ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import useSEO from '@/hooks/useSEO';
 import useStructuredData from '@/hooks/useStructuredData';
-import TopCompanyCarousel from '@/components/Features/TopCompanyCarousel';
-import CareerCarousel from '@/components/Features/CareerCarousel';
-import FeedbackCarousel from '@/components/Features/FeedbackCarousel';
 import CareerHandbookSection from '@/components/Features/CareerHandbookSection';
-import PartnerLogoCarousel from '@/components/Features/PartnerLogoCarousel';
-import JobByCategory from '@/views/components/defaults/JobByCategory';
 import FilterJobPostCard from '@/views/components/defaults/FilterJobPostCard';
-import SuggestedJobPostCard from '@/views/components/defaults/SuggestedJobPostCard';
-import CareerJobPostTabs from '@/views/components/defaults/CareerJobPostTabs';
+import HomeJobDiscoverySection from './HomeJobDiscoverySection';
 import commonService from '@/services/commonService';
 import bannerExplorePcImport from '@/assets/images/banner-explore-pc.webp';
 import bannerExploreGirlImport from '@/assets/images/banner-explore-girl.webp';
@@ -105,7 +98,7 @@ const CareerJobSection = ({
             color: '#2563eb',
             width: 42,
             height: 42,
-            borderRadius: 2,
+            borderRadius: 0,
           }}
           aria-label={career.name}
         >
@@ -158,7 +151,7 @@ const EntryPointCard = ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: 4,
+        borderRadius: 0,
         border: '1px solid',
         borderColor: 'rgba(226, 232, 240, 0.9)',
         bgcolor: '#ffffff',
@@ -197,7 +190,7 @@ const EntryPointCard = ({
               color: accent,
               width: { xs: 48, sm: 56 },
               height: { xs: 48, sm: 56 },
-              borderRadius: 3,
+              borderRadius: 0,
               flexShrink: 0,
             }}
           >
@@ -285,7 +278,7 @@ const EntryPointCard = ({
             bgcolor: accent,
             color: '#ffffff',
             py: 1.5,
-            borderRadius: 2.5,
+            borderRadius: 0,
             fontWeight: 700,
             textTransform: 'none',
             fontSize: '0.95rem',
@@ -361,93 +354,55 @@ export default function HomePage() {
 
       // -- Desktop Breakpoint (≥769px) ---------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.isDesktop, () => {
-        // 0. Partner logos marquee entrance
+        // 0. Discovery section entrance
         gsap.fromTo(
-          '.gsap-partner-logos',
+          '.gsap-discovery-section',
           { y: 20, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', clearProps: 'all' }
         );
 
-        // 1. Urgent jobs section entrance
-        gsap.fromTo(
-          '.gsap-urgent-jobs',
-          { y: 25, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.65, ease: 'power3.out', clearProps: 'all' }
-        );
 
-        // 2. Top company carousel entrance with ScrollTrigger
-        gsap.fromTo(
-          '.gsap-top-companies',
-          { y: 30, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-top-companies',
-              start: 'top 85%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.65,
-            ease: 'power3.out',
-            clearProps: 'all',
-          }
-        );
 
-        // 3. Choose Path section with ScrollTrigger & stagger
-        gsap.fromTo(
-          '.gsap-path-header',
-          { y: 25, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-choose-path',
-              start: 'top 85%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.6,
-            ease: 'power3.out',
-            clearProps: 'all',
-          }
-        );
 
-        gsap.fromTo(
-          '.gsap-entry-card',
-          { y: 35, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-choose-path-grid',
-              start: 'top 85%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.65,
-            stagger: 0.15,
-            ease: 'power3.out',
-            clearProps: 'all',
-          }
-        );
+        // 3. Choose Path section with ScrollTrigger & stagger (chỉ kích hoạt nếu phần tử tồn tại trong DOM)
+        if (typeof document !== 'undefined' && document.querySelector('.gsap-choose-path')) {
+          gsap.fromTo(
+            '.gsap-path-header',
+            { y: 25, opacity: 0 },
+            {
+              scrollTrigger: {
+                trigger: '.gsap-choose-path',
+                start: 'top 85%',
+                once: true,
+              },
+              y: 0,
+              opacity: 1,
+              duration: 0.6,
+              ease: 'power3.out',
+              clearProps: 'all',
+            }
+          );
 
-        // 4. Feedback section with ScrollTrigger
-        gsap.fromTo(
-          '.gsap-feedback-section',
-          { y: 30, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-feedback-section',
-              start: 'top 85%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.65,
-            ease: 'power3.out',
-            clearProps: 'all',
-          }
-        );
+          gsap.fromTo(
+            '.gsap-entry-card',
+            { y: 35, opacity: 0 },
+            {
+              scrollTrigger: {
+                trigger: '.gsap-choose-path-grid',
+                start: 'top 85%',
+                once: true,
+              },
+              y: 0,
+              opacity: 1,
+              duration: 0.65,
+              stagger: 0.15,
+              ease: 'power3.out',
+              clearProps: 'all',
+            }
+          );
+        }
 
-        // 5. Handbook section with ScrollTrigger
+        // 4. Handbook section with ScrollTrigger
         gsap.fromTo(
           '.gsap-handbook-section',
           { y: 30, opacity: 0 },
@@ -470,85 +425,48 @@ export default function HomePage() {
       // Subtle movements (y: 12-16px), earlier trigger (top 92%) and faster durations to eliminate lag
       mm.add(GSAP_MEDIA_CONDITIONS.isMobile, () => {
         gsap.fromTo(
-          '.gsap-partner-logos',
+          '.gsap-discovery-section',
           { y: 10, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', clearProps: 'all' }
         );
 
-        gsap.fromTo(
-          '.gsap-urgent-jobs',
-          { y: 12, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', clearProps: 'all' }
-        );
 
-        gsap.fromTo(
-          '.gsap-top-companies',
-          { y: 14, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-top-companies',
-              start: 'top 92%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            ease: 'power2.out',
-            clearProps: 'all',
-          }
-        );
+        if (typeof document !== 'undefined' && document.querySelector('.gsap-choose-path')) {
+          gsap.fromTo(
+            '.gsap-path-header',
+            { y: 12, opacity: 0 },
+            {
+              scrollTrigger: {
+                trigger: '.gsap-choose-path',
+                start: 'top 92%',
+                once: true,
+              },
+              y: 0,
+              opacity: 1,
+              duration: 0.45,
+              ease: 'power2.out',
+              clearProps: 'all',
+            }
+          );
 
-        gsap.fromTo(
-          '.gsap-path-header',
-          { y: 12, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-choose-path',
-              start: 'top 92%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            ease: 'power2.out',
-            clearProps: 'all',
-          }
-        );
-
-        gsap.fromTo(
-          '.gsap-entry-card',
-          { y: 16, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-choose-path-grid',
-              start: 'top 92%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            stagger: 0.08,
-            ease: 'power2.out',
-            clearProps: 'all',
-          }
-        );
-
-        gsap.fromTo(
-          '.gsap-feedback-section',
-          { y: 14, opacity: 0 },
-          {
-            scrollTrigger: {
-              trigger: '.gsap-feedback-section',
-              start: 'top 92%',
-              once: true,
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.45,
-            ease: 'power2.out',
-            clearProps: 'all',
-          }
-        );
+          gsap.fromTo(
+            '.gsap-entry-card',
+            { y: 16, opacity: 0 },
+            {
+              scrollTrigger: {
+                trigger: '.gsap-choose-path-grid',
+                start: 'top 92%',
+                once: true,
+              },
+              y: 0,
+              opacity: 1,
+              duration: 0.45,
+              stagger: 0.08,
+              ease: 'power2.out',
+              clearProps: 'all',
+            }
+          );
+        }
 
         gsap.fromTo(
           '.gsap-handbook-section',
@@ -571,7 +489,7 @@ export default function HomePage() {
       // -- Reduced Motion -----------------------------------------------
       mm.add(GSAP_MEDIA_CONDITIONS.reduceMotion, () => {
         gsap.set(
-          '.gsap-partner-logos, .gsap-urgent-jobs, .gsap-top-companies, .gsap-path-header, .gsap-entry-card, .gsap-feedback-section, .gsap-handbook-section',
+          '.gsap-discovery-section, .gsap-path-header, .gsap-entry-card, .gsap-handbook-section',
           { opacity: 1, y: 0, clearProps: 'all' }
         );
       });
@@ -581,108 +499,65 @@ export default function HomePage() {
 
   return (
     <Box ref={homeContainerRef}>
-      <Box className="gsap-partner-logos" sx={{ mt: { xs: 2.5, sm: 3.5, md: 5 } }}>
-        <PartnerLogoCarousel />
+      {/* 3-Column Job Discovery Section (Bộ lọc, Việc làm mới nhất, Công ty nổi bật & AI Assistant) */}
+      <Box className="gsap-discovery-section" sx={{ mt: { xs: 1.5, sm: 2.5 } }}>
+        <HomeJobDiscoverySection />
       </Box>
 
-      <Box className="gsap-urgent-jobs" sx={{ mt: { xs: 3, sm: 5, md: 7 } }}>
-        <FilterJobPostCard params={{ isUrgent: true }} fallbackToAllIfEmpty hideIfEmpty />
-      </Box>
-
-      <Box className="gsap-top-companies" sx={{ mt: { xs: 3.5, sm: 5, md: 6 } }}>
-        <TopCompanyCarousel />
-      </Box>
-
-      <Box className="gsap-choose-path" sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
-        <Stack className="gsap-path-header" spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
-          <Typography variant="h4" sx={{ fontWeight: 800 }}>
-            {t('home.choosePathTitle')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 640 }}>
-            {t('home.choosePathDescription')}
-          </Typography>
-        </Stack>
-        <Grid container spacing={3.5} className="gsap-choose-path-grid">
-          <Grid size={{ xs: 12, md: 6 }} className="gsap-entry-card">
-            <EntryPointCard
-              icon={<SearchIcon fontSize="large" />}
-              title={t('home.candidateTitle')}
-              description={t('home.candidateDescription')}
-              benefits={[
-                t('home.candidateBenefit1'),
-                t('home.candidateBenefit2'),
-                t('home.candidateBenefit3'),
-              ]}
-              ctaLabel={t('home.candidateCta')}
-              href={jobsHref}
-              accent="#2563eb"
-              statusBadge={{
-                icon: <LocalFireDepartmentIcon sx={{ fontSize: '15px !important', color: '#ea580c !important' }} />,
-                text: t('home.candidateStatusBadge'),
-              }}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }} className="gsap-entry-card">
-            <EntryPointCard
-              icon={<ApartmentIcon fontSize="large" />}
-              title={t('home.employerTitle')}
-              description={t('home.employerDescription')}
-              benefits={[
-                t('home.employerBenefit1'),
-                t('home.employerBenefit2'),
-                t('home.employerBenefit3'),
-              ]}
-              ctaLabel={t('home.employerCta')}
-              href={employerIntroHref}
-              accent="#0f766e"
-              statusBadge={{
-                icon: <AutoAwesomeIcon sx={{ fontSize: '15px !important', color: '#0f766e !important' }} />,
-                text: t('home.employerStatusBadge'),
-              }}
-            />
-          </Grid>
-        </Grid>
-      </Box>
-
-      {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
-        <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
-          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
-            <Avatar
-              sx={{
-                bgcolor: 'rgba(37, 99, 235, 0.08)',
-                color: '#2563eb',
-                width: 42,
-                height: 42,
-                borderRadius: 2,
-              }}
-              aria-label={t('home.suggestedJobsAria')}
-            >
-              <TipsAndUpdatesIcon color="inherit" fontSize="small" />
-            </Avatar>
-            <Typography
-              variant="h5"
-              sx={{
-                color: 'text.primary',
-                fontWeight: 800,
-                fontSize: { xs: '1.2rem', md: '1.35rem' },
-              }}
-            >
-              {t('home.suggestedJobs')}
+      {/* Choose Path: Ứng viên & Nhà tuyển dụng (Ẩn theo yêu cầu người dùng) */}
+      {false && (
+        <Box className="gsap-choose-path" sx={{ mt: { xs: 4, sm: 6, md: 8 }, display: 'none' }}>
+          <Stack className="gsap-path-header" spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+              {t('home.choosePathTitle')}
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 640 }}>
+              {t('home.choosePathDescription')}
             </Typography>
           </Stack>
-          <LazyLoadSection minHeight="400px">
-            <SuggestedJobPostCard />
-          </LazyLoadSection>
+          <Grid container spacing={3.5} className="gsap-choose-path-grid">
+            <Grid size={{ xs: 12, md: 6 }} className="gsap-entry-card">
+              <EntryPointCard
+                icon={<SearchIcon fontSize="large" />}
+                title={t('home.candidateTitle')}
+                description={t('home.candidateDescription')}
+                benefits={[
+                  t('home.candidateBenefit1'),
+                  t('home.candidateBenefit2'),
+                  t('home.candidateBenefit3'),
+                ]}
+                ctaLabel={t('home.candidateCta')}
+                href={jobsHref}
+                accent="#2563eb"
+                statusBadge={{
+                  icon: <LocalFireDepartmentIcon sx={{ fontSize: '15px !important', color: '#ea580c !important' }} />,
+                  text: t('home.candidateStatusBadge'),
+                }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }} className="gsap-entry-card">
+              <EntryPointCard
+                icon={<ApartmentIcon fontSize="large" />}
+                title={t('home.employerTitle')}
+                description={t('home.employerDescription')}
+                benefits={[
+                  t('home.employerBenefit1'),
+                  t('home.employerBenefit2'),
+                  t('home.employerBenefit3'),
+                ]}
+                ctaLabel={t('home.employerCta')}
+                href={employerIntroHref}
+                accent="#0f766e"
+                statusBadge={{
+                  icon: <AutoAwesomeIcon sx={{ fontSize: '15px !important', color: '#0f766e !important' }} />,
+                  text: t('home.employerStatusBadge'),
+                }}
+              />
+            </Grid>
+          </Grid>
         </Box>
       )}
 
-      {/* -- Key Careers Section (Tabbed Pills & Smart Fallback) -------- */}
-      <CareerJobPostTabs />
-
-      {/* -- Top Career Carousel (Industries) ------------------------------ */}
-      <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
-        <CareerCarousel />
-      </Box>
 
       {/* -- Explore Banner ------------------------------------------------ */}
       <Box sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
@@ -692,7 +567,7 @@ export default function HomePage() {
           sx={{
             display: 'block',
             position: 'relative',
-            borderRadius: { xs: 3, md: 4 },
+            borderRadius: 0,
             overflow: 'hidden',
             boxShadow: '0 12px 30px -10px rgba(37, 99, 235, 0.22)',
             textDecoration: 'none',
@@ -757,7 +632,7 @@ export default function HomePage() {
                 gap: 0.75,
                 px: { xs: 1.25, sm: 1.5 },
                 py: 0.4,
-                borderRadius: '9999px',
+                borderRadius: 0,
                 bgcolor: 'rgba(255, 255, 255, 0.18)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255, 255, 255, 0.25)',
@@ -839,7 +714,7 @@ export default function HomePage() {
                   fontSize: { xs: '0.75rem', sm: '0.8125rem', md: '0.875rem' },
                   py: { xs: 0.75, sm: 1 },
                   px: { xs: 1.75, sm: 2.25 },
-                  borderRadius: '10px',
+                  borderRadius: 0,
                   boxShadow: '0 4px 14px rgba(0, 0, 0, 0.12)',
                   transition: 'all 0.25s ease',
                 }}
@@ -858,20 +733,6 @@ export default function HomePage() {
         </Box>
       </Box>
 
-      {/* -- User Feedback Carousel ---------------------------------------- */}
-      <Box className="gsap-feedback-section" sx={{ mt: { xs: 4, sm: 6, md: 10 } }}>
-        <Stack spacing={1} sx={{ mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
-            {t('home.userFeedback')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-            {t('home.userFeedbackSubtitle')}
-          </Typography>
-        </Stack>
-        <LazyLoadSection minHeight="300px" rootMargin="300px">
-          <FeedbackCarousel />
-        </LazyLoadSection>
-      </Box>
 
       {/* -- Cẩm nang nghề nghiệp (Articles / Handbook Section) -------------- */}
       <Box className="gsap-handbook-section" sx={{ mt: { xs: 4, sm: 6, md: 10 }, mb: { xs: 4, md: 8 } }}>

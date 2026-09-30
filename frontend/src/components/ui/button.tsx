@@ -4,7 +4,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 border-0 outline-none select-none rounded-xl px-5 text-sm font-semibold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer',
+  'inline-flex items-center justify-center gap-2 border-0 outline-none select-none rounded-none px-5 text-sm font-semibold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] cursor-pointer',
   {
     variants: {
       variant: {
@@ -19,7 +19,7 @@ const buttonVariants = cva(
         destructive:
           'border-0 bg-rose-600 text-white shadow-[0_4px_14px_rgba(225,29,72,0.25)] hover:bg-rose-700 hover:shadow-[0_6px_20px_rgba(225,29,72,0.35)] active:bg-rose-800',
         link:
-          'border-0 bg-transparent text-blue-600 underline-offset-4 hover:underline hover:text-blue-700 p-0 h-auto',
+          'border-0 bg-transparent text-blue-600 hover:text-blue-700 p-0 h-auto no-underline hover:no-underline font-semibold',
       },
       size: {
         default: 'h-10 px-5 py-2 text-sm',

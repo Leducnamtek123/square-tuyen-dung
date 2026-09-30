@@ -63,7 +63,7 @@ const SidebarHeader = (_props: SidebarHeaderProps) => {
             clickable
             sx={{
               height: 36,
-              borderRadius: '10px',
+              borderRadius: 0,
               fontWeight: 600,
               fontSize: '0.8125rem',
               bgcolor: '#f8fafc',

@@ -12,7 +12,17 @@ MINIO_BACKUP="backups/minio_media_latest.tar.gz"
 DB_CONTAINER="${DB_CONTAINER:-tuyendung-studio-db}"
 DB_NAME="${DB_NAME:-square_db}"
 DB_USER="${DB_USER:-root}"
-DB_PASSWORD="${DB_PASSWORD:-5Dg-UfRnuEvcqJ9mkhrpaPccoijdKlQCIQKHEA-zaPHn-4vECYIVUNWJOi8XTJFV}"
+DB_PASSWORD="${DB_PASSWORD:-}"
+
+if [ -z "${DB_PASSWORD}" ]; then
+  if [ -t 0 ]; then
+    read -sp "Enter MySQL root password for restore: " DB_PASSWORD
+    echo
+  else
+    echo "Error: DB_PASSWORD environment variable is not set."
+    exit 1
+  fi
+fi
 
 if [ ! -f "${BACKUP_FILE}" ]; then
   echo "Error: Backup file '${BACKUP_FILE}' not found!"

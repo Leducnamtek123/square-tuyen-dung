@@ -322,11 +322,11 @@ export const ChartLoadingState = ({ height = 320, label }: ChartStateProps) => (
           inset: -4,
           borderRadius: '50%',
           border: `1px solid ${pc.primaryLight(0.22)}`,
-          animation: 'sq-chart-loading-pulse 1.4s ease-in-out infinite',
+          animation: 'chart-loading-pulse 1.4s ease-in-out infinite',
           animationDuration: '1.4s !important',
           animationIterationCount: 'infinite !important',
         },
-        '@keyframes sq-chart-loading-pulse': {
+        '@keyframes chart-loading-pulse': {
           '0%, 100%': { opacity: 0.35, transform: 'scale(0.92)' },
           '50%': { opacity: 1, transform: 'scale(1)' },
         },

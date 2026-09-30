@@ -1,6 +1,7 @@
 // Jest globals: describe, it, expect
 import {
   getLocalizedRouteVariants,
+  localizeRoutePath,
 } from '@/configs/routeLocalization';
 import { 
   isAdminPortalPath, 
@@ -196,5 +197,43 @@ describe('Route Localization', () => {
     const variants = getLocalizedRouteVariants('some-unknown-path');
     expect(Array.isArray(variants)).toBe(true);
     expect(variants.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should strip portal prefixes on employer subdomain in browser environment', () => {
+    const originalWindow = (global as any).window;
+    (global as any).window = { location: { hostname: 'ntd.infohr.vn' } };
+
+    try {
+      expect(localizeRoutePath('/employer/login', 'vi')).toBe('/login');
+      expect(localizeRoutePath('/employer/login', 'en')).toBe('/login');
+      expect(localizeRoutePath('/employer/dashboard', 'vi')).toBe('/bang-dieu-khien');
+      expect(localizeRoutePath('/employer/pricing', 'vi')).toBe('/bao-gia');
+      expect(localizeRoutePath('/employer/register', 'vi')).toBe('/register');
+      expect(localizeRoutePath('/employer/register', 'en')).toBe('/register');
+    } finally {
+      if (originalWindow === undefined) {
+        delete (global as any).window;
+      } else {
+        (global as any).window = originalWindow;
+      }
+    }
+  });
+
+  it('should strip portal prefixes on admin subdomain in browser environment', () => {
+    const originalWindow = (global as any).window;
+    (global as any).window = { location: { hostname: 'admin.infohr.vn' } };
+
+    try {
+      expect(localizeRoutePath('/admin/dashboard', 'vi')).toBe('/bang-dieu-khien');
+      expect(localizeRoutePath('/admin/dashboard', 'en')).toBe('/dashboard');
+      expect(localizeRoutePath('/admin/login', 'vi')).toBe('/dang-nhap');
+      expect(localizeRoutePath('/admin/login', 'en')).toBe('/login');
+    } finally {
+      if (originalWindow === undefined) {
+        delete (global as any).window;
+      } else {
+        (global as any).window = originalWindow;
+      }
+    }
   });
 });

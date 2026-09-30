@@ -7,6 +7,11 @@ export interface MockVoiceAiOptions {
   status?: 'scheduled' | 'in_progress' | 'completed';
   sessionType?: 'mock' | 'official';
   score?: number;
+  interviewerName?: string;
+  avatarImageUrl?: string | null;
+  avatarId?: string;
+  characterId?: string;
+  lipsyncVideoUrl?: string | null;
 }
 
 /**

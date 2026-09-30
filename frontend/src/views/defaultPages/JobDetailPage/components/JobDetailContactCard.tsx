@@ -18,16 +18,16 @@ interface JobDetailContactCardProps {
 const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDetail }) => {
   const { t } = useTranslation(["public"]);
   return (
-    <div className="rounded-xl border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
+    <div className="rounded-none border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
       <div className="grid gap-8 md:grid-cols-2">
         <div>
           <h3 className="text-lg font-semibold">
             {t("jobDetail.contactInfo")}
           </h3>
-          <div className="mt-1 h-1 w-12 rounded bg-primary" />
+          <div className="mt-1 h-1 w-12 rounded-none bg-primary" />
 
           <div className="mt-6 space-y-3">
-            <div className="flex items-center gap-3 rounded-lg bg-primary/5 p-3 transition hover:translate-x-2 hover:bg-primary/10">
+            <div className="flex items-center gap-3 rounded-none bg-primary/5 p-3 transition hover:translate-x-2 hover:bg-primary/10">
               <PersonIcon className="text-primary" fontSize="medium" />
               <div>
                 <p className="text-xs text-muted-foreground">
@@ -39,7 +39,7 @@ const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDeta
               </div>
             </div>
 
-            <div className="flex items-center gap-3 rounded-lg bg-primary/5 p-3 transition hover:translate-x-2 hover:bg-primary/10">
+            <div className="flex items-center gap-3 rounded-none bg-primary/5 p-3 transition hover:translate-x-2 hover:bg-primary/10">
               <EmailIcon className="text-primary" fontSize="medium" />
               <div>
                 <p className="text-xs text-muted-foreground">
@@ -51,7 +51,7 @@ const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDeta
               </div>
             </div>
 
-            <div className="flex items-center gap-3 rounded-lg bg-primary/5 p-3 transition hover:translate-x-2 hover:bg-primary/10">
+            <div className="flex items-center gap-3 rounded-none bg-primary/5 p-3 transition hover:translate-x-2 hover:bg-primary/10">
               <PhoneIcon className="text-primary" fontSize="medium" />
               <div>
                 <p className="text-xs text-muted-foreground">
@@ -63,7 +63,7 @@ const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDeta
               </div>
             </div>
 
-            <div className="flex items-center gap-3 rounded-lg bg-primary/5 p-3 transition hover:translate-x-2 hover:bg-primary/10">
+            <div className="flex items-center gap-3 rounded-none bg-primary/5 p-3 transition hover:translate-x-2 hover:bg-primary/10">
               <LocationOnIcon className="text-primary" fontSize="medium" />
               <div>
                 <p className="text-xs text-muted-foreground">
@@ -81,8 +81,8 @@ const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDeta
           <h3 className="text-lg font-semibold">
             {t("jobDetail.map")}
           </h3>
-          <div className="mt-1 h-1 w-12 rounded bg-primary" />
-          <div className="mt-6 flex-1 min-h-[260px] overflow-hidden rounded-xl border border-border/50 shadow-sm">
+          <div className="mt-1 h-1 w-12 rounded-none bg-primary" />
+          <div className="mt-6 flex-1 min-h-[260px] overflow-hidden rounded-none border border-border/50 shadow-sm">
             <Map
               title={jobPostDetail?.jobName}
               subTitle={jobPostDetail?.location?.address}

@@ -32,6 +32,8 @@ export interface InterviewAvatarProps {
   // Thuoc tinh Talking Head va Dual-buffering video
   characterId?: string;
   avatarActions?: Record<string, string>;
+  videoUrl?: string | null;
+  loopVideoUrl?: string | null;
   lipsyncVideoUrl?: string | null;
   speakVideoUrl?: string | null;
   actionHint?: string | null;
@@ -70,6 +72,8 @@ export function InterviewAvatar({
   className = '',
   characterId = 'ng_c_linh',
   avatarActions,
+  videoUrl,
+  loopVideoUrl,
   lipsyncVideoUrl,
   speakVideoUrl,
   actionHint,
@@ -86,15 +90,15 @@ export function InterviewAvatar({
 
   const effectiveAvatarId = avatarId || (avatarImageUrl?.includes('expert_male') ? 'expert_male' : 'aila_recruiter');
 
-  // Máy trạng thái cử chỉ video Full HD
-  const [currentAction, setCurrentAction] = useState<AvatarAction>('wave');
+  // Đơn giản hóa: Phần phỏng vấn chỉ cần 1 video loop cho nhân vật, không cần cử chỉ phức tạp
+  // Máy trạng thái cử chỉ video (wave, nod, thinking, thanks_wave) đã tinh giản thành 1 video loop liên tục (mặc định idle)
+  const [currentAction, setCurrentAction] = useState<AvatarAction>('idle');
   const [isSpeakActive, setIsSpeakActive] = useState(false);
   const [activeLipsyncUrl, setActiveLipsyncUrl] = useState<string | null>(lipsyncVideoUrl || speakVideoUrl || null);
 
   const idleVideoRef = useRef<HTMLVideoElement | null>(null);
   const speakVideoRef = useRef<HTMLVideoElement | null>(null);
   const lastLoadedSpeakSrcRef = useRef<string>('');
-  const nodTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isSpeakingRef = useRef<boolean>(false);
 
   // Cấu hình transceiver chuẩn video trước, audio sau nếu sử dụng WebRTC kết nối
@@ -203,11 +207,16 @@ export function InterviewAvatar({
     };
   }, [effectiveRoom]);
 
-  // Phân giải video cử chỉ hiện tại
+  // Phân giải video loop hiện tại: Chỉ cần 1 video loop duy nhất cho nhân vật (mặc định idle)
   const currentIdleSrc = useMemo(() => {
-    const raw = resolveActionVideoUrl(currentAction, characterId, avatarActions);
+    if (loopVideoUrl) return withVersion(loopVideoUrl);
+    if (videoUrl) return withVersion(videoUrl);
+    const actionToUse = (actionHint && ['wave', 'idle', 'nod', 'thinking', 'thanks_wave'].includes(actionHint))
+      ? (actionHint as AvatarAction)
+      : currentAction;
+    const raw = resolveActionVideoUrl(actionToUse, characterId, avatarActions);
     return withVersion(raw);
-  }, [currentAction, characterId, avatarActions]);
+  }, [loopVideoUrl, videoUrl, actionHint, currentAction, characterId, avatarActions]);
 
   // Phân giải video nói nhép lipsync (bám sát opc007: KHÔNG fallback sang generic speaking.mp4)
   const effectiveSpeakSrc = useMemo(() => {
@@ -296,43 +305,20 @@ export function InterviewAvatar({
     };
   }, [toggleWebRTCAgentAudio]);
 
-  // Điều phối State Machine theo ngữ cảnh phòng phỏng vấn
+  // Điều phối video loop nhân vật:
+  // Đơn giản hóa theo yêu cầu: chỉ cần 1 video loop duy nhất cho nhân vật (idle.mp4), không cần các cử chỉ phức tạp
+  // (loại bỏ nod timer 5s, bỏ wave ban đầu, bỏ thinking switch, bỏ thanks_wave switch).
+  // Vẫn hỗ trợ actionHint cho trường hợp kiểm tra preview cử chỉ (wave, idle, nod, thinking, thanks_wave) nếu cần.
   useEffect(() => {
     if (actionHint && ['wave', 'idle', 'nod', 'thinking', 'thanks_wave'].includes(actionHint)) {
       setCurrentAction(actionHint as AvatarAction);
       return;
     }
 
-    if (sessionStatus === 'completed') {
-      setCurrentAction('thanks_wave');
-      return;
+    if (currentAction !== 'idle') {
+      setCurrentAction('idle');
     }
-
-    if (voiceAssistantState === 'thinking') {
-      setCurrentAction('thinking');
-      return;
-    }
-
-    if (voiceAssistantState === 'listening') {
-      if (currentAction === 'thinking' || currentAction === 'thanks_wave') {
-        setCurrentAction('idle');
-      }
-
-      // Nếu ứng viên nói liên tục hơn 5 giây, kích hoạt cử chỉ gật đầu
-      if (!nodTimerRef.current) {
-        nodTimerRef.current = setTimeout(() => {
-          setCurrentAction('nod');
-        }, 5000);
-      }
-      return;
-    }
-
-    // Reset nod timer nếu không còn listening
-    if (nodTimerRef.current) {
-      clearTimeout(nodTimerRef.current);
-      nodTimerRef.current = null;
-    }
-  }, [actionHint, sessionStatus, voiceAssistantState, currentAction]);
+  }, [actionHint, currentAction]);
 
   // Xử lý nạp và phát video nhép môi có tiếng
   useEffect(() => {
@@ -488,14 +474,14 @@ export function InterviewAvatar({
 
 
 
-      {/* Lớp A: Video Chờ / Cử chỉ (Full HD MP4: idle, wave, nod, thinking, thanks_wave) */}
+      {/* Lớp A: Video Loop Chờ duy nhất cho nhân vật (Full HD MP4: 1 video lặp lại liên tục mượt mà, không gián đoạn tải cử chỉ) */}
       {!isCustomUploadedImage && (
         <video
           ref={idleVideoRef}
           className={styles.stageIdle}
           src={currentIdleSrc}
           autoPlay
-          loop={currentAction === 'idle' || currentAction === 'thinking'}
+          loop
           muted
           playsInline
           onEnded={handleIdleEnded}
@@ -536,6 +522,7 @@ export function InterviewAvatar({
         >
           <Box
             component="img"
+            data-testid="avatar-custom-image"
             src={avatarImageUrl}
             alt={interviewerName}
             sx={{
@@ -552,6 +539,7 @@ export function InterviewAvatar({
 
       {/* Top-Right Floating State Badge */}
       <Box
+        data-testid="avatar-state-badge"
         sx={{
           position: 'absolute',
           top: 14,
@@ -562,7 +550,7 @@ export function InterviewAvatar({
           gap: 1,
           px: 1.5,
           py: 0.45,
-          borderRadius: '9999px',
+          borderRadius: 0,
           backgroundColor: 'rgba(255, 255, 255, 0.94)',
           border: '1px solid #e2e8f0',
           backdropFilter: 'blur(12px)',
@@ -599,6 +587,7 @@ export function InterviewAvatar({
 
       {/* Bottom-Right Floating Minimalist Voice Visualizer Pill */}
       <Box
+        data-testid="avatar-voice-visualizer-pill"
         sx={{
           position: 'absolute',
           bottom: 14,
@@ -609,7 +598,7 @@ export function InterviewAvatar({
           gap: 0.5,
           px: 1.25,
           py: 0.4,
-          borderRadius: '9999px',
+          borderRadius: 0,
           backgroundColor: 'rgba(255, 255, 255, 0.94)',
           border: '1px solid #e2e8f0',
           backdropFilter: 'blur(12px)',

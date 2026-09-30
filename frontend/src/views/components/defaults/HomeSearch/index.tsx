@@ -161,7 +161,7 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
         component="form"
         onSubmit={handleSubmit(handleFilter)}
         sx={{
-          borderRadius: isHero ? 2 : 3.5,
+          borderRadius: 0,
           p: isHero ? 1 : { xs: 1.25, sm: 1.5, md: 2 },
           backgroundColor: isHero ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.72)',
           border: isHero ? '1px solid rgba(15, 23, 42, 0.12)' : '1px solid rgba(226, 232, 240, 0.95)',
@@ -251,17 +251,17 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
                 fullWidth
                 sx={{
                   minHeight: 56,
-                  borderRadius: 1.5,
-                  bgcolor: '#e11d48',
+                  borderRadius: 0,
+                  bgcolor: '#2563eb',
                   color: '#ffffff',
                   px: 2.5,
                   fontWeight: 800,
                   fontSize: 15,
                   textTransform: 'none',
-                  boxShadow: '0 10px 24px rgba(225, 29, 72, 0.35)',
+                  boxShadow: '0 8px 20px rgba(37, 99, 235, 0.35)',
                   '&:hover': {
-                    bgcolor: '#be123c',
-                    boxShadow: '0 14px 28px rgba(225, 29, 72, 0.45)',
+                    bgcolor: '#1d4ed8',
+                    boxShadow: '0 12px 26px rgba(37, 99, 235, 0.45)',
                   },
                 }}
               >
@@ -294,7 +294,7 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
               flexShrink: 0,
               px: { xs: 1.25, sm: 1.5 },
               py: { xs: 0.6, sm: 0.75 },
-              borderRadius: '9999px',
+              borderRadius: 0,
               bgcolor: 'rgba(225, 29, 72, 0.15)',
               border: '1px solid rgba(225, 29, 72, 0.35)',
               backdropFilter: 'blur(10px)',
@@ -358,7 +358,7 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
                     flexShrink: 0,
                     minHeight: { xs: 38, sm: 40 },
                     height: { xs: 38, sm: 40 },
-                    borderRadius: '9999px',
+                    borderRadius: 0,
                     backgroundColor: 'rgba(255, 255, 255, 0.94)',
                     backdropFilter: 'blur(12px)',
                     border: '1px solid rgba(255, 255, 255, 0.85)',

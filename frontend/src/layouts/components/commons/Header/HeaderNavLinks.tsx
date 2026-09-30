@@ -133,7 +133,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
   };
 
   return (
-    <Box sx={{ flexGrow: 1, display: { xs: "none", lg: "flex" }, alignItems: 'center' }}>
+    <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, alignItems: 'center', minWidth: 0 }}>
       {pages.map((page) => {
         const isHighlight =
           Boolean(page.isHighlight) ||
@@ -163,10 +163,10 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                   handleClick(e, page);
                 }
               }}
-              endIcon={hasChildren ? <KeyboardArrowDownIcon sx={{ fontSize: '18px !important', ml: -0.5 }} /> : undefined}
+              endIcon={hasChildren ? <KeyboardArrowDownIcon sx={{ fontSize: '16px !important', ml: -0.5 }} /> : undefined}
               sx={{
                 my: 1,
-                mr: { lg: 0.25, xl: 0.75 },
+                mr: { md: 0.15, lg: 0.35, xl: 0.75 },
                 color: '#0f172a',
                 display: "inline-flex",
                 alignItems: "center",
@@ -174,9 +174,9 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                 whiteSpace: "nowrap",
                 textDecoration: "none",
                 fontWeight: 700,
-                fontSize: { lg: '0.85rem', xl: '0.925rem' },
-                px: { lg: 1.25, xl: 2 },
-                py: isHighlight ? 0.9 : 0.85,
+                fontSize: { md: '0.78rem', lg: '0.84rem', xl: '0.925rem' },
+                px: { md: 0.75, lg: 1.25, xl: 2 },
+                py: isHighlight ? 0.8 : 0.75,
                 borderRadius: 0,
                 position: 'relative',
                 backgroundColor: isActive
@@ -207,7 +207,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                 },
               }}
             >
-              <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
+              <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: { md: 0.5, lg: 0.75 } }}>
                 <Box
                   component="span"
                   sx={{
@@ -229,13 +229,13 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                       alignItems: 'center',
                       verticalAlign: 'middle',
                       lineHeight: 1,
-                      ml: 0.5,
+                      ml: 0.35,
                       transform: 'translateY(-1px)',
                     }}
                     title="HOT"
                     aria-label="HOT"
                   >
-                    <AnimatedFlame size={19} />
+                    <AnimatedFlame size={16} />
                   </Box>
                 )}
               </Box>

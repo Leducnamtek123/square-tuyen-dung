@@ -27,7 +27,7 @@ const styles = {
   },
   '.swiper-pagination-bullet-active': {
     width: 18,
-    borderRadius: '5px',
+    borderRadius: 0,
     opacity: 1,
     backgroundColor: '#2563eb',
   },
@@ -244,7 +244,7 @@ const FeedbackCarousel = () => {
           sx={{
             flexShrink: 0,
             whiteSpace: 'nowrap',
-            borderRadius: '9999px',
+            borderRadius: 0,
             textTransform: 'none',
             fontWeight: 600,
             px: { xs: 1.75, sm: 2.25 },
@@ -284,7 +284,7 @@ const FeedbackCarousel = () => {
           sx={{
             flexShrink: 0,
             whiteSpace: 'nowrap',
-            borderRadius: '9999px',
+            borderRadius: 0,
             textTransform: 'none',
             fontWeight: 600,
             px: { xs: 1.75, sm: 2.25 },
@@ -329,7 +329,7 @@ const FeedbackCarousel = () => {
           sx={{
             flexShrink: 0,
             whiteSpace: 'nowrap',
-            borderRadius: '9999px',
+            borderRadius: 0,
             textTransform: 'none',
             fontWeight: 600,
             px: { xs: 1.75, sm: 2.25 },

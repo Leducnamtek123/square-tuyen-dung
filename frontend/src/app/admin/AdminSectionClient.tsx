@@ -146,14 +146,15 @@ export default function AdminSectionClient({
 
       if (isAuthPage && isLoginPage && nextUser?.roleName === ROLES_NAME.ADMIN) {
         window.location.replace(dashboardPath);
+        return;
       }
-    };
 
-    void checkAuth().finally(() => {
       if (isMounted) {
         dispatchAuthGate({ type: 'checked' });
       }
-    });
+    };
+
+    void checkAuth();
 
     return () => {
       isMounted = false;

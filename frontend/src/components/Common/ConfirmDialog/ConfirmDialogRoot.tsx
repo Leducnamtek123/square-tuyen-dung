@@ -104,7 +104,7 @@ function renderFormattedMessage(content?: React.ReactNode): React.ReactNode {
       return (
         <strong
           key={index}
-          className="mx-0.5 inline-block rounded-md bg-blue-50 px-1.5 py-0.5 font-bold text-blue-700 dark:bg-blue-950/70 dark:text-blue-300"
+          className="mx-0.5 inline-block rounded-none bg-blue-50 px-1.5 py-0.5 font-bold text-blue-700 dark:bg-blue-950/70 dark:text-blue-300"
         >
           {strongMatch[1]}
         </strong>
@@ -184,10 +184,10 @@ export function ConfirmDialogRoot() {
 
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogContent className="max-w-[420px] rounded-2xl p-6 shadow-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <AlertDialogContent className="max-w-[420px] rounded-none p-6 shadow-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
         <div className="flex flex-col items-center text-center">
           <div
-            className={`mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl ${iconConfig.bg} ${iconConfig.darkBg} ${iconConfig.color} ${iconConfig.darkColor} ring-4 ${iconConfig.ring} shadow-sm`}
+            className={`mb-3.5 flex h-14 w-14 items-center justify-center rounded-none ${iconConfig.bg} ${iconConfig.darkBg} ${iconConfig.color} ${iconConfig.darkColor} ring-4 ${iconConfig.ring} shadow-sm`}
           >
             <IconComponent className="h-7 w-7 stroke-[2.2]" />
           </div>
@@ -217,7 +217,7 @@ export function ConfirmDialogRoot() {
                   }
                 }}
                 placeholder={input.placeholder || ''}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder:text-slate-400 shadow-sm"
+                className="w-full px-3.5 py-2 rounded-none border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all placeholder:text-slate-400 shadow-sm"
               />
             </div>
           )}
@@ -227,7 +227,7 @@ export function ConfirmDialogRoot() {
           {showCancelButton && (
             <AlertDialogCancel
               onClick={handleCancel}
-              className="h-10 rounded-xl px-5 text-sm font-semibold border border-slate-200 !bg-white hover:!bg-slate-50 !text-slate-700 shadow-xs transition-all duration-150 cursor-pointer"
+              className="h-10 rounded-none px-5 text-sm font-semibold border border-slate-200 !bg-white hover:!bg-slate-50 !text-slate-700 shadow-xs transition-all duration-150 cursor-pointer"
             >
               {cancelButtonText}
             </AlertDialogCancel>
@@ -235,7 +235,7 @@ export function ConfirmDialogRoot() {
           <AlertDialogAction
             variant={isDanger ? 'destructive' : 'default'}
             onClick={handleConfirm}
-            className={`h-10 rounded-xl px-5 text-sm font-bold transition-all duration-150 cursor-pointer ${
+            className={`h-10 rounded-none px-5 text-sm font-bold transition-all duration-150 cursor-pointer ${
               isDanger
                 ? 'bg-red-600 hover:bg-red-700 !bg-red-600 hover:!bg-red-700 !text-white shadow-md shadow-red-600/20'
                 : 'bg-blue-600 hover:bg-blue-700 !bg-blue-600 hover:!bg-blue-700 !text-white shadow-md shadow-blue-600/25'

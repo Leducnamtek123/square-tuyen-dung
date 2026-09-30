@@ -281,21 +281,22 @@ export default function EmployeeListPage() {
 
   const handleOpenEdit = (emp: NativeEmployee) => {
     setEditingEmp(emp);
+    const rawEmp = emp as any;
     setForm({
-      first_name: emp.first_name || '',
-      last_name: emp.last_name || '',
+      first_name: emp.first_name || rawEmp.firstName || '',
+      last_name: emp.last_name || rawEmp.lastName || '',
       email: emp.email || '',
-      phone: emp.phone || '',
-      department: emp.department ? String(emp.department) : '',
-      designation: emp.designation ? String(emp.designation) : '',
+      phone: emp.phone || rawEmp.phoneNumber || '',
+      department: emp.department ? String(emp.department) : (rawEmp.departmentId ? String(rawEmp.departmentId) : ''),
+      designation: emp.designation ? String(emp.designation) : (rawEmp.designationId ? String(rawEmp.designationId) : ''),
       status: emp.status || 'PROBATION',
-      employment_type: emp.employment_type || 'FULL_TIME',
-      join_date: emp.join_date || new Date().toISOString().split('T')[0],
-      bank_name: emp.bank_name || '',
-      bank_account_number: emp.bank_account_number || '',
-      tax_id: emp.tax_id || '',
-      social_insurance_id: emp.social_insurance_id || '',
-      dependents_count: (emp as any).dependents_count ?? (emp as any).dependentsCount ?? 0,
+      employment_type: emp.employment_type || rawEmp.employmentType || 'FULL_TIME',
+      join_date: emp.join_date || rawEmp.joinDate || new Date().toISOString().split('T')[0],
+      bank_name: emp.bank_name || rawEmp.bankName || '',
+      bank_account_number: emp.bank_account_number || rawEmp.bankAccountNumber || '',
+      tax_id: emp.tax_id || rawEmp.taxId || '',
+      social_insurance_id: emp.social_insurance_id || rawEmp.socialInsuranceId || '',
+      dependents_count: rawEmp.dependents_count ?? rawEmp.dependentsCount ?? 0,
     });
     setOpenModal(true);
   };
@@ -568,7 +569,7 @@ export default function EmployeeListPage() {
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Tìm theo Tên, Mã NV (SQ-EMP-xxx), Email, SĐT..."
+                placeholder="Tìm theo Tên, Mã NV (EMP-xxx), Email, SĐT..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 slotProps={{

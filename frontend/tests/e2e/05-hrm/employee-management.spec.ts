@@ -30,8 +30,8 @@ test.describe('Phân Hệ HRM - Quản Lý Nhân Sự (Employee Management)', ()
       email: 'tranvanbinh@infohr.vn',
       phone: '0912345678',
       department: 'Công nghệ thông tin',
-      designation: 'Kỹ sư phần mềm',
-      status: 'Chính thức (Active)',
+      designation: 'Senior Developer',
+      status: 'Chính thức',
     });
     await employeePage.submitEmployeeForm();
     await employeePage.waitForLoadingGone();
@@ -79,12 +79,13 @@ test.describe('Phân Hệ HRM - Quản Lý Nhân Sự (Employee Management)', ()
 
     // 1. Mở xem chi tiết hồ sơ 360 độ trong Drawer
     await employeePage.openEmployeeDrawer('EMP-001');
-    await expect(page.getByText('Hồ sơ Nhân viên').first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('Nguyễn Văn A').first()).toBeVisible();
+    await expect(employeePage.detailDrawer).toBeVisible({ timeout: 10_000 });
+    await expect(employeePage.detailDrawer.getByText(/hồ sơ nhân viên/i).first()).toBeVisible();
+    await expect(employeePage.detailDrawer.getByText('Nguyễn Văn A').first()).toBeVisible();
 
     // Kiểm tra các tab thông tin
-    await expect(page.getByText(/lịch sử công tác/i).first()).toBeVisible();
-    await expect(page.getByText(/tài liệu số/i).first()).toBeVisible();
+    await expect(employeePage.detailDrawer.getByText(/lịch sử công tác/i).first()).toBeVisible();
+    await expect(employeePage.detailDrawer.getByText(/tài liệu số/i).first()).toBeVisible();
 
     // 2. Đóng Drawer
     await employeePage.closeEmployeeDrawer();

@@ -39,6 +39,7 @@ interface AppliedJobActivityItem {
   resumeDict?: {
     type: number | string;
   };
+  status?: number;
 }
 
 const AppliedJobCard = () => {
@@ -78,6 +79,7 @@ const AppliedJobCard = () => {
             createAt: item.createAt || '',
             jobPostDict,
             resumeDict: raw.resumeDict,
+            status: Number(item.status),
           };
         });
       return {
@@ -145,23 +147,44 @@ const AppliedJobCard = () => {
                 salaryMax={value?.jobPostDict.salaryMax}
               >
                 <Stack spacing={1} alignItems={{ xs: 'flex-start', sm: 'flex-end' }}>
-                  <Chip
-                    label={t("jobSeeker:jobManagement.appliedOn", {
-                      date: dayjs(value?.createAt).format("DD/MM/YYYY"),
-                    })}
-                    size="small"
-                    color="success"
-                    icon={<DoneIcon sx={{ fontSize: 16 }} />}
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: '0.75rem',
-                      borderRadius: '8px',
-                      height: 26,
-                      px: 0.5,
-                      whiteSpace: 'nowrap',
-                      boxShadow: '0 2px 6px rgba(22,163,74,0.15)',
-                    }}
-                  />
+                  {value.status === 5 ? (
+                    <Button
+                      component={Link}
+                      href="/employee/dashboard"
+                      size="small"
+                      variant="contained"
+                      color="success"
+                      sx={{
+                        textTransform: 'none',
+                        fontWeight: 800,
+                        fontSize: '0.75rem',
+                        borderRadius: '8px',
+                        height: 28,
+                        px: 1.5,
+                        boxShadow: '0 2px 8px rgba(22,163,74,0.3)',
+                      }}
+                    >
+                      🎉 Trúng tuyển • Vào Cổng Nhân viên
+                    </Button>
+                  ) : (
+                    <Chip
+                      label={t("jobSeeker:jobManagement.appliedOn", {
+                        date: dayjs(value?.createAt).format("DD/MM/YYYY"),
+                      })}
+                      size="small"
+                      color="success"
+                      icon={<DoneIcon sx={{ fontSize: 16 }} />}
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        borderRadius: '8px',
+                        height: 26,
+                        px: 0.5,
+                        whiteSpace: 'nowrap',
+                        boxShadow: '0 2px 6px rgba(22,163,74,0.15)',
+                      }}
+                    />
+                  )}
                   <Typography
                     variant="subtitle2"
                     sx={{

@@ -821,18 +821,30 @@ const ProfilePage = () => {
 
         {/* Right Column: Applied Resume */}
         <Grid size={{ xs: 12, lg: 5 }} id="applied-resume-section">
-          <Stack spacing={3}>
-            {/* Applied Resume Card */}
-            <CandidateAppliedResumeCard
-              resume={resume}
-              resumesList={resumes as unknown as ExtendedResume[]}
-              candidateName={profileData.fullName}
-              candidateEmail={profileData.email}
-              candidatePhone={profileData.phoneNumber}
-              avatarUrl={avatarUrl || currentUser?.avatarUrl || undefined}
-              onRefresh={refetchResumes}
-            />
-          </Stack>
+          <Box
+            sx={{
+              position: { xs: 'static', lg: 'sticky' },
+              top: { lg: 88 },
+              maxHeight: { lg: 'calc(100vh - 104px)' },
+              overflowY: { lg: 'auto' },
+              '&::-webkit-scrollbar': { display: 'none' },
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
+            <Stack spacing={3}>
+              {/* Applied Resume Card */}
+              <CandidateAppliedResumeCard
+                resume={resume}
+                resumesList={resumes as unknown as ExtendedResume[]}
+                candidateName={profileData.fullName}
+                candidateEmail={profileData.email}
+                candidatePhone={profileData.phoneNumber}
+                avatarUrl={avatarUrl || currentUser?.avatarUrl || undefined}
+                onRefresh={refetchResumes}
+              />
+            </Stack>
+          </Box>
         </Grid>
       </Grid>
 

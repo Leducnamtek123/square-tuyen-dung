@@ -75,7 +75,12 @@ export function AiStudioPreview({
       elevation={0}
       sx={{
         position: { lg: 'sticky' },
-        top: { lg: 24 },
+        top: { lg: 84 },
+        maxHeight: { lg: 'calc(100vh - 104px)' },
+        overflowY: { lg: 'auto' },
+        '&::-webkit-scrollbar': { display: 'none' },
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
         borderRadius: 3.5,
         border: '1px solid',
         borderColor: 'divider',

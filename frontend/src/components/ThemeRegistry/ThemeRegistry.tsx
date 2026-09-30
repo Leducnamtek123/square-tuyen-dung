@@ -9,7 +9,7 @@ import { createTheme } from '@mui/material/styles';
 import type { ThemeOptions } from '@mui/material/styles';
 
 const baseTheme = createTheme(defaultTheme as ThemeOptions);
-const BUTTON_RADIUS = 'var(--sq-button-radius)';
+const BUTTON_RADIUS = 'var(--btn-radius, var(--sq-button-radius, 0px))';
 
 /**
  * Extend theme with MuiAlert overrides to prevent MUI v6 from calling
@@ -22,10 +22,27 @@ const theme = createTheme(baseTheme, {
       defaultProps: {
         disableScrollLock: true,
       },
+      styleOverrides: {
+        paper: {
+          borderRadius: 0,
+        },
+      },
     },
     MuiPopover: {
       defaultProps: {
         disableScrollLock: true,
+      },
+      styleOverrides: {
+        paper: {
+          borderRadius: 0,
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 0,
+        },
       },
     },
     MuiAppBar: {
@@ -39,7 +56,7 @@ const theme = createTheme(baseTheme, {
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 20,
+          borderRadius: 0,
           border: '1px solid',
           borderColor: 'rgba(226, 232, 240, 0.95)',
           boxShadow: '0 10px 30px rgba(15, 23, 42, 0.05)',
@@ -200,7 +217,7 @@ const theme = createTheme(baseTheme, {
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 999,
+          borderRadius: 0,
           fontWeight: 600,
         },
       },
@@ -209,13 +226,14 @@ const theme = createTheme(baseTheme, {
       styleOverrides: {
         root: {
           backgroundImage: 'none',
+          borderRadius: 0,
         },
       },
     },
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
+          borderRadius: 0,
           backgroundColor: 'rgba(255, 255, 255, 0.92)',
         },
       },

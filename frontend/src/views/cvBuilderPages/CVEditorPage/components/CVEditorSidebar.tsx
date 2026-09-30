@@ -182,7 +182,18 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
         </Stack>
 
         {/* Navigation Tabs (4 Main Tabs) */}
-        <Stack direction="row" spacing={0.75} sx={{ bgcolor: '#f1f5f9', p: 0.5, borderRadius: '12px' }}>
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{
+            bgcolor: '#f1f5f9',
+            p: 0.5,
+            borderRadius: '12px',
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': { display: 'none' },
+          }}
+        >
           {[
             { id: 'content', label: t('cvBuilder.tabs.content', 'Nhập liệu'), icon: EditNoteOutlinedIcon },
             { id: 'design', label: t('cvBuilder.tabs.design', 'Thiết kế'), icon: PaletteOutlinedIcon },
@@ -196,17 +207,17 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
                 key={tab.id}
                 size="small"
                 onClick={() => setActiveTab(tab.id as MainTab)}
-                startIcon={<Icon sx={{ fontSize: 15 }} />}
+                startIcon={<Icon sx={{ fontSize: { xs: 13, sm: 15 }, mr: { xs: -0.25, sm: 0 } }} />}
                 sx={{
-                  flex: 1,
+                  flex: { xs: '0 0 auto', sm: 1 },
                   py: 0.75,
                   borderRadius: '9px',
                   fontWeight: 700,
-                  fontSize: '0.725rem',
+                  fontSize: { xs: '0.685rem', sm: '0.725rem' },
                   textTransform: 'none',
                   whiteSpace: 'nowrap',
-                  minWidth: 0,
-                  px: 0.5,
+                  minWidth: { xs: 'auto', sm: 0 },
+                  px: { xs: 1, sm: 0.75 },
                   ...(isSelected
                     ? {
                         bgcolor: '#ffffff',
@@ -227,8 +238,8 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
         </Stack>
       </Box>
 
-      {/* -- Tab Content Forms Scrollable Container ----------------------- */}
-      <Box sx={{ flex: 1, overflowY: 'auto', p: { xs: 2, sm: 2.5 } }}>
+      {/* -- Tab Content Forms Scrollable Container (pb: 10 on mobile to clear launcher) -- */}
+      <Box sx={{ flex: 1, overflowY: 'auto', p: { xs: 1.5, sm: 2.5 }, pb: { xs: 10, sm: 4 } }}>
         {activeTab === 'content' && (
           <UnifiedCVForm
             data={data}

@@ -32,7 +32,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('square_sidebar_collapsed');
+      const saved = localStorage.getItem('sidebar_collapsed') || localStorage.getItem('square_sidebar_collapsed');
       if (saved === 'true') {
         setIsCollapsed(true);
       }
@@ -46,7 +46,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
     });
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('square_sidebar_collapsed', String(!isCollapsed));
+        localStorage.setItem('sidebar_collapsed', String(!isCollapsed));
       } catch (err) {
         console.warn('Could not save sidebar collapsed state:', err);
       }
@@ -63,7 +63,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
     windowGetter !== undefined ? () => (windowGetter() as Window).document.body : undefined;
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100dvh', bgcolor: 'background.default' }}>
+    <Box sx={{ display: 'flex', minHeight: '100dvh', bgcolor: 'background.default', minWidth: 0 }}>
       {/* Start: Header */}
       <Header
         drawerWidth={currentDrawerWidth}
@@ -105,6 +105,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
           display: 'flex',
           flexDirection: 'column',
           minHeight: '100dvh',
+          minWidth: 0,
           width: {
             xs: '100%',
             md: `calc(100% - ${currentDrawerWidth}px)`,
@@ -121,6 +122,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
             flexDirection: 'column',
             alignItems: 'center',
             width: '100%',
+            minWidth: 0,
           }}
         >
           {/* Progressive Onboarding Banner for Incomplete Employer Profile */}
@@ -130,6 +132,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
             sx={{
               width: '100%',
               maxWidth: '1600px',
+              minWidth: 0,
               p: {
                 xs: 2, // 16px
                 sm: 3, // 24px (8pt system)

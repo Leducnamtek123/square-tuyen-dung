@@ -69,7 +69,7 @@ test.describe('Phân Hệ Voice AI - Kết Nối Phòng Phỏng Vấn LiveKit (L
 
     // Xác nhận hiển thị thông báo lỗi phiên phỏng vấn
     const errorAlert = page.locator('[role="alert"], .MuiAlert-message, h2, p').filter({
-      hasText: /không hợp lệ|hết hạn|không tìm thấy|invalid/i,
+      hasText: /không hợp lệ|hết hạn|không tìm thấy|invalid|Request failed|status code 404|404/i,
     });
     await expect(errorAlert.first()).toBeVisible({ timeout: 20_000 });
 

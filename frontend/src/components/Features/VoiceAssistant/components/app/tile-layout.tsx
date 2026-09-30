@@ -134,7 +134,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     audioTrack={agentAudioTrack}
                     color="#38bdf8"
                     className={cn(
-                      'h-[90px] w-[90px] rounded-[30px] border-white/10 shadow-2xl shadow-black/40',
+                      'h-[90px] w-[90px] rounded-none border-white/10 shadow-2xl shadow-black/40',
                       chatOpen && 'border-white/15'
                     )}
                   />
@@ -219,7 +219,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   >
                   <VideoTrack
                     trackRef={cameraTrack || screenShareTrack}
-                    className="bg-zinc-800/55 backdrop-blur-xl aspect-square !w-[90px] !h-[90px] rounded-[28px] border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
+                    className="bg-zinc-800/55 backdrop-blur-xl aspect-square !w-[90px] !h-[90px] rounded-none border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
                   />
                 </MotionContainer>
               )}

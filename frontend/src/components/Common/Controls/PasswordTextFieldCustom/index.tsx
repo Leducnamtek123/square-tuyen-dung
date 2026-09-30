@@ -1,13 +1,13 @@
 'use client';
 import React from 'react';
 import { Control, FieldValues, Path } from 'react-hook-form';
-import { Box, InputAdornment, OutlinedInput, Typography } from "@mui/material";
+import { IconButton, InputAdornment, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ValidationError from '../ValidationError';
 import TypedController from '../TypedController';
 
-const EMPTY_SX = {};
+const EMPTY_SX: SxProps<Theme> = {};
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -15,6 +15,8 @@ interface Props<T extends FieldValues = FieldValues> {
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
+  helperText?: string;
+  disabled?: boolean;
   sx?: SxProps<Theme>;
 }
 
@@ -24,22 +26,23 @@ const PasswordTextFieldCustom = <T extends FieldValues = FieldValues>({
   title = null,
   showRequired = false,
   placeholder = '',
+  helperText = '',
+  disabled = false,
   sx = EMPTY_SX,
 }: Props<T>) => {
-
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   };
 
   return (
     <div>
       {title && (
-        <Typography variant="subtitle2" gutterBottom>
-          {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
+        <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, display: 'block', color: 'text.primary' }}>
+          {title}{showRequired && <span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
         </Typography>
       )}
 
@@ -47,65 +50,68 @@ const PasswordTextFieldCustom = <T extends FieldValues = FieldValues>({
         name={name as Path<T>}
         control={control}
         render={({ field, fieldState }) => (
-
           <>
-
-            <OutlinedInput
+            <TextField
               sx={sx}
               fullWidth
-
+              variant="outlined"
               size="small"
-
               id={name}
-
+              name={field.name}
               placeholder={placeholder}
-
               type={showPassword ? 'text' : 'password'}
-
-              endAdornment={
-
-                <InputAdornment position="end">
-
-                  <Box
-
-                    sx={{ cursor: 'pointer' }}
-
-                    onClick={handleClickShowPassword}
-
-                    onMouseDown={handleMouseDownPassword}
-
-                  >
-
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-
-                  </Box>
-
-                </InputAdornment>
-
-              }
-
               value={field.value ?? ''}
-
               onChange={field.onChange}
-
+              onBlur={field.onBlur}
               error={fieldState.invalid}
-
+              disabled={disabled}
+              helperText={!fieldState.invalid ? helperText : ''}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment
+                      position="end"
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        maxHeight: 'none',
+                        mr: 0.5,
+                      }}
+                    >
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                        size="small"
+                        tabIndex={-1}
+                        sx={{
+                          p: 0.5,
+                          color: '#64748B',
+                          '&:hover': {
+                            color: '#0F172A',
+                            backgroundColor: 'transparent',
+                          },
+                        }}
+                      >
+                        {showPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
 
             {fieldState.invalid && (
               <ValidationError message={fieldState.error?.message} />
             )}
-
           </>
-
         )}
-
       />
-
     </div>
-
   );
-
 };
 
 export default PasswordTextFieldCustom;

@@ -124,6 +124,11 @@ function CustomControlBar({
   const [micLoading, setMicLoading] = useState(false);
   const [camLoading, setCamLoading] = useState(false);
   const [screenLoading, setScreenLoading] = useState(false);
+  const [localMicOverride, setLocalMicOverride] = useState<boolean | null>(null);
+  const [localCamOverride, setLocalCamOverride] = useState<boolean | null>(null);
+
+  const effectiveMicEnabled = localMicOverride !== null ? localMicOverride : isMicrophoneEnabled;
+  const effectiveCamEnabled = localCamOverride !== null ? localCamOverride : isCameraEnabled;
 
   const [confirmEndOpen, setConfirmEndOpen] = useState(false);
 
@@ -134,48 +139,62 @@ function CustomControlBar({
           type="button"
           data-testid="toggle-mic-btn"
           disabled={micLoading}
-          aria-label={isMicrophoneEnabled ? t('controls.muteMicrophone') : t('controls.unmuteMicrophone')}
+          aria-label={effectiveMicEnabled ? t('controls.muteMicrophone') : t('controls.unmuteMicrophone')}
           onClick={async () => {
             if (micLoading) return;
             setMicLoading(true);
             try {
-              await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
+              if (localParticipant && typeof localParticipant.setMicrophoneEnabled === 'function') {
+                await Promise.race([
+                  localParticipant.setMicrophoneEnabled(!effectiveMicEnabled),
+                  new Promise((res) => setTimeout(res, 250)),
+                ]);
+              }
+              setLocalMicOverride(!effectiveMicEnabled);
             } catch (err) {
               console.error('Failed to toggle microphone', err);
+              setLocalMicOverride(!effectiveMicEnabled);
             } finally {
               setMicLoading(false);
             }
           }}
           className={`flex size-10 sm:size-11 items-center justify-center rounded-xl border transition-all duration-150 active:scale-95 cursor-pointer shrink-0
-            ${isMicrophoneEnabled ? 'border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 shadow-sm' : 'border-rose-500/50 bg-rose-500/20 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]'} ${micLoading ? 'cursor-wait opacity-70' : ''}`}
+            ${effectiveMicEnabled ? 'border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 shadow-sm' : 'border-rose-500/50 bg-rose-500/20 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]'} ${micLoading ? 'cursor-wait opacity-70' : ''}`}
         >
-          <FontAwesomeIcon icon={micLoading ? faSpinner : (isMicrophoneEnabled ? faMicrophone : faMicrophoneSlash)} className={`${micLoading ? 'animate-spin ' : ''}text-sm sm:text-base`} />
+          <FontAwesomeIcon icon={micLoading ? faSpinner : (effectiveMicEnabled ? faMicrophone : faMicrophoneSlash)} className={`${micLoading ? 'animate-spin ' : ''}text-sm sm:text-base`} />
         </button>
         <button
           type="button"
           data-testid="toggle-cam-btn"
           disabled={camLoading}
-          aria-label={isCameraEnabled ? t('controls.turnCameraOff') : t('controls.turnCameraOn')}
+          aria-label={effectiveCamEnabled ? t('controls.turnCameraOff') : t('controls.turnCameraOn')}
           onClick={async () => {
             if (camLoading) return;
             setCamLoading(true);
             try {
-              const willEnable = !isCameraEnabled;
-              await localParticipant.setCameraEnabled(!isCameraEnabled);
+              const willEnable = !effectiveCamEnabled;
+              if (localParticipant && typeof localParticipant.setCameraEnabled === 'function') {
+                await Promise.race([
+                  localParticipant.setCameraEnabled(willEnable),
+                  new Promise((res) => setTimeout(res, 250)),
+                ]);
+              }
+              setLocalCamOverride(willEnable);
               if (willEnable && isLocalEmployer && !takeoverActive) {
                 // When employer turns on camera, automatically acquire takeover so AI pauses speaking
                 void onTakeoverToggle?.();
               }
             } catch (err) {
               console.error('Failed to toggle camera', err);
+              setLocalCamOverride(!effectiveCamEnabled);
             } finally {
               setCamLoading(false);
             }
           }}
           className={`flex size-10 sm:size-11 items-center justify-center rounded-xl border transition-all duration-150 active:scale-95 cursor-pointer shrink-0
-            ${isCameraEnabled ? 'border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 shadow-sm' : 'border-rose-500/50 bg-rose-500/20 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]'} ${camLoading ? 'cursor-wait opacity-70' : ''}`}
+            ${effectiveCamEnabled ? 'border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 shadow-sm' : 'border-rose-500/50 bg-rose-500/20 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]'} ${camLoading ? 'cursor-wait opacity-70' : ''}`}
         >
-          <FontAwesomeIcon icon={camLoading ? faSpinner : (isCameraEnabled ? faVideo : faVideoSlash)} className={`${camLoading ? 'animate-spin ' : ''}text-sm sm:text-base`} />
+          <FontAwesomeIcon icon={camLoading ? faSpinner : (effectiveCamEnabled ? faVideo : faVideoSlash)} className={`${camLoading ? 'animate-spin ' : ''}text-sm sm:text-base`} />
         </button>
         {/* Screen share is supported only on desktop/tablet viewports */}
         <button
@@ -663,7 +682,9 @@ function AIParticipantTile({
 }
 
 function formatTimelineTime(timestamp: number) {
-  return new Date(timestamp).toLocaleTimeString('vi-VN', {
+  if (!timestamp || isNaN(timestamp)) return '';
+  const ms = timestamp < 1e11 ? timestamp * 1000 : timestamp;
+  return new Date(ms).toLocaleTimeString('vi-VN', {
     hour: '2-digit',
     minute: '2-digit',
     timeZone: 'Asia/Ho_Chi_Minh',
@@ -686,6 +707,9 @@ function TimelineMessage({
   const participantRole = entry.from ? getParticipantRole(entry.from as any) : 'guest';
   const isAgent =
     entry.type === 'agentTranscript' ||
+    (entry as any).attributes?.role === 'agent' ||
+    (entry as any).attributes?.role === 'ai' ||
+    (entry as any).attributes?.sender === 'ai' ||
     participantRole === 'agent' ||
     isLiveKitAgentIdentity(entry.from?.identity) ||
     Boolean((entry.from as any)?.isAgent);
@@ -870,10 +894,13 @@ function ChatPanel({
       ? t('liveRoom.chat.aiControlSend')
       : t('liveRoom.chat.send');
 
+  const messageCount = messages?.length ?? 0;
+  const lastMessageId = messages?.[messageCount - 1]?.id;
+
   useEffect(() => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [(messages || []).length]);
+  }, [messageCount, lastMessageId]);
 
   return (
     <div

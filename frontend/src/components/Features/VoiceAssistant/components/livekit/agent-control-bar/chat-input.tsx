@@ -75,7 +75,7 @@ export function ChatInput({
       >
         <form
           onSubmit={handleSubmit}
-          className="mb-3 flex grow items-end gap-2 rounded-[24px] border border-white/8 bg-zinc-950/50 p-2 text-sm shadow-inner shadow-black/20"
+          className="mb-3 flex grow items-end gap-2 rounded-none border border-white/8 bg-zinc-950/50 p-2 text-sm shadow-inner shadow-black/20"
         >
           <input
             ref={inputRef}
@@ -96,7 +96,7 @@ export function ChatInput({
             variant={isDisabled ? 'secondary' : 'primary'}
             aria-label={isSending ? t('voiceAi.chat.sendingMessage') : t('voiceAi.chat.sendMessage')}
             title={isSending ? t('voiceAi.chat.sending') : t('voiceAi.chat.send')}
-            className="self-start rounded-[18px]"
+            className="self-start rounded-none"
           >
             {isSending ? (
               <SpinnerIcon className="animate-spin" weight="bold" />

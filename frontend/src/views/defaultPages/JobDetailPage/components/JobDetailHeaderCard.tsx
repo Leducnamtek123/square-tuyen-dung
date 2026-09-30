@@ -16,7 +16,7 @@ import QRCodeBox from "@/components/Common/QRCodeBox";
 import MuiImageCustom from "@/components/Common/MuiImageCustom";
 import { formatLocalizedSalaryRange } from "@/utils/customData";
 import { tConfig } from "@/utils/tConfig";
-import { ROUTES } from "@/configs/constants";
+import { ROUTES, IMAGES } from "@/configs/constants";
 import { localizeRoutePath } from "@/configs/routeLocalization";
 import { formatRoute } from "@/utils/funcUtils";
 import JobDetailActions from "./JobDetailActions";
@@ -64,19 +64,28 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
     )
     : undefined;
 
+  const companyLogo =
+    jobPostDetail?.companyDict?.companyImageUrl ||
+    (jobPostDetail?.companyDict as any)?.logoUrl ||
+    (jobPostDetail as any)?.companyImageUrl ||
+    IMAGES.companyLogoDefault;
+
   return (
-    <div className="rounded-xl border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
+    <div className="rounded-none border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
       <div className="space-y-6">
         <div className="flex flex-wrap items-center gap-4">
           <MuiImageCustom
             width={75}
             height={75}
-            src={jobPostDetail?.companyDict?.companyImageUrl}
+            src={companyLogo}
+            fallbackSrc={IMAGES.companyLogoDefault}
+            alt={jobPostDetail?.companyDict?.companyName || "Logo công ty"}
             style={{
               backgroundColor: "white",
-              borderRadius: 12,
+              borderRadius: 0,
               boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
               padding: 4,
+              objectFit: "contain",
             }}
           />
           <div className="min-w-0 flex-1">
@@ -100,6 +109,7 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
                   size="small"
                   variant="outlined"
                   sx={{
+                    borderRadius: 0,
                     color: '#15803d',
                     borderColor: '#86efac',
                     backgroundColor: '#f0fdf4',

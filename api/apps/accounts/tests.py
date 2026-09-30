@@ -826,3 +826,48 @@ class TestEmailOtpVerification:
         assert job_seeker_user.is_active is True
         assert job_seeker_user.is_verify_email is True
 
+
+@pytest.mark.django_db
+class TestPhoneVerificationSecurity:
+    def test_user_phone_property_getter_and_setter(self, job_seeker_user):
+        job_seeker_user.phone = "0912345678"
+        assert job_seeker_user.phone_number == "0912345678"
+        assert job_seeker_user.phone == "0912345678"
+
+    def test_phone_pattern_accepts_dots_and_spaces(self):
+        from apps.accounts.serializers import PHONE_PATTERN
+        assert bool(PHONE_PATTERN.fullmatch("0912.345.678")) is True
+        assert bool(PHONE_PATTERN.fullmatch("0912 345 678")) is True
+        assert bool(PHONE_PATTERN.fullmatch("+84912345678")) is True
+
+    def test_verify_phone_rejects_duplicate_number(self, job_seeker_user, employer_user):
+        from rest_framework.test import APIClient
+        client = APIClient()
+        employer_user.phone_number = "0988776655"
+        employer_user.save()
+
+        client.force_authenticate(user=job_seeker_user)
+        response = client.post(
+            "/api/v1/auth/verify-phone/",
+            {"phone": "0988776655", "otp": "123456"},
+            format="json",
+        )
+        assert response.status_code == 400
+        error_details = response.data.get("error", {}).get("details", {}) or response.data.get("errors", {})
+        assert "phone" in error_details
+        assert "sử dụng bởi tài khoản khác" in str(error_details["phone"])
+
+    def test_verify_phone_rejects_arbitrary_otp_when_not_debug(self, job_seeker_user, settings):
+        from rest_framework.test import APIClient
+        client = APIClient()
+        settings.DEBUG = False
+        client.force_authenticate(user=job_seeker_user)
+        response = client.post(
+            "/api/v1/auth/verify-phone/",
+            {"phone": "0911223344", "otp": "999888"},
+            format="json",
+        )
+        assert response.status_code == 400
+        error_details = response.data.get("error", {}).get("details", {}) or response.data.get("errors", {})
+        assert "detail" in error_details
+

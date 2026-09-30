@@ -53,6 +53,10 @@ const WorkspaceSwitchMenu = () => {
     dispatch(setActiveWorkspace(workspace));
     setAnchorEl(null);
     if (workspace.type === "company") {
+      if ((workspace.roleCode || "").toLowerCase() === "employee") {
+        window.location.href = '/employee/dashboard';
+        return;
+      }
       if (currentUser?.isOnboarded === false) {
         window.location.href = '/onboarding/employer';
         return;
@@ -76,7 +80,7 @@ const WorkspaceSwitchMenu = () => {
         sx={{
           textTransform: "none",
           border: "1px solid #e2e8f0",
-          borderRadius: "10px",
+          borderRadius: 0,
           height: 38,
           minHeight: 38,
           px: 1.5,

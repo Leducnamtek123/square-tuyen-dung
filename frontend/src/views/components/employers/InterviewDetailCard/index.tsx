@@ -427,28 +427,40 @@ const InterviewDetailCard = () => {
       <Grid container spacing={3}>
         {/* Left Column (35%): Candidate Dossier & Quick Evaluation */}
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Stack spacing={3}>
-            <InterviewInfoCard session={session} t={t} i18n={i18n} />
-            <Box data-tour="interview-detail-score">
-              <InterviewAiEvaluationCard
-                session={session}
-                effectiveStatus={effectiveStatus}
-                t={t}
-                onTriggerAi={handleTriggerAi}
-                isTriggeringAi={state.isTriggeringAi}
-              />
-            </Box>
-            <Box data-tour="interview-detail-actions">
-              <InterviewHrEvaluationForm
-                evalForm={state.evalForm}
-                onChange={handleEvalChange}
-                onSubmit={submitHRInfo}
-                disabled={isInterviewMutating || effectiveStatus !== 'completed'}
-                submitting={isInterviewMutating}
-                t={t}
-              />
-            </Box>
-          </Stack>
+          <Box
+            sx={{
+              position: { xs: 'static', lg: 'sticky' },
+              top: { lg: 84 },
+              maxHeight: { lg: 'calc(100vh - 104px)' },
+              overflowY: { lg: 'auto' },
+              '&::-webkit-scrollbar': { display: 'none' },
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
+            <Stack spacing={3}>
+              <InterviewInfoCard session={session} t={t} i18n={i18n} />
+              <Box data-tour="interview-detail-score">
+                <InterviewAiEvaluationCard
+                  session={session}
+                  effectiveStatus={effectiveStatus}
+                  t={t}
+                  onTriggerAi={handleTriggerAi}
+                  isTriggeringAi={state.isTriggeringAi}
+                />
+              </Box>
+              <Box data-tour="interview-detail-actions">
+                <InterviewHrEvaluationForm
+                  evalForm={state.evalForm}
+                  onChange={handleEvalChange}
+                  onSubmit={submitHRInfo}
+                  disabled={isInterviewMutating || effectiveStatus !== 'completed'}
+                  submitting={isInterviewMutating}
+                  t={t}
+                />
+              </Box>
+            </Stack>
+          </Box>
         </Grid>
 
         {/* Right Column (65%): Tabbed Executive Workspace */}

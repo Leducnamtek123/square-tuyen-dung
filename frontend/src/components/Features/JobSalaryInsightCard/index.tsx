@@ -82,12 +82,12 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
   const language = i18n.language;
 
   return (
-    <Card variant="outlined" sx={{ boxShadow: 0, borderRadius: 3 }}>
+    <Card variant="outlined" sx={{ boxShadow: 0, borderRadius: 0 }}>
       <CardContent>
         <Stack spacing={2.5}>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="space-between">
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Box sx={{ width: 42, height: 42, borderRadius: 2, display: 'grid', placeItems: 'center', bgcolor: 'primary.main', color: 'white', flex: '0 0 auto' }}>
+              <Box sx={{ width: 42, height: 42, borderRadius: 0, display: 'grid', placeItems: 'center', bgcolor: 'primary.main', color: 'white', flex: '0 0 auto' }}>
                 <TrendingUpIcon fontSize="small" />
               </Box>
               <Box>
@@ -100,8 +100,8 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
               </Box>
             </Stack>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              <Chip size="small" label={scopeLabel} color={hasMarketData ? 'primary' : 'default'} variant="outlined" />
-              <Chip size="small" label={confidenceLabel} color={data.confidence === 'high' ? 'success' : data.confidence === 'medium' ? 'primary' : 'warning'} variant="outlined" />
+              <Chip size="small" label={scopeLabel} color={hasMarketData ? 'primary' : 'default'} variant="outlined" sx={{ borderRadius: 0 }} />
+              <Chip size="small" label={confidenceLabel} color={data.confidence === 'high' ? 'success' : data.confidence === 'medium' ? 'primary' : 'warning'} variant="outlined" sx={{ borderRadius: 0 }} />
             </Stack>
           </Stack>
 
@@ -114,7 +114,7 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
               [t('jobDetail.salaryInsightMedian'), formatSalaryInsightMoney(data.medianSalary, language)],
               [t('jobDetail.salaryInsightTypicalBand'), formatSalaryInsightRange(data.p25Salary, data.p75Salary, language)],
             ].map(([label, value]) => (
-              <Box key={label} sx={{ flex: 1, minWidth: 0, border: '1px solid', borderColor: 'divider', borderRadius: 2, p: 1.5 }}>
+              <Box key={label} sx={{ flex: 1, minWidth: 0, border: '1px solid', borderColor: 'divider', borderRadius: 0, p: 1.5 }}>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontWeight: 700 }}>
                   {label}
                 </Typography>
@@ -125,7 +125,7 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
             ))}
           </Stack>
 
-          <Box sx={{ borderRadius: 2, bgcolor: 'grey.50', p: 2 }}>
+          <Box sx={{ borderRadius: 0, bgcolor: 'grey.50', p: 2 }}>
             <Stack spacing={1.5}>
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1}>
                 <Box>
@@ -154,7 +154,7 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
 
               {hasMarketData && minScale != null && maxScale != null ? (
                 <Box>
-                  <Box sx={{ position: 'relative', height: 12, borderRadius: 999, bgcolor: 'grey.200', overflow: 'hidden' }}>
+                  <Box sx={{ position: 'relative', height: 12, borderRadius: 0, bgcolor: 'grey.200', overflow: 'hidden' }}>
                     {p25Percent != null && p75Percent != null && (
                       <Box
                         sx={{
@@ -175,7 +175,7 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
                           bottom: -2,
                           left: `calc(${currentPercent}% - 3px)`,
                           width: 6,
-                          borderRadius: 999,
+                          borderRadius: 0,
                           bgcolor: 'primary.main',
                         }}
                       />
@@ -212,7 +212,7 @@ const JobSalaryInsightCard = ({ slug }: Props) => {
                     : undefined;
 
                   return (
-                    <Box key={job.id} component={detailHref ? Link : 'div'} href={detailHref} sx={{ p: 1.5, borderRadius: 2, bgcolor: 'grey.50', color: 'inherit', textDecoration: 'none', display: 'block', '&:hover': { bgcolor: detailHref ? 'grey.100' : 'grey.50' } }}>
+                    <Box key={job.id} component={detailHref ? Link : 'div'} href={detailHref} sx={{ p: 1.5, borderRadius: 0, bgcolor: 'grey.50', color: 'inherit', textDecoration: 'none', display: 'block', '&:hover': { bgcolor: detailHref ? 'grey.100' : 'grey.50' } }}>
                       <Typography variant="body2" sx={{ fontWeight: 800 }}>
                         {job.jobName}
                       </Typography>

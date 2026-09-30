@@ -53,12 +53,10 @@ export class PreflightPage extends BasePage {
    * Bấm nút "Bắt đầu phỏng vấn" trên màn hình chờ ban đầu (nếu có) để mở màn hình Preflight Check
    */
   async startPreflightIfPresent(timeout = 10_000) {
-    try {
-      if (await this.startInterviewBtn.first().isVisible({ timeout })) {
-        await this.startInterviewBtn.first().click();
-      }
-    } catch {
-      // Có thể đã trực tiếp ở màn Preflight
+    const btn = this.startInterviewBtn.first();
+    const isPresent = await btn.waitFor({ state: 'visible', timeout }).then(() => true).catch(() => false);
+    if (isPresent) {
+      await btn.click();
     }
   }
 
@@ -94,12 +92,15 @@ export class PreflightPage extends BasePage {
    * Bấm nút vào phòng phỏng vấn LiveKit
    */
   async clickJoinRoom() {
-    if (await this.joinRoomBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await this.joinRoomBtn.click();
-    } else if (await this.skipCheckAndJoinBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await this.skipCheckAndJoinBtn.click();
-    } else {
-      const fallbackBtn = this.page.locator('button').filter({ hasText: /vào phòng|tham gia|bắt đầu luyện tập/i }).first();
+    const joinBtn = this.joinRoomBtn.first();
+    const skipBtn = this.skipCheckAndJoinBtn.first();
+    const fallbackBtn = this.page.locator('button').filter({ hasText: /vào phòng|tham gia|bắt đầu luyện tập/i }).first();
+
+    if (await joinBtn.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false)) {
+      await joinBtn.click();
+    } else if (await skipBtn.waitFor({ state: 'visible', timeout: 3000 }).then(() => true).catch(() => false)) {
+      await skipBtn.click();
+    } else if (await fallbackBtn.waitFor({ state: 'visible', timeout: 3000 }).then(() => true).catch(() => false)) {
       await fallbackBtn.click();
     }
   }

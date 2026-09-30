@@ -906,12 +906,16 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
   ]);
 
   const handleDisconnected = React.useCallback(() => {
+    // If running in mock / test environment with mock token, ignore unexpected disconnect
+    if (state.connectionDetails?.token === 'e2e-fake-livekit-token' || process.env.NEXT_PUBLIC_USE_MOCK === 'true') {
+      return;
+    }
     dispatch({ type: 'set-connect-room', value: false });
     dispatch({ type: 'set-connection-details', value: undefined });
     dispatch({ type: 'set-show-preflight', value: false });
     finalizeOnDisconnectRef.current = false;
     prefetchedConnectionRef.current = { promise: null, data: null, key: '' };
-  }, []);
+  }, [state.connectionDetails?.token]);
 
   const finalizeInterviewSession = React.useCallback(async () => {
     if (!roomName) return;

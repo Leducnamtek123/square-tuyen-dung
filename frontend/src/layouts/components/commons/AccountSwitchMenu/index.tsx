@@ -223,12 +223,12 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
             flexShrink: 0,
             backgroundColor: '#ffffff',
             color: '#0f172a',
-            borderRadius: '10px',
-            minHeight: 38,
-            height: 38,
-            px: 1.5,
-            py: 0.6,
-            fontSize: '0.8rem',
+            borderRadius: 0,
+            minHeight: { xs: 34, md: 34, lg: 38 },
+            height: { xs: 34, md: 34, lg: 38 },
+            px: { md: 1, lg: 1.5 },
+            py: 0.5,
+            fontSize: { md: '0.75rem', lg: '0.8rem' },
             fontWeight: 600,
             textTransform: 'none',
             whiteSpace: 'nowrap',
@@ -250,7 +250,12 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
             },
           }}
         >
-          {!isEmployerPortal ? t('nav.switch.forEmployers') : t('nav.switch.forJobSeekers')}
+          <Box component="span" sx={{ display: { xs: 'inline', md: 'none', lg: 'inline' } }}>
+            {!isEmployerPortal ? t('nav.switch.forEmployers') : t('nav.switch.forJobSeekers')}
+          </Box>
+          <Box component="span" sx={{ display: { xs: 'none', md: 'inline', lg: 'none' } }}>
+            {!isEmployerPortal ? t('nav.switch.forEmployersShort', 'Tuyển dụng') : t('nav.switch.forJobSeekersShort', 'Tìm việc')}
+          </Box>
         </Button>
 
       )}

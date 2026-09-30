@@ -36,7 +36,10 @@ else
   echo "SYNC_OAUTH_CLIENT disabled. Skipping OAuth client sync."
 fi
 
+echo "Ensuring MinIO public bucket policy..."
+python manage.py ensure_minio_policy || true
+
 mkdir -p "${TTS_CACHE_DIR:-/tmp/tts_cache}" 2>/dev/null || true
-chmod 777 "${TTS_CACHE_DIR:-/tmp/tts_cache}" 2>/dev/null || true
+chmod 755 "${TTS_CACHE_DIR:-/tmp/tts_cache}" 2>/dev/null || true
 
 exec "$@"

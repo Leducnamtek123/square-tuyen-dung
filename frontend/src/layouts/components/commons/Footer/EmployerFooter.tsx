@@ -31,7 +31,7 @@ export const EmployerFooter: React.FC = () => {
 
   const employerLinks = [
     { label: t('footer.pricingTable', 'Bảng giá dịch vụ'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang) },
-    { label: t('footer.employerBlog', 'Cẩm nang tuyển dụng'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.BLOG}`, lang) },
+    { label: t('footer.employerBlog', 'Cẩm nang tuyển dụng'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=blog`, lang) },
     { label: t('footer.employerFaq', 'Hỏi đáp thường gặp (FAQ)'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.FAQ}`, lang) },
     { label: t('footer.warrantyPolicy', 'Chính sách bảo hành & Hoàn tiền'), route: `/${ROUTES.EMPLOYER.WARRANTY_HTML}` },
     { label: t('footer.employerTerms', 'Điều khoản sử dụng cho Nhà tuyển dụng'), route: `/${ROUTES.EMPLOYER.TERMS_HTML}` },

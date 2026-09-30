@@ -219,15 +219,16 @@ const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
     <Box
       sx={{
         width: '100%',
-        minHeight: { xs: 520, md: 620 },
+        minHeight: { xs: 250, sm: 280, md: 310 },
         height: {
-          xs: `calc(100svh - ${HERO_HEADER_OFFSET.xs})`,
-          sm: `calc(100svh - ${HERO_HEADER_OFFSET.sm})`,
+          xs: 'auto',
+          sm: 290,
+          md: 320,
         },
-        maxHeight: { md: 720 },
+        maxHeight: { xs: 380, md: 350 },
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: '0 16px 36px rgba(15, 23, 42, 0.10)',
+        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
         bgcolor: '#0f172a',
         fontFamily: "var(--font-inter), 'Inter', sans-serif",
       }}
@@ -300,11 +301,12 @@ const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
             sx={{
               width: '100%',
               maxWidth: HERO_CONTAINER_MAX_WIDTH,
-              px: { xs: 3, sm: 4, md: 8, lg: 10 },
+              px: { xs: 2.5, sm: 4, md: 6, lg: 8 },
+              py: { xs: 2, md: 1.5 },
               pointerEvents: 'auto',
             }}
           >
-            <Stack spacing={2.5}>
+            <Stack spacing={1.5}>
               <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
                 <Box
                   className="gsap-hero-tag"
@@ -312,15 +314,15 @@ const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: 1,
-                    px: { xs: 1.25, sm: 1.75 },
-                    py: 0.5,
-                    mb: 1.5,
-                    borderRadius: '9999px',
+                    px: { xs: 1.25, sm: 1.5 },
+                    py: 0.25,
+                    mb: 0.75,
+                    borderRadius: 0,
                     bgcolor: 'rgba(255, 255, 255, 0.12)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
                     backdropFilter: 'blur(12px)',
                     color: '#e0f2fe',
-                    fontSize: { xs: '0.74rem', sm: '0.8rem' },
+                    fontSize: { xs: '0.68rem', sm: '0.74rem' },
                     fontWeight: 600,
                     letterSpacing: '0.02em',
                     whiteSpace: 'nowrap',
@@ -336,14 +338,14 @@ const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
                   component="h1"
                   sx={{
                     fontWeight: 800,
-                    fontSize: { xs: '1.65rem', sm: '2.15rem', md: '2.65rem' },
+                    fontSize: { xs: '1.25rem', sm: '1.6rem', md: '2.05rem' },
                     color: '#ffffff',
                     lineHeight: 1.2,
-                    textShadow: '0 2px 12px rgba(0, 0, 0, 0.5)',
+                    textShadow: '0 2px 10px rgba(0, 0, 0, 0.5)',
                     letterSpacing: '-0.025em',
                   }}
                 >
-                  Chắp cánh sự nghiệp của bạn cùng{' '}
+                  Tìm công việc phù hợp với bạn cùng{' '}
                   <Box
                     component="span"
                     sx={{
@@ -362,14 +364,15 @@ const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
                   variant="subtitle1"
                   sx={{
                     fontWeight: 500,
-                    fontSize: { xs: '0.92rem', sm: '1.08rem' },
+                    fontSize: { xs: '0.78rem', sm: '0.88rem' },
                     color: 'rgba(241, 245, 249, 0.92)',
-                    mt: 1,
-                    maxWidth: 620,
+                    mt: 0.5,
+                    maxWidth: 680,
                     textShadow: '0 1px 6px rgba(0, 0, 0, 0.4)',
+                    display: { xs: 'none', sm: 'block' },
                   }}
                 >
-                  Kết nối ứng viên tài năng &amp; nhà tuyển dụng hàng đầu qua hệ thống AI Matching thế hệ mới.
+                  Hàng nghìn việc làm từ các công ty uy tín đang chờ bạn. Tìm kiếm theo vị trí, kỹ năng hoặc công ty.
                 </Typography>
               </Box>
               <Box className="gsap-hero-search">

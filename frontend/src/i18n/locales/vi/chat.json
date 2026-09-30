@@ -26,18 +26,18 @@
   "noAppliedJobs": "Bạn chưa ứng tuyển vị trí nào",
   "candidates": "ỨNG VIÊN ỨNG TUYỂN",
   "chatbot": {
-    "launcherAria": "Mở trợ lý AILA AI",
-    "panelAria": "Trò chuyện với AILA AI",
+    "launcherAria": "Mở trợ lý InfoHR AI",
+    "panelAria": "Trò chuyện với InfoHR AI",
     "closeAria": "Đóng chat",
     "status": "Đang sẵn sàng",
     "placeholder": "Nhập tin nhắn...",
     "greeting": {
-      "employer": "Chào bạn! Tôi là AILA AI, trợ lý tuyển dụng của bạn. Tôi có thể hỗ trợ quý đối tác tìm ứng viên tiềm năng, soạn tin nhắn mời phỏng vấn và giải đáp mọi thắc mắc tuyển dụng.",
-      "jobSeeker": "Chào bạn! Tôi là AILA AI, trợ lý sự nghiệp của bạn. Bạn cần tìm việc làm hay tư vấn gì không?"
+      "employer": "Chào bạn! Tôi là InfoHR AI, trợ lý tuyển dụng của bạn. Tôi có thể hỗ trợ quý đối tác tìm ứng viên tiềm năng, soạn tin nhắn mời phỏng vấn và giải đáp mọi thắc mắc tuyển dụng.",
+      "jobSeeker": "Chào bạn! Tôi là InfoHR AI, trợ lý đồng hành sự nghiệp của bạn. Bạn cần tìm việc làm hay tư vấn gì hôm nay?"
     },
     "systemPrompt": {
-      "employer": "Bạn là AILA AI, trợ lý AI thông minh dành cho nhà tuyển dụng trên nền tảng InfoHR-Tuyen-Dung. Bạn am hiểu về thị trường lao động, cách viết JD, và quy trình phỏng vấn chuyên nghiệp. Trả lời trực tiếp, mạch lạc và thân thiện bằng Markdown đẹp mắt. Tuyệt đối không trích dẫn hay hiển thị các khối nguồn/ngữ cảnh thô.",
-      "jobSeeker": "Bạn là AILA AI, trợ lý AI thông minh dành cho người tìm việc trên nền tảng InfoHR-Tuyen-Dung. Bạn giúp họ tìm việc, tư vấn sửa CV và chuẩn bị phỏng vấn. Trả lời trực tiếp, mạch lạc và thân thiện bằng Markdown đẹp mắt. Tuyệt đối không trích dẫn hay hiển thị các khối nguồn/ngữ cảnh thô."
+      "employer": "Bạn là InfoHR AI, trợ lý AI thông minh dành cho nhà tuyển dụng trên nền tảng InfoHR Tuyển Dụng. Bạn am hiểu về thị trường lao động, cách viết JD, và quy trình phỏng vấn chuyên nghiệp. Trả lời trực tiếp, mạch lạc và thân thiện bằng Markdown đẹp mắt. Tuyệt đối không trích dẫn hay hiển thị các khối nguồn/ngữ cảnh thô.",
+      "jobSeeker": "Bạn là InfoHR AI, trợ lý AI thông minh dành cho người tìm việc trên nền tảng InfoHR Tuyển Dụng. Bạn giúp họ tìm việc, tư vấn sửa CV và chuẩn bị phỏng vấn. Trả lời trực tiếp, mạch lạc và thân thiện bằng Markdown đẹp mắt. Tuyệt đối không trích dẫn hay hiển thị các khối nguồn/ngữ cảnh thô."
     },
     "error": {
       "apology": "Xin lỗi, tôi gặp chút trục trặc khi xử lý câu hỏi này.",
@@ -77,5 +77,27 @@
   "startWithGreeting": "Hãy bắt đầu cuộc trò chuyện bằng một lời chào",
   "startConversationWith": "Bắt đầu cuộc trò chuyện với {{name}}",
   "startConversation": "Bắt đầu cuộc trò chuyện",
-  "sendFirstMessageHint": "Gửi lời chào hoặc đặt câu hỏi để kết nối ngay."
+  "sendFirstMessageHint": "Gửi lời chào hoặc đặt câu hỏi để kết nối ngay.",
+  "actionCards": {
+    "employer": {
+      "findCandidates": "Tìm ứng viên",
+      "findCandidatesDesc": "Lọc ứng viên tiềm năng theo vị trí",
+      "inviteInterview": "Mời phỏng vấn",
+      "inviteInterviewDesc": "Soạn thư mời phỏng vấn ấn tượng",
+      "optimizeJd": "Tối ưu JD",
+      "optimizeJdDesc": "Hỗ trợ viết mô tả công việc thu hút",
+      "salarySurvey": "Khảo sát lương",
+      "salarySurveyDesc": "Mặt bằng đãi ngộ thị trường"
+    },
+    "jobSeeker": {
+      "findJobs": "Tìm việc phù hợp",
+      "findJobsDesc": "Gợi ý việc làm theo năng lực & lương",
+      "reviewCv": "Đánh giá & Sửa CV",
+      "reviewCvDesc": "Rà soát hồ sơ theo chuẩn ATS",
+      "interviewTips": "Luyện phỏng vấn",
+      "interviewTipsDesc": "Mẹo trả lời câu hỏi nhà tuyển dụng",
+      "salarySurvey": "Khảo sát lương",
+      "salarySurveyDesc": "Tra cứu thu nhập trung bình ngành"
+    }
+  }
 }

@@ -35,12 +35,13 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
           height: 100,
           display: 'grid',
           placeItems: 'center',
+          '--loading-animation-duration': '900ms',
           '--sq-loading-animation-duration': '900ms',
-          animation: 'sq-backdrop-spin 900ms linear infinite',
+          animation: 'backdrop-spin 900ms linear infinite',
           animationDuration: '900ms !important',
           animationIterationCount: 'infinite !important',
           animationTimingFunction: 'linear !important',
-          '@keyframes sq-backdrop-spin': {
+          '@keyframes backdrop-spin': {
             from: { transform: 'rotate(0deg)' },
             to: { transform: 'rotate(360deg)' },
           },

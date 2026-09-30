@@ -426,21 +426,42 @@ def verify_phone_number(request):
 
     clean_phone = str(phone).strip()
 
-    # Validate verification proof via Firebase ID token or OTP code
+    # Prevent duplicate phone number across accounts
+    from apps.accounts.views_oauth import _phone_lookup_values, _normalize_phone_key
+    lookup_vals = _phone_lookup_values(clean_phone)
+    conflict_user = User.objects.filter(phone_number__in=lookup_vals).exclude(id=request.user.id).first()
+    if conflict_user:
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"phone": ["Số điện thoại này đã được sử dụng bởi tài khoản khác."]},
+        )
+
+    # Validate verification proof via Firebase ID token or secure OTP code
     is_verified = False
     if id_token:
         try:
             from apps.common.firebase import verify_id_token
             decoded = verify_id_token(str(id_token).strip())
             if decoded:
-                is_verified = True
+                token_phone = decoded.get("phone_number")
+                if token_phone:
+                    if _normalize_phone_key(token_phone) == _normalize_phone_key(clean_phone):
+                        is_verified = True
+                    else:
+                        return response_data(
+                            status=status.HTTP_400_BAD_REQUEST,
+                            errors={"phone": ["Số điện thoại không trùng khớp với số đã xác thực trên Firebase."]},
+                        )
+                else:
+                    is_verified = True
         except Exception as ex:
             helper.print_log_error("verify_phone_number.firebase_token", ex)
 
-    # Validate OTP code if id_token was not provided or could not be verified
+    # Validate OTP code in DEBUG mode only for dev/testing
     if not is_verified and otp:
         clean_otp = str(otp).strip()
-        if clean_otp in ["123456", "test", "dev"] or (clean_otp.isdigit() and len(clean_otp) == 6) or getattr(settings, "DEBUG", False):
+        is_debug = getattr(settings, "DEBUG", False)
+        if is_debug and clean_otp in ["123456", "test", "dev"]:
             is_verified = True
 
     if not is_verified:
@@ -458,7 +479,14 @@ def verify_phone_number(request):
     user = request.user
     user.phone_number = clean_phone
     user.is_verify_phone = True
-    user.save()
+    try:
+        user.save()
+    except Exception as ex:
+        helper.print_log_error("verify_phone_number.save_user", ex)
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"phone": ["Không thể lưu số điện thoại. Vui lòng thử lại sau."]},
+        )
 
     # Synchronize with JobSeekerProfile
     try:

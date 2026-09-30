@@ -174,7 +174,7 @@ const JobPost = ({
           pt: 2,
           transition: 'transform 280ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1), border-color 280ms ease, background-color 280ms ease',
           willChange: 'transform, box-shadow',
-          borderRadius: '16px',
+          borderRadius: 0,
           border: `1px solid ${theme.palette.divider}`,
           position: 'relative',
           overflow: 'hidden',
@@ -203,7 +203,7 @@ const JobPost = ({
                 backgroundColor: '#fef2f2',
                 border: '1px solid #fecaca',
                 padding: '3px 8px',
-                borderRadius: '6px',
+                borderRadius: 0,
                 zIndex: 2,
               }}
             >
@@ -228,7 +228,7 @@ const JobPost = ({
                 backgroundColor: '#fff7ed',
                 border: '1px solid #fed7aa',
                 padding: '3px 8px',
-                borderRadius: '6px',
+                borderRadius: 0,
                 zIndex: 2,
               }}
             >
@@ -244,11 +244,12 @@ const JobPost = ({
           <Box sx={{ flexShrink: 0 }}>
             <MuiImageCustom
               src={companyImageUrl || IMAGES.companyLogoDefault}
+              fallbackSrc={IMAGES.companyLogoDefault}
               alt={companyName}
               width={54}
               height={54}
               sx={{
-                borderRadius: '12px',
+                borderRadius: 0,
                 border: '1px solid #e2e8f0',
                 p: 0.5,
                 objectFit: 'contain',
@@ -331,10 +332,10 @@ const JobPost = ({
 };
 
 const Loading = () => (
-  <Card sx={{ p: 1, boxShadow: 0 }}>
+  <Card sx={{ p: 1, boxShadow: 0, borderRadius: 0 }}>
     <Stack direction="row" spacing={1}>
       <Box>
-        <Skeleton variant="rounded" width={60} height={60} />
+        <Skeleton variant="rectangular" width={60} height={60} sx={{ borderRadius: 0 }} />
       </Box>
       <Box flex={1}>
         <Typography variant="subtitle2" sx={{ fontSize: 15 }} gutterBottom>

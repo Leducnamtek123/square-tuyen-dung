@@ -107,6 +107,7 @@ def _perform_interview_warmup(session: InterviewSession) -> dict:
     tts_error_detail = ""
 
     for attempt in range(1, max_tts_attempts + 1):
+        tts_ssl_verify = getattr(settings, "TTS_SSL_VERIFY", True)
         try:
             logger.info(
                 "Warmup TTS attempt %d/%d for session %s (room %s)",
@@ -115,7 +116,7 @@ def _perform_interview_warmup(session: InterviewSession) -> dict:
                 session.id,
                 session.room_name,
             )
-            resp = requests.post(tts_url, json=tts_payload, headers=tts_headers, timeout=(10, 25), verify=False)
+            resp = requests.post(tts_url, json=tts_payload, headers=tts_headers, timeout=(10, 25), verify=tts_ssl_verify)
             if resp.status_code == 200 and len(resp.content) > 100:
                 tts_status = "ready"
                 break
@@ -136,7 +137,7 @@ def _perform_interview_warmup(session: InterviewSession) -> dict:
         stt_headers["Authorization"] = f"Bearer {stt_api_key}"
 
     try:
-        resp_stt = requests.get(f"{stt_base_url}/models", headers=stt_headers, timeout=(5, 10), verify=False)
+        resp_stt = requests.get(f"{stt_base_url}/models", headers=stt_headers, timeout=(5, 10), verify=tts_ssl_verify)
         if resp_stt.status_code < 500:
             stt_status = "ready"
         else:

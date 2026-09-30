@@ -22,7 +22,7 @@ export const GooglePlayBadge = ({ height = 38 }: { height?: number }) => {
         height,
         px: 1.5,
         py: 0.5,
-        borderRadius: '8px',
+        borderRadius: 0,
         backgroundColor: '#000000',
         color: '#ffffff',
         textDecoration: 'none',
@@ -68,7 +68,7 @@ export const AppStoreBadge = ({ height = 38 }: { height?: number }) => {
         height,
         px: 1.5,
         py: 0.5,
-        borderRadius: '8px',
+        borderRadius: 0,
         backgroundColor: '#000000',
         color: '#ffffff',
         textDecoration: 'none',
@@ -104,7 +104,7 @@ export const AppDownloadBox = () => {
         sx={{
           p: 0.75,
           backgroundColor: '#ffffff',
-          borderRadius: '10px',
+          borderRadius: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -153,7 +153,7 @@ export const DmcaProtectedBadge = () => (
         width: 'auto',
         display: 'block',
         objectFit: 'contain',
-        borderRadius: '4px',
+        borderRadius: 0,
       }}
     />
   </Link>

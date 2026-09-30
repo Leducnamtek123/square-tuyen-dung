@@ -243,7 +243,7 @@ const JobPostSearch = () => {
           boxShadow: '0 10px 28px rgba(15, 57, 127, 0.08)',
           backgroundColor: '#ffffff',
           border: '1px solid #e2e8f0',
-          borderRadius: 4,
+          borderRadius: 0,
         }}
       >
         <Grid container spacing={1.5} alignItems="center">
@@ -324,7 +324,7 @@ const JobPostSearch = () => {
                   width: '100%',
                   minHeight: 44,
                   justifyContent: 'center',
-                  borderRadius: '10px',
+                  borderRadius: 0,
                   backgroundColor: '#2563eb',
                   color: '#ffffff',
                   fontWeight: 700,
@@ -348,7 +348,7 @@ const JobPostSearch = () => {
                   width: '100%',
                   minHeight: 44,
                   justifyContent: 'center',
-                  borderRadius: '10px',
+                  borderRadius: 0,
                   borderColor: '#cbd5e1',
                   color: '#334155',
                   fontWeight: 700,
@@ -375,7 +375,7 @@ const JobPostSearch = () => {
                   width: '100%',
                   minHeight: 44,
                   justifyContent: 'center',
-                  borderRadius: '10px',
+                  borderRadius: 0,
                   borderColor: activeAdvancedFilterCount > 0 ? '#2563eb' : '#cbd5e1',
                   backgroundColor: activeAdvancedFilterCount > 0 ? '#eff6ff' : '#ffffff',
                   color: activeAdvancedFilterCount > 0 ? '#2563eb' : '#0f172a',
@@ -402,7 +402,7 @@ const JobPostSearch = () => {
                       ml: 0.75,
                       px: 0.75,
                       py: 0.1,
-                      borderRadius: '6px',
+                      borderRadius: 0,
                       backgroundColor: '#2563eb',
                       color: '#ffffff',
                       fontSize: '0.725rem',
@@ -427,7 +427,7 @@ const JobPostSearch = () => {
             p: 1.25,
             px: 2,
             backgroundColor: '#ffffff',
-            borderRadius: '12px',
+            borderRadius: 0,
             border: '1px solid #e2e8f0',
             display: 'flex',
             alignItems: 'center',
@@ -448,7 +448,7 @@ const JobPostSearch = () => {
                 setValue('wardId', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 
@@ -460,7 +460,7 @@ const JobPostSearch = () => {
                 setValue('wardId', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 
@@ -472,7 +472,7 @@ const JobPostSearch = () => {
                 setValue('positionId', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 
@@ -484,7 +484,7 @@ const JobPostSearch = () => {
                 setValue('experienceId', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 
@@ -496,7 +496,7 @@ const JobPostSearch = () => {
                 setValue('jobTypeId', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 
@@ -508,7 +508,7 @@ const JobPostSearch = () => {
                 setValue('typeOfWorkplaceId', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 
@@ -520,7 +520,7 @@ const JobPostSearch = () => {
                 setValue('genderId', '');
                 handleSubmit(handleFilter)();
               }}
-              sx={{ borderRadius: '8px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
+              sx={{ borderRadius: 0, backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: 600, border: '1px solid #bfdbfe' }}
             />
           )}
 

@@ -155,6 +155,19 @@ class User(AbstractUser, CommonBaseModel):
         return company
 
     @property
+    def phone(self):
+        return self.phone_number
+
+    @phone.setter
+    def phone(self, value):
+        self.phone_number = value or None
+
+    def save(self, *args, **kwargs):
+        if self.phone_number == "":
+            self.phone_number = None
+        super().save(*args, **kwargs)
+
+    @property
     def active_company(self):
         return self.get_active_company()
 

@@ -387,7 +387,18 @@ const ArticleDetailPage = () => {
         </Grid>
 
         <Grid size={{ xs: 12, lg: 4 }}>
-          <Stack spacing={3} sx={{ position: { lg: 'sticky' }, top: { lg: 88 } }}>
+          <Stack
+            spacing={3}
+            sx={{
+              position: { lg: 'sticky' },
+              top: { lg: 88 },
+              maxHeight: { lg: 'calc(100vh - 104px)' },
+              overflowY: { lg: 'auto' },
+              '&::-webkit-scrollbar': { display: 'none' },
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
             <Card
               elevation={0}
               sx={{

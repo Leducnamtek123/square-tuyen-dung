@@ -240,8 +240,8 @@ export default function EmployerHomePage() {
   );
 
   // Link đích
-  const registerUrl = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
-  const pricingUrl = localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language);
+  const registerPath = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
+  const pricingPath = localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language);
 
   // Tab chuyển đổi Hero preview giữa Scorecard và 3D BIM Complex
   const [heroTab, setHeroTab] = useState<'scorecard' | 'bim'>('scorecard');
@@ -444,7 +444,7 @@ export default function EmployerHomePage() {
                 >
                   <Button
                     component={Link}
-                    href={registerUrl}
+                    href={registerPath}
                     variant="contained"
                     size="large"
                     sx={{
@@ -487,7 +487,7 @@ export default function EmployerHomePage() {
 
                   <Button
                     component={Link}
-                    href={pricingUrl}
+                    href={pricingPath}
                     variant="outlined"
                     size="large"
                     sx={{
@@ -1631,7 +1631,7 @@ export default function EmployerHomePage() {
                 <Stack spacing={2} sx={{ width: '100%', maxWidth: { lg: 320 }, ml: { lg: 'auto' } }}>
                   <Button
                     component={Link}
-                    href={registerUrl}
+                    href={registerPath}
                     variant="contained"
                     size="large"
                     endIcon={<ArrowForwardRoundedIcon />}
@@ -1657,7 +1657,7 @@ export default function EmployerHomePage() {
 
                   <Button
                     component={Link}
-                    href={pricingUrl}
+                    href={pricingPath}
                     variant="outlined"
                     size="large"
                     sx={{

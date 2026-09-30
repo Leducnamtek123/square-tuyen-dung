@@ -73,57 +73,61 @@ const JobPage = () => {
             </Grid>
 
             <Grid
-
               size={{
-
                 xs: 12,
-
                 sm: 12,
-
                 md: 12,
-
                 lg: 4,
-
                 xl: 4
-
-              }}>
-
+              }}
+            >
               {isJobSeekerLoggedIn && (
-                <>
+                <Box sx={{ display: { xs: 'block', lg: 'none' } }}>
                   <Box sx={{ pt: 2, pb: 3 }}>
-
                     <Typography variant="h5">{t("jobSearch.recommendedJobs")}</Typography>
-
                   </Box>
-
                   {/* Start: SuggestedJobPostCard */}
-
                   <SuggestedJobPostCard fullWidth={true} pageSize={5} />
-
                   {/* End: SuggestedJobPostCard */}
-                </>
+                </Box>
               )}
 
               <Box
-
                 sx={{
-
-                  mt: 2,
-
-                  display: { xs: "none", sm: "none", md: "none", lg: "block" },
-
+                  position: { xs: 'static', lg: 'sticky' },
+                  top: { lg: 88 },
+                  zIndex: 2,
+                  maxHeight: { lg: 'calc(100vh - 104px)' },
+                  overflowY: { lg: 'auto' },
+                  '&::-webkit-scrollbar': { display: 'none' },
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
                 }}
-
               >
+                {isJobSeekerLoggedIn && (
+                  <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+                    <Box sx={{ pt: 1, pb: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 700, color: '#0f172a' }}>
+                        {t("jobSearch.recommendedJobs")}
+                      </Typography>
+                    </Box>
+                    {/* Start: SuggestedJobPostCard */}
+                    <SuggestedJobPostCard fullWidth={true} pageSize={5} />
+                    {/* End: SuggestedJobPostCard */}
+                  </Box>
+                )}
 
-                {/* Start: MainJobRightBanner */}
-
-                <MainJobRightBanner />
-
-                {/* End: MainJobRightBanner */}
-
+                <Box
+                  sx={{
+                    mt: { xs: 2, lg: isJobSeekerLoggedIn ? 2 : 0 },
+                    display: { xs: "none", lg: "block" },
+                  }}
+                >
+                  {/* Start: MainJobRightBanner */}
+                  <MainJobRightBanner />
+                  {/* End: MainJobRightBanner */}
+                </Box>
               </Box>
-
             </Grid>
 
           </Grid>

@@ -424,7 +424,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
             startIcon={<FilterListIcon sx={{ color: '#64748b', fontSize: 18 }} />}
             endIcon={<KeyboardArrowDownIcon sx={{ fontSize: 18, color: '#64748b' }} />}
             sx={{
-              borderRadius: '24px',
+              borderRadius: 0,
               borderColor: '#e2e8f0',
               color: '#334155',
               textTransform: 'none',
@@ -446,7 +446,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
             onClose={() => setAnchorEl(null)}
             PaperProps={{
               sx: {
-                borderRadius: '12px',
+                borderRadius: 0,
                 mt: 1,
                 minWidth: 180,
                 p: 0.5,
@@ -465,7 +465,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                   sx={{
                     fontSize: '0.875rem',
                     fontWeight: isSelected ? 700 : 500,
-                    borderRadius: '8px',
+                    borderRadius: 0,
                     py: 1,
                     px: 1.5,
                     display: 'flex',
@@ -497,6 +497,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
               size="small"
               onClick={handleScrollLeft}
               sx={{
+                borderRadius: 0,
                 display: { xs: 'none', sm: 'inline-flex' },
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#ffffff',
@@ -535,7 +536,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                     sx={{
                       px: 2.2,
                       py: 0.75,
-                      borderRadius: '20px',
+                      borderRadius: 0,
                       cursor: 'pointer',
                       whiteSpace: 'nowrap',
                       fontSize: '0.85rem',
@@ -561,6 +562,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
               size="small"
               onClick={handleScrollRight}
               sx={{
+                borderRadius: 0,
                 display: { xs: 'none', sm: 'inline-flex' },
                 border: '1px solid #e2e8f0',
                 backgroundColor: '#ffffff',
@@ -581,7 +583,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
         <Grid container spacing={2.5}>
           {Array.from(Array(compact ? 6 : 9).keys()).map((i) => (
             <Grid key={i} size={compact ? { xs: 12 } : { xs: 12, sm: 6, md: 4 }}>
-              <Skeleton variant="rounded" height={160} sx={{ borderRadius: '16px' }} />
+              <Skeleton variant="rectangular" height={160} sx={{ borderRadius: 0 }} />
             </Grid>
           ))}
         </Grid>
@@ -622,7 +624,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                       pt: job.isUrgent ? 2.75 : 2.5,
                       backgroundColor: job.isUrgent ? '#fffaf5' : '#ffffff',
                       border: `1px solid ${job.isUrgent ? 'rgba(251, 146, 60, 0.45)' : 'rgba(226, 232, 240, 0.8)'}`,
-                      borderRadius: '20px',
+                      borderRadius: 0,
                       textDecoration: 'none',
                       color: 'inherit',
                       position: 'relative',
@@ -659,7 +661,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                           color: '#ffffff',
                           px: 1.25,
                           py: 0.35,
-                          borderRadius: '999px',
+                          borderRadius: 0,
                           fontSize: '0.72rem',
                           fontWeight: 700,
                           lineHeight: 1.2,
@@ -698,6 +700,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                           size="small"
                           onClick={(e) => toggleFavorite(e, job.id, job.slug)}
                           sx={{
+                            borderRadius: 0,
                             p: 0.5,
                             color: isFav ? '#ef4444' : '#94a3b8',
                             '&:hover': { backgroundColor: 'transparent', color: '#ef4444' },
@@ -721,7 +724,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
                           src={companyLogo}
                           fallbackSrc={IMAGES.companyLogoDefault}
                           sx={{
-                            borderRadius: '10px',
+                            borderRadius: 0,
                             border: `1px solid ${job.isUrgent ? '#fdba74' : '#f1f5f9'}`,
                             objectFit: 'contain',
                             flexShrink: 0,
@@ -781,6 +784,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               sx={{
+                borderRadius: 0,
                 border: '1px solid #e11d48',
                 color: '#e11d48',
                 width: 36,
@@ -801,6 +805,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               sx={{
+                borderRadius: 0,
                 border: '1px solid #e11d48',
                 color: '#e11d48',
                 width: 36,

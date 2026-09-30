@@ -57,12 +57,21 @@ const getStatusColor = (status: string): 'success' | 'primary' | 'info' | 'error
   }
 };
 
-const formatElapsed = (startTime: string | null | undefined, now = Date.now()) => {
+export const formatElapsed = (startTime: string | null | undefined, now = Date.now()) => {
   if (!startTime) return '--:--';
-  const elapsed = Math.max(0, Math.floor((now - new Date(startTime).getTime()) / 1000));
-  const m = Math.floor(elapsed / 60);
-  const s = elapsed % 60;
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  const startMs = new Date(startTime).getTime();
+  if (Number.isNaN(startMs)) return '--:--';
+  const elapsedSeconds = Math.max(0, Math.floor((now - startMs) / 1000));
+  if (elapsedSeconds >= 8 * 3600) {
+    return '>8h (Quá hạn)';
+  }
+  const hours = Math.floor(elapsedSeconds / 3600);
+  const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+  const seconds = elapsedSeconds % 60;
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
 export const ElapsedTimer: React.FC<{

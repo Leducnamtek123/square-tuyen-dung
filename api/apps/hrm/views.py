@@ -952,7 +952,7 @@ class MonthlyPayrollViewSet(viewsets.ModelViewSet):
 
 
 class EmployeeSelfServiceView(APIView):
-    """Cổng tự phục vụ dành cho nhân viên xem hồ sơ, hợp đồng, quỹ phép và bảng lương cá nhân."""
+    """Cổng tự phục vụ dành cho nhân viên xem hồ sơ, hợp đồng, quỹ phép, tiến trình onboarding và bảng lương cá nhân."""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
@@ -967,13 +967,126 @@ class EmployeeSelfServiceView(APIView):
         recent_payrolls = MonthlyPayrollRecord.objects.filter(employee=emp).order_by('-year', '-month')[:6]
         recent_attendance_summaries = MonthlyAttendanceSummary.objects.filter(employee=emp).order_by('-year', '-month')[:6]
 
+        onboarding = (
+            EmployeeOnboardingProcess.objects.filter(employee=emp)
+            .select_related('offer_letter', 'company')
+            .prefetch_related('tasks', 'tasks__document')
+            .first()
+        )
+        today = timezone.now().date()
+        today_attendance = AttendanceRecord.objects.filter(employee=emp, date=today).first()
+
         return Response({
             'employee': EmployeeSerializer(emp).data,
             'active_contract': EmploymentContractSerializer(active_contract).data if active_contract else None,
             'leave_balances': EmployeeLeaveBalanceSerializer(leave_balances, many=True).data,
             'recent_payrolls': MonthlyPayrollRecordSerializer(recent_payrolls, many=True).data,
             'recent_attendance_summaries': MonthlyAttendanceSummarySerializer(recent_attendance_summaries, many=True).data,
+            'onboarding_process': EmployeeOnboardingProcessSerializer(onboarding).data if onboarding else None,
+            'today_attendance': AttendanceRecordSerializer(today_attendance).data if today_attendance else None,
         })
+
+
+class EmployeeSubmitOnboardingTaskView(APIView):
+    """
+    Cổng tự phục vụ dành cho nhân sự nộp tài liệu số (CCCD, Bằng cấp)
+    hoặc cập nhật thông tin tài khoản ngân hàng / mã số thuế cho quy trình Onboarding.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, task_id):
+        emp = Employee.objects.filter(user=request.user, status__in=['ACTIVE', 'PROBATION']).select_related('company').first()
+        if not emp:
+            return Response({'detail': 'Không tìm thấy hồ sơ nhân sự.'}, status=status.HTTP_404_NOT_FOUND)
+
+        task = OnboardingTaskItem.objects.select_related('process', 'process__employee').filter(
+            id=task_id, process__employee=emp
+        ).first()
+        if not task:
+            return Response({'detail': 'Nhiệm vụ Onboarding không tồn tại hoặc không thuộc quyền của bạn.'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data
+        file_url = data.get('file_url')
+        document_type = data.get('document_type', 'OTHER')
+        name = data.get('name')
+
+        if file_url:
+            doc = EmployeeDocument.objects.create(
+                company=emp.company,
+                employee=emp,
+                document_type=document_type,
+                name=name or task.title,
+                file_url=file_url,
+            )
+            task.document = doc
+
+        if 'bank_name' in data or 'bank_account_number' in data:
+            if data.get('bank_name'):
+                emp.bank_name = data['bank_name'].strip()
+            if data.get('bank_account_number'):
+                emp.bank_account_number = data['bank_account_number'].strip()
+            if data.get('bank_account_holder'):
+                emp.bank_account_holder = data['bank_account_holder'].strip()
+            emp.save(update_fields=['bank_name', 'bank_account_number', 'bank_account_holder', 'update_at'])
+            task.is_completed = True
+            task.completed_at = timezone.now()
+            task.completed_by = request.user
+
+        if 'tax_id' in data:
+            emp.tax_id = data.get('tax_id', '').strip()
+            if 'dependents_count' in data:
+                try:
+                    emp.dependents_count = int(data.get('dependents_count', 0))
+                except (ValueError, TypeError):
+                    pass
+            emp.save(update_fields=['tax_id', 'dependents_count', 'update_at'])
+            task.is_completed = True
+            task.completed_at = timezone.now()
+            task.completed_by = request.user
+
+        task.rejection_note = ""
+        task.save(update_fields=['document', 'rejection_note', 'is_completed', 'completed_at', 'completed_by', 'update_at'])
+
+        task.process.recalculate_progress()
+        return Response(OnboardingTaskItemSerializer(task).data, status=status.HTTP_200_OK)
+
+
+class EmployeePunchAttendanceView(APIView):
+    """
+    Cổng tự phục vụ dành cho nhân sự tự chấm công trực tuyến qua Web (Check-in / Check-out).
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        emp = Employee.objects.filter(user=request.user, status__in=['ACTIVE', 'PROBATION']).select_related('company').first()
+        if not emp:
+            return Response({'detail': 'Không tìm thấy hồ sơ nhân sự.'}, status=status.HTTP_404_NOT_FOUND)
+
+        punch_type = request.data.get('punch_type', 'AUTO')
+        if punch_type not in ['CHECK_IN', 'CHECK_OUT', 'AUTO']:
+            punch_type = 'AUTO'
+
+        now = timezone.now()
+        bio_id = getattr(emp, 'employee_code', None) or str(emp.id)
+
+        punch_log = BiometricPunchLog.objects.create(
+            company=emp.company,
+            employee=emp,
+            biometric_id=bio_id,
+            punch_time=now,
+            punch_type=punch_type,
+            source='WEB_APP',
+        )
+
+        from apps.hrm.services import process_punch_logs_for_date
+        process_punch_logs_for_date(emp.company, now.date())
+
+        record = AttendanceRecord.objects.filter(employee=emp, date=now.date()).first()
+        return Response({
+            'message': 'Chấm công thành công.',
+            'punch_log': BiometricPunchLogSerializer(punch_log).data,
+            'today_attendance': AttendanceRecordSerializer(record).data if record else None,
+        }, status=status.HTTP_200_OK)
 
 
 class WorkShiftViewSet(viewsets.ModelViewSet):

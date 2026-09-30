@@ -23,18 +23,18 @@ describe('CustomControlBar & Action Buttons Loading Feedback State', () => {
       expect(aiLayoutSource).toContain('disabled={micLoading}');
       expect(aiLayoutSource).toContain('if (micLoading) return;');
       expect(aiLayoutSource).toContain('setMicLoading(true);');
-      expect(aiLayoutSource).toContain('await localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);');
+      expect(aiLayoutSource).toContain('setMicrophoneEnabled(!effectiveMicEnabled)');
       expect(aiLayoutSource).toContain('setMicLoading(false);');
-      expect(aiLayoutSource).toContain('micLoading ? faSpinner : (isMicrophoneEnabled ? faMicrophone : faMicrophoneSlash)');
+      expect(aiLayoutSource).toContain('micLoading ? faSpinner : (effectiveMicEnabled ? faMicrophone : faMicrophoneSlash)');
     });
 
     it('handles camera toggle with loading feedback, async guard, and disabled state', () => {
       expect(aiLayoutSource).toContain('disabled={camLoading}');
       expect(aiLayoutSource).toContain('if (camLoading) return;');
       expect(aiLayoutSource).toContain('setCamLoading(true);');
-      expect(aiLayoutSource).toContain('await localParticipant.setCameraEnabled(!isCameraEnabled);');
+      expect(aiLayoutSource).toContain('setCameraEnabled(willEnable)');
       expect(aiLayoutSource).toContain('setCamLoading(false);');
-      expect(aiLayoutSource).toContain('camLoading ? faSpinner : (isCameraEnabled ? faVideo : faVideoSlash)');
+      expect(aiLayoutSource).toContain('camLoading ? faSpinner : (effectiveCamEnabled ? faVideo : faVideoSlash)');
     });
 
     it('handles screen share toggle with loading feedback, async guard, and disabled state', () => {

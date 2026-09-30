@@ -33,7 +33,7 @@ const UnifiedAuthCard = styled(Card)(({ theme }) => ({
   boxShadow: 'none',
   border: 'none',
   [theme.breakpoints.up('sm')]: {
-    borderRadius: '24px',
+    borderRadius: 0,
     boxShadow: '0 20px 60px -15px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(226, 232, 240, 0.8)',
   },
   transition: 'all 0.3s ease',
@@ -322,7 +322,7 @@ const EmployerSignUp = () => {
                       border: '1px solid #DBEAFE',
                       px: 1.5,
                       py: 0.6,
-                      borderRadius: '8px',
+                      borderRadius: 0,
                     }}
                   >
                     <Typography
@@ -406,7 +406,7 @@ const EmployerSignUp = () => {
                     icon={<InfoOutlinedIcon sx={{ color: '#2563EB', mt: 0.25 }} />}
                     sx={{
                       mb: 2.5,
-                      borderRadius: '16px',
+                      borderRadius: 0,
                       border: '1px solid #BFDBFE',
                       backgroundColor: '#EFF6FF',
                       '& .MuiAlert-message': { width: '100%' },
@@ -437,7 +437,7 @@ const EmployerSignUp = () => {
                           fontSize: '13px',
                           py: 0.75,
                           px: 1.75,
-                          borderRadius: '10px',
+                          borderRadius: 0,
                           background: 'linear-gradient(135deg, #1E40AF 0%, #2563EB 100%)',
                           boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
                           '&:hover': {
