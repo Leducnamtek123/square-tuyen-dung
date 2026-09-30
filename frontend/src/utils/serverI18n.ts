@@ -145,7 +145,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   'employer.chat':            { vi: 'Hộp thư kết nối ứng viên', en: 'Candidate Messages' },
   'employer.pricing':         { vi: 'Bảng giá dịch vụ tuyển dụng & Đăng tin', en: 'Pricing Plans & Job Posting' },
   'employer.service':         { vi: 'Dịch vụ tuyển dụng nhân sự chuyên sâu', en: 'Recruitment Solutions & Services' },
-  'employer.introduce':       { vi: 'Giới thiệu giải pháp tuyển dụng toàn diện', en: 'Comprehensive Recruitment Solution Overview' },
+  'employer.introduce':       { vi: 'Giới Thiệu Năng Lực & Sứ Mệnh | InfoHR', en: 'Capability & Tech Mission Profile | InfoHR' },
   'employer.faq':             { vi: 'Câu hỏi thường gặp dành cho doanh nghiệp', en: 'Employer Frequently Asked Questions' },
   'employer.agent-assistants': { vi: 'Trợ lý tuyển dụng AI AILA thông minh', en: 'AILA AI Hiring Assistant' },
   'employer.support':         { vi: 'Trung tâm trợ giúp & Hỗ trợ tuyển dụng', en: 'Help Center & Employer Support' },

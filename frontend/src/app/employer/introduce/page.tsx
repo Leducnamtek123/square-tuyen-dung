@@ -3,7 +3,9 @@ import { buildPageMetadata } from '@/utils/serverI18n';
 import IntroducePage from '@/views/employerPages/IntroducePage';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildPageMetadata('employer.introduce');
+  return buildPageMetadata('employer.introduce', {
+    title: 'Giới Thiệu Năng Lực & Sứ Mệnh | InfoHR',
+  });
 }
 
 export default function Page() {
