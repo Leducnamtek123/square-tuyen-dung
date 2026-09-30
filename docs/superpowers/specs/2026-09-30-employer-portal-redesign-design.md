@@ -1,236 +1,181 @@
 # Đặc Tả Kỹ Thuật: Tái Cấu Trúc Hệ Thống Trang Cổng Nhà Tuyển Dụng (ntd.infohr.vn)
 
-- **Ngày tạo**: 2026-09-30  
+- **Ngày cập nhật**: 2026-09-30  
 - **Dự án**: Square Tuyển Dụng (InfoHR) — Employer Portal  
-- **Trạng thái**: Bản thiết kế kiến trúc kỹ thuật (Design Spec)  
-- **Phạm vi tác động**: `frontend/src/app/employer/`, `frontend/src/views/employerPages/`, `frontend/src/middleware.ts`, `frontend/src/layouts/`
+- **Triết lý thiết kế**: Anti-AI Slop, B2B Technical Professional, Đánh thẳng vào nỗi đau thực tế của Nhà tuyển dụng ngành kỹ thuật (Xây dựng, Bất động sản, Kiến trúc, Cơ điện MEP).  
+- **Phạm vi tác động**:  
+  - Routing & Middleware: `frontend/src/middleware.ts`  
+  - Layout & Navigation: `frontend/src/layouts/components/commons/Header/index.tsx`, `LeftDrawer/index.tsx`  
+  - Pages & Views:  
+    + `frontend/src/app/employer/page.tsx` & `frontend/src/views/employerPages/EmployerHomePage/`  
+    + `frontend/src/app/employer/introduce/page.tsx` & `frontend/src/views/employerPages/IntroducePage/`  
+    + `frontend/src/app/employer/pricing/page.tsx` & `frontend/src/views/employerPages/PricingPage/`  
+    + `frontend/src/app/employer/service/page.tsx` (Redirect 301 về `/bao-gia`)
 
 ---
 
-## 1. Bối Cảnh & Vấn Đề Cần Giải Quyết
+## 1. Bối Cảnh, Nỗi Đau Thực Tế & Định Vị InfoHR
 
-Hiện tại, cổng Nhà tuyển dụng (`ntd.infohr.vn`) đang gặp phải các bất cập về phân tầng nội dung và điều hướng:
-1. **Trùng lặp route**: Cả URL Trang chủ (`/`) và Giới thiệu (`/gioi-thieu` / `/introduce`) đều đang cùng rewrite về một file duy nhất (`/employer/introduce`), khiến cổng NTD thiếu một trang chủ độc lập tối ưu phễu chuyển đổi tuyển dụng.
-2. **Trang Giới thiệu thiếu chiều sâu**: Nội dung hiện tại mang hơi hướng landing page bán hàng hơn là hồ sơ năng lực (company profile), công nghệ và tầm nhìn chuyên sâu trong 4 khối ngành trọng điểm (Xây dựng, Bất động sản, Thiết kế nội thất, Kỹ thuật MEP).
-3. **Phân mảnh Dịch vụ và Bảng giá**: Trang `Dịch vụ` (`/dich-vu` hay `ServicePage`) và `Bảng giá` (`/bao-gia` hay `PricingPage`) đang tách rời và đều ở dạng sơ sài. Doanh nghiệp khi xem dịch vụ cần biết ngay bảng giá và ngược lại.
-4. **Header Navigation chưa tối ưu**: Menu cổng NTD còn gom "Giới thiệu & Dịch vụ" thành một mục (`/employer/introduce`), gây khó khăn cho trải nghiệm tìm kiếm thông tin của doanh nghiệp.
+### 1.1. Nỗi đau thực tế của Nhà Tuyển Dụng trong 4 Khối Ngành Kỹ Thuật
+1. **Bội thực CV rác, thiếu người có nghề**:
+   - Đăng tin đại trà trên các trang việc làm chung (TopCV, VietnamWorks, CareerBuilder...) thì nhận về hàng trăm hồ sơ sinh viên mới ra trường hoặc trái ngành.
+   - Khi cần các vị trí then chốt như: *Chỉ huy trưởng công trình*, *Kỹ sư giám sát MEP*, *Kỹ sư QS bóc tách khối lượng cao tầng*, *Kiến trúc sư chủ trì hồ sơ thi công*... thì gần như không có ứng viên đạt yêu cầu nộp đơn.
+2. **Nỗi sợ ứng viên "vẽ" CV & HR không đủ chuyên môn kỹ thuật để hỏi**:
+   - Chuyên viên tuyển dụng HR thường tốt nghiệp ngành xã hội/quản trị, không có chuyên môn đọc bản vẽ, quy chuẩn thi công, hay xử lý xung đột MEP trên Navisworks/Revit.
+   - Khi chuyển thẳng CV lên cho Chỉ huy trưởng hoặc Giám đốc dự án phỏng vấn, lãnh đạo hiện trường mất nhiều giờ quý báu chỉ để phát hiện ứng viên "nói miệng thì hay nhưng không biết làm thật".
+3. **Mất tiền mua điểm mở CV nhưng toàn "hồ sơ chết"**:
+   - Mua các gói nạp điểm lọc CV tiền triệu, nhưng mở ra thì số điện thoại không liên lạc được, ứng viên đã đổi nghề, hoặc hồ sơ không còn nhu cầu tìm việc.
+4. **Chi phí Headhunter quá cao (1.5 - 2 tháng lương)**:
+   - Thuê công ty săn đầu người tốn từ 25 - 50 triệu/vị trí kỹ sư, không phù hợp để tuyển số lượng lớn cho các dự án mở rộng.
 
----
-
-## 2. Mục Tiêu Thiết Kế
-
-1. **Trang Chủ NTD (`ntd.infohr.vn/`)**: Là trang Landing Page chuyển đổi cao, tập trung vào:
-   - Giá trị giải pháp tuyển dụng toàn diện InfoHR.
-   - Thước đo hiệu quả (80% rút ngắn thời gian, 3.5x tỷ lệ tuyển thành công, 1.200+ doanh nghiệp tin dùng).
-   - Showroom trung tâm điều hành tuyển dụng số hóa 3D.
-   - Đột phá phỏng vấn Voice AI AILA 24/7 và AI Match Score.
-   - Quy trình tuyển dụng 4 bước tinh gọn và phễu kêu gọi đăng ký tuyển dụng ngay.
-2. **Trang Giới Thiệu NTD (`ntd.infohr.vn/gioi-thieu`)**: Là trang Hồ sơ năng lực & Tầm nhìn công nghệ tuyển dụng (Company & Tech Profile):
-   - Sứ mệnh kiến tạo nền tảng nhân tài thông minh cho 4 khối ngành trọng điểm.
-   - Giải pháp công nghệ cốt lõi: Voice AI Agent, Video Analysis & Smart AI Match Score.
-   - Hệ sinh thái mở rộng: Tuyển dụng + HRM Quản trị nhân sự + AILA Phỏng vấn.
-   - Đội ngũ chuyên gia, đối tác chiến lược và cam kết chất lượng dịch vụ.
-3. **Trang Dịch Vụ & Bảng Giá (`ntd.infohr.vn/bao-gia`)**: Gộp toàn bộ Dịch vụ vào Bảng giá:
-   - Phân tầng 1: Giới thiệu 3 trụ cột dịch vụ (Đăng tin tuyển dụng, Lọc CV chuyên ngành, Phỏng vấn AI AILA).
-   - Phân tầng 2: Bảng giá chi tiết với các gói: Khởi đầu (Starter), Tăng tốc (Professional), Doanh nghiệp (Enterprise), Gói mua lẻ tiện ích.
-   - Phân tầng 3: Bảng ma trận so sánh chi tiết tính năng (Comparison Matrix).
-   - Phân tầng 4: Form nhận tư vấn báo giá Enterprise tùy chỉnh & FAQ giải đáp thắc mắc.
-   - Tự động chuyển hướng (Redirect 301) từ `/dich-vu` và `/service` về `/bao-gia`.
-4. **Chuẩn hóa Header Navigation**:
-   - Menu cổng NTD gồm 5 mục: `[Trang chủ]` | `[Giới thiệu]` | `[Dịch vụ & Bảng giá]` | `[Tìm ứng viên]` | `[Hỗ trợ]`.
+### 1.2. InfoHR + AILA AI giải quyết triệt để như thế nào?
+1. **Chuyên môn hóa 4 khối ngành**: Hồ sơ ứng viên có thông tin dự án thực tế (quy mô dự án, cấp công trình), chứng chỉ hành nghề (Giám sát, Thiết kế, Định giá), kỹ năng phần mềm kỹ thuật (Revit, AutoCAD, BIM, Civil 3D, Plaxis).
+2. **AILA AI sơ loại kỹ thuật 24/7**:
+   - AILA đóng vai trò là Trợ lý phỏng vấn kỹ thuật sơ bộ: Tự động phỏng vấn ứng viên theo bộ câu hỏi tình huống công trường/dự án chuẩn hóa.
+   - Trả về cho HR **Phiếu đánh giá năng lực ứng viên (Scorecard)**: Điểm khớp JD, checklist chứng chỉ, mốc dự án đã làm, và file ghi âm trả lời tình huống thực tế. Lãnh đạo chỉ mất 2 phút nghe và duyệt trước khi mời gặp trực tiếp.
+3. **Bảo lưu & Minh bạch**: Chỉ tính phí khi ứng viên xác thực trạng thái đang tìm việc; hỗ trợ bảo hành hồ sơ nếu không liên lạc được.
+4. **Chi phí tối ưu**: Trả theo nhu cầu (gói tin đăng, gói điểm lọc có bảo đảm, gói lượt phỏng vấn AI), tiết kiệm 70% ngân sách tuyển dụng.
 
 ---
 
-## 3. Kiến Trúc Kỹ Thuật & Cấu Trúc File
+## 2. Nguyên Tắc Thiết Kế UI/UX: Loại Bỏ Hoàn Toàn Vẻ Ngoài "AI Slop"
 
-```
-frontend/
-├── src/
-│   ├── app/
-│   │   └── employer/
-│   │       ├── page.tsx                  # Trang chủ NTD -> render EmployerHomePage
-│   │       ├── introduce/
-│   │       │   └── page.tsx              # Trang Giới thiệu NTD -> render IntroducePage mới
-│   │       ├── pricing/
-│   │       │   └── page.tsx              # Trang Dịch vụ & Bảng giá -> render PricingPage mới
-│   │       └── service/
-│   │           └── page.tsx              # Tự động redirect về /employer/pricing
-│   ├── views/
-│   │   └── employerPages/
-│   │       ├── EmployerHomePage/         # View mới: Landing Page chuyển đổi NTD
-│   │       │   ├── index.tsx
-│   │       │   └── __tests__/
-│   │       ├── IntroducePage/            # View tái cấu trúc: Hồ sơ năng lực & Công nghệ InfoHR
-│   │       │   ├── index.tsx
-│   │       │   └── __tests__/
-│   │       └── PricingPage/              # View nâng cấp: Dịch vụ & Bảng giá toàn diện
-│   │           ├── index.tsx
-│   │           └── __tests__/
-│   ├── layouts/
-│   │   └── components/
-│   │       └── commons/
-│   │           ├── Header/
-│   │           │   └── index.tsx         # Cập nhật menu HOST_NAME.EMPLOYER_PROJECT
-│   │           └── LeftDrawer/
-│   │               └── index.tsx         # Cập nhật menu mobile NTD
-│   └── middleware.ts                     # Cập nhật EMPLOYER_EXACT_MAP & redirect /dich-vu -> /bao-gia
-```
+1. **Bảng màu B2B Modern Technical**:
+   - Nền trắng tinh khiết `#FFFFFF` và xám kỹ thuật `#F8FAFC`.
+   - Đường kẻ phân cách mảnh sắc sảo `#E2E8F0`, không dùng bóng đổ đen thô kệch.
+   - Màu chủ đạo: Xanh Navy công nghiệp `#0F172A` & `#1E3A8A`, Xanh điểm nhấn `#2563EB`, Đỏ kỹ thuật AILA `#DC2626`.
+   - **CẤM**: Các khối thẻ pastel xanh đỏ tím vàng rực rỡ như đồ chơi trẻ em (`#EFF6FF`, `#FEF2F2`, `#ECFDF5`, `#FEF3C7`).
+2. **Giao diện Sản Phẩm Thực Tế (Product Mockup) thay vì 3D trừu tượng**:
+   - Thể hiện trực quan **Mẫu phiếu kết quả phỏng vấn sơ loại AILA (Candidate Evaluation Card)**:
+     + Tên ứng viên, vị trí (VD: *Kỹ sư Giám sát Cơ điện MEP - 4 năm kinh nghiệm*).
+     + Điểm Match Score kỹ thuật: *86/100*.
+     + Thẩm định chứng chỉ: Chứng chỉ hành nghề Giám sát MEP Hạng II (Bộ Xây dựng), Kỹ năng Revit MEP & Navisworks.
+     + Đoạn audio sóng âm (waveform) mô phỏng câu trả lời tình huống: *"Quy trình xử lý xung đột ống gió HVAC với dầm bê tông..."*.
+3. **Nội dung thực tế, không dùng số liệu "vẽ"**:
+   - Bỏ các số liệu sáo rỗng vô căn cứ kiểu `80%`, `3.5x`, `95%`, `1.200+`.
+   - Thay bằng giá trị vận hành thực tế:
+     + *"Tiết kiệm 15-20 giờ phỏng vấn sơ loại cho mỗi vị trí kỹ sư."*
+     + *"100% hồ sơ có thông tin dự án thực tế & chứng chỉ hành nghề."*
+     + *"Nhận phiếu đánh giá năng lực AILA trong vòng 3 phút sau phỏng vấn."*
+4. **Nhịp điệu bố cục bất đối xứng (Asymmetry & Rhythm)**:
+   - Tránh việc rải 4 thẻ giống nhau liên tục ở mọi phân tầng.
+   - Áp dụng bố cục Split screen (Vấn đề bên trái - Bằng chứng giải pháp bên phải), các bảng so sánh thực tế, và quy trình dòng chảy hiện đại.
 
 ---
 
-## 4. Chi Tiết Thiết Kế Từng Trang
+## 3. Kiến Trúc Cổng NTD (ntd.infohr.vn)
 
-### 4.1. Trang Chủ NTD (`EmployerHomePage`)
-* **URL**: `https://ntd.infohr.vn/` (hoặc `/employer` trên localhost/main domain).
-* **Mục tiêu**: Kích thích doanh nghiệp đăng ký tài khoản, đăng tin hoặc liên hệ trải nghiệm AI.
-* **Các khối thành phần (Sections)**:
-  1. **Hero Banner 3D**:
-     - Chip: "GIẢI PHÁP TUYỂN DỤNG & AI MATCHING DOANH NGHIỆP".
-     - H1: "Bứt Phá Hiệu Quả Tuyển Dụng Nhân Tài Cùng InfoHR".
-     - Subtitle: Hệ sinh thái tuyển dụng thông minh cho 4 khối ngành trọng điểm và phỏng vấn sơ loại tự động AILA AI.
-     - 4 Chips ngành: Xây dựng, Bất động sản, Kiến trúc/Nội thất, Kỹ thuật MEP.
-     - Action Buttons: `[Đăng Ký Tuyển Dụng Ngay]` (trỏ `/dang-ky`), `[Xem Bảng Giá Dịch Vụ]` (trỏ `/bao-gia`).
-     - 3D Showcase Image: Bảng điều hành tuyển dụng doanh nghiệp kèm 4 mini anchors (Đăng tuyển đa kênh, AI Match Score, AILA Voice AI, Doanh nghiệp xác thực).
-  2. **Partner Logo Carousel**: Marquee các thương hiệu và tập đoàn đồng hành.
-  3. **Thước Đo Hiệu Quả (Key Metrics)**:
-     - 80% rút ngắn thời gian sơ tuyển.
-     - 3.5x tăng tỷ lệ tuyển dụng thành công.
-     - 95% độ chính xác thuật toán AI Match Score.
-     - 1.200+ doanh nghiệp tin cậy đồng hành.
-  4. **Hai Trụ Cột Giải Pháp Trọng Tâm**:
-     - Trụ cột 1: Cổng đăng tin tuyển dụng chuẩn hóa & Bộ lọc ứng viên nâng cao.
-     - Trụ cột 2: AILA Voice AI — Phỏng vấn & Chấm điểm ứng viên tự động 24/7.
-  5. **Bento Grid: Vì Sao Doanh Nghiệp Chọn InfoHR**:
-     - Kho ứng viên 4 khối ngành chuẩn xác thực.
-     - AI So khớp năng lực & phỏng vấn khách quan không thiên vị.
-     - ATS CRM theo dõi toàn bộ đường ống ứng viên trên một màn hình.
-     - Chính sách bảo hành tuyển dụng & chuyên viên hỗ trợ 24/7.
-  6. **Quy Trình Tuyển Dụng 4 Bước Tinh Gọn**:
-     - Bước 1: Khởi tạo & Xác thực Doanh nghiệp uy tín.
-     - Bước 2: Đăng tin tuyển dụng chuẩn SEO nhanh chóng.
-     - Bước 3: AI Sàng lọc & Phỏng vấn tự động 24/7.
-     - Bước 4: Tiếp nhận & Onboarding nhân tài.
-  7. **Banner CTA Đáy Trang**: Kêu gọi đăng ký ngay, hiển thị 3 tín hiệu tin cậy (Tặng tin đăng trải nghiệm, Bảo mật chuẩn Quốc tế, Hỗ trợ 24/7).
+### 3.1. Phân Tách 3 Trang Riêng Biệt
 
-### 4.2. Trang Giới Thiệu NTD (`IntroducePage` mới)
-* **URL**: `https://ntd.infohr.vn/gioi-thieu` (hoặc `/employer/introduce`).
-* **Mục tiêu**: Hồ sơ năng lực công nghệ và định vị uy tín thương hiệu InfoHR.
-* **Các khối thành phần (Sections)**:
-  1. **Hero Section**:
-     - Chip: "VỀ CHÚNG TÔI — INFOHR ECOSYSTEM".
-     - H1: "Kiến Tạo Chuẩn Mực Tuyển Dụng Mới Bằng Công Nghệ & Trí Tuệ Nhân Tạo".
-     - Mô tả tầm nhìn chiến lược: Kết nối nguồn lực tinh hoa trong các ngành kinh tế kỹ thuật trọng điểm với các tập đoàn và doanh nghiệp tiên phong.
-  2. **Sứ Mệnh & Tầm Nhìn (Mission & Vision)**:
-     - Thẻ Sứ mệnh: Tối ưu hóa 90% chi phí và thời gian tuyển dụng cho doanh nghiệp thông qua AI và dữ liệu minh bạch.
-     - Thẻ Tầm nhìn: Trở thành nền tảng tuyển dụng & đánh giá năng lực ứng viên bằng Voice AI hàng đầu khu vực.
-     - Thẻ Giá trị cốt lõi: "Chính trực - Đột phá công nghệ - Lấy khách hàng làm trọng tâm - Bền vững".
-  3. **Chuyên Môn Hóa 4 Khối Ngành Trọng Điểm**:
-     - Giới thiệu sâu về giải pháp dữ liệu và nhân lực cho:
-       * Khối Xây dựng (Kỹ sư công trường, Giám sát, Chỉ huy trưởng, Dự toán QS).
-       * Khối Bất động sản (Quản lý dự án, Chuyên viên kinh doanh cao cấp, Thẩm định).
-       * Khối Kiến trúc & Thiết kế nội thất (Kiến trúc sư chủ trì, Thiết kế 3D, Diễn họa).
-       * Khối Cơ điện MEP & Kỹ thuật công trình (Kỹ sư MEP, HVAC, Hệ thống điện - nước).
-  4. **Đột Phá Công Nghệ AILA AI**:
-     - Giới thiệu công nghệ Voice AI thời gian thực (WebRTC + LLM + STT/TTS).
-     - Thuật toán chấm điểm Match Score khách quan dựa trên JD và khung năng lực tiêu chuẩn.
-     - Hệ sinh thái liên thông: InfoHR Portal + InfoHR HRM Engine + AILA AI Voice Center.
-  5. **Cam Kết Chất Lượng & Bảo Mật Dữ Liệu**:
-     - Cam kết bảo mật thông tin hồ sơ doanh nghiệp và ứng viên chuẩn mã hóa dữ liệu.
-     - Chính sách hỗ trợ đổi ứng viên bảo hành nếu ứng viên không phù hợp trong thời gian thử việc.
-  6. **Đội Ngũ Cố Vấn & Chuyên Gia Đồng Hành**: Khối giới thiệu chuyên môn và năng lực vận hành.
-  7. **CTA Hợp Tác**: Đặt lịch tư vấn giải pháp tuyển dụng tùy chỉnh cho doanh nghiệp lớn.
+```mermaid
+flowchart TD
+    subgraph NTD_Portal["Cổng Nhà Tuyển Dụng InfoHR (ntd.infohr.vn)"]
+        Home["1. Trang Chủ NTD (ntd.infohr.vn/)\n• Tối ưu chuyển đổi Nhà tuyển dụng\n• Đối thoại trực diện nỗi đau tuyển dụng kỹ thuật\n• Mockup thực tế AILA Candidate Scorecard\n• Kho ứng viên 4 khối ngành trọng điểm\n• 3 Bước tiếp nhận ứng viên đã sàng lọc\n• CTA Đăng ký / Trải nghiệm AI"]
+        About["2. Trang Giới Thiệu (ntd.infohr.vn/gioi-thieu)\n• Câu chuyện tại sao InfoHR ra đời\n• Khắc phục điểm yếu tuyển dụng ngành kỹ thuật\n• Tiêu chuẩn thẩm định hồ sơ & chứng chỉ hành nghề\n• Nền tảng công nghệ Voice AI thời gian thực AILA\n• Cam kết bảo mật & chính sách đồng hành"]
+        Pricing["3. Trang Dịch Vụ & Bảng Giá (ntd.infohr.vn/bao-gia)\n• Tự động redirect 301 từ /dich-vu và /service\n• Trụ cột dịch vụ: Tin đăng, Lọc CV bảo đảm, Phỏng vấn AI\n• Bảng giá các gói rõ ràng minh bạch\n• Bảng ma trận so sánh chi tiết tính năng\n• Form báo giá giải pháp Enterprise theo yêu cầu"]
+    end
 
-### 4.3. Trang Dịch Vụ & Bảng Giá (`PricingPage` toàn diện)
-* **URL**: `https://ntd.infohr.vn/bao-gia` (hoặc `/employer/pricing`).
-* **Mục tiêu**: Minh bạch hóa toàn bộ các gói dịch vụ và bảng giá, giúp doanh nghiệp dễ dàng chọn gói hoặc gửi yêu cầu báo giá.
-* **Các khối thành phần (Sections)**:
-  1. **Hero Section**:
-     - Chip: "BẢNG GIÁ & DỊCH VỤ MINH BẠCH".
-     - H1: "Giải Pháp Dịch Vụ & Gói Tuyển Dụng Linh Hoạt Cho Doanh Nghiệp".
-     - Subtitle: Lựa chọn gói đăng tin, lọc hồ sơ hoặc phỏng vấn AI tối ưu theo nhu cầu tuyển dụng thực tế.
-  2. **Tổng Quan 3 Trụ Cột Dịch Vụ Cốt Lõi**:
-     - Dịch vụ Đăng tin tuyển dụng Top 1 chuyên mục & Đẩy tin tự động.
-     - Dịch vụ Lọc & Tiếp cận kho hồ sơ CV ứng viên đã xác thực bằng cấp.
-     - Dịch vụ Trợ lý phỏng vấn Voice AI AILA 24/7 & Báo cáo đánh giá ứng viên.
-  3. **Thẻ Các Gói Giá Tuyển Dụng (Pricing Cards)**:
-     - **Gói Khởi Đầu (Starter)**: Phù hợp doanh nghiệp SME tuyển dụng định kỳ (3 tin đăng, 20 điểm lọc CV, hỗ trợ cơ bản).
-     - **Gói Tăng Tốc (Professional - Gói Nổi Bật / Khuyên Dùng)**: Dành cho doanh nghiệp đang mở rộng quy mô (10 tin đăng Top 1, 100 điểm lọc CV chất lượng cao, 50 lượt phỏng vấn AILA AI, huy hiệu Xác thực doanh nghiệp uy tín).
-     - **Gói Doanh Nghiệp (Enterprise)**: Dành cho tập đoàn (Không giới hạn tin đăng, tích hợp ATS CRM, kịch bản AILA AI thiết kế riêng, chuyên viên tư vấn tài khoản 1-on-1).
-     - **Thẻ Mua Thêm Tiện Ích**: Gói mua thêm lượt phỏng vấn AI, Gói mở khóa xem CV theo điểm.
-  4. **Bảng Ma Trận So Sánh Tính Năng (Feature Comparison Matrix)**:
-     - Bảng so sánh chi tiết giữa các gói: Số lượng tin, Vị trí hiển thị, Lượt lọc CV, Phỏng vấn AI, Hỗ trợ kỹ thuật, Báo cáo chuyên sâu.
-  5. **Form Đăng Ký Tư Vấn Doanh Nghiệp (Enterprise Inquiry Form)**:
-     - Nhập tên doanh nghiệp, số điện thoại, quy mô tuyển dụng, nhu cầu cụ thể.
-     - Cam kết liên hệ lại trong vòng 15 phút làm việc.
-  6. **Câu Hỏi Thường Gặp (FAQ Accordion)**:
-     - Quy trình thanh toán và xuất hóa đơn VAT điện tử.
-     - Chính sách bảo hành tin đăng và bảo lưu số lượt lọc CV.
-     - Cách thức hoạt động của AILA AI trong phỏng vấn sơ loại.
-     - Doanh nghiệp có được dùng thử miễn phí không?
+    Nav["Header Navigation NTD\n[Trang chủ] | [Giới thiệu] | [Dịch vụ & Bảng giá] | [Tìm ứng viên] | [Hỗ trợ]"]
+    Nav --> Home
+    Nav --> About
+    Nav --> Pricing
+```
+
+### 3.2. Cấu Trúc File & Directory
+* `frontend/src/views/employerPages/EmployerHomePage/index.tsx`: View Trang chủ NTD mới.
+* `frontend/src/app/employer/page.tsx`: Render `EmployerHomePage`.
+* `frontend/src/views/employerPages/IntroducePage/index.tsx`: View Giới thiệu mới (hồ sơ năng lực, sứ mệnh, thẩm định kỹ thuật).
+* `frontend/src/app/employer/introduce/page.tsx`: Render `IntroducePage`.
+* `frontend/src/views/employerPages/PricingPage/index.tsx`: View Dịch vụ & Bảng giá toàn diện (Gói cước, so sánh, form liên hệ).
+* `frontend/src/app/employer/pricing/page.tsx`: Render `PricingPage`.
+* `frontend/src/app/employer/service/page.tsx`: Redirect 301 về `/employer/pricing`.
+* `frontend/src/middleware.ts`: Cập nhật `EMPLOYER_EXACT_MAP` (`/` -> `/employer`, `/gioi-thieu` -> `/employer/introduce`, `/bao-gia` -> `/employer/pricing`, `/dich-vu` -> `/employer/pricing`).
+* `frontend/src/layouts/components/commons/Header/index.tsx`: Cập nhật menu `HOST_NAME.EMPLOYER_PROJECT`.
+* `frontend/src/layouts/components/commons/LeftDrawer/index.tsx`: Đồng bộ menu mobile.
 
 ---
 
-## 5. Quy Chuẩn Điều Hướng (Routing & Middleware)
+## 4. Chi Tiết Nội Dung Từng Trang
 
-Trong `frontend/src/middleware.ts`:
-```ts
-const EMPLOYER_EXACT_MAP: Record<string, string> = {
-  '/': '/employer',                          // Trang chủ NTD -> /employer (EmployerHomePage)
-  '/gioi-thieu': '/employer/introduce',      // Trang Giới thiệu NTD -> /employer/introduce (IntroducePage)
-  '/introduce': '/employer/introduce',
-  '/bao-gia': '/employer/pricing',           // Trang Dịch vụ & Bảng giá -> /employer/pricing (PricingPage)
-  '/pricing': '/employer/pricing',
-  // Redirect 301 tự động /dich-vu và /service về /bao-gia
-  '/dich-vu': '/employer/pricing',
-  '/service': '/employer/pricing',
-  ...
-};
-```
+### Trang 1: Trang Chủ NTD (`EmployerHomePage`)
+1. **Hero Section (B2B Split Layout)**:
+   - **Bên trái**:
+     - Label: `TUYỂN DỤNG NHÂN SỰ KỸ THUẬT & CHUYÊN MÔN`.
+     - Tiêu đề: **"Đừng để bộ phận HR mất hàng tuần sàng lọc hàng trăm CV không đúng chuyên ngành."**
+     - Mô tả: Nền tảng tuyển dụng chuyên sâu cho 4 khối ngành **Xây dựng • Bất động sản • Kiến trúc nội thất • Kỹ thuật MEP**, tích hợp trợ lý Voice AI **AILA** tự động phỏng vấn sơ loại năng lực kỹ thuật trước khi chuyển tới lãnh đạo.
+     - Action CTAs: `[Đăng Ký Đăng Tuyển]` (trỏ `/dang-ky`), `[Xem Bảng Giá Dịch Vụ]` (trỏ `/bao-gia`).
+     - Tín hiệu tin cậy: Tặng tin đăng tuyển trải nghiệm • Cam kết hồ sơ thật • Hỗ trợ thiết lập kịch bản phỏng vấn kỹ thuật.
+   - **Bên phải**: **Mockup Giao diện Thực tế: AILA Candidate Scorecard**:
+     - Thẻ hồ sơ ứng viên: *Nguyễn Văn Cường — Kỹ sư Giám sát MEP (4 năm KN)*.
+     - Vị trí ứng tuyển: *Chỉ huy phó MEP — Dự án Cao ốc Văn phòng Hạng A*.
+     - Match Score: *88% khớp yêu cầu*.
+     - Checklist: Chứng chỉ Giám sát MEP Hạng II (Đã xác thực) • Sử dụng thành thạo Revit MEP & Navisworks • Sẵn sàng làm việc ngoài giờ.
+     - Audio Player mini: Câu trả lời thực tế tình huống xung đột đường ống tại công trường.
+     - Nút duyệt: `[Chuyển Giám Đốc Dự Án Phỏng Vấn Vòng 2]`.
+2. **Vấn Đề & Giải Pháp (The Contrast Grid)**:
+   - Bảng đối lập: Tuyển dụng truyền thống (Ngập CV rác, HR không biết hỏi kỹ thuật, tốn tiền mua CV chết) vs InfoHR & AILA AI (Ứng viên chuyên ngành có chứng chỉ, AI hỏi sâu kỹ thuật, chỉ trả tiền cho hồ sơ có nhu cầu).
+3. **4 Khối Ngành Trọng Điểm**:
+   - Thẻ ngành Xây dựng: Kỹ sư hiện trường, Chỉ huy trưởng, Dự toán QS, An toàn HSE.
+   - Thẻ ngành Bất động sản: Quản lý dự án, Phát triển mặt bằng, Kinh doanh BĐS công nghiệp/cao cấp.
+   - Thẻ ngành Kiến trúc: KTS chủ trì, Triển khai hồ sơ kỹ thuật thi công, Thiết kế nội thất 3D.
+   - Thẻ ngành Kỹ thuật MEP: Kỹ sư cơ điện công trình, HVAC, Phòng cháy chữa cháy, Trạm biến áp.
+4. **Quy Trình 3 Bước Tinh Gọn**:
+   - Bước 1: Doanh nghiệp đăng tin và chọn tiêu chí năng lực kỹ thuật.
+   - Bước 2: AILA Voice AI tự động liên hệ ứng viên và phỏng vấn sơ loại tình huống 24/7.
+   - Bước 3: Lãnh đạo nhận Scorecard và file ghi âm, chỉ phỏng vấn trực tiếp các ứng viên đạt tiêu chuẩn.
+5. **CTA Chuyển Đổi Cuối Trang**:
+   - Kêu gọi đăng ký tài khoản doanh nghiệp hoặc gửi yêu cầu demo phỏng vấn AI.
 
-Trong `frontend/src/app/employer/page.tsx`:
-```tsx
-import type { Metadata } from 'next';
-import { buildPageMetadata } from '@/utils/serverI18n';
-import EmployerHomePage from '@/views/employerPages/EmployerHomePage';
+### Trang 2: Trang Giới Thiệu NTD (`IntroducePage` mới)
+1. **Hero Giới Thiệu**:
+   - Tiêu đề: **"Tại Sao InfoHR Ra Đời? — Lời Giải Cho Bài Toán Nhân Sự Ngành Kỹ Thuật."**
+   - Câu chuyện thực tế: Ngành Xây dựng, Bất động sản và Kỹ thuật công trình tại Việt Nam đang thiếu hụt trầm trọng nhân sự có năng lực thực chiến, trong khi các sàn việc làm đại trà không đáp ứng được yêu cầu thẩm định chuyên môn.
+2. **3 Trụ Cột Năng Lực Của InfoHR**:
+   - **Thẩm định hồ sơ chuyên môn**: Quy trình xác minh bằng cấp, chứng chỉ hành nghề và danh mục dự án đã tham gia.
+   - **Công nghệ Voice AI thời gian thực (AILA)**: Khả năng phỏng vấn tương tác bằng giọng nói tự nhiên, hỏi đáp tình huống chuyên môn theo TCVN và quy chuẩn xây dựng.
+   - **Hệ sinh thái liên thông**: Kết nối cổng Tuyển dụng InfoHR, Phần mềm Quản trị nhân sự InfoHR HRM, và Trung tâm đánh giá năng lực AILA.
+3. **Tiêu Chuẩn Đạo Đức & Bảo Mật Dữ Liệu**:
+   - Cam kết bảo mật thông tin dự án và bí mật kinh doanh của doanh nghiệp.
+   - Thuật toán chấm điểm khách quan, không thiên vị vùng miền, giới tính.
+4. **Cam Kết Đồng Hành Cùng Doanh Nghiệp**:
+   - Chính sách bảo hành tuyển dụng (hỗ trợ đổi hồ sơ thay thế nếu ứng viên nghỉ việc trong thời gian thử việc đối với các gói dịch vụ cam kết).
+   - Đội ngũ chuyên viên tư vấn hỗ trợ doanh nghiệp tối ưu JD và kịch bản phỏng vấn.
 
-export async function generateMetadata(): Promise<Metadata> {
-  return buildPageMetadata('employer.home');
-}
-
-export default function EmployerRootPage() {
-  return <EmployerHomePage />;
-}
-```
-
-Trong `frontend/src/app/employer/service/page.tsx`:
-```tsx
-import { redirect } from 'next/navigation';
-
-export default function ServiceRedirectPage() {
-  redirect('/employer/pricing');
-}
-```
-
-Trong `Header/index.tsx` cho `HOST_NAME.EMPLOYER_PROJECT`:
-```ts
-[HOST_NAME.EMPLOYER_PROJECT]: [
-  { id: '1', label: t('nav.home', 'Trang chủ'), path: localizeRoutePath('/', i18n.language) },
-  { id: '2', label: t('nav.aboutUs', 'Giới thiệu'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.INTRODUCE}`, i18n.language) },
-  { id: '3', label: t('nav.servicesAndPricing', 'Dịch vụ & Bảng giá'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language) },
-  { id: '4', label: t('nav.findCandidates', 'Tìm ứng viên'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true, isHighlight: true },
-  { id: '5', label: t('nav.support', 'Hỗ trợ'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
-]
-```
+### Trang 3: Trang Dịch Vụ & Bảng Giá (`PricingPage` toàn diện)
+1. **Hero Bảng Giá**:
+   - Tiêu đề: **"Dịch Vụ & Bảng Giá Tuyển Dụng Chuyên Ngành — Minh Bạch, Trả Theo Nhu Cầu."**
+   - Phụ đề: Không phụ phí ẩn, không ép mua gói lớn, chỉ trả tiền cho hồ sơ và dịch vụ mang lại giá trị thật.
+2. **Chi Tiết Các Gói Dịch Vụ**:
+   - **Gói 1: Đăng Tin Tuyển Dụng Chuyên Ngành (Job Posting)**:
+     + Hiển thị ưu tiên chuyên mục ngành.
+     + Đẩy tin tự động theo khung giờ vàng ứng viên tìm việc.
+     + Hỗ trợ tối ưu JD chuẩn kỹ thuật.
+   - **Gói 2: Điểm Lọc Hồ Sơ Bảo Đảm (Verified Resume Search)**:
+     + Tiếp cận kho CV có chứng chỉ hành nghề và thông tin dự án.
+     + Cam kết bảo lưu: Chỉ trừ điểm khi ứng viên nghe máy hoặc phản hồi; bù điểm nếu số thuê bao không liên lạc được.
+   - **Gói 3: Trợ Lý Phỏng Vấn Sơ Loại AILA AI (AI Voice Interviewer)**:
+     + Gói theo số lượng ứng viên (VD: 20 lượt, 50 lượt, 100 lượt).
+     + Tùy biến kịch bản câu hỏi kỹ thuật theo từng vị trí.
+     + Xuất báo cáo Scorecard năng lực và audio ghi âm chi tiết.
+   - **Gói 4: Combo Doanh Nghiệp (Enterprise Solution)**:
+     + Kết hợp toàn diện: Đăng tin không giới hạn + Điểm lọc CV số lượng lớn + AILA AI phỏng vấn độc quyền + Chuyên viên phụ trách riêng 1-on-1.
+3. **Bảng Ma Trận So Sánh Quyền Lợi Tính Năng (Feature Matrix)**:
+   - So sánh chi tiết từng tính năng giữa các gói: Số tin, vị trí top, số điểm CV, lượt phỏng vấn AI, thời gian bảo hành, hỗ trợ kỹ thuật.
+4. **Form Nhận Báo Giá Tùy Chỉnh Enterprise**:
+   - Doanh nghiệp điền thông tin nhu cầu tuyển dụng (số lượng, ngành nghề) để nhận báo giá chiết khấu trong 15 phút.
+5. **FAQ Dịch Vụ & Bảng Giá Thực Tế**:
+   - Làm sao để được bảo hành hoàn điểm khi ứng viên không nghe máy?
+   - AILA AI hỏi những gì và doanh nghiệp có được sửa câu hỏi không?
+   - Thanh toán và xuất hóa đơn VAT như thế nào?
 
 ---
 
-## 6. Kế Hoạch Kiểm Thử & Nghiệm Thu (Verification Plan)
+## 5. Kế Hoạch Triển Khai Chi Tiết
 
-1. **TypeScript & Linter**: Chạy `pnpm run lint` hoặc `tsc --noEmit` bảo đảm không có lỗi type.
-2. **Next.js Build Check**: Chạy kiểm tra build khô (`next build` hoặc tương đương) không lỗi server component / client component.
-3. **Route Check**:
-   - Truy cập `ntd.infohr.vn/` -> Hiển thị Trang chủ NTD mới.
-   - Truy cập `ntd.infohr.vn/gioi-thieu` -> Hiển thị Trang Giới thiệu mới (hồ sơ năng lực).
-   - Truy cập `ntd.infohr.vn/dich-vu` -> Tự động chuyển hướng về `ntd.infohr.vn/bao-gia`.
-   - Truy cập `ntd.infohr.vn/bao-gia` -> Hiển thị Trang Dịch vụ & Bảng giá toàn diện.
-4. **Responsive & Animation**: Kiểm tra animation GSAP mượt mà trên cả desktop và mobile, không có hydration mismatch hay overflow ngang.
+1. **Bước 1**: Cấu hình định tuyến & Middleware (`middleware.ts`, `service/page.tsx`).
+2. **Bước 2**: Xây dựng View `EmployerHomePage` (Trang chủ NTD mới, anti-slop, B2B technical, Scorecard mockup).
+3. **Bước 3**: Cập nhật `frontend/src/app/employer/page.tsx` render `EmployerHomePage`.
+4. **Bước 4**: Xây dựng View `IntroducePage` mới (Hồ sơ năng lực, sứ mệnh thực tế, thẩm định 4 ngành, công nghệ).
+5. **Bước 5**: Nâng cấp View `PricingPage` mới (Tích hợp Dịch vụ + Bảng giá + Bảng so sánh + Form Enterprise + FAQ).
+6. **Bước 6**: Cập nhật Header Navigation và LeftDrawer cổng NTD.
+7. **Bước 7**: Chạy Type check, Linting và Build verification theo Definition of Done.
