@@ -46,15 +46,8 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
-import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
-import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
-import StarRoundedIcon from '@mui/icons-material/StarRounded';
-import BoltRoundedIcon from '@mui/icons-material/BoltRounded';
-import BusinessRoundedIcon from '@mui/icons-material/BusinessRounded';
-import AddShoppingCartRoundedIcon from '@mui/icons-material/AddShoppingCartRounded';
-import HelpOutlineRoundedIcon from '@mui/icons-material/HelpOutlineRounded';
 import PhoneInTalkOutlinedIcon from '@mui/icons-material/PhoneInTalkOutlined';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
@@ -371,9 +364,9 @@ export default function PricingPage() {
       <Box
         component="section"
         sx={{
-          pt: { xs: 6, md: 9 },
-          pb: { xs: 6, md: 8 },
-          backgroundColor: '#FFFFFF',
+          pt: { xs: 7, md: 10 },
+          pb: { xs: 6, md: 9 },
+          background: 'radial-gradient(120% 80% at 50% 0%, #EFF6FF 0%, #FFFFFF 65%)',
           borderBottom: '1px solid #E2E8F0',
         }}
       >
@@ -384,14 +377,15 @@ export default function PricingPage() {
                 label="BẢNG GIÁ & DỊCH VỤ MINH BẠCH"
                 size="small"
                 sx={{
-                  backgroundColor: '#0F172A',
-                  color: '#FFFFFF',
+                  backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                  color: '#2563EB',
+                  border: '1px solid rgba(37, 99, 235, 0.25)',
                   fontWeight: 700,
                   fontSize: '0.75rem',
-                  letterSpacing: '0.08em',
-                  px: 1,
+                  letterSpacing: '0.06em',
+                  px: 1.5,
                   py: 0.5,
-                  borderRadius: '4px',
+                  borderRadius: '100px',
                 }}
               />
             </Box>
@@ -434,17 +428,19 @@ export default function PricingPage() {
                 onClick={handleScrollToSection('cac-goi-gia')}
                 endIcon={<ArrowDownwardRoundedIcon />}
                 sx={{
-                  backgroundColor: '#2563EB',
+                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                   color: '#FFFFFF',
                   px: 3.5,
                   py: 1.5,
                   fontSize: '0.95rem',
                   fontWeight: 700,
-                  borderRadius: '6px',
-                  boxShadow: 'none',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 16px rgba(37, 99, 235, 0.35)',
+                  textTransform: 'none',
+                  transition: 'all 0.25s ease',
                   '&:hover': {
-                    backgroundColor: '#1D4ED8',
-                    boxShadow: 'none',
+                    background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                    boxShadow: '0 6px 22px rgba(37, 99, 235, 0.45)',
                   },
                 }}
               >
@@ -455,14 +451,16 @@ export default function PricingPage() {
                 onClick={handleScrollToSection('dang-ky-tu-van')}
                 endIcon={<ArrowForwardRoundedIcon />}
                 sx={{
-                  borderColor: '#0F172A',
+                  borderColor: '#CBD5E1',
                   color: '#0F172A',
                   px: 3.5,
                   py: 1.5,
                   fontSize: '0.95rem',
                   fontWeight: 700,
-                  borderRadius: '6px',
-                  backgroundColor: 'transparent',
+                  borderRadius: '12px',
+                  backgroundColor: '#FFFFFF',
+                  textTransform: 'none',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
                     borderColor: '#2563EB',
                     color: '#2563EB',
@@ -482,22 +480,26 @@ export default function PricingPage() {
                     variant="outlined"
                     sx={{
                       height: '100%',
-                      p: 2.5,
-                      backgroundColor: '#F8FAFC',
+                      p: 2.75,
+                      backgroundColor: '#FFFFFF',
                       borderColor: '#E2E8F0',
-                      borderRadius: '8px',
+                      borderRadius: '16px',
                       textAlign: 'left',
-                      transition: 'border-color 0.2s ease',
-                      '&:hover': { borderColor: '#2563EB' },
+                      boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                      transition: 'all 0.25s ease',
+                      '&:hover': {
+                        borderColor: '#2563EB',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 10px 24px -6px rgba(15, 23, 42, 0.08)',
+                      },
                     }}
                   >
-                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                    <Stack direction="row" spacing={1.75} alignItems="flex-start">
                       <Box
                         sx={{
-                          p: 1,
-                          backgroundColor: '#FFFFFF',
-                          border: '1px solid #CBD5E1',
-                          borderRadius: '6px',
+                          p: 1.25,
+                          backgroundColor: '#EFF6FF',
+                          borderRadius: '10px',
                           color: '#2563EB',
                           display: 'flex',
                           alignItems: 'center',
@@ -527,22 +529,26 @@ export default function PricingPage() {
                     variant="outlined"
                     sx={{
                       height: '100%',
-                      p: 2.5,
-                      backgroundColor: '#F8FAFC',
+                      p: 2.75,
+                      backgroundColor: '#FFFFFF',
                       borderColor: '#E2E8F0',
-                      borderRadius: '8px',
+                      borderRadius: '16px',
                       textAlign: 'left',
-                      transition: 'border-color 0.2s ease',
-                      '&:hover': { borderColor: '#2563EB' },
+                      boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                      transition: 'all 0.25s ease',
+                      '&:hover': {
+                        borderColor: '#2563EB',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 10px 24px -6px rgba(15, 23, 42, 0.08)',
+                      },
                     }}
                   >
-                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                    <Stack direction="row" spacing={1.75} alignItems="flex-start">
                       <Box
                         sx={{
-                          p: 1,
-                          backgroundColor: '#FFFFFF',
-                          border: '1px solid #CBD5E1',
-                          borderRadius: '6px',
+                          p: 1.25,
+                          backgroundColor: '#F1F5F9',
+                          borderRadius: '10px',
                           color: '#0F172A',
                           display: 'flex',
                           alignItems: 'center',
@@ -572,22 +578,26 @@ export default function PricingPage() {
                     variant="outlined"
                     sx={{
                       height: '100%',
-                      p: 2.5,
-                      backgroundColor: '#F8FAFC',
+                      p: 2.75,
+                      backgroundColor: '#FFFFFF',
                       borderColor: '#E2E8F0',
-                      borderRadius: '8px',
+                      borderRadius: '16px',
                       textAlign: 'left',
-                      transition: 'border-color 0.2s ease',
-                      '&:hover': { borderColor: '#2563EB' },
+                      boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                      transition: 'all 0.25s ease',
+                      '&:hover': {
+                        borderColor: '#2563EB',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 10px 24px -6px rgba(15, 23, 42, 0.08)',
+                      },
                     }}
                   >
-                    <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                    <Stack direction="row" spacing={1.75} alignItems="flex-start">
                       <Box
                         sx={{
-                          p: 1,
-                          backgroundColor: '#FFFFFF',
-                          border: '1px solid #CBD5E1',
-                          borderRadius: '6px',
+                          p: 1.25,
+                          backgroundColor: '#FEF2F2',
+                          borderRadius: '10px',
                           color: '#DC2626',
                           display: 'flex',
                           alignItems: 'center',
@@ -618,6 +628,7 @@ export default function PricingPage() {
       </Box>
 
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
       {/* SECTION 2: 3 TRỤ CỘT DỊCH VỤ CỐT LÕI                                     */}
       {/* ========================================================================= */}
       <Box
@@ -636,13 +647,14 @@ export default function PricingPage() {
               label="HỆ SINH THÁI DỊCH VỤ CHUYÊN BIỆT"
               size="small"
               sx={{
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #CBD5E1',
-                color: '#0F172A',
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                border: '1px solid rgba(37, 99, 235, 0.25)',
+                color: '#2563EB',
                 fontWeight: 700,
                 fontSize: '0.75rem',
-                letterSpacing: '0.08em',
-                px: 1,
+                letterSpacing: '0.06em',
+                px: 1.5,
+                borderRadius: '100px',
               }}
             />
             <Typography
@@ -676,44 +688,78 @@ export default function PricingPage() {
                   flexDirection: 'column',
                   backgroundColor: '#FFFFFF',
                   borderColor: '#E2E8F0',
-                  borderRadius: '10px',
-                  p: { xs: 3, md: 3.5 },
-                  transition: 'all 0.25s ease',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
                   '&:hover': {
                     borderColor: '#2563EB',
                     transform: 'translateY(-4px)',
-                    boxShadow: '0 12px 24px -10px rgba(15, 23, 42, 0.08)',
+                    boxShadow: '0 16px 32px -10px rgba(15, 23, 42, 0.1)',
                   },
                 }}
               >
-                <Stack spacing={2.5} sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {/* Photographic Header */}
+                <Box sx={{ position: 'relative', height: 160, width: '100%', overflow: 'hidden' }}>
+                  <Box
+                    component="img"
+                    src="/images/employer/industry_construction.jpg"
+                    alt="Đăng tin tuyển dụng chuyên ngành"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.5s ease',
+                      '&:hover': { transform: 'scale(1.05)' },
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.15) 60%)',
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: 12,
+                      left: 16,
+                      right: 16,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <Box
                       sx={{
-                        p: 1.25,
+                        p: 1,
                         backgroundColor: '#0F172A',
                         color: '#FFFFFF',
-                        borderRadius: '8px',
+                        borderRadius: '10px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                       }}
                     >
-                      <PostAddOutlinedIcon />
+                      <PostAddOutlinedIcon fontSize="small" />
                     </Box>
                     <Chip
                       label="TIẾP CẬN ĐÚNG NGÀNH"
                       size="small"
                       sx={{
-                        backgroundColor: '#F1F5F9',
+                        backgroundColor: 'rgba(255, 255, 255, 0.92)',
                         color: '#0F172A',
                         fontWeight: 700,
                         fontSize: '0.7rem',
-                        borderRadius: '4px',
+                        borderRadius: '100px',
+                        backdropFilter: 'blur(4px)',
                       }}
                     />
                   </Box>
+                </Box>
 
+                <Stack spacing={2.5} sx={{ p: { xs: 2.75, md: 3 }, flexGrow: 1 }}>
                   <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.25rem', lineHeight: 1.35 }}>
                     Đăng tin tuyển dụng chuyên ngành & hiển thị ưu tiên giờ vàng
                   </Typography>
@@ -754,44 +800,78 @@ export default function PricingPage() {
                   flexDirection: 'column',
                   backgroundColor: '#FFFFFF',
                   borderColor: '#E2E8F0',
-                  borderRadius: '10px',
-                  p: { xs: 3, md: 3.5 },
-                  transition: 'all 0.25s ease',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
                   '&:hover': {
                     borderColor: '#2563EB',
                     transform: 'translateY(-4px)',
-                    boxShadow: '0 12px 24px -10px rgba(15, 23, 42, 0.08)',
+                    boxShadow: '0 16px 32px -10px rgba(15, 23, 42, 0.1)',
                   },
                 }}
               >
-                <Stack spacing={2.5} sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {/* Photographic Header */}
+                <Box sx={{ position: 'relative', height: 160, width: '100%', overflow: 'hidden' }}>
+                  <Box
+                    component="img"
+                    src="/images/employer/engineering_verify.jpg"
+                    alt="Điểm lọc hồ sơ CV bảo đảm có xác thực chứng chỉ hành nghề"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.5s ease',
+                      '&:hover': { transform: 'scale(1.05)' },
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.15) 60%)',
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: 12,
+                      left: 16,
+                      right: 16,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <Box
                       sx={{
-                        p: 1.25,
+                        p: 1,
                         backgroundColor: '#2563EB',
                         color: '#FFFFFF',
-                        borderRadius: '8px',
+                        borderRadius: '10px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                       }}
                     >
-                      <FactCheckOutlinedIcon />
+                      <FactCheckOutlinedIcon fontSize="small" />
                     </Box>
                     <Chip
                       label="100% HỒ SƠ THẬT"
                       size="small"
                       sx={{
-                        backgroundColor: '#F1F5F9',
+                        backgroundColor: 'rgba(255, 255, 255, 0.92)',
                         color: '#2563EB',
                         fontWeight: 700,
                         fontSize: '0.7rem',
-                        borderRadius: '4px',
+                        borderRadius: '100px',
+                        backdropFilter: 'blur(4px)',
                       }}
                     />
                   </Box>
+                </Box>
 
+                <Stack spacing={2.5} sx={{ p: { xs: 2.75, md: 3 }, flexGrow: 1 }}>
                   <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.25rem', lineHeight: 1.35 }}>
                     Điểm lọc hồ sơ CV bảo đảm có xác thực chứng chỉ hành nghề
                   </Typography>
@@ -832,44 +912,78 @@ export default function PricingPage() {
                   flexDirection: 'column',
                   backgroundColor: '#FFFFFF',
                   borderColor: '#E2E8F0',
-                  borderRadius: '10px',
-                  p: { xs: 3, md: 3.5 },
-                  transition: 'all 0.25s ease',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s ease',
                   '&:hover': {
                     borderColor: '#DC2626',
                     transform: 'translateY(-4px)',
-                    boxShadow: '0 12px 24px -10px rgba(15, 23, 42, 0.08)',
+                    boxShadow: '0 16px 32px -10px rgba(15, 23, 42, 0.1)',
                   },
                 }}
               >
-                <Stack spacing={2.5} sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {/* Photographic Header */}
+                <Box sx={{ position: 'relative', height: 160, width: '100%', overflow: 'hidden' }}>
+                  <Box
+                    component="img"
+                    src="/images/employer/voice_ai_interview.jpg"
+                    alt="Trợ lý phỏng vấn sơ loại AILA Voice AI 24/7"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.5s ease',
+                      '&:hover': { transform: 'scale(1.05)' },
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.15) 60%)',
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      bottom: 12,
+                      left: 16,
+                      right: 16,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
                     <Box
                       sx={{
-                        p: 1.25,
+                        p: 1,
                         backgroundColor: '#DC2626',
                         color: '#FFFFFF',
-                        borderRadius: '8px',
+                        borderRadius: '10px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                       }}
                     >
-                      <RecordVoiceOverOutlinedIcon />
+                      <RecordVoiceOverOutlinedIcon fontSize="small" />
                     </Box>
                     <Chip
                       label="CÔNG NGHỆ ĐỘT PHÁ"
                       size="small"
                       sx={{
-                        backgroundColor: '#F1F5F9',
+                        backgroundColor: 'rgba(255, 255, 255, 0.92)',
                         color: '#DC2626',
                         fontWeight: 700,
                         fontSize: '0.7rem',
-                        borderRadius: '4px',
+                        borderRadius: '100px',
+                        backdropFilter: 'blur(4px)',
                       }}
                     />
                   </Box>
+                </Box>
 
+                <Stack spacing={2.5} sx={{ p: { xs: 2.75, md: 3 }, flexGrow: 1 }}>
                   <Typography variant="h5" sx={{ fontWeight: 700, color: '#0F172A', fontSize: '1.25rem', lineHeight: 1.35 }}>
                     Trợ lý phỏng vấn sơ loại AILA Voice AI 24/7 & báo cáo Scorecard
                   </Typography>
@@ -921,12 +1035,14 @@ export default function PricingPage() {
               label="BẢNG GIÁ DỊCH VỤ MINH BẠCH"
               size="small"
               sx={{
-                backgroundColor: '#0F172A',
-                color: '#FFFFFF',
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                color: '#2563EB',
+                border: '1px solid rgba(37, 99, 235, 0.25)',
                 fontWeight: 700,
                 fontSize: '0.75rem',
-                letterSpacing: '0.08em',
-                px: 1,
+                letterSpacing: '0.06em',
+                px: 1.5,
+                borderRadius: '100px',
               }}
             />
             <Typography
@@ -960,11 +1076,16 @@ export default function PricingPage() {
                   flexDirection: 'column',
                   backgroundColor: '#FFFFFF',
                   borderColor: '#E2E8F0',
-                  borderRadius: '10px',
+                  borderRadius: '16px',
                   p: 3,
                   position: 'relative',
-                  transition: 'border-color 0.2s ease',
-                  '&:hover': { borderColor: '#CBD5E1' },
+                  boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                  transition: 'all 0.25s ease',
+                  '&:hover': {
+                    borderColor: '#CBD5E1',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 10px 24px -6px rgba(15, 23, 42, 0.08)',
+                  },
                 }}
               >
                 <Chip
@@ -977,7 +1098,7 @@ export default function PricingPage() {
                     fontWeight: 700,
                     fontSize: '0.7rem',
                     mb: 2,
-                    borderRadius: '4px',
+                    borderRadius: '100px',
                   }}
                 />
 
@@ -1022,11 +1143,13 @@ export default function PricingPage() {
                   variant="outlined"
                   fullWidth
                   sx={{
-                    borderColor: '#0F172A',
+                    borderColor: '#CBD5E1',
                     color: '#0F172A',
                     fontWeight: 700,
-                    py: 1.2,
-                    borderRadius: '6px',
+                    py: 1.25,
+                    borderRadius: '12px',
+                    textTransform: 'none',
+                    transition: 'all 0.2s ease',
                     '&:hover': {
                       borderColor: '#2563EB',
                       color: '#2563EB',
@@ -1041,22 +1164,18 @@ export default function PricingPage() {
 
             {/* Gói 2: Tăng Tốc (Professional) - GÓI NỔI BẬT / KHUYÊN DÙNG */}
             <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-              <Card
-                variant="outlined"
+              {/* Double-bezel radiant shell */}
+              <Box
                 className="gsap-pricing-card"
                 sx={{
                   height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  backgroundColor: '#FFFFFF',
-                  borderColor: '#2563EB',
-                  borderWidth: '2px',
-                  borderRadius: '10px',
-                  p: 3,
-                  position: 'relative',
-                  boxShadow: '0 12px 28px -10px rgba(37, 99, 235, 0.15)',
+                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+                  p: '2px',
+                  borderRadius: '18px',
+                  boxShadow: '0 20px 40px -10px rgba(37, 99, 235, 0.3), 0 0 0 1px rgba(37, 99, 235, 0.2)',
                   transform: { lg: 'scale(1.03)' },
                   zIndex: 2,
+                  position: 'relative',
                 }}
               >
                 <Box
@@ -1065,93 +1184,110 @@ export default function PricingPage() {
                     top: -14,
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    backgroundColor: '#2563EB',
+                    background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                     color: '#FFFFFF',
-                    px: 1.75,
+                    px: 2,
                     py: 0.5,
-                    borderRadius: '20px',
+                    borderRadius: '100px',
                     fontSize: '0.72rem',
                     fontWeight: 800,
                     letterSpacing: '0.04em',
-                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)',
+                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.4)',
                     whiteSpace: 'nowrap',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    zIndex: 3,
                   }}
                 >
                   KHUYÊN DÙNG — TIẾT KIỆM 40%
                 </Box>
 
-                <Chip
-                  label="PHỔ BIẾN NHẤT"
-                  size="small"
+                <Card
+                  variant="outlined"
                   sx={{
-                    alignSelf: 'flex-start',
-                    backgroundColor: '#F1F5F9',
-                    color: '#2563EB',
-                    fontWeight: 700,
-                    fontSize: '0.7rem',
-                    mb: 2,
-                    mt: 1,
-                    borderRadius: '4px',
-                  }}
-                />
-
-                <Typography variant="h5" sx={{ fontWeight: 800, color: '#0F172A', mb: 1 }}>
-                  Gói Tăng Tốc (Professional)
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#64748B', mb: 2.5, minHeight: 40, lineHeight: 1.4 }}>
-                  Giải pháp tối ưu cho tổng thầu, công ty kiến trúc & MEP cần tuyển dụng liên tục.
-                </Typography>
-
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h4" sx={{ fontWeight: 800, color: '#2563EB' }}>
-                    4.500.000 đ
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
-                    / gói 60 ngày
-                  </Typography>
-                </Box>
-
-                <Divider sx={{ borderColor: '#E2E8F0', mb: 2.5 }} />
-
-                <Stack spacing={1.5} sx={{ flexGrow: 1, mb: 3 }}>
-                  {[
-                    '10 Tin đăng vị trí Top ngành ưu tiên',
-                    '100 Điểm lọc hồ sơ CV (Hoàn 100% nếu số chết)',
-                    '50 Lượt trợ lý AILA Voice AI phỏng vấn sơ loại',
-                    'Huy hiệu "Doanh Nghiệp Kỹ Thuật Uy Tín"',
-                    'Tự động đẩy tin 3 lần/tuần khung giờ vàng',
-                    'Chuyên viên quản lý tài khoản hỗ trợ 24/7',
-                  ].map((feat, idx) => (
-                    <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
-                      <CheckCircleRoundedIcon sx={{ color: '#2563EB', fontSize: 16, mt: 0.3, flexShrink: 0 }} />
-                      <Typography variant="body2" sx={{ color: '#0F172A', fontSize: '0.85rem', fontWeight: 600, lineHeight: 1.4 }}>
-                        {feat}
-                      </Typography>
-                    </Stack>
-                  ))}
-                </Stack>
-
-                <Button
-                  component={Link}
-                  href={localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language)}
-                  variant="contained"
-                  fullWidth
-                  sx={{
-                    backgroundColor: '#2563EB',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    py: 1.2,
-                    borderRadius: '6px',
-                    boxShadow: 'none',
-                    '&:hover': {
-                      backgroundColor: '#1D4ED8',
-                      boxShadow: 'none',
-                    },
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    backgroundColor: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '16px',
+                    p: 3,
                   }}
                 >
-                  Chọn Gói Tăng Tốc
-                </Button>
-              </Card>
+                  <Chip
+                    label="PHỔ BIẾN NHẤT"
+                    size="small"
+                    sx={{
+                      alignSelf: 'flex-start',
+                      backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                      color: '#2563EB',
+                      fontWeight: 700,
+                      fontSize: '0.7rem',
+                      mb: 2,
+                      mt: 1,
+                      borderRadius: '100px',
+                    }}
+                  />
+
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: '#0F172A', mb: 1 }}>
+                    Gói Tăng Tốc (Professional)
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: '#64748B', mb: 2.5, minHeight: 40, lineHeight: 1.4 }}>
+                    Giải pháp tối ưu cho tổng thầu, công ty kiến trúc & MEP cần tuyển dụng liên tục.
+                  </Typography>
+
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h4" sx={{ fontWeight: 800, color: '#2563EB' }}>
+                      4.500.000 đ
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
+                      / gói 60 ngày
+                    </Typography>
+                  </Box>
+
+                  <Divider sx={{ borderColor: '#E2E8F0', mb: 2.5 }} />
+
+                  <Stack spacing={1.5} sx={{ flexGrow: 1, mb: 3 }}>
+                    {[
+                      '10 Tin đăng vị trí Top ngành ưu tiên',
+                      '100 Điểm lọc hồ sơ CV (Hoàn 100% nếu số chết)',
+                      '50 Lượt trợ lý AILA Voice AI phỏng vấn sơ loại',
+                      'Huy hiệu "Doanh Nghiệp Kỹ Thuật Uy Tín"',
+                      'Tự động đẩy tin 3 lần/tuần khung giờ vàng',
+                      'Chuyên viên quản lý tài khoản hỗ trợ 24/7',
+                    ].map((feat, idx) => (
+                      <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
+                        <CheckCircleRoundedIcon sx={{ color: '#2563EB', fontSize: 16, mt: 0.3, flexShrink: 0 }} />
+                        <Typography variant="body2" sx={{ color: '#0F172A', fontSize: '0.85rem', fontWeight: 600, lineHeight: 1.4 }}>
+                          {feat}
+                        </Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
+
+                  <Button
+                    component={Link}
+                    href={localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language)}
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+                      color: '#FFFFFF',
+                      fontWeight: 700,
+                      py: 1.3,
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 16px rgba(37, 99, 235, 0.35)',
+                      textTransform: 'none',
+                      transition: 'all 0.25s ease',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                        boxShadow: '0 6px 22px rgba(37, 99, 235, 0.45)',
+                      },
+                    }}
+                  >
+                    Chọn Gói Tăng Tốc
+                  </Button>
+                </Card>
+              </Box>
             </Grid>
 
             {/* Gói 3: Doanh Nghiệp (Enterprise) */}
@@ -1165,11 +1301,16 @@ export default function PricingPage() {
                   flexDirection: 'column',
                   backgroundColor: '#FFFFFF',
                   borderColor: '#E2E8F0',
-                  borderRadius: '10px',
+                  borderRadius: '16px',
                   p: 3,
                   position: 'relative',
-                  transition: 'border-color 0.2s ease',
-                  '&:hover': { borderColor: '#CBD5E1' },
+                  boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                  transition: 'all 0.25s ease',
+                  '&:hover': {
+                    borderColor: '#CBD5E1',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 10px 24px -6px rgba(15, 23, 42, 0.08)',
+                  },
                 }}
               >
                 <Chip
@@ -1182,7 +1323,7 @@ export default function PricingPage() {
                     fontWeight: 700,
                     fontSize: '0.7rem',
                     mb: 2,
-                    borderRadius: '4px',
+                    borderRadius: '100px',
                   }}
                 />
 
@@ -1227,11 +1368,13 @@ export default function PricingPage() {
                   variant="outlined"
                   fullWidth
                   sx={{
-                    borderColor: '#0F172A',
+                    borderColor: '#CBD5E1',
                     color: '#0F172A',
                     fontWeight: 700,
-                    py: 1.2,
-                    borderRadius: '6px',
+                    py: 1.25,
+                    borderRadius: '12px',
+                    textTransform: 'none',
+                    transition: 'all 0.2s ease',
                     '&:hover': {
                       borderColor: '#2563EB',
                       color: '#2563EB',
@@ -1255,11 +1398,16 @@ export default function PricingPage() {
                   flexDirection: 'column',
                   backgroundColor: '#FFFFFF',
                   borderColor: '#E2E8F0',
-                  borderRadius: '10px',
+                  borderRadius: '16px',
                   p: 3,
                   position: 'relative',
-                  transition: 'border-color 0.2s ease',
-                  '&:hover': { borderColor: '#CBD5E1' },
+                  boxShadow: '0 4px 16px -4px rgba(15, 23, 42, 0.04)',
+                  transition: 'all 0.25s ease',
+                  '&:hover': {
+                    borderColor: '#CBD5E1',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 10px 24px -6px rgba(15, 23, 42, 0.08)',
+                  },
                 }}
               >
                 <Chip
@@ -1272,7 +1420,7 @@ export default function PricingPage() {
                     fontWeight: 700,
                     fontSize: '0.7rem',
                     mb: 2,
-                    borderRadius: '4px',
+                    borderRadius: '100px',
                   }}
                 />
 
@@ -1316,11 +1464,13 @@ export default function PricingPage() {
                   variant="outlined"
                   fullWidth
                   sx={{
-                    borderColor: '#0F172A',
+                    borderColor: '#CBD5E1',
                     color: '#0F172A',
                     fontWeight: 700,
-                    py: 1.2,
-                    borderRadius: '6px',
+                    py: 1.25,
+                    borderRadius: '12px',
+                    textTransform: 'none',
+                    transition: 'all 0.2s ease',
                     '&:hover': {
                       borderColor: '#2563EB',
                       color: '#2563EB',
@@ -1355,13 +1505,14 @@ export default function PricingPage() {
               label="MINH BẠCH TÍNH NĂNG"
               size="small"
               sx={{
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #CBD5E1',
-                color: '#0F172A',
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                border: '1px solid rgba(37, 99, 235, 0.25)',
+                color: '#2563EB',
                 fontWeight: 700,
                 fontSize: '0.75rem',
-                letterSpacing: '0.08em',
-                px: 1,
+                letterSpacing: '0.06em',
+                px: 1.5,
+                borderRadius: '100px',
               }}
             />
             <Typography
@@ -1389,9 +1540,9 @@ export default function PricingPage() {
             className="gsap-matrix-table"
             sx={{
               borderColor: '#E2E8F0',
-              borderRadius: '8px',
+              borderRadius: '16px',
               backgroundColor: '#FFFFFF',
-              boxShadow: 'none',
+              boxShadow: '0 4px 20px -4px rgba(15, 23, 42, 0.05)',
               overflowX: 'auto',
             }}
           >
@@ -1605,247 +1756,314 @@ export default function PricingPage() {
           borderBottom: '1px solid #E2E8F0',
         }}
       >
-        <Container maxWidth="md">
-          <Card
-            variant="outlined"
-            className="gsap-form-card"
-            sx={{
-              p: { xs: 3.5, sm: 5 },
-              borderColor: '#E2E8F0',
-              borderRadius: '12px',
-              backgroundColor: '#FFFFFF',
-              boxShadow: '0 8px 30px rgba(15, 23, 42, 0.05)',
-            }}
-          >
-            <Stack spacing={1.5} sx={{ mb: 4, textAlign: 'center' }}>
-              <Box>
-                <Chip
-                  label="TƯ VẤN DOANH NGHIỆP"
-                  size="small"
+        <Container maxWidth="lg">
+          <Grid container spacing={4} alignItems="stretch">
+            {/* Visual Showcase Sidebar */}
+            <Grid size={{ xs: 12, md: 5 }}>
+              <Box
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  p: { xs: 3, md: 4 },
+                  backgroundColor: '#0F172A',
+                  color: '#FFFFFF',
+                  borderRadius: '20px',
+                  border: '1px solid #1E293B',
+                  boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.25)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                <Box
+                  component="img"
+                  src="/images/employer/pricing_showcase.jpg"
+                  alt="InfoHR Enterprise Solutions Dashboard"
                   sx={{
-                    backgroundColor: '#0F172A',
-                    color: '#FFFFFF',
-                    fontWeight: 700,
-                    fontSize: '0.75rem',
-                    letterSpacing: '0.08em',
-                    px: 1,
+                    width: '100%',
+                    height: 200,
+                    objectFit: 'cover',
+                    borderRadius: '12px',
+                    mb: 3,
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
                   }}
                 />
+                <Typography variant="h5" sx={{ fontWeight: 800, color: '#FFFFFF', mb: 1, fontSize: '1.25rem' }}>
+                  Đồng Hành Cùng Doanh Nghiệp Kỹ Thuật Lớn
+                </Typography>
+                <Typography variant="body2" sx={{ color: '#94A3B8', mb: 3, lineHeight: 1.6 }}>
+                  Giải pháp may đo riêng biệt tích hợp trực tiếp vào quy trình tuyển dụng và hệ sinh thái quản trị nhân sự của tập đoàn.
+                </Typography>
+                <Stack spacing={2} sx={{ mt: 'auto', pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  {[
+                    'Phản hồi trong 15 phút từ chuyên viên kỹ thuật',
+                    '100% hồ sơ ứng viên được bảo đảm xác thực',
+                    'Kịch bản Voice AI may đo theo dự án',
+                    'Bảo hành đổi hồ sơ thử việc lên đến 60 ngày',
+                  ].map((point, idx) => (
+                    <Stack key={idx} direction="row" spacing={1.5} alignItems="center">
+                      <CheckCircleRoundedIcon sx={{ color: '#60A5FA', fontSize: 18, flexShrink: 0 }} />
+                      <Typography variant="body2" sx={{ color: '#E2E8F0', fontSize: '0.875rem' }}>
+                        {point}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Stack>
               </Box>
-              <Typography
-                variant="h3"
+            </Grid>
+
+            {/* Form Column */}
+            <Grid size={{ xs: 12, md: 7 }}>
+              <Card
+                variant="outlined"
+                className="gsap-form-card"
                 sx={{
-                  fontSize: { xs: '1.6rem', md: '2.15rem' },
-                  fontWeight: 800,
-                  color: '#0F172A',
+                  p: { xs: 3.5, sm: 4.5 },
+                  borderColor: '#E2E8F0',
+                  borderRadius: '20px',
+                  backgroundColor: '#FFFFFF',
+                  boxShadow: '0 8px 30px rgba(15, 23, 42, 0.05)',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
-                Nhận Báo Giá Tùy Chỉnh & Đặt Lịch Demo AILA AI
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#475569', maxWidth: 640, mx: 'auto' }}>
-                Để lại thông tin nhu cầu tuyển dụng, chuyên viên giải pháp của InfoHR sẽ liên hệ lại trong vòng 15 phút với bảng dự toán chi tiết.
-              </Typography>
-            </Stack>
-
-            {isSubmitted && (
-              <Alert
-                severity="success"
-                sx={{
-                  mb: 3.5,
-                  borderRadius: '6px',
-                  backgroundColor: '#F8FAFC',
-                  color: '#0F172A',
-                  border: '1px solid #16A34A',
-                  '& .MuiAlert-icon': { color: '#16A34A' },
-                }}
-                onClose={() => setIsSubmitted(false)}
-              >
-                Yêu cầu báo giá đã được gửi thành công! Chuyên viên tư vấn InfoHR sẽ liên hệ lại với Quý doanh nghiệp trong vòng 15 phút làm việc qua số điện thoại/Zalo đã cung cấp.
-              </Alert>
-            )}
-
-            <Box component="form" onSubmit={handleFormSubmit} noValidate>
-              <Grid container spacing={2.5}>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: '#0F172A' }}>
-                    Họ và tên người liên hệ *
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    name="contactName"
-                    value={formState.contactName}
-                    onChange={handleInputChange}
-                    error={Boolean(formErrors.contactName)}
-                    helperText={formErrors.contactName}
-                    placeholder="Nguyễn Văn A (Phụ trách Tuyển dụng / Giám đốc)"
+                <Stack spacing={1.5} sx={{ mb: 3.5, textAlign: 'left' }}>
+                  <Box>
+                    <Chip
+                      label="TƯ VẤN DOANH NGHIỆP"
+                      size="small"
+                      sx={{
+                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                        border: '1px solid rgba(37, 99, 235, 0.25)',
+                        color: '#2563EB',
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        letterSpacing: '0.06em',
+                        px: 1.5,
+                        borderRadius: '100px',
+                      }}
+                    />
+                  </Box>
+                  <Typography
+                    variant="h3"
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '6px',
-                      },
-                    }}
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, sm: 6 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: '#0F172A' }}>
-                    Số điện thoại / Zalo *
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    name="phone"
-                    value={formState.phone}
-                    onChange={handleInputChange}
-                    error={Boolean(formErrors.phone)}
-                    helperText={formErrors.phone}
-                    placeholder="0912 345 678"
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '6px',
-                      },
-                    }}
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: '#0F172A' }}>
-                    Tên công ty / Tổng thầu / Đơn vị tư vấn *
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    name="companyName"
-                    value={formState.companyName}
-                    onChange={handleInputChange}
-                    error={Boolean(formErrors.companyName)}
-                    helperText={formErrors.companyName}
-                    placeholder="Công ty CP Xây dựng & Cơ điện ..."
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '6px',
-                      },
-                    }}
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: '#0F172A' }}>
-                    Nhu cầu tuyển dụng chính *
-                  </Typography>
-                  <TextField
-                    select
-                    fullWidth
-                    size="small"
-                    name="hiringNeed"
-                    value={formState.hiringNeed}
-                    onChange={handleInputChange}
-                    error={Boolean(formErrors.hiringNeed)}
-                    helperText={formErrors.hiringNeed}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '6px',
-                      },
+                      fontSize: { xs: '1.5rem', md: '1.95rem' },
+                      fontWeight: 800,
+                      color: '#0F172A',
+                      letterSpacing: '-0.02em',
                     }}
                   >
-                    <MenuItem value="Gói Tăng Tốc (Professional) — 4.500.000 đ">
-                      Gói Tăng Tốc (Professional) — 4.500.000 đ (Khuyên Dùng)
-                    </MenuItem>
-                    <MenuItem value="Gói Doanh Nghiệp (Enterprise) — Báo giá tùy chỉnh">
-                      Gói Doanh Nghiệp (Enterprise) — Báo giá may đo theo quy mô
-                    </MenuItem>
-                    <MenuItem value="Gói Khởi Đầu (Starter) — 1.800.000 đ">
-                      Gói Khởi Đầu (Starter) — 1.800.000 đ
-                    </MenuItem>
-                    <MenuItem value="Thẻ Tiện Ích Lẻ (Lượt phỏng vấn AI / Điểm lọc CV)">
-                      Thẻ Tiện Ích Lẻ (Lượt phỏng vấn AI / Điểm lọc CV)
-                    </MenuItem>
-                    <MenuItem value="Tuyển Chỉ huy trưởng / Kỹ sư Giám sát công trường">
-                      Cần tuyển Chỉ huy trưởng / Kỹ sư Giám sát công trường
-                    </MenuItem>
-                    <MenuItem value="Tuyển Kỹ sư MEP / HVAC / PCCC">
-                      Cần tuyển Kỹ sư Cơ điện MEP / HVAC / PCCC
-                    </MenuItem>
-                    <MenuItem value="Tuyển KTS / Thiết kế nội thất / Kỹ sư BIM">
-                      Cần tuyển Kiến trúc sư / Thiết kế nội thất / BIM
-                    </MenuItem>
-                    <MenuItem value="Tư vấn tổng thể nhân lực cho dự án mới">
-                      Tư vấn trọn gói nhân lực cho dự án khởi công mới
-                    </MenuItem>
-                  </TextField>
-                </Grid>
-
-                <Grid size={{ xs: 12 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: '#0F172A' }}>
-                    Ghi chú thêm về yêu cầu hoặc quy mô dự án (Tùy chọn)
+                    Nhận Báo Giá Tùy Chỉnh & Đặt Lịch Demo AILA AI
                   </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={3}
-                    name="notes"
-                    value={formState.notes}
-                    onChange={handleInputChange}
-                    placeholder="VD: Cần tuyển gấp 3 Kỹ sư MEP cho dự án tòa nhà 25 tầng tại Quận 7, TP.HCM..."
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '6px',
-                      },
-                    }}
-                  />
-                </Grid>
+                  <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.6 }}>
+                    Để lại thông tin nhu cầu tuyển dụng, chuyên viên giải pháp của InfoHR sẽ liên hệ lại trong vòng 15 phút với bảng dự toán chi tiết.
+                  </Typography>
+                </Stack>
 
-                <Grid size={{ xs: 12 }}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    disabled={isSubmitting}
-                    endIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <SendRoundedIcon />}
-                    fullWidth
+                {isSubmitted && (
+                  <Alert
+                    severity="success"
                     sx={{
-                      backgroundColor: '#2563EB',
-                      color: '#FFFFFF',
-                      py: 1.5,
-                      fontWeight: 700,
-                      fontSize: '1rem',
-                      borderRadius: '6px',
-                      boxShadow: 'none',
-                      '&:hover': {
-                        backgroundColor: '#1D4ED8',
-                        boxShadow: 'none',
-                      },
+                      mb: 3.5,
+                      borderRadius: '10px',
+                      backgroundColor: '#F8FAFC',
+                      color: '#0F172A',
+                      border: '1px solid #16A34A',
+                      '& .MuiAlert-icon': { color: '#16A34A' },
                     }}
+                    onClose={() => setIsSubmitted(false)}
                   >
-                    {isSubmitting ? 'Đang gửi thông tin...' : 'Gửi Yêu Cầu Báo Giá & Nhận Tư Vấn'}
-                  </Button>
-                </Grid>
-              </Grid>
-            </Box>
+                    Yêu cầu báo giá đã được gửi thành công! Chuyên viên tư vấn InfoHR sẽ liên hệ lại với Quý doanh nghiệp trong vòng 15 phút làm việc qua số điện thoại/Zalo đã cung cấp.
+                  </Alert>
+                )}
 
-            <Divider sx={{ borderColor: '#E2E8F0', my: 3 }} />
+                <Box component="form" onSubmit={handleFormSubmit} noValidate sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.75, color: '#0F172A' }}>
+                        Họ và tên người liên hệ *
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        name="contactName"
+                        value={formState.contactName}
+                        onChange={handleInputChange}
+                        error={Boolean(formErrors.contactName)}
+                        helperText={formErrors.contactName}
+                        placeholder="Nguyễn Văn A (Phụ trách Tuyển dụng / Giám đốc)"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: '#F8FAFC',
+                            borderRadius: '10px',
+                          },
+                        }}
+                      />
+                    </Grid>
 
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              justifyContent="center"
-              spacing={{ xs: 1.5, sm: 3 }}
-              sx={{ color: '#64748B', fontSize: '0.85rem', textAlign: 'center' }}
-            >
-              <Typography variant="caption" sx={{ color: '#64748B' }}>
-                ✓ Cam kết phản hồi trong 15 phút
-              </Typography>
-              <Typography variant="caption" sx={{ color: '#64748B' }}>
-                ✓ Bảo mật tuyệt đối thông tin dự án
-              </Typography>
-              <Typography variant="caption" sx={{ color: '#64748B' }}>
-                ✓ Xuất hóa đơn VAT điện tử trong ngày
-              </Typography>
-            </Stack>
-          </Card>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.75, color: '#0F172A' }}>
+                        Số điện thoại / Zalo *
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        name="phone"
+                        value={formState.phone}
+                        onChange={handleInputChange}
+                        error={Boolean(formErrors.phone)}
+                        helperText={formErrors.phone}
+                        placeholder="0912 345 678"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: '#F8FAFC',
+                            borderRadius: '10px',
+                          },
+                        }}
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.75, color: '#0F172A' }}>
+                        Tên công ty / Tổng thầu / Đơn vị tư vấn *
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        name="companyName"
+                        value={formState.companyName}
+                        onChange={handleInputChange}
+                        error={Boolean(formErrors.companyName)}
+                        helperText={formErrors.companyName}
+                        placeholder="Công ty CP Xây dựng & Cơ điện ..."
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: '#F8FAFC',
+                            borderRadius: '10px',
+                          },
+                        }}
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.75, color: '#0F172A' }}>
+                        Nhu cầu tuyển dụng chính *
+                      </Typography>
+                      <TextField
+                        select
+                        fullWidth
+                        size="small"
+                        name="hiringNeed"
+                        value={formState.hiringNeed}
+                        onChange={handleInputChange}
+                        error={Boolean(formErrors.hiringNeed)}
+                        helperText={formErrors.hiringNeed}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: '#F8FAFC',
+                            borderRadius: '10px',
+                          },
+                        }}
+                      >
+                        <MenuItem value="Gói Tăng Tốc (Professional) — 4.500.000 đ">
+                          Gói Tăng Tốc (Professional) — 4.500.000 đ (Khuyên Dùng)
+                        </MenuItem>
+                        <MenuItem value="Gói Doanh Nghiệp (Enterprise) — Báo giá tùy chỉnh">
+                          Gói Doanh Nghiệp (Enterprise) — Báo giá may đo theo quy mô
+                        </MenuItem>
+                        <MenuItem value="Gói Khởi Đầu (Starter) — 1.800.000 đ">
+                          Gói Khởi Đầu (Starter) — 1.800.000 đ
+                        </MenuItem>
+                        <MenuItem value="Thẻ Tiện Ích Lẻ (Lượt phỏng vấn AI / Điểm lọc CV)">
+                          Thẻ Tiện Ích Lẻ (Lượt phỏng vấn AI / Điểm lọc CV)
+                        </MenuItem>
+                        <MenuItem value="Tuyển Chỉ huy trưởng / Kỹ sư Giám sát công trường">
+                          Cần tuyển Chỉ huy trưởng / Kỹ sư Giám sát công trường
+                        </MenuItem>
+                        <MenuItem value="Tuyển Kỹ sư MEP / HVAC / PCCC">
+                          Cần tuyển Kỹ sư Cơ điện MEP / HVAC / PCCC
+                        </MenuItem>
+                        <MenuItem value="Tuyển KTS / Thiết kế nội thất / Kỹ sư BIM">
+                          Cần tuyển Kiến trúc sư / Thiết kế nội thất / BIM
+                        </MenuItem>
+                        <MenuItem value="Tư vấn tổng thể nhân lực cho dự án mới">
+                          Tư vấn trọn gói nhân lực cho dự án khởi công mới
+                        </MenuItem>
+                      </TextField>
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.75, color: '#0F172A' }}>
+                        Ghi chú thêm về yêu cầu hoặc quy mô dự án (Tùy chọn)
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={2.5}
+                        name="notes"
+                        value={formState.notes}
+                        onChange={handleInputChange}
+                        placeholder="VD: Cần tuyển gấp 3 Kỹ sư MEP cho dự án tòa nhà 25 tầng tại Quận 7, TP.HCM..."
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            backgroundColor: '#F8FAFC',
+                            borderRadius: '10px',
+                          },
+                        }}
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={isSubmitting}
+                        endIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <SendRoundedIcon />}
+                        fullWidth
+                        sx={{
+                          background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+                          color: '#FFFFFF',
+                          py: 1.4,
+                          fontWeight: 700,
+                          fontSize: '0.975rem',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 16px rgba(37, 99, 235, 0.35)',
+                          textTransform: 'none',
+                          transition: 'all 0.25s ease',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                            boxShadow: '0 6px 22px rgba(37, 99, 235, 0.45)',
+                          },
+                        }}
+                      >
+                        {isSubmitting ? 'Đang gửi thông tin...' : 'Gửi Yêu Cầu Báo Giá & Nhận Tư Vấn'}
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Box>
+
+                <Divider sx={{ borderColor: '#E2E8F0', my: 2.5 }} />
+
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  justifyContent="center"
+                  spacing={{ xs: 1, sm: 2.5 }}
+                  sx={{ color: '#64748B', fontSize: '0.85rem', textAlign: 'center' }}
+                >
+                  <Typography variant="caption" sx={{ color: '#64748B' }}>
+                    ✓ Cam kết phản hồi trong 15 phút
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#64748B' }}>
+                    ✓ Bảo mật tuyệt đối thông tin dự án
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#64748B' }}>
+                    ✓ Xuất hóa đơn VAT điện tử trong ngày
+                  </Typography>
+                </Stack>
+              </Card>
+            </Grid>
+          </Grid>
         </Container>
       </Box>
 
@@ -1868,13 +2086,14 @@ export default function PricingPage() {
               label="GIẢI ĐÁP MINH BẠCH"
               size="small"
               sx={{
-                backgroundColor: '#FFFFFF',
-                border: '1px solid #CBD5E1',
-                color: '#0F172A',
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                border: '1px solid rgba(37, 99, 235, 0.25)',
+                color: '#2563EB',
                 fontWeight: 700,
                 fontSize: '0.75rem',
-                letterSpacing: '0.08em',
-                px: 1,
+                letterSpacing: '0.06em',
+                px: 1.5,
+                borderRadius: '100px',
               }}
             />
             <Typography
@@ -1906,7 +2125,10 @@ export default function PricingPage() {
               sx={{
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E2E8F0',
-                borderRadius: '8px !important',
+                borderRadius: '12px !important',
+                overflow: 'hidden',
+                transition: 'all 0.2s ease',
+                '&:hover': { borderColor: '#CBD5E1' },
                 '&:before': { display: 'none' },
               }}
             >
@@ -1933,7 +2155,10 @@ export default function PricingPage() {
               sx={{
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E2E8F0',
-                borderRadius: '8px !important',
+                borderRadius: '12px !important',
+                overflow: 'hidden',
+                transition: 'all 0.2s ease',
+                '&:hover': { borderColor: '#CBD5E1' },
                 '&:before': { display: 'none' },
               }}
             >
@@ -1960,7 +2185,10 @@ export default function PricingPage() {
               sx={{
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E2E8F0',
-                borderRadius: '8px !important',
+                borderRadius: '12px !important',
+                overflow: 'hidden',
+                transition: 'all 0.2s ease',
+                '&:hover': { borderColor: '#CBD5E1' },
                 '&:before': { display: 'none' },
               }}
             >
@@ -1987,7 +2215,10 @@ export default function PricingPage() {
               sx={{
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E2E8F0',
-                borderRadius: '8px !important',
+                borderRadius: '12px !important',
+                overflow: 'hidden',
+                transition: 'all 0.2s ease',
+                '&:hover': { borderColor: '#CBD5E1' },
                 '&:before': { display: 'none' },
               }}
             >
@@ -2009,29 +2240,49 @@ export default function PricingPage() {
 
           {/* CTA Banner cuối trang */}
           <Box sx={{ mt: 7 }}>
-            <Card
+            <Box
               sx={{
-                p: { xs: 3.5, md: 5 },
-                backgroundColor: '#0F172A',
+                p: { xs: 4, sm: 6, md: 7 },
+                background:
+                  'linear-gradient(135deg, rgba(11, 17, 32, 0.94) 0%, rgba(15, 23, 42, 0.88) 100%), url("/images/employer/cta_cyber_backdrop.jpg") center/cover no-repeat',
                 color: '#FFFFFF',
-                borderRadius: '12px',
+                borderRadius: { xs: '20px', md: '24px' },
                 textAlign: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                border: '1px solid rgba(59, 130, 246, 0.35)',
+                boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.6), 0 0 40px rgba(37, 99, 235, 0.15)',
               }}
             >
-              <Stack spacing={2} alignItems="center">
+              {/* Subtle radial ambient glow */}
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '-25%',
+                  right: '-15%',
+                  width: 450,
+                  height: 450,
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%)',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              <Stack spacing={2.5} alignItems="center" sx={{ position: 'relative', zIndex: 1, maxWidth: 780, mx: 'auto' }}>
                 <Typography
                   variant="h3"
                   sx={{
-                    fontSize: { xs: '1.5rem', md: '2rem' },
+                    fontSize: { xs: '1.5rem', sm: '1.85rem', md: '2.25rem' },
                     fontWeight: 800,
                     letterSpacing: '-0.02em',
+                    lineHeight: 1.3,
                   }}
                 >
                   Cần Tư Vấn Gói Dịch Vụ Phù Hợp Nhất Cho Dự Án Của Bạn?
                 </Typography>
                 <Typography
                   variant="body1"
-                  sx={{ color: '#94A3B8', maxWidth: 640, fontSize: { xs: '0.95rem', md: '1.05rem' } }}
+                  sx={{ color: '#94A3B8', maxWidth: 640, fontSize: { xs: '0.95rem', md: '1.05rem' }, lineHeight: 1.6 }}
                 >
                   Đội ngũ chuyên viên tư vấn kỹ thuật của InfoHR luôn sẵn sàng đồng hành cùng các nhà thầu và doanh nghiệp 24/7.
                 </Typography>
@@ -2043,13 +2294,13 @@ export default function PricingPage() {
                   sx={{ py: 1, color: '#E2E8F0', fontSize: '0.95rem' }}
                 >
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <PhoneInTalkOutlinedIcon sx={{ color: '#2563EB', fontSize: 20 }} />
+                    <PhoneInTalkOutlinedIcon sx={{ color: '#60A5FA', fontSize: 20 }} />
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       Hotline: 028 7108 8688
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <MailOutlineRoundedIcon sx={{ color: '#2563EB', fontSize: 20 }} />
+                    <MailOutlineRoundedIcon sx={{ color: '#60A5FA', fontSize: 20 }} />
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       Email: hotline@infohr.vn
                     </Typography>
@@ -2062,16 +2313,18 @@ export default function PricingPage() {
                     href={localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language)}
                     variant="contained"
                     sx={{
-                      backgroundColor: '#2563EB',
+                      background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                       color: '#FFFFFF',
                       px: 3.5,
-                      py: 1.3,
+                      py: 1.4,
                       fontWeight: 700,
-                      borderRadius: '6px',
-                      boxShadow: 'none',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 16px rgba(37, 99, 235, 0.45)',
+                      textTransform: 'none',
+                      transition: 'all 0.25s ease',
                       '&:hover': {
-                        backgroundColor: '#1D4ED8',
-                        boxShadow: 'none',
+                        background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                        boxShadow: '0 6px 22px rgba(37, 99, 235, 0.55)',
                       },
                     }}
                   >
@@ -2081,15 +2334,18 @@ export default function PricingPage() {
                     onClick={handleScrollToSection('dang-ky-tu-van')}
                     variant="outlined"
                     sx={{
-                      borderColor: '#475569',
+                      borderColor: 'rgba(255, 255, 255, 0.25)',
                       color: '#FFFFFF',
                       px: 3.5,
-                      py: 1.3,
+                      py: 1.4,
                       fontWeight: 700,
-                      borderRadius: '6px',
+                      borderRadius: '12px',
+                      textTransform: 'none',
+                      backdropFilter: 'blur(4px)',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
                         borderColor: '#FFFFFF',
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
                       },
                     }}
                   >
@@ -2097,7 +2353,7 @@ export default function PricingPage() {
                   </Button>
                 </Stack>
               </Stack>
-            </Card>
+            </Box>
           </Box>
         </Container>
       </Box>

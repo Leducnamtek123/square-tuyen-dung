@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   Box,
@@ -38,6 +38,8 @@ import HeadsetMicOutlinedIcon from '@mui/icons-material/HeadsetMicOutlined';
 import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+import ViewInArRoundedIcon from '@mui/icons-material/ViewInArRounded';
+import BusinessRoundedIcon from '@mui/icons-material/BusinessRounded';
 
 import { TabTitle } from '@/utils/generalFunction';
 import { APP_NAME, ROUTES } from '@/configs/constants';
@@ -241,11 +243,16 @@ export default function EmployerHomePage() {
   const registerUrl = localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language);
   const pricingUrl = localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language);
 
-  // 4 Khối ngành kỹ thuật trọng điểm
+  // Tab chuyển đổi Hero preview giữa Scorecard và 3D BIM Complex
+  const [heroTab, setHeroTab] = useState<'scorecard' | 'bim'>('scorecard');
+
+  // 4 Khối ngành kỹ thuật trọng điểm kèm visual hình ảnh chuyên ngành
   const industries = [
     {
       id: 'construction',
       title: 'Khối Xây Dựng & Hạ Tầng',
+      image: '/images/employer/industry_construction.jpg',
+      tag: 'Thi Công & Hiện Trường',
       icon: EngineeringRoundedIcon,
       accentColor: '#2563EB',
       roles: [
@@ -259,6 +266,8 @@ export default function EmployerHomePage() {
     {
       id: 'real-estate',
       title: 'Khối Bất Động Sản & Dự Án',
+      image: '/images/employer/industry_realestate.jpg',
+      tag: 'Phát Triển & Đầu Tư',
       icon: ApartmentRoundedIcon,
       accentColor: '#1E3A8A',
       roles: [
@@ -272,6 +281,8 @@ export default function EmployerHomePage() {
     {
       id: 'architecture',
       title: 'Khối Kiến Trúc & Nội Thất',
+      image: '/images/employer/industry_architecture.jpg',
+      tag: 'Thiết Kế & Mô Hình BIM',
       icon: ArchitectureRoundedIcon,
       accentColor: '#0F172A',
       roles: [
@@ -285,6 +296,8 @@ export default function EmployerHomePage() {
     {
       id: 'mep',
       title: 'Khối Kỹ Thuật & Cơ Điện (MEP)',
+      image: '/images/employer/industry_mep.jpg',
+      tag: 'Hệ Thống Cơ Điện & HVAC',
       icon: BoltRoundedIcon,
       accentColor: '#DC2626',
       roles: [
@@ -349,7 +362,9 @@ export default function EmployerHomePage() {
         sx={{
           pt: { xs: 4, sm: 6, md: 8 },
           pb: { xs: 6, sm: 8, md: 10 },
-          bgcolor: '#FFFFFF',
+          bgcolor: '#FAFBFC',
+          backgroundImage:
+            'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(37, 99, 235, 0.08), transparent 70%), radial-gradient(ellipse 50% 40% at 90% 80%, rgba(220, 38, 38, 0.04), transparent 60%)',
           borderBottom: '1px solid #E2E8F0',
           position: 'relative',
         }}
@@ -369,15 +384,16 @@ export default function EmployerHomePage() {
                     }
                     label="TUYỂN DỤNG NHÂN SỰ KỸ THUẬT & CHUYÊN MÔN"
                     sx={{
-                      height: 30,
-                      px: 1,
+                      height: 32,
+                      px: 1.5,
                       fontWeight: 700,
                       fontSize: '0.75rem',
                       letterSpacing: '0.04em',
-                      bgcolor: '#F8FAFC',
-                      color: '#0F172A',
-                      borderRadius: '6px',
-                      border: '1px solid #CBD5E1',
+                      background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+                      color: '#1D4ED8',
+                      borderRadius: '100px',
+                      border: '1px solid #BFDBFE',
+                      boxShadow: '0 2px 6px rgba(37, 99, 235, 0.08)',
                     }}
                   />
                 </Box>
@@ -431,24 +447,42 @@ export default function EmployerHomePage() {
                     href={registerUrl}
                     variant="contained"
                     size="large"
-                    endIcon={<ArrowForwardRoundedIcon />}
                     sx={{
-                      py: 1.6,
-                      px: 3.5,
+                      py: 1.5,
+                      pl: 3.5,
+                      pr: 2,
                       fontWeight: 700,
                       fontSize: '1rem',
-                      bgcolor: '#2563EB',
+                      background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                       color: '#FFFFFF',
                       textTransform: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      transition: 'all 0.25s ease',
                       '&:hover': {
-                        bgcolor: '#1D4ED8',
-                        boxShadow: '0 6px 16px rgba(37, 99, 235, 0.35)',
+                        background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                        boxShadow: '0 6px 20px rgba(37, 99, 235, 0.4)',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >
-                    Đăng Ký Đăng Tuyển
+                    <span>Đăng Ký Đăng Tuyển</span>
+                    <Box
+                      sx={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        bgcolor: 'rgba(255,255,255,0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <ArrowForwardRoundedIcon sx={{ fontSize: 16 }} />
+                    </Box>
                   </Button>
 
                   <Button
@@ -457,7 +491,7 @@ export default function EmployerHomePage() {
                     variant="outlined"
                     size="large"
                     sx={{
-                      py: 1.6,
+                      py: 1.5,
                       px: 3,
                       fontWeight: 700,
                       fontSize: '1rem',
@@ -465,10 +499,14 @@ export default function EmployerHomePage() {
                       borderColor: '#CBD5E1',
                       bgcolor: '#FFFFFF',
                       textTransform: 'none',
-                      borderRadius: '8px',
+                      borderRadius: '12px',
+                      boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
+                      transition: 'all 0.25s ease',
                       '&:hover': {
-                        borderColor: '#94A3B8',
+                        borderColor: '#2563EB',
                         bgcolor: '#F8FAFC',
+                        color: '#2563EB',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >
@@ -476,75 +514,310 @@ export default function EmployerHomePage() {
                   </Button>
                 </Stack>
 
-                {/* Operational Proof Metrics (Thay thế số liệu vẽ vô căn cứ) */}
+                {/* Operational Proof Metrics */}
                 <Box
                   className="gsap-hero-metrics"
                   sx={{
-                    pt: 3,
+                    pt: 3.5,
                     borderTop: '1px solid #E2E8F0',
                   }}
                 >
                   <Grid container spacing={2}>
                     <Grid size={{ xs: 12, sm: 4 }}>
-                      <Stack direction="row" spacing={1} alignItems="flex-start">
-                        <TimerOutlinedIcon sx={{ fontSize: 20, color: '#2563EB', mt: 0.2 }} />
-                        <Box>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.9rem' }}
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          borderRadius: '12px',
+                          bgcolor: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          boxShadow: '0 2px 6px rgba(15, 23, 42, 0.03)',
+                          height: '100%',
+                        }}
+                      >
+                        <Stack direction="row" spacing={1.2} alignItems="flex-start">
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: '8px',
+                              bgcolor: '#EFF6FF',
+                              color: '#2563EB',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                            }}
                           >
-                            Tiết kiệm 15-20 giờ
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                            Phỏng vấn sơ loại kỹ thuật cho mỗi vị trí
-                          </Typography>
-                        </Box>
-                      </Stack>
+                            <TimerOutlinedIcon sx={{ fontSize: 18 }} />
+                          </Box>
+                          <Box>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.88rem', lineHeight: 1.3 }}
+                            >
+                              Tiết kiệm 15-20 giờ
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: 0.25, fontSize: '0.75rem' }}>
+                              Phỏng vấn sơ loại kỹ thuật cho mỗi vị trí
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </Box>
                     </Grid>
 
                     <Grid size={{ xs: 12, sm: 4 }}>
-                      <Stack direction="row" spacing={1} alignItems="flex-start">
-                        <VerifiedUserOutlinedIcon
-                          sx={{ fontSize: 20, color: '#16A34A', mt: 0.2 }}
-                        />
-                        <Box>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.9rem' }}
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          borderRadius: '12px',
+                          bgcolor: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          boxShadow: '0 2px 6px rgba(15, 23, 42, 0.03)',
+                          height: '100%',
+                        }}
+                      >
+                        <Stack direction="row" spacing={1.2} alignItems="flex-start">
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: '8px',
+                              bgcolor: '#ECFDF5',
+                              color: '#16A34A',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                            }}
                           >
-                            100% hồ sơ chuyên ngành
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                            Có thông tin dự án thực tế & chứng chỉ
-                          </Typography>
-                        </Box>
-                      </Stack>
+                            <VerifiedUserOutlinedIcon sx={{ fontSize: 18 }} />
+                          </Box>
+                          <Box>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.88rem', lineHeight: 1.3 }}
+                            >
+                              100% hồ sơ chuyên ngành
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: 0.25, fontSize: '0.75rem' }}>
+                              Có thông tin dự án thực tế & chứng chỉ
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </Box>
                     </Grid>
 
                     <Grid size={{ xs: 12, sm: 4 }}>
-                      <Stack direction="row" spacing={1} alignItems="flex-start">
-                        <FlashOnOutlinedIcon sx={{ fontSize: 20, color: '#DC2626', mt: 0.2 }} />
-                        <Box>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.9rem' }}
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          borderRadius: '12px',
+                          bgcolor: '#FFFFFF',
+                          border: '1px solid #E2E8F0',
+                          boxShadow: '0 2px 6px rgba(15, 23, 42, 0.03)',
+                          height: '100%',
+                        }}
+                      >
+                        <Stack direction="row" spacing={1.2} alignItems="flex-start">
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: '8px',
+                              bgcolor: '#FEF2F2',
+                              color: '#DC2626',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                            }}
                           >
-                            Nhận Scorecard trong 3 phút
-                          </Typography>
-                          <Typography variant="caption" sx={{ color: '#64748B', display: 'block' }}>
-                            Ngay sau khi ứng viên hoàn thành phỏng vấn
-                          </Typography>
-                        </Box>
-                      </Stack>
+                            <FlashOnOutlinedIcon sx={{ fontSize: 18 }} />
+                          </Box>
+                          <Box>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{ fontWeight: 800, color: '#0F172A', fontSize: '0.88rem', lineHeight: 1.3 }}
+                            >
+                              Nhận Scorecard trong 3 phút
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mt: 0.25, fontSize: '0.75rem' }}>
+                              Ngay sau khi ứng viên hoàn thành phỏng vấn
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </Box>
                     </Grid>
                   </Grid>
                 </Box>
               </Box>
             </Grid>
 
-            {/* Right Column: Candidate Scorecard Mockup */}
+            {/* Right Column: Interactive Hero Preview */}
             <Grid size={{ xs: 12, lg: 6 }} className="gsap-hero-right">
-              <CandidateScorecardMockup />
+              <Box sx={{ width: '100%', maxWidth: 580, mx: 'auto' }}>
+                {/* Preview Mode Switcher */}
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    mb: 1.5,
+                    p: 0.5,
+                    bgcolor: '#F1F5F9',
+                    borderRadius: '100px',
+                    width: 'fit-content',
+                    border: '1px solid #E2E8F0',
+                  }}
+                >
+                  <Button
+                    size="small"
+                    onClick={() => setHeroTab('scorecard')}
+                    startIcon={<AutoAwesomeRoundedIcon sx={{ fontSize: '15px !important' }} />}
+                    sx={{
+                      borderRadius: '100px',
+                      px: 2,
+                      py: 0.5,
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      textTransform: 'none',
+                      bgcolor: heroTab === 'scorecard' ? '#FFFFFF' : 'transparent',
+                      color: heroTab === 'scorecard' ? '#0F172A' : '#64748B',
+                      boxShadow: heroTab === 'scorecard' ? '0 2px 6px rgba(15,23,42,0.08)' : 'none',
+                      '&:hover': {
+                        bgcolor: heroTab === 'scorecard' ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
+                      },
+                    }}
+                  >
+                    AILA Candidate Scorecard
+                  </Button>
+
+                  <Button
+                    size="small"
+                    onClick={() => setHeroTab('bim')}
+                    startIcon={<ViewInArRoundedIcon sx={{ fontSize: '15px !important' }} />}
+                    sx={{
+                      borderRadius: '100px',
+                      px: 2,
+                      py: 0.5,
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      textTransform: 'none',
+                      bgcolor: heroTab === 'bim' ? '#FFFFFF' : 'transparent',
+                      color: heroTab === 'bim' ? '#0F172A' : '#64748B',
+                      boxShadow: heroTab === 'bim' ? '0 2px 6px rgba(15,23,42,0.08)' : 'none',
+                      '&:hover': {
+                        bgcolor: heroTab === 'bim' ? '#FFFFFF' : 'rgba(255,255,255,0.5)',
+                      },
+                    }}
+                  >
+                    Mô Hình Dự Án 3D & BIM
+                  </Button>
+                </Stack>
+
+                {/* Tab Content 1: Candidate Scorecard */}
+                <Box sx={{ display: heroTab === 'scorecard' ? 'block' : 'none' }}>
+                  <CandidateScorecardMockup />
+                </Box>
+
+                {/* Tab Content 2: 3D BIM Complex Visual Showcase */}
+                {heroTab === 'bim' && (
+                  <Box
+                    sx={{
+                      p: '5px',
+                      background:
+                        'linear-gradient(145deg, rgba(37,99,235,0.2) 0%, rgba(226,232,240,0.6) 45%, rgba(15,23,42,0.15) 100%)',
+                      borderRadius: '20px',
+                      border: '1px solid rgba(59, 130, 246, 0.28)',
+                      boxShadow: '0 12px 32px -4px rgba(15, 23, 42, 0.1)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        position: 'relative',
+                        borderRadius: '15px',
+                        overflow: 'hidden',
+                        bgcolor: '#0F172A',
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src="/images/employer/hero_tech_complex.jpg"
+                        alt="Mô hình tổ hợp kỹ thuật BIM 3D"
+                        sx={{
+                          width: '100%',
+                          height: { xs: 340, sm: 420 },
+                          objectFit: 'cover',
+                          display: 'block',
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          inset: 0,
+                          background:
+                            'linear-gradient(to top, rgba(15,23,42,0.92) 0%, rgba(15,23,42,0.3) 50%, transparent 100%)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'flex-end',
+                          p: 3,
+                        }}
+                      >
+                        <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
+                          <Chip
+                            size="small"
+                            label="BIM LOD 400"
+                            sx={{
+                              bgcolor: '#2563EB',
+                              color: '#FFFFFF',
+                              fontWeight: 700,
+                              fontSize: '0.7rem',
+                              borderRadius: '100px',
+                            }}
+                          />
+                          <Chip
+                            size="small"
+                            label="Revit • Navisworks"
+                            sx={{
+                              bgcolor: 'rgba(255,255,255,0.2)',
+                              color: '#FFFFFF',
+                              fontWeight: 600,
+                              fontSize: '0.7rem',
+                              borderRadius: '100px',
+                              backdropFilter: 'blur(4px)',
+                            }}
+                          />
+                          <Chip
+                            size="small"
+                            label="Chứng chỉ BXD"
+                            sx={{
+                              bgcolor: 'rgba(22,163,74,0.3)',
+                              color: '#86EFAC',
+                              fontWeight: 600,
+                              fontSize: '0.7rem',
+                              borderRadius: '100px',
+                              border: '1px solid rgba(22,163,74,0.5)',
+                            }}
+                          />
+                        </Stack>
+                        <Typography
+                          variant="h6"
+                          sx={{ color: '#FFFFFF', fontWeight: 700, fontSize: '1.05rem', mb: 0.5 }}
+                        >
+                          Tổ Hợp Kỹ Thuật Đô Thị & Công Trình Cấp I
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{ color: '#94A3B8', fontSize: '0.78rem' }}
+                        >
+                          Hồ sơ kỹ sư InfoHR được đối chiếu trực tiếp theo năng lực thực chiến và
+                          công trình thực tế đã nghiệm thu.
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
             </Grid>
           </Grid>
         </Container>
@@ -807,45 +1080,100 @@ export default function EmployerHomePage() {
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
-                      borderRadius: '12px',
+                      borderRadius: '16px',
                       borderColor: '#E2E8F0',
                       bgcolor: '#FFFFFF',
-                      p: 3,
-                      transition: 'all 0.25s ease',
+                      overflow: 'hidden',
+                      boxShadow: '0 4px 14px -2px rgba(15, 23, 42, 0.05)',
+                      transition: 'all 0.35s cubic-bezier(0.32,0.72,0,1)',
                       '&:hover': {
-                        borderColor: '#94A3B8',
-                        boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.08)',
+                        borderColor: industry.accentColor,
+                        boxShadow: '0 16px 36px -4px rgba(15, 23, 42, 0.12)',
+                        transform: 'translateY(-4px)',
+                        '& .industry-card-img': {
+                          transform: 'scale(1.08)',
+                        },
                       },
                     }}
                   >
-                    {/* Industry Icon & Title */}
+                    {/* Industry Image Banner */}
                     <Box
                       sx={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: '8px',
+                        height: 160,
+                        width: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
                         bgcolor: '#0F172A',
-                        color: '#FFFFFF',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mb: 2,
                       }}
                     >
-                      <IconComp sx={{ fontSize: 24 }} />
+                      <Box
+                        component="img"
+                        src={industry.image}
+                        alt={industry.title}
+                        className="industry-card-img"
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          display: 'block',
+                          transition: 'transform 0.5s ease',
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          inset: 0,
+                          background:
+                            'linear-gradient(to top, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.2) 60%, transparent 100%)',
+                          display: 'flex',
+                          alignItems: 'flex-end',
+                          justifyContent: 'space-between',
+                          p: 2,
+                        }}
+                      >
+                        <Chip
+                          size="small"
+                          label={industry.tag}
+                          sx={{
+                            bgcolor: 'rgba(255,255,255,0.92)',
+                            color: '#0F172A',
+                            fontWeight: 700,
+                            fontSize: '0.68rem',
+                            backdropFilter: 'blur(4px)',
+                            borderRadius: '100px',
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            width: 34,
+                            height: 34,
+                            borderRadius: '8px',
+                            bgcolor: industry.accentColor,
+                            color: '#FFFFFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                          }}
+                        >
+                          <IconComp sx={{ fontSize: 20 }} />
+                        </Box>
+                      </Box>
                     </Box>
 
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '1.0625rem',
-                        color: '#0F172A',
-                        mb: 2,
-                      }}
-                    >
-                      {industry.title}
-                    </Typography>
+                    {/* Card Body */}
+                    <Box sx={{ p: 2.5, display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '1.0625rem',
+                          color: '#0F172A',
+                          mb: 2,
+                        }}
+                      >
+                        {industry.title}
+                      </Typography>
 
                     {/* Key Roles */}
                     <Box sx={{ mb: 2.5, flex: 1 }}>
@@ -924,7 +1252,8 @@ export default function EmployerHomePage() {
                         {industry.standards}
                       </Typography>
                     </Box>
-                  </Card>
+                  </Box>
+                </Card>
                 </Grid>
               );
             })}
@@ -1226,12 +1555,14 @@ export default function EmployerHomePage() {
           <Box
             className="gsap-cta-banner"
             sx={{
-              bgcolor: '#0F172A',
+              background:
+                'linear-gradient(135deg, rgba(11, 17, 32, 0.94) 0%, rgba(15, 23, 42, 0.88) 100%), url("/images/employer/cta_cyber_backdrop.jpg") center/cover no-repeat',
               color: '#FFFFFF',
-              borderRadius: '20px',
-              p: { xs: 4, sm: 6, md: 7 },
-              border: '1px solid #1E293B',
-              boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.4)',
+              borderRadius: '24px',
+              p: { xs: 4, sm: 6, md: 8 },
+              border: '1px solid rgba(59, 130, 246, 0.35)',
+              boxShadow:
+                '0 25px 60px -15px rgba(15, 23, 42, 0.6), 0 0 40px rgba(37, 99, 235, 0.15)',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -1242,10 +1573,10 @@ export default function EmployerHomePage() {
                 position: 'absolute',
                 top: '-20%',
                 right: '-10%',
-                width: 400,
-                height: 400,
+                width: 450,
+                height: 450,
                 borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%)',
                 pointerEvents: 'none',
               }}
             />
@@ -1260,7 +1591,7 @@ export default function EmployerHomePage() {
                     fontSize: '0.72rem',
                     bgcolor: 'rgba(37, 99, 235, 0.25)',
                     color: '#93C5FD',
-                    borderRadius: '4px',
+                    borderRadius: '100px',
                     border: '1px solid rgba(59, 130, 246, 0.4)',
                     mb: 2,
                   }}
@@ -1308,14 +1639,16 @@ export default function EmployerHomePage() {
                       py: 1.75,
                       fontWeight: 700,
                       fontSize: '1rem',
-                      bgcolor: '#2563EB',
+                      background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                       color: '#FFFFFF',
                       textTransform: 'none',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)',
+                      borderRadius: '12px',
+                      boxShadow: '0 4px 16px rgba(37, 99, 235, 0.45)',
+                      transition: 'all 0.25s ease',
                       '&:hover': {
-                        bgcolor: '#1D4ED8',
-                        boxShadow: '0 6px 20px rgba(37, 99, 235, 0.5)',
+                        background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                        boxShadow: '0 6px 22px rgba(37, 99, 235, 0.55)',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >
@@ -1332,13 +1665,16 @@ export default function EmployerHomePage() {
                       fontWeight: 700,
                       fontSize: '1rem',
                       color: '#F8FAFC',
-                      borderColor: '#334155',
-                      bgcolor: 'rgba(255, 255, 255, 0.04)',
+                      borderColor: 'rgba(255, 255, 255, 0.2)',
+                      bgcolor: 'rgba(255, 255, 255, 0.05)',
+                      backdropFilter: 'blur(8px)',
                       textTransform: 'none',
-                      borderRadius: '8px',
+                      borderRadius: '12px',
+                      transition: 'all 0.25s ease',
                       '&:hover': {
-                        borderColor: '#64748B',
-                        bgcolor: 'rgba(255, 255, 255, 0.08)',
+                        borderColor: '#60A5FA',
+                        bgcolor: 'rgba(255, 255, 255, 0.1)',
+                        transform: 'translateY(-1px)',
                       },
                     }}
                   >

@@ -89,90 +89,100 @@ export const CandidateScorecardMockup: React.FC<CandidateScorecardMockupProps> =
         width: '100%',
         maxWidth: 580,
         mx: 'auto',
-        bgcolor: '#FFFFFF',
-        borderRadius: '16px',
-        border: '1px solid #E2E8F0',
+        p: '5px',
+        background:
+          'linear-gradient(145deg, rgba(37,99,235,0.2) 0%, rgba(226,232,240,0.6) 45%, rgba(220,38,38,0.12) 100%)',
+        borderRadius: '20px',
+        border: '1px solid rgba(59, 130, 246, 0.28)',
         boxShadow:
-          '0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 20px 25px -5px rgba(15, 23, 42, 0.08)',
-        overflow: 'hidden',
-        position: 'relative',
-        transition: 'all 0.3s ease',
+          '0 12px 32px -4px rgba(15, 23, 42, 0.1), 0 4px 12px -2px rgba(37, 99, 235, 0.08)',
+        transition: 'all 0.35s cubic-bezier(0.32,0.72,0,1)',
         '&:hover': {
+          transform: 'translateY(-2px)',
           boxShadow:
-            '0 10px 15px -3px rgba(15, 23, 42, 0.06), 0 25px 35px -5px rgba(15, 23, 42, 0.12)',
+            '0 20px 40px -6px rgba(15, 23, 42, 0.14), 0 8px 16px -3px rgba(37, 99, 235, 0.12)',
         },
       }}
     >
-      {/* Top Banner: Brand Header */}
       <Box
         sx={{
-          bgcolor: '#0F172A',
-          px: { xs: 2, sm: 3 },
-          py: 1.5,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #1E293B',
+          bgcolor: '#FFFFFF',
+          borderRadius: '15px',
+          overflow: 'hidden',
+          position: 'relative',
         }}
       >
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 26,
-              height: 26,
-              borderRadius: '6px',
-              bgcolor: '#DC2626',
-              color: '#FFFFFF',
-            }}
-          >
-            <AutoAwesomeRoundedIcon sx={{ fontSize: 16 }} />
-          </Box>
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: '#F8FAFC',
-              fontSize: '0.75rem',
-            }}
-          >
-            AILA Candidate Scorecard
-          </Typography>
-        </Stack>
+        {/* Top Banner: Brand Header */}
+        <Box
+          sx={{
+            background: 'linear-gradient(90deg, #0F172A 0%, #1E293B 100%)',
+            px: { xs: 2, sm: 3 },
+            py: 1.6,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+          }}
+        >
+          <Stack direction="row" spacing={1.2} alignItems="center">
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 28,
+                height: 28,
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
+                color: '#FFFFFF',
+                boxShadow: '0 2px 8px rgba(220, 38, 38, 0.4)',
+              }}
+            >
+              <AutoAwesomeRoundedIcon sx={{ fontSize: 16 }} />
+            </Box>
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: '#F8FAFC',
+                fontSize: '0.78rem',
+              }}
+            >
+              AILA Candidate Scorecard
+            </Typography>
+          </Stack>
 
-        <Stack direction="row" spacing={1} alignItems="center">
-          <Chip
-            size="small"
-            label="ID: #AILA-2026-8842"
-            sx={{
-              height: 22,
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              bgcolor: '#1E293B',
-              color: '#94A3B8',
-              borderRadius: '4px',
-              border: '1px solid #334155',
-            }}
-          />
-          <Chip
-            size="small"
-            label="Đã phỏng vấn 24/7"
-            sx={{
-              height: 22,
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              bgcolor: 'rgba(37, 99, 235, 0.2)',
-              color: '#60A5FA',
-              borderRadius: '4px',
-              border: '1px solid rgba(59, 130, 246, 0.4)',
-            }}
-          />
-        </Stack>
-      </Box>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Chip
+              size="small"
+              label="ID: #AILA-2026-8842"
+              sx={{
+                height: 24,
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                color: '#CBD5E1',
+                borderRadius: '100px',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+              }}
+            />
+            <Chip
+              size="small"
+              label="Đã phỏng vấn 24/7"
+              sx={{
+                height: 24,
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                bgcolor: 'rgba(37, 99, 235, 0.25)',
+                color: '#93C5FD',
+                borderRadius: '100px',
+                border: '1px solid rgba(147, 197, 253, 0.4)',
+              }}
+            />
+          </Stack>
+        </Box>
 
       {/* Main Candidate Info & Match Score */}
       <Box sx={{ p: { xs: 2.5, sm: 3 } }}>
@@ -598,18 +608,22 @@ export const CandidateScorecardMockup: React.FC<CandidateScorecardMockupProps> =
             )
           }
           sx={{
-            py: 1.5,
-            bgcolor: isForwarded ? '#16A34A' : '#0F172A',
+            py: 1.6,
+            background: isForwarded
+              ? 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)'
+              : 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
             color: '#FFFFFF',
             fontWeight: 700,
-            fontSize: '0.9375rem',
+            fontSize: '0.95rem',
             textTransform: 'none',
-            borderRadius: '8px',
-            boxShadow: 'none',
-            transition: 'all 0.2s ease',
+            borderRadius: '12px',
+            boxShadow: '0 4px 14px rgba(15, 23, 42, 0.2)',
+            transition: 'all 0.25s ease',
             '&:hover': {
-              bgcolor: isForwarded ? '#15803D' : '#1E293B',
-              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.2)',
+              background: isForwarded
+                ? 'linear-gradient(135deg, #15803D 0%, #166534 100%)'
+                : 'linear-gradient(135deg, #1E293B 0%, #334155 100%)',
+              boxShadow: '0 6px 18px rgba(15, 23, 42, 0.3)',
             },
           }}
         >
@@ -617,7 +631,8 @@ export const CandidateScorecardMockup: React.FC<CandidateScorecardMockupProps> =
         </Button>
       </Box>
     </Box>
-  );
+  </Box>
+);
 };
 
 export default CandidateScorecardMockup;

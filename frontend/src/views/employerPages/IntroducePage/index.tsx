@@ -423,7 +423,9 @@ export default function IntroducePage() {
         sx={{
           pt: { xs: 6, sm: 8, md: 10 },
           pb: { xs: 7, md: 11 },
-          bgcolor: '#FFFFFF',
+          bgcolor: '#FAFBFC',
+          backgroundImage:
+            'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(37, 99, 235, 0.08), transparent 70%), radial-gradient(ellipse 50% 40% at 85% 80%, rgba(220, 38, 38, 0.04), transparent 60%)',
           borderBottom: '1px solid #E2E8F0',
           position: 'relative',
         }}
@@ -436,7 +438,7 @@ export default function IntroducePage() {
               icon={<VerifiedUserOutlinedIcon sx={{ color: '#2563EB !important', fontSize: 18 }} />}
               label="HỒ SƠ NĂNG LỰC & SỨ MỆNH CÔNG NGHỆ"
               sx={{
-                bgcolor: '#EFF6FF',
+                background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
                 color: '#1D4ED8',
                 fontWeight: 700,
                 fontSize: { xs: '0.75rem', sm: '0.85rem' },
@@ -445,6 +447,7 @@ export default function IntroducePage() {
                 py: 0.6,
                 border: '1px solid #BFDBFE',
                 borderRadius: '100px',
+                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.08)',
               }}
             />
 
@@ -493,16 +496,21 @@ export default function IntroducePage() {
                 endIcon={<ArrowDownwardRoundedIcon />}
                 sx={{
                   width: { xs: '100%', sm: 'auto' },
-                  bgcolor: '#2563EB',
+                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                   color: '#FFFFFF',
                   fontWeight: 700,
                   fontSize: '0.95rem',
-                  py: 1.4,
+                  py: 1.5,
                   px: 3.5,
-                  borderRadius: '10px',
-                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)',
                   textTransform: 'none',
-                  '&:hover': { bgcolor: '#1D4ED8' },
+                  transition: 'all 0.25s ease',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                    boxShadow: '0 6px 20px rgba(37, 99, 235, 0.4)',
+                    transform: 'translateY(-1px)',
+                  },
                 }}
               >
                 Khám Phá Giải Pháp
@@ -517,17 +525,20 @@ export default function IntroducePage() {
                   width: { xs: '100%', sm: 'auto' },
                   borderColor: '#CBD5E1',
                   color: '#0F172A',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   fontSize: '0.95rem',
-                  py: 1.4,
+                  py: 1.5,
                   px: 3.5,
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   textTransform: 'none',
                   bgcolor: '#FFFFFF',
+                  boxShadow: '0 2px 6px rgba(15, 23, 42, 0.04)',
+                  transition: 'all 0.25s ease',
                   '&:hover': {
                     borderColor: '#2563EB',
                     bgcolor: '#F8FAFC',
                     color: '#2563EB',
+                    transform: 'translateY(-1px)',
                   },
                 }}
               >
@@ -967,6 +978,25 @@ export default function IntroducePage() {
                   boxShadow: '0 8px 30px rgba(37, 99, 235, 0.06)',
                 }}
               >
+                {/* Pillar 1 Image Banner */}
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 140,
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    mb: 2,
+                    bgcolor: '#0F172A',
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src="/images/employer/engineering_verify.jpg"
+                    alt="Thẩm định chứng chỉ hành nghề Bộ Xây dựng"
+                    sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                </Box>
+
                 <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
                   <Box
                     sx={{
@@ -1043,6 +1073,25 @@ export default function IntroducePage() {
                   boxShadow: '0 8px 30px rgba(220, 38, 38, 0.06)',
                 }}
               >
+                {/* Pillar 2 Image Banner */}
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 140,
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    mb: 2,
+                    bgcolor: '#0F172A',
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src="/images/employer/voice_ai_interview.jpg"
+                    alt="Trợ lý Voice AI AILA thời gian thực"
+                    sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                </Box>
+
                 <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
                   <Box
                     sx={{
@@ -1119,6 +1168,25 @@ export default function IntroducePage() {
                   boxShadow: '0 8px 30px rgba(15, 23, 42, 0.06)',
                 }}
               >
+                {/* Pillar 3 Image Banner */}
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 140,
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    mb: 2,
+                    bgcolor: '#0F172A',
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src="/images/employer/hero_tech_complex.jpg"
+                    alt="Hệ sinh thái nhân sự liên thông"
+                    sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                </Box>
+
                 <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
                   <Box
                     sx={{
@@ -1532,26 +1600,41 @@ export default function IntroducePage() {
           <Box
             className="gsap-cta-box"
             sx={{
-              borderRadius: { xs: '20px', md: '28px' },
-              bgcolor: '#0F172A',
+              borderRadius: { xs: '20px', md: '24px' },
+              background:
+                'linear-gradient(135deg, rgba(11, 17, 32, 0.94) 0%, rgba(15, 23, 42, 0.88) 100%), url("/images/employer/cta_cyber_backdrop.jpg") center/cover no-repeat',
               color: '#FFFFFF',
               p: { xs: 4, sm: 6, md: 8 },
               position: 'relative',
               overflow: 'hidden',
-              border: '1px solid #1E293B',
-              boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.25)',
+              border: '1px solid rgba(59, 130, 246, 0.35)',
+              boxShadow: '0 25px 60px -15px rgba(15, 23, 42, 0.6), 0 0 40px rgba(37, 99, 235, 0.15)',
             }}
           >
-            <Stack spacing={3} alignItems="center" textAlign="center" sx={{ maxWidth: 820, mx: 'auto' }}>
+            {/* Ambient subtle glow */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '-25%',
+                right: '-15%',
+                width: 450,
+                height: 450,
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            <Stack spacing={3} alignItems="center" textAlign="center" sx={{ maxWidth: 820, mx: 'auto', position: 'relative', zIndex: 1 }}>
               <Chip
                 label="HỢP TÁC DOANH NGHIỆP"
                 sx={{
-                  bgcolor: 'rgba(37, 99, 235, 0.2)',
-                  color: '#60A5FA',
+                  bgcolor: 'rgba(37, 99, 235, 0.25)',
+                  color: '#93C5FD',
                   fontWeight: 700,
                   fontSize: '0.75rem',
                   letterSpacing: '0.05em',
-                  border: '1px solid rgba(96, 165, 250, 0.3)',
+                  border: '1px solid rgba(59, 130, 246, 0.4)',
                   borderRadius: '100px',
                 }}
               />
@@ -1593,16 +1676,20 @@ export default function IntroducePage() {
                   href={localizeRoutePath(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`, i18n.language)}
                   endIcon={<ArrowForwardRoundedIcon />}
                   sx={{
-                    bgcolor: '#2563EB',
+                    background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
                     color: '#FFFFFF',
                     fontWeight: 700,
                     fontSize: '1rem',
                     py: 1.5,
                     px: 3.5,
-                    borderRadius: '10px',
-                    boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 16px rgba(37, 99, 235, 0.45)',
                     textTransform: 'none',
-                    '&:hover': { bgcolor: '#1D4ED8' },
+                    transition: 'all 0.25s ease',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+                      boxShadow: '0 6px 22px rgba(37, 99, 235, 0.55)',
+                    },
                   }}
                 >
                   Đăng Ký Tài Khoản Doanh Nghiệp
@@ -1613,17 +1700,19 @@ export default function IntroducePage() {
                   component={Link}
                   href={localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, i18n.language)}
                   sx={{
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                    borderColor: 'rgba(255, 255, 255, 0.25)',
                     color: '#FFFFFF',
                     fontWeight: 600,
                     fontSize: '1rem',
                     py: 1.5,
                     px: 3.5,
-                    borderRadius: '10px',
+                    borderRadius: '12px',
                     textTransform: 'none',
+                    backdropFilter: 'blur(4px)',
+                    transition: 'all 0.2s ease',
                     '&:hover': {
                       borderColor: '#FFFFFF',
-                      bgcolor: 'rgba(255, 255, 255, 0.08)',
+                      bgcolor: 'rgba(255, 255, 255, 0.1)',
                     },
                   }}
                 >
