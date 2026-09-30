@@ -143,7 +143,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
   'employer.blog-create':     { vi: 'Viết bài chia sẻ tuyển dụng mới', en: 'Create Recruitment Article' },
   'employer.blog-edit':       { vi: 'Chỉnh sửa bài viết tuyển dụng', en: 'Edit Recruitment Article' },
   'employer.chat':            { vi: 'Hộp thư kết nối ứng viên', en: 'Candidate Messages' },
-  'employer.pricing':         { vi: 'Bảng giá dịch vụ tuyển dụng & Đăng tin', en: 'Pricing Plans & Job Posting' },
+  'employer.pricing':         { vi: 'Dịch Vụ & Bảng Giá Tuyển Dụng | InfoHR', en: 'Recruitment Services & Pricing | InfoHR' },
   'employer.service':         { vi: 'Dịch vụ tuyển dụng nhân sự chuyên sâu', en: 'Recruitment Solutions & Services' },
   'employer.introduce':       { vi: 'Giới Thiệu Năng Lực & Sứ Mệnh | InfoHR', en: 'Capability & Tech Mission Profile | InfoHR' },
   'employer.faq':             { vi: 'Câu hỏi thường gặp dành cho doanh nghiệp', en: 'Employer Frequently Asked Questions' },
