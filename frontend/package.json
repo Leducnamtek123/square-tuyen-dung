@@ -155,7 +155,7 @@
     "jest-transform-stub": "^2.0.0",
     "jsdom": "^29.0.1",
     "postcss": "^8.5.8",
-    "sharp": "^0.34.2",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.2.1",
     "ts-jest": "^29.4.9",
     "typescript": "^5.9.2"
