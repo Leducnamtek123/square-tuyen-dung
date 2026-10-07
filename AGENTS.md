@@ -60,14 +60,24 @@ square-tuyen-dung/
 │
 ├── nginx-gateway/                    # Reverse proxy, SSL termination, subdomain routing
 ├── docs/                             # Engineering documentation hierarchy
-│   ├── coding_guidelines/            # 📖 Coding standards (Git, Backend, Frontend, DoD)
-│   ├── decisions/                    # 🏛️ Architecture Decision Records (ADRs)
-│   ├── features/                     # 🚀 Feature specifications, plans, and questions
-│   ├── progress/                     # 📊 Sprint and milestone progress tracking
-│   ├── BUSINESS_REQUIREMENTS.md      # 💼 Business requirements document (BRD)
-│   ├── domain.md                     # 🌐 Domain model and ubiquitous language (DDD)
-│   ├── MVP.md                        # 🎯 Minimum Viable Product roadmap & checklist
-│   └── README.md                     # 📚 Centralized documentation hub
+│   ├── 00-project/                   # 📌 Project overview, goals, scope, glossary, status
+│   ├── 01-product/                   # 💼 Requirements, user roles, workflows, RBAC matrix
+│   ├── 02-architecture/              # 🏛️ System, backend, frontend, voice-ai, infra, Mermaid
+│   ├── 03-domain/                    # 🌐 Domain entities, workflows, lifecycle rules, invariants
+│   ├── 04-api/                       # 🔌 REST/WS API overview, auth, endpoints, DTO contracts
+│   ├── 05-database/                  # 🗄️ Database schema, ERD, migrations, indexes, dual-persistence
+│   ├── 06-frontend/                  # ⚛️ Next.js 16 + React 19 architecture, routing, state, forms, a11y
+│   ├── 07-design/                    # 🎨 Square Brand Design System (square.vn), colors, typography
+│   ├── 08-development/               # 🛠️ Setup guide, dev commands, standards, testing, git workflow
+│   ├── 09-operations/                # 🚀 Docker production, environments, monitoring, backups
+│   ├── 10-ai/                        # 🤖 AI context, rules (no em dash, i18n), verification protocol
+│   ├── 11-decisions/                 # 📜 Architecture Decision Records (ADR-001 -> ADR-005)
+│   ├── 12-tasks/                     # 📋 Task management (backlog, in-progress, blocked, completed)
+│   ├── 13-changelog/                 # ⏱️ Version changelog following Keep a Changelog
+│   ├── static/                       # 📦 frigate-api.yaml (CI/API spec) and logo branding assets
+│   ├── README.md                     # 📚 Central documentation hub
+│   ├── roadmap.md                    # 🗺️ Product & technical roadmap
+│   └── naming-conventions.md         # 🏷️ Comprehensive naming conventions
 └── docker-compose.yml                # Full local & staging orchestration
 ```
 

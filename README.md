@@ -436,27 +436,25 @@ docker compose logs -f nginx-gateway
 
 ## 📚 Trung Tâm Tài Liệu Chuẩn Hóa (Documentation Hub)
 
-Hệ thống tài liệu dự án được cấu trúc bài bản theo chuẩn kỹ thuật chuyên nghiệp tại thư mục [`docs/`](docs/README.md):
+Hệ thống tài liệu dự án được cấu trúc bài bản gồm 14 phân hệ chuyên sâu tại thư mục [docs/](docs/README.md):
 
 * 📖 **[Tổng Quan Tài Liệu (Docs Hub)](docs/README.md)**: Chỉ mục điều hướng toàn bộ hệ sinh thái tài liệu InfoHR.
-* 📐 **[Quy Chuẩn Lập Trình (Coding Guidelines)](docs/coding_guidelines/README.md)**:
-  * [01. Chiến lược phân nhánh Git](docs/coding_guidelines/01_git_branching.md)
-  * [02. Quy chuẩn Git Commit Message](docs/coding_guidelines/02_git_commit_messages.md)
-  * [03. Hướng dẫn phát triển Backend (Django & DRF)](docs/coding_guidelines/03_backend_guidelines.md)
-  * [04. Hướng dẫn phát triển Frontend (Next.js 16 & React 19)](docs/coding_guidelines/04_frontend_guidelines.md)
-  * [05. Tiêu chuẩn hoàn thành (Definition of Done - DoD)](docs/coding_guidelines/05_definition_of_done.md)
-  * [06. Quy trình làm rõ yêu cầu & đặt câu hỏi](docs/coding_guidelines/06_clarification_and_question_protocol.md)
-  * [07. Hướng dẫn phân hệ Quản trị (Admin Guidelines)](docs/coding_guidelines/07_admin_guidelines.md)
-* 🏛️ **[Hồ Sơ Quyết Định Kiến Trúc (ADRs)](docs/decisions/README.md)**:
-  * [ADR-0001: Kiến trúc Monorepo & Lưu trữ kép (MySQL + Elasticsearch + MinIO)](docs/decisions/0001-monorepo-dual-persistence.md)
-  * [ADR-0002: Kiến trúc Dashboard Admin trên Next.js 16 App Router](docs/decisions/0002-admin-dashboard-stack.md)
-* 🚀 **[Quy Trình Phát Triển Tính Năng (Features)](docs/features/README.md)**:
-  * [Quy trình mẫu từ Spec đến Release](docs/features/EXAMPLE_WORKFLOW.md)
-  * [Đặc tả & Kế hoạch Khởi tạo MVP](docs/features/2026-10-02-mvp-bootstrap/spec.md)
-* 💼 **[Tài Liệu Yêu Cầu Nghiệp Vụ (BRD)](docs/BUSINESS_REQUIREMENTS.md)**: Nghiệp vụ 5 cổng dịch vụ và tiêu chuẩn SLA.
-* 🌐 **[Mô Hình Miền & Thuật Ngữ Nghiệp Vụ (DDD)](docs/domain.md)**: Bounded Contexts, Lifecycles, Ubiquitous Language.
-* 🎯 **[Phạm Vi & Kế Hoạch Bản MVP (v1.0.0)](docs/MVP.md)**: Bản đồ cổng, tài khoản test và checklist phát hành.
-* 📊 **[Bảng Theo Dõi Tiến Độ (Progress Dashboard)](docs/progress/README.md)**: Tình trạng các sprint và phân hệ.
+* 📌 **[00. Tổng Quan Dự Án (Project Overview)](docs/00-project/overview.md)**: Mục tiêu, phạm vi, thuật ngữ Ubiquitous Language, trạng thái.
+* 💼 **[01. Yêu Cầu Sản Phẩm (Product & Workflows)](docs/01-product/requirements.md)**: Chân dung người dùng, 5 luồng công việc cốt lõi, ma trận phân quyền RBAC.
+* 🏛️ **[02. Kiến Trúc Hệ Thống (Architecture)](docs/02-architecture/system-architecture.md)**: Backend DRF, Frontend Next.js 16, Voice AI WebRTC, hạ tầng Docker, sơ đồ Mermaid.
+* 🌐 **[03. Mô Hình Miền & Nghiệp Vụ (Domain & DDD)](docs/03-domain/entities.md)**: Bounded Contexts, FSM State Machines, quy tắc toàn vẹn dữ liệu bất biến.
+* 🔌 **[04. Chuẩn Hóa REST & WS API (API Conventions)](docs/04-api/overview.md)**: Quy chuẩn REST, xác thực JWT, danh mục endpoints, đồng bộ DTO contracts.
+* 🗄️ **[05. Cơ Sở Dữ Liệu & Lưu Trữ Kép (Database)](docs/05-database/schema.md)**: Lược đồ MySQL 8, sơ đồ ERD, migrations, composite indexes, pipeline Elasticsearch 7.
+* ⚛️ **[06. Kiến Trúc Frontend (Next.js 16 & React 19)](docs/06-frontend/architecture.md)**: Subdomain routing middleware, 3-tier state, React Hook Form, tiêu chuẩn tiếp cận WCAG 2.1 AA.
+* 🎨 **[07. Hệ Thống Thiết Kế Chuẩn Square (Design System)](docs/07-design/design-system.md)**: Bảng màu thương hiệu #FF5A1F, typography Geist/Inter, thư viện components.
+* 🛠️ **[08. Hướng Dẫn Phát Triển (Development Guide)](docs/08-development/environment-setup.md)**: Setup môi trường, cheat sheet lệnh dev, chuẩn code Ruff/ESLint, testing Pytest/Playwright, quy trình Git.
+* 🚀 **[09. Vận Hành & Triển Khai (Operations)](docs/09-operations/docker-production.md)**: Docker multi-stage builds, quản lý bí mật .env, giám sát Prometheus/Grafana/Loki, backup & disaster recovery.
+* 🤖 **[10. Quy Chuẩn AI Coding Assistant (AI Guidelines)](docs/10-ai/ai-context.md)**: Ngữ cảnh hệ thống, cấm dùng em dash, đa ngôn ngữ i18n, giao thức kiểm chứng 4 giai đoạn.
+* 📜 **[11. Hồ Sơ Quyết Định Kiến Trúc (ADRs)](docs/11-decisions/README.md)**: ADR-001 đến ADR-005 ghi nhận các quyết định công nghệ then chốt.
+* 📋 **[12. Quản Lý Công Việc & Nhiệm Vụ (Task Board)](docs/12-tasks/completed.md)**: Backlog, in-progress, blocked và báo cáo nghiệm thu 16 lỗi Native HRM.
+* ⏱️ **[13. Lịch Sử Phiên Bản (Changelog)](docs/13-changelog/CHANGELOG.md)**: Lịch sử phát hành tuân thủ Keep a Changelog và SemVer.
+* 📦 **[Tài Nguyên Tĩnh & Spec Hợp Đồng (Static & API Spec)](docs/static/frigate-api.yaml)**: OpenAPI schema contract và dữ liệu nhận diện logo Square.
+* 🗺️ **[Lộ Trình Phát Triển (Roadmap)](docs/roadmap.md)** & 🏷️ **[Quy Chuẩn Đặt Tên Toàn Diện](docs/naming-conventions.md)**.
 
 ---
 

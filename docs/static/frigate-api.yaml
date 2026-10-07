@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: Square Tuyen Dung (InfoHR) Core API
+  description: OpenAPI Specification contract used for CI/CD linting, contract verification, and SDK generation.
+  version: 1.0.0
+  contact:
+    name: InfoHR Engineering Team
+    email: dev@infohr.vn
+servers:
+  - url: https://infohr.vn/api/v1
+    description: Production API Server
+  - url: http://localhost:8000/api/v1
+    description: Local Development API Server
+
+paths:
+  /auth/token/:
+    post:
+      summary: Obtain JWT token pair
+      operationId: auth_token_obtain
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+                  refresh:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      email:
+                        type: string
+                      role:
+                        type: string
+
+  /job/job-posts/:
+    get:
+      summary: List published job posts
+      operationId: job_posts_list
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated job list
+    post:
+      summary: Create a job post
+      operationId: job_posts_create
+      security:
+        - BearerAuth: []
+      responses:
+        '201':
+          description: Job post created successfully
+
+  /interview/join-room/:
+    post:
+      summary: Generate LiveKit room token for Voice AI interview
+      operationId: interview_join_room
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [session_id]
+              properties:
+                session_id:
+                  type: integer
+      responses:
+        '200':
+          description: Room token generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  room_name:
+                    type: string
+
+  /native-hrm/payroll/:
+    get:
+      summary: Retrieve company payroll ledgers
+      operationId: payroll_list
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Monthly payroll list
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
