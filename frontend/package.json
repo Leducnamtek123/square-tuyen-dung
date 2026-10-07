@@ -62,7 +62,7 @@
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
     "libphonenumber-js": "^1.13.2",
-    "livekit-client": "^2.21.0",
+    "livekit-client": "^2.22.3",
     "lucide-react": "^1.27.0",
     "motion": "^12.38.0",
     "mui-file-dropzone": "^4.0.2",
