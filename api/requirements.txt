@@ -7,7 +7,7 @@ django-autoslug==1.9.9
 django-celery-beat==2.5.0
 django-ckeditor==6.5.1
 django-cors-headers==3.14.0
-django-extensions==3.2.1
+django-extensions==4.1
 django-filter==23.1
 django-import-export==3.3.6
 django-otp==1.1.6
