@@ -290,7 +290,7 @@ export default function LeaveListPage() {
           </Stack>
           <Button
             component={Link}
-            href="/employer/hrm/attendances/requests"
+            href="/hrm/attendances/requests"
             size="small"
             variant="contained"
             endIcon={<ArrowForwardIcon sx={{ fontSize: 15 }} />}

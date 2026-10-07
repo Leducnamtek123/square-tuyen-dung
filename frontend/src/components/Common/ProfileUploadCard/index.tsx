@@ -39,6 +39,10 @@ const ProfileUploadImage = ({ resumeImage }: ProfileUploadImageProps) => {
   const safeResumeImage = getSafeResourceUrl(resumeImage);
   const cardImageSrc = !hasImageError && safeResumeImage ? safeResumeImage : IMAGES.coverImageDefault;
 
+  React.useEffect(() => {
+    setHasImageError(false);
+  }, [safeResumeImage]);
+
   return (
     <ImageAny
       src={cardImageSrc}
@@ -47,6 +51,7 @@ const ProfileUploadImage = ({ resumeImage }: ProfileUploadImageProps) => {
       sizes="100vw"
       style={{ objectFit: 'cover', position: 'absolute', inset: 0, zIndex: 1 }}
       alt=""
+      unoptimized
     />
   );
 };

@@ -42,6 +42,7 @@ import toastMessages from '@/utils/toastMessages';
 import { useAppSelector } from '@/hooks/useAppStore';
 import { getSafeRedirectPath, getSafeExternalOpenUrl } from '@/utils/safeExternalUrl';
 import { ROLES_NAME } from '@/configs/constants';
+import { isEmployerHostname } from '@/configs/portalRouting';
 import type { RoleName } from '@/types/auth';
 
 const OTP_LENGTH = 6;
@@ -134,7 +135,9 @@ const EmailVerificationRequiredPage = () => {
   const getLoginUrl = React.useCallback(
     (emailToPrefill?: string) => {
       const isEmployer = roleName === ROLES_NAME.EMPLOYER;
-      const basePath = isEmployer ? '/employer/login' : '/dang-nhap';
+      const basePath = isEmployer
+        ? isEmployerHostname() ? '/login' : '/employer/login'
+        : '/dang-nhap';
       if (emailToPrefill) {
         return `${basePath}?email=${encodeURIComponent(emailToPrefill)}`;
       }
@@ -847,7 +850,7 @@ const EmailVerificationRequiredPage = () => {
                     <li>
                       Nếu địa chỉ email bị sai, bạn có thể{' '}
                       <Link
-                        href={roleName === ROLES_NAME.EMPLOYER ? '/employer/register' : '/dang-ky'}
+                        href={roleName === ROLES_NAME.EMPLOYER ? (isEmployerHostname() ? '/register' : '/employer/register') : '/dang-ky'}
                         style={{ color: '#4338CA', fontWeight: 600, textDecoration: 'underline' }}
                       >
                         đăng ký lại tài khoản mới

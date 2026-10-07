@@ -24,8 +24,9 @@ export class RegisterPage extends BasePage {
       .first();
     this.submitButton = page.locator('button[type="submit"]').first();
     this.alertError = page.locator('[role="alert"]').first();
+    // Lưu ý: bỏ qua #__next-route-announcer__ (role="alert" rỗng của Next.js) và class .Mui-error trên InputBase (không có text)
     this.validationErrors = page
-      .locator('.Mui-error, [role="alert"]')
+      .locator('.MuiFormHelperText-root.Mui-error, [role="alert"]:not(#__next-route-announcer__)')
       .or(page.getByText(/bắt buộc|vui lòng nhập|không khớp|ít nhất|hợp lệ/i));
     this.loginLink = page.locator('a[href*="login"], a[href*="dang-nhap"]').first();
   }
@@ -36,6 +37,7 @@ export class RegisterPage extends BasePage {
   async goto() {
     await super.goto('/register');
     await this.waitForLoadingGone();
+    await this.waitForHydration('form button[type="submit"]');
   }
 
   /**
@@ -88,8 +90,11 @@ export class RegisterPage extends BasePage {
    * Kiểm tra thông báo lỗi khi đăng ký bằng email đã tồn tại
    */
   async expectDuplicateEmailError(message?: string | RegExp) {
-    const alert = this.page.locator('[role="alert"]').or(this.page.locator('.Mui-error')).first();
-    await expect(alert).toBeVisible({ timeout: 10_000 });
+    // Bỏ qua #__next-route-announcer__ (role="alert" rỗng của Next.js) và .Mui-error trên InputBase (không có text);
+    // kiểm tra Alert "Tài khoản đã tồn tại" có chứa nội dung mong đợi
+    const alertCandidates = this.page.locator('[role="alert"]:not(#__next-route-announcer__)');
+    const alert = (message ? alertCandidates.filter({ hasText: message }) : alertCandidates).first();
+    await expect(alert).toBeVisible({ timeout: 15_000 });
     if (message) {
       await expect(alert).toContainText(message);
     }
@@ -100,6 +105,7 @@ export class RegisterPage extends BasePage {
    * Xác nhận đăng ký thành công và chuyển hướng đến trang xác thực hoặc trang chủ
    */
   async expectRegistrationSuccess(targetUrlPattern: RegExp = /\/(email-verification-required|onboarding|xac-nhan-email|$)/) {
-    await expect(this.page).toHaveURL(targetUrlPattern, { timeout: 15_000 });
+    // Dev server có thể phải biên dịch on-demand trang đích sau router.push nên cho thời gian dài hơn
+    await expect(this.page).toHaveURL(targetUrlPattern, { timeout: 45_000 });
   }
 }

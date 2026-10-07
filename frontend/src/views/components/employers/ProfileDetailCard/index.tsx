@@ -114,17 +114,17 @@ const ProfileDetailCard: React.FC = () => {
         aria-label="breadcrumb"
         sx={{ mb: 2.5 }}
       >
-        <Link href="/employer/dashboard" style={{ textDecoration: 'none' }}>
+        <Link href="/dashboard" style={{ textDecoration: 'none' }}>
           <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.8125rem', '&:hover': { color: '#2563EB' } }}>
             Nhà tuyển dụng
           </Typography>
         </Link>
-        <Link href="/nha-tuyen-dung/danh-sach-ung-vien" style={{ textDecoration: 'none' }}>
+        <Link href="/danh-sach-ung-vien" style={{ textDecoration: 'none' }}>
           <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.8125rem', '&:hover': { color: '#2563EB' } }}>
             Quản lý ứng viên
           </Typography>
         </Link>
-        <Link href="/nha-tuyen-dung/danh-sach-ung-vien" style={{ textDecoration: 'none' }}>
+        <Link href="/tim-ung-vien" style={{ textDecoration: 'none' }}>
           <Typography variant="body2" sx={{ color: '#64748B', fontWeight: 600, fontSize: '0.8125rem', '&:hover': { color: '#2563EB' } }}>
             Tìm kiếm ứng viên
           </Typography>

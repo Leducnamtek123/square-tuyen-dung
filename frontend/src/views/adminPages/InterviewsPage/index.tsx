@@ -10,11 +10,13 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '@/components/Common/DataTable';
 import { useDataTable } from '@/hooks';
-import { InterviewSession } from '@/types/models';
+import { InterviewSession, InterviewConnectionLog } from '@/types/models';
+import interviewService from '@/services/interviewService';
 import { useInterviews } from './hooks/useInterviews';
 import dayjs from '@/configs/dayjs-config';
 import toastMessages from '@/utils/toastMessages';
@@ -51,6 +53,25 @@ const InterviewsPage = () => {
   const [selectedInterview, setSelectedInterview] = React.useState<InterviewSession | null>(null);
   const safeSelectedRecordingUrl = getSafeResourceUrl(selectedInterview?.recordingUrl);
   const [deleteTarget, setDeleteTarget] = React.useState<InterviewSession | null>(null);
+  const [connectionLogs, setConnectionLogs] = React.useState<InterviewConnectionLog[]>([]);
+  const [loadingLogs, setLoadingLogs] = React.useState(false);
+
+  React.useEffect(() => {
+    if (selectedInterview?.id) {
+      if (selectedInterview.connectionLogs && selectedInterview.connectionLogs.length > 0) {
+        setConnectionLogs(selectedInterview.connectionLogs);
+      } else {
+        setLoadingLogs(true);
+        interviewService
+          .getConnectionLogs(selectedInterview.id)
+          .then((logs) => setConnectionLogs(Array.isArray(logs) ? logs : []))
+          .catch(() => setConnectionLogs([]))
+          .finally(() => setLoadingLogs(false));
+      }
+    } else {
+      setConnectionLogs([]);
+    }
+  }, [selectedInterview]);
 
   const {
       data,
@@ -245,6 +266,69 @@ const InterviewsPage = () => {
                 </Link>
               </Box>
             )}
+
+            {/* WebRTC Connection Telemetry */}
+            <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px dashed #E2E8F0' }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <SensorsOutlinedIcon sx={{ fontSize: 18, color: '#0EA5E9' }} />
+                Độ ổn định kết nối WebRTC ({connectionLogs.length} bản ghi)
+              </Typography>
+              {loadingLogs ? (
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>Đang tải nhật ký kết nối...</Typography>
+              ) : connectionLogs.length === 0 ? (
+                <Typography variant="caption" sx={{ color: '#10B981', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <CheckCircleIcon sx={{ fontSize: 14 }} /> Kết nối ổn định, không ghi nhận sự cố gián đoạn
+                </Typography>
+              ) : (
+                <Stack spacing={0.75} sx={{ maxHeight: 180, overflowY: 'auto', pr: 0.5 }}>
+                  {connectionLogs.map((log) => {
+                    const isDown = log.eventType === 'disconnected' || log.eventType === 'connection_dropped';
+                    const isReconn = log.eventType === 'reconnected';
+                    return (
+                      <Box
+                        key={log.id}
+                        sx={{
+                          p: 1,
+                          borderRadius: 1.5,
+                          bgcolor: isDown ? '#FEF2F2' : isReconn ? '#ECFDF5' : '#F8FAFC',
+                          border: '1px solid',
+                          borderColor: isDown ? '#FECACA' : isReconn ? '#A7F3D0' : '#E2E8F0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        <Box>
+                          <Typography variant="caption" sx={{ fontWeight: 700, color: isDown ? '#DC2626' : isReconn ? '#059669' : '#475569' }}>
+                            {log.eventTypeDisplay || log.eventType}
+                            {log.reconnectAttempt ? ` (lần ${log.reconnectAttempt})` : ''}
+                          </Typography>
+                          {log.participantIdentity && (
+                            <Typography variant="caption" sx={{ display: 'block', color: '#64748B', fontSize: '0.7rem' }}>
+                              User: {log.participantIdentity}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Box sx={{ textAlign: 'right' }}>
+                          {log.downtimeSeconds !== undefined && Number(log.downtimeSeconds) > 0 && (
+                            <Chip
+                              size="small"
+                              label={`Downtime: ${log.downtimeSeconds}s`}
+                              color={Number(log.downtimeSeconds) > 10 ? 'error' : 'warning'}
+                              sx={{ height: 20, fontSize: '0.6875rem' }}
+                            />
+                          )}
+                          <Typography variant="caption" sx={{ display: 'block', color: '#94A3B8', fontSize: '0.6875rem', mt: 0.25 }}>
+                            {log.timestamp ? dayjs(log.timestamp).format('HH:mm:ss') : ''}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Stack>
+              )}
+            </Box>
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, py: 2 }}>

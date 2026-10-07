@@ -899,6 +899,9 @@
     }
   },
   "sidebar": {
+    "sectionRecruitment": "Tuyển dụng & Phỏng vấn",
+    "sectionAccount": "Doanh nghiệp & Cài đặt",
+    "sectionHrm": "Không gian nhân sự HRM",
     "dashboard": "Bảng điều khiển",
     "agentAssistants": "Trợ lý AI AILA",
     "jobPostList": "Tin tuyển dụng",

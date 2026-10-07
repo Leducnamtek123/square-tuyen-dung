@@ -146,7 +146,7 @@ export default function AttendanceOverviewPage() {
           <Stack direction="row" spacing={1.5} flexWrap="wrap">
             <Button
               variant="outlined"
-              onClick={() => router.push('/employer/hrm/attendances/timesheets')}
+              onClick={() => router.push('/hrm/attendances/timesheets')}
               sx={{
                 textTransform: 'none',
                 borderRadius: 2,
@@ -160,7 +160,7 @@ export default function AttendanceOverviewPage() {
             </Button>
             <Button
               variant="contained"
-              onClick={() => router.push('/employer/hrm/attendances/shift-assignments')}
+              onClick={() => router.push('/hrm/attendances/shift-assignments')}
               sx={{
                 textTransform: 'none',
                 borderRadius: 2,
@@ -300,35 +300,35 @@ export default function AttendanceOverviewPage() {
             title: 'Bảng chấm công chi tiết',
             desc: 'Theo dõi chi tiết quẹt thẻ & ký hiệu công ngày 1-31',
             icon: <TableChartOutlinedIcon sx={{ color: '#2563EB' }} />,
-            url: '/employer/hrm/attendances/timesheets',
+            url: '/hrm/attendances/timesheets',
             bg: '#EFF6FF',
           },
           {
             title: 'Bảng phân ca tổng hợp',
             desc: 'Lập lịch phân ca nhân viên và ca làm việc hàng loạt',
             icon: <GridViewOutlinedIcon sx={{ color: '#059669' }} />,
-            url: '/employer/hrm/attendances/shift-assignments',
+            url: '/hrm/attendances/shift-assignments',
             bg: '#ECFDF5',
           },
           {
             title: 'Bảng chấm công tổng hợp',
             desc: 'Khóa công tháng và chuyển tính lương sang phân hệ Bảng lương',
             icon: <SummarizeOutlinedIcon sx={{ color: '#7C3AED' }} />,
-            url: '/employer/hrm/attendances/monthly-summary',
+            url: '/hrm/attendances/monthly-summary',
             bg: '#F5F3FF',
           },
           {
             title: 'Trung tâm quản lý đơn từ',
             desc: 'Phê duyệt 2 cấp đơn xin nghỉ, cập nhật công, làm thêm giờ, công tác',
             icon: <DescriptionOutlinedIcon sx={{ color: '#EA580C' }} />,
-            url: '/employer/hrm/attendances/requests',
+            url: '/hrm/attendances/requests',
             bg: '#FFF7ED',
           },
           {
             title: 'Dữ liệu máy chấm công',
             desc: 'Log quẹt thẻ máy chấm công và dữ liệu nhập từ Excel',
             icon: <FingerprintOutlinedIcon sx={{ color: '#0284C7' }} />,
-            url: '/employer/hrm/attendances/biometric-logs',
+            url: '/hrm/attendances/biometric-logs',
             bg: '#F0F9FF',
           },
         ].map((item, idx) => (
@@ -409,7 +409,7 @@ export default function AttendanceOverviewPage() {
               </Box>
               <Button
                 size="small"
-                onClick={() => router.push('/employer/hrm/attendances/requests')}
+                onClick={() => router.push('/hrm/attendances/requests')}
                 endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 14 }} />}
                 sx={{ textTransform: 'none', fontWeight: 600 }}
               >
@@ -537,7 +537,7 @@ export default function AttendanceOverviewPage() {
               </Box>
               <Button
                 size="small"
-                onClick={() => router.push('/employer/hrm/attendances/shifts')}
+                onClick={() => router.push('/hrm/attendances/shifts')}
                 endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 14 }} />}
                 sx={{ textTransform: 'none', fontWeight: 600 }}
               >

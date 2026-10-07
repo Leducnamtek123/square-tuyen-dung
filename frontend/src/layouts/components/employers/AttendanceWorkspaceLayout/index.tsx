@@ -62,6 +62,8 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
   const isDonTuActive = pathname.includes('/attendances/requests');
 
   const isTongQuanActive =
+    pathname === '/hrm/attendances' ||
+    pathname === '/hrm/attendances/' ||
     pathname === '/employer/hrm/attendances' ||
     pathname === '/employer/hrm/attendances/';
 
@@ -84,10 +86,10 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
           <MuiLink
             underline="hover"
             color="inherit"
-            href="/employer/hrm/dashboard"
+            href="/hrm/dashboard"
             onClick={(e) => {
               e.preventDefault();
-              router.push('/employer/hrm/dashboard');
+              router.push('/hrm/dashboard');
             }}
             sx={{ cursor: 'pointer', color: '#64748B', '&:hover': { color: '#0F172A' } }}
           >
@@ -156,7 +158,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
           {/* 1. Tổng quan */}
           <Button
             startIcon={<DashboardOutlinedIcon sx={{ fontSize: '1.125rem !important' }} />}
-            onClick={() => router.push('/employer/hrm/attendances')}
+            onClick={() => router.push('/hrm/attendances')}
             sx={{
               px: 1.75,
               py: 1,
@@ -203,7 +205,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElChamCong(null);
-                router.push('/employer/hrm/attendances/timesheets');
+                router.push('/hrm/attendances/timesheets');
               }}
               selected={pathname.includes('/attendances/timesheets')}
             >
@@ -220,7 +222,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElChamCong(null);
-                router.push('/employer/hrm/attendances/monthly-summary');
+                router.push('/hrm/attendances/monthly-summary');
               }}
               selected={pathname.includes('/attendances/monthly-summary')}
             >
@@ -238,7 +240,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElChamCong(null);
-                router.push('/employer/hrm/attendances/biometric-logs');
+                router.push('/hrm/attendances/biometric-logs');
               }}
               selected={pathname.includes('/attendances/biometric-logs')}
             >
@@ -285,7 +287,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElCaLamViec(null);
-                router.push('/employer/hrm/attendances/shift-assignments');
+                router.push('/hrm/attendances/shift-assignments');
               }}
               selected={pathname.includes('/attendances/shift-assignments')}
             >
@@ -302,7 +304,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElCaLamViec(null);
-                router.push('/employer/hrm/attendances/shifts');
+                router.push('/hrm/attendances/shifts');
               }}
               selected={pathname.includes('/attendances/shifts')}
             >
@@ -349,9 +351,9 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElDonTu(null);
-                router.push('/employer/hrm/attendances/requests');
+                router.push('/hrm/attendances/requests');
               }}
-              selected={pathname === '/employer/hrm/attendances/requests'}
+              selected={pathname === '/hrm/attendances/requests' || pathname === '/employer/hrm/attendances/requests'}
             >
               <ListItemIcon>
                 <DescriptionOutlinedIcon fontSize="small" sx={{ color: '#2563EB' }} />
@@ -367,7 +369,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElDonTu(null);
-                router.push('/employer/hrm/attendances/requests?type=LEAVE');
+                router.push('/hrm/attendances/requests?type=LEAVE');
               }}
             >
               <ListItemIcon>
@@ -378,7 +380,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElDonTu(null);
-                router.push('/employer/hrm/attendances/requests?type=REGULARISATION');
+                router.push('/hrm/attendances/requests?type=REGULARISATION');
               }}
             >
               <ListItemIcon>
@@ -389,7 +391,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElDonTu(null);
-                router.push('/employer/hrm/attendances/requests?type=BUSINESS_TRIP');
+                router.push('/hrm/attendances/requests?type=BUSINESS_TRIP');
               }}
             >
               <ListItemIcon>
@@ -400,7 +402,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElDonTu(null);
-                router.push('/employer/hrm/attendances/requests?type=OVERTIME');
+                router.push('/hrm/attendances/requests?type=OVERTIME');
               }}
             >
               <ListItemIcon>
@@ -411,7 +413,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
             <MenuItem
               onClick={() => {
                 setAnchorElDonTu(null);
-                router.push('/employer/hrm/attendances/requests?type=LATE_EARLY');
+                router.push('/hrm/attendances/requests?type=LATE_EARLY');
               }}
             >
               <ListItemIcon>
@@ -424,7 +426,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
           {/* 5. Báo cáo */}
           <Button
             startIcon={<AssessmentOutlinedIcon sx={{ fontSize: '1.125rem !important' }} />}
-            onClick={() => router.push('/employer/hrm/attendances/reports')}
+            onClick={() => router.push('/hrm/attendances/reports')}
             sx={{
               px: 1.75,
               py: 1,
@@ -443,7 +445,7 @@ export default function AttendanceWorkspaceLayout({ children }: AttendanceWorksp
           {/* 6. Thiết lập */}
           <Button
             startIcon={<SettingsOutlinedIcon sx={{ fontSize: '1.125rem !important' }} />}
-            onClick={() => router.push('/employer/hrm/attendances/settings')}
+            onClick={() => router.push('/hrm/attendances/settings')}
             sx={{
               px: 1.75,
               py: 1,

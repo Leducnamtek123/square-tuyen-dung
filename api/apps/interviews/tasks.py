@@ -203,6 +203,19 @@ def finalize_disconnected_session(session_id):
                 "duration": session.duration,
             })
             logger.info("Session %s resumed before grace timeout.", session_id)
+            try:
+                from apps.interviews.models import InterviewConnectionLog
+                downtime = (tz.now() - session.update_at).total_seconds() if session.update_at else 0.0
+                InterviewConnectionLog.objects.create(
+                    session=session,
+                    participant_identity=f"session-{session.id}",
+                    participant_role="candidate",
+                    event_type="reconnected",
+                    downtime_seconds=max(0.0, float(downtime)),
+                    metadata={"source": "grace_period_resumed"},
+                )
+            except Exception as log_exc:
+                logger.warning("Could not create reconnection log for session %s: %s", session.id, log_exc)
             return
     except Exception as exc:
         logger.warning("Could not verify LiveKit participants for session %s: %s", session_id, exc)
@@ -223,6 +236,18 @@ def finalize_disconnected_session(session_id):
             "duration": session.duration,
         })
         logger.info("Session %s cancelled after disconnect grace elapsed.", session_id)
+        try:
+            from apps.interviews.models import InterviewConnectionLog
+            InterviewConnectionLog.objects.create(
+                session=session,
+                participant_identity=f"session-{session.id}",
+                participant_role="candidate",
+                event_type="connection_dropped",
+                downtime_seconds=float(getattr(settings, "INTERVIEW_DISCONNECT_GRACE_SECONDS", 300)),
+                metadata={"source": "grace_period_timeout"},
+            )
+        except Exception as log_exc:
+            logger.warning("Could not create connection_dropped log for session %s: %s", session.id, log_exc)
     except Exception as exc:
         logger.error("Failed to finalize disconnected session %s: %s", session_id, exc)
 

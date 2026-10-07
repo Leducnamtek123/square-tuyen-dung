@@ -29,7 +29,7 @@ const languages = [
 ];
 
 const LanguageSwitcher = ({ color = 'inherit', size = 'medium' }: LanguageSwitcherProps) => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useRouter();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -74,6 +74,7 @@ const LanguageSwitcher = ({ color = 'inherit', size = 'medium' }: LanguageSwitch
     <div>
       <Button
         id="language-button"
+        aria-label={t('common:language.choose', { defaultValue: 'Ngôn ngữ / Language' })}
         aria-controls={open ? 'language-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
@@ -92,11 +93,9 @@ const LanguageSwitcher = ({ color = 'inherit', size = 'medium' }: LanguageSwitch
           transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
             backgroundColor: color === 'white' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.05)',
-            borderColor: color === 'white' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(15, 23, 42, 0.08)',
           },
-          '&:focus-visible': {
-            outline: '2px solid #2563eb',
-            outlineOffset: '2px',
+          '&:focus, &:focus-visible': {
+            outline: 'none',
           },
           '&:active': {
             transform: 'scale(0.98)',
@@ -137,7 +136,7 @@ const LanguageSwitcher = ({ color = 'inherit', size = 'medium' }: LanguageSwitch
         }}
         sx={{
           '& .MuiPaper-root': {
-            borderRadius: 0,
+            borderRadius: 2,
             marginTop: 1,
             minWidth: 150,
             boxShadow: '0px 5px 15px rgba(0,0,0,0.1)',

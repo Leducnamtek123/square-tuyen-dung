@@ -355,8 +355,10 @@ export async function getPageDescription(key: string): Promise<string | undefine
   return PAGE_DESCRIPTIONS[key]?.[locale] ?? PAGE_DESCRIPTIONS[key]?.['vi'];
 }
 
+const DEFAULT_OG_IMAGE_URL = 'https://infohr.vn/android-chrome-512x512.png';
+
 /**
- * Generate a Metadata object with localized title, unique description, and canonical URL.
+ * Generate a Metadata object with localized title, unique description, canonical URL, OpenGraph, Twitter, and Robots.
  * Usage in page.tsx:
  *   export const generateMetadata = () => buildPageMetadata('employer.pricing');
  */
@@ -371,9 +373,28 @@ export async function buildPageMetadata(key: string, extra?: Partial<Metadata>):
   return {
     title,
     ...(safeDescription && { description: safeDescription }),
+    robots: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
     ...(canonicalUrl && {
       alternates: {
         canonical: canonicalUrl,
+        languages: {
+          'vi-VN': canonicalUrl,
+          'en-US': canonicalUrl,
+          'x-default': canonicalUrl,
+        },
       },
       openGraph: {
         title,
@@ -382,6 +403,22 @@ export async function buildPageMetadata(key: string, extra?: Partial<Metadata>):
         siteName: 'InfoHR',
         locale: 'vi_VN',
         type: 'website',
+        images: [
+          {
+            url: DEFAULT_OG_IMAGE_URL,
+            width: 512,
+            height: 512,
+            alt: title,
+            type: 'image/png',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        ...(safeDescription && { description: safeDescription }),
+        images: [DEFAULT_OG_IMAGE_URL],
+        creator: '@infohr_vn',
       },
     }),
     ...extra,
@@ -404,7 +441,7 @@ export function buildSeoMetadata({
   title,
   description,
   path,
-  image = 'https://infohr.vn/android-chrome-512x512.png',
+  image = DEFAULT_OG_IMAGE_URL,
   type = 'website',
   robots,
 }: SeoMetadataOptions): Metadata {
@@ -418,10 +455,28 @@ export function buildSeoMetadata({
   return {
     title,
     description: trimmedDesc,
+    robots: robots || {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        'vi-VN': canonicalUrl,
+        'en-US': canonicalUrl,
+        'x-default': canonicalUrl,
+      },
     },
-    ...(robots && { robots }),
     openGraph: {
       title,
       description: trimmedDesc,
@@ -432,9 +487,19 @@ export function buildSeoMetadata({
       images: [
         {
           url: fullImageUrl,
+          width: 512,
+          height: 512,
           alt: title,
+          type: 'image/png',
         },
       ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: trimmedDesc,
+      images: [fullImageUrl],
+      creator: '@infohr_vn',
     },
   };
 }

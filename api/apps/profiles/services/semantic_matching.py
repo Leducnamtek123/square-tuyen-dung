@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
+import os
 import re
 import math
 import logging
@@ -74,12 +75,14 @@ def extract_resume_full_text(resume: Any) -> str:
     if file_obj:
         try:
             file_path = getattr(file_obj, "file", None)
-            if file_path and hasattr(file_path, "path"):
-                doc = fitz.open(file_path.path)
-                pdf_text = " ".join(page.get_text() for page in doc)
-                if pdf_text.strip():
-                    parts.append(pdf_text)
-                doc.close()
+            if file_path and hasattr(file_path, "path") and os.path.exists(file_path.path):
+                with fitz.open(file_path.path) as doc:
+                    # Giới hạn tối đa 50 trang để ngăn PDF zip bomb / CPU exhaustion
+                    pages_text = [page.get_text() for page in doc[:50]]
+                    pdf_text = " ".join(pages_text).strip()
+                    if pdf_text:
+                        # Cắt độ dài tối đa 50,000 ký tự cho semantic matching
+                        parts.append(pdf_text[:50000])
         except Exception as e:
             logger.warning("Could not parse PDF text from resume %s: %s", getattr(resume, "id", None), e)
 

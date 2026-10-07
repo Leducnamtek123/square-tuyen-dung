@@ -1088,7 +1088,7 @@ export default function AboutUsPage() {
               <Button
                 variant="outlined"
                 component="a"
-                href="https://employer.infohr.vn"
+                href="https://ntd.infohr.vn"
                 target="_blank"
                 rel="noopener noreferrer"
                 endIcon={<ExternalLink size={16} />}

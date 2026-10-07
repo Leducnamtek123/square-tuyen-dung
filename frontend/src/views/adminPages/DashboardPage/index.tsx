@@ -89,6 +89,15 @@ const percent = (value: number, total: number) => {
   return Math.round((value / total) * 100);
 };
 
+const calcGrowthRate = (total: number, newlyAdded: number | undefined): number | undefined => {
+  if (newlyAdded === undefined || newlyAdded === null || total <= 0) return undefined;
+  const previousTotal = total - newlyAdded;
+  if (previousTotal <= 0) {
+    return newlyAdded > 0 ? 100 : 0;
+  }
+  return Math.round((newlyAdded / previousTotal) * 100);
+};
+
 const DashboardPanel = ({ title, children, action }: DashboardPanelProps) => (
   <Paper
     elevation={0}
@@ -434,7 +443,8 @@ export default function DashboardPage() {
             title={t('dashboard.totalUsers')}
             value={totalUsers}
             subtitle={totalUsers === 0 ? t('dashboard.noUserData') : (days === 30 ? `${t('dashboard.last30Days')}: +${n(stats?.newUsers ?? stats?.newUsers30d)}` : `${days} ngày qua: +${n(stats?.newUsers ?? stats?.newUsers30d)}`)}
-            deltaPercent={14}
+            deltaPercent={calcGrowthRate(totalUsers, stats?.newUsers ?? stats?.newUsers30d)}
+            deltaPeriod={days === 30 ? '30 ngày trước' : `${days} ngày trước`}
             icon={<PeopleIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#EFF6FF"
             iconColor="#2563EB"
@@ -446,7 +456,8 @@ export default function DashboardPage() {
             title={t('dashboard.jobPostStatus')}
             value={totalJobPosts}
             subtitle={days === 30 ? `${t('dashboard.newJobPosts30d')}: ${n(stats?.newJobPosts ?? stats?.newJobPosts30d)}` : `${days} ngày qua: +${n(stats?.newJobPosts ?? stats?.newJobPosts30d)}`}
-            deltaPercent={8}
+            deltaPercent={calcGrowthRate(totalJobPosts, stats?.newJobPosts ?? stats?.newJobPosts30d)}
+            deltaPeriod={days === 30 ? '30 ngày trước' : `${days} ngày trước`}
             icon={<WorkIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#ECFDF5"
             iconColor="#10B981"
@@ -458,7 +469,8 @@ export default function DashboardPage() {
             title={t('dashboard.jobPostViews')}
             value={n(stats?.totalJobPostViews)}
             subtitle={`${days} ngày qua: +${n(stats?.newJobPostViews)}`}
-            deltaPercent={18}
+            deltaPercent={calcGrowthRate(n(stats?.totalJobPostViews), stats?.newJobPostViews)}
+            deltaPeriod={days === 30 ? '30 ngày trước' : `${days} ngày trước`}
             icon={<VisibilityIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#ECFEFF"
             iconColor="#0891B2"
@@ -470,7 +482,8 @@ export default function DashboardPage() {
             title={t('dashboard.applicationPipeline')}
             value={totalApplications}
             subtitle={days === 30 ? `${t('dashboard.newApplications30d')}: ${n(stats?.newApplications ?? stats?.newApplications30d)}` : `${days} ngày qua: +${n(stats?.newApplications ?? stats?.newApplications30d)}`}
-            deltaPercent={22}
+            deltaPercent={calcGrowthRate(totalApplications, stats?.newApplications ?? stats?.newApplications30d)}
+            deltaPeriod={days === 30 ? '30 ngày trước' : `${days} ngày trước`}
             icon={<DescriptionIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#FFFBEB"
             iconColor="#F59E0B"
@@ -482,7 +495,8 @@ export default function DashboardPage() {
             title={t('dashboard.companies')}
             value={totalCompanies}
             subtitle={`${t('dashboard.verifiedCompanies')}: ${totalVerifiedCompanies}/${totalCompanies}`}
-            deltaPercent={12}
+            deltaPercent={undefined}
+            deltaPeriod={days === 30 ? '30 ngày trước' : `${days} ngày trước`}
             icon={<BusinessIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#F5F3FF"
             iconColor="#8B5CF6"
@@ -494,7 +508,8 @@ export default function DashboardPage() {
             title={t('dashboard.interviews')}
             value={totalInterviews}
             subtitle={days === 30 ? `${t('dashboard.newInterviews30d')}: ${n(stats?.newInterviews ?? stats?.newInterviews30d)}` : `${days} ngày qua: +${n(stats?.newInterviews ?? stats?.newInterviews30d)}`}
-            deltaPercent={35}
+            deltaPercent={calcGrowthRate(totalInterviews, stats?.newInterviews ?? stats?.newInterviews30d)}
+            deltaPeriod={days === 30 ? '30 ngày trước' : `${days} ngày trước`}
             icon={<SmartToyOutlinedIcon sx={{ fontSize: 24 }} />}
             iconBgColor="#FDF2F8"
             iconColor="#EC4899"

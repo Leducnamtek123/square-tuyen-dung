@@ -1,13 +1,24 @@
 'use client';
+
 import React, { useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from '@/configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
-import { Alert, Box, Button, Stack, Typography, Paper, type Theme } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
-import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import { useForm } from 'react-hook-form';
+import type { RowSelectionState } from '@tanstack/react-table';
+import {
+  Briefcase,
+  Plus,
+  Download,
+  Upload,
+  Search,
+  SlidersHorizontal,
+  X,
+  AlertTriangle,
+  RotateCcw,
+} from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
 import toastMessages from '@/utils/toastMessages';
 import { confirmModal } from '@/utils/sweetalert2Modal';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
@@ -15,12 +26,8 @@ import jobService from '@/services/jobService';
 import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '@/hooks';
 import { useCompanyProfile, useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
-import type { RowSelectionState } from '@tanstack/react-table';
 import { useConfig } from '@/hooks/useConfig';
-import { useForm } from 'react-hook-form';
 import {
-  GlobalFilterBar,
-  ActiveFilterChips,
   GlobalFilterDrawer,
   jobPostFilterConfig,
   useGlobalFilter,
@@ -47,9 +54,9 @@ const JobPostCard = () => {
     ordering,
     pagination,
     onPaginationChange,
-  } = useDataTable({ 
+  } = useDataTable({
     initialSorting: [{ id: 'createAt', desc: true }],
-    initialPageSize: 10
+    initialPageSize: 10,
   });
 
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
@@ -65,11 +72,11 @@ const JobPostCard = () => {
     },
   });
 
-  const { control, handleSubmit, reset } = useForm<any>({
+  const { control, handleSubmit, reset, register, setValue } = useForm<any>({
     defaultValues: filter.appliedValues,
   });
 
-  // Sync react-hook-form when filter values change externally (e.g. URL param or chip removal)
+  // Sync react-hook-form when filter values change externally
   React.useEffect(() => {
     reset(filter.appliedValues);
   }, [filter.appliedValues, reset]);
@@ -105,274 +112,316 @@ const JobPostCard = () => {
 
   const createJobPostHref = localizeRoutePath(`/${ROUTES.EMPLOYER.JOB_POST_CREATE}`, i18n.language);
 
-  const handleShowUpdate = useCallback((slugOrId: string | number) => {
-    const editRoute = localizeRoutePath(`/${ROUTES.EMPLOYER.JOB_POST}/${slugOrId}/edit`, i18n.language);
-    router.push(editRoute);
-  }, [router, i18n.language]);
+  const handleShowUpdate = useCallback(
+    (slugOrId: string | number) => {
+      const editRoute = localizeRoutePath(
+        `/${ROUTES.EMPLOYER.JOB_POST}/${slugOrId}/edit`,
+        i18n.language
+      );
+      router.push(editRoute);
+    },
+    [router, i18n.language]
+  );
 
   const handleShowAdd = useCallback(() => {
     if (isCreateBlocked) return;
     router.push(createJobPostHref);
   }, [isCreateBlocked, router, createJobPostHref]);
 
-  const handleDelete = useCallback((slugOrId: string | number) => {
-    confirmModal(
-      async () => {
-        try {
-          await deleteJobPost(slugOrId);
-          toastMessages.success(t('jobPost.delete.success'));
-        } catch (error) {
-          // Error handled by mutation hook
-        }
-      },
-      t('jobPost.delete.title'),
-      t('jobPost.delete.confirm'),
-      'warning'
-    );
-  }, [deleteJobPost, t]);
+  const handleDelete = useCallback(
+    (slugOrId: string | number) => {
+      confirmModal(
+        async () => {
+          try {
+            await deleteJobPost(slugOrId);
+            toastMessages.success(t('jobPost.delete.success'));
+          } catch (error) {
+            // Error handled by mutation hook
+          }
+        },
+        t('jobPost.delete.title'),
+        t('jobPost.delete.confirm'),
+        'warning'
+      );
+    },
+    [deleteJobPost, t]
+  );
 
   const [exportModalOpen, setExportModalOpen] = React.useState(false);
   const [importModalOpen, setImportModalOpen] = React.useState(false);
 
-  const jobPostExportColumns: ExportColumn[] = React.useMemo(() => [
-    {
-      id: 'title',
-      label: t('jobPost.table.title'),
-      checked: true,
-      getValue: (row) => row['Chức Danh'] || row.jobName || row.title || '---',
-    },
-    {
-      id: 'createdDate',
-      label: t('jobPost.table.createdDate'),
-      checked: true,
-      getValue: (row) => {
-        const val = row['Ngày Đăng'] || row.createAt || row.createdDate;
-        return val ? dayjs(val).format('DD/MM/YYYY') : '---';
+  const jobPostExportColumns: ExportColumn[] = React.useMemo(
+    () => [
+      {
+        id: 'title',
+        label: t('jobPost.table.title'),
+        checked: true,
+        getValue: (row) => row['Chức Danh'] || row.jobName || row.title || '---',
       },
-    },
-    {
-      id: 'deadline',
-      label: t('jobPost.table.deadline'),
-      checked: true,
-      getValue: (row) => {
-        const val = row['Ngày Hết Hạn'] || row.deadline;
-        return val ? dayjs(val).format('DD/MM/YYYY') : '---';
+      {
+        id: 'createdDate',
+        label: t('jobPost.table.createdDate'),
+        checked: true,
+        getValue: (row) => {
+          const val = row['Ngày Đăng'] || row.createAt || row.createdDate;
+          return val ? dayjs(val).format('DD/MM/YYYY') : '---';
+        },
       },
-    },
-    {
-      id: 'status',
-      label: t('jobPost.table.status'),
-      checked: true,
-      getValue: (row) => row['Trạng thái'] || row.status || '---',
-    },
-    {
-      id: 'applicationsCount',
-      label: t('jobPost.table.applications'),
-      checked: true,
-      getValue: (row) => (row['Số Hồ Sơ Ứng Tuyển'] != null ? String(row['Số Hồ Sơ Ứng Tuyển']) : row.appliedNumber != null ? String(row.appliedNumber) : row.applicationsCount != null ? String(row.applicationsCount) : '0'),
-    },
-    {
-      id: 'creator',
-      label: t('jobPost.table.creator'),
-      checked: true,
-      getValue: (row) => row['Người tạo'] || row.creator || '---',
-    },
-  ], [t]);
+      {
+        id: 'deadline',
+        label: t('jobPost.table.deadline'),
+        checked: true,
+        getValue: (row) => {
+          const val = row['Ngày Hết Hạn'] || row.deadline;
+          return val ? dayjs(val).format('DD/MM/YYYY') : '---';
+        },
+      },
+      {
+        id: 'status',
+        label: t('jobPost.table.status'),
+        checked: true,
+        getValue: (row) => row['Trạng thái'] || row.status || '---',
+      },
+      {
+        id: 'applicationsCount',
+        label: t('jobPost.table.applications'),
+        checked: true,
+        getValue: (row) =>
+          row['Số Hồ Sơ Ứng Tuyển'] != null
+            ? String(row['Số Hồ Sơ Ứng Tuyển'])
+            : row.appliedNumber != null
+            ? String(row.appliedNumber)
+            : row.applicationsCount != null
+            ? String(row.applicationsCount)
+            : '0',
+      },
+      {
+        id: 'creator',
+        label: t('jobPost.table.creator'),
+        checked: true,
+        getValue: (row) => row['Người tạo'] || row.creator || '---',
+      },
+    ],
+    [t]
+  );
 
-  const handleFetchJobPostsExportData = useCallback(async (scope: ExportScope) => {
-    const params = {
-      page: 1,
-      pageSize: scope === 'all' ? 1000 : pageSize,
-      ordering,
-      kw: scope === 'all' ? undefined : (filter.appliedValues.kw || undefined),
-      isUrgent: scope === 'all' ? undefined : activeUrgentVal,
-      status: scope === 'all' ? undefined : (filter.appliedValues.statusId === '' ? undefined : filter.appliedValues.statusId),
-    };
-    const resData = await jobService.exportEmployerJobPosts(params);
-    const exportList = (resData || []) as Record<string, any>[];
-    if (scope === 'selected') {
-      const selectedIds = Object.keys(rowSelection).filter(id => rowSelection[id]);
-      if (selectedIds.length === 0) return [];
-      const filtered = exportList.filter((item) => {
-        const itemId = String(item.id ?? item.ID ?? item['Mã Việc Làm'] ?? item.slug ?? '');
-        return selectedIds.includes(itemId);
-      });
-      if (filtered.length > 0) return filtered;
-      const currentList = data?.results || [];
-      return currentList.filter((item: any) => selectedIds.includes(String(item.id ?? item.slug)));
-    }
-    return exportList;
-  }, [pageSize, ordering, filter.appliedValues, activeUrgentVal, rowSelection, data?.results]);
+  const handleFetchJobPostsExportData = useCallback(
+    async (scope: ExportScope) => {
+      const params = {
+        page: 1,
+        pageSize: scope === 'all' ? 1000 : pageSize,
+        ordering,
+        kw: scope === 'all' ? undefined : filter.appliedValues.kw || undefined,
+        isUrgent: scope === 'all' ? undefined : activeUrgentVal,
+        status:
+          scope === 'all'
+            ? undefined
+            : filter.appliedValues.statusId === ''
+            ? undefined
+            : filter.appliedValues.statusId,
+      };
+      const resData = await jobService.exportEmployerJobPosts(params);
+      const exportList = (resData || []) as Record<string, any>[];
+      if (scope === 'selected') {
+        const selectedIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+        if (selectedIds.length === 0) return [];
+        const filtered = exportList.filter((item) => {
+          const itemId = String(item.id ?? item.ID ?? item['Mã Việc Làm'] ?? item.slug ?? '');
+          return selectedIds.includes(itemId);
+        });
+        if (filtered.length > 0) return filtered;
+        const currentList = data?.results || [];
+        return currentList.filter((item: any) => selectedIds.includes(String(item.id ?? item.slug)));
+      }
+      return exportList;
+    },
+    [pageSize, ordering, filter.appliedValues, activeUrgentVal, rowSelection, data?.results]
+  );
+
+  const handleSearchFormSubmit = (formData: any) => {
+    filter.handleApply(formData);
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setValue('statusId', val);
+    const updated = { ...filter.appliedValues, statusId: val };
+    reset(updated);
+    filter.handleApply(updated);
+  };
+
+  const handleClearFilters = () => {
+    reset(jobPostFilterConfig.defaultValues);
+    filter.handleReset();
+  };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper 
-        elevation={0}
-        sx={{ 
-          p: { xs: 2.5, md: 3.5 }, 
-          borderRadius: 3, 
-          border: '1px solid',
-          borderColor: 'divider',
-          boxShadow: (theme: Theme) => theme.customShadows?.z1,
-          bgcolor: 'background.paper',
-          overflow: 'hidden'
-        }}
-      >
-        <Stack 
-          direction={{ xs: 'column', sm: 'row' }} 
-          alignItems={{ xs: 'flex-start', sm: 'center' }} 
-          justifyContent="space-between" 
-          spacing={3} 
-          mb={3}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ 
-              p: 1, 
-              borderRadius: 2, 
-              bgcolor: 'primary.extralight', 
-              color: 'primary.main',
-              display: 'flex'
-            }}>
-              <WorkOutlineIcon sx={{ fontSize: 28 }} />
-            </Box>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
+    <div className="w-full">
+      {/* Main Container Card */}
+      <div className="w-full bg-white border border-slate-200/80 rounded-[4px] shadow-2xs p-4 md:p-6 space-y-4">
+        {/* Header Toolbar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-[4px] bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-base md:text-lg font-bold text-slate-900 tracking-tight">
                 {t('jobPost.title')}
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+              </h1>
+              <p className="text-xs text-slate-500">
                 {t('jobPost.manageSubtitle')}
-              </Typography>
-            </Box>
-          </Box>
-          <Stack direction="row" spacing={1.25} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
-            <Button 
-              variant="outlined" 
-              color="inherit" 
-              startIcon={<UploadFileOutlinedIcon />} 
-              onClick={() => setImportModalOpen(true)} 
-              sx={{ 
-                flex: { xs: 1, sm: 'none' },
-                px: { xs: 1.5, sm: 2.5 }, 
-                py: 1, 
-                fontWeight: 800, 
-                textTransform: 'none',
-                whiteSpace: 'nowrap',
-                border: '1px solid #E2E8F0',
-                bgcolor: '#FFFFFF',
-                color: '#334155',
-                '&:hover': {
-                  bgcolor: '#F8FAFC',
-                  borderColor: '#CBD5E1',
-                },
-              }}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setImportModalOpen(true)}
+              className="h-8.5 px-3 rounded-[4px] text-xs font-medium border-slate-200 text-slate-700 hover:bg-slate-50 gap-1.5 shadow-2xs cursor-pointer"
             >
+              <Upload className="w-3.5 h-3.5 text-slate-500" />
               Nhập Excel/CSV
             </Button>
-            <Button 
-              variant="outlined" 
-              color="inherit" 
-              startIcon={<FileDownloadOutlinedIcon />} 
-              onClick={() => setExportModalOpen(true)} 
-              sx={{ 
-                flex: { xs: 1, sm: 'none' },
-                px: { xs: 1.5, sm: 3 }, 
-                py: 1, 
-                fontWeight: 800, 
-                textTransform: 'none',
-                whiteSpace: 'nowrap',
-                border: '1px solid #E2E8F0',
-                bgcolor: '#FFFFFF',
-                color: '#334155',
-                '&:hover': {
-                  bgcolor: '#F8FAFC',
-                  borderColor: '#CBD5E1',
-                },
-              }}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setExportModalOpen(true)}
+              className="h-8.5 px-3 rounded-[4px] text-xs font-medium border-slate-200 text-slate-700 hover:bg-slate-50 gap-1.5 shadow-2xs cursor-pointer"
             >
+              <Download className="w-3.5 h-3.5 text-slate-500" />
               {t('jobPost.exportList')}
             </Button>
-            <Button 
-              variant="contained" 
-              color="primary" 
-              startIcon={<AddIcon />} 
-              onClick={handleShowAdd} 
+
+            <Button
+              size="sm"
+              onClick={handleShowAdd}
               disabled={isCreateBlocked}
-              sx={{ 
-                flex: { xs: 1.25, sm: 'none' },
-                px: { xs: 2, sm: 4 }, 
-                py: 1.25, 
-                whiteSpace: 'nowrap',
-                boxShadow: (theme: Theme) => theme.customShadows?.primary, 
-                fontWeight: 900,
-                textTransform: 'none'
-              }}
+              className="h-8.5 px-3.5 rounded-[4px] text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-1.5 shadow-2xs cursor-pointer"
             >
+              <Plus className="w-4 h-4" />
               {t('jobPost.createNew')}
             </Button>
-          </Stack>
-        </Stack>
+          </div>
+        </div>
 
-        {/* Unified Global Filter Bar */}
-        <Stack spacing={1.5} sx={{ mb: 3 }}>
-          <GlobalFilterBar
-            control={control}
-            handleSubmit={handleSubmit}
-            handleSearchSubmit={(data) => {
-              filter.handleApply(data);
-            }}
-            primaryFieldName="statusId"
-            primaryFieldOptions={allConfig?.jobPostStatusOptions || []}
-            primaryFieldPlaceholder={t('jobPost.filters.statusPlaceholder')}
-            searchPlaceholder={t('jobPost.filters.keywordsPlaceholder')}
-            onOpenFilterDrawer={() => filter.setDrawerOpen(true)}
-            activeFilterCount={filter.activeFilterCount}
-          />
+        {/* 1-Line Compact Filter Bar */}
+        <form onSubmit={handleSubmit(handleSearchFormSubmit)} className="space-y-2.5">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                {...register('kw')}
+                type="text"
+                placeholder={t('jobPost.filters.keywordsPlaceholder')}
+                className="w-full h-9 pl-9 pr-3 rounded-[4px] border border-slate-200 bg-white text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+              />
+            </div>
 
-          <ActiveFilterChips
-            tags={filter.activeTags}
-            onRemoveTag={(key) => {
-              reset({ ...filter.appliedValues, [key]: '' });
-              filter.handleRemoveTag(key);
-            }}
-            onClearAll={() => {
-              reset(jobPostFilterConfig.defaultValues);
-              filter.handleReset();
-            }}
-          />
-        </Stack>
+            {/* Status Select Dropdown */}
+            <div className="w-full sm:w-48 shrink-0">
+              <select
+                {...register('statusId')}
+                onChange={handleStatusChange}
+                className="w-full h-9 px-3 rounded-[4px] border border-slate-200 bg-white text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 cursor-pointer"
+              >
+                <option value="">{t('jobPost.filters.statusPlaceholder')}</option>
+                <option value="3">Đã duyệt</option>
+                <option value="1">Chờ duyệt</option>
+                <option value="2">Bị từ chối</option>
+              </select>
+            </div>
 
-        {isCreateBlocked ? (
-          <Alert
-            severity="warning"
-            sx={{ mb: 3 }}
-            action={
-              <Button color="inherit" size="small" href={verificationHref}>
-                {t('jobPost.verificationRequired.action')}
+            {/* Filter Drawer Toggle */}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => filter.setDrawerOpen(true)}
+              className="h-9 px-3 rounded-[4px] text-xs font-medium border-slate-200 text-slate-700 hover:bg-slate-50 gap-1.5 cursor-pointer shrink-0"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+              {t('jobPost.filter')}
+              {filter.activeFilterCount > 0 && (
+                <span className="w-4.5 h-4.5 rounded-[3px] bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center ml-0.5">
+                  {filter.activeFilterCount}
+                </span>
+              )}
+            </Button>
+
+            {/* Search Submit Button */}
+            <Button
+              type="submit"
+              size="sm"
+              className="h-9 px-4 rounded-[4px] text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white gap-1.5 cursor-pointer shrink-0 shadow-2xs"
+            >
+              <Search className="w-3.5 h-3.5" />
+              {t('jobPost.filters.search')}
+            </Button>
+          </div>
+
+          {/* Active Filter Tags */}
+          {filter.activeTags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 py-1.5 px-2.5 rounded-[4px] bg-slate-50 border border-slate-200/80 text-xs">
+              <span className="font-semibold text-slate-500 uppercase tracking-wider text-[10px] mr-1">
+                Đang lọc ({filter.activeTags.length}):
+              </span>
+              {filter.activeTags.map((tag) => (
+                <span
+                  key={tag.key}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] bg-blue-50 text-blue-800 border border-blue-200/80 text-xs font-medium"
+                >
+                  <span>
+                    {tag.label}: <strong className="font-semibold">{tag.valueLabel}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      reset({ ...filter.appliedValues, [tag.key]: '' });
+                      filter.handleRemoveTag(tag.key);
+                    }}
+                    className="border-0 bg-transparent p-0 text-blue-500 hover:text-blue-800 transition-colors ml-0.5 cursor-pointer flex items-center justify-center"
+                    aria-label="Xóa bộ lọc"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleClearFilters}
+                className="h-6 px-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50 text-xs font-semibold ml-2 rounded-[3px] cursor-pointer"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                Xóa tất cả
               </Button>
-            }
-          >
-            {t('jobPost.verificationRequired.message')}
-          </Alert>
+            </div>
+          )}
+        </form>
+
+        {/* Company Verification Warning */}
+        {isCreateBlocked ? (
+          <div className="rounded-[4px] border border-amber-200 bg-amber-50/80 p-3 flex items-center justify-between text-xs text-amber-900">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>{t('jobPost.verificationRequired.message')}</span>
+            </div>
+            <a
+              href={verificationHref}
+              className="font-semibold underline hover:text-amber-950 shrink-0 ml-3"
+            >
+              {t('jobPost.verificationRequired.action')}
+            </a>
+          </div>
         ) : null}
 
-        {/* Global Filter Drawer */}
-        <GlobalFilterDrawer
-          open={filter.drawerOpen}
-          onClose={() => filter.setDrawerOpen(false)}
-          config={jobPostFilterConfig}
-          control={control}
-          allConfig={allConfig}
-          handleReset={() => {
-            reset(jobPostFilterConfig.defaultValues);
-            filter.handleReset();
-            filter.setDrawerOpen(false);
-          }}
-          handleSubmit={handleSubmit}
-          handleApply={(data) => {
-            filter.handleApply(data);
-          }}
-        />
-
+        {/* Job Posts Table */}
         <JobPostsTable
           variant="flat"
           rows={data?.results || []}
@@ -391,41 +440,60 @@ const JobPostCard = () => {
           enableRowSelection
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
+          onClearFilters={handleClearFilters}
+          hasActiveFilters={filter.activeTags.length > 0 || Boolean(filter.appliedValues.statusId)}
         />
+      </div>
 
-        <AiCandidateRecommendationModal
-          open={aiModalOpen}
-          onClose={() => setAiModalOpen(false)}
-          jobPost={selectedAiJob}
-        />
+      {/* Global Filter Drawer */}
+      <GlobalFilterDrawer
+        open={filter.drawerOpen}
+        onClose={() => filter.setDrawerOpen(false)}
+        config={jobPostFilterConfig}
+        control={control as any}
+        allConfig={allConfig}
+        handleReset={handleClearFilters}
+        handleSubmit={handleSubmit}
+        handleApply={(formData) => {
+          filter.handleApply(formData);
+        }}
+      />
 
-        <ExportModal
-          open={exportModalOpen}
-          onClose={() => setExportModalOpen(false)}
-          defaultFileName="DanhSachTinTuyenDung"
-          columns={jobPostExportColumns}
-          fetchData={handleFetchJobPostsExportData}
-          entity="job_post"
-          totalRecords={{
-            all: data?.count || 0,
-            filtered: data?.count || 0,
-            selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
-          }}
-        />
+      {/* AI Recommendation Modal */}
+      <AiCandidateRecommendationModal
+        open={aiModalOpen}
+        onClose={() => setAiModalOpen(false)}
+        jobPost={selectedAiJob}
+      />
 
-        <ImportModal
-          open={importModalOpen}
-          onClose={() => setImportModalOpen(false)}
-          entity="job_post"
-          title="Nhập tin tuyển dụng (Job Post Import)"
-          onSuccess={() => {
-            router.refresh();
-          }}
-        />
+      {/* Export Modal */}
+      <ExportModal
+        open={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        defaultFileName="DanhSachTinTuyenDung"
+        columns={jobPostExportColumns}
+        fetchData={handleFetchJobPostsExportData}
+        entity="job_post"
+        totalRecords={{
+          all: data?.count || 0,
+          filtered: data?.count || 0,
+          selected: Object.keys(rowSelection).filter((k) => rowSelection[k]).length,
+        }}
+      />
 
-        {isMutating && <BackdropLoading />}
-      </Paper>
-    </Box>
+      {/* Import Modal */}
+      <ImportModal
+        open={importModalOpen}
+        onClose={() => setImportModalOpen(false)}
+        entity="job_post"
+        title="Nhập tin tuyển dụng (Job Post Import)"
+        onSuccess={() => {
+          router.refresh();
+        }}
+      />
+
+      {isMutating && <BackdropLoading />}
+    </div>
   );
 };
 

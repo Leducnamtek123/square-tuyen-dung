@@ -121,7 +121,7 @@ export default function AdminDataGrid<T>({
       elevation={0}
       sx={{
         width: '100%',
-        borderRadius: 3,
+        borderRadius: '4px',
         border: '1px solid #E2E8F0',
         bgcolor: '#FFFFFF',
         overflow: 'hidden',

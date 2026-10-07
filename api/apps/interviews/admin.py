@@ -6,7 +6,8 @@ from django.contrib import admin
 from .models import (
     Question, QuestionGroup, InterviewScript,
     InterviewSession, InterviewTranscript, InterviewEvaluation,
-    VoiceProfile, VoiceProfileSample, VoiceProfileGrant
+    VoiceProfile, VoiceProfileSample, VoiceProfileGrant,
+    InterviewConnectionLog, InterviewProctoringEvent
 )
 
 
@@ -70,6 +71,11 @@ class EvaluationInline(admin.StackedInline):
     model = InterviewEvaluation
     extra = 0
 
+class ConnectionLogInline(admin.TabularInline):
+    model = InterviewConnectionLog
+    extra = 0
+    readonly_fields = ['participant_identity', 'participant_role', 'event_type', 'downtime_seconds', 'reconnect_attempt', 'network_quality', 'timestamp']
+
 @admin.register(InterviewSession)
 class InterviewSessionAdmin(admin.ModelAdmin):
     list_display = [
@@ -79,7 +85,7 @@ class InterviewSessionAdmin(admin.ModelAdmin):
     list_filter = ['status', 'type']
     search_fields = ['room_name', 'candidate__full_name', 'job_post__job_name']
     readonly_fields = ['room_name', 'invite_token']
-    inlines = [TranscriptInline, EvaluationInline]
+    inlines = [TranscriptInline, EvaluationInline, ConnectionLogInline]
 
 @admin.register(InterviewTranscript)
 class InterviewTranscriptAdmin(admin.ModelAdmin):
@@ -102,3 +108,22 @@ class InterviewScriptAdmin(admin.ModelAdmin):
     list_filter = ['scenario_type', 'hr_persona', 'is_system_preset', 'is_active']
     search_fields = ['name', 'description', 'slug']
     filter_horizontal = ['questions']
+
+
+@admin.register(InterviewConnectionLog)
+class InterviewConnectionLogAdmin(admin.ModelAdmin):
+    list_display = [
+        'id', 'session', 'participant_identity', 'participant_role',
+        'event_type', 'downtime_seconds', 'reconnect_attempt', 'network_quality', 'timestamp'
+    ]
+    list_filter = ['event_type', 'participant_role', 'network_quality']
+    search_fields = ['session__room_name', 'participant_identity']
+    readonly_fields = ['session', 'timestamp']
+
+
+@admin.register(InterviewProctoringEvent)
+class InterviewProctoringEventAdmin(admin.ModelAdmin):
+    list_display = ['id', 'session', 'event_type', 'duration_seconds', 'timestamp']
+    list_filter = ['event_type']
+    search_fields = ['session__room_name']
+

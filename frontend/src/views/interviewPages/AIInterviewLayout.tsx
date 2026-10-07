@@ -45,6 +45,7 @@ import { InterviewAvatar } from './components/avatar/InterviewAvatar';
 import { LiveMicActivityBadge } from './components/LiveMicActivityBadge';
 import { AilaLogo } from '@/components/Common/AilaLogo';
 import { useLiveAudioTrackAnalyzer } from './hooks/useLiveAudioTrackAnalyzer';
+import { useWebRTCTelemetry } from './hooks/useWebRTCTelemetry';
 import {
   getParticipantCompanyName,
   getParticipantRole,
@@ -1123,6 +1124,7 @@ function ChatPanel({
 
 type AIInterviewLayoutProps = {
   sessionId?: number | string;
+  inviteToken?: string;
   onEndSession?: () => Promise<void> | void;
   questions?: Question[];
   defaultDurationSeconds?: number;
@@ -1137,6 +1139,7 @@ type AIInterviewLayoutProps = {
 
 export function AIInterviewLayout({
   sessionId,
+  inviteToken,
   onEndSession,
   questions: propQuestions,
   defaultDurationSeconds,
@@ -1151,6 +1154,10 @@ export function AIInterviewLayout({
   const savedSettings = employerAiSettingService.getSettings();
   const effectiveCharacterId = propCharacterId || savedSettings.activeCharacterId || 'ng_c_linh';
   const effectiveAvatarActions = propAvatarActions || savedSettings.avatarActions;
+  const telemetry = useWebRTCTelemetry({
+    sessionId,
+    inviteToken,
+  });
   const [lipsyncVideoUrl, setLipsyncVideoUrl] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDraft, setChatDraft] = useState('');
@@ -1648,6 +1655,20 @@ export function AIInterviewLayout({
           <div className="flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-50/95 px-4 py-2 text-xs font-semibold text-amber-900 shadow-md backdrop-blur-md">
             <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-ping shrink-0" />
             <span>{tabSwitchWarning}</span>
+          </div>
+        </div>
+      )}
+
+      {/* WebRTC Reconnection Alert Toast */}
+      {telemetry.isReconnecting && (
+        <div className="absolute top-14 inset-x-0 z-50 flex justify-center px-4 pointer-events-none animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2 rounded-xl border border-rose-300 bg-rose-50/95 px-4 py-2 text-xs font-semibold text-rose-900 shadow-md backdrop-blur-md">
+            <span className="flex h-2 w-2 rounded-full bg-rose-500 animate-ping shrink-0" />
+            <span>
+              {t('interview:reconnecting', 'Đang kết nối lại phòng phỏng vấn... (Lần {{attempt}})', {
+                attempt: telemetry.reconnectCount,
+              })}
+            </span>
           </div>
         </div>
       )}

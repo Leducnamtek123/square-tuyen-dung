@@ -91,7 +91,7 @@ export default function TablePagination({
                 sx={{
                   height: 32,
                   fontSize: '0.8125rem',
-                  borderRadius: 1.5,
+                  borderRadius: '3px',
                   '& .MuiSelect-select': { py: 0.5, px: 1.25 },
                 }}
               >
@@ -129,7 +129,7 @@ export default function TablePagination({
           size="medium"
           onClick={() => onPageChange(1)}
           disabled={!canGoPrev}
-          sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
+          sx={{ color: '#64748B', borderRadius: '4px', minWidth: 36, minHeight: 36 }}
           title={t('pagination.firstPage', 'Trang đầu')}
           aria-label={t('pagination.firstPage', 'Trang đầu')}
         >
@@ -139,14 +139,14 @@ export default function TablePagination({
           size="medium"
           onClick={() => onPageChange(safePage - 1)}
           disabled={!canGoPrev}
-          sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
+          sx={{ color: '#64748B', borderRadius: '4px', minWidth: 36, minHeight: 36 }}
           title={t('pagination.prevPage', 'Trang trước')}
           aria-label={t('pagination.prevPage', 'Trang trước')}
         >
           <KeyboardArrowLeftIcon sx={{ fontSize: 20 }} />
         </IconButton>
 
-        <Box sx={{ px: 1.5, py: 0.5, bgcolor: '#F8FAFC', borderRadius: 1.5, border: '1px solid #E2E8F0', minWidth: 48, textAlign: 'center' }}>
+        <Box sx={{ px: 1.5, py: 0.5, bgcolor: '#F8FAFC', borderRadius: '4px', border: '1px solid #E2E8F0', minWidth: 48, textAlign: 'center' }}>
           <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.8125rem', color: '#1E293B' }}>
             {safePage} / {totalPages}
           </Typography>
@@ -156,7 +156,7 @@ export default function TablePagination({
           size="medium"
           onClick={() => onPageChange(safePage + 1)}
           disabled={!canGoNext}
-          sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
+          sx={{ color: '#64748B', borderRadius: '4px', minWidth: 36, minHeight: 36 }}
           title={t('pagination.nextPage', 'Trang sau')}
           aria-label={t('pagination.nextPage', 'Trang sau')}
         >
@@ -166,7 +166,7 @@ export default function TablePagination({
           size="medium"
           onClick={() => onPageChange(totalPages)}
           disabled={!canGoNext}
-          sx={{ color: '#64748B', borderRadius: 1.5, minWidth: 36, minHeight: 36 }}
+          sx={{ color: '#64748B', borderRadius: '4px', minWidth: 36, minHeight: 36 }}
           title={t('pagination.lastPage', 'Trang cuối')}
           aria-label={t('pagination.lastPage', 'Trang cuối')}
         >

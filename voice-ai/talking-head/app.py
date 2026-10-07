@@ -71,9 +71,23 @@ def randN(N)->int:
 
 def build_avatar_session(sessionid:str, params:dict)->BaseAvatar:
     opt_this = copy.deepcopy(opt)
-    opt_this.sessionid = sessionid
+    clean_sid = re.sub(r'[^a-zA-Z0-9_\-]', '', str(sessionid or 'default'))
+    opt_this.sessionid = clean_sid
 
-    avatar_id = params.get('avatar',opt.avatar_id) 
+    raw_avatar_id = str(params.get('avatar', opt.avatar_id or '')).strip()
+    if not re.match(r'^[a-zA-Z0-9_\-]+$', raw_avatar_id):
+        avatar_id = opt.avatar_id
+    else:
+        avatar_id = raw_avatar_id
+
+    # Verify avatar directory exists and is strictly under data/avatars
+    base_avatar_dir = os.path.abspath(os.path.join('data', 'avatars'))
+    target_avatar_dir = os.path.abspath(os.path.join(base_avatar_dir, avatar_id))
+    if not (target_avatar_dir.startswith(base_avatar_dir + os.sep) and os.path.isdir(target_avatar_dir)):
+        logger.warning("Avatar directory %s not found or invalid, falling back to default %s", avatar_id, opt.avatar_id)
+        avatar_id = opt.avatar_id
+        target_avatar_dir = os.path.abspath(os.path.join(base_avatar_dir, avatar_id))
+
     opt_this.avatar_id = avatar_id
     ref_audio = params.get('refaudio','') #音色
     ref_text = params.get('reftext','')
@@ -108,10 +122,18 @@ async def download_record(request):
     sessionid = request.match_info.get('sessionid')
     if not sessionid:
         return web.Response(status=400, text="sessionid is required")
-    
-    filename = sessionid if sessionid.endswith('.mp4') else f"{sessionid}.mp4"
-    record_file = os.path.join('data', 'record', filename)
-    
+
+    clean_sid = re.sub(r'[^a-zA-Z0-9_\-]', '', str(sessionid).replace('.mp4', ''))
+    if not clean_sid:
+        return web.Response(status=400, text="Invalid sessionid")
+
+    base_record_dir = os.path.abspath(os.path.join('data', 'record'))
+    record_file = os.path.abspath(os.path.join(base_record_dir, f"{clean_sid}.mp4"))
+
+    # Path traversal protection
+    if not (record_file.startswith(base_record_dir + os.sep) or record_file == base_record_dir):
+        return web.Response(status=403, text="Access denied")
+
     if os.path.exists(record_file):
         return web.FileResponse(record_file)
     else:

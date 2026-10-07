@@ -29,14 +29,15 @@ export default function TopAnnouncementBanner({
 }: TopAnnouncementBannerProps = {}) {
   const { t, i18n } = useTranslation('common');
   const pathname = usePathname() || '';
-  const [isDismissed, setIsDismissed] = useState(true); // default true on SSR to prevent hydration mismatch
+  const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
     try {
-      const stored = sessionStorage.getItem(STORAGE_KEY) === 'true';
-      setIsDismissed(stored);
+      if (sessionStorage.getItem(STORAGE_KEY) === 'true') {
+        setIsDismissed(true);
+      }
     } catch {
-      setIsDismissed(false);
+      // ignore
     }
   }, []);
 

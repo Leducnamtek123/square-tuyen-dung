@@ -16,6 +16,7 @@ import { useAppSelector } from "@/redux/hooks";
 import tokenService from "@/services/tokenService";
 import { useTranslation } from "react-i18next";
 import { localizeRoutePath } from "@/configs/routeLocalization";
+import { isEmployerHostname } from "@/configs/portalRouting";
 import AnimatedFlame from "@/components/Common/AnimatedFlame";
 
 type HeaderNavSubLink = {
@@ -127,7 +128,10 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
       const hasToken = Boolean(tokenService.getAccessTokenFromCookie());
       if (!hasToken || !isAuthenticated) {
         e.preventDefault();
-        router.push(localizeRoutePath('/nha-tuyen-dung/login', i18n.language));
+        const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
+        const onEmployer = isEmployerHostname(hostName);
+        const loginPath = onEmployer ? '/dang-nhap' : localizeRoutePath('/nha-tuyen-dung/login', i18n.language);
+        router.push(loginPath);
       }
     }
   };
@@ -177,24 +181,18 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                 fontSize: { md: '0.78rem', lg: '0.84rem', xl: '0.925rem' },
                 px: { md: 0.75, lg: 1.25, xl: 2 },
                 py: isHighlight ? 0.8 : 0.75,
-                borderRadius: 0,
+                borderRadius: '8px',
                 position: 'relative',
                 backgroundColor: isActive
                   ? isHighlight
                     ? '#f1f5f9'
-                    : 'rgba(15, 23, 42, 0.06)'
+                    : 'rgba(15, 23, 42, 0.05)'
                   : 'transparent',
-                border: "1px solid",
-                borderColor: isActive
-                  ? isHighlight
-                    ? '#e2e8f0'
-                    : 'rgba(15, 23, 42, 0.10)'
-                  : 'transparent',
-                boxShadow: isActive && isHighlight ? '0 2px 6px rgba(15, 23, 42, 0.04)' : 'none',
+                border: "none",
+                boxShadow: 'none',
                 transition: 'all 0.2s ease-in-out',
                 '&:hover': {
                   backgroundColor: isHighlight ? '#f1f5f9' : 'rgba(15, 23, 42, 0.04)',
-                  borderColor: isHighlight ? '#e2e8f0' : 'rgba(15, 23, 42, 0.10)',
                   transform: isHighlight ? 'translateY(-1px)' : 'none',
                   textDecoration: "none",
                   '& .doodle-underline-stroke': {
@@ -202,7 +200,8 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                     opacity: 1,
                   },
                 },
-                '&:focus, &:active': {
+                '&:focus, &:active, &:focus-visible': {
+                  outline: 'none',
                   textDecoration: "none",
                 },
               }}
@@ -255,7 +254,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                       mt: 1.25,
                       p: 1,
                       width: 360,
-                      borderRadius: 0,
+                      borderRadius: 2,
                       boxShadow: '0 20px 48px rgba(15, 23, 42, 0.18)',
                       border: '1px solid rgba(226, 232, 240, 0.95)',
                     },
@@ -277,7 +276,7 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
                     sx={{
                       py: 1.25,
                       px: 1.5,
-                      borderRadius: 0,
+                      borderRadius: 1.5,
                       mb: 0.5,
                       whiteSpace: 'normal',
                       '&:hover': {

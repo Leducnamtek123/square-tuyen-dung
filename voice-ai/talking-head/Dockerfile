@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.5
-FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim@sha256:4f5d923c9dcea037f57bda425dd209f3ec643da2f0b74227f68d09dab0b3bb36
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1
@@ -26,7 +26,12 @@ RUN uv pip install --system --no-cache \
 COPY . .
 
 # Ensure media and data folders exist
-RUN mkdir -p media/renders data
+RUN mkdir -p media/renders data && \
+    groupadd -g 1001 appuser && \
+    useradd -u 1001 -g appuser -m appuser && \
+    chown -R appuser:appuser /app
+
+USER appuser
 
 EXPOSE 8010
 

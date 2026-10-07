@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { NextRequest } from 'next/server';
-import { middleware } from '@/middleware';
+import { proxy, middleware } from '@/proxy';
 import EmployerServicePage from '../service/page';
 
 // Mock next/navigation redirect
@@ -15,44 +15,50 @@ jest.mock('next/navigation', () => ({
   },
 }));
 
-describe('Employer Portal Routing & Middleware Mapping', () => {
+describe('Employer Portal Routing & Proxy Mapping', () => {
   beforeEach(() => {
     mockRedirect.mockClear();
   });
 
-  describe('Static Middleware Configuration Integrity', () => {
-    const middlewareSource = readFileSync(
-      resolve(__dirname, '../../../../src/middleware.ts'),
+  describe('Static Proxy Configuration Integrity', () => {
+    const proxySource = readFileSync(
+      resolve(__dirname, '../../../../src/proxy.ts'),
       'utf-8'
     );
 
     it('maps root / to /employer in EMPLOYER_EXACT_MAP', () => {
-      expect(middlewareSource).toMatch(/'\/':\s*['"]\/employer['"]/);
+      expect(proxySource).toMatch(/'\/':\s*['"]\/employer['"]/);
     });
 
     it('maps /gioi-thieu and /introduce to /employer/introduce', () => {
-      expect(middlewareSource).toMatch(/'\/gioi-thieu':\s*['"]\/employer\/introduce['"]/);
-      expect(middlewareSource).toMatch(/'\/introduce':\s*['"]\/employer\/introduce['"]/);
+      expect(proxySource).toMatch(/'\/gioi-thieu':\s*['"]\/employer\/introduce['"]/);
+      expect(proxySource).toMatch(/'\/introduce':\s*['"]\/employer\/introduce['"]/);
     });
 
     it('maps /dich-vu and /service to /employer/pricing', () => {
-      expect(middlewareSource).toMatch(/'\/dich-vu':\s*['"]\/employer\/pricing['"]/);
-      expect(middlewareSource).toMatch(/'\/service':\s*['"]\/employer\/pricing['"]/);
+      expect(proxySource).toMatch(/'\/dich-vu':\s*['"]\/employer\/pricing['"]/);
+      expect(proxySource).toMatch(/'\/service':\s*['"]\/employer\/pricing['"]/);
     });
 
     it('maps /bao-gia and /pricing to /employer/pricing', () => {
-      expect(middlewareSource).toMatch(/'\/bao-gia':\s*['"]\/employer\/pricing['"]/);
-      expect(middlewareSource).toMatch(/'\/pricing':\s*['"]\/employer\/pricing['"]/);
+      expect(proxySource).toMatch(/'\/bao-gia':\s*['"]\/employer\/pricing['"]/);
+      expect(proxySource).toMatch(/'\/pricing':\s*['"]\/employer\/pricing['"]/);
     });
   });
 
-  describe('Runtime Middleware Rewrites on Employer Domain', () => {
+  describe('Runtime Proxy Rewrites on Employer Domain', () => {
     const testRewrite = (path: string, host = 'ntd.infohr.vn') => {
       const req = new NextRequest(`https://${host}${path}`, {
         headers: { host },
       });
-      return middleware(req);
+      return proxy(req);
     };
+
+    it('redirects employer.infohr.vn to ntd.infohr.vn via 301', () => {
+      const res = testRewrite('/tin-tuyen-dung', 'employer.infohr.vn');
+      expect(res.status).toBe(301);
+      expect(res.headers.get('location')).toBe('https://ntd.infohr.vn/tin-tuyen-dung');
+    });
 
     it('rewrites root / to /employer on ntd.infohr.vn', () => {
       const res = testRewrite('/');

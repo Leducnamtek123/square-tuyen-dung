@@ -28,15 +28,10 @@ test.describe('Phân hệ 01-Auth: Bảo vệ Route & Phân quyền RBAC (AUTH-0
     await page.goto('/employer/dashboard', { waitUntil: 'domcontentloaded' });
 
     // Client gate chặn lại và chuyển hướng về trang chủ '/' hoặc '/forbidden' hoặc '/employer/login'
-    await page.waitForURL((url) => {
-      const pathname = url.pathname;
-      return (
-        pathname === '/' ||
-        pathname.includes('/forbidden') ||
-        pathname.includes('/login') ||
-        !pathname.includes('/employer/dashboard')
-      );
-    }, { timeout: 15_000 });
+    // Dùng expect.poll trên URL thay vì waitForURL: guard redirect giữa chừng làm navigation bị abort (net::ERR_ABORTED)
+    await expect
+      .poll(() => new URL(page.url()).pathname, { timeout: 30_000 })
+      .not.toContain('/employer/dashboard');
 
     expect(page.url()).not.toContain('/employer/dashboard');
   });
@@ -68,15 +63,9 @@ test.describe('Phân hệ 01-Auth: Bảo vệ Route & Phân quyền RBAC (AUTH-0
     await page.goto('/admin/dashboard', { waitUntil: 'domcontentloaded' });
 
     // AdminSectionClient chặn tài khoản non-admin và chuyển hướng ra trang chủ hoặc /forbidden
-    await page.waitForURL((url) => {
-      const pathname = url.pathname;
-      return (
-        pathname === '/' ||
-        pathname.includes('/forbidden') ||
-        pathname.includes('/login') ||
-        !pathname.includes('/admin/dashboard')
-      );
-    }, { timeout: 15_000 });
+    await expect
+      .poll(() => new URL(page.url()).pathname, { timeout: 30_000 })
+      .not.toContain('/admin/dashboard');
 
     expect(page.url()).not.toContain('/admin/dashboard');
   });
@@ -181,10 +170,12 @@ test.describe('Phân hệ 01-Auth: Bảo vệ Route & Phân quyền RBAC (AUTH-0
     await page.goto('/account', { waitUntil: 'domcontentloaded' });
 
     // Kiểm tra cookies bị xóa hoặc chuyển hướng về login
+    // Lưu ý: injectSession gieo cookie cho cả localhost và 127.0.0.1; trang chạy trên localhost
+    // không thể xóa cookie của 127.0.0.1, nên chỉ kiểm tra cookie thuộc origin hiện tại (giống AUTH-07).
     await expect
       .poll(
         async () => {
-          const cookies = await context.cookies();
+          const cookies = await context.cookies(page.url());
           const accessToken = cookies.find((c) => c.name === 'access_token');
           return accessToken?.value || '';
         },

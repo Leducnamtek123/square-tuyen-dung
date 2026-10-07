@@ -300,7 +300,7 @@ export default function StepEmployerComplete({
 
           <Button
             component={Link}
-            href="/employer/hrm/team"
+            href="/hrm/employees"
             variant="outlined"
             size="small"
             startIcon={<GroupAddIcon />}

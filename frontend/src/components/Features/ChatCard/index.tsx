@@ -68,6 +68,13 @@ const ChatCard = (_props: ChatCardProps) => {
       size="large"
       aria-label={t('chatCard.openChat')}
       color="inherit"
+      sx={{
+        borderRadius: '50%',
+        outline: 'none !important',
+        '&:focus, &:focus-visible': {
+          outline: 'none !important',
+        },
+      }}
     >
       <Badge badgeContent={count} color="error">
         <ChatBubbleOutlineRoundedIcon />

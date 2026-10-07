@@ -68,8 +68,11 @@ export interface InterviewScript {
 
   // CamelCase accessors for seamless compatibility
   scenarioType?: ScenarioType;
+  scenarioTypeDisplay?: string;
   hrPersona?: HrPersona;
+  hrPersonaDisplay?: string;
   systemPrompt?: string;
+  timeLimit?: number;
   greetingMessage?: string;
   closingMessage?: string;
   timeLimitPerQuestion?: number;
@@ -300,3 +303,120 @@ export const DYNAMIC_PROMPT_VARIABLES: readonly DynamicVariable[] = [
     description: 'Danh sách kỹ năng chính cần đánh giá (ví dụ: Python, Microservices, System Design)',
   },
 ];
+
+/**
+ * Normalizes an InterviewScript object from either camelCase (from axios) or snake_case (raw/backend)
+ * so that all components can access fields with 100% reliability.
+ */
+export function normalizeInterviewScript(raw: any): InterviewScript {
+  if (!raw || typeof raw !== 'object') return raw;
+
+  const scenario_type: ScenarioType =
+    raw.scenario_type || raw.scenarioType || 'technical';
+  const hr_persona: HrPersona =
+    raw.hr_persona || raw.hrPersona || 'professional';
+  const time_limit_per_question = Number(
+    raw.time_limit_per_question ?? raw.timeLimitPerQuestion ?? 120
+  );
+  const allow_ai_followup = Boolean(
+    raw.allow_ai_followup ?? raw.allowAiFollowup ?? true
+  );
+  const max_followup_questions = Number(
+    raw.max_followup_questions ?? raw.maxFollowupQuestions ?? 2
+  );
+  const is_system_preset = Boolean(
+    raw.is_system_preset ?? raw.isSystemPreset ?? false
+  );
+  const is_active = Boolean(raw.is_active ?? raw.isActive ?? true);
+  const voice_name = raw.voice_name || raw.voiceName || 'Trúc Ly';
+  const voice_speed = Number(raw.voice_speed ?? raw.voiceSpeed ?? 1.0);
+  const character_id = raw.character_id || raw.characterId || 'ng_c_linh';
+  const system_prompt = raw.system_prompt || raw.systemPrompt || '';
+  const greeting_message = raw.greeting_message || raw.greetingMessage || '';
+  const closing_message = raw.closing_message || raw.closingMessage || '';
+  const evaluation_rubric =
+    raw.evaluation_rubric || raw.evaluationRubric || [];
+
+  const question_details: ScriptQuestion[] =
+    raw.question_details ||
+    raw.questionDetails ||
+    raw.questions_detail ||
+    raw.questionsDetail ||
+    [];
+  const questions = raw.questions || question_details || [];
+  const questions_count = Number(
+    raw.questions_count ??
+      raw.questionsCount ??
+      (Array.isArray(question_details) ? question_details.length : 0) ??
+      (Array.isArray(questions) ? questions.length : 0)
+  );
+
+  const question_group = raw.question_group || raw.questionGroup || null;
+  const question_group_name =
+    raw.question_group_name ||
+    raw.questionGroupName ||
+    (typeof question_group === 'object' && question_group !== null
+      ? question_group.name
+      : undefined);
+
+  const canWrite =
+    raw.canWrite !== undefined ? Boolean(raw.canWrite) : !is_system_preset;
+
+  return {
+    ...raw,
+    id: raw.id,
+    name: raw.name || '',
+    slug: raw.slug || '',
+    description: raw.description || '',
+    scenario_type,
+    scenarioType: scenario_type,
+    scenario_type_display: raw.scenario_type_display || raw.scenarioTypeDisplay,
+    scenarioTypeDisplay: raw.scenario_type_display || raw.scenarioTypeDisplay,
+    hr_persona,
+    hrPersona: hr_persona,
+    hr_persona_display: raw.hr_persona_display || raw.hrPersonaDisplay,
+    hrPersonaDisplay: raw.hr_persona_display || raw.hrPersonaDisplay,
+    system_prompt,
+    systemPrompt: system_prompt,
+    greeting_message,
+    greetingMessage: greeting_message,
+    closing_message,
+    closingMessage: closing_message,
+    time_limit_per_question,
+    timeLimitPerQuestion: time_limit_per_question,
+    allow_ai_followup,
+    allowAiFollowup: allow_ai_followup,
+    max_followup_questions,
+    maxFollowupQuestions: max_followup_questions,
+    character_id,
+    characterId: character_id,
+    voice_name,
+    voiceName: voice_name,
+    voice_speed,
+    voiceSpeed: voice_speed,
+    evaluation_rubric,
+    evaluationRubric: evaluation_rubric,
+    is_system_preset,
+    isSystemPreset: is_system_preset,
+    is_active,
+    isActive: is_active,
+    canWrite,
+    question_group,
+    questionGroup: question_group,
+    question_group_name,
+    questionGroupName: question_group_name,
+    questions,
+    question_details,
+    questionDetails: question_details,
+    questions_count,
+    questionsCount: questions_count,
+    inherit_company_identity:
+      raw.inherit_company_identity ?? raw.inheritCompanyIdentity,
+    inheritCompanyIdentity:
+      raw.inherit_company_identity ?? raw.inheritCompanyIdentity,
+    create_at: raw.create_at || raw.createdAt,
+    createdAt: raw.create_at || raw.createdAt,
+    update_at: raw.update_at || raw.updatedAt,
+    updatedAt: raw.update_at || raw.updatedAt,
+  };
+}

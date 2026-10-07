@@ -51,7 +51,12 @@ const Popup = ({
       <Dialog
         fullScreen={fullScreen}
         open={openPopup}
-        onClose={() => setOpenPopup(false)}
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick') {
+            return;
+          }
+          setOpenPopup(false);
+        }}
         aria-labelledby="responsive-dialog-title"
         maxWidth={maxWidth}
         fullWidth

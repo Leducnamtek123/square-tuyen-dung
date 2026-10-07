@@ -2,13 +2,15 @@
 
 > **Subsystem**: `frontend/`  
 > **Parent Governance**: Inherits all global rules from [../AGENTS.md](../AGENTS.md)  
-> **Tech Stack**: Next.js 16 (App Router), React 19, TypeScript (`strict: true`), MUI 6 + Tailwind CSS v4, TanStack Query v5, Redux Toolkit, LiveKit Client.
+> **Tech Stack**: Next.js 16 (App Router), React 19, TypeScript (`strict: true`), Tailwind CSS v4 + Shadcn UI, TanStack Query v5, Redux Toolkit, LiveKit Client.
 
 ---
 
 ## ⚡ Critical Rules (Always Follow)
 
 - **NEVER** use `any` type in TypeScript — always use `unknown` with type narrowing or define explicit interfaces.
+- **ALWAYS** use **Shadcn UI (`@/components/ui/*`)** and **Tailwind CSS v4** for all new UI and refactored components. **DO NOT USE Material UI (MUI)**.
+- **NEVER** use rounded pills or circular shapes (`rounded-full`, `rounded-2xl`, etc.) for buttons, tags, badges, avatars, or inputs — always use **micro-radius ("bo nhẹ hết cỡ": `rounded-[3px]`, `rounded-[4px]`, `rounded-sm`)**.
 - **ALWAYS** default components to Server Components (RSC) unless interactivity, React hooks, or browser APIs are required.
 - **ALWAYS** lazy-load heavy client-only modules (`@react-pdf-viewer`, `chart.js`, `leaflet`, `react-draft-wysiwyg`) using `next/dynamic` with `{ ssr: false }`.
 - **NEVER** duplicate API server cache into Redux — use `@tanstack/react-query` v5 for all server data.
@@ -35,18 +37,21 @@
 
 ---
 
-## 2. 🎨 UI & Styling Architecture: MUI 6 & Tailwind CSS v4 Coexistence
+## 2. 🎨 UI & Styling Architecture: Shadcn UI & Tailwind CSS Standard (No Material UI)
 
-This project harnesses both **Material UI (MUI v6)** and **Tailwind CSS v4**. To avoid CSS specificity conflicts, adhere to these strict rules:
+This project has officially transitioned to **Shadcn UI (`@/components/ui/*`)** and **Tailwind CSS v4**. To ensure consistent, modern, enterprise SaaS aesthetics (Linear/Stripe-inspired), strictly adhere to these directives:
 
-### Coexistence Principles
-1. **Structural Layout & Spacing**: Use **Tailwind CSS** utility classes for page grids, flex layouts, responsive breakpoints, padding, and margins (`className="flex flex-col gap-4 p-6 md:p-8"`).
-2. **Complex Interactive Widgets**: Use **MUI 6** components for specialized enterprise UI: Dialogs, Menus, DatePickers (`@mui/x-date-pickers`), DataTables, and Sliders.
-3. **MUI Styling (`sx` vs Tailwind)**:
-   - Do NOT mix competing color or font declarations across both `className` and `sx` on the same component.
-   - Use `sx` only for deep slot customizations that cannot be targeted cleanly with Tailwind.
-4. **Class Name Merging**: Always use `cn()` (combining `clsx` and `tailwind-merge`) when conditionally composing CSS classes.
-5. **Icons**: Prefer `lucide-react` or `@phosphor-icons/react` for modern, lightweight SVGs. Keep icon sizing consistent (`size-4`, `size-5`, `h-5 w-5`).
+### Core UI Directives
+1. **Primary UI Framework**: Use **Shadcn UI** components (`Button`, `Card`, `Table`, `Input`, `Select`, `Checkbox`, `Badge`, `Skeleton`, `AlertDialog`, `Sonner`) backed by Radix UI primitives.
+2. **DO NOT USE Material UI (MUI)**:
+   - Do NOT import from `@mui/material` or `@mui/icons-material` in new code or refactored pages.
+   - Do NOT write MUI `sx={...}` style blocks or create MUI `styled(...)` wrappers.
+   - Incrementally replace remaining legacy MUI usages with Shadcn UI and Tailwind utilities.
+3. **Corner Radius Mandate ("Bo nhẹ hết cỡ, tuyệt đối không bo tròn")**:
+   - Always use micro-radius: `rounded-[3px]`, `rounded-[4px]`, or `rounded-sm` (2px - 5px max).
+   - **Banned**: `rounded-full`, `rounded-3xl`, `rounded-2xl`, `rounded-xl`, or pill shapes for buttons, cards, tags, badges, avatars, and inputs.
+4. **Icons**: Use **`lucide-react`** exclusively for crisp, modern SVG line icons with standardized sizing (`w-3.5 h-3.5`, `w-4 h-4`, `w-5 h-5`).
+5. **Class Name Merging**: Always use `cn()` (combining `clsx` and `tailwind-merge`) when conditionally composing CSS classes.
 
 ---
 

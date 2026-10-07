@@ -15,6 +15,8 @@ import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import VideoCameraFrontOutlinedIcon from '@mui/icons-material/VideoCameraFrontOutlined';
+import NetworkCheckOutlinedIcon from '@mui/icons-material/NetworkCheckOutlined';
+import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import type { AdminGeneralStats } from '@/services/statisticService';
 
 interface AiVoiceInterviewHealthWidgetProps {
@@ -197,6 +199,66 @@ export default function AiVoiceInterviewHealthWidget({
               }}
             >
               {proctoringWarnings} sự kiện
+            </Typography>
+          )}
+        </Box>
+
+        {/* WebRTC Reconnection Rate */}
+        <Box
+          sx={{
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: '#F8FAFC',
+            border: '1px solid #F1F5F9',
+          }}
+        >
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+            <NetworkCheckOutlinedIcon sx={{ fontSize: 16, color: '#0EA5E9' }} />
+            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
+              Tỷ lệ tái kết nối
+            </Typography>
+          </Stack>
+          {loading ? (
+            <Skeleton width={50} height={24} />
+          ) : (
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A' }}>
+              {stats?.reconnectionRate !== undefined ? `${stats.reconnectionRate}%` : '100%'}
+            </Typography>
+          )}
+        </Box>
+
+        {/* WebRTC Avg Downtime & Incidents */}
+        <Box
+          sx={{
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: (stats?.avgDowntimeSeconds || 0) > 10 ? '#FFFBEB' : '#F8FAFC',
+            border: '1px solid',
+            borderColor: (stats?.avgDowntimeSeconds || 0) > 10 ? '#FEF3C7' : '#F1F5F9',
+          }}
+        >
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
+            <SensorsOutlinedIcon
+              sx={{ fontSize: 16, color: (stats?.avgDowntimeSeconds || 0) > 10 ? '#F59E0B' : '#64748B' }}
+            />
+            <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
+              Downtime TB & Sự cố
+            </Typography>
+          </Stack>
+          {loading ? (
+            <Skeleton width={60} height={24} />
+          ) : (
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 800,
+                color: (stats?.avgDowntimeSeconds || 0) > 10 ? '#D97706' : '#0F172A',
+              }}
+            >
+              {stats?.avgDowntimeSeconds ? `${stats.avgDowntimeSeconds}s` : '0s'}
+              <Typography component="span" variant="caption" sx={{ ml: 0.5, color: '#64748B', fontWeight: 500 }}>
+                ({stats?.totalConnectionIncidents ?? 0} lần)
+              </Typography>
             </Typography>
           )}
         </Box>

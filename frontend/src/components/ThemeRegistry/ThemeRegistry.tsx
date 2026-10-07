@@ -202,14 +202,17 @@ const theme = createTheme(baseTheme, {
     MuiIconButton: {
       styleOverrides: {
         root: {
-          borderRadius: BUTTON_RADIUS,
+          borderRadius: '50%',
           transition: 'transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease',
           '&:hover': {
             transform: 'translateY(-1px)',
           },
+          '&:focus': {
+            outline: 'none',
+          },
           '&:focus-visible': {
-            outline: '2px solid #2563EB',
-            outlineOffset: 2,
+            outline: 'none',
+            boxShadow: '0 0 0 2px #2563EB',
           },
         },
       },

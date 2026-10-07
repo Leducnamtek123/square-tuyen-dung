@@ -1164,37 +1164,23 @@ export default function PricingPage() {
 
             {/* Gói 2: Tăng Tốc (Professional) - GÓI NỔI BẬT / KHUYÊN DÙNG */}
             <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-              {/* Double-bezel radiant shell */}
-              <Box
-                className="gsap-pricing-card"
-                sx={{
-                  height: '100%',
-                  background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
-                  p: '2px',
-                  borderRadius: '18px',
-                  boxShadow: '0 20px 40px -10px rgba(37, 99, 235, 0.3), 0 0 0 1px rgba(37, 99, 235, 0.2)',
-                  transform: { lg: 'scale(1.03)' },
-                  zIndex: 2,
-                  position: 'relative',
-                }}
-              >
+              <Box sx={{ position: 'relative', height: '100%' }}>
                 <Box
                   sx={{
                     position: 'absolute',
-                    top: -14,
+                    top: -12,
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+                    bgcolor: '#2563EB',
                     color: '#FFFFFF',
                     px: 2,
                     py: 0.5,
                     borderRadius: '100px',
                     fontSize: '0.72rem',
-                    fontWeight: 800,
+                    fontWeight: 700,
                     letterSpacing: '0.04em',
-                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.4)',
+                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
                     whiteSpace: 'nowrap',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
                     zIndex: 3,
                   }}
                 >
@@ -1202,33 +1188,25 @@ export default function PricingPage() {
                 </Box>
 
                 <Card
+                  className="gsap-pricing-card"
                   variant="outlined"
                   sx={{
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     backgroundColor: '#FFFFFF',
-                    border: 'none',
+                    border: '2px solid #2563EB',
                     borderRadius: '16px',
+                    boxShadow: '0 4px 16px -2px rgba(37, 99, 235, 0.1)',
                     p: 3,
+                    pt: 3.5,
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      boxShadow: '0 8px 24px -4px rgba(37, 99, 235, 0.16)',
+                    },
                   }}
                 >
-                  <Chip
-                    label="PHỔ BIẾN NHẤT"
-                    size="small"
-                    sx={{
-                      alignSelf: 'flex-start',
-                      backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                      color: '#2563EB',
-                      fontWeight: 700,
-                      fontSize: '0.7rem',
-                      mb: 2,
-                      mt: 1,
-                      borderRadius: '100px',
-                    }}
-                  />
-
-                  <Typography variant="h5" sx={{ fontWeight: 800, color: '#0F172A', mb: 1 }}>
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: '#0F172A', mb: 1, mt: 0.5 }}>
                     Gói Tăng Tốc (Professional)
                   </Typography>
                   <Typography variant="body2" sx={{ color: '#64748B', mb: 2.5, minHeight: 40, lineHeight: 1.4 }}>

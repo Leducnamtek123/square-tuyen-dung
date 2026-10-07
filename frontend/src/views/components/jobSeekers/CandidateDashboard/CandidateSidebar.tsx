@@ -7,10 +7,12 @@ import { useTranslation } from 'react-i18next';
 import {
   Box,
   Card,
+  Divider,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Typography,
 } from '@mui/material';
 import GridViewIcon from '@mui/icons-material/GridView';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
@@ -319,15 +321,72 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
             {menuItems.map((item) => {
               const activeBg = '#eff6ff';
               const activeColor = '#2563eb';
-              const activeBorder = '4px solid #2563eb';
 
               return (
-                <ListItemButton
-                  key={item.key}
-                  component={Link}
-                  href={item.path}
-                  aria-current={item.active ? 'page' : undefined}
+                <React.Fragment key={item.key}>
+                  {item.key === 'dashboard' && (
+                    <Box sx={{ px: 2, pt: 0.5, pb: 0.75 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: '#94a3b8',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.06em',
+                          fontSize: '0.68rem',
+                          userSelect: 'none',
+                        }}
+                      >
+                        Tổng quan và Hồ sơ
+                      </Typography>
+                    </Box>
+                  )}
+                  {item.key === 'my-jobs' && (
+                    <>
+                      <Divider sx={{ my: 1, borderColor: '#f1f5f9' }} />
+                      <Box sx={{ px: 2, pt: 1, pb: 0.75 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: '#94a3b8',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.06em',
+                            fontSize: '0.68rem',
+                            userSelect: 'none',
+                          }}
+                        >
+                          Việc làm và Phỏng vấn
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+                  {item.key === 'account' && (
+                    <>
+                      <Divider sx={{ my: 1, borderColor: '#f1f5f9' }} />
+                      <Box sx={{ px: 2, pt: 1, pb: 0.75 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: '#94a3b8',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.06em',
+                            fontSize: '0.68rem',
+                            userSelect: 'none',
+                          }}
+                        >
+                          Hệ thống
+                        </Typography>
+                      </Box>
+                    </>
+                  )}
+                  <ListItemButton
+                    component={Link}
+                    href={item.path}
+                    aria-current={item.active ? 'page' : undefined}
                   sx={{
+                    position: 'relative',
                     borderRadius: '12px',
                     mb: 0.5,
                     py: 1.2,
@@ -336,7 +395,19 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
                     backgroundColor: item.active ? activeBg : 'transparent',
                     color: item.active ? activeColor : '#475569',
                     fontWeight: item.active ? 700 : 500,
-                    borderLeft: item.active ? activeBorder : '4px solid transparent',
+                    overflow: 'hidden',
+                    '&::before': item.active
+                      ? {
+                          content: '""',
+                          position: 'absolute',
+                          left: 0,
+                          top: '18%',
+                          bottom: '18%',
+                          width: '4px',
+                          borderRadius: '0 4px 4px 0',
+                          backgroundColor: activeColor,
+                        }
+                      : undefined,
                     '&:hover': {
                       backgroundColor: item.active ? activeBg : '#f8fafc',
                       color: item.active ? activeColor : '#0f172a',
@@ -365,8 +436,9 @@ const CandidateSidebar = ({ completenessPercent }: CandidateSidebarProps) => {
                     }}
                   />
                 </ListItemButton>
-              );
-            })}
+              </React.Fragment>
+            );
+          })}
           </List>
         </Card>
 

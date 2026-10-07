@@ -23,6 +23,7 @@ import 'dayjs/locale/vi';
 import { useAppliedResumes } from '../hooks/useEmployerQueries';
 import { ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
+import { formatRoute } from '@/utils/funcUtils';
 
 dayjs.extend(relativeTime);
 
@@ -145,6 +146,10 @@ export default function RecentApplicationsWidget() {
             const jobTitle = app.jobName || app.jobPostDict?.jobName || 'Vị trí tuyển dụng';
             const aiScore = app.aiAnalysisScore || app.aiAnalysisEffectiveScore;
             const applyTime = app.createAt ? dayjs(app.createAt).locale('vi').fromNow() : '';
+            const detailSlug = app.resumeSlug || (app as any).resume?.slug || '';
+            const candidateProfileHref = detailSlug
+              ? localizeRoutePath(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, detailSlug)}`, i18n.language)
+              : appliedProfilesHref;
 
             return (
               <Box
@@ -167,81 +172,51 @@ export default function RecentApplicationsWidget() {
                   },
                 }}
               >
-                {/* Top / Left: Avatar & Candidate Info + View button on mobile */}
-                <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ minWidth: 0, width: '100%' }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0, flexGrow: 1 }}>
-                    <Avatar
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        bgcolor: '#2563EB',
-                        fontSize: '0.9rem',
-                        fontWeight: 700,
-                        color: '#FFFFFF',
-                        flexShrink: 0,
-                      }}
-                    >
-                      {candidateName.charAt(0).toUpperCase()}
-                    </Avatar>
-
-                    <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                      <Typography
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: '0.875rem',
-                          color: '#0F172A',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {candidateName}
-                      </Typography>
-
-                      <Typography
-                        sx={{
-                          fontSize: '0.78rem',
-                          color: '#64748B',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
-                      >
-                        {jobTitle}
-                      </Typography>
-                    </Box>
-                  </Stack>
-
-                  {/* Mobile only View button */}
-                  <Button
-                    component={Link}
-                    href={appliedProfilesHref}
-                    size="small"
-                    variant="outlined"
+                {/* Top / Left: Avatar & Candidate Info */}
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0, flexGrow: 1 }}>
+                  <Avatar
                     sx={{
-                      display: { xs: 'inline-flex', sm: 'none' },
-                      textTransform: 'none',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      borderRadius: '8px',
-                      borderColor: '#E2E8F0',
-                      color: '#334155',
-                      minWidth: 'auto',
-                      px: 1.2,
-                      py: 0.3,
+                      width: 40,
+                      height: 40,
+                      bgcolor: '#2563EB',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      color: '#FFFFFF',
                       flexShrink: 0,
-                      '&:hover': {
-                        bgcolor: '#EFF6FF',
-                        borderColor: '#93C5FD',
-                        color: '#2563EB',
-                      },
                     }}
                   >
-                    Xem
-                  </Button>
+                    {candidateName.charAt(0).toUpperCase()}
+                  </Avatar>
+
+                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '0.875rem',
+                        color: '#0F172A',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {candidateName}
+                    </Typography>
+
+                    <Typography
+                      sx={{
+                        fontSize: '0.78rem',
+                        color: '#64748B',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {jobTitle}
+                    </Typography>
+                  </Box>
                 </Stack>
 
-                {/* Bottom / Right: AI Score & Time & Desktop View Button */}
+                {/* Bottom / Right: AI Score & Time & Single View Button */}
                 <Stack
                   direction="row"
                   spacing={1.25}
@@ -281,11 +256,11 @@ export default function RecentApplicationsWidget() {
 
                   <Button
                     component={Link}
-                    href={appliedProfilesHref}
+                    href={candidateProfileHref}
                     size="small"
                     variant="outlined"
                     sx={{
-                      display: { xs: 'none', sm: 'inline-flex' },
+                      display: 'inline-flex',
                       textTransform: 'none',
                       fontSize: '0.75rem',
                       fontWeight: 600,
@@ -293,8 +268,10 @@ export default function RecentApplicationsWidget() {
                       borderColor: '#E2E8F0',
                       color: '#334155',
                       minWidth: 'auto',
-                      px: 1.2,
+                      px: 1.5,
                       py: 0.4,
+                      ml: { xs: 'auto', sm: 0 },
+                      flexShrink: 0,
                       '&:hover': {
                         bgcolor: '#EFF6FF',
                         borderColor: '#93C5FD',

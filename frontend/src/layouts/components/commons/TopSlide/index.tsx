@@ -31,11 +31,11 @@ const DEFAULT_BANNER: Banner = {
   description: 'InfoHR Banner',
 } as Banner;
 
-const RenderItem = ({ item }: { item: Banner }) => {
+const RenderItem = ({ item, isFirst = false }: { item: Banner; isFirst?: boolean }) => {
   const imageUrl = item.imageUrl || IMAGES.coverImageDefault;
   const mobileImageUrl = item.imageMobileUrl || imageUrl;
   const imgRef = React.useRef<HTMLImageElement>(null);
-  const [isLoaded, setIsLoaded] = React.useState(false);
+  const [isLoaded, setIsLoaded] = React.useState(isFirst);
 
   React.useEffect(() => {
     if (imgRef.current?.complete) {
@@ -60,29 +60,29 @@ const RenderItem = ({ item }: { item: Banner }) => {
         {imageUrl.endsWith('.jpg') || imageUrl.endsWith('.png') ? (
           <source type="image/webp" srcSet={imageUrl.replace(/\.(jpg|png)$/, '.webp')} />
         ) : null}
-        <Box
-          component="img"
+        <img
           ref={imgRef}
           src={imageUrl}
-          alt={item.description || 'Banner'}
-          loading="eager"
+          alt={item.description || 'InfoHR Banner'}
+          width={1280}
+          height={350}
+          loading={isFirst ? "eager" : "lazy"}
           // @ts-ignore fetchPriority property
-          fetchPriority="high"
-          decoding="async"
+          fetchPriority={isFirst ? "high" : "low"}
+          decoding={isFirst ? "sync" : "async"}
           onLoad={() => setIsLoaded(true)}
           onError={(e) => {
-            (e.target as HTMLImageElement).src = IMAGES.coverImageDefault;
-            (e.target as HTMLImageElement).onerror = null;
+            (e.currentTarget as HTMLImageElement).src = IMAGES.coverImageDefault;
             setIsLoaded(true);
           }}
-          sx={{
+          style={{
             width: '100%',
             height: '100%',
             objectFit: 'cover',
             objectPosition: 'center center',
             display: 'block',
-            opacity: isLoaded ? 1 : 0,
-            transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            opacity: isFirst ? 1 : (isLoaded ? 1 : 0),
+            transition: isFirst ? 'none' : 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         />
       </Box>
@@ -104,7 +104,9 @@ interface TopSlideProps {
 }
 
 const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
-  const [banners, setBanners] = React.useState<Banner[]>(initialBanners ?? []);
+  const [banners, setBanners] = React.useState<Banner[]>(
+    initialBanners && initialBanners.length > 0 ? initialBanners : [DEFAULT_BANNER]
+  );
   const [isLoading, setIsLoading] = React.useState(!initialBanners || initialBanners.length === 0);
   const heroContentRef = useRef<HTMLDivElement>(null);
 
@@ -219,9 +221,9 @@ const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
     <Box
       sx={{
         width: '100%',
-        minHeight: { xs: 250, sm: 280, md: 310 },
+        minHeight: { xs: 340, sm: 290, md: 320 },
         height: {
-          xs: 'auto',
+          xs: 340,
           sm: 290,
           md: 320,
         },
@@ -256,9 +258,9 @@ const TopSlide: React.FC<TopSlideProps> = ({ initialBanners }) => {
               className="mySwiper"
               style={{ height: '100%' }}
             >
-              {banners.map((value) => (
+              {banners.map((value, idx) => (
                 <SwiperSlide key={value.id}>
-                  <RenderItem item={value} />
+                  <RenderItem item={value} isFirst={idx === 0} />
                 </SwiperSlide>
               ))}
             </Swiper>

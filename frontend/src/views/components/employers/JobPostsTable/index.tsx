@@ -1,20 +1,53 @@
 'use client';
+
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Avatar, Box, Button, Chip, IconButton, Tooltip, Stack, Typography } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import LaunchIcon from '@mui/icons-material/Launch';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import dayjs from 'dayjs';
-import DataTable from '@/components/Common/DataTable';
-import { JOB_POST_STATUS_BG_COLOR } from '@/configs/constants';
-import { useConfig } from '@/hooks/useConfig';
-import type { JobPost } from '@/types/models';
-import type { ColumnDef, SortingState, Updater, PaginationState, RowSelectionState, OnChangeFn } from '@tanstack/react-table';
-import pc from '@/utils/muiColors';
+import {
+  Sparkles,
+  ExternalLink,
+  Pencil,
+  Trash2,
+  Users,
+  Eye,
+  Calendar,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
+  Briefcase,
+  AlertCircle,
+} from 'lucide-react';
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+  type SortingState,
+  type Updater,
+  type PaginationState,
+  type RowSelectionState,
+  type OnChangeFn,
+} from '@tanstack/react-table';
 
-interface JobPostsTableProps {
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useConfig } from '@/hooks/useConfig';
+import { JOB_POST_STATUS_BG_COLOR } from '@/configs/constants';
+import type { JobPost } from '@/types/models';
+import { cn } from '@/lib/utils';
+
+export interface JobPostsTableProps {
   rows: JobPost[];
   isLoading: boolean;
   rowCount: number;
@@ -31,6 +64,8 @@ interface JobPostsTableProps {
   variant?: 'card' | 'flat';
   stickyHeader?: boolean;
   maxHeight?: number | string;
+  onClearFilters?: () => void;
+  hasActiveFilters?: boolean;
 }
 
 const JobPostsTable = ({
@@ -47,369 +82,547 @@ const JobPostsTable = ({
   enableRowSelection = false,
   rowSelection,
   onRowSelectionChange,
-  variant = 'card',
-  stickyHeader = true,
-  maxHeight,
+  onClearFilters,
+  hasActiveFilters = false,
 }: JobPostsTableProps) => {
-
   const { t, i18n } = useTranslation('employer');
   const { allConfig } = useConfig();
 
-  const columns = useMemo<ColumnDef<JobPost>[]>(() => [
-    {
-      header: t('jobPost.table.jobTitle'),
-      accessorKey: 'jobName',
-      enableSorting: true,
-      cell: (info) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1.5, py: 1 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
-            {String(info.getValue() ?? '---')}
-          </Typography>
-          {info.row.original.isUrgent && (
-            <Chip
-              label={t('jobPost.urgent').toUpperCase()}
-              size="small"
-              sx={{ 
-                fontWeight: 900, 
-                height: 20, 
-                fontSize: '0.65rem', 
-                borderRadius: 1,
-                bgcolor: pc.error( 0.12),
-                color: 'error.main',
-                border: '1px solid',
-                borderColor: pc.error( 0.24),
-                letterSpacing: 0.5
-              }}
+  const columns = useMemo<ColumnDef<JobPost>[]>(() => {
+    const cols: ColumnDef<JobPost>[] = [];
+
+    if (enableRowSelection) {
+      cols.push({
+        id: 'selection',
+        header: ({ table }) => (
+          <div className="flex items-center justify-center">
+            <Checkbox
+              checked={
+                table.getIsAllPageRowsSelected() ||
+                (table.getIsSomePageRowsSelected() && 'indeterminate')
+              }
+              onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+              aria-label="Chọn tất cả"
+              className="rounded-[3px] border-slate-300"
             />
-          )}
-        </Box>
-      ),
-    },
-    {
-      header: 'Gợi ý hồ sơ bởi AI',
-      id: 'aiRecommendation',
-      cell: (info) => {
-        const job = info.row.original;
-        const totalCount = job.aiRecommendedCount ?? (job as any).ai_recommended_count ?? 0;
-        const rawAvatars = (job.aiRecommendedAvatars || (job as any).ai_recommended_avatars || []) as Array<{ name?: string; initial?: string; avatarUrl?: string | null }>;
+          </div>
+        ),
+        cell: ({ row }) => (
+          <div className="flex items-center justify-center">
+            <Checkbox
+              checked={row.getIsSelected()}
+              disabled={!row.getCanSelect()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label="Chọn dòng"
+              className="rounded-[3px] border-slate-300"
+            />
+          </div>
+        ),
+        size: 40,
+        enableSorting: false,
+      });
+    }
 
-        if (totalCount === 0) {
+    cols.push(
+      {
+        header: t('jobPost.table.jobTitle'),
+        accessorKey: 'jobName',
+        enableSorting: true,
+        cell: ({ row }) => {
+          const job = row.original;
+          const title = job.jobName || (job as any).title || '---';
+          const isUrgent = Boolean(job.isUrgent);
+
           return (
-            <Typography
-              onClick={() => onOpenAiRecommendation?.(job)}
-              variant="caption"
-              sx={{
-                color: 'text.secondary',
-                cursor: 'pointer',
-                fontStyle: 'italic',
-                display: 'block',
-                textAlign: 'center',
-                '&:hover': { color: 'primary.main' }
-              }}
-            >
-              --
-            </Typography>
+            <div className="flex items-center gap-2 py-0.5">
+              <span
+                onClick={() => handleUpdate(job.slug || job.id)}
+                className="font-semibold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer text-sm leading-snug"
+              >
+                {title}
+              </span>
+              {isUrgent && (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-[3px] text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200 tracking-wider uppercase shrink-0">
+                  {t('jobPost.urgent')}
+                </span>
+              )}
+            </div>
           );
-        }
+        },
+      },
+      {
+        header: 'Gợi ý hồ sơ bởi AI',
+        id: 'aiRecommendation',
+        cell: ({ row }) => {
+          const job = row.original;
+          const totalCount = job.aiRecommendedCount ?? (job as any).ai_recommended_count ?? 0;
+          const rawAvatars = (job.aiRecommendedAvatars ||
+            (job as any).ai_recommended_avatars ||
+            []) as Array<{ name?: string; initial?: string; avatarUrl?: string | null }>;
 
-        const avatars = rawAvatars;
-        const remainingCount = Math.max(0, totalCount - avatars.length);
+          if (totalCount === 0) {
+            return (
+              <span
+                onClick={() => onOpenAiRecommendation?.(job)}
+                className="text-xs text-slate-400 italic hover:text-blue-600 cursor-pointer block text-center"
+              >
+                --
+              </span>
+            );
+          }
 
-        return (
-          <Tooltip title={`Xem ${totalCount} hồ sơ được AI phân tích & đề xuất cho vị trí này`} arrow>
-            <Box
+          const avatars = rawAvatars;
+          const remainingCount = Math.max(0, totalCount - avatars.length);
+
+          return (
+            <div
               onClick={() => onOpenAiRecommendation?.(job)}
-              sx={{
-                display: 'inline-flex',
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                cursor: 'pointer',
-                py: 0.5,
-                transition: 'all 0.2s',
-                '&:hover .view-list-link': {
-                  textDecoration: 'underline',
-                  color: '#1d4ed8',
-                },
-                '&:hover .avatar-stack': {
-                  transform: 'scale(1.04)',
-                },
-              }}
+              className="group inline-flex flex-col items-start cursor-pointer py-1"
             >
               {avatars.length > 0 ? (
-                <Stack
-                  className="avatar-stack"
-                  direction="row"
-                  alignItems="center"
-                  spacing={-0.85}
-                  sx={{ mb: 0.5, transition: 'transform 0.2s' }}
-                >
+                <div className="flex items-center -space-x-1.5 mb-1 transition-transform group-hover:scale-105 duration-150">
                   {avatars.slice(0, 3).map((item, idx) => (
-                    <Avatar
-                      key={(item as any).id != null ? String((item as any).id) : ((item as any).resumeId != null ? String((item as any).resumeId) : `avatar-${job.id}-${item.name || idx}`)}
-                      src={item.avatarUrl || undefined}
-                      alt={item.name}
-                      sx={{
-                        width: 26,
-                        height: 26,
-                        fontSize: '0.7rem',
-                        fontWeight: 700,
-                        border: '2px solid #ffffff',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                      }}
+                    <div
+                      key={`avt-${job.id}-${idx}`}
+                      className="w-6 h-6 rounded-[3px] border border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-700 shadow-2xs overflow-hidden"
+                      title={item.name}
                     >
-                      {item.initial || 'U'}
-                    </Avatar>
+                      {item.avatarUrl ? (
+                        <img
+                          src={item.avatarUrl}
+                          alt={item.name || 'Candidate'}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        item.initial || 'U'
+                      )}
+                    </div>
                   ))}
-
                   {remainingCount > 0 && (
-                    <Avatar
-                      sx={{
-                        width: 26,
-                        height: 26,
-                        fontSize: '0.65rem',
-                        fontWeight: 800,
-                        color: '#ffffff',
-                        bgcolor: '#64748b',
-                        border: '2px solid #ffffff',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
-                      }}
-                    >
+                    <div className="w-6 h-6 rounded-[3px] border border-white bg-slate-700 text-white flex items-center justify-center text-[10px] font-bold shadow-2xs">
                       +{remainingCount}
-                    </Avatar>
+                    </div>
                   )}
-                </Stack>
+                </div>
               ) : (
-                <Chip
-                  icon={<AutoAwesomeIcon sx={{ fontSize: '14px !important', color: '#2563EB' }} />}
-                  label={`${totalCount} gợi ý`}
-                  size="small"
-                  sx={{
-                    mb: 0.5,
-                    height: 24,
-                    fontSize: '0.725rem',
-                    fontWeight: 800,
-                    bgcolor: pc.primary(0.08),
-                    color: 'primary.main',
-                    border: '1px solid',
-                    borderColor: pc.primary(0.2),
-                    cursor: 'pointer',
-                  }}
-                />
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] bg-blue-50 text-blue-700 border border-blue-200/80 text-xs font-semibold mb-1 group-hover:bg-blue-100 transition-colors">
+                  <Sparkles className="w-3 h-3 text-blue-600" />
+                  {totalCount} gợi ý
+                </span>
               )}
-
-              <Typography
-                className="view-list-link"
-                variant="caption"
-                sx={{
-                  fontSize: '0.725rem',
-                  color: '#2563eb',
-                  fontWeight: 600,
-                  lineHeight: 1.2,
-                  cursor: 'pointer',
-                }}
-              >
+              <span className="text-[11px] font-medium text-blue-600 group-hover:underline">
                 Xem danh sách
-              </Typography>
-            </Box>
-          </Tooltip>
-        );
+              </span>
+            </div>
+          );
+        },
       },
-    },
-    {
-      header: t('jobPost.table.postDate'),
-      accessorKey: 'createAt',
-      enableSorting: true,
-      cell: (info) => (
-        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+      {
+        header: t('jobPost.table.postDate'),
+        accessorKey: 'createAt',
+        enableSorting: true,
+        cell: (info) => (
+          <span className="text-xs font-medium text-slate-500 flex items-center gap-1.5 whitespace-nowrap">
+            <Calendar className="w-3.5 h-3.5 text-slate-400" />
             {info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '---'}
-        </Typography>
-      ),
-    },
-    {
-      header: t('jobPost.table.deadline'),
-      accessorKey: 'deadline',
-      enableSorting: true,
-      cell: (info) => {
-        const val = info.getValue() as string;
-        const isExpired = info.row.original.isExpired;
-        return (
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: isExpired ? 'error.main' : 'primary.main', 
-              fontWeight: 800,
-              bgcolor: isExpired ? pc.error( 0.08) : pc.primary( 0.08),
-              px: 1.5,
-              py: 0.5,
-              borderRadius: 1.5,
-              display: 'inline-block'
-            }}
-          >
-            {val ? dayjs(val).format('DD/MM/YYYY') : '---'}
-          </Typography>
-        );
+          </span>
+        ),
       },
-    },
-    {
-      header: t('jobPost.table.applications'),
-      accessorKey: 'appliedNumber',
-      enableSorting: true,
-      cell: (info) => (
-        <Typography variant="body2" sx={{ fontWeight: 900, color: 'info.main', fontSize: '1rem' }}>
-            {Number(info.getValue() ?? 0)}
-        </Typography>
-      )
-    },
-    {
-      header: t('jobPost.table.views'),
-      accessorKey: 'views',
-      enableSorting: true,
-      cell: (info) => (
-        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-            {Number(info.getValue() ?? 0)}
-        </Typography>
-      ),
-    },
-    {
-      header: t('jobPost.table.status'),
-      accessorKey: 'status',
-      cell: (info) => {
-        const raw = String(info.getValue() ?? '').trim();
-        const lower = raw.toLowerCase();
-        const isEn = Boolean(i18n?.language && i18n.language.startsWith('en'));
+      {
+        header: t('jobPost.table.deadline'),
+        accessorKey: 'deadline',
+        enableSorting: true,
+        cell: ({ row }) => {
+          const val = row.original.deadline;
+          const isExpired = Boolean(row.original.isExpired);
+          if (!val) return <span className="text-xs text-slate-400">---</span>;
 
-        const STATUS_MAP: Record<string, { labelVi: string; labelEn: string; color: string }> = {
-          '1': { labelVi: 'Chờ duyệt', labelEn: 'Pending', color: 'warning' },
-          'pending': { labelVi: 'Chờ duyệt', labelEn: 'Pending', color: 'warning' },
-          '2': { labelVi: 'Bị từ chối', labelEn: 'Rejected', color: 'error' },
-          'rejected': { labelVi: 'Bị từ chối', labelEn: 'Rejected', color: 'error' },
-          '3': { labelVi: 'Đã duyệt', labelEn: 'Approved', color: 'success' },
-          'approved': { labelVi: 'Đã duyệt', labelEn: 'Approved', color: 'success' },
-        };
-
-        const mapped = STATUS_MAP[raw] || STATUS_MAP[lower];
-        const label = mapped
-          ? (isEn ? mapped.labelEn : mapped.labelVi)
-          : (allConfig?.jobPostStatusDict?.[raw] || raw.toUpperCase() || '---');
-        const colorKey = mapped
-          ? mapped.color
-          : (((JOB_POST_STATUS_BG_COLOR as Record<string, string>)[raw]) || 'default');
-        const muiColor = colorKey === 'default' ? 'default' : colorKey;
-        
-        // pc.X() is used here to avoid alpha(theme.palette[dynamic].main) which crashes in MUI v6
-        const STATUS_CHIP_COLORS: Record<string, { bg: string; border: string }> = {
-          primary:   { bg: pc.primary(0.12),   border: pc.primary(0.24) },
-          secondary: { bg: pc.secondary(0.12), border: pc.secondary(0.24) },
-          error:     { bg: pc.error(0.12),     border: pc.error(0.24) },
-          info:      { bg: pc.info(0.12),      border: pc.info(0.24) },
-          success:   { bg: pc.success(0.12),   border: pc.success(0.24) },
-          warning:   { bg: pc.warning(0.12),   border: pc.warning(0.24) },
-        };
-        const chipColors = muiColor !== 'default' ? STATUS_CHIP_COLORS[muiColor] : null;
-        return (
-          <Chip
-            label={label}
-            size="small"
-            sx={{ 
-              fontWeight: 800, 
-              borderRadius: 1.5,
-              bgcolor: chipColors ? chipColors.bg : 'action.selected',
-              color: muiColor !== 'default' ? `${muiColor}.main` : 'text.secondary',
-              border: '1px solid',
-              borderColor: chipColors ? chipColors.border : 'divider',
-            }}
-          />
-        );
+          return (
+            <span
+              className={cn(
+                'inline-flex items-center px-2 py-0.5 rounded-[3px] text-xs font-medium border whitespace-nowrap',
+                isExpired
+                  ? 'bg-rose-50 text-rose-700 border-rose-200/80'
+                  : 'bg-slate-50 text-slate-700 border-slate-200'
+              )}
+            >
+              {dayjs(val).format('DD/MM/YYYY')}
+            </span>
+          );
+        },
       },
-    },
-    {
-      header: '',
-      id: 'actions',
-      cell: (info) => (
-        <Stack direction="row" spacing={0.75} justifyContent="flex-end">
-          {info.row.original.slug && (
-            <Tooltip title="Xem tin đăng tuyển" arrow>
-              <IconButton
-                aria-label="Xem tin đăng"
-                size="small"
-                onClick={() => window.open(`/jobs/${info.row.original.slug}`, '_blank')}
-                sx={{
-                  color: '#2563EB',
-                  bgcolor: '#EFF6FF',
-                  border: '1px solid #BFDBFE',
-                  borderRadius: '8px',
-                  width: 32,
-                  height: 32,
-                  transition: 'all 0.2s ease',
-                  '&:hover': { bgcolor: '#DBEAFE', transform: 'scale(1.05)' }
-                }}
+      {
+        header: t('jobPost.table.applications'),
+        accessorKey: 'appliedNumber',
+        enableSorting: true,
+        cell: (info) => (
+          <div className="flex items-center gap-1.5">
+            <Users className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-sm font-semibold text-blue-600">
+              {Number(info.getValue() ?? 0)}
+            </span>
+          </div>
+        ),
+      },
+      {
+        header: t('jobPost.table.views'),
+        accessorKey: 'views',
+        enableSorting: true,
+        cell: (info) => (
+          <div className="flex items-center gap-1.5">
+            <Eye className="w-3.5 h-3.5 text-slate-400" />
+            <span className="text-sm font-medium text-slate-600">
+              {Number(info.getValue() ?? 0)}
+            </span>
+          </div>
+        ),
+      },
+      {
+        header: t('jobPost.table.status'),
+        accessorKey: 'status',
+        cell: (info) => {
+          const raw = String(info.getValue() ?? '').trim();
+          const lower = raw.toLowerCase();
+          const isEn = Boolean(i18n?.language && i18n.language.startsWith('en'));
+
+          const STATUS_MAP: Record<
+            string,
+            { labelVi: string; labelEn: string; bg: string; text: string; border: string; dot: string }
+          > = {
+            '1': {
+              labelVi: 'Chờ duyệt',
+              labelEn: 'Pending',
+              bg: 'bg-amber-50',
+              text: 'text-amber-800',
+              border: 'border-amber-200/80',
+              dot: 'bg-amber-500',
+            },
+            pending: {
+              labelVi: 'Chờ duyệt',
+              labelEn: 'Pending',
+              bg: 'bg-amber-50',
+              text: 'text-amber-800',
+              border: 'border-amber-200/80',
+              dot: 'bg-amber-500',
+            },
+            '2': {
+              labelVi: 'Bị từ chối',
+              labelEn: 'Rejected',
+              bg: 'bg-rose-50',
+              text: 'text-rose-800',
+              border: 'border-rose-200/80',
+              dot: 'bg-rose-500',
+            },
+            rejected: {
+              labelVi: 'Bị từ chối',
+              labelEn: 'Rejected',
+              bg: 'bg-rose-50',
+              text: 'text-rose-800',
+              border: 'border-rose-200/80',
+              dot: 'bg-rose-500',
+            },
+            '3': {
+              labelVi: 'Đã duyệt',
+              labelEn: 'Approved',
+              bg: 'bg-emerald-50',
+              text: 'text-emerald-800',
+              border: 'border-emerald-200/80',
+              dot: 'bg-emerald-500',
+            },
+            approved: {
+              labelVi: 'Đã duyệt',
+              labelEn: 'Approved',
+              bg: 'bg-emerald-50',
+              text: 'text-emerald-800',
+              border: 'border-emerald-200/80',
+              dot: 'bg-emerald-500',
+            },
+          };
+
+          const mapped = STATUS_MAP[raw] || STATUS_MAP[lower];
+          const label = mapped
+            ? isEn
+              ? mapped.labelEn
+              : mapped.labelVi
+            : allConfig?.jobPostStatusDict?.[raw] || raw.toUpperCase() || '---';
+
+          const style = mapped || {
+            bg: 'bg-slate-50',
+            text: 'text-slate-700',
+            border: 'border-slate-200',
+            dot: 'bg-slate-400',
+          };
+
+          return (
+            <span
+              className={cn(
+                'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[3px] text-xs font-semibold border whitespace-nowrap',
+                style.bg,
+                style.text,
+                style.border
+              )}
+            >
+              <span className={cn('h-1.5 w-1.5 rounded-[1px] shrink-0', style.dot)} />
+              {label}
+            </span>
+          );
+        },
+      },
+      {
+        id: 'actions',
+        header: () => <span className="sr-only">Thao tác</span>,
+        cell: ({ row }) => {
+          const job = row.original;
+          const idOrSlug = job.slug || job.id;
+
+          return (
+            <div className="flex items-center justify-end gap-1.5">
+              {job.slug && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => window.open(`/jobs/${job.slug}`, '_blank')}
+                  title="Xem tin đăng tuyển"
+                  aria-label="Xem tin đăng tuyển"
+                  className="h-7 w-7 rounded-[4px] border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-500 hover:text-blue-600 shadow-2xs cursor-pointer"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => handleUpdate(idOrSlug)}
+                title={t('jobPost.tooltips.update')}
+                aria-label={t('jobPost.tooltips.update')}
+                className="h-7 w-7 rounded-[4px] border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 text-slate-500 hover:text-blue-600 shadow-2xs cursor-pointer"
               >
-                <LaunchIcon sx={{ fontSize: 16 }} />
-              </IconButton>
-            </Tooltip>
-          )}
-          <Tooltip title={t('jobPost.tooltips.update')} arrow>
-            <IconButton
-              aria-label="Chỉnh sửa tin tuyển dụng"
-              size="small"
-              onClick={() => handleUpdate(info.row.original.slug || info.row.original.id)}
-              sx={{ 
-                color: '#0284C7',
-                bgcolor: '#F0F9FF',
-                border: '1px solid #BAE6FD',
-                borderRadius: '8px',
-                width: 32,
-                height: 32,
-                transition: 'all 0.2s ease',
-                '&:hover': { bgcolor: '#E0F2FE', transform: 'scale(1.05)' }
-              }}
-            >
-              <EditIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t('jobPost.tooltips.delete')} arrow>
-            <IconButton
-              aria-label="Xóa tin tuyển dụng"
-              size="small"
-              onClick={() => handleDelete(info.row.original.slug || info.row.original.id)}
-              sx={{ 
-                color: '#DC2626',
-                bgcolor: '#FEF2F2',
-                border: '1px solid #FECDD3',
-                borderRadius: '8px',
-                width: 32,
-                height: 32,
-                transition: 'all 0.2s ease',
-                '&:hover': { bgcolor: '#FEE2E2', transform: 'scale(1.05)' }
-              }}
-            >
-              <DeleteIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      ),
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => handleDelete(idOrSlug)}
+                title={t('jobPost.tooltips.delete')}
+                aria-label={t('jobPost.tooltips.delete')}
+                className="h-7 w-7 rounded-[4px] border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-500 hover:text-rose-600 shadow-2xs cursor-pointer"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          );
+        },
+      }
+    );
+
+    return cols;
+  }, [allConfig, enableRowSelection, handleDelete, handleUpdate, onOpenAiRecommendation, t, i18n]);
+
+  const totalPages = Math.max(1, Math.ceil(rowCount / (pagination.pageSize || 10)));
+
+  const table = useReactTable({
+    data: rows,
+    columns,
+    pageCount: totalPages,
+    state: {
+      pagination,
+      sorting: sorting ?? [],
+      rowSelection: rowSelection ?? {},
     },
-  ], [allConfig, handleDelete, handleUpdate, t]);
+    enableRowSelection,
+    enableSorting: true,
+    onSortingChange,
+    onRowSelectionChange,
+    getRowId: (row: any, index) =>
+      String(row?.id ?? row?.code ?? row?.slug ?? row?.uuid ?? `row-${index}`),
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    manualSorting: !!onSortingChange,
+  });
+
+  const pageStartIndex = pagination.pageIndex * pagination.pageSize + 1;
+  const pageEndIndex = Math.min((pagination.pageIndex + 1) * pagination.pageSize, rowCount);
 
   return (
-    <DataTable
-      variant={variant}
-      columns={columns}
-      data={rows}
-      isLoading={isLoading}
-      rowCount={rowCount}
-      pagination={pagination}
-      onPaginationChange={onPaginationChange}
-      enableSorting
-      sorting={sorting}
-      onSortingChange={onSortingChange}
-      enableRowSelection={enableRowSelection}
-      rowSelection={rowSelection}
-      onRowSelectionChange={onRowSelectionChange}
-      emptyMessage={t('jobPost.noData')}
-      stickyHeader={stickyHeader}
-      maxHeight={maxHeight}
-    />
+    <div className="w-full space-y-3">
+      {/* Table Container */}
+      <div className="rounded-[4px] border border-slate-200/80 bg-white shadow-2xs overflow-hidden">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="hover:bg-slate-50/75">
+                {headerGroup.headers.map((header) => {
+                  const canSort = header.column.getCanSort();
+                  const sortDirection = header.column.getIsSorted();
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        'text-xs font-semibold text-slate-600',
+                        canSort && 'cursor-pointer select-none hover:text-slate-900'
+                      )}
+                      onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                        {canSort && (
+                          <span className="text-slate-400">
+                            {sortDirection === 'asc' ? (
+                              <ArrowUp className="w-3.5 h-3.5 text-blue-600" />
+                            ) : sortDirection === 'desc' ? (
+                              <ArrowDown className="w-3.5 h-3.5 text-blue-600" />
+                            ) : (
+                              <ArrowUpDown className="w-3 h-3 opacity-60 hover:opacity-100" />
+                            )}
+                          </span>
+                        )}
+                      </div>
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {isLoading ? (
+              Array.from({ length: Math.min(5, pagination.pageSize || 5) }).map((_, index) => (
+                <TableRow key={`loading-row-${index}`}>
+                  {columns.map((_, colIndex) => (
+                    <TableCell key={`loading-col-${colIndex}`}>
+                      <Skeleton className="h-5 w-full rounded-[3px] bg-slate-100" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : rows.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-44 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2 text-slate-500 py-4">
+                    <div className="w-10 h-10 rounded-[4px] bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                      <Briefcase className="w-5 h-5" />
+                    </div>
+                    <p className="text-sm font-semibold text-slate-800">
+                      {t('jobPost.noData')}
+                    </p>
+                    <p className="text-xs text-slate-500 max-w-sm">
+                      {hasActiveFilters
+                        ? 'Không tìm thấy tin tuyển dụng nào phù hợp với bộ lọc hiện tại.'
+                        : 'Bạn chưa tạo tin tuyển dụng nào. Hãy bắt đầu đăng tin để tiếp cận ứng viên.'}
+                    </p>
+                    {hasActiveFilters && onClearFilters && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={onClearFilters}
+                        className="mt-1 h-8 px-3 rounded-[4px] text-xs font-semibold border-blue-200 text-blue-600 bg-blue-50/50 hover:bg-blue-100/60 cursor-pointer shadow-2xs"
+                      >
+                        Xóa bộ lọc (Xem lại tất cả tin đăng)
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className="hover:bg-slate-50/70 border-b border-slate-100 transition-colors"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-2.5">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Modern SaaS Pagination Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1 text-xs text-slate-600">
+        <div className="flex items-center gap-2">
+          <span>
+            {rowCount > 0 ? (
+              <>
+                Hiển thị <span className="font-semibold text-slate-900">{pageStartIndex}</span> -{' '}
+                <span className="font-semibold text-slate-900">{pageEndIndex}</span> trong tổng số{' '}
+                <span className="font-semibold text-slate-900">{rowCount}</span> tin
+              </>
+            ) : (
+              'Không có dữ liệu'
+            )}
+          </span>
+
+          <div className="hidden md:flex items-center gap-1.5 ml-4 pl-4 border-l border-slate-200">
+            <span className="text-slate-500">Hiển thị mỗi trang:</span>
+            <select
+              value={pagination.pageSize}
+              onChange={(e) => {
+                onPaginationChange({
+                  pageIndex: 0,
+                  pageSize: Number(e.target.value),
+                });
+              }}
+              className="h-7 px-2 rounded-[3px] border border-slate-200 bg-white text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-600 cursor-pointer"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (pagination.pageIndex > 0) {
+                onPaginationChange({
+                  ...pagination,
+                  pageIndex: pagination.pageIndex - 1,
+                });
+              }
+            }}
+            disabled={pagination.pageIndex === 0 || isLoading}
+            className="h-8 px-2.5 rounded-[4px] text-xs font-medium border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+          >
+            <ChevronLeft className="w-3.5 h-3.5 mr-1" />
+            Trang trước
+          </Button>
+
+          <span className="px-2 py-1 text-xs font-medium text-slate-700">
+            Trang <span className="font-semibold">{pagination.pageIndex + 1}</span> / {totalPages}
+          </span>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (pagination.pageIndex < totalPages - 1) {
+                onPaginationChange({
+                  ...pagination,
+                  pageIndex: pagination.pageIndex + 1,
+                });
+              }
+            }}
+            disabled={pagination.pageIndex >= totalPages - 1 || isLoading}
+            className="h-8 px-2.5 rounded-[4px] text-xs font-medium border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+          >
+            Trang sau
+            <ChevronRight className="w-3.5 h-3.5 ml-1" />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 

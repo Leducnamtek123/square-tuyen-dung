@@ -117,6 +117,10 @@ const Header = (_props: HeaderProps) => {
     },
   ], [i18n.language, t]);
 
+  const pathname = usePathname() || '/';
+  const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
+  const onEmployerDomain = isEmployerHostname(hostName);
+
   const pages = React.useMemo(() => ({
 
     [HOST_NAME.PROJECT]: [
@@ -144,14 +148,12 @@ const Header = (_props: HeaderProps) => {
       { id: '4', label: t('nav.findCandidates', 'Tìm ứng viên'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.PROFILE}`, i18n.language), requireAuth: true, isHighlight: true },
       { id: '5', label: t('nav.support', 'Hỗ trợ'), path: localizeRoutePath(`/${ROUTES.EMPLOYER.SUPPORT}`, i18n.language) },
     ],
-  }), [t, i18n.language, infoChildren, aboutChildren]);
+  }), [t, i18n.language, infoChildren, aboutChildren, onEmployerDomain]);
 
   const theme = useTheme();
 
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
 
-  const pathname = usePathname() || '/';
-  const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
   const isAdminPortal =
     isAdminPortalPath(pathname) ||
     isAdminHostname(hostName);
@@ -280,6 +282,11 @@ const Header = (_props: HeaderProps) => {
                 minHeight: 44,
                 display: { md: "none" },
                 flexShrink: 0,
+                borderRadius: '50%',
+                outline: 'none !important',
+                '&:focus, &:focus-visible': {
+                  outline: 'none !important',
+                },
               }}
             >
               <MenuIcon />
@@ -302,6 +309,11 @@ const Header = (_props: HeaderProps) => {
                 component="img"
                 src={IMAGES.getTextLogo("light")}
                 alt="InfoHR Logo"
+                width={124}
+                height={34}
+                // @ts-ignore fetchPriority
+                fetchPriority="high"
+                decoding="async"
                 sx={{
                   height: { xs: 26, sm: 30, md: 32, lg: 34 },
                   width: 'auto',

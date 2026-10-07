@@ -134,7 +134,13 @@ const PUBLIC_SUBPATHS = [
   '/legal',
 ];
 
-const CHAT_LAYOUT_PATHS = ['/employer/chat', '/nha-tuyen-dung/ket-noi-voi-ung-vien', '/nha-tuyen-dung/chat'];
+const CHAT_LAYOUT_PATHS = [
+  '/employer/chat',
+  '/nha-tuyen-dung/ket-noi-voi-ung-vien',
+  '/nha-tuyen-dung/chat',
+  '/ket-noi-voi-ung-vien',
+  '/chat',
+];
 
 const getCompanyPortalPath = (fallback = '/employer/dashboard') => {
   return fallback;
@@ -291,6 +297,8 @@ export default function EmployerSectionClient({
   const isChatPage =
     strippedPath === '/chat' ||
     strippedPath.startsWith('/chat/') ||
+    strippedPath === '/ket-noi-voi-ung-vien' ||
+    strippedPath.startsWith('/ket-noi-voi-ung-vien/') ||
     CHAT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
   if (isChatPage) {

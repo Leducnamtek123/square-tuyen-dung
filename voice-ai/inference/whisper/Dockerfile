@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.5
 ARG MIRROR_PREFIX=docker.io/nvidia
-ARG WHISPER_BASE=${MIRROR_PREFIX}/cuda:12.4.1-cudnn-runtime-ubuntu22.04
-FROM ${WHISPER_BASE}
+ARG WHISPER_BASE=docker.io/nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04@sha256:2fcc4280646484290cc50dce5e65f388dd04352b07cbe89a635703bd1f9aedb6
+FROM docker.io/nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04@sha256:2fcc4280646484290cc50dce5e65f388dd04352b07cbe89a635703bd1f9aedb6
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PYTHONUNBUFFERED=1
@@ -27,5 +27,12 @@ RUN pip3 install --no-cache-dir --upgrade pip \
     && pip3 install --no-cache-dir --no-build-isolation vox-box
 
 ENV DATA_DIR=/data
+
+RUN groupadd -g 1001 appuser && \
+    useradd -u 1001 -g appuser -m appuser && \
+    mkdir -p /data && \
+    chown -R appuser:appuser /app /data
+
+USER appuser
 
 CMD ["sh", "-c", "vox-box start --host 0.0.0.0 --port 8080 --huggingface-repo-id ${VOXBOX_HF_REPO_ID:-deepdml/faster-whisper-large-v3-turbo-ct2} --data-dir ${DATA_DIR} --device ${VOXBOX_DEVICE:-cuda}"]

@@ -50,7 +50,7 @@ def main():
         fname = p.name
         
         # Ignored standard files
-        if stem in {'index', 'layout', 'page', 'loading', 'error', 'not-found', 'global-error', 'route', 'middleware', 'shims.d', '__init__', 'urls', 'apps', 'models', 'admin', 'views', 'serializers', 'tasks', 'conftest', 'manage', 'wsgi', 'asgi', 'settings'}:
+        if stem in {'index', 'layout', 'page', 'loading', 'error', 'not-found', 'global-error', 'route', 'middleware', 'proxy', 'shims.d', '__init__', 'urls', 'apps', 'models', 'admin', 'views', 'serializers', 'tasks', 'conftest', 'manage', 'wsgi', 'asgi', 'settings'}:
             continue
         if 'app/' in rel and ('page.tsx' in rel or 'layout.tsx' in rel or 'route.ts' in rel):
             continue

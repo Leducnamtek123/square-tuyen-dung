@@ -967,6 +967,30 @@ class CandidateCvParseView(APIView):
         if not file_obj:
             return Response({"message": "Không tìm thấy tệp tin"}, status=status.HTTP_404_NOT_FOUND)
 
+        # Bảo mật: Chỉ cho phép phân tích tệp tin thuộc loại CV
+        if getattr(file_obj, "file_type", "") != File.CV_TYPE:
+            return Response(
+                {"message": "Tệp tin không thuộc định dạng hồ sơ CV hợp lệ."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Bảo mật: Chặn IDOR / BOLA - chỉ chủ sở hữu tệp mới được phép phân tích
+        file_meta = getattr(file_obj, "metadata", {}) or {}
+        uploaded_by_id = file_meta.get("uploaded_by_user_id") if isinstance(file_meta, dict) else None
+        current_user_id = getattr(request.user, "id", None)
+        has_linked_resume = hasattr(file_obj, "resume_file") and file_obj.resume_file is not None
+
+        if uploaded_by_id is not None and uploaded_by_id != current_user_id:
+            return Response(
+                {"message": "Bạn không có quyền truy cập tệp tin này."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if has_linked_resume and getattr(file_obj.resume_file, "user_id", None) != current_user_id:
+            return Response(
+                {"message": "Bạn không có quyền truy cập tệp tin này."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         from apps.profiles.services.pdf_extraction import parse_cv_text_content
         from shared.helpers.cloudinary_service import CloudinaryService
         from django.conf import settings

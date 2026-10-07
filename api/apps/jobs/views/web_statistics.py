@@ -14,6 +14,7 @@ from rest_framework import status, viewsets
 from apps.accounts import permissions as perms_custom
 from apps.accounts.models import User
 from apps.interviews.models import (
+    InterviewConnectionLog,
     InterviewEvaluation,
     InterviewProctoringEvent,
     InterviewSession,
@@ -36,6 +37,91 @@ from ..models import JobPost, JobPostActivity, JobPostDailyView, SavedJobPost
 from ..serializers import StatisticsSerializer
 
 
+VALID_STAT_DAYS = {7, 14, 30, 60, 90, 365}
+DEFAULT_STAT_DAYS = 30
+
+
+def _parse_filter_days(query_params, default=DEFAULT_STAT_DAYS):
+    """Extract and validate days parameter from request query parameters."""
+    try:
+        days = int(query_params.get("days", default))
+        if days not in VALID_STAT_DAYS:
+            days = default
+    except (TypeError, ValueError):
+        days = default
+    return days
+
+
+def _resolve_stat_handler(handlers, stat_type):
+    """Resolve handler for requested statistics type or return 400 error response."""
+    handler = handlers.get(stat_type)
+    if not handler:
+        return None, var_res.response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"type": [f"Unsupported statistics type: {stat_type}"]},
+            data=None,
+        )
+    return handler, None
+
+
+def _validate_date_serializer(data):
+    """Validate statistics request payload using StatisticsSerializer."""
+    serializer = StatisticsSerializer(data=data)
+    if not serializer.is_valid():
+        return None, var_res.response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            data=None,
+            errors=serializer.errors,
+        )
+    return serializer.data, None
+
+
+def _get_activity_monthly_date_ranges():
+    """Calculate non-UTC and UTC month ranges for the past 12 months."""
+    now = datetime.datetime.now()
+    last_year_today = now.replace(year=now.year - 1)
+    first_day_of_month = last_year_today.replace(day=1)
+    last_day = calendar.monthrange(now.year, now.month)[1]
+    last_day_of_month = datetime.datetime(now.year, now.month, last_day)
+
+    first_day_no_utc = first_day_of_month.date()
+    last_day_no_utc = last_day_of_month.date()
+    first_day_utc = first_day_of_month.astimezone(pytz.utc).date()
+    last_day_utc = last_day_of_month.astimezone(pytz.utc).date()
+    return first_day_no_utc, last_day_no_utc, [first_day_utc, last_day_utc]
+
+
+def _aggregate_monthly_stats(queryset, date_range):
+    """Aggregate model queryset grouped by year and month."""
+    return (
+        queryset.filter(create_at__date__range=date_range)
+        .order_by("create_at")
+        .annotate(year=ExtractYear("create_at"), month=ExtractMonth("create_at"))
+        .values("year", "month")
+        .annotate(count=Count("id"))
+        .order_by("year", "month")
+    )
+
+
+def _format_monthly_activity_series(date_range, qs1, qs2, qs3):
+    """Align counts into parallel series for monthly activity chart."""
+    labels = []
+    data1, data2, data3 = [], [], []
+    for date in date_range:
+        m, y = date.month, date.year
+        items1 = [x for x in qs1 if x["year"] == y and x["month"] == m]
+        data1.append(items1[0]["count"] if items1 else 0)
+
+        items2 = [x for x in qs2 if x["year"] == y and x["month"] == m]
+        data2.append(items2[0]["count"] if items2 else 0)
+
+        items3 = [x for x in qs3 if x["year"] == y and x["month"] == m]
+        data3.append(items3[0]["count"] if items3 else 0)
+
+        labels.append(f"T{m}-{y}")
+    return labels, data1, data2, data3
+
+
 class JobSeekerStatisticViewSet(viewsets.ViewSet):
     permission_classes = [perms_custom.IsJobSeekerUser]
 
@@ -47,13 +133,9 @@ class JobSeekerStatisticViewSet(viewsets.ViewSet):
             "activity": self.activity_statistics,
             "activity-statistics": self.activity_statistics,
         }
-        handler = handlers.get(stat_type)
-        if not handler:
-            return var_res.response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                errors={"type": [f"Unsupported statistics type: {stat_type}"]},
-                data=None,
-            )
+        handler, err_res = _resolve_stat_handler(handlers, stat_type)
+        if err_res:
+            return err_res
         return handler(request)
 
     def general_statistics(self, request):
@@ -83,88 +165,36 @@ class JobSeekerStatisticViewSet(viewsets.ViewSet):
 
     def activity_statistics(self, request):
         user = request.user
-        now = datetime.datetime.now()
-        last_year_today = now.replace(year=now.year - 1)
-        first_day_of_month = last_year_today.replace(day=1)
-        last_day = calendar.monthrange(now.year, now.month)[1]
-        last_day_of_month = datetime.datetime(now.year, now.month, last_day)
+        first_no_utc, last_no_utc, date_range_utc = _get_activity_monthly_date_ranges()
 
-        first_day_of_month_no_utc = first_day_of_month.date()
-        last_day_of_month_no_utc = last_day_of_month.date()
-        first_day_of_month_utc = first_day_of_month.astimezone(pytz.utc).date()
-        last_day_of_month_utc = last_day_of_month.astimezone(pytz.utc).date()
-
-        queryset1 = (
-            JobPostActivity.objects.filter(
-                user=user,
-                is_deleted=False,
-                create_at__date__range=[first_day_of_month_utc, last_day_of_month_utc],
-            )
-            .order_by('create_at')
-            .annotate(year=ExtractYear('create_at'), month=ExtractMonth('create_at'))
-            .values('year', 'month')
-            .annotate(count=Count('id'))
-            .order_by('year', 'month')
+        queryset1 = _aggregate_monthly_stats(
+            JobPostActivity.objects.filter(user=user, is_deleted=False),
+            date_range_utc,
         )
-
-        queryset2 = (
-            SavedJobPost.objects.filter(
-                user=user, create_at__date__range=[first_day_of_month_utc, last_day_of_month_utc]
-            )
-            .order_by('create_at')
-            .annotate(year=ExtractYear('create_at'), month=ExtractMonth('create_at'))
-            .values('year', 'month')
-            .annotate(count=Count('id'))
-            .order_by('year', 'month')
+        queryset2 = _aggregate_monthly_stats(
+            SavedJobPost.objects.filter(user=user),
+            date_range_utc,
         )
-
-        queryset3 = (
-            CompanyFollowed.objects.filter(
-                user=user, create_at__date__range=[first_day_of_month_utc, last_day_of_month_utc]
-            )
-            .order_by('create_at')
-            .annotate(year=ExtractYear('create_at'), month=ExtractMonth('create_at'))
-            .values('year', 'month')
-            .annotate(count=Count('id'))
-            .order_by('year', 'month')
+        queryset3 = _aggregate_monthly_stats(
+            CompanyFollowed.objects.filter(user=user),
+            date_range_utc,
         )
-
-        labels = []
-        data1 = []
-        data2 = []
-        data3 = []
-
-        title1 = "Applied Jobs"
-        title2 = "Saved Jobs"
-        title3 = "Companies Followed"
 
         date_range = pd.date_range(
-            start=first_day_of_month_no_utc,
-            end=last_day_of_month_no_utc,
-            freq='M',
+            start=first_no_utc,
+            end=last_no_utc,
+            freq="M",
             normalize=True,
         )
-
-        for date in date_range:
-            m = date.month
-            y = date.year
-
-            items1 = [x for x in queryset1 if x['year'] == y and x['month'] == m]
-            data1.append(items1[0]['count'] if items1 else 0)
-
-            items2 = [x for x in queryset2 if x['year'] == y and x['month'] == m]
-            data2.append(items2[0]['count'] if items2 else 0)
-
-            items3 = [x for x in queryset3 if x['year'] == y and x['month'] == m]
-            data3.append(items3[0]['count'] if items3 else 0)
-
-            labels.append(f'T{m}-{y}')
+        labels, data1, data2, data3 = _format_monthly_activity_series(
+            date_range, queryset1, queryset2, queryset3
+        )
 
         return var_res.response_data(
             data={
-                "title1": title1,
-                "title2": title2,
-                "title3": title3,
+                "title1": "Applied Jobs",
+                "title2": "Saved Jobs",
+                "title3": "Companies Followed",
                 "labels": labels,
                 "data1": data1,
                 "data2": data2,
@@ -186,13 +216,9 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
             "recruitment-by-rank": self.recruitment_statistics_by_rank,
             "interview": self.interview_statistics,
         }
-        handler = handlers.get(stat_type)
-        if not handler:
-            return var_res.response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                errors={"type": [f"Unsupported statistics type: {stat_type}"]},
-                data=None,
-            )
+        handler, err_res = _resolve_stat_handler(handlers, stat_type)
+        if err_res:
+            return err_res
 
         if stat_type == "general":
             return handler(request)
@@ -274,16 +300,12 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
 
     def interview_statistics(self, request):
         """Interview statistics by month — status breakdown + AI score trends."""
-        serializer = StatisticsSerializer(data=request.data)
-        if not serializer.is_valid():
-            return var_res.response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                data=None,
-                errors=serializer.errors,
-            )
+        ser_data, err_res = _validate_date_serializer(request.data)
+        if err_res:
+            return err_res
 
-        start_date = pd.to_datetime(serializer.data.get("startDate"))
-        end_date = pd.to_datetime(serializer.data.get("endDate"))
+        start_date = pd.to_datetime(ser_data.get("startDate"))
+        end_date = pd.to_datetime(ser_data.get("endDate"))
         user = request.user
         company = user.active_company
 
@@ -387,16 +409,12 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         )
 
     def recruitment_statistics(self, request):
-        serializer = StatisticsSerializer(data=request.data)
-        if not serializer.is_valid():
-            return var_res.response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                data=None,
-                errors=serializer.errors,
-            )
+        ser_data, err_res = _validate_date_serializer(request.data)
+        if err_res:
+            return err_res
 
-        start_date = pd.to_datetime(serializer.data.get("startDate"))
-        end_date = pd.to_datetime(serializer.data.get("endDate"))
+        start_date = pd.to_datetime(ser_data.get("startDate"))
+        end_date = pd.to_datetime(ser_data.get("endDate"))
         user = request.user
 
         queryset = (
@@ -428,16 +446,12 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         return var_res.response_data(data=data_results)
 
     def candidate_statistics(self, request):
-        serializer = StatisticsSerializer(data=request.data)
-        if not serializer.is_valid():
-            return var_res.response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                data=None,
-                errors=serializer.errors,
-            )
+        ser_data, err_res = _validate_date_serializer(request.data)
+        if err_res:
+            return err_res
 
-        start_date_str = serializer.data.get("startDate")
-        end_date_str = serializer.data.get("endDate")
+        start_date_str = ser_data.get("startDate")
+        end_date_str = ser_data.get("endDate")
         start_date1 = pd.to_datetime(start_date_str)
         end_date1 = pd.to_datetime(end_date_str)
         start_date2 = start_date1 - timedelta(days=365)
@@ -506,16 +520,12 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         )
 
     def application_statistics(self, request):
-        serializer = StatisticsSerializer(data=request.data)
-        if not serializer.is_valid():
-            return var_res.response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                data=None,
-                errors=serializer.errors,
-            )
+        ser_data, err_res = _validate_date_serializer(request.data)
+        if err_res:
+            return err_res
 
-        start_date = pd.to_datetime(serializer.data.get("startDate"))
-        end_date = pd.to_datetime(serializer.data.get("endDate"))
+        start_date = pd.to_datetime(ser_data.get("startDate"))
+        end_date = pd.to_datetime(ser_data.get("endDate"))
         user = request.user
 
         # Optimize: cumulative job count using DB aggregation instead of O(n²)
@@ -578,16 +588,12 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         )
 
     def recruitment_statistics_by_rank(self, request):
-        serializer = StatisticsSerializer(data=request.data)
-        if not serializer.is_valid():
-            return var_res.response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                data=None,
-                errors=serializer.errors,
-            )
+        ser_data, err_res = _validate_date_serializer(request.data)
+        if err_res:
+            return err_res
 
-        start_date = pd.to_datetime(serializer.data.get("startDate"))
-        end_date = pd.to_datetime(serializer.data.get("endDate"))
+        start_date = pd.to_datetime(ser_data.get("startDate"))
+        end_date = pd.to_datetime(ser_data.get("endDate"))
 
         user = request.user
         company = user.active_company
@@ -659,12 +665,7 @@ class AdminStatisticViewSet(viewsets.ViewSet):
             )
 
     def trend_statistics(self, request):
-        try:
-            days = int(request.query_params.get("days", 30))
-            if days not in [7, 14, 30, 60, 90, 365]:
-                days = 30
-        except (TypeError, ValueError):
-            days = 30
+        days = _parse_filter_days(request.query_params)
 
         cache_key = f"admin_summary_trend_stats_{days}"
         cached_data = cache.get(cache_key)
@@ -746,12 +747,7 @@ class AdminStatisticViewSet(viewsets.ViewSet):
         return var_res.response_data(data=result_data)
 
     def general_statistics(self, request):
-        try:
-            days = int(request.query_params.get("days", 30))
-            if days not in [7, 14, 30, 60, 90, 365]:
-                days = 30
-        except (TypeError, ValueError):
-            days = 30
+        days = _parse_filter_days(request.query_params)
 
         cache_key = f"admin_summary_general_stats_{days}"
         cached_data = cache.get(cache_key)
@@ -847,6 +843,33 @@ class AdminStatisticViewSet(viewsets.ViewSet):
         passed_eval = evaluations_qs.filter(result="passed").count()
         ai_recommend_hire_rate = round((passed_eval / total_eval) * 100) if total_eval > 0 else 0
 
+        # WebRTC Connection Telemetry & Reliability Metrics
+        connection_logs_qs = InterviewConnectionLog.objects.filter(timestamp__gte=recent_start)
+        total_connection_incidents = connection_logs_qs.filter(
+            event_type__in=["disconnected", "reconnecting", "connection_dropped"]
+        ).count()
+
+        reconnected_sessions_count = (
+            connection_logs_qs.filter(event_type="reconnected")
+            .values("session_id")
+            .distinct()
+            .count()
+        )
+        total_started_interviews = interviews_qs.filter(
+            status__in=["in_progress", "completed", "interrupted"]
+        ).count()
+        reconnection_rate = (
+            round((reconnected_sessions_count / total_started_interviews) * 100)
+            if total_started_interviews > 0
+            else 0
+        )
+
+        avg_downtime_dict = connection_logs_qs.filter(
+            event_type="reconnected",
+            downtime_seconds__gt=0
+        ).aggregate(avg_dt=Avg("downtime_seconds"))
+        avg_downtime_seconds = round(avg_downtime_dict.get("avg_dt") or 0.0, 1)
+
         total_job_post_views = job_posts_qs.aggregate(total=Sum("views")).get("total") or 0
         new_job_post_views = (
             JobPostDailyView.objects.filter(date__gte=today - timedelta(days=days - 1))
@@ -935,6 +958,9 @@ class AdminStatisticViewSet(viewsets.ViewSet):
             "avgInterviewDurationSeconds": avg_interview_duration,
             "proctoringEventsCount": proctoring_events_count,
             "aiRecommendHireRate": ai_recommend_hire_rate,
+            "reconnectionRate": reconnection_rate,
+            "avgDowntimeSeconds": avg_downtime_seconds,
+            "totalConnectionIncidents": total_connection_incidents,
         }
         cache.set(cache_key, stats_data, timeout=300)
         return var_res.response_data(data=stats_data)

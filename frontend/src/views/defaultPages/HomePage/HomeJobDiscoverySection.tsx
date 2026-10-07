@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/vi';
@@ -131,6 +132,10 @@ const CompanyLogo = ({
 }) => {
   const [hasError, setHasError] = useState(false);
 
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
   if (!src || hasError) {
     return (
       <div
@@ -145,14 +150,17 @@ const CompanyLogo = ({
   return (
     <div
       style={{ width: size, height: size }}
-      className="rounded-none border border-slate-200/80 bg-white p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs"
+      className="rounded-none border border-slate-200/80 bg-white p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs relative"
     >
-      <img
+      <Image
         src={src}
         alt={name}
+        width={size}
+        height={size}
         className="w-full h-full object-contain rounded-none"
         onError={() => setHasError(true)}
         loading="lazy"
+        unoptimized
       />
     </div>
   );
@@ -341,9 +349,9 @@ export default function HomeJobDiscoverySection() {
         {/* CỘT 1: BỘ LỌC TÌM KIẾM (LEFT COLUMN - 3 COLS ON DESKTOP)   */}
         {/* ========================================================= */}
         <aside className="col-span-1 lg:col-span-3 lg:sticky lg:top-[80px] self-start z-10">
-          <Card className="rounded-none border-slate-200/90 bg-white shadow-xs p-5 max-h-[calc(100vh-100px)] overflow-y-auto">
+          <Card className="rounded-none border-slate-200/90 bg-white shadow-xs p-4 lg:max-h-[calc(100vh-90px)] lg:overflow-y-auto custom-scrollbar">
             {/* Header: Title + Clear all button */}
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-100">
               <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
                 <FilterAltIcon sx={{ color: '#2563eb', fontSize: 20 }} />
                 <span>Bộ lọc tìm kiếm</span>
@@ -358,10 +366,10 @@ export default function HomeJobDiscoverySection() {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Filter 1: Từ khóa tìm kiếm */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Từ khóa
                 </label>
                 <div className="relative">
@@ -376,18 +384,18 @@ export default function HomeJobDiscoverySection() {
                       if (e.key === 'Enter') handleApplyFilters();
                     }}
                     placeholder="Nhập vị trí, kỹ năng, tên công ty..."
-                    className="pl-9 h-10 text-xs rounded-none bg-slate-50/80 border-slate-200 focus-visible:bg-white focus-visible:border-blue-500"
+                    className="pl-9 h-9 text-xs rounded-none bg-slate-50/80 border-slate-200 focus-visible:bg-white focus-visible:border-blue-500"
                   />
                 </div>
               </div>
 
               {/* Filter 2: Địa điểm (Tỉnh/Thành phố) */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Địa điểm
                 </label>
                 <Select value={selectedCity} onValueChange={setSelectedCity}>
-                  <SelectTrigger className="h-10 text-xs rounded-none bg-slate-50/80 border-slate-200">
+                  <SelectTrigger aria-label="Tất cả tỉnh thành" className="h-9 text-xs rounded-none bg-slate-50/80 border-slate-200">
                     <div className="flex items-center gap-2 truncate">
                       <LocationOnOutlinedIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
                       <SelectValue placeholder="Tất cả tỉnh thành" />
@@ -406,11 +414,11 @@ export default function HomeJobDiscoverySection() {
 
               {/* Filter 3: Ngành nghề */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Ngành nghề
                 </label>
                 <Select value={selectedCareer} onValueChange={setSelectedCareer}>
-                  <SelectTrigger className="h-10 text-xs rounded-none bg-slate-50/80 border-slate-200">
+                  <SelectTrigger aria-label="Tất cả ngành nghề" className="h-9 text-xs rounded-none bg-slate-50/80 border-slate-200">
                     <div className="flex items-center gap-2 truncate">
                       <WorkOutlineOutlinedIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
                       <SelectValue placeholder="Tất cả ngành nghề" />
@@ -429,11 +437,11 @@ export default function HomeJobDiscoverySection() {
 
               {/* Filter 4: Mức lương */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Mức lương
                 </label>
                 <Select value={selectedSalary} onValueChange={setSelectedSalary}>
-                  <SelectTrigger className="h-10 text-xs rounded-none bg-slate-50/80 border-slate-200">
+                  <SelectTrigger aria-label="Tất cả mức lương" className="h-9 text-xs rounded-none bg-slate-50/80 border-slate-200">
                     <div className="flex items-center gap-2 truncate">
                       <PaymentsOutlinedIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
                       <SelectValue placeholder="Tất cả mức lương" />
@@ -451,11 +459,11 @@ export default function HomeJobDiscoverySection() {
 
               {/* Filter 5: Kinh nghiệm */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
                   Kinh nghiệm
                 </label>
                 <Select value={selectedExperience} onValueChange={setSelectedExperience}>
-                  <SelectTrigger className="h-10 text-xs rounded-none bg-slate-50/80 border-slate-200">
+                  <SelectTrigger aria-label="Tất cả kinh nghiệm" className="h-9 text-xs rounded-none bg-slate-50/80 border-slate-200">
                     <div className="flex items-center gap-2 truncate">
                       <PersonOutlineOutlinedIcon sx={{ color: '#94a3b8', fontSize: 18 }} />
                       <SelectValue placeholder="Tất cả kinh nghiệm" />
@@ -474,10 +482,10 @@ export default function HomeJobDiscoverySection() {
 
               {/* Filter 6: Hình thức làm việc (Checkboxes) */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-2">
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
                   Hình thức làm việc
                 </label>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {jobTypeOptions.map((type) => {
                     const idStr = String(type.id);
                     const isChecked = selectedJobTypes.includes(idStr);
@@ -491,7 +499,7 @@ export default function HomeJobDiscoverySection() {
                             setSelectedJobTypes((prev) => [...prev, idStr]);
                           }
                         }}
-                        className="flex items-center gap-2.5 px-2 py-1.5 rounded-none hover:bg-slate-100/80 cursor-pointer select-none transition-colors"
+                        className="flex items-center gap-2 px-2 py-1 rounded-none hover:bg-slate-100/80 cursor-pointer select-none transition-colors"
                       >
                         <Checkbox
                           id={`job-type-${idStr}`}
@@ -521,7 +529,7 @@ export default function HomeJobDiscoverySection() {
               {/* Action Button: Áp dụng */}
               <Button
                 onClick={handleApplyFilters}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 rounded-none shadow-xs text-xs flex items-center justify-center gap-1.5 mt-2"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-9 rounded-none shadow-xs text-xs flex items-center justify-center gap-1.5 mt-2"
               >
                 <TuneIcon sx={{ fontSize: 18 }} />
                 <span>Áp dụng</span>
@@ -553,7 +561,7 @@ export default function HomeJobDiscoverySection() {
               variant="link"
               className="text-xs font-bold text-blue-600 hover:text-blue-700 no-underline hover:no-underline p-0 h-auto"
             >
-              <Link href={jobsHref} className="flex items-center gap-1 no-underline hover:no-underline">
+              <Link href={jobsHref} aria-label="Xem tất cả việc làm" className="flex items-center gap-1 no-underline hover:no-underline">
                 <span>Xem tất cả</span>
                 <ArrowForwardIcon sx={{ fontSize: 14 }} />
               </Link>
@@ -671,7 +679,7 @@ export default function HomeJobDiscoverySection() {
                               </span>
                             )}
                             {job.isHot && (
-                              <span className="text-[11px] font-bold bg-rose-50 text-rose-600 border border-rose-200 px-2 py-0.5 rounded-none">
+                              <span className="text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded-none">
                                 Hot
                               </span>
                             )}
@@ -683,7 +691,7 @@ export default function HomeJobDiscoverySection() {
                           </div>
 
                           {/* Time in Soft Green Badge */}
-                          <span suppressHydrationWarning className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-none">
+                          <span suppressHydrationWarning className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-none">
                             {postedTime}
                           </span>
                         </div>
@@ -695,7 +703,7 @@ export default function HomeJobDiscoverySection() {
                       type="button"
                       onClick={(e) => handleToggleSaveJob(job, e)}
                       aria-label="Lưu việc làm"
-                      className="absolute top-4 right-4 p-1.5 rounded-none text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer bg-transparent border-0"
+                      className="absolute top-3 right-3 p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-none text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer bg-transparent border-0"
                     >
                       {isSaved ? (
                         <BookmarkIcon sx={{ fontSize: 20, color: '#2563eb' }} />
@@ -727,7 +735,7 @@ export default function HomeJobDiscoverySection() {
                 variant="link"
                 className="text-xs font-bold text-blue-600 hover:text-blue-700 no-underline hover:no-underline p-0 h-auto"
               >
-                <Link href={companiesHref} className="flex items-center gap-1 no-underline hover:no-underline">
+                <Link href={companiesHref} aria-label="Xem tất cả công ty nổi bật" className="flex items-center gap-1 no-underline hover:no-underline">
                   <span>Xem tất cả</span>
                   <ArrowForwardIcon sx={{ fontSize: 14 }} />
                 </Link>
@@ -746,7 +754,7 @@ export default function HomeJobDiscoverySection() {
                         <Skeleton className="h-2.5 w-16" />
                       </div>
                     </div>
-                    <Skeleton className="h-7 w-16 rounded-none" />
+                    <Skeleton className="h-9 w-20 rounded-none" />
                   </div>
                 ))}
               </div>
@@ -787,7 +795,7 @@ export default function HomeJobDiscoverySection() {
                         size="sm"
                         variant={isFollowed ? 'secondary' : 'outline'}
                         onClick={() => handleToggleFollowCompany(company)}
-                        className={`rounded-none h-7 px-3.5 text-xs font-semibold transition-all ${
+                        className={`rounded-none h-9 px-4 text-xs font-semibold transition-all min-h-[36px] ${
                           isFollowed
                             ? 'bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100'
                             : 'border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700'

@@ -2,8 +2,11 @@
 
 import React, { useRef, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Grid2 as Grid, Box, Typography, Button, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { Grid2 as Grid, Box, Typography, Button, ToggleButtonGroup, ToggleButton, Collapse } from "@mui/material";
 import RefreshIcon from '@mui/icons-material/Refresh';
+import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import gsap from "gsap";
@@ -30,6 +33,7 @@ const DashboardPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [days, setDays] = useState<number>(30);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [showDemographics, setShowDemographics] = useState<boolean>(false);
 
   // Auto-start employer dashboard tour on first visit
   useTourAutoStart('employer_dashboard', 800);
@@ -260,7 +264,19 @@ const DashboardPage = () => {
           <EmployerQuantityStatistics />
         </Grid>
 
-        {/* ROW 2: Hero Bento Grid - Application Trend (7 Cols) & Recruitment Funnel (5 Cols) */}
+        {/* ROW 2: Actionable Operations - Recent Applications (7 Cols) & Interview Analytics (5 Cols) */}
+        <Grid size={{ xs: 12, lg: 7 }} className="gsap-emp-action-row">
+          <RecentApplicationsWidget />
+        </Grid>
+        <Grid size={{ xs: 12, lg: 5 }} data-tour="employer-active-interviews" className="gsap-emp-action-row">
+          <InterviewStatsChart
+            title={t('dashboard.interviewChart')}
+            startDate={startDate}
+            endDate={endDate}
+          />
+        </Grid>
+
+        {/* ROW 3: Recruitment Velocity & Funnel - Application Trend (7 Cols) & Funnel (5 Cols) */}
         <Grid size={{ xs: 12, lg: 7 }} className="gsap-emp-hero-row">
           <ApplicationChart
             title={t('dashboard.applicationChart')}
@@ -276,32 +292,89 @@ const DashboardPage = () => {
           />
         </Grid>
 
-        {/* ROW 3: Actionable Operations - Recent Applications (7 Cols) & Interview Analytics (5 Cols) */}
-        <Grid size={{ xs: 12, lg: 7 }} className="gsap-emp-action-row">
-          <RecentApplicationsWidget />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 5 }} data-tour="employer-active-interviews" className="gsap-emp-action-row">
-          <InterviewStatsChart
-            title={t('dashboard.interviewChart')}
-            startDate={startDate}
-            endDate={endDate}
-          />
+        {/* ROW 4: Demographics & Candidate Growth (Collapsible for Clean UX) */}
+        <Grid size={12} className="gsap-emp-chart-card">
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              bgcolor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+              userSelect: 'none',
+              transition: 'all 0.15s ease-in-out',
+              '&:hover': {
+                bgcolor: '#F1F5F9',
+                borderColor: '#CBD5E1',
+              },
+            }}
+            onClick={() => setShowDemographics((prev) => !prev)}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 2,
+                  bgcolor: '#EFF6FF',
+                  color: '#2563EB',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <InsightsOutlinedIcon fontSize="small" />
+              </Box>
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#0F172A' }}>
+                  Phân tích nhân khẩu học và Trình độ học vấn ứng viên
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748B' }}>
+                  {showDemographics
+                    ? 'Nhấp để thu gọn biểu đồ phân tích chuyên sâu'
+                    : 'Xem biểu đồ tăng trưởng ứng viên và tỷ lệ học vấn tuyển dụng'}
+                </Typography>
+              </Box>
+            </Box>
+            <Button
+              size="small"
+              variant="text"
+              endIcon={showDemographics ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                color: '#2563EB',
+                fontSize: '0.8125rem',
+              }}
+            >
+              {showDemographics ? 'Thu gọn' : 'Xem chi tiết'}
+            </Button>
+          </Box>
         </Grid>
 
-        {/* ROW 4: Demographics & Candidate Growth (6 / 6 Columns) */}
-        <Grid size={{ xs: 12, md: 6 }} className="gsap-emp-chart-card">
-          <CandidateChart
-            title={t('dashboard.candidateChart')}
-            startDate={startDate}
-            endDate={endDate}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }} className="gsap-emp-chart-card">
-          <HiringAcademicChart
-            title={t('dashboard.academicChart')}
-            startDate={startDate}
-            endDate={endDate}
-          />
+        <Grid size={12}>
+          <Collapse in={showDemographics} timeout="auto">
+            <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }} sx={{ pt: 1 }}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <CandidateChart
+                  title={t('dashboard.candidateChart')}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <HiringAcademicChart
+                  title={t('dashboard.academicChart')}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+              </Grid>
+            </Grid>
+          </Collapse>
         </Grid>
       </Grid>
     </Box>

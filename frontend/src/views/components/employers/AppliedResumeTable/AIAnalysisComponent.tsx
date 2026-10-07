@@ -41,7 +41,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
           sx={{ 
             fontWeight: 900, 
             cursor: 'pointer',
-            borderRadius: 1.5,
+            borderRadius: '3px',
             px: 0.5,
             bgcolor: alpha(color.main, 0.08),
             color: color.main,
@@ -73,7 +73,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
           sx={{ 
             fontWeight: 900, 
             cursor: 'pointer',
-            borderRadius: 1.5,
+            borderRadius: '3px',
             bgcolor: pc.error( 0.08),
             color: 'error.main',
             border: '1px solid',
@@ -104,7 +104,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
         color: '#2563EB',
         border: '1px solid #BFDBFE',
         bgcolor: '#EFF6FF',
-        borderRadius: '8px',
+        borderRadius: '4px',
         transition: 'all 0.2s ease',
         '&:hover': {
           bgcolor: '#DBEAFE',

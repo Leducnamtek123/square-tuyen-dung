@@ -58,7 +58,7 @@ const CareerHandbookSection = () => {
     <Box>
       {/* -- Section Header ------------------------------------------------ */}
       <Stack spacing={1} sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
+        <Typography variant="h5" component="h2" sx={{ fontWeight: 800 }} gutterBottom>
           {t('news.handbookTitle', 'Tin tức & Thông tin')}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
@@ -113,6 +113,9 @@ const CareerHandbookSection = () => {
                       component="img"
                       image={getArticleImage(article)}
                       alt={article.title}
+                      loading="lazy"
+                      width={400}
+                      height={200}
                       sx={{
                         width: '100%',
                         height: '100%',
@@ -142,6 +145,7 @@ const CareerHandbookSection = () => {
                     <Typography
                       className="article-title"
                       variant="h6"
+                      component="h3"
                       sx={{
                         fontWeight: 700,
                         fontSize: '1rem',

@@ -84,7 +84,7 @@ export default function TopViewedJobsWidget({ stats, loading = false }: TopViewe
           </Typography>
         </Box>
         <Link
-          href="/admin/jobs"
+          href="/jobs"
           style={{ textDecoration: 'none' }}
         >
           <Typography

@@ -24,6 +24,7 @@ import numpy as np
 
 import subprocess
 import os
+import re
 import time
 import torch.nn.functional as F
 import cv2
@@ -67,14 +68,21 @@ def load_model():
     return vae, unet, pe, timesteps, audio_processor
 
 def load_avatar(avatar_id):
-    avatar_path = f"./data/avatars/{avatar_id}"
-    full_imgs_path = f"{avatar_path}/full_imgs" 
-    coords_path = f"{avatar_path}/coords.pkl"
-    latents_out_path= f"{avatar_path}/latents.pt"
-    video_out_path = f"{avatar_path}/vid_output/"
-    mask_out_path =f"{avatar_path}/mask"
-    mask_coords_path =f"{avatar_path}/mask_coords.pkl"
-    avatar_info_path = f"{avatar_path}/avator_info.json"
+    clean_id = re.sub(r'[^a-zA-Z0-9_\-]', '', str(avatar_id))
+    if not clean_id:
+        raise ValueError("Invalid avatar_id")
+    base_dir = os.path.abspath(os.path.join(".", "data", "avatars"))
+    avatar_path = os.path.abspath(os.path.join(base_dir, clean_id))
+    if not (avatar_path.startswith(base_dir + os.sep) and os.path.isdir(avatar_path)):
+        raise ValueError(f"Avatar directory {avatar_path} is invalid or outside allowed directory")
+
+    full_imgs_path = os.path.join(avatar_path, "full_imgs")
+    coords_path = os.path.join(avatar_path, "coords.pkl")
+    latents_out_path= os.path.join(avatar_path, "latents.pt")
+    video_out_path = os.path.join(avatar_path, "vid_output")
+    mask_out_path = os.path.join(avatar_path, "mask")
+    mask_coords_path = os.path.join(avatar_path, "mask_coords.pkl")
+    avatar_info_path = os.path.join(avatar_path, "avator_info.json")
 
     input_latent_list_cycle = torch.load(latents_out_path)
     with open(coords_path, 'rb') as f:

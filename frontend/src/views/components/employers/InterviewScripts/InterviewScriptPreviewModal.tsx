@@ -13,7 +13,7 @@ import {
   Button,
   IconButton,
   Divider,
-  Grid,
+  Grid2 as Grid,
   Paper,
   Table,
   TableHead,
@@ -42,6 +42,19 @@ import {
   HR_PERSONA_OPTIONS,
 } from '@/types/interviewScript';
 
+const CATEGORY_DISPLAY_MAP: Record<string, string> = {
+  technical: 'Chuyên môn',
+  behavioral: 'Hành vi (STAR)',
+  soft_skills: 'Kỹ năng mềm',
+  general: 'Tổng quan',
+  situational: 'Xử lý tình huống',
+  culture_fit: 'Phù hợp văn hóa',
+  problem_solving: 'Giải quyết vấn đề',
+  sales: 'Kinh doanh & CSKH',
+  leadership: 'Lãnh đạo & Quản lý',
+  fresher: 'Cơ bản / Fresher',
+};
+
 interface InterviewScriptPreviewModalProps {
   open: boolean;
   script: InterviewScript | null;
@@ -59,15 +72,28 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
 }) => {
   if (!script) return null;
 
-  const scenarioMeta = SCENARIO_OPTIONS.find((s) => s.type === script.scenario_type);
-  const personaMeta = HR_PERSONA_OPTIONS.find((p) => p.persona === script.hr_persona);
-  const rubricList: EvaluationCriterion[] = Array.isArray(script.evaluation_rubric)
-    ? (script.evaluation_rubric as EvaluationCriterion[])
+  const scenarioType = script.scenario_type || script.scenarioType || 'technical';
+  const hrPersona = script.hr_persona || script.hrPersona || 'professional';
+  const isSystemPreset = Boolean(script.is_system_preset ?? script.isSystemPreset);
+  const timeLimit = Number(script.time_limit_per_question ?? script.timeLimitPerQuestion ?? 120);
+  const allowAiFollowup = Boolean(script.allow_ai_followup ?? script.allowAiFollowup ?? true);
+  const maxFollowupQuestions = Number(script.max_followup_questions ?? script.maxFollowupQuestions ?? 2);
+  const voiceName = script.voice_name || script.voiceName || 'Trúc Ly';
+  const voiceSpeed = Number(script.voice_speed ?? script.voiceSpeed ?? 1.0);
+  const characterId = script.character_id || script.characterId || 'ng_c_linh';
+  const systemPrompt = script.system_prompt || script.systemPrompt || '';
+  const greetingMessage = script.greeting_message || script.greetingMessage || '';
+  const closingMessage = script.closing_message || script.closingMessage || '';
+
+  const scenarioMeta = SCENARIO_OPTIONS.find((s) => s.type === scenarioType);
+  const personaMeta = HR_PERSONA_OPTIONS.find((p) => p.persona === hrPersona);
+  const rubricList: EvaluationCriterion[] = Array.isArray(script.evaluation_rubric || script.evaluationRubric)
+    ? ((script.evaluation_rubric || script.evaluationRubric) as EvaluationCriterion[])
     : [];
 
   const totalRubricWeight = rubricList.reduce((sum, item) => sum + (Number(item.weight) || 0), 0);
 
-  const canWrite = Boolean(script.canWrite && !script.is_system_preset);
+  const canWrite = Boolean(script.canWrite && !isSystemPreset);
 
   // Questions detail extraction
   const questionsDetail: ScriptQuestion[] =
@@ -79,19 +105,19 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
   const totalQuestionsCount =
     questionsDetail.length ||
     script.questions_count ||
+    script.questionsCount ||
     (Array.isArray(script.questions) ? script.questions.length : 0);
 
   const questionGroupName =
     script.question_group_name ||
+    script.questionGroupName ||
     (typeof script.question_group === 'object' && script.question_group !== null
       ? script.question_group.name
       : undefined) ||
-    script.questionGroupName ||
     (typeof script.questionGroup === 'object' && script.questionGroup !== null
       ? script.questionGroup.name
       : undefined);
 
-  const timeLimit = script.time_limit_per_question || 120;
   const estimatedTotalMinutes = totalQuestionsCount > 0 ? Math.round((totalQuestionsCount * timeLimit) / 60) : 0;
 
   // Helper to highlight dynamic prompt variables
@@ -154,7 +180,7 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
       >
         <Box sx={{ pr: 2 }}>
           <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ gap: 0.75, mb: 1 }}>
-            {script.is_system_preset && (
+            {isSystemPreset && (
               <Chip
                 icon={<AutoAwesomeRoundedIcon sx={{ fontSize: '13px !important', color: '#ffffff !important' }} />}
                 label="Mẫu chuẩn InfoHR"
@@ -236,7 +262,7 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
           {/* Thông số vận hành & Thời lượng ước tính */}
           <Grid container spacing={2}>
             {/* Ước tính toàn bộ phiên phỏng vấn */}
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: '#f0fdf4', border: '1px solid #bbf7d0' }}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                   <TimerOutlinedIcon sx={{ fontSize: 18, color: '#16a34a' }} />
@@ -250,7 +276,7 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
               </Paper>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: '#f8fafc' }}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                   <TimerOutlinedIcon sx={{ fontSize: 18, color: 'primary.main' }} />
@@ -259,12 +285,12 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
                   </Typography>
                 </Stack>
                 <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                  {script.time_limit_per_question} giây
+                  {timeLimit} giây
                 </Typography>
               </Paper>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: '#f8fafc' }}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                   <ChatBubbleOutlineOutlinedIcon sx={{ fontSize: 18, color: 'primary.main' }} />
@@ -273,12 +299,12 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
                   </Typography>
                 </Stack>
                 <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                  {script.allow_ai_followup ? `Tối đa ${script.max_followup_questions} câu` : 'Không kích hoạt'}
+                  {allowAiFollowup ? `Tối đa ${maxFollowupQuestions} câu` : 'Không kích hoạt'}
                 </Typography>
               </Paper>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Paper variant="outlined" sx={{ p: 2, borderRadius: 2.5, bgcolor: '#f8fafc' }}>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
                   <RecordVoiceOverOutlinedIcon sx={{ fontSize: 18, color: 'primary.main' }} />
@@ -287,7 +313,7 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
                   </Typography>
                 </Stack>
                 <Typography variant="subtitle1" noWrap sx={{ fontWeight: 800, color: 'text.primary' }}>
-                  {script.character_id === 'minh_tri' ? 'Minh Trí' : 'Ngọc Linh'} • {script.voice_name} ({script.voice_speed}x)
+                  {characterId === 'minh_tri' ? 'Minh Trí' : 'Ngọc Linh'} • {voiceName} ({voiceSpeed}x)
                 </Typography>
               </Paper>
             </Grid>
@@ -331,7 +357,12 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={(q as { category_display?: string }).category_display || q.category || 'Chung'}
+                            label={
+                              (q as { category_display?: string }).category_display ||
+                              (q.category && CATEGORY_DISPLAY_MAP[q.category.toLowerCase()]) ||
+                              q.category ||
+                              'Chung'
+                            }
                             size="small"
                             variant="outlined"
                             sx={{ fontSize: '0.72rem', height: 22 }}
@@ -390,30 +421,30 @@ export const InterviewScriptPreviewModal: React.FC<InterviewScriptPreviewModalPr
                 fontFamily: 'inherit',
               }}
             >
-              {renderFormattedPrompt(script.system_prompt)}
+              {renderFormattedPrompt(systemPrompt)}
             </Paper>
           </Box>
 
           {/* Lời chào & Lời cảm ơn */}
           <Grid container spacing={2}>
-            {script.greeting_message && (
-              <Grid item xs={12} sm={6}>
+            {greetingMessage && (
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 0.75 }}>
                   LỜI CHÀO MỞ ĐẦU:
                 </Typography>
                 <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', fontSize: '0.85rem' }}>
-                  {renderFormattedPrompt(script.greeting_message)}
+                  {renderFormattedPrompt(greetingMessage)}
                 </Paper>
               </Grid>
             )}
 
-            {script.closing_message && (
-              <Grid item xs={12} sm={6}>
+            {closingMessage && (
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 0.75 }}>
                   LỜI CẢM ƠN KẾT THÚC:
                 </Typography>
                 <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#f8fafc', fontSize: '0.85rem' }}>
-                  {renderFormattedPrompt(script.closing_message)}
+                  {renderFormattedPrompt(closingMessage)}
                 </Paper>
               </Grid>
             )}

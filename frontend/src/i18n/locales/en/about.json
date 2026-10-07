@@ -98,10 +98,10 @@
           "target": "_self"
         },
         {
-          "subdomain": "employer.infohr.vn",
+          "subdomain": "ntd.infohr.vn",
           "name": "Recruiter Command Center",
           "desc": "Built for talent acquisition teams. Publish SEO-optimized engineering JDs, access verified candidate pools, and manage Kanban recruitment pipelines.",
-          "url": "https://employer.infohr.vn",
+          "url": "https://ntd.infohr.vn",
           "target": "_blank"
         },
         {

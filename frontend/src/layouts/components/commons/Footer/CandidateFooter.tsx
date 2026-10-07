@@ -58,6 +58,7 @@ export const CandidateFooter: React.FC = () => {
             <Grid size={{ xs: 12, md: 5.5, lg: 5 }}>
               <Typography
                 variant="subtitle1"
+                component="h3"
                 sx={{
                   fontWeight: 800,
                   fontSize: '1.05rem',
@@ -107,6 +108,7 @@ export const CandidateFooter: React.FC = () => {
             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3.5 }}>
               <Typography
                 variant="subtitle1"
+                component="h3"
                 sx={{
                   fontWeight: 800,
                   fontSize: '1.05rem',
@@ -147,6 +149,7 @@ export const CandidateFooter: React.FC = () => {
             <Grid size={{ xs: 12, sm: 6, md: 3.5, lg: 3.5 }}>
               <Typography
                 variant="subtitle1"
+                component="h3"
                 sx={{
                   fontWeight: 800,
                   fontSize: '1.05rem',

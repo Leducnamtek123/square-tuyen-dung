@@ -101,7 +101,7 @@ const LeftDrawer = ({ windowProp, pages, mobileOpen, handleDrawerToggle, showPub
       const hasToken = Boolean(tokenService.getAccessTokenFromCookie());
       if (!hasToken || !isAuthenticated) {
         e.preventDefault();
-        push(localizeRoutePath('/nha-tuyen-dung/login', i18n.language));
+        push(onEmployerDomain ? '/dang-nhap' : localizeRoutePath('/nha-tuyen-dung/login', i18n.language));
       }
     }
   };

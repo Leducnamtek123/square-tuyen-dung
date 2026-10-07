@@ -1359,6 +1359,54 @@ class InterviewSessionViewSet(AuditLogViewSetMixin, viewsets.ModelViewSet):
         )
         return response_data(status=status.HTTP_201_CREATED, data=InterviewProctoringEventSerializer(event).data)
 
+    # GET/POST /sessions/{pk}/connection-logs/
+    @action(detail=True, methods=['get', 'post'], url_path='connection-logs',
+            permission_classes=[permissions.AllowAny])
+    def connection_logs(self, request, pk=None):
+        """Ghi nhận và tra cứu sự kiện kết nối & đo lường WebRTC trong phòng phỏng vấn."""
+        from .models import InterviewConnectionLog
+        from .serializers import InterviewConnectionLogSerializer
+
+        token = request.query_params.get("token") or request.headers.get("X-Invite-Token")
+        if request.user.is_authenticated:
+            session = self.get_object()
+        elif token:
+            session = InterviewSession.objects.filter(pk=pk, invite_token=token).first()
+            if not session:
+                return response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": "Phiên phỏng vấn không tồn tại hoặc mã token không hợp lệ."})
+        elif _request_has_agent_auth_headers(request):
+            session = InterviewSession.objects.filter(pk=pk).first()
+            if not session:
+                return response_data(status=status.HTTP_404_NOT_FOUND, errors={"detail": "Phiên phỏng vấn không tồn tại."})
+        else:
+            return response_data(status=status.HTTP_401_UNAUTHORIZED, errors={"detail": "Yêu cầu đăng nhập hoặc cung cấp mã mời phỏng vấn để truy cập sự kiện kết nối."})
+
+        if request.method == 'GET':
+            logs = session.connection_logs.all()
+            return response_data(data=InterviewConnectionLogSerializer(logs, many=True).data)
+
+        event_type = request.data.get("eventType") or request.data.get("event_type")
+        downtime = request.data.get("downtimeSeconds") or request.data.get("downtime_seconds", 0.0)
+        reconnect_attempt = request.data.get("reconnectAttempt") or request.data.get("reconnect_attempt", 1)
+        participant_identity = request.data.get("participantIdentity") or request.data.get("participant_identity", "")
+        participant_role = request.data.get("participantRole") or request.data.get("participant_role", "candidate")
+        network_quality = request.data.get("networkQuality") or request.data.get("network_quality", "")
+        details = request.data.get("details") or request.data.get("metadata", {})
+        if not event_type:
+            return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"eventType": ["Trường eventType là bắt buộc."]})
+
+        log = InterviewConnectionLog.objects.create(
+            session=session,
+            participant_identity=str(participant_identity),
+            participant_role=str(participant_role),
+            event_type=str(event_type),
+            downtime_seconds=float(downtime or 0.0),
+            reconnect_attempt=int(reconnect_attempt or 1),
+            network_quality=str(network_quality),
+            metadata=details if isinstance(details, dict) else {},
+        )
+        return response_data(status=status.HTTP_201_CREATED, data=InterviewConnectionLogSerializer(log).data)
+
     # GET/POST /sessions/{pk}/timeline-highlights/
     @action(detail=True, methods=['get', 'post'], url_path='timeline-highlights',
             permission_classes=[permissions.IsAuthenticated])

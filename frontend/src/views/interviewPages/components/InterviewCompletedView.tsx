@@ -464,7 +464,7 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
             asChild
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/90 px-3 sm:px-4 text-[11px] sm:text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition-all h-9"
           >
-            <Link href={myInterviewsPath}>
+            <Link href={myInterviewsPath} prefetch={false}>
               <ArrowBackIcon sx={{ fontSize: 14 }} />
               <span>{isMock ? 'Lịch phỏng vấn' : 'Về lịch'}</span>
             </Link>
@@ -477,7 +477,7 @@ export const InterviewCompletedView: React.FC<InterviewCompletedViewProps> = ({
             asChild
             className="inline-flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50/90 px-3 sm:px-4 text-[11px] sm:text-xs font-semibold text-blue-700 shadow-2xs hover:bg-blue-100 transition-all h-9"
           >
-            <Link href={practicePath}>
+            <Link href={practicePath} prefetch={false}>
               <PlayArrowRoundedIcon sx={{ fontSize: 16 }} />
               <span>{isMock ? 'Luyện phiên mới' : 'Luyện AI'}</span>
             </Link>

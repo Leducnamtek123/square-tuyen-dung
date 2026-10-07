@@ -153,7 +153,8 @@ const JobSeekerLoginView = ({
                 >
                   <span>Bạn là NTD?</span>
                   <StyledLink
-                    href={`/${ROUTES.EMPLOYER_AUTH.LOGIN}`}
+                    href="https://ntd.infohr.vn/dang-nhap"
+                    prefetch={false}
                     sx={{
                       display: 'inline-flex',
                       alignItems: 'center',

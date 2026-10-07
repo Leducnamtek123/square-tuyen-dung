@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Clean Code Checker analyzes GitHub repositories and reports concrete maintainability issues.">
+  <title>Clean Code Checker — project site</title>
+  <style>
+    :root { color-scheme: light dark; --bg:#09111f; --panel:#111c2f; --text:#edf5ff; --muted:#9fb0c7; --line:#263752; --accent:#67e8b7; --accent-2:#5ab2ff; }
+    * { box-sizing:border-box; }
+    html { font:16px/1.6 Inter,ui-sans-serif,system-ui,sans-serif; background:var(--bg); color:var(--text); }
+    body { margin:0; min-block-size:100vh; background:radial-gradient(circle at 85% 5%,#153b4d 0,transparent 35rem),radial-gradient(circle at 5% 95%,#182950 0,transparent 32rem); }
+    a { color:inherit; }
+    .wrap { inline-size:min(1080px,calc(100% - 2rem)); margin-inline:auto; }
+    header { padding-block:5rem 3rem; }
+    .eyebrow { display:inline-flex; padding:.3rem .7rem; border:1px solid #3d6d68; border-radius:999px; color:var(--accent); font-size:.8rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    h1 { max-inline-size:800px; margin:.9rem 0 .7rem; font-size:clamp(2.6rem,8vw,5.4rem); line-height:.95; letter-spacing:-.055em; }
+    .lead { max-inline-size:720px; color:var(--muted); font-size:clamp(1.05rem,2vw,1.3rem); }
+    .actions { display:flex; flex-wrap:wrap; gap:.75rem; margin-block-start:1.7rem; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-block-size:44px; padding:.65rem 1rem; border:1px solid var(--line); border-radius:.7rem; background:var(--panel); text-decoration:none; font-weight:700; }
+    .button.primary { border-color:transparent; background:var(--accent); color:#052219; }
+    .notice { margin-block:1.5rem 3rem; padding:1rem 1.2rem; border-inline-start:4px solid var(--accent-2); border-radius:.4rem; background:#0c1728; color:var(--muted); }
+    .notice strong { color:var(--text); }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+    .card { padding:1.3rem; border:1px solid var(--line); border-radius:1rem; background:color-mix(in srgb,var(--panel) 90%,transparent); }
+    .card h2 { margin:0 0 .35rem; font-size:1rem; }
+    .card p { margin:0; color:var(--muted); font-size:.93rem; }
+    .quickstart { margin-block:3rem; display:grid; grid-template-columns:.8fr 1.2fr; gap:2rem; align-items:center; }
+    .quickstart h2 { margin:0; font-size:2rem; }
+    .quickstart p { color:var(--muted); }
+    pre { overflow:auto; margin:0; padding:1.2rem; border:1px solid var(--line); border-radius:1rem; background:#050b14; color:#c7f9e8; }
+    footer { padding-block:2rem 3rem; border-block-start:1px solid var(--line); color:var(--muted); font-size:.9rem; }
+    @media (max-width:760px) { header{padding-block-start:3.5rem}.grid,.quickstart{grid-template-columns:1fr}.quickstart{gap:.6rem} }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <span class="eyebrow">Zero-dependency Python</span>
+    <h1>Find the code that deserves attention.</h1>
+    <p class="lead">Clean Code Checker reads a GitHub repository, scores its maintainability, and points to specific files and lines worth improving.</p>
+    <nav class="actions" aria-label="Project links">
+      <a class="button primary" href="https://github.com/sadeqisaidmohaddes-star/clean-code-checker">View source on GitHub</a>
+      <a class="button" href="https://github.com/sadeqisaidmohaddes-star/clean-code-checker#run-it">Setup guide</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <aside class="notice"><strong>Why this page is not the analyzer:</strong> GitHub Pages serves static files and cannot run the Python analysis engine. Clone the repository and launch it locally to perform real scans; repository code and optional tokens stay on your machine.</aside>
+
+    <section class="grid" aria-label="Highlights">
+      <article class="card"><h2>Concrete findings</h2><p>Reports filenames, line numbers, severity, and practical explanations instead of a mystery score.</p></article>
+      <article class="card"><h2>Broad checks</h2><p>Covers complexity, function and file size, formatting, comments, duplication, and maintainability signals.</p></article>
+      <article class="card"><h2>No package install</h2><p>The application uses Python's standard library and talks directly to the GitHub REST API.</p></article>
+    </section>
+
+    <section class="quickstart">
+      <div>
+        <h2>Run it locally</h2>
+        <p>Python 3 is the only runtime requirement. The app opens a local web interface at port 8000.</p>
+      </div>
+      <pre><code>git clone https://github.com/sadeqisaidmohaddes-star/clean-code-checker.git
+cd clean-code-checker
+python app.py</code></pre>
+    </section>
+  </main>
+
+  <footer class="wrap">Built by <a href="https://github.com/sadeqisaidmohaddes-star">Said Mohaddes Sadeqi</a> · Source and documentation are available on GitHub.</footer>
+</body>
+</html>

@@ -41,6 +41,13 @@ def _get_font_paths() -> tuple[str | None, str | None]:
 
 def generate_interview_evaluation_pdf(session: InterviewSession) -> bytes:
     doc = fitz.open()
+    try:
+        return _render_evaluation_pdf_doc(doc, session)
+    finally:
+        doc.close()
+
+
+def _render_evaluation_pdf_doc(doc, session: InterviewSession) -> bytes:
     page = doc.new_page(width=595, height=842)
 
     bold_font, regular_font = _get_font_paths()
@@ -253,7 +260,4 @@ def generate_interview_evaluation_pdf(session: InterviewSession) -> bytes:
         fontsize=8,
         color=(0.5, 0.55, 0.65),
     )
-
-    pdf_bytes = doc.tobytes()
-    doc.close()
-    return pdf_bytes
+    return doc.tobytes()

@@ -1,0 +1,32 @@
+# InfoHR - Nền tảng Tuyển dụng Thông minh & Phỏng vấn Trực tuyến Voice AI
+
+> InfoHR (https://infohr.vn) là hệ sinh thái công nghệ tuyển dụng hàng đầu tại Việt Nam, tiên phong tích hợp trợ lý Voice AI AILA phỏng vấn và đánh giá ứng viên thời gian thực qua WebRTC. InfoHR kết nối hàng triệu ứng viên chất lượng cao với các doanh nghiệp, tập đoàn uy tín trên cả nước, cung cấp các giải pháp tìm kiếm việc làm, tạo CV chuẩn ATS và quản trị nhân sự HRM toàn diện.
+
+## Giới thiệu & Sứ mệnh
+- [Trang chủ InfoHR](https://infohr.vn/): Cổng thông tin việc làm và tuyển dụng chính thức.
+- [Về chúng tôi & Ban điều hành](https://infohr.vn/ve-chung-toi): Sứ mệnh, tầm nhìn, đội ngũ sáng lập và ban lãnh đạo công nghệ InfoHR.
+- [Liên hệ & Hỗ trợ](https://infohr.vn/lien-he): Thông tin văn phòng, đường dây nóng hỗ trợ ứng viên và doanh nghiệp.
+
+## Dịch vụ Dành cho Ứng viên (Job Seekers)
+- [Tìm việc làm mới nhất](https://infohr.vn/viec-lam): Tra cứu hàng ngàn việc làm lương cao cập nhật theo giờ.
+- [Việc làm theo ngành nghề](https://infohr.vn/viec-lam-theo-nganh-nghe): Xây dựng, Bất động sản, Kiến trúc, Cơ điện MEP, CNTT.
+- [Việc làm theo tỉnh thành](https://infohr.vn/viec-lam-theo-tinh-thanh): Cơ hội nghề nghiệp tại Hà Nội, TP.HCM, Đà Nẵng, Bình Dương.
+- [Luyện phỏng vấn AI AILA](https://infohr.vn/practice): Luyện tập phỏng vấn thông minh với trợ lý AI AILA nhận đánh giá tức thì.
+- [Công cụ tạo CV Online](https://infohr.vn/tao-cv): Trình tạo hồ sơ CV chuyên nghiệp chuẩn ATS miễn phí.
+- [Danh sách mẫu CV xin việc](https://infohr.vn/danh-sach-mau-cv): Hàng chục mẫu CV chuẩn nhận diện cho mọi lĩnh vực.
+- [Tra cứu mức lương thị trường](https://infohr.vn/tra-cuu-luong): Báo cáo dữ liệu mức lương theo ngành nghề và cấp bậc.
+
+## Giải pháp Dành cho Nhà tuyển dụng (Employers)
+- [Cổng Nhà tuyển dụng](https://employer.infohr.vn/): Đăng tin tuyển dụng và quản lý hồ sơ ứng viên thông minh.
+- [Dịch vụ & Bảng giá](https://employer.infohr.vn/nha-tuyen-dung/bao-gia): Gói dịch vụ đăng tin, mở hồ sơ và phỏng vấn tự động Voice AI.
+- [Giải pháp phỏng vấn tự động AI AILA](https://aila.infohr.vn/): Sơ loại ứng viên quy mô lớn qua WebRTC Voice AI.
+- [Cẩm nang Quản trị & Tuyển dụng](https://employer.infohr.vn/nha-tuyen-dung/blog-tuyen-dung): Kinh nghiệm phỏng vấn và chiến lược nhân sự.
+
+## Tin tức & Cẩm nang Nghề nghiệp
+- [Tin tức & Cẩm nang InfoHR](https://infohr.vn/tin-tuc): Xu hướng thị trường lao động và bí quyết thăng tiến sự nghiệp.
+- [Câu hỏi thường gặp](https://infohr.vn/cau-hoi-thuong-gap): Giải đáp các thắc mắc về tạo tài khoản, nộp đơn và phỏng vấn.
+
+## Chính sách & Pháp lý
+- [Chính sách bảo mật dữ liệu](https://infohr.vn/chinh-sach-bao-mat): Quy định bảo mật dữ liệu cá nhân theo Nghị định 13/2023/NĐ-CP.
+- [Điều khoản sử dụng dịch vụ](https://infohr.vn/dieu-khoan-su-dung): Thỏa thuận sử dụng và quyền lợi của người dùng trên nền tảng.
+- [Chính sách bảo mật hệ thống](https://infohr.vn/.well-known/security.txt): Tiêu chuẩn báo cáo lỗ hổng RFC 9116.

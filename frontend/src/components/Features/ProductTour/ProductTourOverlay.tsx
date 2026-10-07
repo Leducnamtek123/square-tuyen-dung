@@ -281,21 +281,35 @@ export const ProductTourOverlay: React.FC<ProductTourOverlayProps> = ({
             />
           )}
 
-          {/* Clickable Backdrop Area */}
+          {/* Clickable Backdrop Area - clicking outside dismisses the tour */}
           <Box
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
+            onClick={onClose}
             sx={{
               position: 'absolute',
               inset: 0,
-              cursor: 'default',
+              cursor: 'pointer',
+              ...(targetRect && {
+                // Cut out spotlight rectangle so pointer events pass straight through to the underlying element
+                clipPath: `polygon(
+                  0% 0%, 0% 100%, 
+                  ${Math.max(0, targetRect.left - pad)}px 100%, 
+                  ${Math.max(0, targetRect.left - pad)}px ${Math.max(0, targetRect.top - pad)}px, 
+                  ${targetRect.right + pad}px ${Math.max(0, targetRect.top - pad)}px, 
+                  ${targetRect.right + pad}px ${targetRect.bottom + pad}px, 
+                  ${Math.max(0, targetRect.left - pad)}px ${targetRect.bottom + pad}px, 
+                  ${Math.max(0, targetRect.left - pad)}px 100%, 
+                  100% 100%, 100% 0%
+                )`,
+              }),
             }}
           />
 
           {/* Floating Tour Popover Card - Adaptive Light/Dark Theme */}
           <Box
             ref={cardRef}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
             sx={{
               position: 'absolute',
               top: `${popoverTop}px`,

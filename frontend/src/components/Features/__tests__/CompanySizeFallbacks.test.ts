@@ -13,8 +13,8 @@ const companyHeaderSource = readFileSync(
   join(__dirname, '../../../views/defaultPages/CompanyDetailPage/CompanyHeader.tsx'),
   'utf8'
 );
-const jobDetailSidebarSource = readFileSync(
-  join(__dirname, '../../../views/defaultPages/JobDetailPage/components/JobDetailSidebar.tsx'),
+const jobDetailHeaderSource = readFileSync(
+  join(__dirname, '../../../views/defaultPages/JobDetailPage/components/JobDetailHeaderCard.tsx'),
   'utf8'
 );
 
@@ -30,11 +30,11 @@ describe('company data sourcing', () => {
   it('uses config-backed employee-size rendering on company views', () => {
     expect(companyInfoSectionSource).toContain('employeeSizeDict');
     expect(companyHeaderSource).toContain('employeeSizeDict');
-    expect(jobDetailSidebarSource).toContain('employeeSizeDict');
+    expect(jobDetailHeaderSource).toContain('employeeSizeDict');
   });
 
-  it('does not hardcode employee-size labels in the job detail sidebar', () => {
-    expect(jobDetailSidebarSource).not.toContain('Trên 300 nhân viên');
-    expect(jobDetailSidebarSource).not.toContain('Dưới 10 nhân viên');
+  it('does not hardcode employee-size labels in the job detail header', () => {
+    expect(jobDetailHeaderSource).not.toContain('Trên 300 nhân viên');
+    expect(jobDetailHeaderSource).not.toContain('Dưới 10 nhân viên');
   });
 });

@@ -48,7 +48,7 @@ def main():
         stem = p.stem
         fname = p.name
         # Skip entrypoints, layouts, route pages, shims, mocks, configs
-        if stem in {'index', 'layout', 'page', 'loading', 'error', 'not-found', 'global-error', 'route', 'middleware', 'shims.d'}:
+        if stem in {'index', 'layout', 'page', 'loading', 'error', 'not-found', 'global-error', 'route', 'middleware', 'proxy', 'shims.d'}:
             continue
         if 'app/' in f:
             continue

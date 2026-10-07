@@ -83,7 +83,7 @@ export function useEmployerOnboarding() {
           !isPreview &&
           !isEdit
         ) {
-          router.replace('/employer/dashboard');
+          router.replace('/dashboard');
           return;
         }
 
@@ -366,7 +366,7 @@ export function useEmployerOnboarding() {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('infohr_employer_draft');
       }
-      router.replace('/employer/dashboard');
+      router.replace('/dashboard');
     } catch (err: any) {
       console.error('Request join company error:', err);
       setGeneralError(err.response?.data?.message || 'Không thể gửi yêu cầu tham gia. Vui lòng thử lại.');
@@ -387,11 +387,11 @@ export function useEmployerOnboarding() {
         dispatch(setUserInfo(res.user));
       }
       void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
-      router.replace('/employer/dashboard');
+      router.replace('/dashboard');
     } catch (err) {
       console.error('Error skipping employer onboarding:', err);
       void queryClient.invalidateQueries({ queryKey: ['onboardingStatus'] });
-      router.replace('/employer/dashboard');
+      router.replace('/dashboard');
     } finally {
       setIsSkipping(false);
     }
@@ -412,7 +412,7 @@ export function useEmployerOnboarding() {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('infohr_employer_draft');
       }
-      router.replace('/employer/dashboard');
+      router.replace('/dashboard');
     } catch (err) {
       console.error('Error accepting company invitation:', err);
       setGeneralError('Không thể chấp nhận lời mời. Vui lòng thử lại.');
@@ -430,11 +430,11 @@ export function useEmployerOnboarding() {
   };
 
   const handlePostJob = () => {
-    router.push('/employer/job-posts');
+    router.push('/job-posts');
   };
 
   const handleViewDashboard = () => {
-    router.push('/employer/dashboard');
+    router.push('/dashboard');
   };
 
   return {

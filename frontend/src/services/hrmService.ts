@@ -1,5 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 import { unwrapDataResponse, normalizePaginatedResponse } from '../utils/apiResponse';
+import { snakizeKeys } from '../utils/camelCase';
 
 export type EmployeeFromApplicationPayload = {
   applicationId: number;
@@ -1079,7 +1080,8 @@ const hrmService = {
 
   getAttendanceRequests: (params?: { status?: string; request_type?: string; employee_id?: number }): Promise<NativeAttendanceRequest[]> => {
     return httpRequest.get('native-hrm/attendance-requests/', { params }).then((res) => {
-      return normalizePaginatedResponse<NativeAttendanceRequest>(res).results;
+      // httpRequest tự động camelize response; khôi phục snake_case theo kiểu NativeAttendanceRequest mà các trang đang đọc
+      return snakizeKeys<NativeAttendanceRequest[]>(normalizePaginatedResponse<NativeAttendanceRequest>(res).results);
     });
   },
 

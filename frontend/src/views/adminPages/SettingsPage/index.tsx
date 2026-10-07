@@ -78,10 +78,10 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onSave, is
         sx={{
           p: 3,
           mb: 3,
-          borderRadius: '16px',
-          border: '1px solid',
-          borderColor: 'divider',
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+          borderRadius: 3,
+          border: '1px solid #E2E8F0',
+          bgcolor: '#FFFFFF',
+          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.04)',
         }}
       >
         <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} gap={2}>
@@ -104,8 +104,8 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onSave, is
               py: 1.2,
               px: 3.5,
               fontWeight: 700,
-              borderRadius: '12px',
-              boxShadow: '0 8px 20px rgba(15, 23, 42, 0.15)',
+              borderRadius: 2.5,
+              boxShadow: (theme) => theme.customShadows?.primary || 'none',
               whiteSpace: 'nowrap',
             }}
           >

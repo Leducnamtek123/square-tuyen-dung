@@ -1,8 +1,7 @@
 # syntax=docker/dockerfile:1.5
 ARG MIRROR_PREFIX=docker.io/nvidia
 
-# --- SINGLE STAGE BUILD FOR RELIABILITY ---
-FROM ${MIRROR_PREFIX}/cuda:12.8.1-runtime-ubuntu22.04
+FROM docker.io/nvidia/cuda:12.8.1-runtime-ubuntu22.04@sha256:4a801ef9232d2b05e69df4eb8aa054dbbe2824e5499e1e6e857320bb01ac41a9
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -37,6 +36,12 @@ ENV LD_LIBRARY_PATH="/opt/venv/lib/python3.10/site-packages/torch/lib:${LD_LIBRA
 
 # Copy our bridge script
 COPY api.py ./
+
+RUN groupadd -g 1001 appuser && \
+    useradd -u 1001 -g appuser -m appuser && \
+    chown -R appuser:appuser /workspace /opt/venv
+
+USER appuser
 
 EXPOSE 8298
 

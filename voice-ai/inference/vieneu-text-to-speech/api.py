@@ -325,6 +325,10 @@ def _voice_key(value: object) -> str:
 
 
 def _backend_voice_profile_url(profile_id: str) -> str:
+    clean_id = re.sub(r"[^a-zA-Z0-9_\-]", "", str(profile_id or ""))
+    if not clean_id:
+        raise RuntimeError("Invalid voice profile id")
+
     base_url = (
         os.getenv("VOICE_PROFILE_BACKEND_API_URL")
         or os.getenv("BACKEND_API_URL")
@@ -333,8 +337,8 @@ def _backend_voice_profile_url(profile_id: str) -> str:
     if not base_url:
         raise RuntimeError("BACKEND_API_URL is required for profile voices")
     if base_url.endswith("/v1"):
-        return f"{base_url}/interview/compat/voice-profiles/{profile_id}"
-    return f"{base_url}/v1/interview/compat/voice-profiles/{profile_id}"
+        return f"{base_url}/interview/compat/voice-profiles/{clean_id}"
+    return f"{base_url}/v1/interview/compat/voice-profiles/{clean_id}"
 
 
 def _signed_backend_headers(method: str, url: str, body: bytes = b"") -> dict[str, str]:
@@ -369,29 +373,95 @@ def _fetch_voice_profile(profile_id: str) -> dict:
     return data
 
 
+def _validate_ssrf_safe_url(target_url: str) -> None:
+    """Validate that URL is safe from SSRF (no loopback, private, link-local, or cloud metadata targets)."""
+    import socket
+    import ipaddress
+
+    parsed = urlparse(target_url)
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError(f"SSRF blocked: Disallowed scheme '{parsed.scheme}'")
+
+    hostname = parsed.hostname
+    if not hostname:
+        raise ValueError("SSRF blocked: Missing hostname in URL")
+
+    # Reject well-known loopback / metadata hostnames
+    blocked_hosts = {
+        "localhost", "127.0.0.1", "::1", "metadata.google.internal",
+        "instance-data", "minio", "backend", "redis", "mysql"
+    }
+    if hostname.lower() in blocked_hosts or hostname.lower().endswith(".localhost"):
+        raise ValueError(f"SSRF blocked: Target hostname '{hostname}' is not permitted")
+
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    try:
+        addr_info = socket.getaddrinfo(hostname, port)
+        for _, _, _, _, sockaddr in addr_info:
+            ip_str = sockaddr[0]
+            ip_obj = ipaddress.ip_address(ip_str)
+            if (
+                ip_obj.is_loopback
+                or ip_obj.is_private
+                or ip_obj.is_link_local
+                or ip_obj.is_multicast
+                or ip_obj.is_reserved
+                or ip_obj.is_unspecified
+            ):
+                raise ValueError(f"SSRF blocked: Host resolves to internal/private IP {ip_str}")
+    except socket.gaierror as e:
+        raise ValueError(f"DNS resolution failed for {hostname}: {e}")
+
+
 def _cache_reference_audio(audio_url: str, profile_id: str, sample_id: str | int | None = None) -> str:
-    cache_dir = Path(os.getenv("TTS_VOICE_PROFILE_CACHE_DIR", "/tmp/vieneu_voice_profiles"))
+    cache_dir = Path(os.getenv("TTS_VOICE_PROFILE_CACHE_DIR", "/tmp/vieneu_voice_profiles")).resolve()
     cache_dir.mkdir(parents=True, exist_ok=True)
+
+    _validate_ssrf_safe_url(audio_url)
+
+    clean_profile_id = re.sub(r"[^a-zA-Z0-9_\-]", "", str(profile_id or "default"))
+    clean_sample_id = re.sub(r"[^a-zA-Z0-9_\-]", "", str(sample_id or "sample"))
 
     parsed = urlparse(audio_url)
     ext = Path(parsed.path).suffix.lower()
     if ext not in {".wav", ".mp3", ".flac", ".ogg", ".m4a", ".webm"}:
         ext = ".wav"
     digest = hashlib.sha256(audio_url.encode("utf-8")).hexdigest()[:16]
-    filename = f"profile_{profile_id}_{sample_id or 'sample'}_{digest}{ext}"
-    target_path = cache_dir / filename
+    filename = f"profile_{clean_profile_id}_{clean_sample_id}_{digest}{ext}"
+    target_path = (cache_dir / filename).resolve()
+
+    # Path traversal protection
+    if not str(target_path).startswith(str(cache_dir)):
+        raise ValueError(f"Invalid target path: path traversal detected for {filename}")
+
     if target_path.exists() and target_path.stat().st_size > 0:
         return str(target_path)
 
     timeout = _env_float("VOICE_PROFILE_AUDIO_TIMEOUT_SECONDS", 60.0, minimum=1.0, maximum=300.0)
-    request = urllib.request.Request(audio_url, method="GET")
-    with urllib.request.urlopen(request, timeout=timeout) as response, open(target_path, "wb") as output:
-        while True:
-            chunk = response.read(1024 * 1024)
-            if not chunk:
-                break
-            output.write(chunk)
+    max_bytes = int(os.getenv("TTS_MAX_AUDIO_DOWNLOAD_BYTES", 50 * 1024 * 1024))  # 50MB limit
+    request = urllib.request.Request(
+        audio_url,
+        method="GET",
+        headers={"User-Agent": "SquareTTS/1.0"},
+    )
+    downloaded = 0
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response, open(target_path, "wb") as output:
+            while True:
+                chunk = response.read(1024 * 1024)
+                if not chunk:
+                    break
+                downloaded += len(chunk)
+                if downloaded > max_bytes:
+                    raise ValueError(f"Reference audio exceeds maximum allowed size ({max_bytes} bytes)")
+                output.write(chunk)
+    except Exception:
+        if target_path.exists():
+            target_path.unlink(missing_ok=True)
+        raise
+
     return str(target_path)
+
 
 
 def _resolve_profile_voice(req_voice: str) -> tuple[str | None, str | None, str | None]:

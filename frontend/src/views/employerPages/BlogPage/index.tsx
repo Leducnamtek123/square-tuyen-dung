@@ -189,7 +189,7 @@ const EmployerBlogListPage = () => {
       cell: ({ row }: { row: { original: Article } }) => (
         <Stack direction="row" spacing={0.5}>
           <Tooltip title={t('blog.actions.edit')}>
-            <IconButton aria-label="Thao tác" size="small" onClick={() => push(`/employer/blog/${row.original.id}`)}>
+            <IconButton aria-label="Thao tác" size="small" onClick={() => push(`/blog/${row.original.id}`)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -218,7 +218,7 @@ const EmployerBlogListPage = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => push('/employer/blog/create')}
+          onClick={() => push('/blog/create')}
           sx={{ fontWeight: 700, px: 3 }}
         >
           {t('blog.newPost')}

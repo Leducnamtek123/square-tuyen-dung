@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box, IconButton } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ROLES_NAME } from '@/configs/constants';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import DataTable from '@/components/Common/DataTable';
+import AdminConfirmDialog from '@/components/Common/AdminConfirmDialog';
 import { User as UserModel } from '@/types/models';
 import { RoleName } from '@/types/auth';
 
@@ -48,6 +49,10 @@ const UserTable = ({
     disableRoleActions 
 }: UserTableProps) => {
     const { t } = useTranslation('admin');
+    const [confirmAdminRoleDialog, setConfirmAdminRoleDialog] = useState<{
+        user: UserModel;
+        newRole: RoleName;
+    } | null>(null);
 
     const getRoleLabel = useCallback((roleName: string) => {
         switch (roleName) {
@@ -115,7 +120,17 @@ const UserTable = ({
                     variant="standard"
                     disableUnderline
                     inputProps={{ 'data-testid': 'user-role-select-input' }}
-                    onChange={(event: SelectChangeEvent<string>) => onRoleChange(info.row.original, event.target.value as RoleName)}
+                    onChange={(event: SelectChangeEvent<string>) => {
+                        const targetRole = event.target.value as RoleName;
+                        if (targetRole === ROLES_NAME.ADMIN) {
+                            setConfirmAdminRoleDialog({
+                                user: info.row.original,
+                                newRole: targetRole,
+                            });
+                        } else {
+                            onRoleChange(info.row.original, targetRole);
+                        }
+                    }}
                     disabled={disableRoleActions || info.row.original.id === currentUserId}
                     renderValue={(value) => (
                         <Chip
@@ -215,21 +230,46 @@ const UserTable = ({
     ], [currentUserId, disableRoleActions, getRoleColor, getRoleLabel, onDeleteUser, onInspectUser, onRoleChange, onToggleStatus, t]);
 
     return (
-        <DataTable
-            columns={columns}
-            data={users || []}
-            isLoading={loading}
-            rowCount={rowCount}
-            pagination={pagination}
-            onPaginationChange={onPaginationChange}
-            enableSorting
-            sorting={sorting}
-            onSortingChange={onSortingChange}
-            enableRowSelection
-            rowSelection={rowSelection}
-            onRowSelectionChange={onRowSelectionChange}
-            emptyMessage={t('pages.users.table.noUsers')}
-        />
+        <>
+            <DataTable
+                columns={columns}
+                data={users || []}
+                isLoading={loading}
+                rowCount={rowCount}
+                pagination={pagination}
+                onPaginationChange={onPaginationChange}
+                enableSorting
+                sorting={sorting}
+                onSortingChange={onSortingChange}
+                enableRowSelection
+                rowSelection={rowSelection}
+                onRowSelectionChange={onRowSelectionChange}
+                emptyMessage={t('pages.users.table.noUsers')}
+            />
+            {confirmAdminRoleDialog && (
+                <AdminConfirmDialog
+                    open={Boolean(confirmAdminRoleDialog)}
+                    variant="warning"
+                    title="Xác nhận cấp quyền Quản trị viên (ADMIN)"
+                    message={
+                        <span>
+                            Bạn có chắc chắn muốn nâng quyền cho người dùng{' '}
+                            <strong>{confirmAdminRoleDialog.user.fullName || confirmAdminRoleDialog.user.email}</strong> thành{' '}
+                            <strong>Quản trị viên (ADMIN)</strong>?
+                            <br />
+                            Tài khoản này sẽ có toàn quyền kiểm soát cấu hình, dữ liệu và quản trị người dùng trên toàn hệ thống.
+                        </span>
+                    }
+                    confirmLabel="Xác nhận cấp quyền"
+                    cancelLabel="Hủy bỏ"
+                    onConfirm={() => {
+                        onRoleChange(confirmAdminRoleDialog.user, confirmAdminRoleDialog.newRole);
+                        setConfirmAdminRoleDialog(null);
+                    }}
+                    onClose={() => setConfirmAdminRoleDialog(null)}
+                />
+            )}
+        </>
     );
 };
 

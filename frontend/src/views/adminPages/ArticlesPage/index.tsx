@@ -216,7 +216,7 @@ const AdminArticlesPage = () => {
       cell: ({ row }) => (
         <Stack direction="row" spacing={0.5}>
           <Tooltip title={t('pages.articles.actions.edit')}>
-            <IconButton aria-label="Thao tác" size="small" onClick={() => push(`/admin/articles/${row.original.id}`)} sx={{ color: '#64748B' }}>
+            <IconButton aria-label="Thao tác" size="small" onClick={() => push(`/articles/${row.original.id}`)} sx={{ color: '#64748B' }}>
               <EditIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Tooltip>
@@ -245,7 +245,7 @@ const AdminArticlesPage = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => push('/admin/articles/create')}
+          onClick={() => push('/articles/create')}
           sx={{ fontWeight: 700, px: 2.5, borderRadius: 2.5, textTransform: 'none' }}
         >
           {t('pages.articles.newArticle')}

@@ -27,4 +27,16 @@ describe('JobDetailPage Mobile Responsive Layout', () => {
     expect(jobDetailSource).not.toContain('loading: false');
     expect(jobDetailSource).toContain('isLoading: false');
   });
+
+  it('configures desktop sticky sidebar layout with items-start and sticky positioning', () => {
+    expect(jobDetailSource).toContain('lg:sticky');
+    expect(jobDetailSource).toContain('lg:top-[88px]');
+    expect(jobDetailSource).toContain('lg:self-start');
+    expect(jobDetailSource).toContain('items-start');
+
+    const sidebarSource = readFileSync(join(__dirname, '../components/JobDetailSidebar.tsx'), 'utf8');
+    expect(sidebarSource).toContain('maxHeight: { lg: \'calc(100dvh - 108px)\' }');
+    expect(sidebarSource).toContain('overflowY: { lg: \'auto\' }');
+    expect(sidebarSource).toContain('custom-scrollbar');
+  });
 });

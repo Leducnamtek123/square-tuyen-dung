@@ -20,6 +20,7 @@ import {
 import { Grid2 as Grid } from '@mui/material';
 import { Controller, type Control, type FieldErrors } from 'react-hook-form';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CategoryIcon from '@mui/icons-material/Category';
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
@@ -29,6 +30,7 @@ import SendIcon from '@mui/icons-material/Send';
 import DateTimePickerCustom from '@/components/Common/Controls/DateTimePickerCustom';
 import type { FormValues } from './types';
 import type { Question, QuestionGroup } from '@/types/models';
+import type { InterviewScript } from '@/types/interviewScript';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
 const ControllerAny = Controller as any;
@@ -41,6 +43,7 @@ type Props = {
   inputSx: Record<string, unknown>;
   questionGroups: QuestionGroup[];
   questions: Question[];
+  interviewScripts?: InterviewScript[];
   selectedJobPostId: string | number;
   selectedQuestionsCount: number;
   isInterviewMutating: boolean;
@@ -50,6 +53,7 @@ type Props = {
   onOpenAddQuestion: () => void;
   onOpenEditQuestion: () => void;
   onQuestionGroupChange: (value: string | number) => void;
+  onScriptChange?: (value: string | number) => void;
   onTestMockInterview?: () => void;
 };
 
@@ -61,6 +65,7 @@ const InterviewCreateCardQuestionSection = ({
   inputSx,
   questionGroups,
   questions,
+  interviewScripts = [],
   selectedJobPostId,
   selectedQuestionsCount,
   isInterviewMutating,
@@ -70,9 +75,22 @@ const InterviewCreateCardQuestionSection = ({
   onOpenAddQuestion,
   onOpenEditQuestion,
   onQuestionGroupChange,
+  onScriptChange,
   onTestMockInterview,
 }: Props) => {
   const minDateTime = React.useMemo(() => new Date().toISOString(), []);
+
+  const scriptSlotProps = React.useMemo(() => ({
+    input: {
+      startAdornment: (
+        <InputAdornment position="start">
+          <AssignmentOutlinedIcon sx={{ fontSize: 20, color: 'primary.main' }} />
+        </InputAdornment>
+      ),
+    },
+    inputLabel: { sx: { fontWeight: 600 } },
+    formHelperText: { sx: { fontWeight: 600, color: 'text.secondary' } },
+  }), []);
 
   const questionGroupSlotProps = React.useMemo(() => ({
     input: {
@@ -108,11 +126,46 @@ const InterviewCreateCardQuestionSection = ({
       <Grid size={12}>
         <Divider sx={{ my: 2, borderStyle: 'dashed' }}>
           <Chip
-            label={t('interview:interviewCreateCard.label.questions').toUpperCase()}
+            label="KỊCH BẢN & BỘ CÂU HỎI PHỎNG VẤN"
             size="small"
             sx={{ fontWeight: 900, bgcolor: 'background.neutral', color: 'text.secondary', letterSpacing: 1.5, px: 2 }}
           />
         </Divider>
+      </Grid>
+
+      <Grid size={12}>
+        <ControllerAny
+          name="selected_script"
+          control={control}
+          render={({ field }: any) => (
+            <TextField
+              {...field}
+              value={field.value || ''}
+              select
+              fullWidth
+              onChange={(e: any) => onScriptChange ? onScriptChange(e.target.value) : field.onChange(e.target.value)}
+              label="Kịch bản Phỏng vấn AI (Interview Script)"
+              variant="outlined"
+              helperText="Chọn kịch bản AI đã cấu hình sẵn (mục tiêu, nhân vật AI, thời lượng và tiêu chí chấm điểm)"
+              sx={inputSx}
+              slotProps={scriptSlotProps}
+            >
+              <MenuItem value="" sx={{ fontWeight: 600 }}>
+                <em>Không áp dụng kịch bản riêng (Tự cấu hình)</em>
+              </MenuItem>
+              {interviewScripts.map((script) => {
+                const scenario = script.scenario_type_display || script.scenarioTypeDisplay || 'Kịch bản';
+                const persona = script.hr_persona_display || script.hrPersonaDisplay || '';
+                const duration = script.time_limit_per_question || script.timeLimitPerQuestion;
+                return (
+                  <MenuItem key={script.id} value={script.id} sx={{ fontWeight: 600 }}>
+                    {script.name} — [{scenario}{persona ? ` • ${persona}` : ''}{duration ? ` • ${duration}s/câu` : ''}]
+                  </MenuItem>
+                );
+              })}
+            </TextField>
+          )}
+        />
       </Grid>
 
       <Grid size={12}>

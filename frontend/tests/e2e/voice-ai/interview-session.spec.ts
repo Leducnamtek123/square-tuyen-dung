@@ -24,6 +24,12 @@ test.describe('Voice AI Interview E2E Flow', () => {
       fullName: DEFAULT_CANDIDATE.fullName,
     });
     await injectSession(context, DEFAULT_CANDIDATE);
+    // Tắt tour hướng dẫn phòng luyện tập (tự bật lần đầu) để overlay không chặn click nút bắt đầu
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem('infohr_product_tour_completed_practice_room', 'true');
+      } catch {}
+    });
   });
 
   test('Candidate can browse practice question sets and initialize AI mock practice session on /practice', async ({ page }) => {
@@ -37,11 +43,11 @@ test.describe('Voice AI Interview E2E Flow', () => {
     const setItem = page.getByText(firstSet.name).or(page.getByText(/bộ câu hỏi/i)).first();
     await expect(setItem).toBeVisible({ timeout: 20_000 });
 
-    // Click "Luyện tập bộ này với AI"
-    const startSetBtn = page.getByRole('button', { name: /luyện tập bộ này với ai|bắt đầu/i })
-      .or(page.getByTestId('start-set-mock-btn'))
-      .first();
+    // Click "Luyện tập bộ này với AI" (nút của trang luyện tập ứng viên; trang landing khách cũng có nút
+    // "Bắt đầu..." nên dùng data-testid để không bấm nhầm trước khi phiên đăng nhập hydrate xong)
+    const startSetBtn = page.getByTestId('start-set-mock-btn').first();
     await expect(startSetBtn).toBeVisible({ timeout: 15_000 });
+    await expect(startSetBtn).toHaveText(/luyện tập bộ này với ai/i);
     await startSetBtn.click();
 
     // Verify redirection to interview room

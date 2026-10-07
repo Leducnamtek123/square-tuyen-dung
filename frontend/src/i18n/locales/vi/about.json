@@ -98,10 +98,10 @@
           "target": "_self"
         },
         {
-          "subdomain": "employer.infohr.vn",
+          "subdomain": "ntd.infohr.vn",
           "name": "Trung Tâm Điều Hành Tuyển Dụng",
           "desc": "Dành cho phòng nhân sự & hội đồng tuyển dụng. Đăng tin chuẩn JD kỹ thuật, truy cập kho hồ sơ xác thực, lọc ứng viên thông minh và quản lý đường ống Kanban CRM.",
-          "url": "https://employer.infohr.vn",
+          "url": "https://ntd.infohr.vn",
           "target": "_blank"
         },
         {

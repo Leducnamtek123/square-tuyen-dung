@@ -153,17 +153,17 @@ export const InterviewScriptDrawer: React.FC<InterviewScriptDrawerProps> = ({
     if (script) {
       setName(script.name || '');
       setDescription(script.description || '');
-      setScenarioType(script.scenario_type || 'technical');
-      setHrPersona(script.hr_persona || 'professional');
-      setSystemPrompt(script.system_prompt || '');
-      setGreetingMessage(script.greeting_message || '');
-      setClosingMessage(script.closing_message || '');
-      setTimeLimitPerQuestion(script.time_limit_per_question || 120);
-      setAllowAiFollowup(script.allow_ai_followup ?? true);
-      setMaxFollowupQuestions(script.max_followup_questions || 2);
-      setCharacterId(script.character_id || 'ng_c_linh');
-      setVoiceName(script.voice_name || 'Trúc Ly');
-      setVoiceSpeed(script.voice_speed || 1.0);
+      setScenarioType(script.scenario_type || script.scenarioType || 'technical');
+      setHrPersona(script.hr_persona || script.hrPersona || 'professional');
+      setSystemPrompt(script.system_prompt || script.systemPrompt || '');
+      setGreetingMessage(script.greeting_message || script.greetingMessage || '');
+      setClosingMessage(script.closing_message || script.closingMessage || '');
+      setTimeLimitPerQuestion(Number(script.time_limit_per_question ?? script.timeLimitPerQuestion ?? 120));
+      setAllowAiFollowup(Boolean(script.allow_ai_followup ?? script.allowAiFollowup ?? true));
+      setMaxFollowupQuestions(Number(script.max_followup_questions ?? script.maxFollowupQuestions ?? 2));
+      setCharacterId(script.character_id || script.characterId || 'ng_c_linh');
+      setVoiceName(script.voice_name || script.voiceName || 'Trúc Ly');
+      setVoiceSpeed(Number(script.voice_speed ?? script.voiceSpeed ?? 1.0));
 
       // Question group
       const initialGroupId =
@@ -187,6 +187,9 @@ export const InterviewScriptDrawer: React.FC<InterviewScriptDrawerProps> = ({
           : []) ||
         (Array.isArray(script.question_details)
           ? script.question_details.map((q) => q.id)
+          : []) ||
+        (Array.isArray(script.questionDetails)
+          ? script.questionDetails.map((q) => q.id)
           : []);
       setSelectedQuestionIds(rawQIds.filter((id: unknown) => Boolean(id) && !isNaN(Number(id))).map(Number));
 
@@ -199,8 +202,9 @@ export const InterviewScriptDrawer: React.FC<InterviewScriptDrawerProps> = ({
           : true;
       setInheritCompanyIdentity(initialInherit);
 
-      if (Array.isArray(script.evaluation_rubric) && script.evaluation_rubric.length > 0) {
-        setRubric(script.evaluation_rubric as EvaluationCriterion[]);
+      const rawRubric = script.evaluation_rubric || script.evaluationRubric;
+      if (Array.isArray(rawRubric) && rawRubric.length > 0) {
+        setRubric(rawRubric as EvaluationCriterion[]);
       } else {
         setRubric(DEFAULT_RUBRIC);
       }

@@ -1104,12 +1104,15 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             sx: { 
                                 borderRadius: 4, 
                                 p: 1,
+                                maxHeight: '90vh',
+                                display: 'flex',
+                                flexDirection: 'column',
                                 boxShadow: '0 20px 60px rgba(15, 23, 42, 0.16)',
                             } 
                         } 
                     }}
                 >
-                    <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, pb: 1, fontSize: '1.25rem', letterSpacing: '-0.01em' }}>
+                    <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, pb: 1, fontSize: '1.25rem', letterSpacing: '-0.01em', flexShrink: 0 }}>
                         <Stack direction="row" spacing={1.5} alignItems="center">
                             <Box
                                 sx={{
@@ -1130,7 +1133,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             </Typography>
                         </Stack>
                     </DialogTitle>
-                    <DialogContent sx={{ px: 3, pb: 1 }}>
+                    <DialogContent sx={{ px: 3, pb: 1, overflowY: 'auto' }}>
                         <Stack spacing={2.5} sx={{ pt: 1.5 }}>
                             {isEdit && isSystemQuestion(currentQuestion) && (
                                 <Alert
@@ -1158,7 +1161,8 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                                     placeholder="Nhập nội dung chi tiết của câu hỏi phỏng vấn..."
                                     fullWidth
                                     multiline
-                                    rows={4}
+                                    minRows={3}
+                                    maxRows={6}
                                     variant="outlined"
                                     value={currentQuestion.text || ''}
                                     onChange={(e) => handleTextChange(e.target.value)}
@@ -1338,7 +1342,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             </Grid>
                         </Stack>
                     </DialogContent>
-                    <DialogActions sx={{ p: 3, pt: 2, gap: 1.5 }}>
+                    <DialogActions sx={{ p: 3, pt: 2, gap: 1.5, flexShrink: 0 }}>
                         <Button 
                             onClick={handleClose} 
                             color="inherit" 

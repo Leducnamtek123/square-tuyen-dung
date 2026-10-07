@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clean Code Checker</title>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧼</text></svg>" />
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap">
+      <h1><span class="logo">🧼</span> Clean Code Checker</h1>
+      <p class="tagline">Point it at a GitHub repository and get a clean-code report — scores, grades and the exact lines worth fixing.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="mode-tabs">
+      <button type="button" class="mode-tab active" data-mode="github">GitHub Repo</button>
+      <button type="button" class="mode-tab" data-mode="local">Local Directory</button>
+    </div>
+
+    <form id="analyze-form" class="panel search">
+      <div class="field">
+        <label id="repo-label" for="repo">GitHub repository</label>
+        <input id="repo" name="repo" type="text" autocomplete="off" spellcheck="false"
+               placeholder="https://github.com/owner/repo  ·  or  owner/repo" required />
+      </div>
+      <details id="token-accordion" class="advanced">
+        <summary>Add a token (optional — for private repos &amp; higher rate limits)</summary>
+        <div class="field">
+          <label for="token">Personal access token</label>
+          <input id="token" name="token" type="password" autocomplete="off"
+                 placeholder="ghp_… (never stored, sent only to GitHub)" />
+        </div>
+      </details>
+      <button id="analyze-btn" type="submit">Analyze</button>
+    </form>
+
+    <div id="examples-github" class="examples">
+      <span>Try:</span>
+      <button type="button" class="chip" data-repo="pallets/flask">pallets/flask</button>
+      <button type="button" class="chip" data-repo="psf/requests">psf/requests</button>
+      <button type="button" class="chip" data-repo="expressjs/express">expressjs/express</button>
+    </div>
+
+    <div id="examples-local" class="examples" hidden>
+      <span>Try:</span>
+      <button type="button" class="chip-local" data-path=".">.</button>
+      <button type="button" class="chip-local" data-path="cleancode">cleancode</button>
+      <button type="button" class="chip-local" data-path="tests">tests</button>
+    </div>
+
+    <section id="status" class="status" hidden></section>
+    <section id="report" class="report" hidden></section>
+  </main>
+
+  <footer class="wrap">
+    <p>Runs locally · no data leaves your machine except the GitHub API call · zero third-party dependencies.</p>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

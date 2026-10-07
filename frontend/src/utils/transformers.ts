@@ -332,6 +332,16 @@ export const transformInterviewSession = (session: unknown): InterviewSession | 
       })
       .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0) || a.id - b.id),
     transcripts: Array.isArray(s.transcripts) ? s.transcripts : [],
+    connectionLogs: Array.isArray(s.connectionLogs)
+      ? s.connectionLogs
+      : Array.isArray(s.connection_logs)
+      ? s.connection_logs
+      : [],
+    connection_logs: Array.isArray(s.connection_logs)
+      ? s.connection_logs
+      : Array.isArray(s.connectionLogs)
+      ? s.connectionLogs
+      : [],
   };
 };
 

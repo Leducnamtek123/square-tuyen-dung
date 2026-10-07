@@ -40,18 +40,20 @@ export class AiScorecardPage extends BasePage {
     this.radarChartContainer = page.locator('canvas, [class*="CompetencyRadarChart"], svg').first();
 
     this.tabsList = page.locator('.MuiTabs-root').first();
-    this.analysisTab = page.getByRole('tab', { name: /phân tích ai/i }).first();
-    this.transcriptTab = page.getByRole('tab', { name: /bản ghi hội thoại/i }).first();
-    this.recordingTab = page.getByRole('tab', { name: /bản ghi hình|ghi âm/i }).first();
-    this.questionsTab = page.getByRole('tab', { name: /bộ câu hỏi/i }).first();
+    // Nhãn tab lấy từ i18n interviewDetail.subtitle.* (vi/en)
+    this.analysisTab = page.getByRole('tab', { name: /phân tích ai|ai analysis/i }).first();
+    this.transcriptTab = page.getByRole('tab', { name: /bản ghi (cuộc trò chuyện|hội thoại)|transcript/i }).first();
+    this.recordingTab = page.getByRole('tab', { name: /ghi hình|ghi âm|recording/i }).first();
+    this.questionsTab = page.getByRole('tab', { name: /danh sách câu hỏi|bộ câu hỏi|questions/i }).first();
 
     this.mediaVideoPlayer = page.locator('video, audio').first();
-    this.openRecordingBtn = page.getByRole('button', { name: /mở bản ghi hình|mở bản ghi âm/i }).or(
-      page.getByRole('link', { name: /mở bản ghi/i })
+    this.openRecordingBtn = page.getByRole('button', { name: /mở (bản )?ghi (hình|âm)|open recording/i }).or(
+      page.getByRole('link', { name: /mở (bản )?ghi (hình|âm)|open recording/i })
     ).first();
 
-    this.transcriptContainer = page.locator('[class*="InterviewTranscriptPanel"]').first();
-    this.transcriptBubbles = page.locator('[class*="InterviewTranscriptPanel"] .MuiPaper-root, [class*="InterviewTranscriptPanel"] [class*="MuiBox-root"]');
+    // Panel transcript được bọc trong wrapper data-tour (class MUI sx không chứa tên component)
+    this.transcriptContainer = page.locator('[data-tour="interview-detail-transcript"]').first();
+    this.transcriptBubbles = this.transcriptContainer.locator('.MuiPaper-root, [class*="MuiBox-root"]');
 
     this.proctoringAuditSection = page.locator('text=/biên bản giám sát|ai proctoring audit/i').first();
     this.proctoringViolationBadge = page.locator('text=/cảnh báo|lần rời màn hình|vi phạm/i').first();
@@ -63,6 +65,8 @@ export class AiScorecardPage extends BasePage {
   async goto(sessionId: number | string = 777) {
     await super.goto(`/employer/interviews/${sessionId}`);
     await this.waitForLoadingGone();
+    // Chờ không gian làm việc chi tiết (thanh tab) render xong — dev server có thể compile chậm
+    await expect(this.page.getByRole('tablist').first()).toBeVisible({ timeout: 60_000 });
   }
 
   /**
@@ -96,7 +100,7 @@ export class AiScorecardPage extends BasePage {
    */
   async playAudioRecording() {
     await this.selectTab('recording');
-    await expect(this.mediaVideoPlayer.or(this.openRecordingBtn)).toBeVisible({ timeout: 15_000 });
+    await expect(this.mediaVideoPlayer.or(this.openRecordingBtn).first()).toBeVisible({ timeout: 15_000 });
   }
 
   /**

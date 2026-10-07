@@ -51,7 +51,7 @@ export const LegalPolicyViewer: React.FC<Props> = ({ slug, portal = 'jobseeker' 
     }
   };
 
-  const homeHref = portal === 'employer' ? '/employer/introduce' : '/';
+  const homeHref = portal === 'employer' ? '/introduce' : '/';
   const homeLabel = portal === 'employer' ? 'Nhà tuyển dụng' : 'Trang chủ';
 
   return (

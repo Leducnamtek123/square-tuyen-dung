@@ -30,6 +30,7 @@ import {
   PreparationStepState,
 } from './components/InterviewPreparationModal';
 import { localizeRoutePath } from '@/configs/routeLocalization';
+import { isEmployerHostname } from '@/configs/portalRouting';
 import { cn } from '@/lib/utils';
 import { IMAGES } from '@/configs/images';
 import DottedWorldMapBackground from '@/views/onboardingPages/components/DottedWorldMapBackground';
@@ -357,6 +358,7 @@ function ActiveInterviewRoom({
         >
           <AIInterviewLayout
             sessionId={session?.id}
+            inviteToken={session?.inviteToken}
             onEndSession={onEndSession}
             questions={questions}
             avatarId={avatarId}
@@ -1030,13 +1032,23 @@ const InterviewSessionPage = ({ participantRole = 'jobseeker' }: InterviewSessio
 
   // --- Completed or Processing: Show Results / Completion View -----------------
   if (statusKey === 'completed' || isProcessing) {
+    const isEmployer =
+      normalizedRole === 'employer' ||
+      (typeof window !== 'undefined' ? isEmployerHostname(window.location.hostname) : false);
+    const myInterviewsPath = isEmployer
+      ? '/interviews'
+      : localizeRoutePath('/phong-van-cua-toi', i18n.language);
+    const practicePath = isEmployer
+      ? '/interview-scripts'
+      : localizeRoutePath('/practice', i18n.language);
+
     return (
       <InterviewCompletedView
         session={state.session}
         isProcessing={isProcessing}
-        myInterviewsPath={localizeRoutePath('/phong-van-cua-toi', i18n.language)}
-        practicePath={localizeRoutePath('/practice', i18n.language)}
-        onBackHome={() => push('/')}
+        myInterviewsPath={myInterviewsPath}
+        practicePath={practicePath}
+        onBackHome={() => push(isEmployer ? '/dashboard' : '/')}
       />
     );
   }

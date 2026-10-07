@@ -3,6 +3,7 @@
 ###############################################################################
 
 import asyncio
+import re
 import uuid
 from typing import Dict, Optional
 from utils.logger import logger
@@ -63,6 +64,10 @@ class SessionManager:
             
         if sessionid is None:
             sessionid = _rand_session_id()
+        else:
+            sessionid = re.sub(r"[^a-zA-Z0-9_\-]", "", str(sessionid))
+            if not sessionid:
+                sessionid = _rand_session_id()
 
         # Dọn dẹp các session không hoạt động hoặc đã kết thúc
         stale_sids = [

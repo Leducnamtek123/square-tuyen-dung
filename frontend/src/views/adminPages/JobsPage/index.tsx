@@ -351,7 +351,7 @@ export default function JobsPage() {
           setSearchTerm(q);
           setPage(1);
         }}
-        searchPlaceholder={`Tìm kiếm tin tuyển dụng... (${t('common.clearFilters')})`}
+        searchPlaceholder="Tìm kiếm theo tiêu đề tin, doanh nghiệp..."
         filters={filters}
         onFilterChange={(_id, val) => {
           setStatusFilter(val);
@@ -367,6 +367,20 @@ export default function JobsPage() {
         onSelectRows={setSelectedJobs}
         bulkActions={bulkActions}
         loading={isLoading}
+        emptyAction={
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => {
+              setStatusFilter('all');
+              setSearchTerm('');
+              setPage(1);
+            }}
+            sx={{ textTransform: 'none', mt: 1 }}
+          >
+            {t('common.clearFilters')}
+          </Button>
+        }
       />
 
       {/* Action Confirmation Dialog */}

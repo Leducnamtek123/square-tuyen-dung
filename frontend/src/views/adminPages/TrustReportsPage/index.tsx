@@ -110,7 +110,7 @@ export default function TrustReportsPage() {
     });
   };
 
-  const handleConfirmResolution = async () => {
+  const handleConfirmResolution = async (reason?: string) => {
     const { report, nextStatus } = resolutionDialog;
     if (!report || !nextStatus) return;
     try {
@@ -351,6 +351,11 @@ export default function TrustReportsPage() {
         }"?`}
         variant={resolutionDialog.nextStatus === 'resolved' ? 'info' : 'danger'}
         loading={isMutating}
+        requireReason={true}
+        reasonLabel="Ghi chú kết luận xử lý / Lý do"
+        reasonPlaceholder="Nhập ghi chú kết luận xử lý hoặc lý do từ chối/bác bỏ để ghi nhận vào hệ thống thanh tra..."
+        confirmLabel={resolutionDialog.nextStatus === 'resolved' ? 'Xác nhận xử lý' : 'Xác nhận bác bỏ'}
+        cancelLabel="Hủy bỏ"
         onConfirm={handleConfirmResolution}
         onClose={() => setResolutionDialog((prev) => ({ ...prev, open: false }))}
       />

@@ -392,11 +392,6 @@ const ArticleDetailPage = () => {
             sx={{
               position: { lg: 'sticky' },
               top: { lg: 88 },
-              maxHeight: { lg: 'calc(100vh - 104px)' },
-              overflowY: { lg: 'auto' },
-              '&::-webkit-scrollbar': { display: 'none' },
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
             }}
           >
             <Card

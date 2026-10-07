@@ -1,0 +1,8 @@
+# Production Readiness Checklist Scanner ignore list
+# Format: relative/path | reason
+
+waf/logs | Runtime WAF audit logs and traffic captures
+voice-ai/talking-head/models | AI deep learning weights and checkpoint models
+voice-ai/talking-head/media | Video and audio media assets
+api/candidate_cvs | Local candidate CV documents
+api/logs | Runtime backend application logs

@@ -5,14 +5,15 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getUserInfo, removeUserInfo } from "../redux/userSlice";
+import dynamic from "next/dynamic";
 import { useConfig } from "@/hooks/useConfig";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import ChatBot from "../components/Features/ChatBot";
+const ChatBot = dynamic(() => import("../components/Features/ChatBot"), { ssr: false });
 import ScrollToTop from "../components/Common/ScrollToTop";
 import { ConfirmDialogRoot } from "../components/Common/ConfirmDialog";
 import { ROUTES, AUTH_CONFIG } from "../configs/constants";
-import { isAdminPortalPath } from "../configs/portalRouting";
+import { isAdminPortalPath, isEmployerPortalPath, isEmployerHostname, stripPortalPrefix } from "../configs/portalRouting";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import tokenService from "../services/tokenService";
 import ErrorBoundary from "../components/ErrorBoundary";
@@ -76,12 +77,59 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     '/employer/privacy-policy',
     '/nha-tuyen-dung/chinh-sach-bao-mat',
   ];
-  const isEmployerPath = pathname.startsWith('/employer') || pathname.startsWith('/nha-tuyen-dung');
-  const isEmployerPublicPath = employerPublicPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  const onEmployerDomain = isEmployerHostname();
+  const strippedPath = stripPortalPrefix(pathname);
+  const employerPublicSubpaths = [
+    '/login',
+    '/dang-nhap',
+    '/forgot-password',
+    '/quen-mat-khau',
+    '/reset-password',
+    '/cap-nhat-mat-khau',
+    '/register',
+    '/dang-ky',
+    '/introduce',
+    '/gioi-thieu',
+    '/service',
+    '/dich-vu',
+    '/pricing',
+    '/bao-gia',
+    '/support',
+    '/ho-tro',
+    '/contact',
+    '/lien-he',
+    '/faq',
+    '/cau-hoi-thuong-gap',
+    '/terms-of-service',
+    '/terms-and-conditions',
+    '/dieu-khoan-dich-vu',
+    '/privacy-policy',
+    '/chinh-sach-bao-mat',
+    '/legal',
+  ];
+  const isEmployerPath =
+    onEmployerDomain ||
+    isEmployerPortalPath(pathname) ||
+    pathname.startsWith('/employer') ||
+    pathname.startsWith('/nha-tuyen-dung');
+  const isEmployerPublicPath =
+    employerPublicPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`)) ||
+    (onEmployerDomain &&
+      employerPublicSubpaths.some((path) => strippedPath === path || strippedPath.startsWith(`${path}/`)));
   const isEmployerPortal = isEmployerPath && !isEmployerPublicPath;
   const isChatPage =
     pathname.startsWith(`/${ROUTES.JOB_SEEKER.CHAT}`) ||
-    pathname.startsWith(`/${ROUTES.EMPLOYER.CHAT}`);
+    pathname.startsWith(`/${ROUTES.EMPLOYER.CHAT}`) ||
+    pathname.startsWith('/ket-noi-voi-nha-tuyen-dung') ||
+    pathname.startsWith('/nha-tuyen-dung/ket-noi-voi-ung-vien') ||
+    pathname.startsWith('/nha-tuyen-dung/chat') ||
+    pathname.startsWith('/ket-noi-voi-ung-vien') ||
+    pathname === '/chat' ||
+    pathname.startsWith('/chat/') ||
+    strippedPath === '/chat' ||
+    strippedPath.startsWith('/chat/') ||
+    strippedPath === '/ket-noi-voi-ung-vien' ||
+    strippedPath.startsWith('/ket-noi-voi-ung-vien/');
   const jobSeekerInterviewPrefix = `/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW.replace('/:id', '')}`;
   const isJobSeekerInterviewRoute =
     pathname === jobSeekerInterviewPrefix ||
@@ -201,15 +249,31 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     return <MaintenanceModeScreen detail={effectiveMaintenanceDetail} />;
   }
 
+  const isAuthRoute =
+    pathname.includes('/login') ||
+    pathname.includes('/dang-nhap') ||
+    pathname.includes('/register') ||
+    pathname.includes('/dang-ky') ||
+    pathname.includes('/forgot-password') ||
+    pathname.includes('/reset-password');
+
+  const mainContent = (
+    <ProductTourProvider>
+      {children}
+      {hasMounted && <Toaster richColors position="top-right" />}
+      {hasMounted && canShowChatBot && <ChatBot />}
+    </ProductTourProvider>
+  );
+
   return (
     <ErrorBoundary>
-      <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
-        <ProductTourProvider>
-          {children}
-          {hasMounted && <Toaster richColors position="top-right" />}
-          {hasMounted && canShowChatBot && <ChatBot />}
-        </ProductTourProvider>
-      </GoogleOAuthProvider>
+      {isAuthRoute ? (
+        <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
+          {mainContent}
+        </GoogleOAuthProvider>
+      ) : (
+        mainContent
+      )}
       {hasMounted && <ConfirmDialogRoot />}
       {hasMounted && <ScrollToTop />}
     </ErrorBoundary>

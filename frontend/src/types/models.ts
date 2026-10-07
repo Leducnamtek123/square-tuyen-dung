@@ -636,6 +636,9 @@ export interface CreateMockSessionPayload {
   question_group_id?: number | string | null;
   question_ids?: number[];
   voice_profile_id?: number | string | null;
+  interview_script_id?: number | string | null;
+  interview_script?: number | string | null;
+  interviewScript?: number | string | null;
   job_post_id?: number | string | null;
   session_metadata?: Record<string, unknown>;
 }
@@ -754,6 +757,12 @@ export interface InterviewSession {
   voice_profile?: number | null;
   voiceProfileName?: string | null;
   voice_profile_name?: string | null;
+  interviewScript?: number | null;
+  interview_script?: number | null;
+  interviewScriptName?: string | null;
+  interview_script_name?: string | null;
+  interviewScriptDetail?: any;
+  interview_script_detail?: any;
   sessionType?: 'official' | 'mock' | string;
   session_type?: 'official' | 'mock' | string;
   timeLimitPerQuestion?: number;
@@ -772,6 +781,28 @@ export interface InterviewSession {
   proctoring_events?: InterviewProctoringEvent[];
   proctoringViolationCount?: number;
   proctoring_violation_count?: number;
+  connectionLogs?: InterviewConnectionLog[];
+  connection_logs?: InterviewConnectionLog[];
+}
+
+export interface InterviewConnectionLog {
+  id: number;
+  session?: number;
+  participantIdentity?: string;
+  participant_identity?: string;
+  eventType: 'reconnecting' | 'reconnected' | 'disconnected' | 'connection_dropped' | string;
+  event_type?: string;
+  eventTypeDisplay?: string;
+  event_type_display?: string;
+  timestamp?: string;
+  downtimeSeconds?: number;
+  downtime_seconds?: number;
+  reconnectAttempt?: number;
+  reconnect_attempt?: number;
+  reason?: string;
+  metadata?: Record<string, any> | null;
+  createAt?: string;
+  create_at?: string;
 }
 
 export interface InterviewProctoringEvent {

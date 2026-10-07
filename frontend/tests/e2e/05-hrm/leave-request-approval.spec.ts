@@ -33,7 +33,10 @@ test.describe('Phân Hệ HRM - Quy Trình Phê Duyệt Đơn Nghỉ Phép (Leav
 
     // 4. Kiểm tra tab Quỹ Phép & Hạn mức
     await leavePage.switchTab('BALANCES');
-    await expect(page.getByText(/hạn mức phép|phép năm|quỹ phép/i).first()).toBeVisible({ timeout: 15_000 });
+    // Chỉ tìm trong <main> để tránh khớp thẻ <title> ẩn của tài liệu; nút cấp phát chỉ hiển thị ở tab Quỹ Phép
+    await expect(
+      page.locator('main').getByRole('button', { name: /cấp phát quỹ phép năm/i }).first()
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   /**

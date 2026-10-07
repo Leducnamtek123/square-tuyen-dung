@@ -273,16 +273,18 @@ const HomeSearch = ({ variant = 'default' }: HomeSearchProps) => {
       </Box>
 
       {/* -- Popular Keywords Pills ------------------ */}
-      {isHero && popularKeywords.length > 0 && (
+      {isHero && (
         <Box
           sx={{
             mt: { xs: 1.5, md: 2 },
+            minHeight: 36,
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
             gap: 1.25,
             width: '100%',
             overflow: 'hidden',
+            visibility: popularKeywords.length > 0 ? 'visible' : 'hidden',
           }}
         >
           {/* Trend Indicator Badge */}

@@ -315,15 +315,19 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 2, sm: 2 },
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           bgcolor: '#ffffff',
         }}
       >
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-          <PersonOutlineIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
+          <PersonOutlineIcon sx={{ color: '#2563eb', fontSize: 19, flexShrink: 0 }} />
+          <Typography
+            variant="subtitle1"
+            noWrap
+            sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+          >
             Thông tin cơ bản
           </Typography>
         </Stack>
@@ -562,24 +566,28 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 2, sm: 2 },
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           bgcolor: '#ffffff',
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <FlagOutlinedIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
-              Mục tiêu nghề nghiệp & Tóm tắt
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 1.5, flexWrap: 'nowrap', minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, flexShrink: 1 }}>
+            <FlagOutlinedIcon sx={{ color: '#2563eb', fontSize: 19, flexShrink: 0 }} />
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+            >
+              Mục tiêu nghề nghiệp
             </Typography>
           </Stack>
           {onOpenAISuggestions && (
             <Button
               size="small"
               onClick={onOpenAISuggestions}
-              startIcon={<AutoFixHighOutlinedIcon sx={{ fontSize: 15 }} />}
+              startIcon={<AutoFixHighOutlinedIcon sx={{ fontSize: 14 }} />}
               sx={{
                 fontSize: '0.725rem',
                 fontWeight: 700,
@@ -587,11 +595,14 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
                 textTransform: 'none',
                 bgcolor: '#f5f3ff',
                 borderRadius: '8px',
-                px: 1.5,
+                px: 1.25,
+                py: 0.4,
+                flexShrink: 0,
+                whiteSpace: 'nowrap',
                 '&:hover': { bgcolor: '#ede9fe' },
               }}
             >
-              Gợi ý bằng AI
+              Gợi ý AI
             </Button>
           )}
         </Stack>
@@ -621,35 +632,42 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 2, sm: 2 },
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           bgcolor: '#ffffff',
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <WorkOutlineIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2, flexWrap: 'nowrap', minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, flexShrink: 1 }}>
+            <WorkOutlineIcon sx={{ color: '#2563eb', fontSize: 19, flexShrink: 0 }} />
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+            >
               Kinh nghiệm làm việc
             </Typography>
           </Stack>
           <Button
             size="small"
             onClick={handleAddExperience}
-            startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            startIcon={<AddIcon sx={{ fontSize: 15 }} />}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
+              fontSize: '0.725rem',
               color: '#2563eb',
               textTransform: 'none',
               bgcolor: '#eff6ff',
               borderRadius: '8px',
-              px: 1.5,
+              px: 1.25,
+              py: 0.4,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
-            Thêm kinh nghiệm làm việc
+            Thêm kinh nghiệm
           </Button>
         </Stack>
 
@@ -677,11 +695,11 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
                   gap: 1.5,
                 }}
               >
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1e293b', fontSize: '0.825rem' }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                  <Typography variant="subtitle2" noWrap sx={{ fontWeight: 800, color: '#1e293b', fontSize: '0.825rem', minWidth: 0, flex: 1 }}>
                     #{idx + 1} {exp.position || 'Chức danh công việc'}
                   </Typography>
-                  <IconButton size="small" onClick={() => handleDeleteExperience(exp.id)} sx={{ color: '#ef4444', p: 0.5 }}>
+                  <IconButton size="small" onClick={() => handleDeleteExperience(exp.id)} sx={{ color: '#ef4444', p: 0.5, flexShrink: 0 }}>
                     <DeleteOutlineIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </Stack>
@@ -745,31 +763,38 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 2, sm: 2 },
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           bgcolor: '#ffffff',
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <SchoolOutlinedIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2, flexWrap: 'nowrap', minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, flexShrink: 1 }}>
+            <SchoolOutlinedIcon sx={{ color: '#2563eb', fontSize: 19, flexShrink: 0 }} />
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+            >
               Học vấn & Trình độ
             </Typography>
           </Stack>
           <Button
             size="small"
             onClick={handleAddEducation}
-            startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            startIcon={<AddIcon sx={{ fontSize: 15 }} />}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
+              fontSize: '0.725rem',
               color: '#2563eb',
               textTransform: 'none',
               bgcolor: '#eff6ff',
               borderRadius: '8px',
-              px: 1.5,
+              px: 1.25,
+              py: 0.4,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
@@ -801,11 +826,11 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
                   gap: 1.5,
                 }}
               >
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1e293b', fontSize: '0.825rem' }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                  <Typography variant="subtitle2" noWrap sx={{ fontWeight: 800, color: '#1e293b', fontSize: '0.825rem', minWidth: 0, flex: 1 }}>
                     #{idx + 1} {edu.school || 'Trường đào tạo'}
                   </Typography>
-                  <IconButton size="small" onClick={() => handleDeleteEducation(edu.id)} sx={{ color: '#ef4444', p: 0.5 }}>
+                  <IconButton size="small" onClick={() => handleDeleteEducation(edu.id)} sx={{ color: '#ef4444', p: 0.5, flexShrink: 0 }}>
                     <DeleteOutlineIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </Stack>
@@ -865,16 +890,20 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 2, sm: 2 },
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           bgcolor: '#ffffff',
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <CodeOutlinedIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2, flexWrap: 'nowrap', minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, flexShrink: 1 }}>
+            <CodeOutlinedIcon sx={{ color: '#2563eb', fontSize: 19, flexShrink: 0 }} />
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+            >
               Kỹ năng chuyên môn
             </Typography>
           </Stack>
@@ -977,31 +1006,38 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 2, sm: 2 },
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           bgcolor: '#ffffff',
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <TranslateOutlinedIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2, flexWrap: 'nowrap', minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, flexShrink: 1 }}>
+            <TranslateOutlinedIcon sx={{ color: '#2563eb', fontSize: 19, flexShrink: 0 }} />
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+            >
               Ngoại ngữ
             </Typography>
           </Stack>
           <Button
             size="small"
             onClick={() => handleAddLanguage()}
-            startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            startIcon={<AddIcon sx={{ fontSize: 15 }} />}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
+              fontSize: '0.725rem',
               color: '#2563eb',
               textTransform: 'none',
               bgcolor: '#eff6ff',
               borderRadius: '8px',
-              px: 1.5,
+              px: 1.25,
+              py: 0.4,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
@@ -1093,31 +1129,38 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 2, sm: 2 },
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           bgcolor: '#ffffff',
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <WorkspacePremiumOutlinedIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2, flexWrap: 'nowrap', minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, flexShrink: 1 }}>
+            <WorkspacePremiumOutlinedIcon sx={{ color: '#2563eb', fontSize: 19, flexShrink: 0 }} />
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+            >
               Chứng chỉ & Giải thưởng
             </Typography>
           </Stack>
           <Button
             size="small"
             onClick={handleAddCertificate}
-            startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            startIcon={<AddIcon sx={{ fontSize: 15 }} />}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
+              fontSize: '0.725rem',
               color: '#2563eb',
               textTransform: 'none',
               bgcolor: '#eff6ff',
               borderRadius: '8px',
-              px: 1.5,
+              px: 1.25,
+              py: 0.4,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
@@ -1188,31 +1231,38 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
       <Paper
         elevation={0}
         sx={{
-          p: { xs: 2, sm: 2.5 },
+          p: { xs: 2, sm: 2 },
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           bgcolor: '#ffffff',
         }}
       >
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <FolderOutlinedIcon sx={{ color: '#2563eb', fontSize: 20 }} />
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2, flexWrap: 'nowrap', minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0, flexShrink: 1 }}>
+            <FolderOutlinedIcon sx={{ color: '#2563eb', fontSize: 19, flexShrink: 0 }} />
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ fontWeight: 700, color: '#0f172a', fontSize: '0.9rem', whiteSpace: 'nowrap' }}
+            >
               Dự án tiêu biểu
             </Typography>
           </Stack>
           <Button
             size="small"
             onClick={handleAddProject}
-            startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+            startIcon={<AddIcon sx={{ fontSize: 15 }} />}
             sx={{
               fontWeight: 700,
-              fontSize: '0.75rem',
+              fontSize: '0.725rem',
               color: '#2563eb',
               textTransform: 'none',
               bgcolor: '#eff6ff',
               borderRadius: '8px',
-              px: 1.5,
+              px: 1.25,
+              py: 0.4,
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
               '&:hover': { bgcolor: '#dbeafe' },
             }}
           >
@@ -1241,11 +1291,11 @@ export const UnifiedCVForm: React.FC<UnifiedCVFormProps> = ({
                   gap: 1.5,
                 }}
               >
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1e293b', fontSize: '0.825rem' }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1}>
+                  <Typography variant="subtitle2" noWrap sx={{ fontWeight: 800, color: '#1e293b', fontSize: '0.825rem', minWidth: 0, flex: 1 }}>
                     #{idx + 1} {proj.name || 'Tên dự án'}
                   </Typography>
-                  <IconButton size="small" onClick={() => handleDeleteProject(proj.id)} sx={{ color: '#ef4444', p: 0.5 }}>
+                  <IconButton size="small" onClick={() => handleDeleteProject(proj.id)} sx={{ color: '#ef4444', p: 0.5, flexShrink: 0 }}>
                     <DeleteOutlineIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </Stack>

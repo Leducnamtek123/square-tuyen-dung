@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { Box, Grid2 as Grid } from '@mui/material';
+import React, { useRef, useState } from 'react';
+import { Box, Grid2 as Grid, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import gsap from 'gsap';
@@ -34,6 +34,7 @@ const KPI_QUERY_PARAMS = Object.freeze({ pageSize: 1 });
 const DashboardPage = () => {
   const { t } = useTranslation('jobSeeker');
   const containerRef = useRef<HTMLDivElement>(null);
+  const [jobFeedTab, setJobFeedTab] = useState<'ai' | 'recommended'>('ai');
   TabTitle(t('dashboard.pageTitle', { appName: APP_NAME }));
 
   // Auto-start candidate dashboard tour on first visit
@@ -178,14 +179,76 @@ const DashboardPage = () => {
         </Grid>
       </Grid>
 
-      {/* Row 3: AI Smart Job Recommendations Section */}
-      <Box data-tour="candidate-ai-jobs" className="gsap-candidate-ai-section">
-        <AiRecommendedJobsSection />
-      </Box>
+      {/* Row 3 & 4: Unified Smart Job Feed Section with Segmented Switcher */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 1.5,
+          }}
+        >
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '1.15rem' }}>
+              Cơ hội việc làm dành cho bạn
+            </Typography>
+            <Typography variant="caption" sx={{ color: '#64748B' }}>
+              Việc làm phù hợp với kinh nghiệm và hồ sơ CV của bạn
+            </Typography>
+          </Box>
 
-      {/* Row 4: Recommended Jobs Full Width Section */}
-      <Box className="gsap-candidate-jobs-card">
-        <CandidateRecommendedJobsCard />
+          <ToggleButtonGroup
+            size="small"
+            value={jobFeedTab}
+            exclusive
+            onChange={(_, val) => val && setJobFeedTab(val)}
+            sx={{
+              bgcolor: '#F1F5F9',
+              p: '3px',
+              borderRadius: '10px',
+              border: '1px solid #E2E8F0',
+              '& .MuiToggleButton-root': {
+                px: 2,
+                py: 0.6,
+                fontWeight: 700,
+                fontSize: '0.8125rem',
+                textTransform: 'none',
+                border: 'none',
+                borderRadius: '8px !important',
+                color: '#64748B',
+                transition: 'all 0.15s ease-in-out',
+                '&.Mui-selected': {
+                  bgcolor: '#FFFFFF',
+                  color: '#2563EB',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                  fontWeight: 800,
+                },
+              },
+            }}
+          >
+            <ToggleButton value="ai">Gợi ý bởi AI</ToggleButton>
+            <ToggleButton value="recommended">Việc làm phù hợp</ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+
+        {/* AI Smart Job Recommendations Section */}
+        <Box
+          data-tour="candidate-ai-jobs"
+          className="gsap-candidate-ai-section"
+          sx={{ display: jobFeedTab === 'ai' ? 'block' : 'none' }}
+        >
+          <AiRecommendedJobsSection />
+        </Box>
+
+        {/* Recommended Jobs Full Width Section */}
+        <Box
+          className="gsap-candidate-jobs-card"
+          sx={{ display: jobFeedTab === 'recommended' ? 'block' : 'none' }}
+        >
+          <CandidateRecommendedJobsCard />
+        </Box>
       </Box>
     </Box>
   );

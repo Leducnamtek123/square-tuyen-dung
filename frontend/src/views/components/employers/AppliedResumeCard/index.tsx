@@ -11,6 +11,10 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
@@ -19,6 +23,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -89,6 +94,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [exportModalOpen, setExportModalOpen] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
+  const [dataMenuAnchorEl, setDataMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const handleOpenDataMenu = (e: React.MouseEvent<HTMLElement>) => setDataMenuAnchorEl(e.currentTarget);
+  const handleCloseDataMenu = () => setDataMenuAnchorEl(null);
   const [optimisticAnalysis, setOptimisticAnalysis] = useState<Record<string, Partial<JobPostActivity>>>({});
 
   const {
@@ -387,7 +395,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
         elevation={0}
         sx={{
           p: { xs: 2.5, md: 3.5 },
-          borderRadius: 3,
+          borderRadius: '4px',
           border: '1px solid',
           borderColor: 'divider',
           boxShadow: (theme) => theme.customShadows?.z1,
@@ -407,7 +415,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
             <Box
               sx={{
                 p: 1,
-                borderRadius: 2,
+                borderRadius: '4px',
                 bgcolor: 'primary.extralight',
                 color: 'primary.main',
                 display: 'flex',
@@ -451,7 +459,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                   flex: { xs: 1, sm: 'none' },
                   bgcolor: '#F1F5F9',
                   p: '3px',
-                  borderRadius: '10px',
+                  borderRadius: '4px',
                   border: '1px solid #E2E8F0',
                   '& .MuiToggleButton-root': {
                     flex: { xs: 1, sm: 'none' },
@@ -461,7 +469,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                     fontSize: '0.8125rem',
                     textTransform: 'none',
                     border: 'none',
-                    borderRadius: '8px !important',
+                    borderRadius: '3px !important',
                     color: '#64748B',
                     transition: 'all 0.15s ease-in-out',
                     '&.Mui-selected': {
@@ -504,7 +512,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                     fontWeight: 700,
                     fontSize: '0.8125rem',
                     textTransform: 'none',
-                    borderRadius: '10px !important',
+                    borderRadius: '4px !important',
                     border: '1px solid',
                     borderColor: blindMode ? '#F59E0B' : '#E2E8F0',
                     color: blindMode ? '#B45309' : '#475569',
@@ -524,23 +532,23 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               </Tooltip>
             </Stack>
 
-            {/* Action Buttons Group (Import, Export & Add Candidate) */}
-            <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
-              {/* Import List Button */}
+            {/* Action Buttons Group (Data Actions Menu & Primary Add Candidate) */}
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ width: { xs: '100%', sm: 'auto' } }}>
+              {/* Secondary Data Actions Menu (Import / Export) */}
               <Button
                 variant="outlined"
                 color="inherit"
-                startIcon={<UploadFileOutlinedIcon />}
-                onClick={() => setImportModalOpen(true)}
+                endIcon={<KeyboardArrowDownIcon />}
+                onClick={handleOpenDataMenu}
                 sx={{
                   flex: { xs: 1, sm: 'none' },
-                  px: { xs: 1.5, sm: 2.25 },
+                  px: { xs: 1.5, sm: 2 },
                   py: 0.85,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontSize: '0.8125rem',
                   textTransform: 'none',
                   whiteSpace: 'nowrap',
-                  borderRadius: '10px',
+                  borderRadius: '4px',
                   border: '1px solid #E2E8F0',
                   bgcolor: '#FFFFFF',
                   color: '#334155',
@@ -553,40 +561,54 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                   },
                 }}
               >
-                Nhập Excel/CSV
+                Thao tác dữ liệu
               </Button>
-
-              {/* Export List Button */}
-              <Button
-                variant="outlined"
-                color="inherit"
-                startIcon={<FileDownloadOutlinedIcon />}
-                onClick={() => setExportModalOpen(true)}
-                sx={{
-                  flex: { xs: 1, sm: 'none' },
-                  px: { xs: 1.5, sm: 2.25 },
-                  py: 0.85,
-                  fontWeight: 700,
-                  fontSize: '0.8125rem',
-                  textTransform: 'none',
-                  whiteSpace: 'nowrap',
-                  borderRadius: '10px',
-                  border: '1px solid #E2E8F0',
-                  bgcolor: '#FFFFFF',
-                  color: '#334155',
-                  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
-                  transition: 'all 0.15s ease',
-                  '&:hover': {
-                    bgcolor: '#F8FAFC',
-                    borderColor: '#CBD5E1',
-                    color: '#0F172A',
+              <Menu
+                anchorEl={dataMenuAnchorEl}
+                open={Boolean(dataMenuAnchorEl)}
+                onClose={handleCloseDataMenu}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                slotProps={{
+                  paper: {
+                    elevation: 3,
+                    sx: {
+                      borderRadius: '4px',
+                      border: '1px solid #E2E8F0',
+                      minWidth: 190,
+                      py: 0.5,
+                      mt: 0.5,
+                    },
                   },
                 }}
               >
-                {t('employer:appliedResume.downloadList', 'Tải danh sách')}
-              </Button>
+                <MenuItem
+                  onClick={() => {
+                    handleCloseDataMenu();
+                    setImportModalOpen(true);
+                  }}
+                  sx={{ py: 1, px: 2, fontSize: '0.8125rem', fontWeight: 600, color: '#334155' }}
+                >
+                  <ListItemIcon sx={{ minWidth: 28, color: '#64748B' }}>
+                    <UploadFileOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Nhập Excel/CSV" primaryTypographyProps={{ fontSize: '0.8125rem', fontWeight: 600 }} />
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleCloseDataMenu();
+                    setExportModalOpen(true);
+                  }}
+                  sx={{ py: 1, px: 2, fontSize: '0.8125rem', fontWeight: 600, color: '#334155' }}
+                >
+                  <ListItemIcon sx={{ minWidth: 28, color: '#64748B' }}>
+                    <FileDownloadOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={t('employer:appliedResume.downloadList', 'Tải danh sách')} primaryTypographyProps={{ fontSize: '0.8125rem', fontWeight: 600 }} />
+                </MenuItem>
+              </Menu>
 
-              {/* Add Candidate Button */}
+              {/* Add Candidate Button (Primary Action) */}
               <Button
                 variant="contained"
                 startIcon={<PersonAddIcon />}
@@ -596,17 +618,15 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                   px: { xs: 1.75, sm: 2.75 },
                   py: 0.85,
                   whiteSpace: 'nowrap',
-                  borderRadius: '10px',
+                  borderRadius: '4px',
                   bgcolor: '#2563EB',
-                  backgroundImage: 'linear-gradient(180deg, #3B82F6 0%, #2563EB 100%)',
                   boxShadow: '0 1px 3px rgba(37, 99, 235, 0.3), 0 1px 2px rgba(37, 99, 235, 0.2)',
-                  fontWeight: 800,
+                  fontWeight: 700,
                   fontSize: '0.8125rem',
                   textTransform: 'none',
                   transition: 'all 0.15s ease',
                   '&:hover': {
                     bgcolor: '#1D4ED8',
-                    backgroundImage: 'linear-gradient(180deg, #2563EB 0%, #1D4ED8 100%)',
                     boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
                     transform: 'translateY(-1px)',
                   },

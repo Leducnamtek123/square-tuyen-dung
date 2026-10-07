@@ -278,6 +278,7 @@ export const CandidatePracticePage: React.FC = () => {
             <Button
               variant="outlined"
               size="small"
+              data-tour="practice-topics"
               startIcon={<TuneIcon sx={{ fontSize: 16 }} />}
               onClick={() => setShowCustomStudio((prev) => !prev)}
               sx={{
@@ -301,17 +302,17 @@ export const CandidatePracticePage: React.FC = () => {
           <Card
             variant="outlined"
             sx={{
-              p: { xs: 2.5, md: 3 },
+              p: { xs: 2, sm: 2.5, md: 3 },
               borderRadius: '16px',
-              borderColor: '#bfdbfe',
-              backgroundColor: '#f8faff',
+              borderColor: '#e2e8f0',
+              backgroundColor: '#ffffff',
               mb: 3.5,
-              boxShadow: '0 4px 16px rgba(37,99,235,0.06)',
+              boxShadow: '0 4px 20px -2px rgba(0,0,0,0.03)',
             }}
           >
             <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, mb: 2, gap: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#1e3a8a' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a' }}>
                   Thiết lập phòng luyện tập tự do
                 </Typography>
                 <Chip size="small" label="Tương tác cùng AI" sx={{ bgcolor: '#eff6ff', color: '#1d4ed8', fontWeight: 700, fontSize: '0.7rem', border: '1px solid #bfdbfe' }} />
@@ -514,7 +515,7 @@ export const CandidatePracticePage: React.FC = () => {
           </Box>
         ) : (
           <Stack spacing={2.5} sx={{ width: '100%' }}>
-            {questionSets.map((set) => (
+            {questionSets.map((set, sIdx) => (
               <Card
                 key={set.id}
                 variant="outlined"
@@ -643,6 +644,7 @@ export const CandidatePracticePage: React.FC = () => {
                   <Stack direction={{ xs: 'row', md: 'column' }} spacing={1.25} sx={{ width: { xs: '100%', md: 220 }, flexShrink: 0, justifyContent: 'center' }}>
                     <Button
                       variant="contained"
+                      data-tour={sIdx === 0 ? 'practice-start' : undefined}
                       data-testid="start-set-mock-btn"
                       onClick={() => handleStartSetMock(set)}
                       disabled={isStartingMock}

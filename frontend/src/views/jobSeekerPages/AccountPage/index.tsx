@@ -456,10 +456,11 @@ const AccountPage = () => {
           </Box>
 
           {/* Logout Button Row */}
-          <Box sx={{ pt: 1, px: 1 }}>
+          <Box sx={{ pt: 1.5, px: 0 }}>
             <Button
-              variant="text"
-              startIcon={<LogoutIcon sx={{ color: '#ef4444' }} />}
+              variant="contained"
+              disableElevation
+              startIcon={<LogoutIcon sx={{ color: '#be123c', fontSize: 20 }} />}
               onClick={() =>
                 confirmModal(
                   handleConfirmLogout,
@@ -469,12 +470,19 @@ const AccountPage = () => {
                 )
               }
               sx={{
-                color: '#ef4444',
-                fontWeight: 800,
-                fontSize: '0.9rem',
+                minHeight: 44,
+                px: 2.5,
+                borderRadius: 2,
+                bgcolor: 'rgba(244, 63, 94, 0.08)',
+                color: '#be123c',
+                fontWeight: 600,
+                fontSize: '0.875rem',
                 textTransform: 'none',
-                p: 0,
-                '&:hover': { backgroundColor: 'transparent', color: '#dc2626' },
+                border: '1px solid rgba(244, 63, 94, 0.2)',
+                '&:hover': {
+                  bgcolor: 'rgba(244, 63, 94, 0.14)',
+                  borderColor: 'rgba(244, 63, 94, 0.35)',
+                },
               }}
             >
               Đăng xuất khỏi tài khoản
@@ -486,7 +494,10 @@ const AccountPage = () => {
       {/* Edit Email Dialog */}
       <Dialog
         open={emailDialogOpen}
-        onClose={() => setEmailDialogOpen(false)}
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick') return;
+          setEmailDialogOpen(false);
+        }}
         maxWidth="xs"
         fullWidth
         PaperProps={{ sx: { borderRadius: '20px', p: 1 } }}
@@ -539,7 +550,10 @@ const AccountPage = () => {
       {/* Change Password Dialog */}
       <Dialog
         open={passwordDialogOpen}
-        onClose={() => setPasswordDialogOpen(false)}
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick') return;
+          setPasswordDialogOpen(false);
+        }}
         maxWidth="xs"
         fullWidth
         PaperProps={{ sx: { borderRadius: '20px', p: 1 } }}
@@ -640,7 +654,10 @@ const AccountPage = () => {
       {/* Select Language Dialog */}
       <Dialog
         open={langDialogOpen}
-        onClose={() => setLangDialogOpen(false)}
+        onClose={(event, reason) => {
+          if (reason === 'backdropClick') return;
+          setLangDialogOpen(false);
+        }}
         maxWidth="xs"
         fullWidth
         PaperProps={{ sx: { borderRadius: '20px', p: 1 } }}

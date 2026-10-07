@@ -83,6 +83,9 @@ const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n 
   const email = session?.candidateEmail || session?.candidate_email;
   const language = session?.interviewLanguageDisplay || session?.interview_language_display || (session?.interviewLanguage === 'en' ? 'Tiếng Anh' : 'Tiếng Việt');
   const proctoringCount = Number(session?.proctoringViolationCount ?? session?.proctoring_violation_count ?? (Array.isArray(session?.proctoringEvents) ? session.proctoringEvents.length : 0));
+  const scriptName = session?.interviewScriptName || session?.interview_script_name || session?.interviewScriptDetail?.name || session?.interview_script_detail?.name;
+  const scriptScenario = session?.interviewScriptDetail?.scenario_type_display || session?.interviewScriptDetail?.scenarioTypeDisplay || session?.interview_script_detail?.scenario_type_display || session?.interview_script_detail?.scenarioTypeDisplay;
+  const scriptPersona = session?.interviewScriptDetail?.hr_persona_display || session?.interviewScriptDetail?.hrPersonaDisplay || session?.interview_script_detail?.hr_persona_display || session?.interview_script_detail?.hrPersonaDisplay;
 
   return (
     <Paper elevation={0} sx={interviewDetailCardSx}>
@@ -133,6 +136,19 @@ const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n 
               : '---'}
           </Typography>
         </InfoRow>
+
+        {scriptName && (
+          <InfoRow icon={<AssignmentOutlinedIcon />} label="Kịch bản phỏng vấn AI">
+            <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.5, fontSize: '0.875rem' }}>
+              {scriptName}
+            </Typography>
+            {(scriptScenario || scriptPersona) && (
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mt: 0.25 }}>
+                {[scriptScenario, scriptPersona].filter(Boolean).join(' • ')}
+              </Typography>
+            )}
+          </InfoRow>
+        )}
 
         {language && (
           <InfoRow icon={<TranslateOutlinedIcon />} label="Ngôn ngữ phỏng vấn">

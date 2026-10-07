@@ -181,6 +181,13 @@ class CreateMockSessionView(APIView):
         if voice_profile_id:
             voice_profile_obj = VoiceProfile.objects.filter(id=voice_profile_id).first()
 
+        # Link InterviewScript if provided
+        interview_script_id = serializer.validated_data.get('interview_script_id') or serializer.validated_data.get('interview_script')
+        interview_script_obj = None
+        if interview_script_id:
+            from .models import InterviewScript
+            interview_script_obj = InterviewScript.objects.filter(id=interview_script_id).first()
+
         # Resolve Career instance
         from apps.common.models import Career
         career_obj = None
@@ -207,6 +214,11 @@ class CreateMockSessionView(APIView):
         elif question_group_obj:
             # Ưu tiên câu hỏi từ nhóm câu hỏi được chỉ định
             candidate_questions = list(question_group_obj.questions.all())
+        elif interview_script_obj and interview_script_obj.questions.exists():
+            # Ưu tiên câu hỏi gắn kèm kịch bản phỏng vấn
+            candidate_questions = list(interview_script_obj.questions.all())
+        elif interview_script_obj and interview_script_obj.question_group_id and interview_script_obj.question_group:
+            candidate_questions = list(interview_script_obj.question_group.questions.all())
         elif career_obj:
             qs_career = list(Question.objects.filter(career=career_obj).order_by('?'))
             candidate_questions.extend(qs_career)
@@ -260,12 +272,15 @@ class CreateMockSessionView(APIView):
             user_role = getattr(request.user, 'role_name', '')
             is_employer = user_role in ['recruiter', 'employer', 'admin']
 
+        resolved_script = interview_script_obj or (getattr(job_post_obj, 'interview_script', None) if job_post_obj else None)
+        script_time_limit = getattr(resolved_script, 'time_limit_per_question', None) or 120
+
         # Khởi tạo session phỏng vấn thử
         session = InterviewSession.objects.create(
             candidate=candidate,
             created_by=request.user if request.user and request.user.is_authenticated else None,
             job_post=job_post_obj,
-            interview_script=(getattr(job_post_obj, 'interview_script', None) if job_post_obj else None),
+            interview_script=resolved_script,
             question_group=question_group_obj,
             voice_profile=voice_profile_obj,
             session_type=InterviewSession.SESSION_TYPE_MOCK,
@@ -273,8 +288,8 @@ class CreateMockSessionView(APIView):
             status='scheduled',
             type='mixed',
             scheduled_at=timezone.now(),
-            duration=len(selected_questions) * 120,
-            time_limit_per_question=120,
+            duration=len(selected_questions) * script_time_limit,
+            time_limit_per_question=script_time_limit,
             notes=f"Phiên phỏng vấn thử vị trí: {position_title}",
             session_metadata={
                 "position_title": position_title,
@@ -285,6 +300,7 @@ class CreateMockSessionView(APIView):
                 "is_employer_preview": is_employer,
                 "question_group_id": question_group_obj.id if question_group_obj else None,
                 "voice_profile_id": voice_profile_obj.id if voice_profile_obj else None,
+                "interview_script_id": resolved_script.id if resolved_script else None,
                 **(serializer.validated_data.get('session_metadata') or {}),
             }
         )

@@ -1,0 +1,10 @@
+# InfoHR Security Policy
+# https://securitytxt.org/ (RFC 9116)
+
+Contact: mailto:security@infohr.vn
+Contact: https://infohr.vn/lien-he
+Expires: 2027-12-31T23:59:59.000Z
+Canonical: https://infohr.vn/.well-known/security.txt
+Preferred-Languages: vi, en
+Policy: https://infohr.vn/chinh-sach-bao-mat
+Acknowledgments: https://infohr.vn/ve-chung-toi

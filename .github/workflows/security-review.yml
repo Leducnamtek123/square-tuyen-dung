@@ -14,20 +14,21 @@ jobs:
   security-audit:
     name: AI Security Review
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0a5c61591373683505ea898e09a6ea32f8b41931 # v5.0.0
         with:
           python-version: '3.11'
 
       - name: Claude Code Security Review
-        uses: anthropics/claude-code-security-review@main
+        uses: anthropics/claude-code-security-review@5cb4481d43a5323cb186bc57d26bb4e019b85c13 # v1
         with:
           comment-pr: true
           upload-results: true

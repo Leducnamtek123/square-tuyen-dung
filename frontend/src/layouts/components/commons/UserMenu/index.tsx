@@ -87,17 +87,39 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu, isVerified }: UserM
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
+    const currentHost = window.location.hostname;
+    const isDomainSystem = currentHost.includes(HOST_NAME.PROJECT);
+
+    if (isDomainSystem) {
+      if (toEmployer) {
+        const employerPath = normalizedPath.replace(/^\/employer/, '') || '/dashboard';
+        window.location.href = `${protocol}//${HOST_NAME.EMPLOYER_PROJECT}${port}${employerPath}`;
+        return;
+      }
+      const candidatePath = normalizedPath || '/dashboard';
+      window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${candidatePath}`;
+      return;
+    }
+
     const employerFallbackPath = `/${ROUTES.EMPLOYER.DASHBOARD}`;
     const targetPath = toEmployer && !normalizedPath ? employerFallbackPath : normalizedPath;
     const localizedPath = targetPath ? localizeRoutePath(targetPath, i18n.language) : "";
-    window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${localizedPath}`;
+    window.location.href = `${protocol}//${window.location.host}${localizedPath}`;
   }, [i18n.language]);
 
   const openAdminPortal = React.useCallback(() => {
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
+    const currentHost = window.location.hostname;
+    const isDomainSystem = currentHost.includes(HOST_NAME.PROJECT);
+
+    if (isDomainSystem) {
+      window.location.href = `${protocol}//${HOST_NAME.ADMIN_PROJECT}${port}/dashboard`;
+      return;
+    }
+
     const adminPath = localizeRoutePath(`/${ROUTES.ADMIN.DASHBOARD}`, i18n.language);
-    window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${adminPath}`;
+    window.location.href = `${protocol}//${window.location.host}${adminPath}`;
   }, [i18n.language]);
 
   const menuItems = React.useMemo(() => {
@@ -161,10 +183,6 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu, isVerified }: UserM
           };
           dispatch(setActiveWorkspace(normalizedWorkspace));
           if (workspace.type === "company") {
-            if (rawRole === "employee") {
-              window.location.href = '/employee/dashboard';
-              return;
-            }
             if (currentUser?.isOnboarded === false) {
               window.location.href = '/onboarding/employer';
               return;

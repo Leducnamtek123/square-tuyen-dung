@@ -3,7 +3,7 @@
   "entry": [
     "src/app/**/*.{ts,tsx}",
     "src/pages/**/*.{ts,tsx}",
-    "src/middleware.{ts,tsx}",
+    "src/proxy.{ts,tsx}",
     "src/instrumentation.{ts,tsx}",
     "src/layouts/index.tsx",
     "src/services/index.ts",

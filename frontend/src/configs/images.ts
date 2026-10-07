@@ -24,8 +24,8 @@ import letterSvg from '../assets/images/svg-images/letter.svg';
 import sadSvg from '../assets/images/svg-images/sad.svg';
 
 // Import assets
-import jobSeekerChatbotIcon from '../assets/icons/job_seeker_chatbot_icon.gif';
-import employerChatbotIcon from '../assets/icons/employer_chatbot_icon.gif';
+import jobSeekerChatbotIcon from '../assets/icons/job_seeker_chatbot_icon_opt.webp';
+import employerChatbotIcon from '../assets/icons/employer_chatbot_icon_opt.webp';
 import coverImageDefault from '../assets/images/cover-image-default.webp';
 import companyLogoDefault from '../assets/images/company_logo_default.png';
 import companyCoverDefault from '../assets/images/company_cover_default.png';
@@ -67,8 +67,8 @@ const imgSrc = (img: string | { src?: string; default?: { src?: string } } | nul
 };
 
 export const IMAGES = {
-  getLogo: (_mode: 'dark' | 'light' = 'dark') => '/infohr-icons/logo-brand.png',
-  getTextLogo: (_mode: 'dark' | 'light' = 'dark') => '/infohr-icons/logo-brand.png',
+  getLogo: (_mode: 'dark' | 'light' = 'dark') => '/infohr-icons/logo-brand.webp',
+  getTextLogo: (_mode: 'dark' | 'light' = 'dark') => '/infohr-icons/logo-brand.webp',
   coverImageDefault: imgSrc(coverImageDefault),
   chPlayDownload: imgSrc(chPlayDownload),
   appStoreDownload: imgSrc(appStoreDownload),

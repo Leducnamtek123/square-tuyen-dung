@@ -209,7 +209,12 @@ async def admin_config(request):
     try:
         opt = request.app.get("opt")
         if opt:
-            return json_ok(data={"config": vars(opt)})
+            raw_config = vars(opt).copy()
+            # Mask any credentials/keys/tokens/passwords
+            for k in list(raw_config.keys()):
+                if any(sec in k.lower() for sec in ["key", "secret", "token", "password", "auth"]):
+                    raw_config[k] = "******"
+            return json_ok(data={"config": raw_config})
         return json_error("Config not found")
     except Exception as e:
         logger.exception('admin_config exception:')
@@ -313,14 +318,16 @@ async def call_metaconnect_tts(text: str, voice: str = "Trúc Ly") -> bytes:
     api_key = (
         os.getenv("TTS_API_KEY")
         or os.getenv("AI_TTS_API_KEY")
-        or "airp_live_ZX173OjElohx_4xp3OhMBdtNZkfgdGbFxbgIWLTH4LCP8"
+        or ""
     )
+    if not api_key:
+        raise RuntimeError("Missing TTS_API_KEY or AI_TTS_API_KEY in environment.")
     model = os.getenv("TTS_MODEL") or os.getenv("AI_TTS_MODEL") or "tts-vi"
     url = f"{base_url}/audio/speech"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "User-Agent": "curl/7.68.0",
+        "User-Agent": "Aila-Voice-AI/1.0",
     }
     payload = {
         "model": model,
@@ -328,7 +335,7 @@ async def call_metaconnect_tts(text: str, voice: str = "Trúc Ly") -> bytes:
         "voice": voice,
         "response_format": "mp3",
     }
-    async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
+    async with httpx.AsyncClient(timeout=30.0, verify=True) as client:
         res = await client.post(url, json=payload, headers=headers)
         if res.status_code != 200:
             raise RuntimeError(f"Metaconnect TTS HTTP {res.status_code}: {res.text[:200]}")
@@ -368,6 +375,12 @@ async def render_avatar_lipsync(request):
         avatar_id = params.get('avatar_id', '').strip() or "ng_c_linh"
         action = params.get('action', '').strip() or "speaking"
         audio_url = params.get('audio_url', '').strip()
+
+        import re
+        if not re.match(r"^[a-zA-Z0-9_\-]+$", avatar_id):
+            return json_error("Invalid avatar_id format", code=400)
+        if not re.match(r"^[a-zA-Z0-9_\-]+$", action):
+            return json_error("Invalid action format", code=400)
 
         audio_path = None
 
@@ -416,7 +429,25 @@ async def render_avatar_lipsync(request):
                 temp_files.append(audio_path)
         elif audio_url:
             if audio_url.startswith("http://") or audio_url.startswith("https://"):
-                async with httpx.AsyncClient(timeout=30.0, verify=False) as client:
+                from urllib.parse import urlparse
+                import socket
+                import ipaddress
+
+                parsed = urlparse(audio_url)
+                if not parsed.hostname:
+                    return json_error("Invalid audio_url host", code=400)
+                if parsed.hostname.lower() in ("localhost", "127.0.0.1", "::1", "metadata.google.internal"):
+                    return json_error("Forbidden internal audio_url target", code=403)
+                try:
+                    addr_info = socket.getaddrinfo(parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80))
+                    for _, _, _, _, sockaddr in addr_info:
+                        ip_obj = ipaddress.ip_address(sockaddr[0])
+                        if ip_obj.is_loopback or ip_obj.is_private or ip_obj.is_link_local or ip_obj.is_reserved:
+                            return json_error("Forbidden private or internal IP in audio_url", code=403)
+                except Exception as e:
+                    return json_error(f"Cannot resolve audio_url host: {e}", code=400)
+
+                async with httpx.AsyncClient(timeout=30.0, verify=True) as client:
                     resp = await client.get(audio_url)
                     if resp.status_code != 200:
                         return json_error(f"Download audio failed HTTP {resp.status_code}", code=400)
@@ -424,10 +455,16 @@ async def render_avatar_lipsync(request):
                         tmp.write(resp.content)
                         audio_path = tmp.name
                         temp_files.append(audio_path)
-            elif os.path.isfile(audio_url):
-                audio_path = audio_url
             else:
-                return json_error(f"Audio file not found: {audio_url}", code=404)
+                # Confinement check for local file
+                safe_local = os.path.normpath(audio_url)
+                full_local = os.path.abspath(safe_local)
+                allowed_roots = [os.path.abspath("data"), os.path.abspath("media")]
+                is_safe_dir = any(full_local.startswith(root + os.sep) for root in allowed_roots)
+                if is_safe_dir and os.path.isfile(full_local):
+                    audio_path = full_local
+                else:
+                    return json_error("Access denied: Local audio file path outside permitted directories", code=403)
         else:
             return json_error("Either 'text', 'audio_url', or uploaded audio file is required", code=400)
 

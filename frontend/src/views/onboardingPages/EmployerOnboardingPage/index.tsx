@@ -395,7 +395,7 @@ export default function EmployerOnboardingPage() {
             {t('employerOnboarding.consentNotice.text', 'Bằng việc tiếp tục thiết lập, bạn đồng ý với')}{' '}
             <Box
               component="a"
-              href="/employer/thoa-thuan-su-dung.html"
+              href="/thoa-thuan-su-dung.html"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
@@ -405,7 +405,7 @@ export default function EmployerOnboardingPage() {
             ,{' '}
             <Box
               component="a"
-              href="/employer/chinh-sach-bao-mat.html"
+              href="/chinh-sach-bao-mat.html"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
@@ -415,7 +415,7 @@ export default function EmployerOnboardingPage() {
             {t('employerOnboarding.consentNotice.and', 'và')}{' '}
             <Box
               component="a"
-              href="/employer/quy-dinh-dang-tin.html"
+              href="/quy-dinh-dang-tin.html"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: '#2563EB', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}

@@ -49,7 +49,7 @@ square-tuyen-dung/
 ├── .github/copilot-instructions.md   # GitHub Copilot adapter
 ├── .windsurfrules                    # Windsurf adapter
 │
-├── frontend/                         # Next.js 16, React 19, MUI 6, Tailwind v4, TanStack Query, Redux
+├── frontend/                         # Next.js 16, React 19, Tailwind v4, Shadcn UI, TanStack Query, Redux
 │   └── AGENTS.md                     # 📖 Frontend-specific rules & component guidelines
 │
 ├── api/                              # Django 4.2+, DRF, Celery, MySQL 8.0, Redis 7, Elasticsearch 7
@@ -59,9 +59,15 @@ square-tuyen-dung/
 │   └── AGENTS.md                     # 📖 Voice AI, audio streaming & interview engine guidelines
 │
 ├── nginx-gateway/                    # Reverse proxy, SSL termination, subdomain routing
-├── docs/                             # Architecture specifications, audits, and deployment guides
-│   ├── ARCHITECTURE.md               # 📖 Master System Architecture Guide & Archify Blueprints
-│   └── architecture/                 # 🌐 Interactive Archify HTML & JSON models
+├── docs/                             # Engineering documentation hierarchy
+│   ├── coding_guidelines/            # 📖 Coding standards (Git, Backend, Frontend, DoD)
+│   ├── decisions/                    # 🏛️ Architecture Decision Records (ADRs)
+│   ├── features/                     # 🚀 Feature specifications, plans, and questions
+│   ├── progress/                     # 📊 Sprint and milestone progress tracking
+│   ├── BUSINESS_REQUIREMENTS.md      # 💼 Business requirements document (BRD)
+│   ├── domain.md                     # 🌐 Domain model and ubiquitous language (DDD)
+│   ├── MVP.md                        # 🎯 Minimum Viable Product roadmap & checklist
+│   └── README.md                     # 📚 Centralized documentation hub
 └── docker-compose.yml                # Full local & staging orchestration
 ```
 

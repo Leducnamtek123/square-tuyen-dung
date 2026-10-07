@@ -105,9 +105,9 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 3, sm: 5 },
+        p: { xs: 3, sm: 4 },
         backgroundColor: 'background.paper',
-        borderRadius: 4,
+        borderRadius: '4px',
         boxShadow: (theme) => theme.customShadows?.z1,
         border: '1px solid',
         borderColor: 'divider',
@@ -138,7 +138,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
               py: 1.25,
               fontWeight: 700,
               textTransform: 'none',
-              borderRadius: 2,
+              borderRadius: '4px',
             }}
           >
             Xuất lịch phỏng vấn
@@ -156,6 +156,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
               fontWeight: 800,
               textTransform: 'none',
               fontSize: '0.9rem',
+              borderRadius: '4px',
             }}
           >
             {t('interview:interviewListCard.scheduleInterview')}
@@ -176,7 +177,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             sx={{
               fontWeight: 700,
               textTransform: 'none',
-              borderRadius: '8px',
+              borderRadius: '4px',
               px: 2,
               py: 0.75,
               whiteSpace: 'nowrap',
@@ -188,7 +189,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         }
         sx={{
           mb: 3,
-          borderRadius: '12px',
+          borderRadius: '4px',
           bgcolor: 'rgba(37, 99, 235, 0.05)',
           border: '1px solid rgba(37, 99, 235, 0.15)',
           alignItems: { xs: 'flex-start', sm: 'center' },

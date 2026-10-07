@@ -1,14 +1,123 @@
 # robots.txt - InfoHR Tuyển Dụng
 # https://www.robotstxt.org/robotstxt.html
 
+# --- AI Crawlers & Search Engines (Explicit Access) ---
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /cap-nhat-mat-khau/
+Disallow: /email-verification-required
+Disallow: /bang-dieu-khien
+Disallow: /ho-so
+Disallow: /viec-lam-cua-toi
+Disallow: /cong-ty-cua-toi
+Disallow: /phong-van-cua-toi
+Disallow: /tai-khoan
+Disallow: /thong-bao
+Disallow: /phong-van/
+Disallow: /forbidden
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /phong-van/
+Disallow: /forbidden
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /phong-van/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /phong-van/
+Disallow: /forbidden
+
+User-agent: Claude-User
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /phong-van/
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /phong-van/
+Disallow: /forbidden
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /phong-van/
+Disallow: /forbidden
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /phong-van/
+Disallow: /forbidden
+
+# --- Standard Search Engine Crawlers ---
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /phong-van/
+Disallow: /forbidden
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /phong-van/
+Disallow: /forbidden
+
+# --- Default Crawlers ---
 User-agent: *
 Allow: /
 Allow: /viec-lam
 Allow: /cong-ty
 Allow: /ve-chung-toi
+Allow: /tin-tuc
 Allow: /viec-lam-theo-nganh-nghe
 Allow: /viec-lam-theo-tinh-thanh
 Allow: /viec-lam-theo-hinh-thuc-lam-viec
+Allow: /practice
+Allow: /tra-cuu-luong
+Allow: /tao-cv
+Allow: /danh-sach-mau-cv
 
 # Disallow authenticated & admin/employer portal paths
 Disallow: /admin/
@@ -29,6 +138,5 @@ Disallow: /thong-bao
 Disallow: /phong-van/
 Disallow: /forbidden
 
-# Sitemap location
+# Sitemaps & Specifications
 Sitemap: https://infohr.vn/sitemap.xml
-

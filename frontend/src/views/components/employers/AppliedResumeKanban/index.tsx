@@ -19,6 +19,7 @@ import {
   MenuItem,
   useMediaQuery,
   useTheme,
+  Skeleton,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -316,11 +317,61 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
   );
 
   if (isLoading) {
-    return <LinearProgress sx={{ my: 4, borderRadius: 2 }} />;
+    return (
+      <Box sx={{ width: '100%', minWidth: 0, overflowX: 'auto', pb: 2, minHeight: 500 }}>
+        <Stack
+          direction="row"
+          spacing={2.5}
+          sx={{ minWidth: { xs: '100%', md: (statuses.length || 4) * 320 + 'px' }, alignItems: 'flex-start' }}
+        >
+          {Array.from({ length: statuses.length || 4 }).map((_, col) => (
+            <Box
+              key={col}
+              sx={{
+                width: { xs: '100%', md: 320 },
+                bgcolor: '#F8FAFC',
+                borderRadius: '16px',
+                p: 2,
+                border: '1px solid #E2E8F0',
+                minHeight: 450,
+              }}
+            >
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                <Skeleton variant="text" width="55%" height={26} />
+                <Skeleton variant="rectangular" width={26} height={20} sx={{ borderRadius: '12px' }} />
+              </Stack>
+              <Stack spacing={2}>
+                {[1, 2, 3].map((card) => (
+                  <Box
+                    key={card}
+                    sx={{
+                      p: 2,
+                      bgcolor: '#FFFFFF',
+                      borderRadius: '12px',
+                      border: '1px solid #F1F5F9',
+                    }}
+                  >
+                    <Stack direction="row" spacing={1.5} alignItems="center" mb={1.5}>
+                      <Skeleton variant="circular" width={40} height={40} />
+                      <Box sx={{ flex: 1 }}>
+                        <Skeleton variant="text" width="80%" height={20} />
+                        <Skeleton variant="text" width="50%" height={16} />
+                      </Box>
+                    </Stack>
+                    <Skeleton variant="rectangular" width="100%" height={32} sx={{ borderRadius: 1, mb: 1 }} />
+                    <Skeleton variant="text" width="40%" height={16} />
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+    );
   }
 
   return (
-    <>
+    <Box sx={{ width: '100%', minWidth: 0, maxWidth: '100%' }}>
       {openDrawerId && selectedActivityInfo && (
         <AIAnalysisDrawer
           open={Boolean(openDrawerId)}
@@ -337,7 +388,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
       )}
 
       {/* Mobile Status Tabs Switcher */}
-      <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 2 }}>
+      <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 2, width: '100%', minWidth: 0, overflowX: 'auto' }}>
         <Tabs
           value={mobileSelectedStatus || (statuses[0]?.id ? String(statuses[0].id) : false)}
           onChange={(_, val) => setMobileSelectedStatus(String(val))}
@@ -370,7 +421,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
         </Tabs>
       </Box>
 
-      <Box sx={{ width: '100%', overflowX: isMobile ? 'visible' : 'auto', pb: 2, minHeight: '500px' }}>
+      <Box sx={{ width: '100%', minWidth: 0, overflowX: isMobile ? 'visible' : 'auto', pb: 2, minHeight: '500px' }}>
         <DragDropContext onDragEnd={handleDragEnd}>
           <Stack
             direction="row"
@@ -430,35 +481,23 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
                         {columnCount === 0 ? (
                           <Box
                             sx={{
+                              minHeight: '7rem',
+                              border: '1.5px dashed #CBD5E1',
+                              borderRadius: 2.5,
                               display: 'flex',
-                              flexDirection: 'column',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              py: 6,
-                              px: 2,
+                              p: 2,
+                              bgcolor: 'rgba(241, 245, 249, 0.4)',
                             }}
                           >
-                            <Box
-                              sx={{
-                                width: 56,
-                                height: 56,
-                                borderRadius: '50%',
-                                bgcolor: statusStyle.badgeBg,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                mb: 1.5,
-                              }}
-                            >
-                              {statusStyle.icon}
-                            </Box>
                             <Typography
-                              variant="body2"
+                              variant="caption"
                               sx={{
                                 color: '#64748B',
                                 fontWeight: 500,
                                 textAlign: 'center',
-                                fontSize: '13px',
+                                userSelect: 'none',
                               }}
                             >
                               Chưa có ứng viên ở trạng thái này
@@ -837,7 +876,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({
           );
         })}
       </Menu>
-    </>
+    </Box>
   );
 };
 

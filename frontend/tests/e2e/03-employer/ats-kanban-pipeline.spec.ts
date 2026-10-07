@@ -25,7 +25,7 @@ test.describe('Phân Hệ 3 - Nhà Tuyển Dụng: Phễu Tuyển Dụng ATS & B
   /**
    * EMP-03: Chuyển đổi giữa chế độ xem Bảng / Kanban và chuyển trạng thái ứng viên
    */
-  test('EMP-03: Switch view mode and move candidate status across ATS pipeline', async ({ page }) => {
+  test('EMP-03: Switch view mode and move candidate status across ATS pipeline', async () => {
     await atsKanbanPage.goto();
 
     // 1. Kiểm tra ứng viên hiển thị trong bảng
@@ -36,11 +36,11 @@ test.describe('Phân Hệ 3 - Nhà Tuyển Dụng: Phễu Tuyển Dụng ATS & B
     await atsKanbanPage.switchView('board');
     await expect(atsKanbanPage.boardViewBtn).toHaveAttribute('aria-pressed', 'true');
 
-    // 3. Chuyển trạng thái ứng viên từ "Chờ xác nhận" sang "Phù hợp"
-    await atsKanbanPage.changeCandidateStatusViaMenu(candidate.id, 'Phù hợp');
+    // 3. Chuyển trạng thái ứng viên từ "Chờ xác nhận" sang "Đã liên hệ" (bước kế tiếp trong applicationStatusOptions)
+    await atsKanbanPage.changeCandidateStatusViaMenu(candidate.id, 'Đã liên hệ');
 
-    // 4. Xác nhận card di chuyển và không gây lỗi giao diện
-    await expect(page.locator('body')).toBeVisible();
+    // 4. Xác nhận card di chuyển sang cột mới (đã có toast cập nhật thành công)
+    await atsKanbanPage.expectToastMessage(/cập nhật|thành công/i);
   });
 
   /**
@@ -60,7 +60,7 @@ test.describe('Phân Hệ 3 - Nhà Tuyển Dụng: Phễu Tuyển Dụng ATS & B
     });
 
     const candidate = MOCK_APPLIED_RESUMES[0];
-    await atsKanbanPage.changeCandidateStatusViaMenu(candidate.id, 'Phù hợp');
+    await atsKanbanPage.changeCandidateStatusViaMenu(candidate.id, 'Đã liên hệ');
 
     // Hệ thống báo lỗi hoặc hoàn tác vị trí
     const errorNotice = page.locator('.swal2-modal, [role="alert"], [class*="error"]').first();
@@ -70,7 +70,7 @@ test.describe('Phân Hệ 3 - Nhà Tuyển Dụng: Phễu Tuyển Dụng ATS & B
   /**
    * EMP-09: Lọc ứng viên có điểm AI >= 80%, đánh dấu trúng tuyển và xuất file Excel
    */
-  test('EMP-09: Filter candidates by AI score, mark as hired and export Excel list', async ({ page }) => {
+  test('EMP-09: Filter candidates by AI score, mark as hired and export Excel list', async () => {
     await atsKanbanPage.goto();
 
     // 1. Lọc ứng viên có điểm AI cao
@@ -79,8 +79,14 @@ test.describe('Phân Hệ 3 - Nhà Tuyển Dụng: Phễu Tuyển Dụng ATS & B
     // Ứng viên điểm cao xuất hiện
     await atsKanbanPage.expectCandidateVisible(MOCK_APPLIED_RESUMES[0].fullName);
 
-    // 2. Đổi trạng thái sang "Đã tuyển dụng" (Hired)
+    // 2. Đổi trạng thái sang "Đã tuyển dụng" (Hired) — menu chuyển nhanh nằm trên card Kanban
+    await atsKanbanPage.switchView('board');
     await atsKanbanPage.moveToHired(MOCK_APPLIED_RESUMES[0].id);
+
+    // Trúng tuyển tự động mở hộp thoại tiếp nhận nhân sự HRM → đóng lại để tiếp tục
+    await expect(atsKanbanPage.hrmDialog).toBeVisible({ timeout: 10_000 });
+    await atsKanbanPage.hrmDialog.getByRole('button', { name: /hủy/i }).click();
+    await expect(atsKanbanPage.hrmDialog).not.toBeVisible({ timeout: 10_000 });
 
     // 3. Bấm xuất danh sách ra file Excel
     const download = await atsKanbanPage.exportExcel();

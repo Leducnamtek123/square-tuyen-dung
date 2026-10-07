@@ -35,7 +35,7 @@ import dayjs from 'dayjs';
 import { ROUTES } from '@/configs/constants';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { interviewService } from '@/services/interviewService';
-import { useEmployerVoiceProfiles } from '../hooks/useEmployerQueries';
+import { useEmployerInterviewScripts, useEmployerVoiceProfiles } from '../hooks/useEmployerQueries';
 import { getAppliedResumeJobPostId } from '../appliedResumeUtils';
 import toastMessages from '@/utils/toastMessages';
 import employerAiSettingService from '@/services/employerAiSettingService';
@@ -58,6 +58,8 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
   const { push } = useRouter();
   const queryClient = useQueryClient();
   const { data: voiceProfilesData } = useEmployerVoiceProfiles();
+  const { data: scriptsData } = useEmployerInterviewScripts();
+  const interviewScripts = scriptsData || [];
   const aiSettings = employerAiSettingService.getSettings();
 
   const [interviewFormat, setInterviewFormat] = useState<'ai' | 'live'>('ai');
@@ -65,10 +67,23 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
     dayjs().add(1, 'day').hour(9).minute(0).format('YYYY-MM-DDTHH:mm')
   );
   const [interviewType, setInterviewType] = useState<'mixed' | 'technical' | 'behavioral'>('mixed');
+  const [selectedScriptId, setSelectedScriptId] = useState<string | number>('');
   const [selectedVoiceProfileId, setSelectedVoiceProfileId] = useState<string | number>('auto');
   const [notes, setNotes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const handleScriptChange = (val: string | number) => {
+    setSelectedScriptId(val);
+    if (!val) return;
+    const script = interviewScripts.find((s) => String(s.id) === String(val));
+    if (script) {
+      const scType = (script.scenario_type || script.scenarioType) as any;
+      if (scType && ['mixed', 'technical', 'behavioral'].includes(scType)) {
+        setInterviewType(scType);
+      }
+    }
+  };
 
   React.useEffect(() => {
     if (open) {
@@ -79,8 +94,21 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
           ? 'Phỏng vấn tự động cùng AI Recruiter. Ứng viên vui lòng sử dụng tai nghe và micro trong không gian yên tĩnh.'
           : 'Phỏng vấn trực tiếp cùng Hội đồng tuyển dụng qua phòng họp trực tuyến.'
       );
+      if (interviewScripts.length > 0) {
+        const candidateJobScriptId =
+          (candidate as any)?.jobPost?.interview_script ||
+          (candidate as any)?.jobPost?.interviewScript ||
+          (candidate as any)?.jobPostDict?.interview_script;
+        const matchingScript = candidateJobScriptId
+          ? interviewScripts.find((s) => String(s.id) === String(candidateJobScriptId))
+          : null;
+        const defaultScript = matchingScript || interviewScripts[0];
+        if (defaultScript) {
+          handleScriptChange(defaultScript.id);
+        }
+      }
     }
-  }, [open, interviewFormat]);
+  }, [open, interviewFormat, interviewScripts.length]);
 
   if (!candidate) return null;
 
@@ -145,6 +173,7 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
         scheduled_at: dayjs(scheduledAt).toISOString(),
         type: interviewType,
         voice_profile: voiceProfile,
+        interview_script: selectedScriptId ? Number(selectedScriptId) : undefined,
         notes: notes.trim(),
         session_metadata: {
           interview_format: interviewFormat,
@@ -367,7 +396,43 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
 
             {/* AI Specific Options */}
             {interviewFormat === 'ai' && (
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+              <>
+                <Box>
+                  <Typography variant="body2" sx={{ fontWeight: 700, color: '#334155', mb: 0.75 }}>
+                    Kịch bản Phỏng vấn AI
+                  </Typography>
+                  <TextField
+                    select
+                    fullWidth
+                    size="small"
+                    value={selectedScriptId}
+                    onChange={(e) => handleScriptChange(e.target.value)}
+                    disabled={isSubmitting}
+                    helperText="Áp dụng kịch bản AI đã thiết lập sẵn (thời lượng, tính cách và tiêu chí đánh giá)"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        bgcolor: '#FFFFFF',
+                      },
+                    }}
+                  >
+                    <MenuItem value="">
+                      <em>Không áp dụng kịch bản riêng (Tự cấu hình)</em>
+                    </MenuItem>
+                    {interviewScripts.map((script) => {
+                      const scenario = script.scenario_type_display || script.scenarioTypeDisplay || 'Kịch bản';
+                      const persona = script.hr_persona_display || script.hrPersonaDisplay || '';
+                      const duration = script.time_limit_per_question || script.timeLimitPerQuestion;
+                      return (
+                        <MenuItem key={script.id} value={script.id}>
+                          {script.name} — [{scenario}{persona ? ` • ${persona}` : ''}{duration ? ` • ${duration}s/câu` : ''}]
+                        </MenuItem>
+                      );
+                    })}
+                  </TextField>
+                </Box>
+
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="body2" sx={{ fontWeight: 700, color: '#334155', mb: 0.75 }}>
                     Loại phỏng vấn
@@ -421,6 +486,7 @@ export const QuickScheduleInterviewModal: React.FC<QuickScheduleInterviewModalPr
                   </TextField>
                 </Box>
               </Stack>
+              </>
             )}
 
             {/* Notes / Message to Candidate */}

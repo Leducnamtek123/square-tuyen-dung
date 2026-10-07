@@ -43,8 +43,8 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
         elevation={0}
         onClick={handleOpenUserMenu}
         sx={{
-          p: '4px 12px 4px 4px',
-          borderRadius: '20px',
+          p: '4px 10px 4px 4px',
+          borderRadius: '4px',
           backgroundColor: '#FFFFFF',
           border: '1px solid #E5E7EB',
           cursor: 'pointer',
@@ -59,7 +59,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
           <Avatar
             alt={currentUser?.fullName}
             src={currentUser?.avatarUrl || undefined}
-            sx={{ width: 28, height: 28, fontSize: '0.8125rem', bgcolor: '#2563EB', color: '#FFFFFF' }}
+            sx={{ width: 28, height: 28, fontSize: '0.8125rem', bgcolor: '#2563EB', color: '#FFFFFF', borderRadius: '3px' }}
           >
             {currentUser?.fullName?.charAt(0)?.toUpperCase()}
           </Avatar>

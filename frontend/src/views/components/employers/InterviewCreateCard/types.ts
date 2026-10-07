@@ -4,6 +4,7 @@ export interface FormValues {
   scheduled_at: string;
   voice_profile: string | number;
   selected_group: string | number;
+  selected_script?: string | number;
   selected_questions: number[];
 
   // AI Studio & Avatar Parameters

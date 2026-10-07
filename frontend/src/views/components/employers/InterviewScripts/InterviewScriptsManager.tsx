@@ -10,7 +10,7 @@ import {
   Tab,
   TextField,
   InputAdornment,
-  Grid,
+  Grid2 as Grid,
   CircularProgress,
   Skeleton,
   Paper,
@@ -149,8 +149,8 @@ export const InterviewScriptsManager: React.FC = () => {
   };
 
   // Compute counts for tabs
-  const companyCount = useMemo(() => scripts.filter((s) => !s.is_system_preset).length, [scripts]);
-  const systemCount = useMemo(() => scripts.filter((s) => s.is_system_preset).length, [scripts]);
+  const companyCount = useMemo(() => scripts.filter((s) => !(s.is_system_preset ?? s.isSystemPreset)).length, [scripts]);
+  const systemCount = useMemo(() => scripts.filter((s) => Boolean(s.is_system_preset ?? s.isSystemPreset)).length, [scripts]);
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -266,7 +266,7 @@ export const InterviewScriptsManager: React.FC = () => {
 
         {/* Filters Row */}
         <Grid container spacing={2} sx={{ mt: 2 }} alignItems="center">
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <TextField
               fullWidth
               size="small"
@@ -285,7 +285,7 @@ export const InterviewScriptsManager: React.FC = () => {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3.5}>
+          <Grid size={{ xs: 12, sm: 6, md: 3.5 }}>
             <FormControl fullWidth size="small">
               <InputLabel id="filter-scenario-label">Loại kịch bản</InputLabel>
               <Select
@@ -304,7 +304,7 @@ export const InterviewScriptsManager: React.FC = () => {
             </FormControl>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3.5}>
+          <Grid size={{ xs: 12, sm: 6, md: 3.5 }}>
             <FormControl fullWidth size="small">
               <InputLabel id="filter-persona-label">Phong thái HR</InputLabel>
               <Select
@@ -329,7 +329,7 @@ export const InterviewScriptsManager: React.FC = () => {
       {loading ? (
         <Grid container spacing={2.5}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Grid item xs={12} md={6} lg={4} key={i}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={i}>
               <Paper sx={{ p: 2.5, borderRadius: 3, border: '1px solid #e2e8f0' }}>
                 <Skeleton variant="text" width="60%" height={32} sx={{ mb: 1 }} />
                 <Skeleton variant="text" width="90%" height={20} />
@@ -385,7 +385,7 @@ export const InterviewScriptsManager: React.FC = () => {
       ) : (
         <Grid container spacing={2.5}>
           {scripts.map((script) => (
-            <Grid item xs={12} md={6} lg={4} key={script.id}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }} key={script.id}>
               <InterviewScriptCard
                 script={script}
                 onPreview={(s) => setPreviewingScript(s)}

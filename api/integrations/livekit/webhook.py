@@ -127,9 +127,25 @@ def _handle_livekit_event(payload: Any) -> None:
         return
 
     if event in {"room_started", "room_start"}:
+        was_interrupted = session.status == "interrupted"
         if session.status in {"draft", "scheduled", "calibration", "processing", "interrupted"}:
             update_interview_status(session, "in_progress")
             logger.info("LiveKit webhook: session %s marked in_progress", session.id)
+            if was_interrupted:
+                try:
+                    from apps.interviews.models import InterviewConnectionLog
+                    from django.utils import timezone
+                    downtime = (timezone.now() - session.update_at).total_seconds() if session.update_at else 0.0
+                    InterviewConnectionLog.objects.create(
+                        session=session,
+                        participant_identity=f"agent-{session.room_name}",
+                        participant_role="agent",
+                        event_type="reconnected",
+                        downtime_seconds=max(0.0, float(downtime)),
+                        metadata={"source": "livekit_webhook", "event": event},
+                    )
+                except Exception as exc:
+                    logger.warning("LiveKit webhook: failed to log reconnection for session %s: %s", session.id, exc)
     elif event in {"room_finished", "room_ended", "room_stopped", "room_disconnected"}:
         if session.status not in {"completed", "cancelled", "processing"}:
             if (session.session_metadata or {}).get("persistent"):
@@ -137,6 +153,18 @@ def _handle_livekit_event(payload: Any) -> None:
                 return
             update_interview_status(session, "interrupted")
             logger.info("LiveKit webhook: session %s marked interrupted", session.id)
+            try:
+                from apps.interviews.models import InterviewConnectionLog
+                InterviewConnectionLog.objects.create(
+                    session=session,
+                    participant_identity=f"agent-{session.room_name}",
+                    participant_role="agent",
+                    event_type="disconnected",
+                    downtime_seconds=0.0,
+                    metadata={"source": "livekit_webhook", "event": event},
+                )
+            except Exception as exc:
+                logger.warning("LiveKit webhook: failed to log disconnection for session %s: %s", session.id, exc)
 
     recording_url = _extract_recording_url(payload)
     if recording_url and recording_url != session.recording_url:

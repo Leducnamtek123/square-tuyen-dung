@@ -1072,6 +1072,9 @@ def upload_file(request):
         upload_result = CloudinaryService.upload_file(file_obj, folder)
         
         if upload_result:
+            if isinstance(upload_result, dict) and hasattr(request, "user") and getattr(request.user, "is_authenticated", False):
+                upload_result = dict(upload_result)
+                upload_result["uploaded_by_user_id"] = request.user.id
             file_instance = File.update_or_create_file_with_cloudinary(
                 None,
                 upload_result,

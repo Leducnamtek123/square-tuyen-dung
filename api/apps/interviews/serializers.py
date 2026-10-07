@@ -19,6 +19,7 @@ from apps.jobs.models import JobPost
 from apps.common import serializers as common_serializers
 from shared.configs import variable_system as var_sys
 from apps.accounts.permissions import user_has_company_permission
+from apps.accounts.active_company import apply_active_company_from_request
 
 
 def _is_admin_user(user) -> bool:
@@ -30,6 +31,11 @@ def _request_active_company(request):
     user = getattr(request, "user", None)
     if not user or not getattr(user, "is_authenticated", False):
         return None
+    if request is not None:
+        try:
+            apply_active_company_from_request(request)
+        except Exception:
+            pass
     try:
         return user.get_active_company()
     except Exception:
@@ -1238,10 +1244,52 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
         # Set status to scheduled by default for new interviews created via this serializer
         validated_data.setdefault('status', 'scheduled')
         session = InterviewSession.objects.create(**validated_data)
+
+        # 1. Explicit question_ids provided
         if question_ids:
             session.questions.set(question_ids)
+        # 2. Direct question_group attached to session
         elif session.question_group:
             session.questions.set(session.question_group.questions.all())
+        # 3. Direct interview_script attached to session
+        elif session.interview_script:
+            script_qs = session.interview_script.questions.all()
+            if script_qs.exists():
+                session.questions.set(script_qs)
+            elif session.interview_script.question_group:
+                session.questions.set(session.interview_script.question_group.questions.all())
+
+        # Câu hỏi fallback chỉ được lấy từ ngân hàng chung hoặc của chính công ty tuyển dụng
+        # (khớp với rule tenant trong validate()). Model Question không có field is_active.
+        job_company_id = getattr(session.job_post, 'company_id', None) if session.job_post else None
+        scoped_question_qs = Question.objects.filter(
+            Q(company__isnull=True) | Q(company_id=job_company_id)
+        ) if job_company_id else Question.objects.filter(company__isnull=True)
+
+        # 4. Fallback to JobPost configuration if session still has no questions
+        if not session.questions.exists() and session.job_post:
+            jp = session.job_post
+            if getattr(jp, 'interview_script', None):
+                if not session.interview_script:
+                    session.interview_script = jp.interview_script
+                    session.save(update_fields=['interview_script'])
+                jp_script_qs = jp.interview_script.questions.all()
+                if jp_script_qs.exists():
+                    session.questions.set(jp_script_qs)
+                elif jp.interview_script.question_group:
+                    session.questions.set(jp.interview_script.question_group.questions.all())
+            elif getattr(jp, 'interview_template', None):
+                session.questions.set(jp.interview_template.questions.all())
+            elif getattr(jp, 'career', None):
+                career_qs = scoped_question_qs.filter(career=jp.career)[:5]
+                if career_qs.exists():
+                    session.questions.set(career_qs)
+
+        # 5. Ultimate fallback: Ensure official interviews never enter room with 0 questions
+        if not session.questions.exists():
+            fallback_qs = scoped_question_qs[:5]
+            if fallback_qs.exists():
+                session.questions.set(fallback_qs)
 
         try:
             from .tasks import prewarm_interview_tts_task
@@ -1258,6 +1306,12 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
             session.questions.set(question_ids)
         elif 'question_group' in validated_data and session.question_group:
             session.questions.set(session.question_group.questions.all())
+        elif 'interview_script' in validated_data and session.interview_script:
+            script_qs = session.interview_script.questions.all()
+            if script_qs.exists():
+                session.questions.set(script_qs)
+            elif session.interview_script.question_group:
+                session.questions.set(session.interview_script.question_group.questions.all())
         return session
 
 class InterviewContextSerializer(serializers.Serializer):
@@ -1304,5 +1358,31 @@ class InterviewProctoringEventSerializer(serializers.ModelSerializer):
             'create_at', 'createAt'
         ]
         read_only_fields = ['id', 'create_at', 'timestamp']
+
+
+class InterviewConnectionLogSerializer(serializers.ModelSerializer):
+    participantIdentity = serializers.CharField(source="participant_identity", read_only=True)
+    participantRole = serializers.CharField(source="participant_role", read_only=True)
+    eventType = serializers.CharField(source="event_type", read_only=True)
+    eventTypeLabel = serializers.CharField(source="get_event_type_display", read_only=True)
+    downtimeSeconds = serializers.FloatField(source="downtime_seconds", read_only=True)
+    reconnectAttempt = serializers.IntegerField(source="reconnect_attempt", read_only=True)
+    networkQuality = serializers.CharField(source="network_quality", read_only=True)
+    details = serializers.JSONField(source="metadata", read_only=True)
+    createAt = serializers.DateTimeField(source="create_at", read_only=True)
+
+    class Meta:
+        from .models import InterviewConnectionLog
+        model = InterviewConnectionLog
+        fields = [
+            'id', 'session', 'participant_identity', 'participantIdentity',
+            'participant_role', 'participantRole', 'event_type', 'eventType',
+            'eventTypeLabel', 'downtime_seconds', 'downtimeSeconds',
+            'reconnect_attempt', 'reconnectAttempt', 'network_quality',
+            'networkQuality', 'metadata', 'details', 'timestamp', 'create_at', 'createAt'
+        ]
+        read_only_fields = ['id', 'session', 'create_at', 'timestamp']
+
+
 
 

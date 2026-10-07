@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Collapse, List, ListItem } from '@mui/material';
+import { Box, Collapse, Divider, List, ListItem, Typography } from '@mui/material';
 import GridViewIcon from '@mui/icons-material/GridView';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
@@ -13,6 +13,7 @@ import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import LaunchOutlinedIcon from '@mui/icons-material/LaunchOutlined';
 import { ROUTES, APP_NAME, LINKS } from '@/configs/constants';
 import { getLocalizedRouteVariants, localizeRoutePath } from '@/configs/routeLocalization';
+import { isEmployerHostname, stripPortalPrefix } from '@/configs/portalRouting';
 import MenuItem from './MenuItem';
 
 interface EmployerMenuProps {
@@ -26,14 +27,48 @@ interface EmployerMenuProps {
 }
 
 const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, liveInterviewCount = 0, isCollapsed = false }: EmployerMenuProps) => {
-  const routePath = (route: string) => localizeRoutePath(`/${route}`, language);
+  const routePath = (route: string) => {
+    const rawLocalized = localizeRoutePath(`/${route}`, language);
+    if (typeof window !== 'undefined') {
+      const hn = window.location.hostname;
+      if (isEmployerHostname(hn)) {
+        return stripPortalPrefix(rawLocalized, hn);
+      }
+    }
+    return rawLocalized;
+  };
+
   const isSelected = (route: string) => {
     const pathname = location.pathname || '';
-    return getLocalizedRouteVariants(`/${route}`).some((path) => pathname === path || pathname.startsWith(`${path}/`));
+    const variants = getLocalizedRouteVariants(`/${route}`);
+    const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
+    const onEmployerDomain = isEmployerHostname(hostName);
+    return variants.some((path) => {
+      const target = onEmployerDomain ? stripPortalPrefix(path, hostName) : path;
+      return pathname === target || pathname.startsWith(`${target}/`);
+    });
   };
 
   return (
     <>
+      {!isCollapsed && (
+        <Box sx={{ px: 2, pt: 1, pb: 0.5 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: '#94a3b8',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              fontSize: '0.68rem',
+              userSelect: 'none',
+            }}
+          >
+            {t('employer:sidebar.sectionRecruitment', { defaultValue: 'Tuyển dụng & Phỏng vấn' })}
+          </Typography>
+        </Box>
+      )}
+
       <ListItem disablePadding>
         <MenuItem icon={GridViewIcon} text={t('employer:sidebar.dashboard')} to={routePath(ROUTES.EMPLOYER.DASHBOARD)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.DASHBOARD) }} />
       </ListItem>
@@ -118,6 +153,26 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
         </Collapse>
       )}
 
+      {isCollapsed ? (
+        <Divider sx={{ my: 1, borderColor: '#f1f5f9' }} />
+      ) : (
+        <Box sx={{ px: 2, pt: 1.75, pb: 0.5 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: '#94a3b8',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              fontSize: '0.68rem',
+              userSelect: 'none',
+            }}
+          >
+            {t('employer:sidebar.sectionAccount', { defaultValue: 'Doanh nghiệp & Cài đặt' })}
+          </Typography>
+        </Box>
+      )}
+
       <ListItem disablePadding>
         <MenuItem icon={NotificationsNoneOutlinedIcon} text={t('employer:sidebar.notifications')} to={routePath(ROUTES.EMPLOYER.NOTIFICATION)} isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.NOTIFICATION) }} />
       </ListItem>
@@ -147,6 +202,41 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand, language, live
             <MenuItem text={t('employer:sidebar.settings')} to={routePath(ROUTES.EMPLOYER.SETTING)} kind="child" isCollapsed={isCollapsed} state={{ selected: isSelected(ROUTES.EMPLOYER.SETTING) }} />
           </List>
         </Collapse>
+      )}
+
+      <Divider sx={{ my: 1.5, borderColor: '#f1f5f9' }} />
+      {!isCollapsed && (
+        <Box sx={{ px: 2, pt: 0.5, pb: 0.75, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: '#94a3b8',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              fontSize: '0.68rem',
+              userSelect: 'none',
+            }}
+          >
+            {t('employer:sidebar.sectionHrm', { defaultValue: 'Không gian nhân sự HRM' })}
+          </Typography>
+          <Box
+            component="span"
+            sx={{
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              color: '#0284c7',
+              bgcolor: '#e0f2fe',
+              px: 0.75,
+              py: 0.2,
+              borderRadius: '4px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
+          >
+            HRM
+          </Box>
+        </Box>
       )}
 
       <ListItem disablePadding>

@@ -6,7 +6,9 @@ import {
     Autocomplete,
     Box,
     Button,
+    Chip,
     CircularProgress,
+    Collapse,
     Dialog,
     DialogActions,
     DialogContent,
@@ -31,6 +33,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
+import TuneIcon from '@mui/icons-material/Tune';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
 import DataTable from '@/components/Common/DataTable';
@@ -153,6 +156,20 @@ const ProfilesPage = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openBulkDeleteDialog, setOpenBulkDeleteDialog] = useState(false);
     const [openImportDialog, setOpenImportDialog] = useState(() => Boolean(readPersistedImportJobId()));
+    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+    const activeAdvancedCount = useMemo(() => {
+        let count = 0;
+        if (filters.careerId) count++;
+        if (filters.experienceId) count++;
+        if (filters.positionId) count++;
+        if (filters.academicLevelId) count++;
+        if (filters.typeOfWorkplaceId) count++;
+        if (filters.jobTypeId) count++;
+        if (filters.genderId) count++;
+        if (filters.maritalStatusId) count++;
+        return count;
+    }, [filters]);
     const [currentProfile, setCurrentProfile] = useState<JobSeekerProfile | null>(null);
     const [importForm, setImportForm] = useState({
         sourceUrl: 'https://ntd.vieclam24h.vn/tim-kiem-ung-vien-nhanh',
@@ -522,24 +539,26 @@ const ProfilesPage = () => {
                             <span>
                                 <Button
                                     variant="text"
-                                    color="error"
+                                    color="inherit"
                                     size="small"
                                     onClick={handleResetFilters}
                                     sx={{
-                                        minWidth: 44,
-                                        height: 44,
+                                        minWidth: 40,
+                                        height: 40,
                                         p: 0,
+                                        color: 'text.secondary',
+                                        '&:hover': { color: 'text.primary', bgcolor: 'action.hover' },
                                     }}
                                 >
-                                    <RefreshIcon sx={{ fontSize: 22 }} />
+                                    <RefreshIcon sx={{ fontSize: 20 }} />
                                 </Button>
                             </span>
                         </Tooltip>
                     </Stack>
 
                     <Box component="form" onSubmit={handleSubmit(() => onPaginationChange({ pageIndex: 0, pageSize }))}>
-                        <Grid container spacing={2}>
-                            <Grid size={{ xs: 12, md: 6, lg: 6.5 }}>
+                        <Grid container spacing={1.5} alignItems="center">
+                            <Grid size={{ xs: 12, sm: 6, md: 5, lg: 5.5 }}>
                                 <TextFieldCustom
                                     name="kw"
                                     placeholder={t('employer:profileSearch.placeholder.enterkeywords')}
@@ -547,7 +566,7 @@ const ProfilesPage = () => {
                                     icon={<SearchIcon sx={{ color: 'primary.main' }} />}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, md: 3, lg: 3 }}>
+                            <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
                                 <SingleSelectCustom
                                     name="cityId"
                                     control={control}
@@ -555,7 +574,7 @@ const ProfilesPage = () => {
                                     placeholder={t('employer:profileSearch.placeholder.selectcityprovince')}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, md: 3, lg: 2.5 }}>
+                            <Grid size={{ xs: 6, sm: 6, md: 2, lg: 1.75 }}>
                                 <Button
                                     variant="contained"
                                     color="primary"
@@ -563,95 +582,128 @@ const ProfilesPage = () => {
                                     type="submit"
                                     fullWidth
                                     sx={{
-                                        height: 42,
+                                        height: 40,
                                         boxShadow: (theme) => theme.customShadows?.primary,
-                                        fontWeight: 900,
-                                        fontSize: '0.98rem',
+                                        fontWeight: 700,
+                                        fontSize: '0.875rem',
                                         textTransform: 'none',
-                                        letterSpacing: '0.5px',
                                     }}
                                 >
                                     {t('employer:profileSearch.label.search')}
                                 </Button>
                             </Grid>
-                        </Grid>
-
-                        <Divider sx={{ my: 2, borderStyle: 'dashed', opacity: 0.6 }} />
-
-                        <Grid container spacing={2.25}>
-                            <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-                                <SingleSelectCustom
-                                    name="careerId"
-                                    control={control}
-                                    options={allConfig?.careerOptions || []}
-                                    title={t('employer:profileSearch.label.careers')}
-                                    placeholder={t('employer:profileSearch.placeholder.allcareers')}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-                                <SingleSelectCustom
-                                    name="experienceId"
-                                    control={control}
-                                    options={allConfig?.experienceOptions || []}
-                                    title={t('employer:profileSearch.label.experience')}
-                                    placeholder={t('employer:profileSearch.placeholder.allexperience')}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-                                <SingleSelectCustom
-                                    name="positionId"
-                                    control={control}
-                                    options={allConfig?.positionOptions || []}
-                                    title={t('employer:profileSearch.label.position')}
-                                    placeholder={t('employer:profileSearch.placeholder.allpositions')}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-                                <SingleSelectCustom
-                                    name="academicLevelId"
-                                    control={control}
-                                    options={allConfig?.academicLevelOptions || []}
-                                    title={t('employer:profileSearch.label.academicLevel')}
-                                    placeholder={t('employer:profileSearch.placeholder.allacademiclevels')}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-                                <SingleSelectCustom
-                                    name="typeOfWorkplaceId"
-                                    control={control}
-                                    options={allConfig?.typeOfWorkplaceOptions || []}
-                                    title={t('employer:profileSearch.label.workplace')}
-                                    placeholder={t('employer:profileSearch.placeholder.allworkplaces')}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-                                <SingleSelectCustom
-                                    name="jobTypeId"
-                                    control={control}
-                                    options={allConfig?.jobTypeOptions || []}
-                                    title={t('employer:profileSearch.label.employmentType')}
-                                    placeholder={t('employer:profileSearch.placeholder.allemploymenttypes')}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-                                <SingleSelectCustom
-                                    name="genderId"
-                                    control={control}
-                                    options={allConfig?.genderOptions || []}
-                                    title={t('employer:profileSearch.label.gender')}
-                                    placeholder={t('employer:profileSearch.placeholder.allgenders')}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, md: 6, lg: 3 }}>
-                                <SingleSelectCustom
-                                    name="maritalStatusId"
-                                    control={control}
-                                    options={allConfig?.maritalStatusOptions || []}
-                                    title={t('employer:profileSearch.label.maritalStatus')}
-                                    placeholder={t('employer:profileSearch.placeholder.allmaritalstatuses')}
-                                />
+                            <Grid size={{ xs: 6, sm: 6, md: 2, lg: 1.75 }}>
+                                <Button
+                                    variant="outlined"
+                                    color="inherit"
+                                    onClick={() => setShowAdvancedFilters((prev) => !prev)}
+                                    startIcon={<TuneIcon sx={{ fontSize: 18 }} />}
+                                    fullWidth
+                                    sx={{
+                                        height: 40,
+                                        fontWeight: 600,
+                                        fontSize: '0.8125rem',
+                                        textTransform: 'none',
+                                        borderColor: showAdvancedFilters ? 'primary.main' : '#E2E8F0',
+                                        color: showAdvancedFilters ? 'primary.main' : '#334155',
+                                        bgcolor: showAdvancedFilters ? '#EFF6FF' : '#FFFFFF',
+                                        '&:hover': {
+                                            borderColor: 'primary.main',
+                                            bgcolor: '#F8FAFC',
+                                        },
+                                    }}
+                                >
+                                    {showAdvancedFilters ? 'Thu gọn' : 'Bộ lọc nâng cao'}
+                                    {activeAdvancedCount > 0 && (
+                                        <Chip
+                                            label={activeAdvancedCount}
+                                            size="small"
+                                            color="primary"
+                                            sx={{ ml: 0.75, height: 20, minWidth: 20, fontSize: '0.75rem', fontWeight: 700 }}
+                                        />
+                                    )}
+                                </Button>
                             </Grid>
                         </Grid>
+
+                        <Collapse in={showAdvancedFilters} unmountOnExit>
+                            <Divider sx={{ my: 2, borderStyle: 'dashed', opacity: 0.6 }} />
+
+                            <Grid container spacing={2}>
+                                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                                    <SingleSelectCustom
+                                        name="careerId"
+                                        control={control}
+                                        options={allConfig?.careerOptions || []}
+                                        title={t('employer:profileSearch.label.careers')}
+                                        placeholder={t('employer:profileSearch.placeholder.allcareers')}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                                    <SingleSelectCustom
+                                        name="experienceId"
+                                        control={control}
+                                        options={allConfig?.experienceOptions || []}
+                                        title={t('employer:profileSearch.label.experience')}
+                                        placeholder={t('employer:profileSearch.placeholder.allexperience')}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                                    <SingleSelectCustom
+                                        name="positionId"
+                                        control={control}
+                                        options={allConfig?.positionOptions || []}
+                                        title={t('employer:profileSearch.label.position')}
+                                        placeholder={t('employer:profileSearch.placeholder.allpositions')}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                                    <SingleSelectCustom
+                                        name="academicLevelId"
+                                        control={control}
+                                        options={allConfig?.academicLevelOptions || []}
+                                        title={t('employer:profileSearch.label.academicLevel')}
+                                        placeholder={t('employer:profileSearch.placeholder.allacademiclevels')}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                                    <SingleSelectCustom
+                                        name="typeOfWorkplaceId"
+                                        control={control}
+                                        options={allConfig?.typeOfWorkplaceOptions || []}
+                                        title={t('employer:profileSearch.label.workplace')}
+                                        placeholder={t('employer:profileSearch.placeholder.allworkplaces')}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                                    <SingleSelectCustom
+                                        name="jobTypeId"
+                                        control={control}
+                                        options={allConfig?.jobTypeOptions || []}
+                                        title={t('employer:profileSearch.label.employmentType')}
+                                        placeholder={t('employer:profileSearch.placeholder.allemploymenttypes')}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                                    <SingleSelectCustom
+                                        name="genderId"
+                                        control={control}
+                                        options={allConfig?.genderOptions || []}
+                                        title={t('employer:profileSearch.label.gender')}
+                                        placeholder={t('employer:profileSearch.placeholder.allgenders')}
+                                    />
+                                </Grid>
+                                <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }}>
+                                    <SingleSelectCustom
+                                        name="maritalStatusId"
+                                        control={control}
+                                        options={allConfig?.maritalStatusOptions || []}
+                                        title={t('employer:profileSearch.label.maritalStatus')}
+                                        placeholder={t('employer:profileSearch.placeholder.allmaritalstatuses')}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Collapse>
                     </Box>
                 </Stack>
             </Paper>

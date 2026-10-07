@@ -55,7 +55,6 @@ describe('common employer navigation routes', () => {
     expect(source).not.toContain("route: `/${ROUTES.EMPLOYER.JOB_POST}`");
     expect(source).not.toContain("route: `/${ROUTES.EMPLOYER.PROFILE}`");
     expect(source).not.toContain("route: `/${ROUTES.EMPLOYER.DASHBOARD}`");
-    expect(source).not.toContain("route: localizeRoutePath(`/${ROUTES.EMPLOYER.BLOG}`, lang)");
-    expect(source).toContain("route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=blog`, lang)");
+    expect(source).toContain("route: onEmployerDomain ? '/blog' : localizeRoutePath(`/${ROUTES.EMPLOYER.BLOG}`, lang)");
   });
 });

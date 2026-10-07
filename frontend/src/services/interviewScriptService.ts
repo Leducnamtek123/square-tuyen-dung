@@ -4,10 +4,11 @@
  */
 
 import httpRequest from '../utils/httpRequest';
-import type {
-  InterviewScript,
-  InterviewScriptInput,
-  GetScriptsParams,
+import {
+  type InterviewScript,
+  type InterviewScriptInput,
+  type GetScriptsParams,
+  normalizeInterviewScript,
 } from '../types/interviewScript';
 
 const SCRIPT_STORAGE_KEY = 'infohr_employer_interview_scripts_v1';
@@ -253,11 +254,11 @@ export const interviewScriptService = {
       // Primary REST API call: /api/v1/interview/web/scripts/
       const res = await httpRequest.get('interview/web/scripts/', { params: cleanParams });
       if (res && Array.isArray(res.data)) {
-        apiScripts = res.data;
+        apiScripts = res.data.map(normalizeInterviewScript);
       } else if (res && Array.isArray(res.results)) {
-        apiScripts = res.results;
+        apiScripts = res.results.map(normalizeInterviewScript);
       } else if (Array.isArray(res)) {
-        apiScripts = res;
+        apiScripts = res.map(normalizeInterviewScript);
       }
     } catch {
       // Network or API not deployed yet — use local fallback
@@ -265,24 +266,25 @@ export const interviewScriptService = {
     }
 
     // Combine presets and company scripts
-    const companyScripts = loadStoredCompanyScripts();
-    let allScripts: InterviewScript[] = apiScripts && apiScripts.length > 0
+    const companyScripts = loadStoredCompanyScripts().map(normalizeInterviewScript);
+    let allScripts: InterviewScript[] = (apiScripts && apiScripts.length > 0
       ? apiScripts
-      : [...SYSTEM_PRESET_SCRIPTS, ...companyScripts];
+      : [...SYSTEM_PRESET_SCRIPTS.map(normalizeInterviewScript), ...companyScripts]
+    ).map(normalizeInterviewScript);
 
     // Apply filtering
     if (tab === 'company') {
-      allScripts = allScripts.filter((s) => !s.is_system_preset);
+      allScripts = allScripts.filter((s) => !(s.is_system_preset ?? s.isSystemPreset));
     } else if (tab === 'system') {
-      allScripts = allScripts.filter((s) => s.is_system_preset);
+      allScripts = allScripts.filter((s) => Boolean(s.is_system_preset ?? s.isSystemPreset));
     }
 
     if (scenario_type && scenario_type !== 'all') {
-      allScripts = allScripts.filter((s) => s.scenario_type === scenario_type);
+      allScripts = allScripts.filter((s) => (s.scenario_type || s.scenarioType) === scenario_type);
     }
 
     if (hr_persona && hr_persona !== 'all') {
-      allScripts = allScripts.filter((s) => s.hr_persona === hr_persona);
+      allScripts = allScripts.filter((s) => (s.hr_persona || s.hrPersona) === hr_persona);
     }
 
     if (search && search.trim()) {
@@ -291,7 +293,7 @@ export const interviewScriptService = {
         (s) =>
           s.name.toLowerCase().includes(q) ||
           s.description.toLowerCase().includes(q) ||
-          s.scenario_type.toLowerCase().includes(q)
+          (s.scenario_type || s.scenarioType || '').toLowerCase().includes(q)
       );
     }
 
@@ -306,20 +308,20 @@ export const interviewScriptService = {
 
     try {
       const res = await httpRequest.get(`interview/web/scripts/${id}/`);
-      if (res && res.data) return res.data;
-      if (res && res.id) return res;
+      if (res && res.data) return normalizeInterviewScript(res.data);
+      if (res && (res.id || (res as any).name)) return normalizeInterviewScript(res);
     } catch {
       // Fallback
     }
 
     // Search system presets
     const foundPreset = SYSTEM_PRESET_SCRIPTS.find((s) => s.id === numId);
-    if (foundPreset) return foundPreset;
+    if (foundPreset) return normalizeInterviewScript(foundPreset);
 
     // Search company scripts
     const companyScripts = loadStoredCompanyScripts();
     const foundCompany = companyScripts.find((s) => s.id === numId);
-    if (foundCompany) return foundCompany;
+    if (foundCompany) return normalizeInterviewScript(foundCompany);
 
     throw new Error(`Không tìm thấy kịch bản với mã ${id}`);
   },
@@ -365,13 +367,13 @@ export const interviewScriptService = {
     try {
       const res = await httpRequest.post('interview/web/scripts/', input);
       if (res && (res.data || res.id)) {
-        return res.data || res;
+        return normalizeInterviewScript(res.data || res);
       }
     } catch {
       // Local copy is already saved
     }
 
-    return newScript;
+    return normalizeInterviewScript(newScript);
   },
 
   /**
@@ -408,13 +410,13 @@ export const interviewScriptService = {
     try {
       const res = await httpRequest.put(`interview/web/scripts/${id}/`, input);
       if (res && (res.data || res.id)) {
-        return res.data || res;
+        return normalizeInterviewScript(res.data || res);
       }
     } catch {
       // Local copy updated
     }
 
-    return updatedScript;
+    return normalizeInterviewScript(updatedScript);
   },
 
   /**
@@ -449,7 +451,7 @@ export const interviewScriptService = {
 
     const clonedId = Date.now();
     const clonedName = `${source.name} (Bản sao)`;
-    const clonedScript: InterviewScript = {
+    const clonedScript: InterviewScript = normalizeInterviewScript({
       ...source,
       id: clonedId,
       name: clonedName,
@@ -458,7 +460,7 @@ export const interviewScriptService = {
       canWrite: true,
       create_at: new Date().toISOString(),
       update_at: new Date().toISOString(),
-    };
+    });
 
     const current = loadStoredCompanyScripts();
     const updated = [clonedScript, ...current];
@@ -468,7 +470,7 @@ export const interviewScriptService = {
     try {
       const res = await httpRequest.post(`interview/web/scripts/${id}/clone/`);
       if (res && (res.data || res.id)) {
-        return res.data || res;
+        return normalizeInterviewScript(res.data || res);
       }
     } catch {
       // Local copy saved

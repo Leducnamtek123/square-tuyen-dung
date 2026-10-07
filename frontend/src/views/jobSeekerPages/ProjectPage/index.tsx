@@ -1,7 +1,7 @@
  'use client';
 import * as React from "react";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Card, Stack, Tab, Typography } from "@mui/material";
+import { Box, Card, Paper, Stack, Tab, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
 import { TabTitle } from "@/utils/generalFunction";
@@ -9,6 +9,7 @@ import SavedJobCard from "@/views/components/jobSeekers/SavedJobCard";
 import AppliedJobCard from "@/views/components/jobSeekers/AppliedJobCard";
 import SuggestedJobPostCard from "@/views/components/defaults/SuggestedJobPostCard";
 import JobPostNotificationCard from "@/views/components/jobSeekers/JobPostNotificationCard";
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 const ProjectPage = () => {
 
     const { t } = useTranslation('jobSeeker');
@@ -46,7 +47,17 @@ const ProjectPage = () => {
 
                 <Stack spacing={2}>
 
-                    <Card sx={{ p: 1 }}>
+                    <Paper
+                        variant="outlined"
+                        elevation={0}
+                        sx={{
+                            p: { xs: 1, sm: 1.5 },
+                            borderRadius: '16px',
+                            borderColor: 'divider',
+                            bgcolor: 'background.paper',
+                            boxShadow: 'none',
+                        }}
+                    >
 
                         <Box sx={{ width: "100%", typography: "body1" }}>
 
@@ -156,7 +167,7 @@ const ProjectPage = () => {
 
                         </Box>
 
-                    </Card>
+                    </Paper>
 
                 </Stack>
 
@@ -180,28 +191,47 @@ const ProjectPage = () => {
 
                 <Stack spacing={2}>
 
-                    <Card sx={{ p: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 } }}>
-
+                    <Card
+                        elevation={0}
+                        sx={{
+                            p: { xs: 1.5, sm: 2 },
+                            borderRadius: '16px',
+                            border: '1px solid #e2e8f0',
+                            bgcolor: '#ffffff',
+                            boxShadow: '0 2px 12px -2px rgba(0,0,0,0.03)',
+                        }}
+                    >
                         <Stack>
-
-                            <Box sx={{ mb: 2 }}>
-
-                                <Typography variant="h6">{t("jobManagement.suitableJobs")}</Typography>
-
+                            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box
+                                    sx={{
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: '8px',
+                                        bgcolor: '#eff6ff',
+                                        color: '#2563eb',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    <AutoAwesomeIcon sx={{ fontSize: 18 }} />
+                                </Box>
+                                <Box>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0f172a' }}>
+                                        {t("jobManagement.suitableJobs")}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                                        Gợi ý việc làm liên quan cho bạn
+                                    </Typography>
+                                </Box>
                             </Box>
 
                             <Box>
-
-                                {/* Start: SuggestedJobPostCard */}
-
                                 <SuggestedJobPostCard fullWidth={true} pageSize={5} />
-
-                                {/* End: SuggestedJobPostCardf */}
-
                             </Box>
-
                         </Stack>
-
                     </Card>
 
                 </Stack>

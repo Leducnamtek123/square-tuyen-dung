@@ -95,7 +95,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
             }}
             sx={{
                 '& .MuiOutlinedInput-root': {
-                    borderRadius: '8px',
+                    borderRadius: '4px',
                     backgroundColor: statusCfg.bg,
                     boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
                     transition: 'all 0.15s ease',

@@ -1,6 +1,7 @@
 import os
 import json
 import uuid
+import re
 from aiohttp import web
 from server.task_manager import task_manager
 from utils.logger import logger
@@ -61,6 +62,13 @@ async def create_avatar_task(request):
 
         if not model_type or not avatar_id:
             return json_error("model and avatar_id are required")
+
+        allowed_models = {"musetalk", "wav2lip", "ultralight"}
+        if model_type not in allowed_models:
+            return json_error(f"Invalid model. Allowed: {', '.join(allowed_models)}")
+
+        if not re.match(r"^[a-zA-Z0-9_\-]+$", str(avatar_id)):
+            return json_error("Invalid avatar_id: only alphanumeric, hyphen, and underscore characters are allowed")
 
         if 'video_path' not in params:
             return json_error("video_file or video_path is required")

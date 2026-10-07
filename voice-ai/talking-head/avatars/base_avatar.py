@@ -24,6 +24,7 @@ import torch
 import numpy as np
 import subprocess
 import os
+import re
 import time
 import cv2
 import glob
@@ -277,22 +278,36 @@ class BaseAvatar:
         self._record_audio_pipe.stdin.close()
         self._record_audio_pipe.wait()
         
+        safe_session_id = re.sub(r"[^a-zA-Z0-9_\-]", "", str(self.opt.sessionid))
         record_path = os.path.join('data', 'record')
         os.makedirs(record_path, exist_ok=True)
-        output_file = os.path.join(record_path, f"{self.opt.sessionid}.mp4")
+        output_file = os.path.join(record_path, f"{safe_session_id}.mp4")
         
-        temp_aac = f"temp{self.opt.sessionid}.aac"
-        temp_mp4 = f"temp{self.opt.sessionid}.mp4"
+        temp_aac = f"temp{safe_session_id}.aac"
+        temp_mp4 = f"temp{safe_session_id}.mp4"
         
-        cmd_combine_audio = f"ffmpeg -y -i {temp_aac} -i {temp_mp4} -c:v copy -c:a copy {output_file}"
-        os.system(cmd_combine_audio)
-        
-        # 删除临时文件
         try:
-            os.remove(temp_aac)
-            os.remove(temp_mp4)
+            combine_cmd = [
+                "ffmpeg", "-y",
+                "-i", temp_aac,
+                "-i", temp_mp4,
+                "-c:v", "copy",
+                "-c:a", "copy",
+                output_file,
+            ]
+            res = subprocess.run(combine_cmd, capture_output=True, text=True, check=False)
+            if res.returncode != 0:
+                logger.error("FFmpeg combine failed for session %s: %s", safe_session_id, res.stderr)
         except Exception as e:
-            logger.error(f"Error removing temp files: {e}")
+            logger.error("Error running ffmpeg combine: %s", e)
+        finally:
+            # Dọn dẹp tệp tạm thời
+            for temp_f in (temp_aac, temp_mp4):
+                try:
+                    if os.path.exists(temp_f):
+                        os.remove(temp_f)
+                except Exception as e:
+                    logger.error("Error removing temp file %s: %s", temp_f, e)
 
     # def mirror_index(self, size, index):
     #     turn = index // size

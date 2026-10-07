@@ -33,12 +33,16 @@ test.describe('Phân Hệ HRM - Chấm Công & Giải Trình Ca Làm Việc (Att
 
     // 4. Kiểm tra trang Bảng chấm công chi tiết (Timesheet)
     await attendancePage.gotoTimesheets();
-    await expect(page.getByText(/bảng chấm công chi tiết|bảng công|timesheet/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /bảng chấm công chi tiết|bảng công|timesheet/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByText('Nguyễn Văn A').first()).toBeVisible();
 
     // 5. Kiểm tra trang Danh sách Ca làm việc (Shifts)
     await attendancePage.gotoShifts();
-    await expect(page.getByText(/quản lý ca làm việc|ca làm việc/i).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /quản lý ca làm việc|ca làm việc/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByText('Ca hành chính').first()).toBeVisible();
   });
 });

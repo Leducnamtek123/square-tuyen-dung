@@ -20,12 +20,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import dayjs from '@/configs/dayjs-config';
 import interviewService from '@/services/interviewService';
+import interviewScriptService from '@/services/interviewScriptService';
 import jobService from '@/services/jobService';
 import questionGroupService from '@/services/questionGroupService';
 import toastMessages from '@/utils/toastMessages';
 import type { JobPost, QuestionGroup } from '@/types/models';
+import type { InterviewScript } from '@/types/interviewScript';
 
 interface ScheduleInterviewModalProps {
   open: boolean;
@@ -44,9 +47,11 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
 }) => {
   const [jobPosts, setJobPosts] = useState<JobPost[]>([]);
   const [questionGroups, setQuestionGroups] = useState<QuestionGroup[]>([]);
+  const [interviewScripts, setInterviewScripts] = useState<InterviewScript[]>([]);
   const [loadingOptions, setLoadingOptions] = useState(false);
 
   const [selectedJobPost, setSelectedJobPost] = useState<number | ''>('');
+  const [selectedScript, setSelectedScript] = useState<number | ''>('');
   const [interviewType, setInterviewType] = useState<'mixed' | 'technical' | 'behavioral'>('mixed');
   const [interviewLanguage, setInterviewLanguage] = useState<'vi' | 'en' | 'ja' | 'ko'>('vi');
   const [selectedQuestionGroup, setSelectedQuestionGroup] = useState<number | ''>('');
@@ -67,8 +72,9 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
     Promise.all([
       jobService.getEmployerJobPost({ pageSize: 50 }),
       questionGroupService.getQuestionGroups({ pageSize: 50 }),
+      interviewScriptService.getScripts({ pageSize: 50 }),
     ])
-      .then(([jobsRes, groupsRes]) => {
+      .then(([jobsRes, groupsRes, scriptsRes]) => {
         if (!active) return;
         const posts = jobsRes?.results || [];
         setJobPosts(posts);
@@ -78,9 +84,9 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
 
         const groups = groupsRes?.results || [];
         setQuestionGroups(groups);
-        if (groups.length > 0) {
-          setSelectedQuestionGroup(groups[0].id);
-        }
+
+        const scripts = scriptsRes || [];
+        setInterviewScripts(scripts);
       })
       .catch((err) => {
         if (!active) return;
@@ -94,6 +100,23 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
       active = false;
     };
   }, [open]);
+
+  const handleScriptChange = (scriptId: number | '') => {
+    setSelectedScript(scriptId);
+    if (!scriptId) return;
+
+    const script = interviewScripts.find((s) => Number(s.id) === Number(scriptId));
+    if (script) {
+      const scriptGroup = script.question_group || script.questionGroup;
+      if (scriptGroup) {
+        setSelectedQuestionGroup(Number(scriptGroup));
+      }
+      const scType = (script.scenario_type || script.scenarioType) as any;
+      if (scType && ['mixed', 'technical', 'behavioral'].includes(scType)) {
+        setInterviewType(scType);
+      }
+    }
+  };
 
   const handleSubmit = async () => {
     if (!selectedJobPost) {
@@ -118,6 +141,7 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
         interviewLanguage: interviewLanguage,
         scheduled_at: dayjs(scheduledAt).toISOString(),
         question_group: selectedQuestionGroup ? Number(selectedQuestionGroup) : undefined,
+        interview_script: selectedScript ? Number(selectedScript) : undefined,
         notes: notes.trim() || undefined,
       };
 
@@ -283,7 +307,32 @@ export const ScheduleInterviewModal: React.FC<ScheduleInterviewModalProps> = ({
               </MenuItem>
             </TextField>
 
-            {/* 4. Bộ câu hỏi */}
+            {/* 4. Kịch bản phỏng vấn AI */}
+            <TextField
+              select
+              label="Kịch bản Phỏng vấn AI (Interview Script)"
+              size="small"
+              fullWidth
+              value={selectedScript}
+              onChange={(e) => handleScriptChange(e.target.value ? Number(e.target.value) : '')}
+              helperText="Chọn kịch bản AI với mục tiêu, persona và tiêu chí chấm điểm chuyên biệt"
+            >
+              <MenuItem value="">
+                <em>Không áp dụng kịch bản riêng (Tự cấu hình)</em>
+              </MenuItem>
+              {interviewScripts.map((script) => {
+                const scenario = script.scenario_type_display || script.scenarioTypeDisplay || 'Kịch bản';
+                const persona = script.hr_persona_display || script.hrPersonaDisplay || '';
+                const duration = script.time_limit_per_question || script.timeLimitPerQuestion;
+                return (
+                  <MenuItem key={script.id} value={script.id}>
+                    {script.name} — [{scenario}{persona ? ` • ${persona}` : ''}{duration ? ` • ${duration}s/câu` : ''}]
+                  </MenuItem>
+                );
+              })}
+            </TextField>
+
+            {/* 5. Bộ câu hỏi */}
             <TextField
               select
               label="Bộ câu hỏi phỏng vấn - Tùy chọn"

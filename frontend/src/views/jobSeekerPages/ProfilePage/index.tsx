@@ -617,24 +617,24 @@ const ProfilePage = () => {
     {
       label: 'Email',
       value: profileData.email || 'Chưa cập nhật',
-      icon: <EmailOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} />,
+      icon: <EmailOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} />,
       isEmail: true,
       isVerified: Boolean(currentUser?.isVerifyEmail ?? true),
     },
     {
       label: 'Số điện thoại',
       value: profileData.phoneNumber || 'Chưa cập nhật',
-      icon: <PhoneIphoneOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} />,
+      icon: <PhoneIphoneOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} />,
       isPhone: true,
       isVerified: isPhoneVerified,
     },
-    { label: 'Tỉnh / Thành phố', value: profileData.city || 'Chưa cập nhật', icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Quận / Huyện', value: profileData.district || 'Chưa cập nhật', icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Trình độ học vấn', value: profileData.education ? t(`common:choices.${profileData.education}`, { defaultValue: profileData.education }) : 'Chưa cập nhật', icon: <SchoolOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Kinh nghiệm', value: profileData.experience ? t(`common:choices.${profileData.experience}`, { defaultValue: profileData.experience }) : 'Chưa cập nhật', icon: <WorkOutlineOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Ngành nghề', value: profileData.career ? t(`common:choices.${profileData.career}`, { defaultValue: profileData.career }) : 'Chưa cập nhật', icon: <CategoryOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Tình trạng hôn nhân', value: profileData.maritalStatus ? t(`common:choices.${profileData.maritalStatus}`, { defaultValue: profileData.maritalStatus }) : 'Chưa cập nhật', icon: <FavoriteBorderOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
-    { label: 'Ngày sinh', value: formatDate(profileData.dob), icon: <CakeOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} /> },
+    { label: 'Tỉnh / Thành phố', value: profileData.city || 'Chưa cập nhật', icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} /> },
+    { label: 'Quận / Huyện', value: profileData.district || 'Chưa cập nhật', icon: <LocationOnOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} /> },
+    { label: 'Trình độ học vấn', value: profileData.education ? t(`common:choices.${profileData.education}`, { defaultValue: profileData.education }) : 'Chưa cập nhật', icon: <SchoolOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} /> },
+    { label: 'Kinh nghiệm', value: profileData.experience ? t(`common:choices.${profileData.experience}`, { defaultValue: profileData.experience }) : 'Chưa cập nhật', icon: <WorkOutlineOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} /> },
+    { label: 'Ngành nghề', value: profileData.career ? t(`common:choices.${profileData.career}`, { defaultValue: profileData.career }) : 'Chưa cập nhật', icon: <CategoryOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} /> },
+    { label: 'Tình trạng hôn nhân', value: profileData.maritalStatus ? t(`common:choices.${profileData.maritalStatus}`, { defaultValue: profileData.maritalStatus }) : 'Chưa cập nhật', icon: <FavoriteBorderOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} /> },
+    { label: 'Ngày sinh', value: formatDate(profileData.dob), icon: <CakeOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} /> },
     {
       label: 'Giới tính',
       value:
@@ -647,7 +647,7 @@ const ProfilePage = () => {
               : profileData.gender
                 ? profileData.gender
                 : 'Chưa cập nhật',
-      icon: <PersonOutlineOutlinedIcon sx={{ fontSize: 18, color: '#2563eb' }} />,
+      icon: <PersonOutlineOutlinedIcon sx={{ fontSize: 18, color: '#64748b' }} />,
     },
   ];
 

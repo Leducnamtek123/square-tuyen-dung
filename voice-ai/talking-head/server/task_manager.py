@@ -129,10 +129,45 @@ class TaskManager:
         if not task.notify_url:
             return
 
+        url = str(task.notify_url).strip()
         try:
+            from urllib.parse import urlparse
+            import socket
+            import ipaddress
+
+            parsed = urlparse(url)
+            if parsed.scheme not in ("http", "https"):
+                logger.warning("SSRF block: Invalid scheme %s for task %s", parsed.scheme, task.task_id)
+                return
+
+            hostname = parsed.hostname
+            if not hostname:
+                logger.warning("SSRF block: Missing hostname in notify_url for task %s", task.task_id)
+                return
+
+            # Chặn localhost / hostname đặc biệt
+            if hostname.lower() in ("localhost", "127.0.0.1", "::1", "metadata.google.internal"):
+                logger.warning("SSRF block: Localhost/metadata target %s for task %s", hostname, task.task_id)
+                return
+
+            # Phân giải DNS và kiểm tra IP
+            addr_info = socket.getaddrinfo(hostname, parsed.port or (443 if parsed.scheme == "https" else 80))
+            for family, _, _, _, sockaddr in addr_info:
+                ip_str = sockaddr[0]
+                ip_obj = ipaddress.ip_address(ip_str)
+                if (
+                    ip_obj.is_loopback
+                    or ip_obj.is_private
+                    or ip_obj.is_link_local
+                    or ip_obj.is_multicast
+                    or ip_obj.is_reserved
+                ):
+                    logger.warning("SSRF block: IP %s is private/internal for task %s", ip_str, task.task_id)
+                    return
+
             payload = task.to_dict()
-            logger.info(f"Sending notification for task {task.task_id} to {task.notify_url}")
-            requests.post(task.notify_url, json=payload, timeout=5)
+            logger.info(f"Sending notification for task {task.task_id} to {url}")
+            requests.post(url, json=payload, timeout=5, allow_redirects=False)
         except Exception as e:
             logger.error(f"Failed to send notification for task {task.task_id}: {e}")
 

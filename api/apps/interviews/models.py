@@ -755,6 +755,94 @@ class InterviewProctoringEvent(CommonBaseModel):
         return f"Proctoring: {self.get_event_type_display()} on session #{self.session_id}"
 
 
+class InterviewConnectionLog(CommonBaseModel):
+    """Sự kiện kết nối & đo lường độ ổn định WebRTC trong buổi phỏng vấn AI."""
+
+    EVENT_RECONNECTING = 'reconnecting'
+    EVENT_RECONNECTED = 'reconnected'
+    EVENT_DISCONNECTED = 'disconnected'
+    EVENT_CONNECTION_DROPPED = 'connection_dropped'
+    EVENT_FAILED = 'failed'
+
+    EVENT_CHOICES = [
+        (EVENT_RECONNECTING, 'Đang kết nối lại'),
+        (EVENT_RECONNECTED, 'Kết nối lại thành công'),
+        (EVENT_DISCONNECTED, 'Mất kết nối'),
+        (EVENT_CONNECTION_DROPPED, 'Rớt kết nối đột ngột'),
+        (EVENT_FAILED, 'Kết nối thất bại'),
+    ]
+
+    ROLE_CANDIDATE = 'candidate'
+    ROLE_EMPLOYER = 'employer'
+    ROLE_AGENT = 'agent'
+    ROLE_OBSERVER = 'observer'
+
+    ROLE_CHOICES = [
+        (ROLE_CANDIDATE, 'Ứng viên'),
+        (ROLE_EMPLOYER, 'Nhà tuyển dụng'),
+        (ROLE_AGENT, 'AI Agent'),
+        (ROLE_OBSERVER, 'Người quan sát'),
+    ]
+
+    session = models.ForeignKey(
+        'InterviewSession',
+        on_delete=models.CASCADE,
+        related_name='connection_logs',
+        verbose_name="Buổi phỏng vấn"
+    )
+    participant_identity = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Định danh người tham gia"
+    )
+    participant_role = models.CharField(
+        max_length=50,
+        choices=ROLE_CHOICES,
+        default=ROLE_CANDIDATE,
+        verbose_name="Vai trò"
+    )
+    event_type = models.CharField(
+        max_length=50,
+        choices=EVENT_CHOICES,
+        verbose_name="Loại sự kiện kết nối"
+    )
+    downtime_seconds = models.FloatField(
+        default=0.0,
+        verbose_name="Thời gian gián đoạn tính bằng giây"
+    )
+    reconnect_attempt = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Lần thử kết nối lại"
+    )
+    network_quality = models.CharField(
+        max_length=30,
+        blank=True,
+        default="",
+        verbose_name="Chất lượng mạng (poor/good/excellent)"
+    )
+    metadata = models.JSONField(
+        blank=True,
+        null=True,
+        default=dict,
+        verbose_name="Thông tin kỹ thuật chi tiết (RTT, packet loss, jitter)"
+    )
+    timestamp = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True,
+        verbose_name="Thời điểm ghi nhận"
+    )
+
+    class Meta:
+        db_table = "project_interview_connection_log"
+        ordering = ['-timestamp']
+        verbose_name = "Interview Connection Log"
+        verbose_name_plural = "Interview Connection Logs"
+
+    def __str__(self):
+        return f"ConnectionLog: {self.get_event_type_display()} on session #{self.session_id} ({self.participant_identity})"
+
+
 class SalaryBenchmark(CommonBaseModel):
     """Bảng dữ liệu mức lương thị trường theo ngành nghề và chức danh."""
 

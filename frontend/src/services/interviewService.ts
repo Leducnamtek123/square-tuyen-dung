@@ -8,6 +8,7 @@ import type {
   QuestionHintsDetailResponse,
   CreateMockSessionPayload,
   MockSessionResponse,
+  InterviewConnectionLog,
 } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
 import { normalizePaginatedResponse, unwrapDataResponse } from '../utils/apiResponse';
@@ -40,6 +41,8 @@ export interface ScheduleSessionInput {
   question_ids?: number[];
   question_group?: number;
   voice_profile?: number | null;
+  interview_script?: number | null;
+  interviewScript?: number | null;
   notes?: string;
 }
 
@@ -260,6 +263,32 @@ const interviewService = {
   ): Promise<any> => {
     const url = `interview/web/sessions/${sessionId}/proctoring-events/`;
     return (httpRequest.post(url, data) as Promise<unknown>).then(unwrapDataResponse);
+  },
+
+  recordConnectionLog: (
+    sessionId: IdType,
+    data: {
+      eventType: string;
+      participantIdentity?: string;
+      downtimeSeconds?: number;
+      reconnectAttempt?: number;
+      reason?: string;
+      metadata?: Record<string, any>;
+    },
+    inviteToken?: string
+  ): Promise<InterviewConnectionLog> => {
+    const url = `interview/web/sessions/${sessionId}/connection-logs/`;
+    const params = inviteToken ? { invite_token: inviteToken } : undefined;
+    return (httpRequest.post(url, data, { params }) as Promise<unknown>).then(unwrapDataResponse<InterviewConnectionLog>);
+  },
+
+  getConnectionLogs: (
+    sessionId: IdType,
+    inviteToken?: string
+  ): Promise<InterviewConnectionLog[]> => {
+    const url = `interview/web/sessions/${sessionId}/connection-logs/`;
+    const params = inviteToken ? { invite_token: inviteToken } : undefined;
+    return (httpRequest.get(url, { params }) as Promise<unknown>).then(unwrapDataResponse<InterviewConnectionLog[]>);
   },
 
   getSSEUrl: (sessionId: IdType): string => {

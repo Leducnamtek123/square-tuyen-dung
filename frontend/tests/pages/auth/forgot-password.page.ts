@@ -26,8 +26,9 @@ export class ForgotPasswordPage extends BasePage {
     this.errorAlert = page
       .locator('[role="alert"].MuiAlert-standardError, [role="alert"]:has-text("lỗi"), [role="alert"]:has-text("hết hạn")')
       .first();
+    // Lưu ý: bỏ qua #__next-route-announcer__ (role="alert" rỗng của Next.js) và class .Mui-error trên InputBase (không có text)
     this.validationErrors = page
-      .locator('.Mui-error, [role="alert"]')
+      .locator('.MuiFormHelperText-root.Mui-error, [role="alert"]:not(#__next-route-announcer__)')
       .or(page.getByText(/bắt buộc|vui lòng nhập|không hợp lệ|không khớp/i));
 
     this.newPasswordInput = page.locator('input[name="newPassword"], input#newPassword').first();
@@ -49,6 +50,7 @@ export class ForgotPasswordPage extends BasePage {
     const targetUrl = paths[portalOrPath] || (portalOrPath.startsWith('/') ? portalOrPath : `/${portalOrPath}`);
     await super.goto(targetUrl);
     await this.waitForLoadingGone();
+    await this.waitForHydration('button[type="submit"]');
   }
 
   /**
@@ -78,6 +80,7 @@ export class ForgotPasswordPage extends BasePage {
   async gotoResetPassword(token: string) {
     await super.goto(`/reset-password/${token}`);
     await this.waitForLoadingGone();
+    await this.waitForHydration('button[type="submit"]');
   }
 
   /**
@@ -113,7 +116,8 @@ export class ForgotPasswordPage extends BasePage {
    * Xác nhận đặt lại mật khẩu thành công (chuyển hướng về trang đăng nhập)
    */
   async expectResetPasswordSuccess() {
-    await expect(this.page).toHaveURL(/login.*passwordResetSuccess|login/i, { timeout: 15_000 });
+    // Dev server có thể phải biên dịch on-demand trang /login sau router.push nên cho thời gian dài hơn
+    await expect(this.page).toHaveURL(/login.*passwordResetSuccess|login/i, { timeout: 45_000 });
   }
 
   /**

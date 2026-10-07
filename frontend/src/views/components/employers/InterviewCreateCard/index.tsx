@@ -30,6 +30,7 @@ import {
   useEmployerVoiceProfiles,
   useInterviewDetail,
   useInterviewMutations,
+  useEmployerInterviewScripts,
   useQuestionGroups,
   useQuestionMutations,
 } from '../hooks/useEmployerQueries';
@@ -38,6 +39,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import InterviewCreateCardForm from './InterviewCreateCardForm';
 import type { FormValues } from './types';
 import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '@/types/models';
+import type { InterviewScript } from '@/types/interviewScript';
 import pc from '@/utils/muiColors';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTourAutoStart } from '@/components/Features/ProductTour';
@@ -78,6 +80,7 @@ type InterviewCreateCardInnerProps = {
   jobs: Array<{ id: string | number; jobName?: string }>;
   questions: Question[];
   questionGroups: QuestionGroup[];
+  interviewScripts: InterviewScript[];
   isLoadingJobs: boolean;
 };
 
@@ -90,6 +93,7 @@ const InterviewCreateCardInner = ({
   jobs,
   questions,
   questionGroups,
+  interviewScripts,
   isLoadingJobs,
 }: InterviewCreateCardInnerProps) => {
   const { push, back } = useRouter();
@@ -180,7 +184,7 @@ const InterviewCreateCardInner = ({
     }
   }, [selectedVoiceProfileId, setValue, voiceProfiles]);
 
-    const handleQuestionGroupChange = useCallback((value: string | number) => {
+  const handleQuestionGroupChange = useCallback((value: string | number) => {
     setValue('selected_group', value, { shouldValidate: true });
 
     if (!value) {
@@ -189,8 +193,33 @@ const InterviewCreateCardInner = ({
     }
 
     const group = questionGroups.find((item) => String(item.id) === String(value));
-        setValue('selected_questions', group?.questions?.map((question: Question) => question.id) ?? [], { shouldValidate: true });
-    }, [questionGroups, setValue]);
+    setValue('selected_questions', group?.questions?.map((question: Question) => question.id) ?? [], { shouldValidate: true });
+  }, [questionGroups, setValue]);
+
+  const handleScriptChange = useCallback((value: string | number) => {
+    setValue('selected_script', value, { shouldValidate: true });
+    if (!value) return;
+
+    const matchedScript = interviewScripts.find((item) => String(item.id) === String(value));
+    if (matchedScript) {
+      const scriptGroup = matchedScript.question_group || matchedScript.questionGroup;
+      if (scriptGroup) {
+        setValue('selected_group', scriptGroup as any, { shouldValidate: true });
+        const group = questionGroups.find((g) => String(g.id) === String(scriptGroup));
+        if (group?.questions?.length) {
+          setValue('selected_questions', group.questions.map((q: Question) => q.id), { shouldValidate: true });
+        }
+      } else if (matchedScript.questions && matchedScript.questions.length > 0) {
+        setValue('selected_questions', matchedScript.questions.map((q: any) => typeof q === 'object' ? q.id : q), { shouldValidate: true });
+      }
+      if (matchedScript.voice_name || matchedScript.voiceName) {
+        setValue('ai_voice', matchedScript.voice_name || matchedScript.voiceName);
+      }
+      if (matchedScript.voice_speed || matchedScript.voiceSpeed) {
+        setValue('ai_speed', matchedScript.voice_speed || matchedScript.voiceSpeed);
+      }
+    }
+  }, [interviewScripts, questionGroups, setValue]);
 
   const handleSaveQuestion = useCallback(async () => {
     const trimmed = questionDraft.trim();
@@ -226,6 +255,7 @@ const InterviewCreateCardInner = ({
         candidate: Number(data.candidate),
         scheduled_at: data.scheduled_at,
         voice_profile: selectedVoiceProfile,
+        interview_script: data.selected_script ? Number(data.selected_script) : null,
         question_ids: data.selected_questions.filter(Boolean),
         type: 'mixed' as const,
         session_metadata: {
@@ -286,6 +316,7 @@ const InterviewCreateCardInner = ({
       const res = await interviewService.createMockSession({
         job_title: selectedJob?.jobName || 'Thử nghiệm phỏng vấn AI',
         job_post_id: values.job_post ? Number(values.job_post) : undefined,
+        interview_script_id: values.selected_script ? Number(values.selected_script) : undefined,
         question_group_id: selectedGroup ? Number(selectedGroup) : undefined,
         question_ids: selectedQuestions.length > 0 ? selectedQuestions : undefined,
         voice_profile_id: values.voice_profile && values.voice_profile !== 'auto' ? Number(values.voice_profile) : undefined,
@@ -343,9 +374,11 @@ const InterviewCreateCardInner = ({
         isStartingMock={isStartingMock}
         selectedJobPostId={selectedJobPostId}
         selectedQuestionsCount={(watch('selected_questions') ?? []).length}
+        interviewScripts={interviewScripts}
         onCancel={() => back()}
         onJobPostChange={handleJobPostChange}
         onQuestionGroupChange={handleQuestionGroupChange}
+        onScriptChange={handleScriptChange}
         onOpenAddQuestion={handleOpenAddQuestion}
         onOpenEditQuestion={handleOpenEditQuestion}
         onTestMockInterview={handleTestMockInterview}
@@ -445,11 +478,13 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
   const { data: jobData, isLoading: isLoadingJobs } = useEmployerJobPosts({ pageSize: 1000 });
   const { data: questionData } = useEmployerQuestions({ pageSize: 1000 });
   const { data: groupData } = useQuestionGroups({ pageSize: 1000 });
+  const { data: scriptData } = useEmployerInterviewScripts();
   const { data: sessionDetail, isLoading: isLoadingSession } = useInterviewDetail(sessionId as string | number);
 
   const jobs = useMemo(() => jobData?.results ?? [], [jobData]);
   const questions = useMemo(() => questionData?.results ?? [], [questionData]);
   const questionGroups = useMemo(() => groupData?.results ?? [], [groupData]);
+  const interviewScripts = useMemo(() => scriptData ?? [], [scriptData]);
 
   const initialValues = useMemo<FormValues>(() => {
     const meta = ((sessionDetail?.sessionMetadata || sessionDetail?.session_metadata || {}) as Record<string, any>);
@@ -463,6 +498,9 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
         : (candidateIdQuery ? (Number(candidateIdQuery) || candidateIdQuery) : ''),
       scheduled_at: sessionDetail?.scheduledAt ?? '',
       selected_group: sessionDetail?.questionGroup ? extractId(sessionDetail.questionGroup) : '',
+      selected_script: (sessionDetail?.interviewScript ?? sessionDetail?.interview_script)
+        ? extractId(sessionDetail?.interviewScript ?? sessionDetail?.interview_script)
+        : '',
       voice_profile: sessionDetail?.voiceProfile ?? sessionDetail?.voice_profile ?? '',
       selected_questions: sessionDetail?.questions?.map((q: Question) => q.id) ?? [],
       ai_avatar_id: meta.avatar_id || customAi.selectedAvatarId || 'ly_3d',
@@ -493,6 +531,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
       jobs={jobs}
       questions={questions}
       questionGroups={questionGroups}
+      interviewScripts={interviewScripts}
       isLoadingJobs={isLoadingJobs}
     />
   );

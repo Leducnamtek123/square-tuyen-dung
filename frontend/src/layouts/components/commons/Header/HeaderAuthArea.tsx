@@ -45,10 +45,14 @@ const HeaderAuthArea = ({
           backgroundColor: '#ffffff',
           transition: 'all 0.2s ease-in-out',
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          outline: 'none !important',
           '&:hover': {
             borderColor: '#2563eb',
             transform: 'scale(1.05)',
             boxShadow: '0 4px 14px rgba(37,99,235,0.18)',
+          },
+          '&:focus, &:focus-visible': {
+            outline: 'none !important',
           },
         }}
       >
@@ -101,13 +105,16 @@ const HeaderAuthArea = ({
           sx={{
             color: '#0f172a',
             borderColor: '#cbd5e1',
-            borderRadius: 0,
+            borderRadius: '8px',
             textTransform: 'none',
             fontWeight: 600,
             fontSize: { xs: '0.8rem', md: '0.78rem', lg: '0.85rem' },
             px: { xs: 1, md: 1, lg: 1.5 },
             minWidth: 'auto',
             whiteSpace: 'nowrap',
+            '&:focus, &:focus-visible': {
+              outline: 'none',
+            },
           }}
         >
           {t('header.auth.login', { defaultValue: 'Đăng nhập' })}
@@ -119,13 +126,16 @@ const HeaderAuthArea = ({
           sx={{
             backgroundColor: '#2563eb',
             color: '#ffffff',
-            borderRadius: 0,
+            borderRadius: '8px',
             textTransform: 'none',
             fontWeight: 600,
             fontSize: { xs: '0.8rem', md: '0.78rem', lg: '0.85rem' },
             px: { xs: 1, md: 1, lg: 1.5 },
             minWidth: 'auto',
             whiteSpace: 'nowrap',
+            '&:focus, &:focus-visible': {
+              outline: 'none',
+            },
           }}
         >
           {t('header.auth.signUp', { defaultValue: 'Đăng ký' })}

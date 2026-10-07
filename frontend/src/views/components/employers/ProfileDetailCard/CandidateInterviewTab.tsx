@@ -380,7 +380,7 @@ export const CandidateInterviewTab: React.FC<CandidateInterviewTabProps> = ({ pr
 
                       <Button
                         component={Link}
-                        href={session.id ? `/employer/interviews/${session.id}` : `/employer/interviews`}
+                        href={session.id ? `/interviews/${session.id}` : `/interviews`}
                         size="small"
                         variant="outlined"
                         endIcon={<OpenInNewIcon sx={{ fontSize: 15 }} />}

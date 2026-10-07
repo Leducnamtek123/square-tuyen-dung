@@ -594,6 +594,8 @@ export default function HomePage() {
             src={bannerExploreGirl}
             alt="InfoHR Explore"
             loading="lazy"
+            width={420}
+            height={220}
             sx={{
               position: 'absolute',
               right: { xs: -20, sm: 0, md: 10, lg: 30 },
@@ -735,10 +737,128 @@ export default function HomePage() {
 
 
       {/* -- Cẩm nang nghề nghiệp (Articles / Handbook Section) -------------- */}
-      <Box className="gsap-handbook-section" sx={{ mt: { xs: 4, sm: 6, md: 10 }, mb: { xs: 4, md: 8 } }}>
+      <Box className="gsap-handbook-section" sx={{ mt: { xs: 4, sm: 6, md: 10 }, mb: { xs: 4, md: 6 } }}>
         <LazyLoadSection minHeight="400px" rootMargin="300px">
           <CareerHandbookSection />
         </LazyLoadSection>
+      </Box>
+
+      {/* -- Câu hỏi thường gặp & Hướng dẫn (FAQ & Guide Section for GEO / SEO) -- */}
+      <Box component="section" sx={{ mt: { xs: 4, sm: 6, md: 8 }, mb: { xs: 6, md: 10 } }}>
+        <Stack spacing={1} sx={{ mb: 4, textAlign: 'center', alignItems: 'center' }}>
+          <Typography
+            variant="h5"
+            component="h2"
+            sx={{
+              fontWeight: 800,
+              color: '#0f172a',
+              fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
+            }}
+          >
+            Câu hỏi thường gặp về tuyển dụng và tìm việc làm trên InfoHR
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 680 }}>
+            Giải đáp nhanh các thắc mắc về quy trình tìm việc, tạo hồ sơ CV chuẩn ATS và ứng dụng trí tuệ nhân tạo Voice AI trong phỏng vấn tuyển dụng.
+          </Typography>
+        </Stack>
+
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Card
+              sx={{
+                p: 3,
+                height: '100%',
+                borderRadius: 0,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                component="h3"
+                sx={{ fontWeight: 700, color: '#1e3a8a', mb: 1.25 }}
+              >
+                Làm thế nào để tìm việc và ứng tuyển nhanh chóng trên InfoHR?
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.65 }}>
+                Ứng viên chỉ cần nhập chức danh công việc hoặc kỹ năng tại thanh tìm kiếm trên InfoHR, chọn khu vực hoặc ngành nghề mong muốn. Sau đó chọn công việc phù hợp, tải lên CV có sẵn hoặc sử dụng công cụ tạo CV online chuẩn ATS của InfoHR để ứng tuyển trực tiếp chỉ với 1 cú click.
+              </Typography>
+            </Card>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Card
+              sx={{
+                p: 3,
+                height: '100%',
+                borderRadius: 0,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                component="h3"
+                sx={{ fontWeight: 700, color: '#1e3a8a', mb: 1.25 }}
+              >
+                Tại sao nên luyện tập phỏng vấn với trợ lý AI AILA?
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.65 }}>
+                Trợ lý Voice AI AILA cung cấp môi trường mô phỏng phỏng vấn thực tế qua công nghệ WebRTC giọng nói thời gian thực. Sau mỗi buổi phỏng vấn, AILA cung cấp bảng chấm điểm chi tiết về chuyên môn, sự tự tin, phát âm và gợi ý câu trả lời tối ưu giúp ứng viên sẵn sàng cho buổi phỏng vấn thật.
+              </Typography>
+            </Card>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Card
+              sx={{
+                p: 3,
+                height: '100%',
+                borderRadius: 0,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                component="h3"
+                sx={{ fontWeight: 700, color: '#1e3a8a', mb: 1.25 }}
+              >
+                Nhà tuyển dụng đăng tin và sàng lọc ứng viên như thế nào?
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.65 }}>
+                Doanh nghiệp đăng ký tài khoản Nhà tuyển dụng tại cổng employer.infohr.vn, xác thực hồ sơ công ty và tiến hành đăng tin tuyển dụng. InfoHR hỗ trợ tính năng lọc hồ sơ nâng cao và tích hợp AI AILA để sơ loại tự động hàng loạt ứng viên.
+              </Typography>
+            </Card>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <Card
+              sx={{
+                p: 3,
+                height: '100%',
+                borderRadius: 0,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                component="h3"
+                sx={{ fontWeight: 700, color: '#1e3a8a', mb: 1.25 }}
+              >
+                Hồ sơ ứng viên và CV trên InfoHR có được bảo mật không?
+              </Typography>
+              <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.65 }}>
+                InfoHR tuân thủ nghiêm ngặt các quy định pháp luật và Nghị định 13/2023/NĐ-CP về bảo vệ dữ liệu cá nhân. Toàn bộ hồ sơ, thông tin liên hệ và tài liệu CV được mã hóa và lưu trữ an toàn, chỉ hiển thị với nhà tuyển dụng khi được ứng viên cho phép.
+              </Typography>
+            </Card>
+          </Grid>
+        </Grid>
       </Box>
     </Box>
   );

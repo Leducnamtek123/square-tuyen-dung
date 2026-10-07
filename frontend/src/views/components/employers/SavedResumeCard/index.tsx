@@ -4,11 +4,8 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import dayjs from '@/configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { Box, Button, Stack, Typography, Paper } from '@mui/material';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import { Bookmark, Upload, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import SavedResumeTable from '../SavedResumeTable';
 import { useSavedResumes, useToggleSaveResume } from '../hooks/useEmployerQueries';
@@ -27,7 +24,6 @@ import {
   ActiveFilterChips,
   savedResumeFilterConfig,
 } from '@/components/Common/Filters';
-
 
 interface SavedResumeCardProps {
   title: string;
@@ -74,7 +70,6 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   const { control, reset, handleSubmit } = useForm<Record<string, any>>({
     defaultValues: draftValues,
   });
-
 
   useEffect(() => {
     reset(draftValues);
@@ -188,85 +183,63 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   );
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 2, md: 3 },
-          borderRadius: 3,
-          bgcolor: 'background.paper',
-          border: '1px solid',
-          borderColor: 'divider',
-          boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.02)',
-        }}
-      >
-        {/* Header & Filter Bar */}
-        <Stack spacing={2} sx={{ mb: 3 }}>
-          {/* Primary Golden Standard Filter Bar */}
-          <GlobalFilterBar
-            control={control}
-            handleSubmit={handleSubmit}
-            handleSearchSubmit={(data) => handleApply(data)}
-            cityOptions={allConfig?.cityOptions || []}
-            searchPlaceholder={t('employer:savedResumeFilterForm.placeholder.enterjobpostorcandidatename')}
-            cityPlaceholder={t('employer:savedResumeFilterForm.placeholder.selectlocation')}
-            onOpenFilterDrawer={() => setDrawerOpen(true)}
-            activeFilterCount={activeFilterCount}
-          />
+    <div className="w-full">
+      <BackdropLoading open={isLoading && resumes.length === 0} />
 
-          <ActiveFilterChips
-            tags={activeTags}
-            onRemoveTag={handleRemoveTag}
-            onClearAll={handleReset}
-          />
-
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            justifyContent="space-between"
-            alignItems={{ xs: 'stretch', sm: 'center' }}
-            spacing={2}
-          >
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary' }}>
-                {title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+      <div className="w-full rounded-[4px] border border-slate-200/80 bg-white p-5 md:p-6 shadow-2xs space-y-4">
+        {/* Row 1: Header Section (Title + Subtitle on Left, Actions on Right) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[4px] bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <Bookmark className="w-5 h-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 tracking-tight">{title}</h1>
+              <p className="text-xs text-slate-500 font-normal mt-0.5">
                 {t('employer:savedResume.subtitle')}
-              </Typography>
-            </Box>
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<UploadFileOutlinedIcon />}
-                onClick={() => setImportModalOpen(true)}
-                sx={{
-                  px: 3,
-                  py: 1,
-                  fontWeight: 700,
-                  textTransform: 'none',
-                  borderRadius: '8px',
-                }}
-              >
-                Nhập Excel/CSV
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<FileDownloadOutlinedIcon />}
-                onClick={() => setExportModalOpen(true)}
-                sx={{
-                  px: 4,
-                  py: 1,
-                  fontWeight: 900,
-                  textTransform: 'none',
-                }}
-              >
-                {t('employer:savedResume.downloadList')}
-              </Button>
-            </Stack>
-          </Stack>
-        </Stack>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setImportModalOpen(true)}
+              className="h-9 px-3 rounded-[4px] border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              <Upload className="w-3.5 h-3.5 mr-1.5 text-slate-500" />
+              Nhập Excel/CSV
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setExportModalOpen(true)}
+              className="h-9 px-3.5 rounded-[4px] bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs"
+            >
+              <Download className="w-3.5 h-3.5 mr-1.5" />
+              {t('employer:savedResume.downloadList')}
+            </Button>
+          </div>
+        </div>
+
+        {/* Row 2: Global Filter Bar */}
+        <GlobalFilterBar
+          control={control}
+          handleSubmit={handleSubmit}
+          handleSearchSubmit={(data) => handleApply(data)}
+          cityOptions={allConfig?.cityOptions || []}
+          searchPlaceholder={t('employer:savedResumeFilterForm.placeholder.enterjobpostorcandidatename')}
+          cityPlaceholder={t('employer:savedResumeFilterForm.placeholder.selectlocation')}
+          onOpenFilterDrawer={() => setDrawerOpen(true)}
+          activeFilterCount={activeFilterCount}
+        />
+
+        {/* Row 3: Active Filter Chips */}
+        <ActiveFilterChips
+          tags={activeTags}
+          onRemoveTag={handleRemoveTag}
+          onClearAll={handleReset}
+        />
 
         {/* Global Filter Drawer Standard */}
         <GlobalFilterDrawer
@@ -280,8 +253,8 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
           handleApply={(data) => handleApply(data)}
         />
 
-        {/* Table Content */}
-        <Box sx={{ overflow: 'hidden', width: '100%' }}>
+        {/* Row 4: Modern Table Content */}
+        <div className="w-full overflow-hidden">
           <SavedResumeTable
             variant="flat"
             isLoading={isLoading}
@@ -296,8 +269,8 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
             rowSelection={rowSelection}
             onRowSelectionChange={setRowSelection as OnChangeFn<RowSelectionState>}
           />
-        </Box>
-      </Paper>
+        </div>
+      </div>
 
       {/* Export Modal */}
       <ExportModal
@@ -319,7 +292,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
         entity="candidate"
         title="Nhập hồ sơ ứng viên (Candidate Import)"
       />
-    </Box>
+    </div>
   );
 };
 

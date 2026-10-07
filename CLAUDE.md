@@ -22,3 +22,4 @@
 2. **Backend**: Django 4.2+ DRF with MySQL 8. Keep ViewSets thin, isolate business logic in `apps/*/services/`. Enforce zero N+1 queries with `select_related()` and `prefetch_related()`. Detailed rules in [api/AGENTS.md](./api/AGENTS.md).
 3. **Voice AI**: LiveKit Agents Python SDK. Streaming pipeline with low-latency LLM & TTS chunking. Detailed rules in [voice-ai/AGENTS.md](./voice-ai/AGENTS.md).
 4. **Code Quality**: Run linting and verification before concluding any task. Preserve existing Vietnamese docstrings and domain comments.
+5. **Documentation & Guidelines**: Consult [docs/README.md](./docs/README.md) and [docs/coding_guidelines/README.md](./docs/coding_guidelines/README.md) for branching, commit messages, and Definition of Done (DoD).

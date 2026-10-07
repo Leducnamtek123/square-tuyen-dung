@@ -187,7 +187,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
       if (mode === 'create') {
         await contentService.employerCreateBlog(payload, thumbnailFile || undefined);
         toastMessages.success(t(submitForReview ? 'blog.messages.createReviewSuccess' : 'blog.messages.createDraftSuccess'));
-        push('/employer/blog');
+        push('/blog');
       } else if (articleId) {
         await contentService.employerUpdateBlog(articleId, payload, thumbnailFile || undefined);
         toastMessages.success(t(submitForReview ? 'blog.messages.updateReviewSuccess' : 'blog.messages.updateDraftSuccess'));
@@ -211,7 +211,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
     <Box sx={{ p: 3, maxWidth: 1100, mx: 'auto' }}>
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <IconButton aria-label="Thao tác" onClick={() => push('/employer/blog')} sx={{ bgcolor: 'action.hover' }}>
+        <IconButton aria-label="Thao tác" onClick={() => push('/blog')} sx={{ bgcolor: 'action.hover' }}>
           <ArrowBackIcon />
         </IconButton>
         <Box flex={1}>

@@ -12,6 +12,7 @@ import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import type { FormValues } from './types';
 import type { JobPostActivity, Question, QuestionGroup, VoiceProfile } from '@/types/models';
+import type { InterviewScript } from '@/types/interviewScript';
 import type { TFunction } from 'i18next';
 import InterviewCreateCardQuestionSection from './InterviewCreateCardQuestionSection';
 import { ProductTourTrigger } from '@/components/Features/ProductTour';
@@ -31,6 +32,7 @@ type Props = {
   questionGroups: QuestionGroup[];
   candidates: JobPostActivity[];
   voiceProfiles: VoiceProfile[];
+  interviewScripts?: InterviewScript[];
   isLoadingJobs: boolean;
   isLoadingCandidates: boolean;
   isLoadingVoiceProfiles: boolean;
@@ -41,6 +43,7 @@ type Props = {
   onCancel: () => void;
   onJobPostChange: (value: string | number) => void;
   onQuestionGroupChange: (value: string | number) => void;
+  onScriptChange?: (value: string | number) => void;
   onOpenAddQuestion: () => void;
   onOpenEditQuestion: () => void;
   onTestMockInterview?: () => void;
@@ -61,6 +64,7 @@ const InterviewCreateCardForm = ({
   questions,
   candidates,
   voiceProfiles,
+  interviewScripts = [],
   isLoadingJobs,
   isLoadingCandidates,
   isLoadingVoiceProfiles,
@@ -71,6 +75,7 @@ const InterviewCreateCardForm = ({
   onCancel,
   onJobPostChange,
   onQuestionGroupChange,
+  onScriptChange,
   onOpenAddQuestion,
   onOpenEditQuestion,
   onTestMockInterview,
@@ -728,6 +733,7 @@ const InterviewCreateCardForm = ({
               inputSx={inputSx}
               questionGroups={questionGroups}
               questions={questions}
+              interviewScripts={interviewScripts}
               selectedJobPostId={selectedJobPostId}
               selectedQuestionsCount={selectedQuestionsCount}
               isInterviewMutating={isInterviewMutating}
@@ -737,6 +743,7 @@ const InterviewCreateCardForm = ({
               onOpenAddQuestion={onOpenAddQuestion}
               onOpenEditQuestion={onOpenEditQuestion}
               onQuestionGroupChange={onQuestionGroupChange}
+              onScriptChange={onScriptChange}
               onTestMockInterview={onTestMockInterview}
             />
           </Grid>

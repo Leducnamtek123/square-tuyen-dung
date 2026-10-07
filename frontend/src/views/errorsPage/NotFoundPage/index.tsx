@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
   Box,
@@ -60,7 +61,10 @@ const NotFoundPage = () => {
       if (isEmployerHostname()) return '/';
       return localizeRoutePath(`/${ROUTES.EMPLOYER.DASHBOARD}`, i18n.language);
     }
-    if (isAdmin) return '/admin/dashboard';
+    if (isAdmin) {
+      if (isAdminHostname()) return '/';
+      return '/admin/dashboard';
+    }
     return '/';
   }, [isEmployer, isAdmin, i18n.language]);
 
@@ -132,33 +136,34 @@ const NotFoundPage = () => {
       const uTitle = t('adminUsersTitle', { defaultValue: 'Quản lý người dùng' });
       const uDesc = t('adminUsersDesc', { defaultValue: 'Phân quyền tài khoản doanh nghiệp & ứng viên' });
 
+      const onAdmin = isAdminHostname();
       return [
         {
           title: dTitle,
           desc: dDesc,
           icon: <DashboardOutlinedIcon sx={{ fontSize: 20 }} />,
-          path: '/admin/dashboard',
+          path: onAdmin ? '/dashboard' : '/admin/dashboard',
           ariaLabel: `${dTitle} - ${dDesc}`,
         },
         {
           title: jTitle,
           desc: jDesc,
           icon: <WorkOutlineRoundedIcon sx={{ fontSize: 20 }} />,
-          path: '/admin/jobs',
+          path: onAdmin ? '/jobs' : '/admin/jobs',
           ariaLabel: `${jTitle} - ${jDesc}`,
         },
         {
           title: pTitle,
           desc: pDesc,
           icon: <DescriptionOutlinedIcon sx={{ fontSize: 20 }} />,
-          path: '/admin/profiles',
+          path: onAdmin ? '/profiles' : '/admin/profiles',
           ariaLabel: `${pTitle} - ${pDesc}`,
         },
         {
           title: uTitle,
           desc: uDesc,
           icon: <PeopleOutlineRoundedIcon sx={{ fontSize: 20 }} />,
-          path: '/admin/users',
+          path: onAdmin ? '/users' : '/admin/users',
           ariaLabel: `${uTitle} - ${uDesc}`,
         },
       ];
@@ -437,10 +442,11 @@ const NotFoundPage = () => {
             sx={{ mb: 6, width: { xs: '100%', sm: 'auto' } }}
           >
             <Button
+              component={Link}
+              href={homePath}
               variant="contained"
               size="large"
               startIcon={<HomeRoundedIcon sx={{ fontSize: 20 }} />}
-              onClick={() => router.push(homePath)}
               aria-label={
                 isEmployer
                   ? t('backEmployerHome', { defaultValue: 'Về trang chủ NTD' })

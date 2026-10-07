@@ -91,6 +91,11 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
   const confidenceScore = softSkills?.confidence != null ? Math.round(Number(softSkills.confidence) * 10) : Math.round(score100 * 0.95);
   const clarityScore = softSkills?.clarity != null ? Math.round(Number(softSkills.clarity) * 10) : commScore100;
   const relevanceScore = Math.round((techScore100 + score100) / 2);
+  const rubric =
+    session?.interviewScriptDetail?.evaluation_rubric ||
+    session?.interviewScriptDetail?.evaluationRubric ||
+    session?.interview_script_detail?.evaluation_rubric ||
+    session?.interview_script_detail?.evaluationRubric;
 
   const radarDimensions: RadarDimension[] = [
     { key: 'content', label: 'Nội dung', value: Number.isFinite(techScore100) ? techScore100 : 0 },
@@ -219,6 +224,46 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({
             </Stack>
             <CompetencyRadarChart dimensions={radarDimensions} size={240} accentColor="#4f46e5" />
           </Box>
+
+          {/* Rubric Criteria If Applied */}
+          {rubric && Array.isArray(rubric) && rubric.length > 0 && (
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 2.5,
+                bgcolor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+              }}
+            >
+              <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', mb: 1, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Tiêu chí chấm điểm theo kịch bản
+              </Typography>
+              <Stack spacing={1}>
+                {rubric.map((item: any, idx: number) => (
+                  <Box key={idx} sx={{ p: 1.25, borderRadius: 1.5, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
+                      <Typography variant="body2" sx={{ fontWeight: 750, color: 'text.primary', fontSize: '0.8125rem' }}>
+                        {item.criterion || item.title || item.name}
+                      </Typography>
+                      {item.weight != null && (
+                        <Chip
+                          label={`Trọng số: ${item.weight}%`}
+                          size="small"
+                          sx={{ height: 20, fontSize: '0.6875rem', fontWeight: 800, bgcolor: 'primary.extralight', color: 'primary.main' }}
+                        />
+                      )}
+                    </Stack>
+                    {item.description && (
+                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5, lineHeight: 1.4 }}>
+                        {item.description}
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+          )}
 
           {/* Executive Summary */}
           <Box

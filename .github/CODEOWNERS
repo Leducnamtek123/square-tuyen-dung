@@ -1,0 +1,6 @@
+# InfoHR Codeowners
+* @infohr-devops @infohr-core
+/api/ @infohr-backend
+/frontend/ @infohr-frontend
+/voice-ai/ @infohr-ai
+/monitoring/ @infohr-devops

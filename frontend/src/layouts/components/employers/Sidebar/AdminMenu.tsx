@@ -8,6 +8,7 @@ import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { ROUTES } from '@/configs/constants';
 import { getLocalizedRouteVariants, localizeRoutePath } from '@/configs/routeLocalization';
+import { isAdminHostname, stripPortalPrefix } from '@/configs/portalRouting';
 import { useQuery } from '@tanstack/react-query';
 import adminManagementService from '@/services/adminManagementService';
 import adminJobService from '@/services/adminJobService';
@@ -29,10 +30,26 @@ interface AdminMenuProps {
 }
 
 const AdminMenu = ({ t, location, expandedItems, handleExpand, language, isCollapsed = false }: AdminMenuProps) => {
-  const routePath = (route: string) => localizeRoutePath(`/${route}`, language);
+  const routePath = (route: string) => {
+    const rawLocalized = localizeRoutePath(`/${route}`, language);
+    if (typeof window !== 'undefined') {
+      const hn = window.location.hostname;
+      if (isAdminHostname(hn)) {
+        return stripPortalPrefix(rawLocalized, hn);
+      }
+    }
+    return rawLocalized;
+  };
+
   const isSelected = (route: string) => {
     const pathname = location.pathname || '';
-    return getLocalizedRouteVariants(`/${route}`).some((path) => pathname === path || pathname.startsWith(`${path}/`));
+    const variants = getLocalizedRouteVariants(`/${route}`);
+    const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
+    const onAdminDomain = isAdminHostname(hostName);
+    return variants.some((path) => {
+      const target = onAdminDomain ? stripPortalPrefix(path, hostName) : path;
+      return pathname === target || pathname.startsWith(`${target}/`);
+    });
   };
 
   const { data: verificationsData } = useQuery({

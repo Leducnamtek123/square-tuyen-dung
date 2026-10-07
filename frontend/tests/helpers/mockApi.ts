@@ -303,10 +303,15 @@ export const MOCK_HRM_ATTENDANCE_REQUESTS = [
     id: 1,
     employee: 1,
     employee_name: 'Nguyễn Văn A',
-    request_type: 'CHECKIN_MISSING',
-    request_type_label: 'Giải trình quên chấm công',
-    target_date: '2026-09-21',
-    explanation: 'Quên chấm công vào ca sáng',
+    employee_code: 'EMP-001',
+    department_name: 'Công nghệ thông tin',
+    request_type: 'REGULARISATION',
+    request_type_label: 'Đề nghị cập nhật công (Giải trình quên chấm công)',
+    start_date: '2026-09-21',
+    end_date: '2026-09-21',
+    start_time: '08:30:00',
+    end_time: '17:30:00',
+    reason: 'Quên chấm công vào ca sáng',
     status: 'PENDING_STAGE_1',
     status_label: 'Chờ QL trực tiếp duyệt',
   },
@@ -590,6 +595,8 @@ export const MOCK_EMPLOYER_STATS = {
 export const MOCK_APPLIED_RESUMES = [
   {
     id: 10,
+    // userId: tài khoản ứng viên (serializer trả về userId) — cần để bật nút "Lên lịch phỏng vấn"
+    userId: 101,
     fullName: 'Nguyen Van Ung Vien',
     candidate_name: 'Nguyen Van Ung Vien',
     email: 'candidate.e2e@infohr.vn',

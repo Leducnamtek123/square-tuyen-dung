@@ -239,7 +239,7 @@ export const CVEditorSidebar: React.FC<CVEditorSidebarProps> = ({
       </Box>
 
       {/* -- Tab Content Forms Scrollable Container (pb: 10 on mobile to clear launcher) -- */}
-      <Box sx={{ flex: 1, overflowY: 'auto', p: { xs: 1.5, sm: 2.5 }, pb: { xs: 10, sm: 4 } }}>
+      <Box sx={{ flex: 1, overflowY: 'auto', p: { xs: 1.5, sm: 2 }, pb: { xs: 10, sm: 4 } }}>
         {activeTab === 'content' && (
           <UnifiedCVForm
             data={data}

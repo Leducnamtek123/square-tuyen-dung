@@ -67,7 +67,19 @@ const NotificationCard: React.FC = () => {
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        <IconButton size="large" aria-label={t('notification.openMenu')} color="inherit" onClick={openNotificationsMenu}>
+        <IconButton
+          size="large"
+          aria-label={t('notification.openMenu')}
+          color="inherit"
+          onClick={openNotificationsMenu}
+          sx={{
+            borderRadius: '50%',
+            outline: 'none !important',
+            '&:focus, &:focus-visible': {
+              outline: 'none !important',
+            },
+          }}
+        >
           <Badge badgeContent={unreadCount} color="error">
             <NotificationsNoneOutlinedIcon />
           </Badge>

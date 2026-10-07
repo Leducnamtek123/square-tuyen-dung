@@ -125,7 +125,7 @@ def analyze_dead_code_and_orphans(files, code_contents):
         fname = f.stem
         
         # Whitelist entrypoints
-        if f.name in ['page.tsx', 'layout.tsx', 'route.ts', 'error.tsx', 'not-found.tsx', 'loading.tsx', 'template.tsx', 'default.tsx', 'middleware.ts', 'shims.d.ts', 'global.d.ts', 'index.ts', 'index.tsx']:
+        if f.name in ['page.tsx', 'layout.tsx', 'route.ts', 'error.tsx', 'not-found.tsx', 'loading.tsx', 'template.tsx', 'default.tsx', 'middleware.ts', 'proxy.ts', 'shims.d.ts', 'global.d.ts', 'index.ts', 'index.tsx']:
             continue
         if 'src/app/' in rel:
             continue

@@ -158,15 +158,15 @@ class RetryRateLimitTransport(httpx.AsyncBaseTransport):
                 resp_content = await resp.aread()
                 if len(resp_content) > 100:
                     try:
-                        def _save_to_disk():
+                        def _save_to_disk(data: bytes) -> None:
                             tmp_f = f"{cache_file}.tmp.{os.getpid()}"
-                            pathlib.Path(tmp_f).write_bytes(resp_content)
+                            pathlib.Path(tmp_f).write_bytes(data)
                             os.replace(tmp_f, cache_file)
                             try:
                                 os.chmod(cache_file, 0o666)
                             except Exception:
                                 pass
-                        await asyncio.to_thread(_save_to_disk)
+                        await asyncio.to_thread(_save_to_disk, resp_content)
                         logger.info("TTS Cache SAVED to %s (%d bytes)", cache_file, len(resp_content))
                     except Exception as save_exc:
                         logger.warning("Failed to save TTS cache: %s", save_exc)

@@ -24,6 +24,7 @@ import torch
 import numpy as np
 
 import os
+import re
 import time
 import cv2
 import glob
@@ -61,10 +62,17 @@ def load_model(opt):
     return audio_processor,model
 
 def load_avatar(avatar_id):
-    avatar_path = f"./data/avatars/{avatar_id}"
-    full_imgs_path = f"{avatar_path}/full_imgs" 
-    face_imgs_path = f"{avatar_path}/face_imgs" 
-    coords_path = f"{avatar_path}/coords.pkl" 
+    clean_id = re.sub(r'[^a-zA-Z0-9_\-]', '', str(avatar_id))
+    if not clean_id:
+        raise ValueError("Invalid avatar_id")
+    base_dir = os.path.abspath(os.path.join(".", "data", "avatars"))
+    avatar_path = os.path.abspath(os.path.join(base_dir, clean_id))
+    if not (avatar_path.startswith(base_dir + os.sep) and os.path.isdir(avatar_path)):
+        raise ValueError(f"Avatar directory {avatar_path} is invalid or outside allowed directory")
+
+    full_imgs_path = os.path.join(avatar_path, "full_imgs")
+    face_imgs_path = os.path.join(avatar_path, "face_imgs")
+    coords_path = os.path.join(avatar_path, "coords.pkl") 
     
     model = Model(6, 'hubert').to(device)
     model.load_state_dict(torch.load(f"{avatar_path}/ultralight.pth"))

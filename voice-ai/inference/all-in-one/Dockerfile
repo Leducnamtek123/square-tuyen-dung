@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.5
-ARG VLLM_IMAGE=vllm/vllm-openai:v0.10.1
-FROM ${VLLM_IMAGE}
+ARG VLLM_IMAGE=vllm/vllm-openai:v0.10.1@sha256:c62343ee72f094ef574ab3af2717d0c60fec5e0808b238f19ac4c0d22fd152f7
+FROM vllm/vllm-openai:v0.10.1@sha256:c62343ee72f094ef574ab3af2717d0c60fec5e0808b238f19ac4c0d22fd152f7
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -75,7 +75,12 @@ COPY all-in-one/supervisord.conf /etc/supervisor/conf.d/square-ai.conf
 RUN chmod +x /opt/square-ai/start_llm.sh \
     /opt/square-ai/start_whisper.sh \
     /opt/square-ai/start_tts.sh \
-    && mkdir -p /models/huggingface /models/whisper /var/log/square-ai
+    && mkdir -p /models/huggingface /models/whisper /var/log/square-ai && \
+    groupadd -g 1001 appuser && \
+    useradd -u 1001 -g appuser -m appuser && \
+    chown -R appuser:appuser /opt /models /var/log/square-ai
+
+USER appuser
 
 EXPOSE 8000 8080 8298
 

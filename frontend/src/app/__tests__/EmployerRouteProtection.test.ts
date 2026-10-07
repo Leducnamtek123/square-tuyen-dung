@@ -29,4 +29,10 @@ describe('Employer Route Protection & EmployerSectionClient Guard', () => {
     expect(clientGateSource).toContain("user?.isOnboarded === false && !pathname.includes('/onboarding')");
     expect(clientGateSource).toContain("window.location.replace('/onboarding/employer')");
   });
+
+  it('includes both localized and English chat paths for employer domain', () => {
+    expect(clientGateSource).toContain("'/ket-noi-voi-ung-vien'");
+    expect(clientGateSource).toContain("'/chat'");
+    expect(clientGateSource).toContain("strippedPath === '/ket-noi-voi-ung-vien'");
+  });
 });

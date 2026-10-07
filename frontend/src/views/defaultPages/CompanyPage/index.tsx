@@ -35,10 +35,10 @@ const CompanyPage = () => {
         sx={{
           position: 'absolute',
           top: -20,
-          right: { xs: '-100px', md: '5%', lg: '8%' },
-          width: { xs: '320px', md: '480px', lg: '560px' },
+          right: { xs: 0, md: '5%', lg: '8%' },
+          width: { xs: '240px', sm: '320px', md: '480px', lg: '560px' },
           height: '380px',
-          opacity: 0.15,
+          opacity: { xs: 0.08, md: 0.15 },
           pointerEvents: 'none',
           zIndex: 0,
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cpath fill='%232563eb' d='M500 200h80v400h-80zM600 120h100v480h-100zM420 300h60v300h-60zM320 250h80v350h-80zM220 380h80v220h-80zM680 80h80v520h-80z'/%3E%3C/svg%3E")`,

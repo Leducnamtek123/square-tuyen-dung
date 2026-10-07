@@ -146,9 +146,9 @@ export default function RequestManagementPage() {
   const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
     if (newValue === 'ALL') {
-      router.push('/employer/hrm/attendances/requests');
+      router.push('/hrm/attendances/requests');
     } else {
-      router.push(`/employer/hrm/attendances/requests?type=${newValue}`);
+      router.push(`/hrm/attendances/requests?type=${newValue}`);
     }
   };
 
@@ -391,7 +391,7 @@ export default function RequestManagementPage() {
             action={
               <Button
                 component={Link}
-                href="/employer/hrm/leaves"
+                href="/hrm/leaves"
                 size="small"
                 variant="contained"
                 sx={{
@@ -706,7 +706,7 @@ export default function RequestManagementPage() {
                 >
                   {employees.map((emp) => (
                     <MenuItem key={emp.id} value={String(emp.id)}>
-                      {emp.first_name} {emp.last_name} ({emp.employee_code || 'Chưa có mã'}) - {emp.department_name}
+                      {emp.fullName || emp.full_name || [emp.last_name, emp.first_name].filter(Boolean).join(' ')} ({emp.employee_code || 'Chưa có mã'}) - {emp.department_name}
                     </MenuItem>
                   ))}
                 </TextField>

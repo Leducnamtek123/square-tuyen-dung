@@ -22,11 +22,12 @@ test.describe('Candidate interview room smoke', () => {
       }
     });
 
-    await page.route('**/api/common/configs**', async (route) => {
+    // API client dùng prefix /api/v1/ (httpRequest baseURL); chấp nhận cả /api/ cũ
+    await page.route(/\/api\/(v1\/)?common\/configs/, async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
     });
 
-    await page.route('**/api/common/all-careers**', async (route) => {
+    await page.route(/\/api\/(v1\/)?common\/all-careers/, async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -34,7 +35,7 @@ test.describe('Candidate interview room smoke', () => {
       });
     });
 
-    await page.route(/\/api\/interview\/web\/sessions\/invite\/demo-invite\/$/, async (route) => {
+    await page.route(/\/api\/(v1\/)?interview\/web\/sessions\/invite\/demo-invite\/$/, async (route) => {
       sessionDetailRequests += 1;
       await route.fulfill({
         status: 200,
@@ -57,7 +58,7 @@ test.describe('Candidate interview room smoke', () => {
       });
     });
 
-    await page.route(/\/api\/interview\/web\/sessions\/invite\/demo-invite\/livekit-token\/$/, async (route) => {
+    await page.route(/\/api\/(v1\/)?interview\/web\/sessions\/invite\/demo-invite\/livekit-token\/$/, async (route) => {
       livekitTokenRequests += 1;
       await route.fulfill({
         status: 200,
@@ -70,7 +71,7 @@ test.describe('Candidate interview room smoke', () => {
       });
     });
 
-    await page.route(/\/api\/interview\/web\/sessions\/room-demo\/status\/$/, async (route) => {
+    await page.route(/\/api\/(v1\/)?interview\/web\/sessions\/room-demo\/status\/$/, async (route) => {
       statusUpdateRequests += 1;
       await route.fulfill({
         status: 200,
@@ -84,17 +85,47 @@ test.describe('Candidate interview room smoke', () => {
       });
     });
 
+    // Cổng sẵn sàng TTS/STT (warmup) trước khi vào phòng
+    await page.route(/\/api\/(v1\/)?interview\/web\/sessions\/[^/]+\/warmup\/$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, tts: 'ready', stt: 'ready' }),
+      });
+    });
+
+    // Giả lập LiveKit WebSocket luôn mở (không cần LiveKit server thật)
+    await page.routeWebSocket(/.*livekit.*/, () => {
+      // giữ kết nối mở, không đóng
+    });
+
+    // Tắt tour hướng dẫn phòng phỏng vấn để overlay không che HUD
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem('infohr_product_tour_completed_interview_ai_live', 'true');
+      } catch {}
+    });
+
     await page.goto('/interview/demo-invite', { waitUntil: 'domcontentloaded' });
 
     const startButton = page.locator('button').filter({ hasText: /Bắt đầu|Báº¯t|Start/i }).first();
     await expect(startButton).toBeVisible({ timeout: 20_000 });
     await startButton.click();
 
-    const joinButton = page.locator('button').filter({ hasText: /Tham gia|Join/i }).first();
+    // Nút vào phòng: ưu tiên data-testid ổn định (copy hiện tại: "Vào phòng phỏng vấn ...")
+    const joinButton = page
+      .getByTestId('join-interview-room-btn')
+      .or(page.locator('button').filter({ hasText: /Vào phòng|Tham gia|Join/i }))
+      .first();
     await expect(joinButton).toBeEnabled({ timeout: 20_000 });
     await joinButton.click();
 
-    await expect(page.locator('button').filter({ hasText: /Kết thúc|Káº¿t thÃºc|End/i }).first()).toBeVisible({
+    await expect(
+      page
+        .getByTestId('end-interview-btn')
+        .or(page.locator('button').filter({ hasText: /Kết thúc|Káº¿t thÃºc|End/i }))
+        .first()
+    ).toBeVisible({
       timeout: 20_000,
     });
     await page.waitForTimeout(3_000);

@@ -39,27 +39,23 @@ export const AnimatedFlame: React.FC<AnimatedFlameProps> = ({ size = 20, classNa
           overflow: 'visible',
           animation: 'flameBodyDance 1.6s infinite ease-in-out',
           transformOrigin: '50% 90%',
+          willChange: 'transform',
           filter: 'drop-shadow(0 0 3px rgba(249, 115, 22, 0.65)) drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))',
           '@keyframes flameBodyDance': {
             '0%': {
               transform: 'scale(1) rotate(0deg)',
-              filter: 'drop-shadow(0 0 3px rgba(249, 115, 22, 0.65)) drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))',
             },
             '25%': {
               transform: 'scale(1.05, 0.95) rotate(-2.5deg)',
-              filter: 'drop-shadow(0 0 5px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 10px rgba(239, 68, 68, 0.5))',
             },
             '50%': {
               transform: 'scale(0.97, 1.04) rotate(2deg)',
-              filter: 'drop-shadow(0 0 4px rgba(249, 115, 22, 0.7)) drop-shadow(0 0 7px rgba(239, 68, 68, 0.4))',
             },
             '75%': {
               transform: 'scale(1.04, 1.01) rotate(-1.5deg)',
-              filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 9px rgba(239, 68, 68, 0.5))',
             },
             '100%': {
               transform: 'scale(1) rotate(0deg)',
-              filter: 'drop-shadow(0 0 3px rgba(249, 115, 22, 0.65)) drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))',
             },
           },
         }}

@@ -54,10 +54,11 @@ export class AtsKanbanPage extends BasePage {
     this.appliedTable = page.locator('table, [role="table"]').first();
     this.tableRows = page.locator('tbody tr');
 
-    this.exportBtn = page.getByRole('button', { name: /xuất danh sách|xuất excel/i }).first();
-    this.exportModal = page.locator('[role="dialog"]').filter({ hasText: /xuất dữ liệu|xuất danh sách/i }).first();
+    // Xuất danh sách nằm trong menu "Thao tác dữ liệu" → mục "Tải danh sách"
+    this.exportBtn = page.getByRole('button', { name: /thao tác dữ liệu/i }).first();
+    this.exportModal = page.locator('[role="dialog"]').filter({ hasText: /xuất dữ liệu|xuất danh sách|export/i }).first();
     this.exportConfirmBtn = this.exportModal.getByRole('button', { name: /tải xuống|xuất/i }).first();
-    this.importBtn = page.getByRole('button', { name: /nhập excel/i }).first();
+    this.importBtn = page.getByRole('menuitem', { name: /nhập excel/i }).first();
 
     this.statusMenu = page.locator('.MuiMenu-paper, [role="menu"]').first();
     this.statusMenuItems = this.statusMenu.locator('[role="menuitem"]');
@@ -69,7 +70,7 @@ export class AtsKanbanPage extends BasePage {
     this.scheduleCloseBtn = this.quickScheduleModal.locator('button[aria-label="close"], button:has-text("Đóng")').first();
 
     this.hrmConvertBtn = page.locator('button[aria-label*="HRM"], button:has([data-testid="PersonAddAltIcon"])').first();
-    this.hrmDialog = page.locator('[role="dialog"]').filter({ hasText: /chuyển sang hrm|tạo nhân viên/i }).first();
+    this.hrmDialog = page.locator('[role="dialog"]').filter({ hasText: /tiếp nhận nhân sự|chuyển sang hrm|tạo nhân viên/i }).first();
   }
 
   /**
@@ -101,11 +102,25 @@ export class AtsKanbanPage extends BasePage {
   }
 
   /**
+   * Xác định card (Kanban) hoặc dòng (Bảng) của ứng viên theo ID hồ sơ ứng tuyển.
+   * Kanban dùng @hello-pangea/dnd (thuộc tính data-rfd-*); dòng bảng chứa ô chọn trạng thái id="status-select-{id}".
+   */
+  candidateContainer(candidateId: number | string): Locator {
+    const id = String(candidateId);
+    return this.page
+      .locator(`[data-rfd-draggable-id="${id}"], [data-rbd-draggable-id="${id}"]`)
+      .or(this.page.locator('tbody tr').filter({ has: this.page.locator(`[id="status-select-${id}"]`) }))
+      .first();
+  }
+
+  /**
    * Kéo thả card ứng viên sang cột trạng thái mới
    */
   async dragCandidate(candidateId: number | string, targetColumnStatusId: string | number) {
-    const card = this.page.locator(`[data-rbd-draggable-id="${candidateId}"]`).first();
-    const targetColumn = this.page.locator(`[data-rbd-droppable-id="${targetColumnStatusId}"]`).first();
+    const card = this.candidateContainer(candidateId);
+    const targetColumn = this.page
+      .locator(`[data-rfd-droppable-id="${targetColumnStatusId}"], [data-rbd-droppable-id="${targetColumnStatusId}"]`)
+      .first();
 
     if ((await card.isVisible()) && (await targetColumn.isVisible())) {
       await card.dragTo(targetColumn);
@@ -117,9 +132,7 @@ export class AtsKanbanPage extends BasePage {
    * Chuyển trạng thái ứng viên bằng Menu Thao tác (DriveFileMove icon)
    */
   async changeCandidateStatusViaMenu(candidateId: number | string, targetStatusNameOrId: string | number) {
-    const card = this.page.locator(`[data-rbd-draggable-id="${candidateId}"]`).or(
-      this.page.locator('.MuiCard-root, tr').filter({ hasText: String(candidateId) })
-    ).first();
+    const card = this.candidateContainer(candidateId);
 
     const moveBtn = card.locator('button[aria-label="Chuyển trạng thái"], button:has([data-testid="DriveFileMoveOutlinedIcon"])').first();
     await expect(moveBtn).toBeVisible({ timeout: 10_000 });
@@ -137,12 +150,11 @@ export class AtsKanbanPage extends BasePage {
    * Mở modal lên lịch phỏng vấn nhanh từ card ứng viên
    */
   async openInterviewScheduleModal(candidateId: number | string) {
-    const card = this.page.locator(`[data-rbd-draggable-id="${candidateId}"]`).or(
-      this.page.locator('.MuiCard-root, tr').filter({ hasText: String(candidateId) })
-    ).first();
+    const card = this.candidateContainer(candidateId);
 
     const scheduleBtn = card.locator('button[aria-label="Lên lịch phỏng vấn"], button:has([data-testid="EventIcon"])').first();
     await expect(scheduleBtn).toBeVisible({ timeout: 10_000 });
+    await expect(scheduleBtn).toBeEnabled({ timeout: 10_000 });
     await scheduleBtn.click();
 
     await expect(this.quickScheduleModal).toBeVisible({ timeout: 10_000 });
@@ -181,6 +193,8 @@ export class AtsKanbanPage extends BasePage {
   async exportExcel() {
     await expect(this.exportBtn).toBeVisible({ timeout: 15_000 });
     await this.exportBtn.click();
+    // Mở modal xuất dữ liệu từ menu "Thao tác dữ liệu"
+    await this.page.getByRole('menuitem', { name: /tải danh sách|download list/i }).first().click();
 
     await expect(this.exportModal).toBeVisible({ timeout: 10_000 });
     

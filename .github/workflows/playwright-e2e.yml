@@ -7,19 +7,22 @@ on:
     - cron: '0 18 * * *' # Chạy định kỳ 1h sáng giờ VN
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   fast-mocked-e2e:
     name: "Tier 1: Fast Mocked E2E Matrix"
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aaa8cca74f48d # v3.0.0
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5a1 # v4.1.0
         with:
           node-version: 20
           cache: 'pnpm'
@@ -43,7 +46,7 @@ jobs:
 
       - name: Upload HTML Test Report on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb99baeddf # v4.5.0
         with:
           name: playwright-mock-report
           path: frontend/playwright-report/
@@ -55,7 +58,7 @@ jobs:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Start Full Docker Compose Stack
         run: docker compose -f docker-compose.yml up -d --build
@@ -65,11 +68,11 @@ jobs:
           docker compose exec -T backend python manage.py migrate
           docker compose exec -T backend python manage.py check
 
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@a3252b78c470c02df07e9d59298aaa8cca74f48d # v3.0.0
         with:
           version: 9
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5a1 # v4.1.0
         with:
           node-version: 20
           cache: 'pnpm'

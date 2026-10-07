@@ -692,13 +692,13 @@ export const CVEditorPage: React.FC = () => {
                 onChange={(e) => handleDataChange({ ...cvData, title: e.target.value })}
                 style={{
                   fontWeight: 700,
-                  fontSize: '0.8rem',
+                  fontSize: '1rem',
                   fontFamily: 'Inter, sans-serif',
                   color: '#0f172a',
                   background: 'transparent',
                   border: '1px solid transparent',
                   borderRadius: '6px',
-                  padding: '1px 3px',
+                  padding: '2px 4px',
                   outline: 'none',
                   flex: 1,
                   minWidth: 0,
@@ -930,12 +930,12 @@ export const CVEditorPage: React.FC = () => {
 
       {/* -- Main Studio Body ----------------------------------------------- */}
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* Left Side: Form Controls Sidebar (460px fixed) */}
+        {/* Left Side: Form Controls Sidebar (460px - 500px responsive) */}
         <Box
           data-tour="cv-ai-assist"
           className="no-print"
           sx={{
-            width: { xs: '100%', md: 450, lg: 480 },
+            width: { xs: '100%', md: 460, lg: 480, xl: 500 },
             shrink: 0,
             height: '100%',
             overflow: 'hidden',

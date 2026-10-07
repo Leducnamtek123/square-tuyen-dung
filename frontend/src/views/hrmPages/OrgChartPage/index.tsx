@@ -503,7 +503,7 @@ export default function OrgChartPage() {
             <Typography variant="body2" sx={{ color: '#64748b', maxWidth: 460, mx: 'auto', mb: 3 }}>
               Doanh nghiệp của bạn chưa tạo phòng ban nào hoặc chưa phân cấp cơ cấu tổ chức.
             </Typography>
-            <Link href="/employer/hrm/departments" style={{ textDecoration: 'none' }}>
+            <Link href="/hrm/departments" style={{ textDecoration: 'none' }}>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}

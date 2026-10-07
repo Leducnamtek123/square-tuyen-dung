@@ -108,12 +108,16 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ data, language = 'vi' 
                     <span>{skill.name}</span>
                   </div>
                   {skill.level ? (
-                    <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden"
+                      style={{ borderRadius: 9999 }}
+                    >
                       <div
                         className="h-full rounded-full transition-all duration-300"
                         style={{
                           width: `${(skill.level / 5) * 100}%`,
                           backgroundColor: primaryColor,
+                          borderRadius: 9999,
                         }}
                       />
                     </div>

@@ -1,0 +1,317 @@
+{
+  "version": 1,
+  "skills": {
+    "adaptive-metrics": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/adaptive-metrics/SKILL.md",
+      "computedHash": "79de088aa3ebd0e08ced058180125e8083e04f7ca6e2590912229a92c3519762"
+    },
+    "admin": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/admin/SKILL.md",
+      "computedHash": "3c1442fd0f562104473b4299934de410802aad6ba2fc44b7a7a4e9dd1563fd32"
+    },
+    "admission-control": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-app-sdk/admission-control/SKILL.md",
+      "computedHash": "03de8ae7052eaa6fd9544c7fd6cb9489077399fabb12a958386ceb4b0f09c7c2"
+    },
+    "alerting-irm": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/alerting-irm/SKILL.md",
+      "computedHash": "2037eed7dc356ba49cbf56e65cd37e5bc1d2f3dfc41ac621ac5777f5ac07a9ee"
+    },
+    "alloy": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/alloy/SKILL.md",
+      "computedHash": "6a8c4d6195197b90420c9016e2a97b4e0145407790392e3743adbb4ee21c7fdd"
+    },
+    "app-observability": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/app-observability/SKILL.md",
+      "computedHash": "28a8cc995b0bcc7cf7e602db0cea827d4f83f017260a7b1e254e64c5d72b0691"
+    },
+    "app-sdk-concepts": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-app-sdk/app-sdk-concepts/SKILL.md",
+      "computedHash": "b44b5c86db33e1c858f66c2435f62270a1ead65697abb756c12158aa1d81eb12"
+    },
+    "assistant-mcp": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/assistant-mcp/SKILL.md",
+      "computedHash": "a0f9b7357efcae398095c2d295311d1c46b8fa9f5054dda7eec37abc4da66095"
+    },
+    "audit-and-reduce-dependencies": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-plugins/audit-and-reduce-dependencies/SKILL.md",
+      "computedHash": "777fc9b99f3ae4691688d7d56721dc73baca48c5bb23fdf51233cb7c25d798dd"
+    },
+    "beyla": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/beyla/SKILL.md",
+      "computedHash": "90a2dc977da3ae20ef558907f2729762bc3e0b4694c79680bc3abc57e1270585"
+    },
+    "check-npm": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-plugins/check-npm/SKILL.md",
+      "computedHash": "b1d447c8646bc84c42e73894113419075a951d5955b705c7fdf979318d58149c"
+    },
+    "cloud-integrations": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/cloud-integrations/SKILL.md",
+      "computedHash": "3f899becd8824966661ca42dd7ae11b07e4ecf11f1b362c0f4a6f60ea39d8f49"
+    },
+    "cost-management": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/cost-management/SKILL.md",
+      "computedHash": "dccbcfc67546a2fde318c6140f96844ec6d3d4937128efa9f8a524fb7f71f229"
+    },
+    "cue-kind-definition": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-app-sdk/cue-kind-definition/SKILL.md",
+      "computedHash": "0c7ffdb3b6540e86227177ee05d29f0788bd5f2191afd76ae1b9944c6ec9e2d3"
+    },
+    "dashboarding": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/dashboarding/SKILL.md",
+      "computedHash": "cafd091f7b71fb043ada1b9bbf17e529474b6116dbd3c9e31d70d787b1eb90e3"
+    },
+    "database-observability": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/database-observability/SKILL.md",
+      "computedHash": "04d8e35bd165df7008f61925a75f0a5a9aa040e0dd7436b539f82b241bc4c866"
+    },
+    "datasources-provisioning": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-datasources/datasources-provisioning/SKILL.md",
+      "computedHash": "70804a1aa0ac73711335106daf7e3656ca8d665a1c6e4a95c0a3b1535586ab9c"
+    },
+    "dpm-finder": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/dpm-finder/SKILL.md",
+      "computedHash": "7192f2a6b31f83ee6f75daeeff3a6432dd7684ab288abb8319968fc54406f271"
+    },
+    "fleet-management": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/fleet-management/SKILL.md",
+      "computedHash": "dde74e17fe0e981b208cddf857cf6667a01a97ca23cdbad992bf3aaf83b5188b"
+    },
+    "frontend-session-rca": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/frontend-session-rca/SKILL.md",
+      "computedHash": "7dfa1c5433c480d3ae92f275227a09996e39bb844de4afb2fd6a314f4e03ebc6"
+    },
+    "grafana-oss": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/grafana-oss/SKILL.md",
+      "computedHash": "6e7aa29959879df2f005dbe2e044f99b73011f16e656ea3e50713fa0c228bf0f"
+    },
+    "grafana-scenes": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-plugins/grafana-scenes/SKILL.md",
+      "computedHash": "e9dd3203a6da7efe158bbd42c2745fe4a3a30ecbeb99698e7431432b01e1f823"
+    },
+    "infrastructure": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/infrastructure/SKILL.md",
+      "computedHash": "01d2d604793c2a7ebf7d83b57ed5132afc48d40beb33d16e0fe28db4d313452b"
+    },
+    "k6": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-k6/k6/SKILL.md",
+      "computedHash": "3b8f48ee2938a95e5508b71b74eb812f9c48173445fbb02a7bd81a38fc4bded4"
+    },
+    "k6-cloud-investigate-test": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-k6/k6-cloud-investigate-test/SKILL.md",
+      "computedHash": "f4d0e01a9c4970893700cea11744a5ed8294f6bb35e228c833ce4a75148bcac3"
+    },
+    "k6-docs": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-k6/k6-docs/SKILL.md",
+      "computedHash": "2ad5b850cf6dda90cebb4f4f3f60fdbcce4b9a8c1112e3b3049ca84863111551"
+    },
+    "k6-manage": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-k6/k6-manage/SKILL.md",
+      "computedHash": "56901e5990a9c3dbb3e828b3022c578c9f4dcf34e51cd750f38b70674ac4a3db"
+    },
+    "k6-perf-test-website": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-k6/k6-perf-test-website/SKILL.md",
+      "computedHash": "130593d693a019e9881d3aff08ff4d250744e9243c3e7d9947272b01db595437"
+    },
+    "k6-test-maintenance": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-k6/k6-test-maintenance/SKILL.md",
+      "computedHash": "9eb61e06b5916e9e96aa8bbd43dfd7ec7da82c9380580cd265186e6c0fffeee5"
+    },
+    "k6-trend-analysis": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-k6/k6-trend-analysis/SKILL.md",
+      "computedHash": "626db38d03551b3d2b64e73e55a2cb71c67e3b3348261ce36a27c8ee43044b80"
+    },
+    "loki": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-lgtm/loki/SKILL.md",
+      "computedHash": "d795a6d243616bcda87e1506c0d0847f62a354c6ccb4f881d73f78c3f4f063e3"
+    },
+    "loki-label-analyzer": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/loki-label-analyzer/SKILL.md",
+      "computedHash": "3df886a204ad14358ea6b438111bcabf0c8fe85bd7b441714b370195fe9bc4ba"
+    },
+    "mimir": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-lgtm/mimir/SKILL.md",
+      "computedHash": "fd7cf669fe6f0dfd910f9c13fc9208dcdfbf44bbc9bd1ae60a87f8cdfc6b82fb"
+    },
+    "ml-ai": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/ml-ai/SKILL.md",
+      "computedHash": "733d6248b6e380d31b2d66fedc021c5a39917e238929aba89487ad5deffd0c25"
+    },
+    "oncall-irm": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/oncall-irm/SKILL.md",
+      "computedHash": "983e04605f94a552c28a1258c3f36c46d02c287b48013914ca485248d8872f04"
+    },
+    "opentelemetry": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/opentelemetry/SKILL.md",
+      "computedHash": "772a52faf409e5ed3a353bde694aaa1df017d87d63f1fb6489c7c9c2ab3b22ee"
+    },
+    "plugin-bundle-size": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-plugins/plugin-bundle-size/SKILL.md",
+      "computedHash": "71e4831fd586c695d895f012e9b3748052ebb1e442cf774a7ca3782e169989dd"
+    },
+    "private-connectivity": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/private-connectivity/SKILL.md",
+      "computedHash": "02ed54bba35973287c86c5aaa926969e2cf9b4b208b0921b7fdbe8ba202c08a3"
+    },
+    "profilecli-insights": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-lgtm/profilecli-insights/SKILL.md",
+      "computedHash": "43b7c27655b3dfcee1bb47fd4e8a563c94dc875198ca2ff3f14ace19f59badaa"
+    },
+    "prometheus": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-lgtm/prometheus/SKILL.md",
+      "computedHash": "7d4943135c4ce4c0bce89eb06073c87557e1d86a9e9ba1ed1d65ee774f9b430d"
+    },
+    "prometheus-cardinality-troubleshooter": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/prometheus-cardinality-troubleshooter/SKILL.md",
+      "computedHash": "bd54948af8b8d46e2dc5e56794b58f6e9f53bbca03fd0cbb0f4fdaf05c6bc473"
+    },
+    "prometheus-label-strategy": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/prometheus-label-strategy/SKILL.md",
+      "computedHash": "7735a8e3e366028c48e5c12c106a0853c21e53e14cad7a5b98661824586bb895"
+    },
+    "promql": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/promql/SKILL.md",
+      "computedHash": "5a54dc2c9319e52d59d5b8694c51700a7795bc611584021c258d5d3c3274e5fd"
+    },
+    "pyroscope": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-lgtm/pyroscope/SKILL.md",
+      "computedHash": "2a95d2f65e3b023a82fd58684e1ebbb19d8ab7691fa764bb725acf9a9f88b194"
+    },
+    "react-19-plugin-migration": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-plugins/react-19-plugin-migration/SKILL.md",
+      "computedHash": "7c7fccad9526df73d5609eb136fe169d03cdc5282f65bfa597a132cd37e0e110"
+    },
+    "reconciler-logic": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-app-sdk/reconciler-logic/SKILL.md",
+      "computedHash": "28333e9b304969e605e4402f9675777daf3ae4d3608dbefdee41c12a7e8643cc"
+    },
+    "send-data": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/send-data/SKILL.md",
+      "computedHash": "42c7639cd68b257cc16f74be1d04cf9194ed8f0f7fe03d7a0ae40044ab20b47d"
+    },
+    "skill-authoring": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-core/skill-authoring/SKILL.md",
+      "computedHash": "4bcb952898f3f640c6cc38779d4e24986597b010d83544305315994d8f27dc46"
+    },
+    "synthetic-monitoring-checks": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/synthetic-monitoring-checks/SKILL.md",
+      "computedHash": "5c65f13295c61496a96a710d6461d36b7b87401008398ed3344328d2fc6538a8"
+    },
+    "tempo": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-lgtm/tempo/SKILL.md",
+      "computedHash": "f50c5fe9e723c963b3e77e8594be9dd3135c392913b73a78788ee09cbe8d2cce"
+    },
+    "testing": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "skills/grafana-cloud/testing/SKILL.md",
+      "computedHash": "a79f64578b69c030f9946d39bb346adb8b192eb4d4c82a71b116c974796186fb"
+    },
+    "your-skill-name": {
+      "source": "grafana/skills",
+      "sourceType": "github",
+      "skillPath": "template/SKILL.md",
+      "computedHash": "ecb525feeadd0e0d698a506c80090b0f2bda27233ea3dae3ba389e9d8ad7f379"
+    }
+  }
+}

@@ -37,7 +37,9 @@ test.describe('Phân Hệ HRM - Cơ Cấu Tổ Chức & Sơ Đồ Cây (Org Char
 
     // 3. Điều hướng tới Sơ đồ tổ chức (Org Chart)
     await page.goto('/employer/hrm/org-chart');
-    await expect(page.getByText(/sơ đồ cây tổ chức|sơ đồ tổ chức/i).first()).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole('heading', { name: /sơ đồ cây tổ chức|sơ đồ tổ chức/i }).first()).toBeVisible({
+      timeout: 20_000,
+    });
 
     // 4. Kiểm tra các nút phòng ban trong cây sơ đồ tổ chức
     await expect(page.getByText('Ban Giám Đốc').first()).toBeVisible({ timeout: 15_000 });

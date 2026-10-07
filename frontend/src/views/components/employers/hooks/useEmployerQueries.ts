@@ -10,6 +10,8 @@ import questionService from '@/services/questionService';
 import questionGroupService from '@/services/questionGroupService';
 import companyService from '@/services/companyService';
 import companyImageService from '@/services/companyImageService';
+import interviewScriptService from '@/services/interviewScriptService';
+import type { InterviewScript, GetScriptsParams } from '@/types/interviewScript';
 import { normalizePaginatedResponse } from '@/utils/apiResponse';
 import { PaginatedResponse } from '@/types/api';
 import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup, CompanyImage, VoiceProfile } from '@/types/models';
@@ -525,6 +527,14 @@ export const useQuestionGroupMutations = () => {
     deleteQuestionGroup: deleteMutation.mutateAsync,
     isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
   };
+};
+
+// --- Interview Scripts ---------------------------------------
+export const useEmployerInterviewScripts = (params: GetScriptsParams = {}) => {
+  return useQuery<InterviewScript[]>({
+    queryKey: ['employerInterviewScripts', params],
+    queryFn: () => interviewScriptService.getScripts(params),
+  });
 };
 
 // --- Company Profile -----------------------------------------

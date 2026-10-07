@@ -26,18 +26,18 @@ const CandidateCvScoreCard: React.FC<CandidateCvScoreCardProps> = ({ viewedCount
     <Card
       elevation={0}
       sx={{
-        p: 3,
-        borderRadius: '24px',
-        border: '1px solid rgba(226, 232, 240, 0.85)',
+        p: 2.5,
+        borderRadius: '16px',
+        border: '1px solid #e2e8f0',
         backgroundColor: '#ffffff',
-        boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)',
+        boxShadow: '0 4px 20px -2px rgba(0,0,0,0.03)',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         transition: 'transform 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease',
         '&:hover': {
-          transform: 'translateY(-3px)',
-          boxShadow: '0 25px 45px -10px rgba(15, 57, 127, 0.10)',
+          transform: 'translateY(-2px)',
+          boxShadow: '0 8px 24px -4px rgba(15, 23, 42, 0.08)',
         },
       }}
     >

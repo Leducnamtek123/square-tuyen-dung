@@ -48,18 +48,27 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
   onDelete,
   isCloning = false,
 }) => {
-  const scenarioMeta = SCENARIO_OPTIONS.find((s) => s.type === script.scenario_type) || {
-    type: script.scenario_type,
-    label: script.scenario_type,
-    shortLabel: script.scenario_type,
+  const scenarioType = script.scenario_type || script.scenarioType || 'technical';
+  const hrPersona = script.hr_persona || script.hrPersona || 'professional';
+  const isSystemPreset = Boolean(script.is_system_preset ?? script.isSystemPreset);
+  const timeLimit = Number(script.time_limit_per_question ?? script.timeLimitPerQuestion ?? 120);
+  const allowAiFollowup = Boolean(script.allow_ai_followup ?? script.allowAiFollowup ?? true);
+  const maxFollowupQuestions = Number(script.max_followup_questions ?? script.maxFollowupQuestions ?? 2);
+  const voiceName = script.voice_name || script.voiceName || 'Trúc Ly';
+  const voiceSpeed = Number(script.voice_speed ?? script.voiceSpeed ?? 1.0);
+
+  const scenarioMeta = SCENARIO_OPTIONS.find((s) => s.type === scenarioType) || {
+    type: scenarioType,
+    label: scenarioType,
+    shortLabel: scenarioType,
     color: '#475569',
     bgColor: '#f8fafc',
     borderColor: '#cbd5e1',
   };
 
-  const personaMeta = HR_PERSONA_OPTIONS.find((p) => p.persona === script.hr_persona) || {
-    persona: script.hr_persona,
-    label: script.hr_persona,
+  const personaMeta = HR_PERSONA_OPTIONS.find((p) => p.persona === hrPersona) || {
+    persona: hrPersona,
+    label: hrPersona,
     tagline: '',
     badgeColor: '#2563eb',
     badgeBg: '#eff6ff',
@@ -68,7 +77,7 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
   };
 
   const renderPersonaIcon = () => {
-    switch (script.hr_persona) {
+    switch (hrPersona) {
       case 'friendly':
         return <SentimentSatisfiedAltIcon sx={{ fontSize: 15 }} />;
       case 'challenger':
@@ -79,26 +88,27 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
     }
   };
 
-  const canWrite = Boolean(script.canWrite && !script.is_system_preset);
+  const canWrite = Boolean(script.canWrite && !isSystemPreset);
 
   // Question count & Question Group
   const questionsCount =
     script.questions_count ??
+    script.questionsCount ??
     (Array.isArray(script.question_details) ? script.question_details.length : 0) ??
+    (Array.isArray(script.questionDetails) ? script.questionDetails.length : 0) ??
     (Array.isArray((script as { questions_detail?: unknown[] }).questions_detail) ? (script as { questions_detail?: unknown[] }).questions_detail!.length : 0) ??
     (Array.isArray(script.questions) ? script.questions.length : 0);
 
   const questionGroupName =
     script.question_group_name ||
+    script.questionGroupName ||
     (typeof script.question_group === 'object' && script.question_group !== null
       ? script.question_group.name
       : undefined) ||
-    script.questionGroupName ||
     (typeof script.questionGroup === 'object' && script.questionGroup !== null
       ? script.questionGroup.name
       : undefined);
 
-  const timeLimit = script.time_limit_per_question || 120;
   const estimatedMinutes = questionsCount > 0 ? Math.round((questionsCount * timeLimit) / 60) : 0;
 
   return (
@@ -107,7 +117,7 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
       sx={{
         borderRadius: 3,
         border: '1px solid',
-        borderColor: script.is_system_preset ? 'primary.light' : 'divider',
+        borderColor: isSystemPreset ? 'primary.light' : 'divider',
         bgcolor: 'background.paper',
         display: 'flex',
         flexDirection: 'column',
@@ -126,7 +136,7 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
         {/* Top Badges row */}
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ gap: 0.75, mb: 1.5 }}>
           {/* System Preset Badge */}
-          {script.is_system_preset && (
+          {isSystemPreset && (
             <Chip
               icon={<AutoAwesomeRoundedIcon sx={{ fontSize: '14px !important', color: '#ffffff !important' }} />}
               label="Mẫu InfoHR"
@@ -262,7 +272,7 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
           <Stack direction="row" spacing={1} alignItems="center">
             <HelpOutlineOutlinedIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
             <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.78rem' }}>
-              {script.time_limit_per_question}s / câu
+              {timeLimit}s / câu
             </Typography>
           </Stack>
 
@@ -271,18 +281,18 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
             <ChatBubbleOutlineOutlinedIcon
               sx={{
                 fontSize: 16,
-                color: script.allow_ai_followup ? 'success.main' : 'text.disabled',
+                color: allowAiFollowup ? 'success.main' : 'text.disabled',
               }}
             />
             <Typography
               variant="caption"
               sx={{
                 fontWeight: 600,
-                color: script.allow_ai_followup ? 'text.primary' : 'text.secondary',
+                color: allowAiFollowup ? 'text.primary' : 'text.secondary',
                 fontSize: '0.78rem',
               }}
             >
-              {script.allow_ai_followup ? `Hỏi sâu: Tối đa ${script.max_followup_questions}` : 'Hỏi sâu: Tắt'}
+              {allowAiFollowup ? `Hỏi sâu: Tối đa ${maxFollowupQuestions}` : 'Hỏi sâu: Tắt'}
             </Typography>
           </Stack>
 
@@ -294,7 +304,7 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
               noWrap
               sx={{ fontWeight: 600, color: 'text.primary', fontSize: '0.78rem' }}
             >
-              {script.voice_name || 'Trúc Ly'} ({script.voice_speed || 1.0}x)
+              {voiceName} ({voiceSpeed}x)
             </Typography>
           </Stack>
         </Box>
@@ -325,12 +335,14 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
                 onClick={() => onClone(script)}
                 disabled={isCloning}
                 sx={{
+                  width: 36,
+                  height: 36,
                   border: '1px solid #e2e8f0',
                   bgcolor: '#ffffff',
                   '&:hover': { bgcolor: '#eff6ff', borderColor: 'primary.main' },
                 }}
               >
-                <ContentCopyOutlinedIcon sx={{ fontSize: 16 }} />
+                <ContentCopyOutlinedIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </span>
           </Tooltip>
@@ -343,12 +355,14 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
                 color="info"
                 onClick={() => onEdit(script)}
                 sx={{
+                  width: 36,
+                  height: 36,
                   border: '1px solid #e2e8f0',
                   bgcolor: '#ffffff',
                   '&:hover': { bgcolor: '#f0f9ff', borderColor: 'info.main' },
                 }}
               >
-                <EditOutlinedIcon sx={{ fontSize: 16 }} />
+                <EditOutlinedIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
           )}
@@ -361,12 +375,14 @@ export const InterviewScriptCard: React.FC<InterviewScriptCardProps> = ({
                 color="error"
                 onClick={() => onDelete(script)}
                 sx={{
+                  width: 36,
+                  height: 36,
                   border: '1px solid #e2e8f0',
                   bgcolor: '#ffffff',
                   '&:hover': { bgcolor: '#fef2f2', borderColor: 'error.main' },
                 }}
               >
-                <DeleteOutlineRoundedIcon sx={{ fontSize: 16 }} />
+                <DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
           )}

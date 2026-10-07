@@ -56,6 +56,8 @@ class CreateMockSessionInputSerializer(serializers.Serializer):
         child=serializers.IntegerField(), required=False, allow_empty=True
     )
     voice_profile_id = serializers.IntegerField(required=False, allow_null=True)
+    interview_script_id = serializers.IntegerField(required=False, allow_null=True)
+    interview_script = serializers.IntegerField(required=False, allow_null=True)
     job_post_id = serializers.IntegerField(required=False, allow_null=True)
     interview_language = serializers.CharField(required=False, default='vi')
     session_metadata = serializers.JSONField(required=False, default=dict)

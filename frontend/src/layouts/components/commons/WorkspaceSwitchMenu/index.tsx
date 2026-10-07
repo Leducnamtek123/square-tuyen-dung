@@ -41,22 +41,30 @@ const WorkspaceSwitchMenu = () => {
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
-    const mainHost = HOST_NAME.PROJECT;
+    const currentHost = window.location.hostname;
+    const isDomainSystem = currentHost.includes(HOST_NAME.PROJECT);
+
+    if (isDomainSystem) {
+      if (toEmployer) {
+        const employerPath = normalizedPath.replace(/^\/employer/, '') || '/dashboard';
+        window.location.href = `${protocol}//${HOST_NAME.EMPLOYER_PROJECT}${port}${employerPath}`;
+        return;
+      }
+      const candidatePath = normalizedPath || '/dashboard';
+      window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${candidatePath}`;
+      return;
+    }
+
     const employerFallbackPath = `/${ROUTES.EMPLOYER.DASHBOARD}`;
     const targetPath = toEmployer && !normalizedPath ? employerFallbackPath : normalizedPath;
     const localizedPath = targetPath ? localizeRoutePath(targetPath, getPreferredLanguage()) : "";
-    const targetUrl = `${protocol}//${mainHost}${port}${localizedPath}`;
-    window.location.href = targetUrl;
+    window.location.href = `${protocol}//${window.location.host}${localizedPath}`;
   };
 
   const handleSelectWorkspace = (workspace: WorkspaceItem) => {
     dispatch(setActiveWorkspace(workspace));
     setAnchorEl(null);
     if (workspace.type === "company") {
-      if ((workspace.roleCode || "").toLowerCase() === "employee") {
-        window.location.href = '/employee/dashboard';
-        return;
-      }
       if (currentUser?.isOnboarded === false) {
         window.location.href = '/onboarding/employer';
         return;
@@ -93,9 +101,8 @@ const WorkspaceSwitchMenu = () => {
             backgroundColor: '#f8fafc',
             borderColor: '#cbd5e1',
           },
-          '&:focus-visible': {
-            outline: '2px solid #2563eb',
-            outlineOffset: '2px',
+          '&:focus, &:focus-visible': {
+            outline: 'none',
           },
           '&:active': {
             transform: 'scale(0.98)',

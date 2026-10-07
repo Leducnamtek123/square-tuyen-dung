@@ -899,6 +899,9 @@
     }
   },
   "sidebar": {
+    "sectionRecruitment": "Recruitment & Interviews",
+    "sectionAccount": "Company & Settings",
+    "sectionHrm": "HRM Workspace",
     "dashboard": "Dashboard",
     "agentAssistants": "AI Assistant AILA",
     "jobPostList": "Job Post List",

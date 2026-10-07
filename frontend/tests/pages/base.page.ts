@@ -35,6 +35,22 @@ export class BasePage {
   }
 
   /**
+   * Chờ React hydrate xong phần tử (có gắn __reactProps/__reactFiber).
+   * Tránh trường hợp fill/click trước khi hydrate khiến form submit native (reload trang) hoặc mất giá trị input.
+   */
+  async waitForHydration(selector: string, timeout = 60_000) {
+    await this.page.waitForFunction(
+      (sel) => {
+        const el = document.querySelector(sel);
+        if (!el) return false;
+        return Object.keys(el).some((k) => k.startsWith('__reactProps') || k.startsWith('__reactFiber'));
+      },
+      selector,
+      { timeout }
+    );
+  }
+
+  /**
    * Kiểm tra thông báo Toast (Sonner, MUI Alert hoặc toast custom) xuất hiện
    */
   async expectToastMessage(message: string | RegExp, timeout = 10_000) {

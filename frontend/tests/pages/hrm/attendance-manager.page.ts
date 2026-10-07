@@ -39,7 +39,7 @@ export class AttendanceManagerPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.pageHeading = page.getByText(/quản lý đơn từ chấm công|bảng chấm công|chấm công/i).first();
-    this.createRequestBtn = page.getByRole('button', { name: /tạo đơn từ chấm công mới|tạo đơn/i }).first();
+    this.createRequestBtn = page.getByRole('button', { name: /gửi đơn mới|tạo đơn từ chấm công mới|tạo đơn/i }).first();
     this.requestRows = page.locator('tbody tr');
 
     // Create Modal

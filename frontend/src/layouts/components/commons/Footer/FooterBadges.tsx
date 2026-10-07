@@ -146,8 +146,12 @@ export const DmcaProtectedBadge = () => (
   >
     <Box
       component="img"
-      src="/images/badges/dmca.png"
+      src="/images/badges/dmca.webp"
       alt="DMCA Protected"
+      loading="lazy"
+      decoding="async"
+      width={66}
+      height={32}
       sx={{
         height: 32,
         width: 'auto',
@@ -179,6 +183,10 @@ export const MinistryOfIndustryBadge = () => {
         component="img"
         src="/images/badges/dadangki.webp"
         alt={t('footer.ministryRegistered', 'Đã Đăng Ký Bộ Công Thương')}
+        loading="lazy"
+        decoding="async"
+        width={100}
+        height={38}
         sx={{
           height: 38,
           width: 'auto',

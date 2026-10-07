@@ -12,6 +12,7 @@ import Link from 'next/link';
 import AdminMenu from './AdminMenu';
 import EmployerMenu from './EmployerMenu';
 import AiAssistantCard from './AiAssistantCard';
+import { stripPortalPrefix } from '@/configs/portalRouting';
 
 const shellHeaderHeight = 60;
 
@@ -36,27 +37,28 @@ const getInitialExpandedItems = (pathname: string | null, isAdmin?: boolean) => 
   };
 
   if (!pathname) return initial;
+  const p = stripPortalPrefix(pathname);
 
   if (isAdmin) {
-    if (pathname.includes('/admin/users') || pathname.includes('/admin/settings') || pathname.includes('/admin/audit-logs')) {
+    if (p.includes('/users') || p.includes('/settings') || p.includes('/audit-logs')) {
       initial.system = true;
-    } else if (pathname.includes('/admin/careers') || pathname.includes('/admin/cities') || pathname.includes('/admin/districts') || pathname.includes('/admin/wards')) {
+    } else if (p.includes('/careers') || p.includes('/cities') || p.includes('/districts') || p.includes('/wards')) {
       initial.categories = true;
-    } else if (pathname.includes('/admin/banners') || pathname.includes('/admin/banner-types') || pathname.includes('/admin/feedbacks') || pathname.includes('/admin/contact-messages') || pathname.includes('/admin/articles') || pathname.includes('/admin/chat')) {
+    } else if (p.includes('/banners') || p.includes('/banner-types') || p.includes('/feedbacks') || p.includes('/contact-messages') || p.includes('/articles') || p.includes('/chat')) {
       initial.content = true;
-    } else if (pathname.includes('/admin/companies') || pathname.includes('/admin/company-verifications') || pathname.includes('/admin/profiles') || pathname.includes('/admin/resumes')) {
+    } else if (p.includes('/companies') || p.includes('/company-verifications') || p.includes('/profiles') || p.includes('/resumes')) {
       initial.profiles = true;
-    } else if (pathname.includes('/admin/jobs') || pathname.includes('/admin/trust-reports') || pathname.includes('/admin/job-activity') || pathname.includes('/admin/interviews') || pathname.includes('/admin/voice-profiles') || pathname.includes('/admin/interview-preview')) {
+    } else if (p.includes('/jobs') || p.includes('/trust-reports') || p.includes('/job-activity') || p.includes('/interviews') || p.includes('/voice-profiles') || p.includes('/interview-preview')) {
       initial.recruitment = true;
     }
   } else {
-    if (pathname.includes('/employer/applied-profiles') || pathname.includes('/employer/saved-profiles') || pathname.includes('/employer/candidates') || pathname.includes('/employer/profiles') || pathname.includes('ung-vien')) {
+    if (p.includes('/applied-profiles') || p.includes('/saved-profiles') || p.includes('/candidates') || p.includes('/profiles') || p.includes('ung-vien')) {
       initial.candidates = true;
-    } else if (pathname.includes('/employer/interviews') || pathname.includes('/employer/question-bank') || pathname.includes('/employer/question-groups') || pathname.includes('phong-van')) {
+    } else if (p.includes('/interviews') || p.includes('/question-bank') || p.includes('/question-groups') || p.includes('phong-van')) {
       initial.interviews = true;
-    } else if (pathname.includes('/employer/company') || pathname.includes('/employer/verification') || pathname.includes('/employer/account') || pathname.includes('/employer/settings') || pathname.includes('tai-khoan')) {
+    } else if (p.includes('/company') || p.includes('/verification') || p.includes('/account') || p.includes('/settings') || p.includes('tai-khoan')) {
       initial.account = true;
-    } else if (pathname.includes('/hrm') || pathname.includes('hrm')) {
+    } else if (p.includes('/hrm') || p.includes('hrm')) {
       initial.hrm = true;
     }
   }

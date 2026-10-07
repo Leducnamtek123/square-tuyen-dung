@@ -58,7 +58,7 @@ export const EmployeeHeader: React.FC<Props> = ({ employee, companyName, company
       <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 4 }, minHeight: 64 }}>
         {/* Left: InfoHR + Company Identity */}
         <Stack direction="row" spacing={2} alignItems="center">
-          <Link href="/employee/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Link href="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
             <Typography
               variant="h6"
               sx={{

@@ -20,7 +20,6 @@ import jobService from "@/services/jobService";
 import companyService from "@/services/companyService";
 import ApplyCard from "@/components/Features/ApplyCard";
 import OnboardingRequiredDialog from "@/components/Features/OnboardingRequiredDialog";
-import JobSalaryInsightCard from "@/components/Features/JobSalaryInsightCard";
 import TrustReportDialog from "@/components/Features/TrustReportDialog";
 import SocialNetworkSharingPopup from "@/components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
 import { ROLES_NAME, ROUTES } from "@/configs/constants";
@@ -324,7 +323,7 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
         <NoDataCard title={t("jobDetail.noData")} />
       ) : (
         <div className={cn("mt-2", canApply ? "pb-[calc(96px+env(safe-area-inset-bottom,1.25rem))] md:pb-0" : "")}>
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-start">
             <div className="flex flex-col gap-8">
               <JobDetailHeaderCard
                 jobPostDetail={state.jobPostDetail}
@@ -341,10 +340,9 @@ const JobDetailPage: React.FC<JobDetailPageProps> = ({ initialJob }) => {
                 jobPostDetail={state.jobPostDetail}
                 allConfig={allConfig}
               />
-              <JobSalaryInsightCard slug={slug as string} />
               <JobDetailContactCard jobPostDetail={state.jobPostDetail as JobPost & { companyDict?: Company; location?: Location & { lat?: number; lng?: number; } }} />
             </div>
-            <div className="lg:sticky lg:top-[88px] self-start space-y-6">
+            <div className="space-y-6 lg:sticky lg:top-[88px] lg:self-start">
               <JobDetailSidebar jobPostDetail={state.jobPostDetail as JobPost & { companyDict?: Company }} />
             </div>
           </div>

@@ -19,7 +19,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { HOST_NAME, ROUTES } from '@/configs/constants';
-import { getPreferredLanguage, isEmployerPortalPath } from '@/configs/portalRouting';
+import { getPreferredLanguage, isEmployerPortalPath, isEmployerHostname } from '@/configs/portalRouting';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 
 interface AccountSwitchMenuProps {
@@ -32,21 +32,22 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
   const hostName = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-  const isEmployerPortal = isEmployerPortalPath(pathname) || hostName.startsWith("employer.");
+  const isEmployerPortal = isEmployerPortalPath(pathname) || isEmployerHostname(hostName);
 
   const openPortal = (toEmployer = false, path = "") => {
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
     const language = getPreferredLanguage();
 
-    const mainHost = HOST_NAME.PROJECT;
     let targetUrl = "";
 
     if (toEmployer) {
+      const employerHost = HOST_NAME.EMPLOYER_PROJECT;
       const employerPath = path && path !== '/' ? path : ROUTES.EMPLOYER.INTRODUCE;
       const localizedPath = localizeRoutePath(employerPath.startsWith('/') ? employerPath : `/${employerPath}`, language);
-      targetUrl = `${protocol}//${mainHost}${port}${localizedPath}`;
+      targetUrl = `${protocol}//${employerHost}${port}${localizedPath}`;
     } else {
+      const mainHost = HOST_NAME.PROJECT;
       const localizedPath = path ? localizeRoutePath(path.startsWith('/') ? path : `/${path}`, language) : '/';
       targetUrl = `${protocol}//${mainHost}${port}${localizedPath}`;
     }
@@ -241,9 +242,8 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
               borderColor: '#cbd5e1',
               boxShadow: '0 2px 8px rgba(15, 23, 42, 0.04)',
             },
-            '&:focus-visible': {
-              outline: '2px solid #2563eb',
-              outlineOffset: '2px',
+            '&:focus, &:focus-visible': {
+              outline: 'none',
             },
             '&:active': {
               transform: 'scale(0.98)',

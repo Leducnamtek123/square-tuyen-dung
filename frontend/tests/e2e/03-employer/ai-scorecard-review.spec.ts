@@ -15,7 +15,7 @@ test.describe('Phân Hệ 3 - Nhà Tuyển Dụng: Bảng Điểm Đánh Giá AI
     // Bỏ qua product tour
     await page.addInitScript(() => {
       try {
-        window.localStorage.setItem('infohr_product_tour_completed_interview_detail', 'true');
+        window.localStorage.setItem('infohr_product_tour_completed_employer_interview_detail', 'true');
       } catch {}
     });
 

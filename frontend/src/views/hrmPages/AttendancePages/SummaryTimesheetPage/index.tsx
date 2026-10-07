@@ -330,7 +330,7 @@ export default function SummaryTimesheetPage() {
             <Button
               variant="outlined"
               size="small"
-              onClick={() => router.push('/employer/hrm/payroll')}
+              onClick={() => router.push('/hrm/payroll')}
               sx={{
                 textTransform: 'none',
                 borderRadius: 2,
@@ -792,7 +792,7 @@ export default function SummaryTimesheetPage() {
             endIcon={<ArrowForwardOutlinedIcon />}
             onClick={() => {
               setPushSuccessModal({ ...pushSuccessModal, open: false });
-              router.push('/employer/hrm/payroll');
+              router.push('/hrm/payroll');
             }}
             sx={{
               textTransform: 'none',

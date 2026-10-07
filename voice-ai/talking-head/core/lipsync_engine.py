@@ -99,7 +99,7 @@ class LipSyncEngine:
             self.model = Wav2Lip()
             if self.checkpoint_path and os.path.isfile(self.checkpoint_path):
                 logger.info("Nạp Wav2Lip checkpoint từ %s lên thiết bị %s", self.checkpoint_path, self.device)
-                checkpoint = torch.load(self.checkpoint_path, map_location=self.device)
+                checkpoint = torch.load(self.checkpoint_path, map_location=self.device, weights_only=True)
                 state_dict = checkpoint.get("state_dict", checkpoint)
                 cleaned_state_dict = {
                     k.replace("module.", ""): v for k, v in state_dict.items()

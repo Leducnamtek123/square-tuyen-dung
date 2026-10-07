@@ -284,7 +284,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
     <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <IconButton aria-label="Thao tác" onClick={() => push('/admin/articles')} sx={{ bgcolor: 'action.hover' }}>
+        <IconButton aria-label="Thao tác" onClick={() => push('/articles')} sx={{ bgcolor: 'action.hover' }}>
           <ArrowBackIcon />
         </IconButton>
         <Box flex={1}>

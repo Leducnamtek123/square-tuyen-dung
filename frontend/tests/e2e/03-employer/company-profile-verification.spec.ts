@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { setupAllApiMocks } from '../../mocks';
 import { setupDomainEmployerMocks } from '../../mocks/mock-employer';
 import { injectSession, DEFAULT_EMPLOYER } from '../../helpers/auth';
@@ -12,7 +13,7 @@ test.describe('Phân Hệ 3 - Nhà Tuyển Dụng: Hồ Sơ Doanh Nghiệp & Xá
 
   test.beforeAll(async () => {
     // Tạo file mẫu giấy phép kinh doanh phục vụ test upload
-    const fixturesDir = path.resolve(__dirname, '../../fixtures');
+    const fixturesDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../fixtures');
     if (!fs.existsSync(fixturesDir)) {
       fs.mkdirSync(fixturesDir, { recursive: true });
     }

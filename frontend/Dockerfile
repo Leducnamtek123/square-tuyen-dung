@@ -1,7 +1,7 @@
 # =============================================================================
 # frontend/Dockerfile — Development
 # =============================================================================
-FROM node:22-slim
+FROM node:22-slim@sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c
 
 WORKDIR /project_web_app
 
@@ -16,6 +16,9 @@ RUN pnpm install --ignore-scripts
 
 # Copy application code
 COPY . .
+
+# Use non-root user
+USER node
 
 EXPOSE 80
 

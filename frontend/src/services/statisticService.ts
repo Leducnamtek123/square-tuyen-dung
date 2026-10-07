@@ -144,6 +144,9 @@ export interface AdminGeneralStats {
   avgInterviewDurationSeconds?: number;
   proctoringEventsCount?: number;
   aiRecommendHireRate?: number;
+  reconnectionRate?: number;
+  avgDowntimeSeconds?: number;
+  totalConnectionIncidents?: number;
   totalJobPostViews?: number;
   newJobPostViews?: number;
   topViewedJobs?: TopViewedJobItem[];

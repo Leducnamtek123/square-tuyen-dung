@@ -219,7 +219,7 @@ const EmployerSignUp = () => {
             if (user?.isOnboarded === false) {
               push('/onboarding/employer');
             } else {
-              push('/employer/dashboard');
+              push('/dashboard');
             }
           })
           .catch(() => {
@@ -485,11 +485,11 @@ const EmployerSignUp = () => {
                   }}
                 >
                   Bằng việc đăng ký tài khoản, quý doanh nghiệp đồng ý tuân thủ các{' '}
-                  <StyledLink href="/employer/terms-of-service" sx={{ fontSize: '11.5px', color: '#2563EB' }}>
+                  <StyledLink href="/terms-of-service" sx={{ fontSize: '11.5px', color: '#2563EB' }}>
                     Điều khoản dịch vụ
                   </StyledLink>{' '}
                   và{' '}
-                  <StyledLink href="/employer/privacy-policy" sx={{ fontSize: '11.5px', color: '#2563EB' }}>
+                  <StyledLink href="/privacy-policy" sx={{ fontSize: '11.5px', color: '#2563EB' }}>
                     Chính sách bảo mật
                   </StyledLink>{' '}
                   của InfoHR.

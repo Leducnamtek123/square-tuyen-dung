@@ -186,7 +186,7 @@ export default function HrmDashboardPage() {
       title: 'Bảng Chấm công Tháng',
       desc: 'Theo dõi quẹt thẻ, giờ làm và chốt bảng công',
       icon: <TableChartOutlinedIcon sx={{ fontSize: 22 }} />,
-      href: '/employer/hrm/attendances/timesheets',
+      href: '/hrm/attendances/timesheets',
       color: '#0d9488',
       bgColor: '#f0fdfa',
     },
@@ -194,7 +194,7 @@ export default function HrmDashboardPage() {
       title: 'Tính Lương Gross sang Net',
       desc: 'Bảng lương, BHXH & Thuế TNCN chuẩn luật',
       icon: <ReceiptLongOutlinedIcon sx={{ fontSize: 22 }} />,
-      href: '/employer/hrm/payroll',
+      href: '/hrm/payroll',
       color: '#16a34a',
       bgColor: '#f0fdf4',
     },
@@ -202,7 +202,7 @@ export default function HrmDashboardPage() {
       title: 'Hồ sơ Nhân viên 360°',
       desc: 'Danh bạ, hợp đồng, biến động và tài liệu số',
       icon: <PeopleAltOutlinedIcon sx={{ fontSize: 22 }} />,
-      href: '/employer/hrm/employees',
+      href: '/hrm/employees',
       color: '#2563eb',
       bgColor: '#eff6ff',
     },
@@ -210,7 +210,7 @@ export default function HrmDashboardPage() {
       title: 'Tiếp nhận Onboarding',
       desc: 'Quy trình đón nhân sự mới từ tuyển dụng',
       icon: <PersonAddOutlinedIcon sx={{ fontSize: 22 }} />,
-      href: '/employer/hrm/onboarding',
+      href: '/hrm/onboarding',
       color: '#7c3aed',
       bgColor: '#f5f3ff',
     },
@@ -267,7 +267,7 @@ export default function HrmDashboardPage() {
             <Button
               variant="contained"
               startIcon={<PersonAddOutlinedIcon sx={{ fontSize: 18 }} />}
-              onClick={() => push('/employer/hrm/onboarding')}
+              onClick={() => push('/hrm/onboarding')}
               sx={{
                 borderRadius: 2.5,
                 textTransform: 'none',
@@ -378,7 +378,7 @@ export default function HrmDashboardPage() {
                   <Button
                     size="small"
                     endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 14 }} />}
-                    onClick={() => push('/employer/hrm/departments')}
+                    onClick={() => push('/hrm/departments')}
                     sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem', color: '#2563eb' }}
                   >
                     Xem tất cả
@@ -520,7 +520,7 @@ export default function HrmDashboardPage() {
                 <Button
                   size="small"
                   endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 14 }} />}
-                  onClick={() => push('/employer/hrm/leaves')}
+                  onClick={() => push('/hrm/leaves')}
                   sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem', color: '#2563eb' }}
                 >
                   Xem tất cả
@@ -682,7 +682,7 @@ export default function HrmDashboardPage() {
                 <Button
                   size="small"
                   endIcon={<ArrowForwardOutlinedIcon sx={{ fontSize: 14 }} />}
-                  onClick={() => push('/employer/hrm/employees')}
+                  onClick={() => push('/hrm/employees')}
                   sx={{ textTransform: 'none', fontWeight: 700, fontSize: '0.8125rem', color: '#2563eb' }}
                 >
                   Xem tất cả

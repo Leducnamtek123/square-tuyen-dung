@@ -32,7 +32,7 @@ interface MenuItemProps {
 }
 
 const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; href?: string; target?: string; rel?: string }>(({ theme }) => ({
-  borderRadius: '8px',
+  borderRadius: '4px',
   margin: '2px 8px',
   padding: '7px 10px',
   color: '#4B5563',
@@ -53,16 +53,6 @@ const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementT
     backgroundColor: 'rgba(37, 99, 235, 0.08)',
     color: '#2563EB',
     fontWeight: 600,
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      left: 0,
-      top: '15%',
-      bottom: '15%',
-      width: 3,
-      borderRadius: '0 4px 4px 0',
-      backgroundColor: '#2563EB',
-    },
     '&:hover': {
       backgroundColor: 'rgba(37, 99, 235, 0.12)',
       color: '#2563EB',

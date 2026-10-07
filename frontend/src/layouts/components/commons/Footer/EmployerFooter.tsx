@@ -16,6 +16,8 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 import FooterSocialIcons from './FooterSocialIcons';
 import { DmcaProtectedBadge, MinistryOfIndustryBadge } from './FooterBadges';
 
+import { isEmployerHostname } from '@/configs/portalRouting';
+
 const subscribeToStaticYear = () => () => {};
 const getCurrentYearSnapshot = () => new Date().getFullYear();
 
@@ -29,13 +31,34 @@ export const EmployerFooter: React.FC = () => {
     getCurrentYearSnapshot
   );
 
+  const hostName = typeof window !== 'undefined' ? window.location.hostname : '';
+  const onEmployerDomain = isEmployerHostname(hostName);
+
   const employerLinks = [
-    { label: t('footer.pricingTable', 'Bảng giá dịch vụ'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang) },
-    { label: t('footer.employerBlog', 'Cẩm nang tuyển dụng'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}?category=blog`, lang) },
-    { label: t('footer.employerFaq', 'Hỏi đáp thường gặp (FAQ)'), route: localizeRoutePath(`/${ROUTES.EMPLOYER.FAQ}`, lang) },
-    { label: t('footer.warrantyPolicy', 'Chính sách bảo hành & Hoàn tiền'), route: `/${ROUTES.EMPLOYER.WARRANTY_HTML}` },
-    { label: t('footer.employerTerms', 'Điều khoản sử dụng cho Nhà tuyển dụng'), route: `/${ROUTES.EMPLOYER.TERMS_HTML}` },
-    { label: t('footer.employerPrivacy', 'Chính sách bảo mật thông tin'), route: `/${ROUTES.EMPLOYER.PRIVACY_HTML}` },
+    {
+      label: t('footer.pricingTable', 'Bảng giá dịch vụ'),
+      route: onEmployerDomain ? '/bao-gia' : localizeRoutePath(`/${ROUTES.EMPLOYER.PRICING}`, lang),
+    },
+    {
+      label: t('footer.employerBlog', 'Cẩm nang tuyển dụng'),
+      route: onEmployerDomain ? '/blog' : localizeRoutePath(`/${ROUTES.EMPLOYER.BLOG}`, lang),
+    },
+    {
+      label: t('footer.employerFaq', 'Hỏi đáp thường gặp (FAQ)'),
+      route: onEmployerDomain ? '/cau-hoi-thuong-gap' : localizeRoutePath(`/${ROUTES.EMPLOYER.FAQ}`, lang),
+    },
+    {
+      label: t('footer.warrantyPolicy', 'Chính sách bảo hành & Hoàn tiền'),
+      route: onEmployerDomain ? '/chinh-sach-bao-hanh.html' : `/${ROUTES.EMPLOYER.WARRANTY_HTML}`,
+    },
+    {
+      label: t('footer.employerTerms', 'Điều khoản sử dụng cho Nhà tuyển dụng'),
+      route: onEmployerDomain ? '/thoa-thuan-su-dung.html' : `/${ROUTES.EMPLOYER.TERMS_HTML}`,
+    },
+    {
+      label: t('footer.employerPrivacy', 'Chính sách bảo mật thông tin'),
+      route: onEmployerDomain ? '/chinh-sach-bao-mat.html' : `/${ROUTES.EMPLOYER.PRIVACY_HTML}`,
+    },
   ];
 
   return (
@@ -57,6 +80,7 @@ export const EmployerFooter: React.FC = () => {
             <Grid size={{ xs: 12, md: 5.5, lg: 5 }}>
               <Typography
                 variant="subtitle1"
+                component="h3"
                 sx={{
                   fontWeight: 800,
                   fontSize: '1.05rem',
@@ -106,6 +130,7 @@ export const EmployerFooter: React.FC = () => {
             <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3.5 }}>
               <Typography
                 variant="subtitle1"
+                component="h3"
                 sx={{
                   fontWeight: 800,
                   fontSize: '1.05rem',
@@ -144,6 +169,7 @@ export const EmployerFooter: React.FC = () => {
             <Grid size={{ xs: 12, sm: 6, md: 3.5, lg: 3.5 }}>
               <Typography
                 variant="subtitle1"
+                component="h3"
                 sx={{
                   fontWeight: 800,
                   fontSize: '1.05rem',
